@@ -18,7 +18,7 @@ _build/bootloader.img: src/bootloader.asm src/layout.asm
 	@ nasm $(NASM_FLAGS) -o $@ $< || rm -f $@
 
 .PRECIOUS:_build/kernel.img
-_build/kernel.img: src/kernel.asm src/layout.asm src/quarter.f
+_build/kernel.img: src/kernel.asm src/layout.asm
 	@ echo 'Assembling $@'
 	@ nasm $(NASM_FLAGS) -o $@ $< || rm -f $@
 
