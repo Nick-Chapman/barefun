@@ -31,12 +31,36 @@ top_of_memory equ 0
 start:
     mov sp, top_of_memory
     kcall clear_screen
-    jmp repl
+    jmp repl_start
 
-repl:
+repl_start:
+    kcall output_prompt
+    mov si, 0
+    jmp repl_collect
+
+repl_collect: ;(line)si->
     kcall read_char ;; ->ax
-    kcall emit_twice
-    jmp repl
+    cmp ax, 13
+    jz got_newline
+    ;; si := cons(al,si)
+    push ax
+    push si
+    mov si, sp
+    kcall emit ;_twice
+    jmp repl_collect
+
+got_newline:
+    kcall output_newline
+    kcall print_chars_from_si
+    jmp repl_start
+
+print_chars_from_si:
+    cmp si, 0
+    jz output_newline
+    mov ax, [si+2]
+    kcall output_char
+    mov si, [si] ;;can we be sure that si is still valid?
+    jmp print_chars_from_si
 
 emit_twice: ;ax->
     push ax ;; save as free var...
@@ -44,17 +68,21 @@ emit_twice: ;ax->
     mov ax, [bx+4] ;; ... for access here
     jmp emit
 
-emit: ;ax->
-    cmp ax, 13
-    jz output_newline
-    cmp ax, 10
-    jz output_newline
+emit: ;al->
     jmp output_char
 
 output_newline:
     mov al,  10
     kcall output_char
     mov al,  13
+    jmp output_char
+
+output_prompt:
+    mov al, '>'
+    jmp output_char
+
+output_x:
+    mov al, 'x'
     jmp output_char
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
