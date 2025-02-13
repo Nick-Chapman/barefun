@@ -8,17 +8,19 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; current continuation (register bp)
-
+;;; bx is the frane pointer, from which we an access free variables
 %macro kret 0
-    jmp bp
+    mov bx, bp
+    mov bp, [bp+2]
+    jmp [bx]
 %endmacro
 
 %macro kcall 1
     push bp
-    mov bp, %%after
+    push %%after
+    mov bp, sp
     jmp %1
 %%after:
-    pop bp
 %endmacro
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,15 +31,20 @@ top_of_memory equ 0
 start:
     mov sp, top_of_memory
     kcall clear_screen
-.loop:
-    kcall read_char
-    push ax
-    kcall emit
-    pop ax
-    kcall emit
-    jmp .loop
+    jmp repl
 
-emit:
+repl:
+    kcall read_char ;; ->ax
+    kcall emit_twice
+    jmp repl
+
+emit_twice: ;ax->
+    push ax ;; save as free var...
+    kcall emit
+    mov ax, [bx+4] ;; ... for access here
+    jmp emit
+
+emit: ;ax->
     cmp ax, 13
     jz output_newline
     cmp ax, 10
@@ -58,13 +65,14 @@ clear_screen:
     int 0x10
     kret
 
-output_char: ; in: AL=char
+output_char: ; al->
     mov ah, 0x0e ; Function: Teletype output
     mov bh, 0
     int 0x10
+    ;mov ax, 0x77 ; splat so we can be sure we saved
     kret
 
-read_char: ; out: AX=char
+read_char: ; ->ax
     mov ah, 0
     int 0x16
     mov ah, 0
