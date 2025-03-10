@@ -1,18 +1,20 @@
 
 (* Repl example coded directly in ocaml as a starting point for compilation. *)
 
-let read_line : unit -> char list =
+type 'a my_list = Nil | Cons of 'a * 'a my_list
+
+let read_line : unit -> char my_list =
   let rec loop acc =
     let c = Prim.get_char () in
     Prim.put_char c;
-    if not (Prim.eq_char c '\n') then loop (c::acc) else acc
+    if not (Prim.eq_char c '\n') then loop (Cons (c,acc)) else acc
   in
-  fun () -> loop []
+  fun () -> loop Nil
 
 let rec put_chars xs =
   match xs with
-  | [] -> ()
-  | x::xs -> Prim.put_char x; put_chars xs
+  | Nil -> ()
+  | Cons (x,xs) -> Prim.put_char x; put_chars xs
 
 let start : unit -> _ =
   let rec loop () =
