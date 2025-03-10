@@ -3,7 +3,7 @@ module Exp1 (Exp(..),Arm(..),Literal(..),Id(..),Cid(..)) where
 import Data.List (intercalate)
 import Text.Printf (printf)
 
-data Exp
+data Exp -- TODO: recursive bindings
   = Var Id
   | Con Cid [Exp]
   | Lit Literal
@@ -27,12 +27,6 @@ instance Show Cid where show (Cid s) = s
 instance Show Id where show (Id s) = s
 instance Show Literal where show = \case LitC c -> show c
 
-{- TODO
-example should use constructor syntax for Nil/Cons
-"rec", parse and pp
-unit, parse as constructor, and special case PP
--}
-
 pretty :: Exp -> Lines
 pretty = \case
 
@@ -54,7 +48,7 @@ pretty = \case
     [show c]
 
   Con c es ->
-    undefined $ onHead (show c ++) (foldl juxComma [] (map pretty es)) -- TODO
+    onHead (show c ++) (foldl1 juxComma (map pretty es))
 
   Lit x ->
     [show x]
@@ -85,10 +79,14 @@ type Lines = [String]
 bracket :: Lines -> Lines
 bracket = onHead ("(" ++) . onTail (++ ")")
 
-onHead,onTail :: (String -> String) -> Lines -> Lines
+onHead :: (String -> String) -> Lines -> Lines
 onHead _ [] = error "onHead"
 onHead f (x:xs) = f x : xs
-onTail f = reverse . onHead f . reverse
+
+onTail :: (String -> String) -> Lines -> Lines
+onTail _ [] = error "onTail"
+onTail f xs = (reverse . onHead f . reverse) xs
+
 
 jux :: Lines -> Lines -> Lines
 jux [x] [y] = [ x ++ " " ++ y ]

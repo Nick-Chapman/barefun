@@ -3,14 +3,14 @@ let read_line =
   let rec loop acc =
     let c = get_char () in
     let () = put_char c in
-    if not (eq_char c '\n') then loop (cons c acc) else acc
+    if not (eq_char c '\n') then loop (Cons (c,acc)) else acc
   in
-  fun () -> loop nil
+  fun () -> loop Nil
 
 let rec put_chars xs =
   match xs with
   | Nil -> ()
-  | Cons x xs ->
+  | Cons (x,xs) ->
      let () = put_char x in
      put_chars xs
 

@@ -1,13 +1,14 @@
 module Parser (parse1) where
 
 import qualified Par4
-import Par4 (Par,noError,alts,many,some,sat)
+import Par4 (Par,noError,alts,many,some,sat,separated)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import Text.Printf (printf)
 
 import qualified Exp1 as AST
 import Exp1 (Exp,Id,Arm,Cid)
 
+-- TODO: parse recursive bindings
 -- TODO: infixes --oh, we do have some
 -- TODO: comments
 -- TODO: type constraints
@@ -28,9 +29,9 @@ deProg (Prog defs) = flatten defs main
       Def x rhs : ds -> AST.Let x rhs (flatten ds e)
 
 mkUnit,mkTrue,mkFalse :: Cid
-mkUnit = AST.Cid "UNIT"
-mkTrue = AST.Cid "TRUE"
-mkFalse = AST.Cid "FALSE"
+mkUnit = AST.Cid "Unit"
+mkTrue = AST.Cid "True"
+mkFalse = AST.Cid "False"
 
 data Prog = Prog [Def]
 data Def = Def Id Exp
@@ -134,7 +135,9 @@ gram6 = program where
     key "("
     key ")"
 
-  pat = alts [identifier, do openClose; pure (AST.Id "_")]
+  -- TODO: odd to allow unit-pattern here
+  pat :: Par Id =
+    alts [identifier, do openClose; pure (AST.Id "_")]
 
   -- expression forms...
 
@@ -150,7 +153,12 @@ gram6 = program where
   char = mkChar <$> charLit
   unit = do openClose; pure (AST.Con mkUnit [])
 
-  atom = alts [char,unit,bracketed exp]
+  cons0 :: Par Exp = do
+    c <- constructor
+    pure (AST.Con c [])
+
+  -- TODO: atom should include var
+  atom = alts [cons0,char,unit,bracketed exp]
 
   atomOrVar = alts [atom,var]
 
@@ -175,6 +183,14 @@ gram6 = program where
   conj = infixOp ["&"] equal
 
   infixWeakestPrecendence = conj
+
+  tuple_exp :: Par [Exp] =
+    bracketed (separated (key ",") exp)
+
+  consApp = do
+    c <- constructor
+    es <- tuple_exp
+    pure (AST.Con c es)
 
   let_ = do
     key "let"
@@ -203,10 +219,14 @@ gram6 = program where
     e <- exp
     pure (mkAbstraction xs e)
 
+  tuple_id :: Par [Id] =
+    alts [ bracketed (separated (key ",") pat)
+         , pure [] ]
+
   arm :: Par Arm = do
     key "|"
     c <- constructor
-    xs <- many pat
+    xs <- tuple_id
     key "->"
     e <- exp
     pure (AST.Arm c xs e)
@@ -218,7 +238,7 @@ gram6 = program where
     as <- many arm
     pure (AST.Case e as)
 
-  exp = alts [match_,abstraction,ite,let_,infixWeakestPrecendence]
+  exp = alts [consApp,match_,abstraction,ite,let_,infixWeakestPrecendence]
 
   definition = do
     key "let"
