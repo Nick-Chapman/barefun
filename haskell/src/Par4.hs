@@ -1,5 +1,5 @@
 -- | 4-value Parser Combinators
-module Par4 (Par,parse,word,key,int,ws0,ws1,sp,nl,lit,sat,char,alts,opt,separated,terminated,many,some,digit,dot,noError) where
+module Par4 (Par,parse,word,key,int,ws0,ws1,sp,nl,lit,sat,char,alts,opt,separated,terminated,many,some,digit,dot,noError,Position,position) where
 
 import Control.Applicative (Alternative,empty,(<|>),many,some)
 import Control.Monad (ap,liftM)
@@ -27,6 +27,7 @@ dot :: Par Char
 sat :: (Char -> Bool) -> Par Char
 char :: Par Char
 noError :: Par a -> Par a
+position :: Par Position
 
 separated sep p = do x <- p; alts [ pure [x], do sep; xs <- separated sep p; pure (x:xs) ]
 terminated term p = alts [ pure [], do x <- p; term; xs <- terminated term p; pure (x:xs) ]
@@ -50,8 +51,10 @@ digitOfChar :: Char -> Int
 digitOfChar c = Char.ord c - ord0 where ord0 = Char.ord '0'
 
 noError = NoError
+position = Pos
 
 data Par a where
+  Pos :: Par Position
   Ret :: a -> Par a
   Bind :: Par a -> (a -> Par b) -> Par b
   Fail :: Par a
@@ -70,34 +73,39 @@ data K4 a b = K4
   }
 
 parse :: Par a -> String -> a
-parse parStart chars  = do
+parse parStart chars0  = do
 
-  case (run chars parStart kFinal) of
+  case (run chars0 parStart kFinal) of
     Left remains -> error $ "failed to parse: " ++ report remains
     Right (a,[]) -> a
     Right (_,remains) -> error $ "unparsed input from: " ++ report remains
 
   where
     report :: String -> String
-    report remains = item ++ " at " ++ lc pos
+    report remains = item ++ " at " ++ show (mkPosition pos)
       where
-        item = if pos == length chars then "<EOF>" else show (chars !! pos)
-        pos = length chars - length remains
+        item = if pos == length chars0 then "<EOF>" else show (chars0 !! pos)
+        pos = length chars0 - length remains
 
-    lc :: Int -> String
-    lc p = "line " ++ show line ++ ", column " ++ show col
+    mkPosition :: Int -> Position
+    mkPosition p = Position {line,col}
       where
-        line :: Int = 1 + length [ () | c <- take p chars, c == '\n' ]
-        col :: Int = length (takeWhile (/= '\n') (reverse (take p chars)))
+        line :: Int = 1 + length [ () | c <- take p chars0, c == '\n' ]
+        col :: Int = length (takeWhile (/= '\n') (reverse (take p chars0)))
 
-    kFinal = K4 { eps = \a -> Right (a,chars)
+    kFinal = K4 { eps = \a -> Right (a,chars0)
                 , succ = \chars a -> Right (a,chars)
-                , fail = \() -> Left chars
+                , fail = \() -> Left chars0
                 , err = \chars -> Left chars
                 }
 
     run :: [Char] -> Par a -> K4 a b -> Res b
     run chars par k@K4{eps,succ,fail,err} = case par of
+
+      Pos -> do
+        let p = length chars0 - length chars -- TODO: meh
+        let position = mkPosition p
+        eps position
 
       Ret x -> eps x
 
@@ -138,3 +146,9 @@ parse parStart chars  = do
                         , fail
                         , err
                         }
+
+
+data Position = Position { line :: Int, col :: Int }
+
+instance Show Position where
+  show Position{line,col} = "line " ++ show line ++ ", column " ++ show col

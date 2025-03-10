@@ -2,9 +2,10 @@ module Exp1 (Exp(..),Arm(..),Literal(..),Id(..),Cid(..)) where
 
 import Data.List (intercalate)
 import Text.Printf (printf)
+import Par4 (Position)
 
 data Exp -- TODO: recursive bindings
-  = Var Id
+  = Var (Maybe Position) Id
   | Con Cid [Exp]
   | Lit Literal
   | App Exp Exp
@@ -20,6 +21,8 @@ data Literal = LitC Char
 data Builtin -- = PutChar | GetChar | EqChar -- TODO
 
 newtype Id = Id String
+  deriving (Eq,Ord)
+
 newtype Cid = Cid String
 
 instance Show Exp where show = intercalate "\n" . pretty
@@ -42,7 +45,7 @@ pretty = \case
     bracket $
     jux (pretty e1) (pretty e2)
 
-  Var x -> [show x]
+  Var _ x -> [show x]
 
   Con c [] ->
     [show c]
@@ -97,5 +100,3 @@ indented hang = \case
   [] -> error "indented"
   [oneLine] -> [hang ++ " " ++ oneLine]
   lines -> [hang] ++ ["  " ++ line | line <- lines]
-
-

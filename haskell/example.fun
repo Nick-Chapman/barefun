@@ -19,7 +19,7 @@ let rec put_chars xs =
      put_chars xs
 
 let start =
-  let rec loop () =
+  let loop () =
     let () = put_char '>' in
     let xs = read_line () in
     let () = put_chars xs in
@@ -27,3 +27,5 @@ let start =
     loop ()
   in
   loop
+
+let main = start

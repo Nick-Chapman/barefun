@@ -1,7 +1,7 @@
 module Parser (parse1) where
 
 import qualified Par4
-import Par4 (Par,noError,alts,many,some,sat,separated)
+import Par4 (Par,noError,alts,many,some,sat,separated,position)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import Text.Printf (printf)
 
@@ -22,7 +22,7 @@ parse1 = Par4.parse (deProg <$> gram6)
 deProg :: Prog -> Exp
 deProg (Prog defs) = flatten defs main
   where
-    main = AST.Var (AST.Id "main")
+    main = AST.Var Nothing (AST.Id "main")
     flatten :: [Def] -> Exp -> Exp
     flatten ds e = case ds of
       [] -> e
@@ -147,7 +147,11 @@ gram6 = program where
     key ")"
     pure x
 
-  var = AST.Var <$> identifier
+  var = do
+    x <- identifier
+    pos <- position
+    pure (AST.Var (Just pos) x)
+
   --num = Num <$> number -- TODO reinstate
   --str = Str <$> string -- TODO reinstate
   char = mkChar <$> charLit
@@ -162,10 +166,12 @@ gram6 = program where
 
   atomOrVar = alts [atom,var]
 
+  -- TODO: simplify this varOrApp nonsense
   varOrApp = do
+    pos <- position
     x <- identifier
-    let loop acc = alts [ do x <- atomOrVar; loop (x:acc), pure (mkApps (AST.Var x) (reverse acc)) ]
-    alts [ do y <- atomOrVar; loop [y], pure (AST.Var x) ]
+    let loop acc = alts [ do x <- atomOrVar; loop (x:acc), pure (mkApps (AST.Var (Just pos) x) (reverse acc)) ]
+    alts [ do y <- atomOrVar; loop [y], pure (AST.Var (Just pos) x) ]
 
   atomOrApp = alts [atom,varOrApp]
 
@@ -175,7 +181,7 @@ gram6 = program where
            , do
                name <- alts [ do key x; return x | x <- names ]
                x <- sub
-               loop (mkApps (AST.Var (AST.Id name)) [acc,x])
+               loop (mkApps (AST.Var Nothing (AST.Id name)) [acc,x])
            ]
 
   sum = infixOp ["+"] atomOrApp
