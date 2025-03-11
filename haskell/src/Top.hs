@@ -2,9 +2,9 @@ module Top (main) where
 
 import Data.Map (Map)
 import Exp1 (Exp(..),Arm(..),Id(..),Cid(..),Literal(..),Builtin(..))
+import Interaction (Interaction(..),runTerm)
 import Par4 (Position)
 import Parser (parse1)
-import System.IO --(stdin,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
 import Text.Printf (printf)
 import qualified Data.Map as Map
 
@@ -13,14 +13,10 @@ main = do
   putStrLn "*barefun*"
   s <- readFile "example.fun"
   let e0 = parse1 s
-  --if (show e0 /= show e0) then error "" else do -- TODO: unhacky way to be strict
   let e = wrapPrimDefs e0
-  --printf "----------\n%s\n----------\n" (show e)
-  putStrLn "executing..."
-  --let input = "hey\nman\n"
+  --printf "----------\n%s\n----------\nexecuting...\n" (show e)
   runTerm (exec e)
   pure ()
-
 
 wrapPrimDefs :: Exp -> Exp
 wrapPrimDefs userExp =
@@ -35,59 +31,6 @@ wrapPrimDefs userExp =
     getCharExp = Lam x (Prim GetChar [x])
     eqCharExp = Lam x (Lam y (Prim EqChar [x,y]))
 
-
-
-runTerm :: Interaction -> IO ()
-runTerm i = do
-  hSetEcho stdin False
-  hSetBuffering stdin NoBuffering
-  loop i
-
-  where
-    loop :: Interaction -> IO ()
-    loop = \case
-      IDone ->
-        pure ()
-      IDebug mes i -> do
-        printf "debug: %s" mes
-        loop i
-      IPut c i -> do
-        printf "%c" c
-        hFlush stdout
-        loop i
-      IGet f -> do
-        c <- getChar
-        loop (f c)
-
-
-_runFixedInput :: String -> Interaction -> IO ()
-_runFixedInput = loop
-  where
-    loop :: String -> Interaction -> IO ()
-    loop input = \case
-      IDone ->
-        pure ()
-      IDebug mes i -> do
-        printf "debug: %s" mes
-        loop input i
-      IPut c i -> do
-        printf "Put: %s\n" (show c)
-        loop input i
-      IGet f ->
-        case input of
-          [] -> do
-            printf "Get -- Input exhaused\n";
-            pure ()
-          c:input -> do
-            printf "Get: %s\n" (show c)
-            loop input (f c)
-
-
-data Interaction
-  = IDone
-  | IDebug String Interaction
-  | IPut Char Interaction
-  | IGet (Char -> Interaction)
 
 exec :: Exp -> Interaction
 exec exp0 =
