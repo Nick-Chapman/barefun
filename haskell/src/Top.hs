@@ -81,49 +81,51 @@ exec exp0 =
             k (v:vs)
 
     eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
-    eval env e k = case e of -- TODO: move \k into each branch to be sure it is always called
+    eval env = \case
 
-      Let x e1 e2 -> do
+      Let x e1 e2 -> \k -> do
         eval env e1 $ \v1 -> do
         eval (Map.insert x v1 env) e2 k
 
-      Lam x e -> do
+      Lam x e -> \k -> do
         k (VClosure env x e)
 
-      RecLam f x e ->
+      RecLam f x e -> \k -> do
         k (VRecClosure env f x e)
 
-      Var pos x -> do
+      Var pos x -> \k -> do
         k (maybe err id $ Map.lookup x env)
           where err = error (show ("var-lookup",x,pos))
 
-      App e1 pos e2 -> do
+      App e1 pos e2 -> \k -> do
         eval env e1 $ \v1 -> do
           eval env e2 $ \v2 -> do
             apply v1 pos v2 k
 
-      Con c es ->
+      Con c es -> \k -> do
         evals env es $ \vs -> do
         k (VCons c vs)
 
-      Lit (LitC c) ->
+      Lit (LitC c) -> \k -> do
         k (VChar c)
 
-      Prim PutChar [x] -> do
+      -- TODO: move evaluation rules for prims out of this definition
+
+      Prim PutChar [x] -> \k -> do
         let e = Var Nothing x
         eval env e $ \v -> do
           case v of
             VChar c -> IPut c (k VUnit)
             _ -> error "PutChar/expected char"
 
-      Prim GetChar [x] -> do
+      Prim GetChar [x] -> \k -> do
         let e = Var Nothing x
         eval env e $ \v -> do
           case v of
             VCons (Cid "Unit") [] -> IGet (\c -> k (VChar c))
             v -> error (show ("GetChar/expected unit",v))
 
-      Prim EqChar [x1,x2] -> do
+      Prim EqChar [x1,x2] -> \k -> do
         let e1 = Var Nothing x1
         let e2 = Var Nothing x2
         eval env e1 $ \v1 -> do
@@ -138,10 +140,10 @@ exec exp0 =
               _ ->
                 error (show ("GetChar/expected char/char",v1,v2))
 
-      Prim b xs ->
+      Prim b xs -> \_k -> do
         error (show ("prim/unsupported",b,length xs))
 
-      Case e arms0 -> do
+      Case e arms0 -> \k -> do
         eval env e $ \v -> do
           case v of
             VCons cidActual vArgs -> do
@@ -149,19 +151,18 @@ exec exp0 =
                 dispatch :: [Arm] -> Interaction
                 dispatch arms = case arms of
                   [] ->
-                    error "case match failure; no more arms!"
+                    error "case match failure"
 
                   Arm cid xs body : arms ->
-                    --IDebug (printf "arm?: %s ~ %s\n" (show cidActual) (show cid)) $ do
                     if cid /= cidActual then dispatch arms else do
-                      if length xs /= length vArgs then error (show ("case arm bind length mismatch",xs,vArgs)) else do
+                      if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
                         let env' = foldr (uncurry Map.insert) env (zip xs vArgs)
                         eval env' body k
 
-
               dispatch arms0
 
-            _ -> error "case/scrut-expression not a constructed value"
+            _ ->
+              error "case/scrut not a constructed value"
 
 
     apply :: Value -> Position -> Value -> (Value -> Interaction) -> Interaction

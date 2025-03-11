@@ -4,7 +4,7 @@ import Data.List (intercalate)
 import Text.Printf (printf)
 import Par4 (Position)
 
-data Exp -- TODO: recursive bindings
+data Exp
   = Var (Maybe Position) Id
   | Con Cid [Exp]
   | Lit Literal
@@ -32,7 +32,6 @@ instance Show Exp where show = intercalate "\n" . pretty
 instance Show Cid where show (Cid s) = s
 instance Show Id where show (Id s) = s
 instance Show Literal where show = \case LitC c -> show c
-
 
 pretty :: Exp -> Lines
 pretty = \case
@@ -71,7 +70,6 @@ pretty = \case
   Prim b xs -> do
     [printf "PRIM:%s%s" (show b) (show xs)]
 
-
 prettyArm :: Arm -> Lines
 prettyArm = \case
   Arm c xs rhs -> do
@@ -97,7 +95,6 @@ onHead f (x:xs) = f x : xs
 onTail :: (String -> String) -> Lines -> Lines
 onTail _ [] = error "onTail"
 onTail f xs = (reverse . onHead f . reverse) xs
-
 
 jux :: Lines -> Lines -> Lines
 jux [x] [y] = [ x ++ " " ++ y ]
