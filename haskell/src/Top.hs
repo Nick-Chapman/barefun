@@ -115,7 +115,7 @@ exec exp0 =
         let e = Var Nothing x
         eval env e $ \v -> do
           case v of
-            VChar c -> IPut c (k VUnit)
+            VChar c -> IPut c (k mkVUnit)
             _ -> error "PutChar/expected char"
 
       Prim GetChar [x] -> \k -> do
@@ -170,7 +170,6 @@ exec exp0 =
       --IDebug (printf "apply: %s @ %s\n" (show func) (show arg)) $ do
       let err tag = error (show ("apply",tag,p))
       case func of
-        VUnit -> err "unit"
         VCons{} -> err "cons"
         VChar{} -> err "char"
         VClosure env x body -> do
@@ -179,19 +178,19 @@ exec exp0 =
           eval (Map.insert f me (Map.insert x arg env)) body k
 
 
-
 type Env = Map Id Value
 
+mkVUnit :: Value
+mkVUnit = VCons (Cid "Unit") []
+
 data Value
-  = VUnit -- TODO: fix confusion. A unit is a VCons value
-  | VCons Cid [Value]
+  = VCons Cid [Value]
   | VChar Char
   | VClosure Env Id Exp
   | VRecClosure Env Id Id Exp
 
 instance Show Value where
   show = \case
-    VUnit -> "[unit]"
     VCons c vs -> printf "[vcons:%s:%s]" (show c) (show vs)
     VChar c -> printf"[char:%s]" (show c)
     VClosure{} -> "[closure]"
