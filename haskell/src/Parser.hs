@@ -1,7 +1,7 @@
 module Parser (parse1) where
 
 import qualified Par4
-import Par4 (Par,noError,alts,many,some,sat,separated,position)
+import Par4 (Par,noError,alts,many,some,sat,separated,position,Position(..))
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import Text.Printf (printf)
 
@@ -22,19 +22,23 @@ parse1 = Par4.parse (deProg <$> gram6)
 deProg :: Prog -> Exp
 deProg (Prog defs) = flatten defs main
   where
+    noPos = Position 0 0
     main = AST.Var Nothing (AST.Id "main")
     flatten :: [Def] -> Exp -> Exp
     flatten ds e = case ds of
-      [] -> e
+      [] -> AST.App main noPos mkUnit
       Def x rhs : ds -> AST.Let x rhs (flatten ds e)
 
-mkUnit,mkTrue,mkFalse :: Cid
-mkUnit = AST.Cid "Unit"
+mkUnitC,mkTrue,mkFalse :: Cid
+mkUnitC = AST.Cid "Unit"
 mkTrue = AST.Cid "True"
 mkFalse = AST.Cid "False"
 
 data Prog = Prog [Def]
 data Def = Def Id Exp
+
+mkUnit :: Exp
+mkUnit = AST.Con mkUnitC []
 
 mkDef :: Id -> [Id] -> Exp -> Def
 mkDef f xs e = Def f (mkAbstraction xs e)
@@ -42,8 +46,8 @@ mkDef f xs e = Def f (mkAbstraction xs e)
 mkAbstraction :: [Id] -> Exp -> Exp
 mkAbstraction xs e = case xs of [] -> e; x:xs -> AST.Lam x (mkAbstraction xs e)
 
-mkApps :: Exp -> [Exp] -> Exp
-mkApps f es = case es of [] -> f; e:es -> mkApps (AST.App f e) es
+mkApps :: Exp -> [(Position,Exp)] -> Exp
+mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 
 mkIte :: Exp -> Exp -> Exp -> Exp
 mkIte i t e = AST.Case i [AST.Arm mkTrue [] t, AST.Arm mkFalse [] e ]
@@ -155,7 +159,7 @@ gram6 = program where
   --num = Num <$> number -- TODO reinstate
   --str = Str <$> string -- TODO reinstate
   char = mkChar <$> charLit
-  unit = do openClose; pure (AST.Con mkUnit [])
+  unit = do openClose; pure mkUnit
 
   cons0 :: Par Exp = do
     c <- constructor
@@ -166,29 +170,37 @@ gram6 = program where
 
   atomOrVar = alts [atom,var]
 
+  positionedAtomOrVar :: Par (Position,Exp) = do
+    p <- position
+    e <- atomOrVar
+    pure (p,e)
+
   -- TODO: simplify this varOrApp nonsense
   varOrApp = do
     pos <- position
     x <- identifier
-    let loop acc = alts [ do x <- atomOrVar; loop (x:acc), pure (mkApps (AST.Var (Just pos) x) (reverse acc)) ]
-    alts [ do y <- atomOrVar; loop [y], pure (AST.Var (Just pos) x) ]
+    let loop acc = alts [ do x <- positionedAtomOrVar; loop (x:acc)
+                        , pure (mkApps (AST.Var (Just pos) x) (reverse acc))
+                        ]
+    alts [ do y <- positionedAtomOrVar; loop [y], pure (AST.Var (Just pos) x) ]
 
   atomOrApp = alts [atom,varOrApp]
 
-  infixOp names sub = sub >>= loop where
+  {-infixOp names sub = sub >>= loop where
     loop acc =
       alts [ pure acc
            , do
                name <- alts [ do key x; return x | x <- names ]
                x <- sub
-               loop (mkApps (AST.Var Nothing (AST.Id name)) [acc,x])
+               loop (mkAppsX (AST.Var Nothing (AST.Id name)) [acc,x])
            ]
 
   sum = infixOp ["+"] atomOrApp
   equal = infixOp ["==","<"] sum
   conj = infixOp ["&"] equal
 
-  infixWeakestPrecendence = conj
+  infixWeakestPrecendence = conj-}
+  infixWeakestPrecendence = atomOrApp
 
   tuple_exp :: Par [Exp] =
     bracketed (separated (key ",") exp)

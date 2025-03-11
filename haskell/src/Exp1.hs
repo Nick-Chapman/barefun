@@ -1,4 +1,4 @@
-module Exp1 (Exp(..),Arm(..),Literal(..),Id(..),Cid(..)) where
+module Exp1 (Exp(..),Arm(..),Literal(..),Builtin(..),Id(..),Cid(..)) where
 
 import Data.List (intercalate)
 import Text.Printf (printf)
@@ -8,17 +8,18 @@ data Exp -- TODO: recursive bindings
   = Var (Maybe Position) Id
   | Con Cid [Exp]
   | Lit Literal
-  | App Exp Exp
+  | App Exp Position Exp
   | Lam Id Exp
   | Let Id Exp Exp
-  | Prim Builtin [Exp]
+  | Prim Builtin [Id]
   | Case Exp [Arm]
 
 data Arm = Arm Cid [Id] Exp
 
 data Literal = LitC Char
 
-data Builtin -- = PutChar | GetChar | EqChar -- TODO
+data Builtin = PutChar -- | GetChar | EqChar -- TODO
+  deriving (Show)
 
 newtype Id = Id String
   deriving (Eq,Ord)
@@ -29,6 +30,7 @@ instance Show Exp where show = intercalate "\n" . pretty
 instance Show Cid where show (Cid s) = s
 instance Show Id where show (Id s) = s
 instance Show Literal where show = \case LitC c -> show c
+
 
 pretty :: Exp -> Lines
 pretty = \case
@@ -41,7 +43,7 @@ pretty = \case
     bracket $
     indented ("fun " ++ show x ++ " ->") (pretty body)
 
-  App e1 e2 ->
+  App e1 _ e2 ->
     bracket $
     jux (pretty e1) (pretty e2)
 
@@ -60,8 +62,8 @@ pretty = \case
     (onHead ("match "++) . onTail (++ " with")) (pretty scrut)
     ++ concat (map prettyArm arms)
 
-  Prim b es ->
-    undefined b es -- TODO
+  Prim b xs -> do
+    [printf "PRIM:%s%s" (show b) (show xs)]
 
 
 prettyArm :: Arm -> Lines

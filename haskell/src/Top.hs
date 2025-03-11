@@ -1,8 +1,9 @@
-module Top where
+module Top (main) where
 
-import Exp1 (Exp(..),Id(..))
+import Exp1 (Exp(..),Id(..),Cid,Literal(..),Builtin(..))
 import Parser (parse1)
 import Text.Printf (printf)
+import Par4 (Position)
 
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -11,18 +12,29 @@ main :: IO ()
 main = do
   putStrLn "*barefun*"
   s <- readFile "example.fun"
-  let e = parse1 s
-  --let _no :: IO () =
+  let e0 = parse1 s
+  let e = wrapPrimDefs e0
   printf "----------\n%s\n----------\n" (show e)
   putStrLn "executing..."
   run (exec e) -- TODO: reinstate after parse/PP is good
   pure ()
 
+
+wrapPrimDefs :: Exp -> Exp
+wrapPrimDefs userExp =
+  Let (Id "put_char") putCharExp userExp
+
+putCharExp :: Exp
+putCharExp = Lam x (Prim PutChar [x])
+  where x = Id "x"
+
 run :: Interaction -> IO ()
 run i = loop i
   where
     loop = \case
-      IPut c i -> undefined c i
+      IPut c i -> do
+        printf "Put: %s\n" (show c)
+        loop i
       IGet f -> undefined f
       IDone -> pure ()
       IDebug mes i -> do
@@ -37,43 +49,79 @@ data Interaction
 
 exec :: Exp -> Interaction
 exec exp0 =
-  inner env0 exp0 k0 -- TODO: apply to unit at the top level
+  eval Map.empty exp0 k0
   where
     k0 v =
       IDebug (printf "Final value: %s\n" (show v))
       $ IDone
 
-    env0 = Map.empty
+    evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
+    evals env es k = case es of
+      [] -> k []
+      e:es -> undefined e es env
 
-    inner :: Env -> Exp -> (Value -> Interaction) -> Interaction
-    inner q e k = case e of
+    eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
+    eval env e k = case e of
 
-      Let x e1 e2 ->
-        inner q e1 $ \v1 -> do
-        let q' = Map.insert x v1 q
-        inner q' e2 k
+      Let x e1 e2 -> do
+        eval env e1 $ \v1 -> do
+        eval (Map.insert x v1 env) e2 k
 
       Lam x e -> do
-        let v = Closure q x e
-        k v
+        k (VClosure env x e)
 
       Var pos x -> do
-        let v = maybe err id $ Map.lookup x q
-              where err = error (show ("exec",x,pos)) -- TODO: show location of the var reference
-        k v
+        k (maybe err id $ Map.lookup x env)
+          where err = error (show ("var-lookup",x,pos))
 
-      Con c es -> undefined c es
-      Lit x -> undefined x
-      App e1 e2 -> undefined e1 e2
+      App e1 pos e2 -> do
+        eval env e1 $ \v1 -> do
+          eval env e2 $ \v2 -> do
+            apply v1 pos v2 k
 
-      Prim b es -> undefined b es
-      Case e as -> undefined e as
+      Con c es ->
+        evals env es $ \vs -> do
+        k (VCons c vs)
+
+      Lit (LitC c) ->
+        k (VChar c)
+
+      Prim PutChar [x] -> do
+        let e = Var Nothing x
+        eval env e $ \v -> do
+          case v of
+            VChar c -> IPut c (k VUnit)
+            _ -> error "PutChar/expected char"
+
+      Prim b xs ->
+        error (show ("prim/wrong#args",b,length xs))
+
+      Case e as ->
+        undefined e as
+
+
+    apply :: Value -> Position -> Value -> (Value -> Interaction) -> Interaction
+    apply func p arg k = do
+      let err tag = error (show ("apply",tag,p))
+      case func of
+        VUnit -> err "unit"
+        VCons{} -> err "cons"
+        VChar{} -> err "char"
+        VClosure env x body -> do
+          eval (Map.insert x arg env) body k
+
 
 type Env = Map Id Value
 
 data Value
-  = Closure Env Id Exp
+  = VUnit
+  | VCons Cid [Value]
+  | VChar Char
+  | VClosure Env Id Exp
 
 instance Show Value where
   show = \case
-    Closure{} -> "<closure>"
+    VUnit -> "[unit]"
+    VCons c vs -> printf "[vcons:%s:%s]" (show c) (show vs)
+    VChar c -> printf"[char:%c]" (show c)
+    VClosure{} -> "[closure]"
