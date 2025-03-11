@@ -10,13 +10,13 @@ let get_char_echoing () =
   c
 
 let read_line =
-  let loop acc =
+  let rec loop acc =
     let c = get_char_echoing () in
     if not (eq_char c '\n') then loop (Cons (c,acc)) else acc
   in
   fun () -> loop Nil
 
-let put_chars xs =
+let rec put_chars xs =
   match xs with
   | Nil -> ()
   | Cons (x,xs) ->
@@ -24,7 +24,7 @@ let put_chars xs =
      put_chars xs
 
 let start =
-  let loop () =
+  let rec loop () =
     let () = put_char '>' in
     let xs = read_line () in
     let () = put_chars xs in

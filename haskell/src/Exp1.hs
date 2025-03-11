@@ -10,6 +10,7 @@ data Exp -- TODO: recursive bindings
   | Lit Literal
   | App Exp Position Exp
   | Lam Id Exp
+  | RecLam Id Id Exp
   | Let Id Exp Exp
   | Prim Builtin [Id]
   | Case Exp [Arm]
@@ -43,6 +44,10 @@ pretty = \case
   Lam x body ->
     bracket $
     indented ("fun " ++ show x ++ " ->") (pretty body)
+
+  RecLam f x body ->
+    bracket $
+    indented ("rec-fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
 
   App e1 _ e2 ->
     bracket $

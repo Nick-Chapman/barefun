@@ -8,7 +8,6 @@ import Text.Printf (printf)
 import qualified Exp1 as AST
 import Exp1 (Exp,Id,Arm,Cid)
 
--- TODO: parse recursive bindings
 -- TODO: infixes --oh, we do have some
 -- TODO: comments
 -- TODO: type constraints
@@ -39,9 +38,6 @@ data Def = Def Id Exp
 
 mkUnit :: Exp
 mkUnit = AST.Con mkUnitC []
-
-mkDef :: Id -> [Id] -> Exp -> Def
-mkDef f xs e = Def f (mkAbstraction xs e)
 
 mkAbstraction :: [Id] -> Exp -> Exp
 mkAbstraction xs e = case xs of [] -> e; x:xs -> AST.Lam x (mkAbstraction xs e)
@@ -75,7 +71,7 @@ gram6 = program where
 
   -- nibbling from here...
 
-  keywords = ["let","in","if","then","else","fun","match","with"]
+  keywords = ["let","in","if","then","else","fun","match","with","rec"]
 
   isVariableChar1 c = Char.isLower c || c == '_'
   isConstructorChar1 c = Char.isUpper c
@@ -139,9 +135,11 @@ gram6 = program where
     key "("
     key ")"
 
-  -- TODO: odd to allow unit-pattern here
+  -- identifier or unit-pattern
   pat :: Par Id =
-    alts [identifier, do openClose; pure (AST.Id "_")]
+    alts [identifier
+         , do openClose; pure (AST.Id "_")
+         ]
 
   -- expression forms...
 
@@ -208,16 +206,30 @@ gram6 = program where
   infixWeakestPrecendence = conj-}
   infixWeakestPrecendence = atomOrApp
 
-  let_ = do
-    key "let"
-    -- TODO: rec
-    x <- pat
-    formals <- many pat
+  bindingAbstraction = do
+    xs <- many pat
     key "="
-    rhs <- exp
+    bound <- exp
+    pure (mkAbstraction xs bound)
+
+  binding = do
+    key "let"
+    alts [do key "rec"; pure True, pure False] >>= \case
+      True -> do
+        f <- identifier
+        x1 <- pat
+        rhs <- bindingAbstraction
+        pure (f, AST.RecLam f x1 rhs)
+      False -> do
+        f <- pat
+        rhs <- bindingAbstraction
+        pure (f,rhs)
+
+  let_ = do
+    (x,rhs) <- binding
     key "in"
     body <- exp
-    pure (AST.Let x (mkAbstraction formals rhs) body)
+    pure (AST.Let x rhs body)
 
   ite = do
     key "if"
@@ -257,12 +269,8 @@ gram6 = program where
   exp = alts [match_,abstraction,ite,let_,infixWeakestPrecendence]
 
   definition = do
-    key "let"
-    name <- identifier
-    formals <- many pat
-    key "="
-    body <- exp
-    return (mkDef name formals body)
+    (x,rhs) <- binding
+    return (Def x rhs)
 
   program = do
     whitespace

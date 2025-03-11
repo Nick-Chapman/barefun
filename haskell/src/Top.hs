@@ -13,11 +13,12 @@ main = do
   putStrLn "*barefun*"
   s <- readFile "example.fun"
   let e0 = parse1 s
+  --if (show e0 /= show e0) then error "" else do -- TODO: unhacky way to be strict
   let e = wrapPrimDefs e0
-  printf "----------\n%s\n----------\n" (show e)
+  --printf "----------\n%s\n----------\n" (show e)
   putStrLn "executing..."
-  let input = "hello\nworld\n"
-  run input (exec e) -- TODO: reinstate after parse/PP is good
+  let input = "hey\nman\n"
+  run input (exec e)
   pure ()
 
 
@@ -49,7 +50,9 @@ run = loop
         loop input i
       IGet f ->
         case input of
-          [] -> undefined
+          [] -> do
+            printf "Get -- Input exhaused\n";
+            pure ()
           c:input -> do
             printf "Get: %s\n" (show c)
             loop input (f c)
@@ -86,6 +89,9 @@ exec exp0 =
 
       Lam x e -> do
         k (VClosure env x e)
+
+      RecLam f x e ->
+        k (VRecClosure env f x e)
 
       Var pos x -> do
         k (maybe err id $ Map.lookup x env)
@@ -149,9 +155,8 @@ exec exp0 =
                     --IDebug (printf "arm?: %s ~ %s\n" (show cidActual) (show cid)) $ do
                     if cid /= cidActual then dispatch arms else do
                       if length xs /= length vArgs then error (show ("case arm bind length mismatch",xs,vArgs)) else do
-                        --let e2 = Map.fromList (zip xs vArgs)
-                        --let env' = Map.union e2 env
-                        eval env body k -- TODO
+                        let env' = foldr (uncurry Map.insert) env (zip xs vArgs)
+                        eval env' body k
 
 
               dispatch arms0
@@ -169,6 +174,9 @@ exec exp0 =
         VChar{} -> err "char"
         VClosure env x body -> do
           eval (Map.insert x arg env) body k
+        me@(VRecClosure env f x body) -> do
+          eval (Map.insert f me (Map.insert x arg env)) body k
+
 
 
 type Env = Map Id Value
@@ -178,6 +186,7 @@ data Value
   | VCons Cid [Value]
   | VChar Char
   | VClosure Env Id Exp
+  | VRecClosure Env Id Id Exp
 
 instance Show Value where
   show = \case
@@ -185,3 +194,4 @@ instance Show Value where
     VCons c vs -> printf "[vcons:%s:%s]" (show c) (show vs)
     VChar c -> printf"[char:%s]" (show c)
     VClosure{} -> "[closure]"
+    VRecClosure{} -> "[rec-closure]"
