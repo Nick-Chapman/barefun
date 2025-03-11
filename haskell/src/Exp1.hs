@@ -18,13 +18,14 @@ data Arm = Arm Cid [Id] Exp
 
 data Literal = LitC Char
 
-data Builtin = PutChar -- | GetChar | EqChar -- TODO
+data Builtin = PutChar | GetChar | EqChar
   deriving (Show)
 
 newtype Id = Id String
   deriving (Eq,Ord)
 
 newtype Cid = Cid String
+  deriving (Eq,Ord)
 
 instance Show Exp where show = intercalate "\n" . pretty
 instance Show Cid where show (Cid s) = s

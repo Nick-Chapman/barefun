@@ -161,12 +161,18 @@ gram6 = program where
   char = mkChar <$> charLit
   unit = do openClose; pure mkUnit
 
-  cons0 :: Par Exp = do
+  tuple_exp :: Par [Exp] =
+    bracketed (separated (key ",") exp)
+
+  consApp = do
     c <- constructor
-    pure (AST.Con c [])
+    alts
+      [ do es <- tuple_exp; pure (AST.Con c es)
+      , pure (AST.Con c [])
+      ]
 
   -- TODO: atom should include var
-  atom = alts [cons0,char,unit,bracketed exp]
+  atom = alts [consApp,char,unit,bracketed exp]
 
   atomOrVar = alts [atom,var]
 
@@ -184,7 +190,7 @@ gram6 = program where
                         ]
     alts [ do y <- positionedAtomOrVar; loop [y], pure (AST.Var (Just pos) x) ]
 
-  atomOrApp = alts [atom,varOrApp]
+  atomOrApp = alts [atom,varOrApp,consApp]
 
   {-infixOp names sub = sub >>= loop where
     loop acc =
@@ -201,14 +207,6 @@ gram6 = program where
 
   infixWeakestPrecendence = conj-}
   infixWeakestPrecendence = atomOrApp
-
-  tuple_exp :: Par [Exp] =
-    bracketed (separated (key ",") exp)
-
-  consApp = do
-    c <- constructor
-    es <- tuple_exp
-    pure (AST.Con c es)
 
   let_ = do
     key "let"
@@ -256,7 +254,7 @@ gram6 = program where
     as <- many arm
     pure (AST.Case e as)
 
-  exp = alts [consApp,match_,abstraction,ite,let_,infixWeakestPrecendence]
+  exp = alts [match_,abstraction,ite,let_,infixWeakestPrecendence]
 
   definition = do
     key "let"
