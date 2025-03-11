@@ -9,4 +9,4 @@ let init_no_buffering () =
 
 let main() =
   init_no_buffering();
-  Repl.start()
+  Repl.main()
