@@ -1,11 +1,11 @@
 module Top (main) where
 
-import Exp1 (Exp(..),Arm(..),Id(..),Cid(..),Literal(..),Builtin(..))
-import Parser (parse1)
-import Text.Printf (printf)
-import Par4 (Position)
-
 import Data.Map (Map)
+import Exp1 (Exp(..),Arm(..),Id(..),Cid(..),Literal(..),Builtin(..))
+import Par4 (Position)
+import Parser (parse1)
+import System.IO --(stdin,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
+import Text.Printf (printf)
 import qualified Data.Map as Map
 
 main :: IO ()
@@ -17,8 +17,8 @@ main = do
   let e = wrapPrimDefs e0
   --printf "----------\n%s\n----------\n" (show e)
   putStrLn "executing..."
-  let input = "hey\nman\n"
-  run input (exec e)
+  --let input = "hey\nman\n"
+  runTerm (exec e)
   pure ()
 
 
@@ -35,8 +35,33 @@ wrapPrimDefs userExp =
     getCharExp = Lam x (Prim GetChar [x])
     eqCharExp = Lam x (Lam y (Prim EqChar [x,y]))
 
-run :: String -> Interaction -> IO ()
-run = loop
+
+
+runTerm :: Interaction -> IO ()
+runTerm i = do
+  hSetEcho stdin False
+  hSetBuffering stdin NoBuffering
+  loop i
+
+  where
+    loop :: Interaction -> IO ()
+    loop = \case
+      IDone ->
+        pure ()
+      IDebug mes i -> do
+        printf "debug: %s" mes
+        loop i
+      IPut c i -> do
+        printf "%c" c
+        hFlush stdout
+        loop i
+      IGet f -> do
+        c <- getChar
+        loop (f c)
+
+
+_runFixedInput :: String -> Interaction -> IO ()
+_runFixedInput = loop
   where
     loop :: String -> Interaction -> IO ()
     loop input = \case
