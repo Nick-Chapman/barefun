@@ -90,6 +90,7 @@ gram6 = program where
         let s = x:xs
         if s `elem` keywords then fail else nibble (pure s)
 
+  -- TODO: allow true/false (keywords) as constructors
   constructor = AST.Cid <$> do
     x <- sat isConstructorChar1
     xs <- many $ sat isIdentifierChar

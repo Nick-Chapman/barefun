@@ -12,7 +12,7 @@ data Exp
   | Lam Id Exp
   | RecLam Id Id Exp
   | Let Id Exp Exp
-  | Prim Builtin [Id]
+  | Prim Builtin [Id] -- TODO: alow prim args to be Exp, for sake of NbE output
   | Case Exp [Arm]
 
 data Arm = Arm Cid [Id] Exp
