@@ -1,12 +1,12 @@
 module Parser (parse1) where
 
-import qualified Par4
+import Exp1 (Exp,Id,Arm)
 import Par4 (Par,noError,alts,many,some,sat,separated,position,Position(..))
-import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import Text.Printf (printf)
-
+import Value (Cid(..))
+import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import qualified Exp1 as AST
-import Exp1 (Exp,Id,Arm,Cid)
+import qualified Par4
 
 -- TODO: infixes --oh, we do have some
 -- TODO: comments
@@ -28,10 +28,10 @@ deProg (Prog defs) = flatten defs main
       [] -> AST.App main noPos mkUnit
       Def x rhs : ds -> AST.Let x rhs (flatten ds e)
 
-mkUnitC,mkTrue,mkFalse :: Cid
-mkUnitC = AST.Cid "Unit"
-mkTrue = AST.Cid "True"
-mkFalse = AST.Cid "False"
+mkUnitC,mkTrue,mkFalse :: Cid -- TODO: builtin cids shoiuld not be here
+mkUnitC = Cid "Unit"
+mkTrue = Cid "True"
+mkFalse = Cid "False"
 
 data Prog = Prog [Def]
 data Def = Def Id Exp
@@ -91,7 +91,7 @@ gram6 = program where
         if s `elem` keywords then fail else nibble (pure s)
 
   -- TODO: allow true/false (keywords) as constructors
-  constructor = AST.Cid <$> do
+  constructor = Cid <$> do
     x <- sat isConstructorChar1
     xs <- many $ sat isIdentifierChar
     let s = x:xs

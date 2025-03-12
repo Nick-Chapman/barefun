@@ -1,10 +1,13 @@
-module Value
-  ( Value(..)
-  ) where
+module Value ( Cid(..), Value(..)) where
 
-import Exp1 (Cid)
 import Interaction (Interaction)
 import Text.Printf (printf)
+
+newtype Cid = Cid String
+  deriving (Eq,Ord)
+
+instance Show Cid where show (Cid s) = s
+
 
 data Value
   = VCons Cid [Value] -- TODO: use integer tags here

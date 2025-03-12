@@ -1,7 +1,8 @@
 module Top (main) where
 
+import Builtin (Builtin(..),evalBuiltin)
 import Data.Map (Map)
-import Exp1 (Exp(..),Arm(..),Id(..),Cid(..),Literal(..),Builtin(..))
+import Exp1 (Exp(..),Arm(..),Id(..),Literal(..))
 import Interaction (Interaction(..),runTerm)
 import Par4 (Position)
 import Parser (parse1)
@@ -32,6 +33,8 @@ wrapPrimDefs userExp =
     getCharExp = Lam x (Prim GetChar [x])
     eqCharExp = Lam x (Lam y (Prim EqChar [x,y]))
 
+
+type Env = Map Id Value
 
 exec :: Exp -> Interaction
 exec exp0 =
@@ -79,39 +82,10 @@ exec exp0 =
       Lit (LitC c) -> \k -> do
         k (VChar c)
 
-      -- TODO: move evaluation rules for prims out of this definition
-
-      Prim PutChar [x] -> \k -> do
-        let e = Var Nothing x
-        eval env e $ \v -> do
-          case v of
-            VChar c -> IPut c (k mkVUnit)
-            _ -> error "PutChar/expected char"
-
-      Prim GetChar [x] -> \k -> do
-        let e = Var Nothing x
-        eval env e $ \v -> do
-          case v of
-            VCons (Cid "Unit") [] -> IGet (\c -> k (VChar c))
-            v -> error (show ("GetChar/expected unit",v))
-
-      Prim EqChar [x1,x2] -> \k -> do
-        let e1 = Var Nothing x1
-        let e2 = Var Nothing x2
-        eval env e1 $ \v1 -> do
-          eval env e2 $ \v2 -> do
-            case (v1,v2) of
-              (VChar c1,VChar c2) -> do
-                let b = (c1 == c2)
-                let vTrue = VCons (Cid "True") []
-                let vFalse = VCons (Cid "False") []
-                let v = if b then vTrue else vFalse
-                k v
-              _ ->
-                error (show ("GetChar/expected char/char",v1,v2))
-
-      Prim b xs -> \_k -> do
-        error (show ("prim/unsupported",b,length xs))
+      Prim b xs -> \k -> do
+        let es = [ Var Nothing x | x <- xs ] -- TODO: wont be needed when Prim contains expressions
+        evals env es $ \vs -> do
+        evalBuiltin b vs k
 
       Case e arms0 -> \k -> do
         eval env e $ \v -> do
@@ -143,9 +117,3 @@ exec exp0 =
         VCons{} -> err "cons"
         VChar{} -> err "char"
         VFunc f -> f arg k
-
-
-type Env = Map Id Value
-
-mkVUnit :: Value
-mkVUnit = VCons (Cid "Unit") []
