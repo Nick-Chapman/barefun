@@ -6,6 +6,7 @@ import Interaction (Interaction(..),runTerm)
 import Par4 (Position)
 import Parser (parse1)
 import Text.Printf (printf)
+import Value (Value(..))
 import qualified Data.Map as Map
 
 main :: IO ()
@@ -148,14 +149,3 @@ type Env = Map Id Value
 
 mkVUnit :: Value
 mkVUnit = VCons (Cid "Unit") []
-
-data Value
-  = VCons Cid [Value]
-  | VChar Char
-  | VFunc (Value -> (Value -> Interaction) -> Interaction)
-
-instance Show Value where
-  show = \case
-    VCons c vs -> printf "[vcons:%s:%s]" (show c) (show vs)
-    VChar c -> printf"[char:%s]" (show c)
-    VFunc{} -> "[function]"
