@@ -33,10 +33,13 @@ let rec put_chars xs =
      let () = put_char x in
      put_chars xs
 
+let message = cons 'Y' (cons 'o' (cons 'u' (cons ':' Nil)))
+
 let start =
   let rec loop () =
     let () = put_char '>' in
     let xs = read_line () in
+    let () = put_chars message in
     let () = put_chars (reverse xs) in
     let () = put_char '\n' in
     loop ()
