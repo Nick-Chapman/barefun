@@ -3,7 +3,7 @@ module Top (main) where
 import Builtin (Builtin(..),evalBuiltin)
 import Data.Map (Map)
 import Exp1 (Exp(..),Arm(..),Id(..),Literal(..))
-import Interaction (Interaction(..),runTerm)
+import Interaction (Interaction(..),runFixedInput)
 import Par4 (Position)
 import Parser (parse1)
 import Text.Printf (printf)
@@ -13,11 +13,12 @@ import qualified Data.Map as Map
 main :: IO ()
 main = do
   putStrLn "*barefun*"
-  s <- readFile "example.fun"
+  s <- readFile "../ocaml/example.fun"
   let e0 = parse1 s
   let e = wrapPrimDefs e0
   --printf "----------\n%s\n----------\nexecuting...\n" (show e)
-  runTerm (exec e)
+  --runTerm (exec e)
+  runFixedInput "Hello\nWorld!\n" (exec e)
   pure ()
 
 wrapPrimDefs :: Exp -> Exp

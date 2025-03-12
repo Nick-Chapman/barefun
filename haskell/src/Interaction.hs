@@ -41,7 +41,8 @@ runFixedInput = loop
         printf "debug: %s" mes
         loop input i
       IPut c i -> do
-        printf "Put: %s\n" (show c)
+        --printf "[%s]" (show c)
+        printf "%c" c
         loop input i
       IGet f ->
         case input of
@@ -49,5 +50,5 @@ runFixedInput = loop
             printf "Get -- Input exhaused\n";
             pure ()
           c:input -> do
-            printf "Get: %s\n" (show c)
+            --printf "{%s}" (show c)
             loop input (f c)

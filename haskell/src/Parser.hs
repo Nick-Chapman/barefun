@@ -71,7 +71,7 @@ gram6 = program where
 
   -- nibbling from here...
 
-  keywords = ["let","in","if","then","else","fun","match","with","rec"]
+  keywords = ["let","in","if","then","else","fun","match","with","rec","true","false"]
 
   isVariableChar1 c = Char.isLower c || c == '_'
   isConstructorChar1 c = Char.isUpper c
@@ -91,11 +91,17 @@ gram6 = program where
         if s `elem` keywords then fail else nibble (pure s)
 
   -- TODO: allow true/false (keywords) as constructors
-  constructor = Cid <$> do
+  constructor0 = Cid <$> do
     x <- sat isConstructorChar1
     xs <- many $ sat isIdentifierChar
     let s = x:xs
     nibble (pure s)
+
+  constructor = alts
+    [ constructor0
+    , do key "true"; pure mkTrue
+    , do key "false"; pure mkFalse
+    ]
 
   decNumber = do
     foldl (\acc d -> 10*acc + d) (0::Int) <$> some decDigit

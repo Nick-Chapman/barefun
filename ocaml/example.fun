@@ -11,8 +11,8 @@ let reverse =
 
 let not b =
   match b with
-  | True -> False
-  | False -> True
+  | true -> false
+  | false -> true
 
 let get_char_echoing () =
   let c = get_char () in
