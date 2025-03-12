@@ -55,11 +55,12 @@ exec exp0 =
         eval env e1 $ \v1 -> do
         eval (Map.insert x v1 env) e2 k
 
-      Lam x e -> \k -> do
-        k (VClosure env x e)
+      Lam x body -> \k -> do
+        k (VFunc (\arg k -> eval (Map.insert x arg env) body k))
 
-      RecLam f x e -> \k -> do
-        k (VRecClosure env f x e)
+      RecLam f x body -> \k -> do
+        let me = VFunc (\arg k -> eval (Map.insert f me (Map.insert x arg env)) body k)
+        k me
 
       Var pos x -> \k -> do
         k (maybe err id $ Map.lookup x env)
@@ -140,10 +141,7 @@ exec exp0 =
       case func of
         VCons{} -> err "cons"
         VChar{} -> err "char"
-        VClosure env x body -> do
-          eval (Map.insert x arg env) body k
-        me@(VRecClosure env f x body) -> do
-          eval (Map.insert f me (Map.insert x arg env)) body k
+        VFunc f -> f arg k
 
 
 type Env = Map Id Value
@@ -154,12 +152,10 @@ mkVUnit = VCons (Cid "Unit") []
 data Value
   = VCons Cid [Value]
   | VChar Char
-  | VClosure Env Id Exp
-  | VRecClosure Env Id Id Exp
+  | VFunc (Value -> (Value -> Interaction) -> Interaction)
 
 instance Show Value where
   show = \case
     VCons c vs -> printf "[vcons:%s:%s]" (show c) (show vs)
     VChar c -> printf"[char:%s]" (show c)
-    VClosure{} -> "[closure]"
-    VRecClosure{} -> "[rec-closure]"
+    VFunc{} -> "[function]"
