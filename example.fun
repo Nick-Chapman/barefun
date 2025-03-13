@@ -48,22 +48,26 @@ let rec put_chars xs =
 
 let put_int i = put_chars (chars_of_int i)
 
+let newline () = put_char '\n'
+
 let read_line =
   let rec loop acc =
     let c = get_char () in
     let n = ord c in
-    if eq_int n 127 then
-      match acc with
-      | Nil -> loop acc
-      | Cons (_,tail) ->
-         (* TODO: how to actually delete the char on the screen? *)
-         let () = put_char '^' in
-         let () = put_char 'R' in
-         loop tail
-    else
-      let () = put_char c in
-      if eq_char c '\n' then reverse acc else
-        loop (cons c acc)
+    if eq_char c '\n' then let () = newline () in reverse acc else
+      if less_int n 32 then loop acc else
+        if less_int 127 n then loop acc else
+          if eq_int n 127 then
+            match acc with
+            | Nil -> loop acc
+            | Cons (_,tail) ->
+               let () = put_char (chr 8) in
+               let () = put_char ' ' in
+               let () = put_char (chr 8) in
+               loop tail
+          else
+            let () = put_char c in
+            loop (cons c acc)
   in
   fun () -> loop Nil
 

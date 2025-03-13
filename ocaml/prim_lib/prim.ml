@@ -11,10 +11,9 @@ let get_char : unit -> char = fun () ->
 
 let put_char : char -> unit = fun c ->
   let open Printf in
-  if c = '\n' then printf "\n%!" else
-    let d = Char.code c in
-    if d < 32 || d > 126 then printf "%s%!" (Char.escaped c) else
-      printf "%c%!" c
+  let n = Char.code c in
+  let dontEscape = (32 <= n && n <= 126) || n = 8 || c = '\n' in
+  if dontEscape then printf "%c%!" c else printf "%s%!" (Char.escaped c)
 
 let eq_int : int -> int -> bool = fun x1 x2 ->
   x1 = x2

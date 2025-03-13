@@ -25,7 +25,8 @@ runTerm i = do
         loop i
       IPut c i -> do
         let n = ord c
-        putStr (if (n >= 32 && n <= 126) || c == '\n' then [c] else showLitChar c "")
+        let dontEscape = (32 <= n && n <= 126) || n == 8 || c == '\n'
+        putStr (if dontEscape then [c] else showLitChar c "")
         hFlush stdout
         loop i
       IGet f -> do
