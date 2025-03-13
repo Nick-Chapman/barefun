@@ -7,9 +7,8 @@ import Value (Cid(..))
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import qualified Exp1 as AST
 import qualified Par4
+import Data.Word (Word16)
 
--- TODO: infixes --oh, we do have some
--- TODO: comments
 -- TODO: type constraints
 -- TODO: list syntax
 -- TODO: semi colon syntax
@@ -28,7 +27,7 @@ deProg (Prog defs) = flatten defs main
       [] -> AST.App main noPos mkUnit
       Def x rhs : ds -> AST.Let x rhs (flatten ds e)
 
-mkUnitC,mkTrue,mkFalse :: Cid -- TODO: builtin cids shoiuld not be here
+mkUnitC,mkTrue,mkFalse :: Cid -- TODO: builtin cids should not be here
 mkUnitC = Cid "Unit"
 mkTrue = Cid "True"
 mkFalse = Cid "False"
@@ -47,9 +46,6 @@ mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 
 mkIte :: Exp -> Exp -> Exp -> Exp
 mkIte i t e = AST.Case i [AST.Arm mkTrue [] t, AST.Arm mkFalse [] e ]
-
-mkChar :: Char -> Exp
-mkChar c = AST.Lit (AST.LitC c)
 
 gram6 :: Par Prog
 gram6 = program where
@@ -74,7 +70,7 @@ gram6 = program where
 
   whitespace = skip (alts [white1, comment])
 
-  --decDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789" [0..] ]
+  decDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789" [0..] ]
   --hexDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789abcdef" [0..] ]
 
   nibble par = do
@@ -115,14 +111,14 @@ gram6 = program where
     , do key "false"; pure mkFalse
     ]
 
-  --decNumber = foldl (\acc d -> 10*acc + d) (0::Int) <$> some decDigit
+  decNumber :: Par Word16 = foldl (\acc d -> 10*acc + d) 0 <$> some decDigit
 
   {-hexNumber = noError $ do
     lit '0'
     lit 'x'
     foldl (\acc d -> 16*acc + d) 0 <$> some hexDigit-}
 
-  --number = nibble $ alts [hexNumber,decNumber]
+  number = nibble $ alts [decNumber] -- hexNumber
 
   charLitPlain = sat $ \c -> c /= '\\' -- TODO only printable
 
@@ -140,24 +136,17 @@ gram6 = program where
     singleQuote
     pure x
 
-  stringLitChar = sat $ \c -> c /= '"' -- TODO: do escaped chars properly
-
-  doubleQuote = lit '"'
-  _string = nibble $ do  -- TODO: reinstate
+  --stringLitChar = sat $ \c -> c /= '"' -- TODO: do escaped chars properly
+  {-doubleQuote = lit '"'
+  _string = nibble $ do  -- TODO: string syntax
     doubleQuote
     x <- many stringLitChar
     doubleQuote
-    pure x
+    pure x-}
 
   openClose = noError $ do
     key "("
     key ")"
-
-  -- identifier or unit-pattern
-  pat :: Par Id =
-    alts [identifier
-         , do openClose; pure (AST.Id "_")
-         ]
 
   -- expression forms...
 
@@ -172,9 +161,8 @@ gram6 = program where
     pos <- position
     pure (AST.Var (Just pos) x)
 
-  --num = Num <$> number -- TODO reinstate
-  --str = Str <$> string -- TODO reinstate
-  char = mkChar <$> charLit
+  num = AST.Lit . AST.LitN <$> number
+  char = AST.Lit . AST.LitC <$> charLit
   unit = do openClose; pure mkUnit
 
   tuple_exp :: Par [Exp] =
@@ -187,42 +175,35 @@ gram6 = program where
       , pure (AST.Con c [])
       ]
 
-  -- TODO: atom should include var
-  atom = alts [consApp,char,unit,bracketed exp]
+  atom = alts [var,consApp,char,num,unit,bracketed exp]
 
-  atomOrVar = alts [atom,var]
+  application = do
+    let loop f = alts [ pure f , do p <- position; e <- atom; loop (AST.App f p e)]
+    atom >>= loop
 
-  positionedAtomOrVar :: Par (Position,Exp) = do
-    p <- position
-    e <- atomOrVar
-    pure (p,e)
-
-  -- TODO: simplify this varOrApp nonsense
-  varOrApp = do
-    pos <- position
-    x <- identifier
-    let loop acc = alts [ do x <- positionedAtomOrVar; loop (x:acc)
-                        , pure (mkApps (AST.Var (Just pos) x) (reverse acc))
-                        ]
-    alts [ do y <- positionedAtomOrVar; loop [y], pure (AST.Var (Just pos) x) ]
-
-  atomOrApp = alts [atom,varOrApp,consApp]
-
-  {-infixOp names sub = sub >>= loop where
+  infixOp names sub = sub >>= loop where
     loop acc =
       alts [ pure acc
            , do
+               p1 <- position
                name <- alts [ do key x; return x | x <- names ]
+               p2 <- position
                x <- sub
-               loop (mkAppsX (AST.Var Nothing (AST.Id name)) [acc,x])
+               loop (mkApps (AST.Var Nothing (AST.Id name)) [(p1,acc),(p2,x)])
            ]
 
-  sum = infixOp ["+"] atomOrApp
-  equal = infixOp ["==","<"] sum
-  conj = infixOp ["&"] equal
+  infix1 = infixOp ["%","/"] application
+  infix2 = infixOp ["+"] infix1
+  --infix3 = infixOp ["==","<"] infix2
+  --infix4 = infixOp ["&"] infix3
 
-  infixWeakestPrecendence = conj-}
-  infixWeakestPrecendence = atomOrApp
+  infixWeakestPrecendence = infix2
+
+  -- identifier or unit-pattern
+  pat :: Par Id =
+    alts [identifier
+         , do openClose; pure (AST.Id "_")
+         ]
 
   bindingAbstraction = do
     xs <- many pat

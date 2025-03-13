@@ -15,3 +15,12 @@ let put_char : char -> unit = fun c ->
     let d = Char.code c in
     if d < 32 || d > 126 then printf "%s%!" (Char.escaped c) else
       printf "%c%!" c
+
+let eq_int : int -> int -> bool = fun x1 x2 ->
+  x1 = x2
+
+let (+) : int -> int -> int = (+)
+let (%) : int -> int -> int = (mod)
+let (/) : int -> int -> int = (/)
+let ord : char -> int = Char.code
+let chr : int -> char = Char.chr

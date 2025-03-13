@@ -1,9 +1,10 @@
 module Exp1 (Exp(..),Arm(..),Literal(..),Id(..)) where
 
-import Data.List (intercalate)
-import Text.Printf (printf)
-import Par4 (Position)
 import Builtin (Builtin)
+import Data.List (intercalate)
+import Data.Word (Word16)
+import Par4 (Position)
+import Text.Printf (printf)
 import Value (Cid)
 
 data Exp
@@ -19,14 +20,17 @@ data Exp
 
 data Arm = Arm Cid [Id] Exp
 
-data Literal = LitC Char
+data Literal = LitC Char | LitN Word16
 
 newtype Id = Id String
   deriving (Eq,Ord)
 
 instance Show Exp where show = intercalate "\n" . pretty
 instance Show Id where show (Id s) = s
-instance Show Literal where show = \case LitC c -> show c
+instance Show Literal where
+  show = \case
+    LitC c -> show c
+    LitN n -> show n
 
 pretty :: Exp -> Lines
 pretty = \case
