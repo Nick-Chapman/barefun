@@ -15,4 +15,3 @@ let put_char : char -> unit = fun c ->
     let d = Char.code c in
     if d < 32 || d > 126 then printf "%s%!" (Char.escaped c) else
       printf "%c%!" c
-

@@ -1,0 +1,3 @@
+(library
+ (name prim_lib)
+ (libraries unix))
