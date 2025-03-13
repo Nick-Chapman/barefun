@@ -5,7 +5,7 @@ Functional language system on baremetal. WIP
 Driving example: `example.fun`
 
 - Can be execute directly by treating example code as ocaml.
-- Can be via using haskell-coded interpreter.`
+- Can be via using haskell-coded interpreter.
 
 ```
 (cd ocaml; dune build -w)

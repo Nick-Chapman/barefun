@@ -25,18 +25,20 @@ wrapPrimDefs body0 = foldr (\(name,rhs) body -> Let (Id name) rhs body) body0 bi
 
 bindings :: [(String,Exp)]
 bindings =
-  [ ("put_char", Lam x (Prim PutChar [x]))
-  , ("get_char", Lam x (Prim GetChar [x]))
-  , ("eq_char", Lam x (Lam y (Prim EqChar [x,y])))
-  , ("eq_int", Lam x (Lam y (Prim EqInt [x,y])))
-  , ("less_int", Lam x (Lam y (Prim LessInt [x,y])))
-  , ("+", Lam x (Lam y (Prim AddInt [x,y])))
-  , ("%", Lam x (Lam y (Prim ModInt [x,y])))
-  , ("/", Lam x (Lam y (Prim DivInt [x,y])))
-  , ("ord", Lam x (Prim CharOrd [x]))
-  , ("chr", Lam x (Prim CharChr [x]))
+  [ ("put_char", Lam x (Prim PutChar [ex]))
+  , ("get_char", Lam x (Prim GetChar [ex]))
+  , ("eq_char", Lam x (Lam y (Prim EqChar [ex,ey])))
+  , ("eq_int", Lam x (Lam y (Prim EqInt [ex,ey])))
+  , ("less_int", Lam x (Lam y (Prim LessInt [ex,ey])))
+  , ("+", Lam x (Lam y (Prim AddInt [ex,ey])))
+  , ("%", Lam x (Lam y (Prim ModInt [ex,ey])))
+  , ("/", Lam x (Lam y (Prim DivInt [ex,ey])))
+  , ("ord", Lam x (Prim CharOrd [ex]))
+  , ("chr", Lam x (Prim CharChr [ex]))
   ]
   where
+    ex = Var Nothing x
+    ey = Var Nothing y
     x = Id "x"
     y = Id "y"
 
@@ -87,8 +89,7 @@ eval env = \case
   Lit literal -> \k -> do
     k (evalLit literal)
 
-  Prim b xs -> \k -> do
-    let es = [ Var Nothing x | x <- xs ] -- TODO: wont be needed when Prim contains expressions
+  Prim b es -> \k -> do
     evals env es $ \vs -> do
     evalBuiltin b vs k
 
