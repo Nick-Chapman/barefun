@@ -1,7 +1,7 @@
-module Interaction ( Interaction(..), runTerm, runFixedInput ) where
+module Interaction ( Interaction(..), runTerm ) where
 
 import Text.Printf (printf)
-import System.IO (stdin,stdout,hFlush,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
+import System.IO (stdin,stdout,hIsEOF,hFlush,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
 
 data Interaction
   = IDone
@@ -20,35 +20,14 @@ runTerm i = do
       IDone ->
         pure ()
       IDebug mes i -> do
-        printf "debug: %s" mes
+        printf "[debug] %s" mes
         loop i
       IPut c i -> do
-        printf "%c" c
+        printf "%c" c -- TODO: show non-printable
         hFlush stdout
         loop i
       IGet f -> do
-        c <- getChar
-        loop (f c)
-
-runFixedInput :: String -> Interaction -> IO ()
-runFixedInput = loop
-  where
-    loop :: String -> Interaction -> IO ()
-    loop input = \case
-      IDone ->
-        pure ()
-      IDebug mes i -> do
-        printf "debug: %s" mes
-        loop input i
-      IPut c i -> do
-        --printf "[%s]" (show c)
-        printf "%c" c
-        loop input i
-      IGet f ->
-        case input of
-          [] -> do
-            printf "Get -- Input exhaused\n";
-            pure ()
-          c:input -> do
-            --printf "{%s}" (show c)
-            loop input (f c)
+        b <- hIsEOF stdin
+        if b then printf "[EOF]\n" else do
+          c <- getChar
+          loop (f c)
