@@ -22,7 +22,7 @@ let get_char_echoing () =
 let read_line =
   let rec loop acc =
     let c = get_char_echoing () in
-    if not (eq_char c '\n') then loop (cons c acc) else acc
+    if not (eq_char c '\n') then loop (cons c acc) else reverse acc
   in
   fun () -> loop Nil
 
@@ -40,7 +40,7 @@ let start =
     let () = put_char '>' in
     let xs = read_line () in
     let () = put_chars message in
-    let () = put_chars (reverse xs) in
+    let () = put_chars xs in
     let () = put_char '\n' in
     loop ()
   in

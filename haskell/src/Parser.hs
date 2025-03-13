@@ -1,7 +1,7 @@
 module Parser (parse1) where
 
 import Exp1 (Exp,Id,Arm)
-import Par4 (Par,noError,alts,many,some,sat,separated,position,Position(..))
+import Par4 (Par,noError,skip,alts,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
 import Value (Cid(..))
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
@@ -57,12 +57,25 @@ gram6 = program where
   fail = alts []
 
   lit x = do _ <- sat (== x); pure ()
-  white = alts [lit ' ',lit '\n'] -- TODO: tabs
+  white1 = alts [lit ' ', lit '\n', lit '\t']
 
-  decDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789" [0..] ]
-  hexDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789abcdef" [0..] ]
+  next = sat (\_ -> True)
 
-  whitespace = do _ <- many white; return ()
+  comment = do
+    noError $ do lit '('; lit '*'
+    nest 0
+    where
+      nest :: Int -> Par ()
+      nest i =
+        next >>= \case
+        '*' -> do next >>= \case ')' -> if i == 0 then pure () else nest (i-1); _ -> nest i
+        '(' -> do next >>= \case '*' -> nest (i+1); _ -> nest i
+        _ -> nest i
+
+  whitespace = skip (alts [white1, comment])
+
+  --decDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789" [0..] ]
+  --hexDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789abcdef" [0..] ]
 
   nibble par = do
     x <- par
@@ -90,7 +103,6 @@ gram6 = program where
         let s = x:xs
         if s `elem` keywords then fail else nibble (pure s)
 
-  -- TODO: allow true/false (keywords) as constructors
   constructor0 = Cid <$> do
     x <- sat isConstructorChar1
     xs <- many $ sat isIdentifierChar
@@ -103,15 +115,14 @@ gram6 = program where
     , do key "false"; pure mkFalse
     ]
 
-  decNumber = do
-    foldl (\acc d -> 10*acc + d) (0::Int) <$> some decDigit
+  --decNumber = foldl (\acc d -> 10*acc + d) (0::Int) <$> some decDigit
 
-  hexNumber = noError $ do
+  {-hexNumber = noError $ do
     lit '0'
     lit 'x'
-    foldl (\acc d -> 16*acc + d) 0 <$> some hexDigit
+    foldl (\acc d -> 16*acc + d) 0 <$> some hexDigit-}
 
-  _number = nibble $ alts [hexNumber,decNumber] -- TODO: reinstate
+  --number = nibble $ alts [hexNumber,decNumber]
 
   charLitPlain = sat $ \c -> c /= '\\' -- TODO only printable
 

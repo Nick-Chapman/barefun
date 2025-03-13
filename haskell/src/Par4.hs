@@ -1,5 +1,5 @@
 -- | 4-value Parser Combinators
-module Par4 (Par,parse,word,key,int,ws0,ws1,sp,nl,lit,sat,char,alts,opt,separated,terminated,many,some,digit,dot,noError,Position(..),position) where
+module Par4 (Par,parse,word,key,int,ws0,ws1,sp,nl,lit,sat,char,alts,opt,skip,separated,terminated,many,some,digit,dot,noError,Position(..),position) where
 
 import Control.Applicative (Alternative,empty,(<|>),many,some)
 import Control.Monad (ap,liftM)
@@ -10,6 +10,7 @@ instance Applicative Par where pure = Ret; (<*>) = ap
 instance Alternative Par where empty = Fail; (<|>) = Alt
 instance Monad Par where (>>=) = Bind
 
+skip :: Par () -> Par ()
 separated :: Par () -> Par a -> Par [a]
 terminated :: Par () -> Par a -> Par [a]
 opt :: Par a -> Par (Maybe a)
@@ -29,6 +30,7 @@ char :: Par Char
 noError :: Par a -> Par a
 position :: Par Position
 
+skip p = do _ <- many p; return ()
 separated sep p = do x <- p; alts [ pure [x], do sep; xs <- separated sep p; pure (x:xs) ]
 terminated term p = alts [ pure [], do x <- p; term; xs <- terminated term p; pure (x:xs) ]
 opt p = alts [ pure Nothing, fmap Just p ]
