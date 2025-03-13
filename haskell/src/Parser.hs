@@ -1,13 +1,13 @@
 module Parser (parse1) where
 
+import Data.Word (Word16)
 import Exp1 (Exp,Id,Arm)
 import Par4 (Par,noError,skip,alts,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
-import Value (Cid(..))
+import Value (Cid(..),cUnit,cFalse,cTrue)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import qualified Exp1 as AST
 import qualified Par4
-import Data.Word (Word16)
 
 -- TODO: type constraints
 -- TODO: list syntax
@@ -24,19 +24,11 @@ deProg (Prog defs) = flatten defs main
     main = AST.Var Nothing (AST.Id "main")
     flatten :: [Def] -> Exp -> Exp
     flatten ds e = case ds of
-      [] -> AST.App main noPos mkUnit
+      [] -> AST.App main noPos (AST.Con cUnit [])
       Def x rhs : ds -> AST.Let x rhs (flatten ds e)
-
-mkUnitC,mkTrue,mkFalse :: Cid -- TODO: builtin cids should not be here
-mkUnitC = Cid "Unit"
-mkTrue = Cid "True"
-mkFalse = Cid "False"
 
 data Prog = Prog [Def]
 data Def = Def Id Exp
-
-mkUnit :: Exp
-mkUnit = AST.Con mkUnitC []
 
 mkAbstraction :: [Id] -> Exp -> Exp
 mkAbstraction xs e = case xs of [] -> e; x:xs -> AST.Lam x (mkAbstraction xs e)
@@ -45,7 +37,7 @@ mkApps :: Exp -> [(Position,Exp)] -> Exp
 mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 
 mkIte :: Exp -> Exp -> Exp -> Exp
-mkIte i t e = AST.Case i [AST.Arm mkTrue [] t, AST.Arm mkFalse [] e ]
+mkIte i t e = AST.Case i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
 
 gram6 :: Par Prog
 gram6 = program where
@@ -107,8 +99,8 @@ gram6 = program where
 
   constructor = alts
     [ constructor0
-    , do key "true"; pure mkTrue
-    , do key "false"; pure mkFalse
+    , do key "true"; pure cTrue
+    , do key "false"; pure cFalse
     ]
 
   decNumber :: Par Word16 = foldl (\acc d -> 10*acc + d) 0 <$> some decDigit
@@ -163,7 +155,7 @@ gram6 = program where
 
   num = AST.Lit . AST.LitN <$> number
   char = AST.Lit . AST.LitC <$> charLit
-  unit = do openClose; pure mkUnit
+  unit = do openClose; pure (AST.Con cUnit [])
 
   tuple_exp :: Par [Exp] =
     bracketed (separated (key ",") exp)

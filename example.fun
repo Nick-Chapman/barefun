@@ -1,4 +1,6 @@
 
+(* TODO: ocaml build should ensure all defs are used *)
+
 let cons x xs = Cons (x,xs)
 
 let rec append xs ys = (* non tail-recursive version *)
@@ -24,10 +26,10 @@ let rec length xs =
   | Nil -> 0
   | Cons (_,xs) -> 1 + length xs
 
-let not b =
+(*let not b =
   match b with
   | true -> false
-  | false -> true
+  | false -> true*)
 
 let chars_of_int =
   let ord0 = ord '0' in

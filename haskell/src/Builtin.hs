@@ -1,32 +1,33 @@
 module Builtin ( Builtin(..), evalBuiltin ) where
 
 import Interaction (Interaction(..))
-import Value (Value(..),Cid(..))
+import Value (Value(..),tUnit,tFalse,tTrue)
 import qualified Data.Char as Char (chr,ord)
 
 data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | DivInt | ModInt | CharOrd | CharChr
   deriving (Show)
 
 evalBuiltin :: Builtin -> [Value] -> (Value -> Interaction) -> Interaction
-evalBuiltin b vs k =
+evalBuiltin b vs k = do
+  let unit = VCons tUnit []
+  let false = VCons tFalse []
+  let true = VCons tTrue []
   case (b,vs) of
     (PutChar, [v]) -> do
       case v of
-        VChar c -> IPut c (k mkVUnit)
+        VChar c -> IPut c (k unit)
         _ -> error "PutChar/expected char"
 
     (GetChar,[v]) -> do
       case v of
-        VCons (Cid "Unit") [] -> IGet (\c -> k (VChar c))
-        v -> error (show ("GetChar/expected unit",v))
+        VCons _tag [] -> IGet (\c -> k (VChar c))
+        _ -> error (show ("GetChar/expected unit",v))
 
     (EqChar, [v1,v2]) -> do
       case (v1,v2) of
         (VChar x1,VChar x2) -> do
           let b = (x1 == x2)
-          let vTrue = VCons (Cid "True") []
-          let vFalse = VCons (Cid "False") []
-          let res = if b then vTrue else vFalse
+          let res = if b then true else false
           k res
         _ ->
           error (show ("EqChar/expected char/char",v1,v2))
@@ -35,9 +36,7 @@ evalBuiltin b vs k =
       case (v1,v2) of
         (VNum x1,VNum x2) -> do
           let b = (x1 == x2)
-          let vTrue = VCons (Cid "True") []
-          let vFalse = VCons (Cid "False") []
-          let res = if b then vTrue else vFalse
+          let res = if b then true else false
           k res
         _ ->
           error (show ("EqInt/expected num/num",v1,v2))
@@ -46,9 +45,7 @@ evalBuiltin b vs k =
       case (v1,v2) of
         (VNum x1,VNum x2) -> do
           let b = (x1 < x2)
-          let vTrue = VCons (Cid "True") []
-          let vFalse = VCons (Cid "False") []
-          let res = if b then vTrue else vFalse
+          let res = if b then true else false
           k res
         _ ->
           error (show ("LessInt/expected num/num",v1,v2))
@@ -95,6 +92,3 @@ evalBuiltin b vs k =
 
     _ -> do
       error (show ("builtin/unsupported",b,length vs))
-
-mkVUnit :: Value -- TODO move to Value?
-mkVUnit = VCons (Cid "Unit") []

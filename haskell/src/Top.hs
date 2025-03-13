@@ -7,7 +7,7 @@ import Interaction (Interaction(..),runTerm)
 import Par4 (Position)
 import Parser (parse1)
 import Text.Printf (printf)
-import Value (Value(..))
+import Value (Value(..), Cid(..), initCenv)
 import qualified Data.Map as Map
 
 main :: IO ()
@@ -42,14 +42,16 @@ bindings =
     x = Id "x"
     y = Id "y"
 
-type Env = Map Id Value
-
 execute :: Exp -> Interaction
-execute exp = eval Map.empty exp k0
+execute exp = eval env0 exp k0
   where
+    env0 = Env { venv = Map.empty, cenv = initCenv}
     k0 v =
       IDebug (printf "Final value: %s\n" (show v))
       $ IDone
+
+
+data Env = Env { venv :: Map Id Value, cenv :: Map Cid Int }
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
 evals env es k = case es of
@@ -60,21 +62,21 @@ evals env es k = case es of
         k (v:vs)
 
 eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
-eval env = \case
+eval env@Env{venv,cenv} = \case
 
   Let x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
-    eval (Map.insert x v1 env) e2 k
+      eval env { venv = Map.insert x v1 venv } e2 k
 
   Lam x body -> \k -> do
-    k (VFunc (\arg k -> eval (Map.insert x arg env) body k))
+    k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
 
   RecLam f x body -> \k -> do
-    let me = VFunc (\arg k -> eval (Map.insert f me (Map.insert x arg env)) body k)
+    let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
 
   Var pos x -> \k -> do
-    k (maybe err id $ Map.lookup x env)
+    k (maybe err id $ Map.lookup x venv)
       where err = error (show ("var-lookup",x,pos))
 
   App e1 pos e2 -> \k -> do
@@ -82,9 +84,12 @@ eval env = \case
       eval env e2 $ \v2 -> do
         apply v1 pos v2 k
 
-  Con c es -> \k -> do
+  Con cid es -> \k -> do
     evals env es $ \vs -> do
-    k (VCons c vs)
+    let tag = maybe err id $ Map.lookup cid cenv
+          where err = error (show ("cenv-lookup",cid))
+    if tag /= tag then undefined else -- strictness hack -- TODO: how to do this properly?
+      k (VCons tag vs)
 
   Lit literal -> \k -> do
     k (evalLit literal)
@@ -96,17 +101,19 @@ eval env = \case
   Case e arms0 -> \k -> do
     eval env e $ \case
 
-      VCons cidActual vArgs -> do
+      VCons tagActual vArgs -> do
         let
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
             [] ->
               error "case match failure"
 
-            Arm cid xs body : arms ->
-              if cid /= cidActual then dispatch arms else do
+            Arm cid xs body : arms -> do
+              let tag = maybe err id $ Map.lookup cid cenv
+                    where err = error (show ("cenv-lookup",cid))
+              if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
-                  let env' = foldr (uncurry Map.insert) env (zip xs vArgs)
+                  let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
                   eval env' body k
 
         dispatch arms0
