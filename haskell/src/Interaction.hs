@@ -1,6 +1,6 @@
 module Interaction ( Interaction(..), runTerm ) where
 
-import Data.Char (showLitChar)
+import Data.Char (showLitChar,ord)
 import System.IO (stdin,stdout,hIsEOF,hFlush,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
 import Text.Printf (printf)
 
@@ -24,7 +24,8 @@ runTerm i = do
         printf "[debug] %s" mes
         loop i
       IPut c i -> do
-        putStr (if c == '\n' then [c] else showLitChar c "")
+        let n = ord c
+        putStr (if (n >= 32 && n <= 126) || c == '\n' then [c] else showLitChar c "")
         hFlush stdout
         loop i
       IGet f -> do

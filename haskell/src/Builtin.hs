@@ -4,7 +4,7 @@ import Interaction (Interaction(..))
 import Value (Value(..),Cid(..))
 import qualified Data.Char as Char (chr,ord)
 
-data Builtin = PutChar | GetChar | EqChar | EqInt | AddInt | DivInt | ModInt | CharOrd | CharChr
+data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | DivInt | ModInt | CharOrd | CharChr
   deriving (Show)
 
 evalBuiltin :: Builtin -> [Value] -> (Value -> Interaction) -> Interaction
@@ -30,6 +30,7 @@ evalBuiltin b vs k =
           k res
         _ ->
           error (show ("EqChar/expected char/char",v1,v2))
+
     (EqInt, [v1,v2]) -> do
       case (v1,v2) of
         (VNum x1,VNum x2) -> do
@@ -40,6 +41,17 @@ evalBuiltin b vs k =
           k res
         _ ->
           error (show ("EqInt/expected num/num",v1,v2))
+
+    (LessInt, [v1,v2]) -> do
+      case (v1,v2) of
+        (VNum x1,VNum x2) -> do
+          let b = (x1 < x2)
+          let vTrue = VCons (Cid "True") []
+          let vFalse = VCons (Cid "False") []
+          let res = if b then vTrue else vFalse
+          k res
+        _ ->
+          error (show ("LessInt/expected num/num",v1,v2))
 
     (AddInt, [v1,v2]) -> do
       case (v1,v2) of

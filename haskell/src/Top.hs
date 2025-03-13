@@ -29,6 +29,7 @@ bindings =
   , ("get_char", Lam x (Prim GetChar [x]))
   , ("eq_char", Lam x (Lam y (Prim EqChar [x,y])))
   , ("eq_int", Lam x (Lam y (Prim EqInt [x,y])))
+  , ("less_int", Lam x (Lam y (Prim LessInt [x,y])))
   , ("+", Lam x (Lam y (Prim AddInt [x,y])))
   , ("%", Lam x (Lam y (Prim ModInt [x,y])))
   , ("/", Lam x (Lam y (Prim DivInt [x,y])))

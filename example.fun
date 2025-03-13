@@ -19,40 +19,15 @@ let rec map f xs =
   | Nil -> Nil
   | Cons (x,xs) -> cons (f x) (map f xs)
 
-let convert_o_to_sttar c = if eq_char c 'o' then '*' else c
-
-let star_the_ohs = map convert_o_to_sttar
+let rec length xs =
+  match xs with
+  | Nil -> 0
+  | Cons (_,xs) -> 1 + length xs
 
 let not b =
   match b with
   | true -> false
   | false -> true
-
-let get_char_echoing () =
-  let c = get_char () in
-  let () = put_char c in
-  c
-
-let read_line =
-  let rec loop acc =
-    let c = get_char_echoing () in
-    if not (eq_char c '\n') then loop (cons c acc) else reverse acc
-  in
-  fun () -> loop Nil
-
-let rec put_chars xs =
-  match xs with
-  | Nil -> ()
-  | Cons (x,xs) ->
-     let () = put_char x in
-     put_chars xs
-
-let message = cons 'Y' (cons 'o' (cons 'u' (cons ':' (cons ' ' Nil))))
-
-let rec length xs =
-  match xs with
-  | Nil -> 0
-  | Cons (_,xs) -> 1 + length xs
 
 let chars_of_int =
   let ord0 = ord '0' in
@@ -64,7 +39,37 @@ let chars_of_int =
   fun i ->
   if eq_int i 0 then cons '0' Nil else loop Nil i
 
+let rec put_chars xs =
+  match xs with
+  | Nil -> ()
+  | Cons (x,xs) ->
+     let () = put_char x in
+     put_chars xs
+
 let put_int i = put_chars (chars_of_int i)
+
+let read_line =
+  let rec loop acc =
+    let c = get_char () in
+    let n = ord c in
+    if eq_int n 127 then
+      match acc with
+      | Nil -> loop acc
+      | Cons (_,tail) ->
+         (* TODO: how to actually delete the char on the screen? *)
+         let () = put_char '^' in
+         let () = put_char 'R' in
+         loop tail
+    else
+      let () = put_char c in
+      if eq_char c '\n' then reverse acc else
+        loop (cons c acc)
+  in
+  fun () -> loop Nil
+
+let message = cons 'Y' (cons 'o' (cons 'u' (cons ':' (cons ' ' Nil))))
+
+let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c)
 
 let start =
   let rec loop () =
