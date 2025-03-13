@@ -5,7 +5,7 @@ let eq_char : char -> char -> bool = fun c1 c2 ->
 let get_char : unit -> char = fun () ->
   let bytes = Bytes.create 1 in
   let n = Unix.read Unix.stdin bytes 0 1 in
-  if n < 1 then failwith "n<1" else
+  if n < 1 then (Printf.printf "Input exhausted\n"; exit 1) else
   let c : char = Bytes.get bytes 0 in
   c
 

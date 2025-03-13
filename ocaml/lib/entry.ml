@@ -1,12 +1,13 @@
 
-let init_no_buffering () =
+let init_terminal_no_buffering () =
   let open Unix in
-  let tio = tcgetattr stdin in
-  tio.c_echo <- false;
-  tio.c_icanon <- false;
-  tcsetattr stdin TCSANOW tio;
-  ()
+  if isatty stdin then
+    let tio = tcgetattr stdin in
+    tio.c_echo <- false;
+    tio.c_icanon <- false;
+    tcsetattr stdin TCSANOW tio
 
 let main() =
-  init_no_buffering();
+  Printf.printf "[ocaml]\n";
+  init_terminal_no_buffering();
   Example.main()
