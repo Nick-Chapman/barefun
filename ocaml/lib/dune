@@ -7,5 +7,5 @@
     (progn
       (echo "open Prim\n")
       (echo "type 'a my_list = Nil | Cons of 'a * 'a my_list\n")
-      (cat ../example.fun)
+      (cat ../../example.fun)
       )))

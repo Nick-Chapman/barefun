@@ -13,7 +13,7 @@ import qualified Data.Map as Map
 main :: IO ()
 main = do
   putStrLn "*barefun*"
-  s <- readFile "../ocaml/example.fun"
+  s <- readFile "../example.fun"
   let e0 = parse1 s
   let e = wrapPrimDefs e0
   --printf "----------\n%s\n----------\nexecuting...\n" (show e)
