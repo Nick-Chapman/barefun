@@ -1,7 +1,8 @@
 module Interaction ( Interaction(..), runTerm ) where
 
-import Text.Printf (printf)
+import Data.Char (showLitChar)
 import System.IO (stdin,stdout,hIsEOF,hFlush,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
+import Text.Printf (printf)
 
 data Interaction
   = IDone
@@ -23,11 +24,11 @@ runTerm i = do
         printf "[debug] %s" mes
         loop i
       IPut c i -> do
-        printf "%c" c -- TODO: show non-printable
+        putStr (if c == '\n' then [c] else showLitChar c "")
         hFlush stdout
         loop i
       IGet f -> do
         b <- hIsEOF stdin
-        if b then printf "[EOF]\n" else do
+        if b then putStrLn "[EOF]" else do
           c <- getChar
           loop (f c)
