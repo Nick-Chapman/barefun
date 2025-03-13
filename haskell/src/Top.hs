@@ -2,56 +2,78 @@ module Top (main) where
 
 import Builtin (Builtin(..),evalBuiltin)
 import Data.Map (Map)
-import Exp1 (Exp(..),Arm(..),Id(..),Literal(..))
+import Exp1 (Prog(..),Def(..),Exp(..),Arm(..),Id(..),Literal(..))
 import Interaction (Interaction(..),runTerm)
-import Par4 (Position)
-import Parser (parse1)
+import Par4 (Position(..))
+import Parser (parseProg)
 import Text.Printf (printf)
-import Value (Value(..), Cid(..), initCenv)
+import Value (Value(..), Cid(..), cUnit, initCenv)
 import qualified Data.Map as Map
+import qualified Exp1 as AST
 
 main :: IO ()
 main = do
   putStrLn "[haskell]"
   s <- readFile "../example.fun"
-  let e0 = parse1 s
-  let e = wrapPrimDefs e0
-  --printf "----------\n%s\n----------\nexecuting...\n" (show e)
-  runTerm (execute e)
+  let (Prog defs) = parseProg s
+  -- printf "----------\n%s\n----------\nexecuting...\n" (show defs)  -- TODO: show defs
+  runTerm (executeDefs env0 (defs0 ++ defs))
   pure ()
 
-wrapPrimDefs :: Exp -> Exp
-wrapPrimDefs body0 = foldr (\(name,rhs) body -> Let (Id name) rhs body) body0 bindings
-
-bindings :: [(String,Exp)]
-bindings =
-  [ ("put_char", Lam x (Prim PutChar [ex]))
-  , ("get_char", Lam x (Prim GetChar [ex]))
-  , ("eq_char", Lam x (Lam y (Prim EqChar [ex,ey])))
-  , ("eq_int", Lam x (Lam y (Prim EqInt [ex,ey])))
-  , ("less_int", Lam x (Lam y (Prim LessInt [ex,ey])))
-  , ("+", Lam x (Lam y (Prim AddInt [ex,ey])))
-  , ("%", Lam x (Lam y (Prim ModInt [ex,ey])))
-  , ("/", Lam x (Lam y (Prim DivInt [ex,ey])))
-  , ("ord", Lam x (Prim CharOrd [ex]))
-  , ("chr", Lam x (Prim CharChr [ex]))
-  ]
-  where
-    ex = Var Nothing x
-    ey = Var Nothing y
-    x = Id "x"
-    y = Id "y"
-
-execute :: Exp -> Interaction
-execute exp = eval env0 exp k0
-  where
-    env0 = Env { venv = Map.empty, cenv = initCenv}
-    k0 v =
-      IDebug (printf "Final value: %s\n" (show v))
-      $ IDone
-
-
 data Env = Env { venv :: Map Id Value, cenv :: Map Cid Int }
+
+env0 :: Env
+env0 = Env { venv = Map.empty, cenv = initCenv}
+
+defs0 :: [Def]
+defs0 = [ ValDef (Id name) exp | (name,exp) <- bindings ]
+  where
+    bindings :: [(String,Exp)]
+    bindings =
+      [ ("put_char", Lam x (Prim PutChar [ex]))
+      , ("get_char", Lam x (Prim GetChar [ex]))
+      , ("eq_char", Lam x (Lam y (Prim EqChar [ex,ey])))
+      , ("eq_int", Lam x (Lam y (Prim EqInt [ex,ey])))
+      , ("less_int", Lam x (Lam y (Prim LessInt [ex,ey])))
+      , ("+", Lam x (Lam y (Prim AddInt [ex,ey])))
+      , ("%", Lam x (Lam y (Prim ModInt [ex,ey])))
+      , ("/", Lam x (Lam y (Prim DivInt [ex,ey])))
+      , ("ord", Lam x (Prim CharOrd [ex]))
+      , ("chr", Lam x (Prim CharChr [ex]))
+      ]
+      where
+        ex = Var Nothing x
+        ey = Var Nothing y
+        x = Id "x"
+        y = Id "y"
+
+mainApp :: Exp
+mainApp = AST.App main noPos (AST.Con cUnit [])
+  where
+    noPos = Position 0 0
+    main = AST.Var Nothing (AST.Id "main")
+
+executeDefs :: Env -> [Def] -> Interaction
+executeDefs = loop
+  where
+    loop :: Env -> [Def] -> Interaction
+    loop env@Env{venv,cenv} = \case
+
+      [] -> do
+        eval env mainApp $ \v ->
+          IDebug (printf "Final value: %s\n" (show v))
+          $ IDone
+
+      ValDef name rhs : defs -> do
+        eval env rhs $ \value -> do
+          loop env { venv = Map.insert name value venv } defs
+
+      TypeDef cids : defs -> do
+        let pairs = zip cids [0::Int .. ]
+        let f (name,tag) cenv = Map.insert name tag cenv
+        let cenv' = foldr f cenv pairs
+        let env' = env { cenv = cenv' }
+        loop env' defs
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
 evals env es k = case es of

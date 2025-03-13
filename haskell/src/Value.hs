@@ -1,5 +1,5 @@
 module Value
-  ( Cid(..), cUnit, cTrue, cFalse --, cNil, cCons
+  ( Cid(..), cUnit, cTrue, cFalse
   , tUnit, tFalse, tTrue
   , Value(..), initCenv
   ) where
@@ -29,26 +29,20 @@ instance Show Value where
     VNum n -> printf"[number:%s]" (show n)
     VFunc{} -> "[function]"
 
-cUnit,cFalse,cTrue,cNil,cCons :: Cid
+cUnit,cFalse,cTrue :: Cid
 cUnit = Cid "Unit"
 cTrue = Cid "true"
 cFalse = Cid "false"
-cNil = Cid "Nil"
-cCons = Cid "Cons"
 
 -- These tag values only need to be unique within their type
-tUnit,tFalse,tTrue,tNil,tCons :: Int
+tUnit,tFalse,tTrue :: Int
 tUnit = 10
 tFalse = 20
 tTrue = 21
-tNil = 30
-tCons = 31
 
 initCenv :: Map Cid Int
 initCenv = Map.fromList
   [ (cUnit, tUnit)
-  , (cNil, tNil)
-  , (cCons, tCons)
   , (cFalse, tFalse)
   , (cTrue, tTrue)
   ]

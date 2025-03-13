@@ -7,6 +7,5 @@
   (with-stdout-to example.ml
     (progn
       (echo "open Prim_lib.Prim\n")
-      (echo "type 'a my_list = Nil | Cons of 'a * 'a my_list\n") ; TODO: move to example.fun
       (cat ../../example.fun)
       )))

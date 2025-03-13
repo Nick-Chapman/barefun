@@ -1,4 +1,4 @@
-module Exp1 (Exp(..),Arm(..),Literal(..),Id(..)) where
+module Exp1 (Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..)) where
 
 import Builtin (Builtin)
 import Data.List (intercalate)
@@ -6,6 +6,9 @@ import Data.Word (Word16)
 import Par4 (Position)
 import Text.Printf (printf)
 import Value (Cid)
+
+data Prog = Prog [Def]
+data Def = ValDef Id Exp | TypeDef [Cid]
 
 data Exp
   = Var (Maybe Position) Id

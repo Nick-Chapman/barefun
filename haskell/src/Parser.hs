@@ -1,34 +1,20 @@
-module Parser (parse1) where
+module Parser (parseProg) where
 
 import Data.Word (Word16)
-import Exp1 (Exp,Id,Arm)
-import Par4 (Par,noError,skip,alts,many,some,sat,separated,position,Position(..))
+import Exp1 (Prog,Exp,Id,Arm)
+import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
 import Value (Cid(..),cUnit,cFalse,cTrue)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import qualified Exp1 as AST
 import qualified Par4
 
--- TODO: type constraints
 -- TODO: list syntax
 -- TODO: semi colon syntax
 -- TODO: example.fun -- use richer syntax when supported
 
-parse1 :: String -> Exp
-parse1 = Par4.parse (deProg <$> gram6)
-
-deProg :: Prog -> Exp
-deProg (Prog defs) = flatten defs main
-  where
-    noPos = Position 0 0
-    main = AST.Var Nothing (AST.Id "main")
-    flatten :: [Def] -> Exp -> Exp
-    flatten ds e = case ds of
-      [] -> AST.App main noPos (AST.Con cUnit [])
-      Def x rhs : ds -> AST.Let x rhs (flatten ds e)
-
-data Prog = Prog [Def]
-data Def = Def Id Exp
+parseProg :: String -> Prog
+parseProg = Par4.parse gram6
 
 mkAbstraction :: [Id] -> Exp -> Exp
 mkAbstraction xs e = case xs of [] -> e; x:xs -> AST.Lam x (mkAbstraction xs e)
@@ -41,6 +27,8 @@ mkIte i t e = AST.Case i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
 
 gram6 :: Par Prog
 gram6 = program where
+
+  keywords = ["let","in","if","then","else","fun","match","with","rec","true","false","type","of"]
 
   fail = alts []
 
@@ -72,11 +60,14 @@ gram6 = program where
 
   -- nibbling from here...
 
-  keywords = ["let","in","if","then","else","fun","match","with","rec","true","false"]
-
   isVariableChar1 c = Char.isLower c || c == '_'
   isConstructorChar1 c = Char.isUpper c
   isIdentifierChar c = Char.isNumber c || Char.isAlpha c || c `elem` "'_"
+
+  tvar = nibble $ do
+    lit '\''
+    _xs <- some $ sat isIdentifierChar
+    pure ()
 
   key s =
     if all isIdentifierChar s && s `notElem` keywords
@@ -178,7 +169,7 @@ gram6 = program where
       alts [ pure acc
            , do
                p1 <- position
-               name <- alts [ do key x; return x | x <- names ]
+               name <- alts [ do key x; pure x | x <- names ]
                p2 <- position
                x <- sub
                loop (mkApps (AST.Var Nothing (AST.Id name)) [(p1,acc),(p2,x)])
@@ -259,11 +250,57 @@ gram6 = program where
 
   exp = alts [match_,abstraction,ite,let_,infixWeakestPrecendence]
 
-  definition = do
+  value_def = do
     (x,rhs) <- binding
-    return (Def x rhs)
+    pure (AST.ValDef x rhs)
+
+
+  -- types and typedefs: mostly skipped
+
+  type_constructor :: Par () = do
+    _ <- identifier
+    pure ()
+
+  atomic_type = alts
+    [ do
+        _ <- tvar
+        _ <- opt type_constructor
+        pure ()
+    , do
+        _ <- constructor; pure ()
+    ]
+
+  type_ = do
+    separated (key "*") atomic_type
+
+  maybe_tvar_seq =
+    alts [ tvar
+         -- , bracketed (separated (key ",")) tvar -- TODO: when we have an example
+         , pure ()
+         ]
+
+  of_type = do
+    key "of"
+    type_
+
+  type_def_arm = do
+    cid <- constructor
+    _ <- opt of_type
+    pure cid
+
+  type_def = do
+    key "type"
+    maybe_tvar_seq
+    type_constructor
+    key "="
+    cids <- separated (key "|") type_def_arm
+    pure (AST.TypeDef cids)
+
+
+
+  definition = alts [value_def,type_def]
 
   program = do
     whitespace
-    defs <- many definition
-    pure $ Prog defs
+    ds <- many definition
+    pure $ AST.Prog ds

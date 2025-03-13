@@ -1,6 +1,8 @@
 
 (* TODO: ocaml build should ensure all defs are used *)
 
+type 'a list = Nil | Cons of 'a * 'a list
+
 let cons x xs = Cons (x,xs)
 
 let rec append xs ys = (* non tail-recursive version *)
