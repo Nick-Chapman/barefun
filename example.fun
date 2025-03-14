@@ -1,39 +1,40 @@
 
-let cons x xs = Cons (x,xs)
+let cons x xs = x :: xs
 
 let rec eq_list eq xs ys =
   match xs with
-  | Nil -> (match ys with | Nil -> true | Cons (_,_) -> false)
-  | Cons (x,xs) ->
+  | [] -> (match ys with | [] -> true | _::_ -> false)
+  | x::xs ->
      match ys with
-     | Nil -> false
-     | Cons (y,ys) ->
+     | [] -> false
+     | y::ys ->
         if eq x y then eq_list eq xs ys else false
 
 let eq_char_list = eq_list eq_char
 
 let rec append xs ys = (* non tail-recursive version *)
   match xs with
-  | Nil -> ys
-  | Cons (x,xs) -> cons x (append xs ys)
+  | [] -> ys
+  | x::xs -> cons x (append xs ys)
 
 let reverse =
   let rec loop acc xs =
     match xs with
-    | Nil -> acc
-    | Cons (x,xs) -> loop (cons x acc) xs
+    | [] -> acc
+    | x::xs -> loop (cons x acc) xs
   in
-  loop Nil
+  loop []
+
 
 let rec map f xs =
   match xs with
-  | Nil -> Nil
-  | Cons (x,xs) -> cons (f x) (map f xs)
+  | [] -> []
+  | x::xs -> f x :: map f xs
 
 let rec length xs =
   match xs with
-  | Nil -> 0
-  | Cons (_,xs) -> 1 + length xs
+  | [] -> 0
+  | _::xs -> 1 + length xs
 
 (*let not b =
   match b with
@@ -48,12 +49,12 @@ let chars_of_int =
       loop (cons (char_of_digit (i%10)) acc) (i/10)
   in
   fun i ->
-  if eq_int i 0 then cons '0' Nil else loop Nil i
+  if eq_int i 0 then cons '0' [] else loop [] i
 
 let rec put_chars xs =
   match xs with
-  | Nil -> ()
-  | Cons (x,xs) -> put_char x; put_chars xs
+  | [] -> ()
+  | x::xs -> put_char x; put_chars xs
 
 let put_string s = put_chars (explode s)
 
@@ -70,8 +71,9 @@ let read_line =
         if less_int 127 n then loop acc else
           if eq_int n 127 then
             match acc with
-            | Nil -> loop acc
-            | Cons (_,tail) ->
+            | [] -> loop acc
+            | _::tail ->
+               (* erase the previous char *)
                put_char (chr 8);
                put_char ' ';
                put_char (chr 8);
@@ -79,7 +81,7 @@ let read_line =
           else
             (put_char c; loop (cons c acc))
   in
-  fun () -> loop Nil
+  fun () -> loop []
 
 let rec fib n =
   (*let () = put_int n in let () = newline () in*)
@@ -128,8 +130,3 @@ let put_opt put opt = match opt with
 let _use_opt () =
   put_opt put_char (Some 'x');
   put_opt put_char None
-
-let rec _std_map f xs =
-  match xs with
-  | [] -> []
-  | x :: xs -> f x :: _std_map f xs

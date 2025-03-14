@@ -36,8 +36,8 @@ cUnit,cFalse,cTrue,cNil,cCons :: Cid
 cUnit = Cid "Unit"
 cTrue = Cid "true"
 cFalse = Cid "false"
-cNil = Cid "Nil"
-cCons = Cid "Cons"
+cNil = Cid "[]"
+cCons = Cid "::"
 
 -- These tag values only need to be unique within their type
 tUnit,tFalse,tTrue,tNil,tCons :: Int

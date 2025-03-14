@@ -33,19 +33,12 @@ let chr : int -> char = Char.chr
 (* TODO: allow binding for infix ops in .fun *)
 let (<) : int -> int -> bool = less_int
 
-(* TODO: avoid need for my_list, using standard ocaml list instead *)
-type 'a my_list = Nil | Cons of 'a * 'a my_list
+let upto : int -> int -> int list =
+  fun i j ->
+  let rec loop acc i = if i > j then List.rev acc else loop (i::acc) (i+1) in
+  loop [] i
 
 (* TODO: move explode into example.fun, defined using lower level primitives *)
-let explode : string -> char my_list =
-  let rec of_list : 'a list -> 'a my_list = function
-    | [] -> Nil
-    | x::xs -> Cons (x, of_list xs)
-  in
-  let upto : int -> int -> int list =
-    fun i j ->
-    let rec loop acc i = if i > j then List.rev acc else loop (i::acc) (i+1) in
-    loop [] i
-  in
+let explode : string -> char list =
   fun s ->
-  of_list (List.map (fun i -> s.[i]) (upto 0 (String.length s - 1)))
+  List.map (fun i -> s.[i]) (upto 0 (String.length s - 1))
