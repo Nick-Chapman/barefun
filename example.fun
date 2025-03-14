@@ -1,4 +1,6 @@
 
+let (<) = less_int
+
 let cons x xs = x :: xs
 
 let rec eq_list eq xs ys =
@@ -34,7 +36,7 @@ let rec map f xs =
 let rec length xs =
   match xs with
   | [] -> 0
-  | _::xs -> 1 + length xs
+  | _::xs -> (+) 1 (length xs)
 
 (*let not b =
   match b with

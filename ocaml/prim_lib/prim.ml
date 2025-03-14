@@ -31,9 +31,6 @@ let (/) : int -> int -> int = (/)
 let ord : char -> int = Char.code
 let chr : int -> char = Char.chr
 
-(* TODO: allow binding for infix ops in .fun *)
-let (<) : int -> int -> bool = less_int
-
 let upto : int -> int -> int list =
   fun i j ->
   let rec loop acc i = if i > j then List.rev acc else loop (i::acc) (i+1) in

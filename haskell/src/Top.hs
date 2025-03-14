@@ -38,9 +38,7 @@ defs0 = [ ValDef (Id name) exp | (name,exp) <- bindings ]
       , ("eq_char", Lam x (Lam y (Prim EqChar [ex,ey])))
       , ("eq_int", Lam x (Lam y (Prim EqInt [ex,ey])))
 
-      -- TODO: just have one name for this prim & make the infix binding in the example.fun
       , ("less_int", Lam x (Lam y (Prim LessInt [ex,ey])))
-      , ("<", Lam x (Lam y (Prim LessInt [ex,ey])))
 
       , ("+", Lam x (Lam y (Prim AddInt [ex,ey])))
       , ("-", Lam x (Lam y (Prim SubInt [ex,ey])))

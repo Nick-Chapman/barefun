@@ -9,9 +9,6 @@ import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import qualified Exp1 as AST
 import qualified Par4
 
--- TODO: list syntax
--- TODO: bracketed infix ops -- ref and def
-
 parseProg :: String -> Prog
 parseProg = Par4.parse gram6
 
@@ -77,6 +74,13 @@ gram6 = program where
     if all isIdentifierChar s && s `notElem` keywords
     then error (printf "Add \"%s\" to keywords list" s)
     else nibble (noError (mapM_ lit s))
+
+  bracketedInfixName = nibble $ noError $ do
+    lit '('
+    s <- alts [ do mapM_ lit name; pure name
+              | name <- infixNames ]
+    lit ')'
+    pure (AST.Id s)
 
   identifier = AST.Id <$> noError name
     where
@@ -172,8 +176,8 @@ gram6 = program where
   -- expressions...
 
   var = do
-    x <- identifier
     pos <- position
+    x <- alts [identifier,bracketedInfixName]
     pure (AST.Var (Just pos) x)
 
   num = AST.Lit . AST.LitN <$> number
@@ -186,6 +190,7 @@ gram6 = program where
   tupleExp :: Par [Exp] =
     bracketed (separated (key ",") exp)
 
+  -- TODO: support syntax for list expressions
   nilExp = do
     key "["
     key "]"
@@ -216,13 +221,18 @@ gram6 = program where
                loop (mkApps (AST.Var Nothing (AST.Id name)) [(p1,acc),(p2,x)])
            ]
 
-  app = alts [application]
+  infixNames = infixGroup1 ++ infixGroup2 ++ infixGroup3 ++ infixGroup4
 
-  infix1 = infixOp ["*","%","/"] app
-  infix2 = infixOp ["+","-"] infix1
-  infix3 = infixOp ["::"] infix2 -- list-cons construtor can be used like a function
-  infix4 = infixOp ["<"] infix3
-  --infix5 = infixOp ["&"] infix4
+  infixGroup1 = ["*","%","/"]
+  infixGroup2 = ["+","-"]
+  infixGroup3 = ["::"] -- list-cons construtor used as a function
+  infixGroup4 = ["<"]
+
+  infix0 = application
+  infix1 = infixOp infixGroup1 infix0
+  infix2 = infixOp infixGroup2 infix1
+  infix3 = infixOp infixGroup3 infix2
+  infix4 = infixOp infixGroup4 infix3
 
   infixWeakestPrecendence = infix4
 
@@ -236,12 +246,12 @@ gram6 = program where
     key "let"
     alts [do key "rec"; pure True, pure False] >>= \case
       True -> do
-        f <- identifier
+        f <- alts [identifier,bracketedInfixName]
         x1 <- identOrUnit
         rhs <- bindingAbstraction
         pure (f, AST.RecLam f x1 rhs)
       False -> do
-        f <- identOrUnit
+        f <- alts [identOrUnit,bracketedInfixName]
         rhs <- bindingAbstraction
         pure (f,rhs)
 
