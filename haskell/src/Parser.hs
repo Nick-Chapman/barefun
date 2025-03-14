@@ -176,11 +176,11 @@ gram6 = program where
            ]
 
   infix1 = infixOp ["%","/"] application
-  infix2 = infixOp ["+"] infix1
-  --infix3 = infixOp ["==","<"] infix2
+  infix2 = infixOp ["+","-"] infix1
+  infix3 = infixOp ["<"] infix2
   --infix4 = infixOp ["&"] infix3
 
-  infixWeakestPrecendence = infix2
+  infixWeakestPrecendence = infix3
 
   -- identifier or unit-pattern
   pat :: Par Id =
@@ -254,7 +254,6 @@ gram6 = program where
     (x,rhs) <- binding
     pure (AST.ValDef x rhs)
 
-
   -- types and typedefs: mostly skipped
 
   type_constructor :: Par () = do
@@ -295,8 +294,6 @@ gram6 = program where
     key "="
     cids <- separated (key "|") type_def_arm
     pure (AST.TypeDef cids)
-
-
 
   definition = alts [value_def,type_def]
 

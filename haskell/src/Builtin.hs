@@ -4,8 +4,10 @@ import Interaction (Interaction(..))
 import Value (Value(..),tUnit,tFalse,tTrue)
 import qualified Data.Char as Char (chr,ord)
 
-data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | DivInt | ModInt | CharOrd | CharChr
+data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | SubInt | DivInt | ModInt | CharOrd | CharChr
   deriving (Show)
+
+-- TODO: reduce the boiler plate for defining new builtins
 
 evalBuiltin :: Builtin -> [Value] -> (Value -> Interaction) -> Interaction
 evalBuiltin b vs k = do
@@ -13,6 +15,7 @@ evalBuiltin b vs k = do
   let false = VCons tFalse []
   let true = VCons tTrue []
   case (b,vs) of
+
     (PutChar, [v]) -> do
       case v of
         VChar c -> IPut c (k unit)
@@ -57,6 +60,14 @@ evalBuiltin b vs k = do
           k res
         _ ->
           error (show ("AddInt/expected num/num",v1,v2))
+
+    (SubInt, [v1,v2]) -> do
+      case (v1,v2) of
+        (VNum x1,VNum x2) -> do
+          let res = VNum (x1 - x2)
+          k res
+        _ ->
+          error (show ("SubInt/expected num/num",v1,v2))
 
     (DivInt, [v1,v2]) -> do
       case (v1,v2) of

@@ -3,6 +3,17 @@ type 'a list = Nil | Cons of 'a * 'a list
 
 let cons x xs = Cons (x,xs)
 
+let rec eq_list eq xs ys =
+  match xs with
+  | Nil -> (match ys with | Nil -> true | Cons (_,_) -> false)
+  | Cons (x,xs) ->
+     match ys with
+     | Nil -> false
+     | Cons (y,ys) ->
+        if eq x y then eq_list eq xs ys else false
+
+let eq_char_list = eq_list eq_char
+
 let rec append xs ys = (* non tail-recursive version *)
   match xs with
   | Nil -> ys
@@ -73,22 +84,44 @@ let read_line =
   in
   fun () -> loop Nil
 
-let message = cons 'Y' (cons 'o' (cons 'u' (cons ':' (cons ' ' Nil))))
+let rec fib n =
+  (*let () = put_int n in let () = newline () in*)
+  if n < 2 then n else fib (n-1) + fib (n-2)
 
-let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c)
+let runfib () =
+  let n = 10 in
+  let res = fib n in
+  let () = put_chars (cons 'f' (cons 'i' (cons 'b' (cons ' ' Nil)))) in
+  let () = put_int n in
+  let () = put_chars (cons ' ' (cons '-' (cons '>' (cons ' ' Nil)))) in
+  let () = put_int res in
+  let () = newline () in
+  ()
+
+let fallback line =
+  let message = cons 'Y' (cons 'o' (cons 'u' (cons ':' (cons ' ' Nil)))) in
+  let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c) in
+  let n = 100 + length line in
+  let () = put_chars (append message (star_the_ohs line)) in
+  (* TODO: semicolon syntax *)
+  let () = put_char ' ' in
+  let () = put_char '{' in
+  let () = put_int n in
+  let () = put_char '}' in
+  let () = newline () in
+  ()
+
+let runfibS = cons 'r' (cons 'u' (cons 'n' (cons 'f' (cons 'i' (cons 'b' Nil)))))
+
+let execute line =
+  if eq_char_list line runfibS then runfib () else
+    fallback line
 
 let main =
   let rec loop () =
     let () = put_char '>' in
     let xs = read_line () in
-    let n = 100 + length xs in
-    let () = put_chars (append message (star_the_ohs xs)) in
-    (* TODO: semicolon syntax *)
-    let () = put_char ' ' in
-    let () = put_char '{' in
-    let () = put_int n in
-    let () = put_char '}' in
-    let () = put_char '\n' in
+    let () = execute xs in
     loop ()
   in
   loop

@@ -22,7 +22,11 @@ let less_int : int -> int -> bool = fun x1 x2 ->
   x1 < x2
 
 let (+) : int -> int -> int = (+)
+let (-) : int -> int -> int = (-)
 let (%) : int -> int -> int = (mod)
 let (/) : int -> int -> int = (/)
 let ord : char -> int = Char.code
 let chr : int -> char = Char.chr
+
+(* TODO: allow binding for infix ops in .fun *)
+let (<) : int -> int -> bool = less_int
