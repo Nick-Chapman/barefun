@@ -122,9 +122,14 @@ let main =
 type 'a my_option = Some of 'a | None
 
 let put_opt put opt = match opt with
-  | Some (x) -> put x (* TODO: allow missing brackets for unary constructor pattern *)
+  | Some x -> put x
   | None -> put_string "None"
 
 let _use_opt () =
   put_opt put_char (Some 'x');
   put_opt put_char None
+
+let rec _std_map f xs =
+  match xs with
+  | [] -> []
+  | x :: xs -> f x :: _std_map f xs

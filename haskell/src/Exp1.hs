@@ -68,7 +68,7 @@ pretty = \case
     [show c]
 
   Con c es ->
-    onHead (show c ++) (foldl1 juxComma (map pretty es))
+    onHead (show c ++) (bracket (foldl1 juxComma (map pretty es)))
 
   Lit x ->
     [show x]

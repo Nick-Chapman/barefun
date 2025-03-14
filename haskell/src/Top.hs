@@ -7,7 +7,7 @@ import Interaction (Interaction(..),runTerm)
 import Par4 (Position(..))
 import Parser (parseProg)
 import Text.Printf (printf)
-import Value (Value(..), Cid(..), cUnit, initCenv)
+import Value (Value(..), Cid(..), cUnit, cCons, initCenv)
 import qualified Data.Map as Map
 import qualified Exp1 as AST
 
@@ -49,6 +49,9 @@ defs0 = [ ValDef (Id name) exp | (name,exp) <- bindings ]
       , ("ord", Lam x (Prim CharOrd [ex]))
       , ("chr", Lam x (Prim CharChr [ex]))
       , ("explode", Lam x (Prim Explode [ex]))
+
+      -- not a primitive but an infix constructor
+      , ("::", Lam x (Lam y (Con cCons [ex,ey])))
       ]
       where
         ex = Var Nothing x

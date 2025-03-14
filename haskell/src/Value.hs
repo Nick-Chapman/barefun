@@ -1,5 +1,5 @@
 module Value
-  ( Cid(..), cUnit, cTrue, cFalse
+  ( Cid(..), cUnit, cTrue, cFalse, cNil, cCons
   , tUnit, tFalse, tTrue
   , Value(..), initCenv
   , mkList

@@ -4,7 +4,7 @@ import Data.Word (Word16)
 import Exp1 (Prog,Exp,Id,Arm)
 import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
-import Value (Cid(..),cUnit,cFalse,cTrue)
+import Value (Cid(..),cUnit,cFalse,cTrue,cNil,cCons)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import qualified Exp1 as AST
 import qualified Par4
@@ -92,6 +92,7 @@ gram6 = program where
     let s = x:xs
     nibble (pure s)
 
+  -- TODO: false/true allows them to be applied to args which is silly
   constructor = alts
     [ constructor0
     , do key "true"; pure cTrue
@@ -130,13 +131,45 @@ gram6 = program where
     key "("
     key ")"
 
-  -- expression forms...
-
   bracketed thing = do
     key "("
     x <- thing
     key ")"
     pure x
+
+  identOrUnit :: Par Id =
+    alts [identifier
+         , do openClose; pure underscore
+         ]
+
+  -- patterns...
+
+  nilPat = do
+    key "["
+    key "]"
+    pure (cNil,[])
+
+  consPat = do
+    x <- identOrUnit
+    key "::"
+    xs <- identOrUnit
+    pure (cCons,[x,xs])
+
+  tupleId :: Par [Id] =
+    alts [ bracketed (separated (key ",") identOrUnit)
+         , do x <- identOrUnit; pure [x]
+         , pure []
+         ]
+
+  constructedPat = do
+    c <- constructor
+    xs <- tupleId
+    pure (c,xs)
+
+  pat :: Par (Cid, [Id]) =
+    alts [nilPat,consPat,constructedPat]
+
+  -- expressions...
 
   var = do
     x <- identifier
@@ -150,17 +183,23 @@ gram6 = program where
 
   literal = alts [num,char,string,unit]
 
-  tuple_exp :: Par [Exp] =
+  tupleExp :: Par [Exp] =
     bracketed (separated (key ",") exp)
+
+  nilExp = do
+    key "["
+    key "]"
+    pure (AST.Con cNil [])
 
   consApp = do
     c <- constructor
     alts
-      [ do es <- tuple_exp; pure (AST.Con c es)
+      [ do es <- tupleExp; pure (AST.Con c es)
+--      , do e <- atom0; pure (AST.Con c [e]) -- TODO: How to make this work?
       , pure (AST.Con c [])
       ]
 
-  atom = alts [literal,var,consApp,bracketed exp]
+  atom = alts [literal,var,nilExp,bracketed exp,consApp]
 
   application = do
     let loop f = alts [ pure f , do p <- position; e <- atom; loop (AST.App f p e)]
@@ -177,21 +216,18 @@ gram6 = program where
                loop (mkApps (AST.Var Nothing (AST.Id name)) [(p1,acc),(p2,x)])
            ]
 
-  infix1 = infixOp ["%","/"] application
+  app = alts [application]
+
+  infix1 = infixOp ["%","/"] app
   infix2 = infixOp ["+","-"] infix1
-  infix3 = infixOp ["<"] infix2
-  --infix4 = infixOp ["&"] infix3
+  infix3 = infixOp ["::"] infix2 -- list-cons construtor can be used like a function
+  infix4 = infixOp ["<"] infix3
+  --infix5 = infixOp ["&"] infix4
 
-  infixWeakestPrecendence = infix3
-
-  -- identifier or unit-pattern
-  pat :: Par Id =
-    alts [identifier
-         , do openClose; pure underscore
-         ]
+  infixWeakestPrecendence = infix4
 
   bindingAbstraction = do
-    xs <- many pat
+    xs <- many identOrUnit
     key "="
     bound <- exp
     pure (mkAbstraction xs bound)
@@ -201,11 +237,11 @@ gram6 = program where
     alts [do key "rec"; pure True, pure False] >>= \case
       True -> do
         f <- identifier
-        x1 <- pat
+        x1 <- identOrUnit
         rhs <- bindingAbstraction
         pure (f, AST.RecLam f x1 rhs)
       False -> do
-        f <- pat
+        f <- identOrUnit
         rhs <- bindingAbstraction
         pure (f,rhs)
 
@@ -226,19 +262,14 @@ gram6 = program where
 
   abstraction = do
     key "fun"
-    xs <- some pat
+    xs <- some identOrUnit
     key "->"
     e <- exp
     pure (mkAbstraction xs e)
 
-  tuple_id :: Par [Id] =
-    alts [ bracketed (separated (key ",") pat)
-         , pure [] ]
-
   arm :: Par Arm = do
     key "|"
-    c <- constructor
-    xs <- tuple_id
+    (c,xs) <- pat
     key "->"
     e <- exp
     pure (AST.Arm c xs e)
