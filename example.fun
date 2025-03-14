@@ -87,10 +87,22 @@ let rec fib n =
   (*let () = put_int n in let () = newline () in*)
   if n < 2 then n else fib (n-1) + fib (n-2)
 
+let rec fact n =
+  if n < 2 then 1 else fact (n-1) * n
+
 let runfib () =
   let n = 10 in
   let res = fib n in
   put_string "fib ";
+  put_int n;
+  put_string " --> ";
+  put_int res;
+  newline ()
+
+let runfact () =
+  let n = 6 in
+  let res = fact n in
+  put_string "fact ";
   put_int n;
   put_string " --> ";
   put_int res;
@@ -108,7 +120,8 @@ let fallback line =
 
 let execute line =
   if eq_char_list line (explode "runfib") then runfib () else
-    fallback line
+    if eq_char_list line (explode "runfact") then runfact () else
+      fallback line
 
 let main =
   let rec loop () =

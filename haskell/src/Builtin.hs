@@ -4,7 +4,7 @@ import Interaction (Interaction(..))
 import Value (Value(..),tUnit,tFalse,tTrue, mkList)
 import qualified Data.Char as Char (chr,ord)
 
-data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | SubInt | DivInt | ModInt | CharOrd | CharChr | Explode
+data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | SubInt | DivInt | ModInt | MulInt | CharOrd | CharChr | Explode
   deriving (Show)
 
 -- TODO: reduce the boiler plate for defining new builtins
@@ -84,6 +84,14 @@ evalBuiltin b vs k = do
           k res
         _ ->
           error (show ("ModInt/expected num/num",v1,v2))
+
+    (MulInt, [v1,v2]) -> do
+      case (v1,v2) of
+        (VNum x1,VNum x2) -> do
+          let res = VNum (x1 * x2)
+          k res
+        _ ->
+          error (show ("MulInt/expected num/num",v1,v2))
 
     (CharOrd, [v]) -> do
       case v of

@@ -218,7 +218,7 @@ gram6 = program where
 
   app = alts [application]
 
-  infix1 = infixOp ["%","/"] app
+  infix1 = infixOp ["*","%","/"] app
   infix2 = infixOp ["+","-"] infix1
   infix3 = infixOp ["::"] infix2 -- list-cons construtor can be used like a function
   infix4 = infixOp ["<"] infix3

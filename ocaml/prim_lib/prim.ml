@@ -23,6 +23,7 @@ let eq_int : int -> int -> bool = fun x1 x2 ->
 let less_int : int -> int -> bool = fun x1 x2 ->
   x1 < x2
 
+let ( * ) : int -> int -> int = ( * )
 let (+) : int -> int -> int = (+)
 let (-) : int -> int -> int = (-)
 let (%) : int -> int -> int = (mod)

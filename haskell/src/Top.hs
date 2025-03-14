@@ -46,6 +46,8 @@ defs0 = [ ValDef (Id name) exp | (name,exp) <- bindings ]
       , ("-", Lam x (Lam y (Prim SubInt [ex,ey])))
       , ("%", Lam x (Lam y (Prim ModInt [ex,ey])))
       , ("/", Lam x (Lam y (Prim DivInt [ex,ey])))
+      , ("*", Lam x (Lam y (Prim MulInt [ex,ey])))
+
       , ("ord", Lam x (Prim CharOrd [ex]))
       , ("chr", Lam x (Prim CharChr [ex]))
       , ("explode", Lam x (Prim Explode [ex]))
