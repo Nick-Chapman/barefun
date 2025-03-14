@@ -10,8 +10,6 @@ import qualified Exp1 as AST
 import qualified Par4
 
 -- TODO: list syntax
--- TODO: semi colon syntax
--- TODO: example.fun -- use richer syntax when supported
 
 parseProg :: String -> Prog
 parseProg = Par4.parse gram6
@@ -21,6 +19,12 @@ mkAbstraction xs e = case xs of [] -> e; x:xs -> AST.Lam x (mkAbstraction xs e)
 
 mkApps :: Exp -> [(Position,Exp)] -> Exp
 mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
+
+underscore :: Id
+underscore = AST.Id "_"
+
+mkSeq :: Exp -> Exp -> Exp
+mkSeq e1 e2 = AST.Let underscore e1 e2
 
 mkIte :: Exp -> Exp -> Exp -> Exp
 mkIte i t e = AST.Case i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
@@ -185,7 +189,7 @@ gram6 = program where
   -- identifier or unit-pattern
   pat :: Par Id =
     alts [identifier
-         , do openClose; pure (AST.Id "_")
+         , do openClose; pure underscore
          ]
 
   bindingAbstraction = do
@@ -248,7 +252,24 @@ gram6 = program where
     as <- many arm
     pure (AST.Case e as)
 
-  exp = alts [match_,abstraction,ite,let_,infixWeakestPrecendence]
+  expITE = alts
+    [ infixWeakestPrecendence
+    , ite ]
+
+  expSEQ = do
+    e1 <- expITE
+    alts [ do key ";"
+              e2 <- exp
+              pure (mkSeq e1 e2)
+         , pure e1
+         ]
+
+  exp = alts
+    [ expSEQ
+    , abstraction
+    , match_
+    , let_
+    ]
 
   value_def = do
     (x,rhs) <- binding
