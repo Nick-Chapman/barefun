@@ -1,10 +1,10 @@
 module Builtin ( Builtin(..), evalBuiltin ) where
 
 import Interaction (Interaction(..))
-import Value (Value(..),tUnit,tFalse,tTrue)
+import Value (Value(..),tUnit,tFalse,tTrue, mkList)
 import qualified Data.Char as Char (chr,ord)
 
-data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | SubInt | DivInt | ModInt | CharOrd | CharChr
+data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | SubInt | DivInt | ModInt | CharOrd | CharChr | Explode
   deriving (Show)
 
 -- TODO: reduce the boiler plate for defining new builtins
@@ -100,6 +100,14 @@ evalBuiltin b vs k = do
           k res
         _ ->
           error (show ("CharChr/expected num",v))
+
+    (Explode, [v]) -> do
+      case v of
+        VString s -> do
+          let res = mkList [ VChar c | c <- s ]
+          k res
+        _ ->
+          error (show ("Explode/expected string",v))
 
     _ -> do
       error (show ("builtin/unsupported",b,length vs))

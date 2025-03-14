@@ -10,6 +10,7 @@ import qualified Exp1 as AST
 import qualified Par4
 
 -- TODO: list syntax
+-- TODO: bracketed infix ops -- ref and def
 
 parseProg :: String -> Prog
 parseProg = Par4.parse gram6
@@ -55,7 +56,6 @@ gram6 = program where
   whitespace = skip (alts [white1, comment])
 
   decDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789" [0..] ]
-  --hexDigit = alts [ do lit c; pure n | (c,n) <- zip "0123456789abcdef" [0..] ]
 
   nibble par = do
     x <- par
@@ -100,12 +100,7 @@ gram6 = program where
 
   decNumber :: Par Word16 = foldl (\acc d -> 10*acc + d) 0 <$> some decDigit
 
-  {-hexNumber = noError $ do
-    lit '0'
-    lit 'x'
-    foldl (\acc d -> 16*acc + d) 0 <$> some hexDigit-}
-
-  number = nibble $ alts [decNumber] -- hexNumber
+  number = nibble $ alts [decNumber]
 
   charLitPlain = sat $ \c -> c /= '\\' -- TODO only printable
 
@@ -123,13 +118,13 @@ gram6 = program where
     singleQuote
     pure x
 
-  --stringLitChar = sat $ \c -> c /= '"' -- TODO: do escaped chars properly
-  {-doubleQuote = lit '"'
-  _string = nibble $ do  -- TODO: string syntax
+  stringLitChar = sat $ \c -> c /= '"' -- TODO: do escaped chars properly
+  doubleQuote = lit '"'
+  stringLit = nibble $ do
     doubleQuote
     x <- many stringLitChar
     doubleQuote
-    pure x-}
+    pure x
 
   openClose = noError $ do
     key "("
@@ -150,7 +145,10 @@ gram6 = program where
 
   num = AST.Lit . AST.LitN <$> number
   char = AST.Lit . AST.LitC <$> charLit
+  string = AST.Lit . AST.LitS <$> stringLit
   unit = do openClose; pure (AST.Con cUnit [])
+
+  literal = alts [num,char,string,unit]
 
   tuple_exp :: Par [Exp] =
     bracketed (separated (key ",") exp)
@@ -162,7 +160,7 @@ gram6 = program where
       , pure (AST.Con c [])
       ]
 
-  atom = alts [var,consApp,char,num,unit,bracketed exp]
+  atom = alts [literal,var,consApp,bracketed exp]
 
   application = do
     let loop f = alts [ pure f , do p <- position; e <- atom; loop (AST.App f p e)]

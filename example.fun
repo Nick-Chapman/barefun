@@ -1,6 +1,4 @@
 
-type 'a list = Nil | Cons of 'a * 'a list
-
 let cons x xs = Cons (x,xs)
 
 let rec eq_list eq xs ys =
@@ -57,6 +55,8 @@ let rec put_chars xs =
   | Nil -> ()
   | Cons (x,xs) -> put_char x; put_chars xs
 
+let put_string s = put_chars (explode s)
+
 let put_int i = put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
@@ -88,27 +88,24 @@ let rec fib n =
 let runfib () =
   let n = 10 in
   let res = fib n in
-  put_chars (cons 'f' (cons 'i' (cons 'b' (cons ' ' Nil))));
+  put_string "fib ";
   put_int n;
-  put_chars (cons ' ' (cons '-' (cons '>' (cons ' ' Nil))));
+  put_string " --> ";
   put_int res;
   newline ()
 
 let fallback line =
-  let message = cons 'Y' (cons 'o' (cons 'u' (cons ':' (cons ' ' Nil)))) in
   let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c) in
   let n = 100 + length line in
-  put_chars (append message (star_the_ohs line));
+  put_chars (append (explode "You wrote: ") (star_the_ohs line));
   put_char ' ';
   put_char '{';
   put_int n;
   put_char '}';
   newline ()
 
-let runfibS = cons 'r' (cons 'u' (cons 'n' (cons 'f' (cons 'i' (cons 'b' Nil)))))
-
 let execute line =
-  if eq_char_list line runfibS then runfib () else
+  if eq_char_list line (explode "runfib") then runfib () else
     fallback line
 
 let main =

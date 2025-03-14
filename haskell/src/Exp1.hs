@@ -23,7 +23,7 @@ data Exp
 
 data Arm = Arm Cid [Id] Exp
 
-data Literal = LitC Char | LitN Word16
+data Literal = LitC Char | LitN Word16 | LitS String
 
 newtype Id = Id String
   deriving (Eq,Ord)
@@ -34,6 +34,7 @@ instance Show Literal where
   show = \case
     LitC c -> show c
     LitN n -> show n
+    LitS s -> show s
 
 pretty :: Exp -> Lines
 pretty = \case

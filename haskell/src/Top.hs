@@ -45,6 +45,7 @@ defs0 = [ ValDef (Id name) exp | (name,exp) <- bindings ]
       , ("/", Lam x (Lam y (Prim DivInt [ex,ey])))
       , ("ord", Lam x (Prim CharOrd [ex]))
       , ("chr", Lam x (Prim CharChr [ex]))
+      , ("explode", Lam x (Prim Explode [ex]))
       ]
       where
         ex = Var Nothing x
@@ -158,3 +159,4 @@ evalLit :: Literal -> Value
 evalLit = \case
   LitC c -> VChar c
   LitN n -> VNum n
+  LitS s -> VString s
