@@ -6,6 +6,9 @@
 (rule
   (with-stdout-to example.ml
     (progn
+      (echo "module M : sig val main : unit -> unit end = struct\n")
       (echo "open Prim_lib.Prim\n")
+      (echo "#1 \"example.fun\"\n")
       (cat ../../example.fun)
+      (echo "end\n")
       )))

@@ -10,4 +10,4 @@ let init_terminal_no_buffering () =
 let () =
   Printf.printf "[ocaml]\n";
   init_terminal_no_buffering();
-  Example_lib.Example.main()
+  Example_lib.Example.M.main()

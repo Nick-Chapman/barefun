@@ -1,6 +1,4 @@
 
-(* TODO: ocaml build should ensure all defs are used *)
-
 type 'a list = Nil | Cons of 'a * 'a list
 
 let cons x xs = Cons (x,xs)
@@ -79,7 +77,7 @@ let message = cons 'Y' (cons 'o' (cons 'u' (cons ':' (cons ' ' Nil))))
 
 let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c)
 
-let start =
+let main =
   let rec loop () =
     let () = put_char '>' in
     let xs = read_line () in
@@ -94,5 +92,3 @@ let start =
     loop ()
   in
   loop
-
-let main = start
