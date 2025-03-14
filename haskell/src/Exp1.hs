@@ -28,6 +28,8 @@ data Literal = LitC Char | LitN Word16 | LitS String
 newtype Id = Id String
   deriving (Eq,Ord)
 
+instance Show Prog where show (Prog defs) = intercalate "\n" (map show defs)
+instance Show Def where show = intercalate "\n" . prettyDef
 instance Show Exp where show = intercalate "\n" . pretty
 instance Show Id where show (Id s) = s
 instance Show Literal where
@@ -35,6 +37,11 @@ instance Show Literal where
     LitC c -> show c
     LitN n -> show n
     LitS s -> show s
+
+prettyDef :: Def -> Lines
+prettyDef = \case
+  ValDef x rhs -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs))
+  TypeDef cids -> ["type _ = " ++ intercalate " | " (map show cids)]
 
 pretty :: Exp -> Lines
 pretty = \case

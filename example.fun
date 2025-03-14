@@ -117,3 +117,14 @@ let main =
     loop ()
   in
   loop
+
+
+type 'a my_option = Some of 'a | None
+
+let put_opt put opt = match opt with
+  | Some (x) -> put x (* TODO: allow missing brackets for unary constructor pattern *)
+  | None -> put_string "None"
+
+let _use_opt () =
+  put_opt put_char (Some 'x');
+  put_opt put_char None

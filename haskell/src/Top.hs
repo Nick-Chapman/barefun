@@ -15,15 +15,18 @@ main :: IO ()
 main = do
   putStrLn "[haskell]"
   s <- readFile "../example.fun"
-  let (Prog defs) = parseProg s
-  -- printf "----------\n%s\n----------\nexecuting...\n" (show defs)  -- TODO: show defs
-  runTerm (executeDefs env0 (defs0 ++ defs))
+  let prog = wrapPreDefs (parseProg s)
+  --printf "----------\n%s\n----------\nexecuting...\n" (show prog)
+  runTerm (executeProg env0 prog)
   pure ()
 
 data Env = Env { venv :: Map Id Value, cenv :: Map Cid Int }
 
 env0 :: Env
 env0 = Env { venv = Map.empty, cenv = initCenv}
+
+wrapPreDefs :: Prog -> Prog
+wrapPreDefs (Prog defs) = Prog (defs0 ++ defs)
 
 defs0 :: [Def]
 defs0 = [ ValDef (Id name) exp | (name,exp) <- bindings ]
@@ -59,8 +62,8 @@ mainApp = AST.App main noPos (AST.Con cUnit [])
     noPos = Position 0 0
     main = AST.Var Nothing (AST.Id "main")
 
-executeDefs :: Env -> [Def] -> Interaction
-executeDefs = loop
+executeProg :: Env -> Prog -> Interaction
+executeProg env0 (Prog defs) = loop env0 defs
   where
     loop :: Env -> [Def] -> Interaction
     loop env@Env{venv,cenv} = \case
