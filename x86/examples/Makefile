@@ -1,5 +1,5 @@
 
-default = print3
+default = cursor
 
 top: run
 
