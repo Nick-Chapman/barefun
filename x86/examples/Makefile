@@ -1,10 +1,11 @@
 
-default = print1
+default = print2
 
 top: run
 
 build: build-$(default)
 run: run-$(default)
+burn: burn-$(default)
 
 build-%: ,build ,build/%.img
 	@ echo -n
