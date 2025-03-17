@@ -1,0 +1,3 @@
+
+Setup Makefile to allow multiple examples to be easily built and run.
+By using NASM sections in one file we can have examples with separate bootloader stages.
