@@ -24,5 +24,7 @@ NASM_FLAGS = -Werror
 	@ echo 'Assembling $@'
 	@ nasm $(NASM_FLAGS) -o $@ $< || rm -f $@
 
-
 ,build: ; @mkdir -p $@
+
+burn: ,build/disk.img
+	dd if=$< of=/dev/sda
