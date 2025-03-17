@@ -1,5 +1,5 @@
 
-default = print2
+default = print3
 
 top: run
 
