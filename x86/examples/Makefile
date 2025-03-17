@@ -1,5 +1,5 @@
 
-default = repl
+default = print1
 
 top: run
 
