@@ -4,34 +4,30 @@ import Builtin (Builtin(..))
 import Exp1 (Prog(..),Def(..),Exp(..),Id(..), cCons)
 
 wrapPreDefs :: Prog -> Prog
-wrapPreDefs (Prog defs) = Prog (Predefined.defs ++ defs)
-
-defs :: [Def]
-defs = [ ValDef (Id name) exp | (name,exp) <- bindings ]
+wrapPreDefs (Prog defs) =
+  Prog ([ ValDef (Id name) exp | (name,exp) <- bindings ] ++ defs)
   where
     bindings :: [(String,Exp)]
-    bindings = -- TODO: capture common patterns
-      [ ("put_char", Lam x (Prim PutChar [ex]))
-      , ("get_char", Lam x (Prim GetChar [ex]))
-      , ("eq_char", Lam x (Lam y (Prim EqChar [ex,ey])))
-      , ("eq_int", Lam x (Lam y (Prim EqInt [ex,ey])))
-
-      , ("less_int", Lam x (Lam y (Prim LessInt [ex,ey])))
-
-      , ("+", Lam x (Lam y (Prim AddInt [ex,ey])))
-      , ("-", Lam x (Lam y (Prim SubInt [ex,ey])))
-      , ("%", Lam x (Lam y (Prim ModInt [ex,ey])))
-      , ("/", Lam x (Lam y (Prim DivInt [ex,ey])))
-      , ("*", Lam x (Lam y (Prim MulInt [ex,ey])))
-
-      , ("ord", Lam x (Prim CharOrd [ex]))
-      , ("chr", Lam x (Prim CharChr [ex]))
-      , ("explode", Lam x (Prim Explode [ex]))
-
-      -- not a primitive but an infix constructor
-      , ("::", Lam x (Lam y (Con cCons [ex,ey])))
+    bindings =
+      [ ("*"            , prim2 MulInt)
+      , ("+"            , prim2 AddInt)
+      , ("-"            , prim2 SubInt)
+      , ("%"            , prim2 ModInt)
+      , ("/"            , prim2 DivInt)
+      , ("eq_char"      , prim2 EqChar)
+      , ("eq_int"       , prim2 EqInt)
+      , ("less_int"     , prim2 LessInt)
+      , ("ord"          , prim1 CharOrd)
+      , ("chr"          , prim1 CharChr)
+      , ("explode"      , prim1 Explode)
+      , ("put_char"     , prim1 PutChar)
+      , ("get_char"     , prim1 GetChar)
+      , ("::"           , construct2 cCons)
       ]
       where
+        prim1 p1 = Lam x (Prim p1 [ex])
+        prim2 p2 = Lam x (Lam y (Prim p2 [ex,ey]))
+        construct2 c2 = Lam x (Lam y (Con c2 [ex,ey]))
         ex = Var Nothing x
         ey = Var Nothing y
         x = Id "x"
