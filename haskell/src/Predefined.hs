@@ -1,7 +1,10 @@
-module Predefined (defs) where
+module Predefined (wrapPreDefs) where
 
 import Builtin (Builtin(..))
-import Exp1 (Def(..),Exp(..),Id(..), cCons)
+import Exp1 (Prog(..),Def(..),Exp(..),Id(..), cCons)
+
+wrapPreDefs :: Prog -> Prog
+wrapPreDefs (Prog defs) = Prog (Predefined.defs ++ defs)
 
 defs :: [Def]
 defs = [ ValDef (Id name) exp | (name,exp) <- bindings ]
