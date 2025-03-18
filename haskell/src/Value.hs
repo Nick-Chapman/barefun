@@ -25,11 +25,11 @@ instance Show Value where
 
 -- These tag values only need to be unique within their type
 tUnit,tFalse,tTrue,tNil,tCons :: Int
-tUnit = 10
-tFalse = 20
-tTrue = 21
-tNil = 30
-tCons = 31
+tUnit = 0
+tFalse = 0
+tTrue = 1
+tNil = 0
+tCons = 1
 
 mkBool :: Bool -> Value
 mkBool = \case

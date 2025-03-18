@@ -5,6 +5,7 @@ module Exp1
 import Builtin (Builtin)
 import Data.List (intercalate)
 import Data.Word (Word16)
+import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position)
 import Text.Printf (printf)
 
@@ -32,7 +33,7 @@ newtype Id = Id String
 newtype Cid = Cid String
   deriving (Eq,Ord)
 
--- TODO: split out pretty printer?
+
 instance Show Prog where show (Prog defs) = intercalate "\n" (map show defs)
 instance Show Def where show = intercalate "\n" . prettyDef
 instance Show Exp where show = intercalate "\n" . pretty
@@ -95,29 +96,3 @@ prettyPat :: Cid -> [Id] -> String
 prettyPat c = \case
   [] -> show c
   xs -> printf "%s(%s)" (show c) (intercalate "," (map show xs))
-
-juxComma :: Lines -> Lines -> Lines
-juxComma a b = jux (onTail (++",") a) b
-
-type Lines = [String]
-
-bracket :: Lines -> Lines
-bracket = onHead ("(" ++) . onTail (++ ")")
-
-onHead :: (String -> String) -> Lines -> Lines
-onHead _ [] = error "onHead"
-onHead f (x:xs) = f x : xs
-
-onTail :: (String -> String) -> Lines -> Lines
-onTail _ [] = error "onTail"
-onTail f xs = (reverse . onHead f . reverse) xs
-
-jux :: Lines -> Lines -> Lines
-jux [x] [y] = [ x ++ " " ++ y ]
-jux xs ys = xs ++ ys
-
-indented :: String -> Lines -> Lines
-indented hang = \case
-  [] -> error "indented"
-  [oneLine] -> [hang ++ " " ++ oneLine]
-  lines -> [hang] ++ ["  " ++ line | line <- lines]

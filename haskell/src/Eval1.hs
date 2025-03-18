@@ -74,8 +74,7 @@ eval env@Env{venv,cenv} = \case
     evals env es $ \vs -> do
     let tag = maybe err id $ Map.lookup cid cenv
           where err = error (show ("cenv-lookup",cid))
-    if tag /= tag then undefined else -- strictness hack -- TODO: how to do this properly?
-      k (VCons tag vs)
+    k (VCons tag vs)
 
   AST.Lit literal -> \k -> do
     k (evalLit literal)

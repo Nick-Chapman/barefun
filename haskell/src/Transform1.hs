@@ -1,8 +1,10 @@
 module Transform1 (compile,execute) where
 
 import Builtin (Builtin,evalBuiltin)
+import Data.List (intercalate)
 import Data.Map (Map)
 import Interaction (Interaction(..))
+import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Predefined (cUnit,cFalse,cTrue,cNil,cCons)
 import Text.Printf (printf)
@@ -28,12 +30,11 @@ data Exp
   | Let Id Exp Exp
   | Prim Builtin [Exp]
   | Case Exp [Arm]
-  deriving Show -- TODO: pretty print
 
 data Arm = ArmTag Ctag [Id] Exp
-  deriving Show
 
-type Ctag = Int
+data Ctag = Ctag Int
+
 type Literal = SRC.Literal
 type Id = SRC.Id
 
@@ -52,7 +53,7 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
         walk cenv' defs
 
     mainApp :: Exp
-    mainApp = App main noPos (ConTag tUnit [])
+    mainApp = App main noPos (ConTag (Ctag tUnit) [])
 
     noPos = Position 0 0
     main = Var Nothing (SRC.Id "main")
@@ -60,8 +61,8 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
 transExp :: Cenv -> SRC.Exp -> Exp
 transExp cenv e = trans e
   where
-    transCid :: SRC.Cid -> Int
-    transCid cid = maybe err id $ Map.lookup cid cenv
+    transCid :: SRC.Cid -> Ctag
+    transCid cid = Ctag $ maybe err id $ Map.lookup cid cenv
       where err = error (show ("Transform1.transCid",cid))
 
     trans :: SRC.Exp -> Exp
@@ -128,7 +129,7 @@ eval env@Env{venv} = \case
       eval env e2 $ \v2 -> do
         apply v1 pos v2 k
 
-  ConTag tag es -> \k -> do
+  ConTag (Ctag tag) es -> \k -> do
     evals env es $ \vs -> do
       k (VCons tag vs)
 
@@ -149,7 +150,7 @@ eval env@Env{venv} = \case
             [] ->
               error "case match failure"
 
-            ArmTag tag xs body : arms -> do
+            ArmTag (Ctag tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
                   let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
@@ -176,3 +177,54 @@ data Env = Env { venv :: Map Id Value }
 
 env0 :: Env
 env0 = Env { venv = Map.empty }
+
+
+instance Show Exp where show = intercalate "\n" . pretty
+instance Show Ctag where show (Ctag n) = printf "Tag_%d" n
+
+pretty :: Exp -> Lines
+pretty = \case
+
+  Let x rhs body ->
+    indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs))
+    ++ pretty body
+
+  Lam x body ->
+    bracket $
+    indented ("fun " ++ show x ++ " ->") (pretty body)
+
+  RecLam f x body ->
+    bracket $
+    indented ("rec-fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
+
+  App e1 _ e2 ->
+    bracket $
+    jux (pretty e1) (pretty e2)
+
+  Var _ x -> [show x]
+
+  ConTag tag [] ->
+    [show tag]
+
+  ConTag tag es ->
+    onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
+
+  Lit x ->
+    [show x]
+
+  Case scrut arms ->
+    (onHead ("match "++) . onTail (++ " with")) (pretty scrut)
+    ++ concat (map prettyArm arms)
+
+  Prim b xs -> do
+    [printf "PRIM:%s%s" (show b) (show xs)]
+
+prettyArm :: Arm -> Lines
+prettyArm = \case
+  ArmTag c xs rhs -> do
+    indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
+
+prettyPat :: Ctag -> [Id] -> String
+prettyPat tag = \case
+  [] -> show tag
+  xs -> printf "%s(%s)" (show tag) (intercalate "," (map show xs))
