@@ -1,1 +1,7 @@
-(cram (deps ocaml/bin/main.exe sample.input))
+(cram
+ (deps
+  ocaml/bin/main.exe
+  haskell/main.exe
+  sample.input
+  example.fun
+))

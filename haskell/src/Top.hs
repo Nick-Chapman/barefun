@@ -14,7 +14,7 @@ import qualified Exp1 as AST
 main :: IO ()
 main = do
   putStrLn "[haskell]"
-  s <- readFile "../example.fun"
+  s <- readFile "example.fun" -- TODO: take filename for .fun program on command line
   let prog = wrapPreDefs (parseProg s)
   --printf "----------\n%s\n----------\nexecuting...\n" (show prog)
   runTerm (executeProg env0 prog)
