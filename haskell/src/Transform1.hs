@@ -2,9 +2,9 @@ module Transform1 (compile,execute) where
 
 import Builtin (Builtin,evalBuiltin)
 import Data.Map (Map)
-import Exp1 (cUnit,cFalse,cTrue,cNil,cCons)
 import Interaction (Interaction(..))
 import Par4 (Position(..))
+import Predefined (cUnit,cFalse,cTrue,cNil,cCons)
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map

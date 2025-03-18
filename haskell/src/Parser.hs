@@ -1,8 +1,8 @@
 module Parser (parseProg) where
 
 import Data.Word (Word16)
-import Exp1 (Prog,Exp,Id,Arm)
-import Exp1 (Cid(..),cUnit,cFalse,cTrue,cNil,cCons)
+import Exp1 (Prog,Exp,Id,Arm,Cid)
+import Predefined (cUnit,cFalse,cTrue,cNil,cCons)
 import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
@@ -90,7 +90,7 @@ gram6 = program where
         let s = x:xs
         if s `elem` keywords then fail else nibble (pure s)
 
-  constructor0 = Cid <$> do
+  constructor0 = AST.Cid <$> do
     x <- sat isConstructorChar1
     xs <- many $ sat isIdentifierChar
     let s = x:xs

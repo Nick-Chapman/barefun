@@ -1,7 +1,10 @@
-module Predefined (wrapPreDefs) where
+module Predefined
+  ( wrapPreDefs
+  , cUnit,cFalse,cTrue,cNil,cCons
+  ) where
 
 import Builtin (Builtin(..))
-import Exp1 (Prog(..),Def(..),Exp(..),Id(..), cCons)
+import Exp1 (Prog(..),Def(..),Exp(..),Id(..), Cid(..))
 
 wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =
@@ -32,3 +35,10 @@ wrapPreDefs (Prog defs) =
         ey = Var Nothing y
         x = Id "x"
         y = Id "y"
+
+cUnit,cFalse,cTrue,cNil,cCons :: Cid
+cUnit = Cid "Unit"
+cTrue = Cid "true"
+cFalse = Cid "false"
+cNil = Cid "[]"
+cCons = Cid "::"
