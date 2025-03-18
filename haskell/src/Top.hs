@@ -8,6 +8,8 @@ import Text.Printf (printf)
 import qualified Eval1 (executeProg)
 import qualified Transform1 (compile,execute)
 
+data Mode = M1 | M2
+
 main :: IO ()
 main = do
   putStrLn "[haskell]"
@@ -15,11 +17,16 @@ main = do
   let prog = wrapPreDefs (parseProg s)
   let _no :: IO () = printf "----------\n%s\n----------\nexecuting...\n" (show prog)
 
-  -- execute Exp1 directly
-  let _ = runTerm (Eval1.executeProg prog)
+  let mode = M2
+  case mode of
 
-  -- compile to Exp2; then execute
-  let e2 = Transform1.compile prog
-  runTerm (Transform1.execute e2)
+    M1 -> do
+      -- execute Exp1 directly
+      runTerm (Eval1.executeProg prog)
+
+    M2 -> do
+      -- compile to Exp2; then execute
+      let e2 = Transform1.compile prog
+      runTerm (Transform1.execute e2)
 
   pure ()

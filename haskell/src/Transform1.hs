@@ -10,12 +10,18 @@ import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
 import qualified Exp1 as SRC
 
-data Prog = Prog [Def]
-data Def = ValDef Id Exp | TypeDef [Cid]
+compile :: SRC.Prog -> Prog
+compile = transProg initCenv
+
+execute :: Prog -> Interaction
+execute = executeProg
+
+data Prog = Prog [Def] -- TODO: avoid Prog/defs by conversion to nested let-expressions
+data Def = ValDef Id Exp
 
 data Exp
   = Var (Maybe Position) Id
-  | Con Cid [Exp]
+  | ConTag Ctag [Exp]
   | Lit Literal
   | App Exp Position Exp
   | Lam Id Exp
@@ -24,49 +30,65 @@ data Exp
   | Prim Builtin [Exp]
   | Case Exp [Arm]
 
-data Arm = Arm Cid [Id] Exp
+data Arm = ArmTag Ctag [Id] Exp
 
+type Ctag = Int
 type Literal = SRC.Literal
 type Id = SRC.Id
 type Cid = SRC.Cid
 
+transProg :: Cenv -> SRC.Prog -> Prog
+transProg cenv (SRC.Prog defs) = Prog (walk cenv defs)
+  where
+    walk :: Cenv -> [SRC.Def] -> [Def]
+    walk cenv = \case
+      [] -> []
+      SRC.ValDef name rhs : defs -> ValDef name (transExp cenv rhs) : walk cenv defs
+      SRC.TypeDef cids : defs -> do
+        let pairs = zip cids [0::Int .. ]
+        let f (name,tag) cenv = Map.insert name tag cenv
+        let cenv' = foldr f cenv pairs
+        walk cenv' defs
 
-compile :: SRC.Prog -> Prog
-compile = transProg
+transExp :: Cenv -> SRC.Exp -> Exp
+transExp cenv e = trans e
+  where
+    transCid :: Cid -> Int
+    transCid cid = maybe err id $ Map.lookup cid cenv
+      where err = error (show ("Transform1.transCid",cid))
 
-transProg :: SRC.Prog -> Prog
-transProg (SRC.Prog xs) = Prog (map transDef xs)
+    trans :: SRC.Exp -> Exp
+    trans = \case
+      SRC.Let x rhs body -> Let x (trans rhs) (trans body)
+      SRC.Lam x body -> Lam x (trans body)
+      SRC.RecLam f x body -> RecLam f x (trans body)
+      SRC.App e1 p e2 -> App (trans e1) p (trans e2)
+      SRC.Var p x -> Var p x
+      SRC.Con cid es -> ConTag (transCid cid) (map trans es)
+      SRC.Lit x -> Lit x
+      SRC.Case scrut arms -> Case (trans scrut) (map transArm arms)
+      SRC.Prim b xs -> Prim b (map trans xs)
 
-transDef :: SRC.Def -> Def
-transDef = \case
-  SRC.ValDef name rhs -> ValDef name (transExp rhs)
-  SRC.TypeDef cids -> TypeDef cids
+    transArm :: SRC.Arm -> Arm
+    transArm (SRC.Arm cid xs e) = ArmTag (transCid cid) xs (trans e)
 
-transArm :: SRC.Arm -> Arm
-transArm (SRC.Arm c xs e) = Arm c xs (transExp e)
+type Cenv = Map Cid Int
 
-transExp :: SRC.Exp -> Exp
-transExp = \case
-  SRC.Let x rhs body -> Let x (trans rhs) (trans body)
-  SRC.Lam x body -> Lam x (trans body)
-  SRC.RecLam f x body -> RecLam f x (trans body)
-  SRC.App e1 p e2 -> App (trans e1) p (trans e2)
-  SRC.Var p x -> Var p x
-  SRC.Con c es -> Con c (map trans es)
-  SRC.Lit x -> Lit x
-  SRC.Case scrut arms -> Case (trans scrut) (map transArm arms)
-  SRC.Prim b xs -> Prim b (map trans xs)
-  where trans = transExp
+initCenv :: Cenv
+initCenv = Map.fromList
+  [ (cUnit, tUnit)
+  , (cFalse, tFalse)
+  , (cTrue, tTrue)
+  , (cNil, tNil)
+  , (cCons, tCons)
+  ]
 
-
-execute :: Prog -> Interaction
-execute = executeProg
 
 executeProg :: Prog -> Interaction
 executeProg (Prog defs) = loop env0 defs
   where
     loop :: Env -> [Def] -> Interaction
-    loop env@Env{venv,cenv} = \case
+    loop env@Env{venv} = \case
 
       [] -> do
         eval env mainApp $ \v ->
@@ -77,15 +99,8 @@ executeProg (Prog defs) = loop env0 defs
         eval env rhs $ \value -> do
           loop env { venv = Map.insert name value venv } defs
 
-      TypeDef cids : defs -> do
-        let pairs = zip cids [0::Int .. ]
-        let f (name,tag) cenv = Map.insert name tag cenv
-        let cenv' = foldr f cenv pairs
-        let env' = env { cenv = cenv' }
-        loop env' defs
-
 mainApp :: Exp
-mainApp = App main noPos (Con cUnit [])
+mainApp = App main noPos (ConTag tUnit [])
   where
     noPos = Position 0 0
     main = Var Nothing (SRC.Id "main")
@@ -99,7 +114,7 @@ evals env es k = case es of
         k (v:vs)
 
 eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
-eval env@Env{venv,cenv} = \case
+eval env@Env{venv} = \case
 
   Let x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
@@ -121,11 +136,8 @@ eval env@Env{venv,cenv} = \case
       eval env e2 $ \v2 -> do
         apply v1 pos v2 k
 
-  Con cid es -> \k -> do
+  ConTag tag es -> \k -> do
     evals env es $ \vs -> do
-    let tag = maybe err id $ Map.lookup cid cenv
-          where err = error (show ("cenv-lookup",cid))
-    if tag /= tag then undefined else -- strictness hack -- TODO: how to do this properly?
       k (VCons tag vs)
 
   Lit literal -> \k -> do
@@ -145,9 +157,7 @@ eval env@Env{venv,cenv} = \case
             [] ->
               error "case match failure"
 
-            Arm cid xs body : arms -> do
-              let tag = maybe err id $ Map.lookup cid cenv
-                    where err = error (show ("cenv-lookup",cid))
+            ArmTag tag xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
                   let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
@@ -170,17 +180,7 @@ evalLit = \case
   SRC.LitN n -> VNum n
   SRC.LitS s -> VString s
 
-data Env = Env { venv :: Map Id Value, cenv :: Map Cid Int }
+data Env = Env { venv :: Map Id Value }
 
 env0 :: Env
-env0 = Env { venv = Map.empty, cenv = initCenv}
-
-initCenv :: Map Cid Int
-initCenv = Map.fromList
-  [ (cUnit, tUnit)
-  , (cFalse, tFalse)
-  , (cTrue, tTrue)
-  , (cNil, tNil)
-  , (cCons, tCons)
-  ]
-
+env0 = Env { venv = Map.empty }
