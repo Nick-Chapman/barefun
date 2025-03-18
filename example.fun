@@ -120,10 +120,17 @@ let fallback line =
   put_char '}';
   newline ()
 
+type 'a option = Some of 'a | None
+
+let maybe_special line =
+  if eq_char_list line (explode "runfib") then Some (runfib) else (* TODO: fix parser to avoid need for parens *)
+    if eq_char_list line (explode "runfact") then Some (runfact) else
+      None
+
 let execute line =
-  if eq_char_list line (explode "runfib") then runfib () else
-    if eq_char_list line (explode "runfact") then runfact () else
-      fallback line
+  match maybe_special line with
+  | None -> fallback line
+  | Some (f) -> f ()
 
 let main =
   let rec loop () =
@@ -134,14 +141,3 @@ let main =
     loop ()
   in
   loop
-
-
-type 'a my_option = Some of 'a | None
-
-let put_opt put opt = match opt with
-  | Some x -> put x
-  | None -> put_string "None"
-
-let _use_opt () =
-  put_opt put_char (Some 'x');
-  put_opt put_char None
