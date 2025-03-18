@@ -3,5 +3,5 @@
   ocaml/bin/main.exe
   haskell/main.exe
   sample.input
-  example.fun
+  shell.fun
 ))

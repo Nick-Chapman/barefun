@@ -15,7 +15,7 @@ Ocaml REPL
 
 Haskell REPL
 
-  $ cat sample.input | haskell/main.exe example.fun
+  $ cat sample.input | haskell/main.exe shell.fun
   [haskell]
   > Hello, World!
   You wrote: Hell*, W*rld! {113}

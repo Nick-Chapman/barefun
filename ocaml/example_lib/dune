@@ -4,11 +4,22 @@
  (libraries prim_lib))
 
 (rule
-  (with-stdout-to example.ml
+  (with-stdout-to shell.ml
     (progn
       (echo "module M : sig val main : unit -> unit end = struct\n")
       (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"example.fun\"\n")
-      (cat ../../example.fun)
+      (echo "#1 \"shell.fun\"\n")
+      (cat ../../shell.fun)
+      (echo "end\n")
+      )))
+
+
+(rule
+  (with-stdout-to minimal.ml
+    (progn
+      (echo "module M : sig val main : unit -> unit end = struct\n")
+      (echo "open Prim_lib.Prim\n")
+      (echo "#1 \"minimal.fun\"\n")
+      (cat ../../minimal.fun)
       (echo "end\n")
       )))

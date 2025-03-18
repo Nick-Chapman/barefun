@@ -12,11 +12,11 @@ wrapPreDefs (Prog defs) =
   where
     bindings :: [(String,Exp)]
     bindings =
-      [ ("*"            , prim2 MulInt)
-      , ("+"            , prim2 AddInt)
+      [ ("+"            , prim2 AddInt)
       , ("-"            , prim2 SubInt)
-      , ("%"            , prim2 ModInt)
+      , ("*"            , prim2 MulInt)
       , ("/"            , prim2 DivInt)
+      , ("%"            , prim2 ModInt)
       , ("<"            , prim2 LessInt)
       , ("="            , prim2 EqInt)
       , ("eq_char"      , prim2 EqChar)
