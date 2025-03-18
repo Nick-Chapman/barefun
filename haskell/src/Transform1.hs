@@ -3,6 +3,7 @@ module Transform1 (compile,execute) where
 import Builtin (Builtin,evalBuiltin)
 import Data.List (intercalate)
 import Data.Map (Map)
+import Data.Set (Set,member,union,(\\),singleton)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
@@ -10,6 +11,7 @@ import Predefined (cUnit,cFalse,cTrue,cNil,cCons)
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
+import qualified Data.Set as Set (fromList,unions,empty)
 import qualified Exp0 as SRC
 
 type Transformed = Exp
@@ -45,7 +47,11 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
     walk :: Cenv -> [SRC.Def] -> Exp
     walk cenv = \case
       [] -> mainApp
-      SRC.ValDef name rhs : defs -> Let name (transExp cenv rhs) (walk cenv defs)
+
+      SRC.ValDef name rhs : defs -> do
+        let body = walk cenv defs
+        if name `member` fvs body then Let name (transExp cenv rhs) body else body
+
       SRC.TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
         let f (name,tag) cenv = Map.insert name tag cenv
@@ -90,6 +96,21 @@ initCenv = Map.fromList
   , (cNil, tNil)
   , (cCons, tCons)
   ]
+
+
+fvs :: Exp -> Set Id
+fvs = \case
+  Let x rhs body -> fvs rhs `union` (fvs body \\ singleton x)
+  Lam x body -> fvs body \\ singleton x
+  RecLam f x body -> fvs body \\ Set.fromList [f,x]
+  App e1 _ e2 -> fvs e1 `union` fvs e2
+  Var _ x -> singleton x
+  ConTag _ es -> Set.unions (map fvs es)
+  Lit _ -> Set.empty
+  Case scrut arms -> fvs scrut `union` Set.unions (map fvsArm arms)
+  Prim _ es -> Set.unions (map fvs es)
+  where
+    fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs
 
 
 executeExp :: Exp -> Interaction
