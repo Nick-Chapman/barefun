@@ -10,14 +10,13 @@ import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
 import qualified Exp1 as SRC
 
-compile :: SRC.Prog -> Prog
+type Transformed = Exp
+
+compile :: SRC.Prog -> Transformed
 compile = transProg initCenv
 
-execute :: Prog -> Interaction
-execute = executeProg
-
-data Prog = Prog [Def] -- TODO: avoid Prog/defs by conversion to nested let-expressions
-data Def = ValDef Id Exp
+execute :: Transformed -> Interaction
+execute = executeExp
 
 data Exp
   = Var (Maybe Position) Id
@@ -31,29 +30,34 @@ data Exp
   | Case Exp [Arm]
 
 data Arm = ArmTag Ctag [Id] Exp
-
 type Ctag = Int
 type Literal = SRC.Literal
 type Id = SRC.Id
-type Cid = SRC.Cid
 
-transProg :: Cenv -> SRC.Prog -> Prog
-transProg cenv (SRC.Prog defs) = Prog (walk cenv defs)
+
+transProg :: Cenv -> SRC.Prog -> Exp
+transProg cenv (SRC.Prog defs) = walk cenv defs
   where
-    walk :: Cenv -> [SRC.Def] -> [Def]
+    walk :: Cenv -> [SRC.Def] -> Exp
     walk cenv = \case
-      [] -> []
-      SRC.ValDef name rhs : defs -> ValDef name (transExp cenv rhs) : walk cenv defs
+      [] -> mainApp
+      SRC.ValDef name rhs : defs -> Let name (transExp cenv rhs) (walk cenv defs)
       SRC.TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
         let f (name,tag) cenv = Map.insert name tag cenv
         let cenv' = foldr f cenv pairs
         walk cenv' defs
 
+    mainApp :: Exp
+    mainApp = App main noPos (ConTag tUnit [])
+
+    noPos = Position 0 0
+    main = Var Nothing (SRC.Id "main")
+
 transExp :: Cenv -> SRC.Exp -> Exp
 transExp cenv e = trans e
   where
-    transCid :: Cid -> Int
+    transCid :: SRC.Cid -> Int
     transCid cid = maybe err id $ Map.lookup cid cenv
       where err = error (show ("Transform1.transCid",cid))
 
@@ -72,7 +76,7 @@ transExp cenv e = trans e
     transArm :: SRC.Arm -> Arm
     transArm (SRC.Arm cid xs e) = ArmTag (transCid cid) xs (trans e)
 
-type Cenv = Map Cid Int
+type Cenv = Map SRC.Cid Int
 
 initCenv :: Cenv
 initCenv = Map.fromList
@@ -84,26 +88,11 @@ initCenv = Map.fromList
   ]
 
 
-executeProg :: Prog -> Interaction
-executeProg (Prog defs) = loop env0 defs
-  where
-    loop :: Env -> [Def] -> Interaction
-    loop env@Env{venv} = \case
-
-      [] -> do
-        eval env mainApp $ \v ->
-          IDebug (printf "Final value: %s\n" (show v))
-          $ IDone
-
-      ValDef name rhs : defs -> do
-        eval env rhs $ \value -> do
-          loop env { venv = Map.insert name value venv } defs
-
-mainApp :: Exp
-mainApp = App main noPos (ConTag tUnit [])
-  where
-    noPos = Position 0 0
-    main = Var Nothing (SRC.Id "main")
+executeExp :: Exp -> Interaction
+executeExp exp =
+  eval env0 exp $ \v ->
+  IDebug (printf "Final value: %s\n" (show v))
+  $ IDone
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
 evals env es k = case es of
