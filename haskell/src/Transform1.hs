@@ -28,8 +28,11 @@ data Exp
   | Let Id Exp Exp
   | Prim Builtin [Exp]
   | Case Exp [Arm]
+  deriving Show -- TODO: pretty print
 
 data Arm = ArmTag Ctag [Id] Exp
+  deriving Show
+
 type Ctag = Int
 type Literal = SRC.Literal
 type Id = SRC.Id
