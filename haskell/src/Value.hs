@@ -1,7 +1,7 @@
 module Value
   ( tUnit, tFalse, tTrue, tNil, tCons
   , Value(..)
-  , mkList
+  , mkBool,mkList
   ) where
 
 import Data.Word (Word16)
@@ -30,6 +30,14 @@ tFalse = 20
 tTrue = 21
 tNil = 30
 tCons = 31
+
+mkBool :: Bool -> Value
+mkBool = \case
+  False -> false
+  True -> true
+  where
+    false = VCons tFalse []
+    true = VCons tTrue []
 
 vNil :: Value
 vNil = VCons tNil []

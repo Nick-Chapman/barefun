@@ -1,121 +1,40 @@
 module Builtin ( Builtin(..), evalBuiltin ) where
 
 import Interaction (Interaction(..))
-import Value (Value(..),tUnit,tFalse,tTrue, mkList)
+import Value (Value(..),tUnit,mkBool,mkList)
 import qualified Data.Char as Char (chr,ord)
 
-data Builtin = PutChar | GetChar | EqChar | LessInt | EqInt | AddInt | SubInt | DivInt | ModInt | MulInt | CharOrd | CharChr | Explode
+data Builtin
+  = PutChar | GetChar
+  | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
+  | EqChar | CharOrd | CharChr
+  | Explode
   deriving (Show)
-
--- TODO: reduce the boiler plate for defining new builtins
 
 evalBuiltin :: Builtin -> [Value] -> (Value -> Interaction) -> Interaction
 evalBuiltin b vs k = do
-  let unit = VCons tUnit []
-  let false = VCons tFalse []
-  let true = VCons tTrue []
-  case (b,vs) of
+  let
+    unit = VCons tUnit []
+    oneArg = \case [v] -> v; _ -> err
+    twoArgs c1 c2 = \case [v1,v2] -> (c1 v1, c2 v2); _ -> err
+    deUnit = \case VCons tag [] | tag == tUnit -> (); _ -> err
+    deNum = \case VNum n -> n; _ -> err
+    deChar = \case VChar c -> c; _ -> err
+    deString = \case VString s -> s; _ -> err
+    err :: a
+    err = error (show (b,vs))
 
-    (PutChar, [v]) -> do
-      case v of
-        VChar c -> IPut c (k unit)
-        _ -> error "PutChar/expected char"
-
-    (GetChar,[v]) -> do
-      case v of
-        VCons _tag [] -> IGet (\c -> k (VChar c))
-        _ -> error (show ("GetChar/expected unit",v))
-
-    (EqChar, [v1,v2]) -> do
-      case (v1,v2) of
-        (VChar x1,VChar x2) -> do
-          let b = (x1 == x2)
-          let res = if b then true else false
-          k res
-        _ ->
-          error (show ("EqChar/expected char/char",v1,v2))
-
-    (EqInt, [v1,v2]) -> do
-      case (v1,v2) of
-        (VNum x1,VNum x2) -> do
-          let b = (x1 == x2)
-          let res = if b then true else false
-          k res
-        _ ->
-          error (show ("EqInt/expected num/num",v1,v2))
-
-    (LessInt, [v1,v2]) -> do
-      case (v1,v2) of
-        (VNum x1,VNum x2) -> do
-          let b = (x1 < x2)
-          let res = if b then true else false
-          k res
-        _ ->
-          error (show ("LessInt/expected num/num",v1,v2))
-
-    (AddInt, [v1,v2]) -> do
-      case (v1,v2) of
-        (VNum x1,VNum x2) -> do
-          let res = VNum (x1 + x2)
-          k res
-        _ ->
-          error (show ("AddInt/expected num/num",v1,v2))
-
-    (SubInt, [v1,v2]) -> do
-      case (v1,v2) of
-        (VNum x1,VNum x2) -> do
-          let res = VNum (x1 - x2)
-          k res
-        _ ->
-          error (show ("SubInt/expected num/num",v1,v2))
-
-    (DivInt, [v1,v2]) -> do
-      case (v1,v2) of
-        (VNum x1,VNum x2) -> do
-          let res = VNum (x1 `div` x2)
-          k res
-        _ ->
-          error (show ("DivInt/expected num/num",v1,v2))
-
-    (ModInt, [v1,v2]) -> do
-      case (v1,v2) of
-        (VNum x1,VNum x2) -> do
-          let res = VNum (x1 `mod` x2)
-          k res
-        _ ->
-          error (show ("ModInt/expected num/num",v1,v2))
-
-    (MulInt, [v1,v2]) -> do
-      case (v1,v2) of
-        (VNum x1,VNum x2) -> do
-          let res = VNum (x1 * x2)
-          k res
-        _ ->
-          error (show ("MulInt/expected num/num",v1,v2))
-
-    (CharOrd, [v]) -> do
-      case v of
-        VChar c -> do
-          let res = VNum (fromIntegral $ Char.ord c)
-          k res
-        _ ->
-          error (show ("CharOrd/expected char",v))
-
-    (CharChr, [v]) -> do
-      case v of
-        VNum n -> do
-          let res = VChar (Char.chr (fromIntegral n))
-          k res
-        _ ->
-          error (show ("CharChr/expected num",v))
-
-    (Explode, [v]) -> do
-      case v of
-        VString s -> do
-          let res = mkList [ VChar c | c <- s ]
-          k res
-        _ ->
-          error (show ("Explode/expected string",v))
-
-    _ -> do
-      error (show ("builtin/unsupported",b,length vs))
+  case b of
+    PutChar -> IPut (deChar (oneArg vs)) (k unit)
+    GetChar -> case deUnit (oneArg vs) of () -> IGet (\c -> k (VChar c))
+    AddInt -> k (VNum (uncurry (+) (twoArgs deNum deNum vs)))
+    SubInt -> k (VNum (uncurry (-) (twoArgs deNum deNum vs)))
+    MulInt -> k (VNum (uncurry (*) (twoArgs deNum deNum vs)))
+    DivInt -> k (VNum (uncurry div (twoArgs deNum deNum vs)))
+    ModInt -> k (VNum (uncurry mod (twoArgs deNum deNum vs)))
+    LessInt -> k (mkBool (uncurry (<) (twoArgs deNum deNum vs)))
+    EqInt -> k (mkBool (uncurry (==) (twoArgs deNum deNum vs)))
+    EqChar -> k (mkBool (uncurry (==) (twoArgs deChar deChar vs)))
+    CharOrd -> k (VNum ((fromIntegral . Char.ord) (deChar (oneArg vs))))
+    CharChr -> k (VChar ((Char.chr . fromIntegral) (deNum (oneArg vs))))
+    Explode -> k (mkList [ VChar c | c <- deString (oneArg vs) ])
