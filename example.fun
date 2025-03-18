@@ -127,7 +127,7 @@ let execute line =
 
 let main =
   let rec loop () =
-    put_char '$';
+    put_char '>';
     put_char ' ';
     let xs = read_line () in
     execute xs;

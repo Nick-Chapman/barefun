@@ -1,0 +1,1 @@
+(cram (deps ocaml/bin/main.exe sample.input))
