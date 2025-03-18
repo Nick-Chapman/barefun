@@ -1,15 +1,17 @@
 module Top (main) where
 
-import Builtin (Builtin(..),evalBuiltin)
+import Builtin (evalBuiltin)
 import Data.Map (Map)
 import Exp1 (Prog(..),Def(..),Exp(..),Arm(..),Id(..),Literal(..))
 import Interaction (Interaction(..),runTerm)
 import Par4 (Position(..))
 import Parser (parseProg)
 import Text.Printf (printf)
-import Value (Value(..), Cid(..), cUnit, cCons, initCenv)
+import Value (Value(..), Cid(..), cUnit, initCenv)
 import qualified Data.Map as Map
 import qualified Exp1 as AST
+
+import qualified Predefined (defs)
 
 main :: IO ()
 main = do
@@ -26,38 +28,7 @@ env0 :: Env
 env0 = Env { venv = Map.empty, cenv = initCenv}
 
 wrapPreDefs :: Prog -> Prog
-wrapPreDefs (Prog defs) = Prog (defs0 ++ defs)
-
-defs0 :: [Def]
-defs0 = [ ValDef (Id name) exp | (name,exp) <- bindings ]
-  where
-    bindings :: [(String,Exp)]
-    bindings =
-      [ ("put_char", Lam x (Prim PutChar [ex]))
-      , ("get_char", Lam x (Prim GetChar [ex]))
-      , ("eq_char", Lam x (Lam y (Prim EqChar [ex,ey])))
-      , ("eq_int", Lam x (Lam y (Prim EqInt [ex,ey])))
-
-      , ("less_int", Lam x (Lam y (Prim LessInt [ex,ey])))
-
-      , ("+", Lam x (Lam y (Prim AddInt [ex,ey])))
-      , ("-", Lam x (Lam y (Prim SubInt [ex,ey])))
-      , ("%", Lam x (Lam y (Prim ModInt [ex,ey])))
-      , ("/", Lam x (Lam y (Prim DivInt [ex,ey])))
-      , ("*", Lam x (Lam y (Prim MulInt [ex,ey])))
-
-      , ("ord", Lam x (Prim CharOrd [ex]))
-      , ("chr", Lam x (Prim CharChr [ex]))
-      , ("explode", Lam x (Prim Explode [ex]))
-
-      -- not a primitive but an infix constructor
-      , ("::", Lam x (Lam y (Con cCons [ex,ey])))
-      ]
-      where
-        ex = Var Nothing x
-        ey = Var Nothing y
-        x = Id "x"
-        y = Id "y"
+wrapPreDefs (Prog defs) = Prog (Predefined.defs ++ defs)
 
 mainApp :: Exp
 mainApp = AST.App main noPos (AST.Con cUnit [])

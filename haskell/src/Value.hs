@@ -15,7 +15,7 @@ import qualified Data.Map as Map
 newtype Cid = Cid String
   deriving (Eq,Ord)
 
-instance Show Cid where show (Cid s) = s
+instance Show Cid where show (Cid s) = s -- TODO: move to Exp1
 
 data Value
   = VCons Int [Value]
@@ -47,7 +47,7 @@ tTrue = 21
 tNil = 30
 tCons = 31
 
-initCenv :: Map Cid Int
+initCenv :: Map Cid Int -- TODO move to Exp1
 initCenv = Map.fromList
   [ (cUnit, tUnit)
   , (cFalse, tFalse)
