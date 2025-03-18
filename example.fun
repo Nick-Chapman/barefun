@@ -1,5 +1,12 @@
 
-let (<) = less_int
+let not b =
+  match b with
+  | true -> false
+  | false -> true
+
+let (>) a b = b < a
+let (<=) a b = not (b < a)
+let (>=) a b = not (a < b)
 
 let cons x xs = x :: xs
 
@@ -38,20 +45,15 @@ let rec length xs =
   | [] -> 0
   | _::xs -> (+) 1 (length xs)
 
-(*let not b =
-  match b with
-  | true -> false
-  | false -> true*)
-
 let chars_of_int =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in
   let rec loop acc i =
-    if eq_int i 0 then acc else
+    if i = 0 then acc else
       loop (cons (char_of_digit (i%10)) acc) (i/10)
   in
   fun i ->
-  if eq_int i 0 then cons '0' [] else loop [] i
+  if i = 0 then cons '0' [] else loop [] i
 
 let rec put_chars xs =
   match xs with
@@ -69,9 +71,9 @@ let read_line =
     let c = get_char () in
     let n = ord c in
     if eq_char c '\n' then (newline(); reverse acc) else
-      if less_int n 32 then loop acc else
-        if less_int 127 n then loop acc else
-          if eq_int n 127 then
+      if n <= 31 then loop acc else
+        if n > 127 then loop acc else
+          if n = 127 then
             match acc with
             | [] -> loop acc
             | _::tail ->
@@ -86,11 +88,12 @@ let read_line =
   fun () -> loop []
 
 let rec fib n =
-  (*let () = put_int n in let () = newline () in*)
+  (*put_int n; newline ();*)
   if n < 2 then n else fib (n-1) + fib (n-2)
 
 let rec fact n =
-  if n < 2 then 1 else fact (n-1) * n
+  (*put_int n; newline ();*)
+  if n >= 2 then fact (n-1) * n else 1
 
 let runfib () =
   let n = 10 in

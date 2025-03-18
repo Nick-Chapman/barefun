@@ -77,7 +77,7 @@ gram6 = program where
 
   bracketedInfixName = nibble $ noError $ do
     lit '('
-    s <- alts [ do mapM_ lit name; pure name
+    s <- alts [ noError $ do mapM_ lit name; pure name
               | name <- infixNames ]
     lit ')'
     pure (AST.Id s)
@@ -225,8 +225,8 @@ gram6 = program where
 
   infixGroup1 = ["*","%","/"]
   infixGroup2 = ["+","-"]
-  infixGroup3 = ["::"] -- list-cons construtor used as a function
-  infixGroup4 = ["<"]
+  infixGroup3 = ["::"]
+  infixGroup4 = ["=","<=","<",">=",">"]
 
   infix0 = application
   infix1 = infixOp infixGroup1 infix0

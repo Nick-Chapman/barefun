@@ -5,20 +5,21 @@ module X : sig
   val (+) : int -> int -> int
   val (-) : int -> int -> int
   val (/) : int -> int -> int
+  val (<) : int -> int -> bool
+  val (=) : int -> int -> bool
+
   val chr : int -> char
   val eq_char : char -> char -> bool
-  val eq_int : int -> int -> bool
   val explode : string -> char list
   val get_char : unit -> char
-  val less_int : int -> int -> bool
   val ord : char -> int
   val put_char : char -> unit
   val upto : int -> int -> int list
 
 end = struct
 
-  let eq_int = (=)
-  let less_int = (<)
+  let (=) = (=)
+  let (<) = (<)
   let ( * ) = ( * )
   let (+) = (+)
   let (-) = (-)
