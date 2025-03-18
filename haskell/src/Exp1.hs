@@ -1,11 +1,13 @@
-module Exp1 (Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..)) where
+module Exp1
+  ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..)
+  , cUnit,cFalse,cTrue,cNil,cCons
+  ) where
 
 import Builtin (Builtin)
 import Data.List (intercalate)
 import Data.Word (Word16)
 import Par4 (Position)
 import Text.Printf (printf)
-import Value (Cid)
 
 data Prog = Prog [Def]
 data Def = ValDef Id Exp | TypeDef [Cid]
@@ -28,10 +30,22 @@ data Literal = LitC Char | LitN Word16 | LitS String
 newtype Id = Id String
   deriving (Eq,Ord)
 
+newtype Cid = Cid String
+  deriving (Eq,Ord)
+
+cUnit,cFalse,cTrue,cNil,cCons :: Cid -- TODO: move to Predefined?
+cUnit = Cid "Unit"
+cTrue = Cid "true"
+cFalse = Cid "false"
+cNil = Cid "[]"
+cCons = Cid "::"
+
+-- TODO: split out pretty printer?
 instance Show Prog where show (Prog defs) = intercalate "\n" (map show defs)
 instance Show Def where show = intercalate "\n" . prettyDef
 instance Show Exp where show = intercalate "\n" . pretty
 instance Show Id where show (Id s) = s
+instance Show Cid where show (Cid s) = s
 instance Show Literal where
   show = \case
     LitC c -> show c

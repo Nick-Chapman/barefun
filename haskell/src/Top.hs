@@ -2,12 +2,13 @@ module Top (main) where
 
 import Builtin (evalBuiltin)
 import Data.Map (Map)
+import Exp1 (Cid,cUnit,cFalse,cTrue,cNil,cCons)
 import Exp1 (Prog(..),Def(..),Exp(..),Arm(..),Id(..),Literal(..))
 import Interaction (Interaction(..),runTerm)
 import Par4 (Position(..))
 import Parser (parseProg)
 import Text.Printf (printf)
-import Value (Value(..), Cid(..), cUnit, initCenv)
+import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
 import qualified Exp1 as AST
 
@@ -137,3 +138,13 @@ evalLit = \case
   LitC c -> VChar c
   LitN n -> VNum n
   LitS s -> VString s
+
+
+initCenv :: Map Cid Int
+initCenv = Map.fromList
+  [ (cUnit, tUnit)
+  , (cFalse, tFalse)
+  , (cTrue, tTrue)
+  , (cNil, tNil)
+  , (cCons, tCons)
+  ]

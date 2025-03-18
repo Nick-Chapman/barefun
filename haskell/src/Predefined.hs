@@ -1,8 +1,7 @@
 module Predefined (defs) where
 
 import Builtin (Builtin(..))
-import Exp1 (Def(..),Exp(..),Id(..))
-import Value (cCons) -- TODO: avoid dep on Value by moving Cid into Exp1
+import Exp1 (Def(..),Exp(..),Id(..), cCons)
 
 defs :: [Def]
 defs = [ ValDef (Id name) exp | (name,exp) <- bindings ]
