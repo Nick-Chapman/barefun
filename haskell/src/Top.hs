@@ -4,7 +4,7 @@ import Interaction (runTerm)
 import Parser (parseProg)
 import Predefined (wrapPreDefs)
 import Text.Printf (printf)
-
+import System.Environment (getArgs)
 import qualified Eval1 (executeProg)
 import qualified Transform1 (compile,execute)
 
@@ -13,7 +13,9 @@ data Mode = M1 | M2
 main :: IO ()
 main = do
   putStrLn "[haskell]"
-  s <- readFile "example.fun" -- TODO: take filename for .fun program on command line
+  path <- parseCommandLine <$> getArgs
+  s <- readFile path
+
   let prog = wrapPreDefs (parseProg s)
   let _no :: IO () = printf "----------\n%s\n----------\nexecuting...\n" (show prog)
 
@@ -30,3 +32,8 @@ main = do
       runTerm (Transform1.execute e2)
 
   pure ()
+
+parseCommandLine :: [String] -> String
+parseCommandLine = \case
+  [path] -> path
+  xs -> error (show ("parseCommandLine",xs))
