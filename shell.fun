@@ -34,7 +34,6 @@ let reverse =
   in
   loop []
 
-
 let rec map f xs =
   match xs with
   | [] -> []
@@ -135,12 +134,9 @@ let execute line =
   | None -> fallback line
   | Some (f) -> f ()
 
-let main =
-  let rec loop () =
-    put_char '>';
-    put_char ' ';
-    let xs = read_line () in
-    execute xs;
-    loop ()
-  in
-  loop
+let rec main () =
+  put_char '>';
+  put_char ' ';
+  let xs = read_line () in
+  execute xs;
+  main ()

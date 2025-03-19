@@ -1,4 +1,7 @@
-module Transform1 (compile,execute) where
+module Transform1
+  ( Exp(..),Arm(..),Ctag(..),SRC.Literal(..),SRC.Id(..)
+  , compile, execute
+  ) where
 
 import Builtin (Builtin,evalBuiltin)
 import Data.List (intercalate)

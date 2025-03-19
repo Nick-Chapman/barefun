@@ -37,7 +37,13 @@ newtype Cid = Cid String
 instance Show Prog where show (Prog defs) = intercalate "\n" (map show defs)
 instance Show Def where show = intercalate "\n" . prettyDef
 instance Show Exp where show = intercalate "\n" . pretty
-instance Show Id where show (Id s) = s
+
+instance Show Id where
+  show (Id s) =
+    case s of
+      "*" -> "( * )"
+      s -> s
+
 instance Show Cid where show (Cid s) = s
 instance Show Literal where
   show = \case
