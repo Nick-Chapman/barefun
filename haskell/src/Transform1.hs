@@ -221,8 +221,8 @@ pretty = \case
     indented ("fun " ++ show x ++ " ->") (pretty body)
 
   RecLam f x body ->
-    bracket $
-    indented ("rec-fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
+    onHead ("fix "++) $ bracket $
+    indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
 
   App e1 _ e2 ->
     bracket $
