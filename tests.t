@@ -18,7 +18,7 @@ Ocaml REPL
 Haskell REPL
 
   $ cat sample.input | haskell/main.exe shell.fun
-  [haskell]
+  [haskell-eval2]
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}

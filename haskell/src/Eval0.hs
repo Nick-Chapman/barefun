@@ -1,4 +1,4 @@
-module Eval0 (executeProg) where
+module Eval0 (executeProg,evalLit,apply) where
 
 import Builtin (evalBuiltin)
 import Data.Map (Map)

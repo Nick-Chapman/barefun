@@ -4,6 +4,6 @@
  (deps Setup.hs package.yaml stack.yaml (glob_files "app/*") (glob_files "src/*"))
  (action
  (progn
- (system "stack build 2> /dev/null")
+  (system "stack build")
   (system "cp .stack-work/dist/x86_64-linux-tinfo6/ghc-9.2.7/build/main.exe/main.exe main.exe")
  )))

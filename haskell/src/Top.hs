@@ -11,8 +11,7 @@ import qualified Transform2 (compile,execute)
 
 main :: IO ()
 main = do
-  putStrLn "[haskell]"
-  let defaultMode = Eval1 -- TODO: EVal2
+  let defaultMode = Eval2
   config <- parseCommandLine defaultMode <$> getArgs
   let Config {path,mode} = config
   s <- readFile path
@@ -21,11 +20,13 @@ main = do
     JustParse0 -> do
       printf "[ast]\n----------\n%s\n----------\n" (show prog)
     Eval0 -> do
+      putStrLn "[haskell-eval0]"
       runTerm (Eval0.executeProg prog)
     Compile1 -> do
       let e1 = Transform1.compile prog
       printf "[transform1]\n----------\n%s\n----------\n" (show e1)
     Eval1 -> do
+      putStrLn "[haskell-eval1]"
       let e1 = Transform1.compile prog
       runTerm (Transform1.execute e1)
     Compile2 -> do
@@ -33,6 +34,7 @@ main = do
       let e2 = Transform2.compile e1
       printf "[transform2]\n----------\n%s\n----------\n" (show e2)
     Eval2 -> do
+      putStrLn "[haskell-eval2]"
       let e1 = Transform1.compile prog
       let e2 = Transform2.compile e1
       runTerm (Transform2.execute e2)
@@ -47,10 +49,10 @@ data Mode
 parseCommandLine :: Mode -> [String] -> Config
 parseCommandLine = loop
   where
-    defaulrCompilationMode = Compile2
+    defaultCompilationMode = Compile2
     loop :: Mode -> [String] -> Config
     loop mode = \case
-      "-compile":xs -> loop defaulrCompilationMode xs
+      "-compile":xs -> loop defaultCompilationMode xs
       "-parse":xs -> loop JustParse0 xs
       "-eval0":xs -> loop Eval0 xs
       "-compile1":xs -> loop Compile1 xs

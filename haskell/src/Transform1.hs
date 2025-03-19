@@ -1,6 +1,6 @@
 module Transform1
   ( Exp(..),Arm(..),Ctag(..),SRC.Literal(..),SRC.Id(..)
-  , compile, execute
+  , compile, execute, SRC.evalLit, SRC.apply
   ) where
 
 import Builtin (Builtin,evalBuiltin)
@@ -16,6 +16,7 @@ import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (fromList,unions,empty)
 import qualified Exp0 as SRC
+import qualified Eval0 as SRC (evalLit,apply)
 
 type Transformed = Exp
 
@@ -119,6 +120,48 @@ fvs = \case
     fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs
 
 
+instance Show Exp where show = intercalate "\n" . pretty
+instance Show Ctag where show (Ctag n) = printf "Tag_%d" n
+
+pretty :: Exp -> Lines
+pretty = \case
+  Let x rhs body ->
+    indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs))
+    ++ pretty body
+  Lam x body ->
+    bracket $
+    indented ("fun " ++ show x ++ " ->") (pretty body)
+  RecLam f x body ->
+    onHead ("fix "++) $ bracket $
+    indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
+  App e1 _ e2 ->
+    bracket $
+    jux (pretty e1) (pretty e2)
+  Var _ x -> [show x]
+  ConTag tag [] ->
+    [show tag]
+  ConTag tag es ->
+    onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
+  Lit x ->
+    [show x]
+  Case scrut arms ->
+    (onHead ("match "++) . onTail (++ " with")) (pretty scrut)
+    ++ concat (map prettyArm arms)
+  Prim b xs -> do
+    [printf "PRIM:%s%s" (show b) (show xs)]
+
+prettyArm :: Arm -> Lines
+prettyArm = \case
+  ArmTag c xs rhs -> do
+    indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
+
+prettyPat :: Ctag -> [Id] -> String
+prettyPat tag = \case
+  [] -> show tag
+  xs -> printf "%s(%s)" (show tag) (intercalate "," (map show xs))
+
+
+
 executeExp :: Exp -> Interaction
 executeExp exp =
   eval env0 exp $ \v ->
@@ -135,123 +178,46 @@ evals env es k = case es of
 
 eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
 eval env@Env{venv} = \case
-
   Let x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k
-
   Lam x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
-
   RecLam f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
-
   Var pos x -> \k -> do
     k (maybe err id $ Map.lookup x venv)
       where err = error (show ("var-lookup",x,pos))
-
   App e1 pos e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env e2 $ \v2 -> do
-        apply v1 pos v2 k
-
+        SRC.apply v1 pos v2 k
   ConTag (Ctag tag) es -> \k -> do
     evals env es $ \vs -> do
       k (VCons tag vs)
-
   Lit literal -> \k -> do
-    k (evalLit literal)
-
+    k (SRC.evalLit literal)
   Prim b es -> \k -> do
     evals env es $ \vs -> do
     evalBuiltin b vs k
-
   Case e arms0 -> \k -> do
     eval env e $ \case
-
       VCons tagActual vArgs -> do
         let
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
-            [] ->
-              error "case match failure"
-
+            [] -> error "case match failure"
             ArmTag (Ctag tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
                   let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
                   eval env' body k
-
         dispatch arms0
-
       v ->
         error (printf "case/scrut not a constructed value: %s" (show v))
-
-apply :: Value -> Position -> Value -> (Value -> Interaction) -> Interaction
-apply func p arg k = do
-  case func of
-    VFunc f -> f arg k
-    v -> error (show ("apply",v,p))
-
-evalLit :: Literal -> Value
-evalLit = \case
-  SRC.LitC c -> VChar c
-  SRC.LitN n -> VNum n
-  SRC.LitS s -> VString s
 
 data Env = Env { venv :: Map Id Value }
 
 env0 :: Env
 env0 = Env { venv = Map.empty }
-
-
-instance Show Exp where show = intercalate "\n" . pretty
-instance Show Ctag where show (Ctag n) = printf "Tag_%d" n
-
-pretty :: Exp -> Lines
-pretty = \case
-
-  Let x rhs body ->
-    indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs))
-    ++ pretty body
-
-  Lam x body ->
-    bracket $
-    indented ("fun " ++ show x ++ " ->") (pretty body)
-
-  RecLam f x body ->
-    onHead ("fix "++) $ bracket $
-    indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
-
-  App e1 _ e2 ->
-    bracket $
-    jux (pretty e1) (pretty e2)
-
-  Var _ x -> [show x]
-
-  ConTag tag [] ->
-    [show tag]
-
-  ConTag tag es ->
-    onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
-
-  Lit x ->
-    [show x]
-
-  Case scrut arms ->
-    (onHead ("match "++) . onTail (++ " with")) (pretty scrut)
-    ++ concat (map prettyArm arms)
-
-  Prim b xs -> do
-    [printf "PRIM:%s%s" (show b) (show xs)]
-
-prettyArm :: Arm -> Lines
-prettyArm = \case
-  ArmTag c xs rhs -> do
-    indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
-
-prettyPat :: Ctag -> [Id] -> String
-prettyPat tag = \case
-  [] -> show tag
-  xs -> printf "%s(%s)" (show tag) (intercalate "," (map show xs))
