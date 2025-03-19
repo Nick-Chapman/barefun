@@ -3,6 +3,8 @@ Ocaml REPL
 
   $ cat sample.input | ocaml/bin/main.exe
   [ocaml]
+  LOAD
+  RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
   > runfib
@@ -17,6 +19,7 @@ Haskell REPL
 
   $ cat sample.input | haskell/main.exe shell.fun
   [haskell]
+  RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
   > runfib

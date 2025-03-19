@@ -65,6 +65,10 @@ let put_int i = put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
 
+let put_string_newline s =
+  put_string s;
+  newline ()
+
 let read_line =
   let rec loop acc =
     let c = get_char () in
@@ -134,9 +138,16 @@ let execute line =
   | None -> fallback line
   | Some (f) -> f ()
 
-let rec main () =
+let rec mainloop () =
   put_char '>';
   put_char ' ';
   let xs = read_line () in
   execute xs;
-  main ()
+  mainloop ()
+
+let () = put_string_newline "LOAD"
+
+let main () =
+  put_string_newline "RUN";
+  let () = mainloop () in
+  put_string_newline "NEVER"

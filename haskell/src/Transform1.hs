@@ -53,7 +53,10 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
 
       SRC.ValDef name rhs : defs -> do
         let body = walk cenv defs
+        -- This looses top-level side effects, so should not really be done
+        -- But in makes the examples small for compilation dev...
         if name `member` fvs body then Let name (transExp cenv rhs) body else body
+        --Let name (transExp cenv rhs) body
 
       SRC.TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
