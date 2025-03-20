@@ -7,15 +7,25 @@ Ocaml REPL
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
-  > runfib
-  fib 10 --> 55
-  > runfact
-  fact 6 --> 720
+  > fib
+  fib: ERROR: expected an argument
+  > fib xx
+  fib: ERROR: expected arg1 to be numeric
+  > fib xx yy
+  fib: ERROR: expected exactly one argument
+  > fib 20
+  fib: 20 --> 6765
+  > fib 21
+  fib: 21 --> 10946
+  > fact 6
+  fact: 6 --> 720
+  > fact 7
+  fact: 7 --> 5040
   > Goodbye
   You wrote: G**dbye {107}
   > [EOF]
 
-Haskell REPL
+Haskell REPL (stage0)
 
   $ cat shell.input | ../haskell/main.exe shell.fun -0
   [stage0]
@@ -23,36 +33,70 @@ Haskell REPL
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
-  > runfib
-  fib 10 --> 55
-  > runfact
-  fact 6 --> 720
+  > fib
+  fib: ERROR: expected an argument
+  > fib xx
+  fib: ERROR: expected arg1 to be numeric
+  > fib xx yy
+  fib: ERROR: expected exactly one argument
+  > fib 20
+  fib: 20 --> 6765
+  > fib 21
+  fib: 21 --> 10946
+  > fact 6
+  fact: 6 --> 720
+  > fact 7
+  fact: 7 --> 5040
   > Goodbye
   You wrote: G**dbye {107}
   > [EOF]
+
+Haskell REPL (stage1)
 
   $ cat shell.input | ../haskell/main.exe shell.fun -1
   [stage1]
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
-  > runfib
-  fib 10 --> 55
-  > runfact
-  fact 6 --> 720
+  > fib
+  fib: ERROR: expected an argument
+  > fib xx
+  fib: ERROR: expected arg1 to be numeric
+  > fib xx yy
+  fib: ERROR: expected exactly one argument
+  > fib 20
+  fib: 20 --> 6765
+  > fib 21
+  fib: 21 --> 10946
+  > fact 6
+  fact: 6 --> 720
+  > fact 7
+  fact: 7 --> 5040
   > Goodbye
   You wrote: G**dbye {107}
   > [EOF]
+
+Haskell REPL (stage2)
 
   $ cat shell.input | ../haskell/main.exe shell.fun -2
   [stage2]
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
-  > runfib
-  fib 10 --> 55
-  > runfact
-  fact 6 --> 720
+  > fib
+  fib: ERROR: expected an argument
+  > fib xx
+  fib: ERROR: expected arg1 to be numeric
+  > fib xx yy
+  fib: ERROR: expected exactly one argument
+  > fib 20
+  fib: 20 --> 6765
+  > fib 21
+  fib: 21 --> 10946
+  > fact 6
+  fact: 6 --> 720
+  > fact 7
+  fact: 7 --> 5040
   > Goodbye
   You wrote: G**dbye {107}
   > [EOF]

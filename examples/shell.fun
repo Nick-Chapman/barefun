@@ -8,6 +8,24 @@ let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
+type 'a option = Some of 'a | None
+
+let parse_digit c =
+  let n = ord c - ord '0' in
+  (* TODO missing parens for "Some(x)" cause haskell evaluation to go wrong. parse mistake? *)
+  if n >= 0 then if n <= 9 then Some(n) else None else None
+
+let parse_num =
+  let rec loop acc xs =
+    match xs with
+    | [] -> Some(acc)
+    | x::xs ->
+        match parse_digit x with
+        | None -> None
+        | Some d -> loop (10 * acc + d) xs
+  in
+  loop 0
+
 let cons x xs = x :: xs
 
 let rec eq_list eq xs ys =
@@ -26,13 +44,13 @@ let rec append xs ys = (* non tail-recursive version *)
   | [] -> ys
   | x::xs -> cons x (append xs ys)
 
-let reverse =
+let reverse xs = (* eta reduce case ocaml type issue for multiple uses *)
   let rec loop acc xs =
     match xs with
     | [] -> acc
     | x::xs -> loop (cons x acc) xs
   in
-  loop []
+  loop [] xs
 
 let rec map f xs =
   match xs with
@@ -98,23 +116,41 @@ let rec fact n =
   (*put_int n; newline ();*)
   if n >= 2 then fact (n-1) * n else 1
 
-let runfib () =
-  let n = 10 in
-  let res = fib n in
-  put_string "fib ";
-  put_int n;
-  put_string " --> ";
-  put_int res;
-  newline ()
+let error s = put_string "ERROR: "; put_string s; newline ()
 
-let runfact () =
-  let n = 6 in
-  let res = fact n in
-  put_string "fact ";
-  put_int n;
-  put_string " --> ";
-  put_int res;
-  newline ()
+let runfib args =
+  put_string "fib: ";
+  match args with
+  | [] -> error "expected an argument"
+  | arg1::more ->
+     match more with
+     | _::_ -> error "expected exactly one argument"
+     | [] ->
+        match parse_num arg1 with
+        | None -> error "expected arg1 to be numeric"
+        | Some n ->
+           let res = fib n in
+           put_int n;
+           put_string " --> ";
+           put_int res;
+           newline ()
+
+let runfact args =
+  put_string "fact: ";
+  match args with
+  | [] -> error "expected an argument"
+  | arg1::more ->
+     match more with
+     | _::_ -> error "expected exactly one argument"
+     | [] ->
+        match parse_num arg1 with
+        | None -> error "expected arg1 to be numeric"
+        | Some n ->
+           let res = fact n in
+           put_int n;
+           put_string " --> ";
+           put_int res;
+           newline ()
 
 let fallback line =
   let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c) in
@@ -126,17 +162,25 @@ let fallback line =
   put_char '}';
   newline ()
 
-type 'a option = Some of 'a | None
-
-let maybe_special line =
-  if eq_char_list line (explode "runfib") then Some (runfib) else (* TODO: fix parser to avoid need for parens *)
-    if eq_char_list line (explode "runfact") then Some (runfact) else
-      None
+let split_words =
+  let rec loop accWs accCs xs =
+    match xs with
+    | [] -> reverse (reverse accCs :: accWs)
+    (* TODO: handle multiple space seps *)
+    | x::xs ->
+       if eq_char x ' ' then loop (reverse accCs :: accWs) [] xs
+       else loop accWs (x::accCs) xs
+  in
+  loop [] []
 
 let execute line =
-  match maybe_special line with
-  | None -> fallback line
-  | Some (f) -> f ()
+  let words = split_words line in
+  match words with
+  | [] -> ()
+  | command::args ->
+     if eq_char_list command (explode "fib") then runfib args else
+       if eq_char_list command (explode "fact") then runfact args else
+         fallback line
 
 let rec mainloop () =
   put_char '>';

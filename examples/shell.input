@@ -1,4 +1,9 @@
 Hello, World!
-runfib
-runfact
+fib
+fib xx
+fib xx yy
+fib 20
+fib 21
+fact 6
+fact 7
 Goodbye
