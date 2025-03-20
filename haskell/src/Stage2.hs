@@ -1,4 +1,4 @@
--- | Result of ANF conversion
+-- | ANF style expressions. All sub-expressions named. Atomic/Compound expression forms distinguished.
 module Stage2
   ( execute
   , compile
@@ -22,34 +22,44 @@ type Transformed = Code
 
 data Code
   = Var (Maybe Position) Id
-  | Lit Literal
-  | ConTag Ctag [Id]
-  | Prim Builtin [Id]
-  | Lam Id Code
-  | RecLam Id Id Code
   | App Id Position Id
-  | Let Id Code Code
+  | LetAtomic Id Atomic Code
+  | PushContinuation (Id,Code) Code
   | Case Id [Arm]
+  | Atomic Atomic -- TODO: remove this
 
 data Arm = ArmTag Ctag [Id] Code
+
+-- Atomic expressions cause only bounded evaluation.
+data Atomic
+  = Lit Literal
+  | Prim Builtin [Id]
+  | ConTag Ctag [Id]
+  | Lam Id Code
+  | RecLam Id Id Code
 
 ----------------------------------------------------------------------
 -- Show
 
-instance Show Code where show = intercalate "\n" . pretty
+instance Show Code where show = intercalate "\n" . ("let k () = ()":) . pretty
 
 pretty :: Code -> Lines
 pretty = \case
-  Var _ x -> [show x]
+  Atomic a -> onHead ("k "++) $ prettyA a
+  Var _ x -> ["k "++show x]
+  App x1 _ x2 -> [printf "%s %s k" (show x1) (show x2)]
+  LetAtomic x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyA rhs)) ++ pretty body
+  PushContinuation (x,later) first -> indented ("let k " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
+  Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
+
+prettyA :: Atomic -> Lines
+prettyA = \case
   Lit x -> [show x]
+  Prim b xs -> do [printf "PRIM_%s%s" (show b) (show xs)]
   ConTag tag [] -> [show tag]
   ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
-  Prim b xs -> do [printf "PRIM_%s%s" (show b) (show xs)]
-  Lam x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
-  RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
-  App x1 _ x2 -> [printf "%s %s" (show x1) (show x2)]
-  Let x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
-  Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
+  Lam x body -> bracket $ indented ("fun " ++ show x ++ " k ->") (pretty body)
+  RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
 
 prettyArm :: Arm -> Lines
 prettyArm = \case
@@ -73,19 +83,15 @@ evalCode0 exp =
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env@Env{venv} = \case
+  Atomic a -> evalA a
   Var _pos x -> \k -> k (look x)
-  Lit literal -> \k -> k (evalLit literal)
-  ConTag (Ctag tag) xs -> \k -> k (VCons tag (map look xs))
-  Prim b xs -> \k -> do evalBuiltin b (map look xs) k
-  Lam x body -> \k -> do
-    k (VFunc (\arg k -> evalCode env { venv = Map.insert x arg venv } body k))
-  RecLam f x body -> \k -> do
-    let me = VFunc (\arg k -> evalCode env { venv = Map.insert f me (Map.insert x arg venv) } body k)
-    k me
   App x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
-  Let x c1 c2 -> \k -> do
-    evalCode env c1 $ \v1 -> do
+  LetAtomic x a1 c2 -> \k -> do
+    evalA a1 $ \v1 -> do
       evalCode env { venv = Map.insert x v1 venv } c2 k
+  PushContinuation (x,later) first -> \k -> do
+    evalCode env first $ \v1 -> do
+      evalCode env { venv = Map.insert x v1 venv } later k
   Case scrut arms0 -> \k -> do
     case (look scrut) of
       VCons tagActual vArgs -> do
@@ -102,6 +108,17 @@ evalCode env@Env{venv} = \case
       v ->
         error (printf "case/scrut not a constructed value: %s" (show v))
   where
+    evalA :: Atomic -> (Value -> Interaction) -> Interaction
+    evalA = \case
+      Lit literal -> \k -> k (evalLit literal)
+      Prim b xs -> \k -> evalBuiltin b (map look xs) k
+      ConTag (Ctag tag) xs -> \k -> k (VCons tag (map look xs))
+      Lam x body -> \k -> do
+        k (VFunc (\arg k -> evalCode env { venv = Map.insert x arg venv } body k))
+      RecLam f x body -> \k -> do
+        let me = VFunc (\arg k -> evalCode env { venv = Map.insert f me (Map.insert x arg venv) } body k)
+        k me
+
     look :: Id -> Value
     look x = do
       maybe err id $ Map.lookup x venv
@@ -116,7 +133,7 @@ env0 = Env { venv = Map.empty }
 -- Compile
 
 -- | Convert to ANF. Generate name for all sub expressions.
--- | TODO: distinguish binding of Atomic/Compound expressions
+-- | Distinguish binding of Atomic/Compound expressions
 
 compile :: SRC.Exp -> Transformed
 compile e = runM (trans e)
@@ -126,15 +143,15 @@ trans = \case
   SRC.Var p x -> do
     pure $ Var p x
   SRC.Lit x -> do
-    pure $ Lit x
+    pure $ Atomic $ Lit x
   SRC.ConTag tag es -> do
     transIds es $ \xs ->
-      pure $ ConTag tag xs
+      pure $ Atomic $ ConTag tag xs
   SRC.Prim b es -> do
     transIds es $ \xs ->
-      pure $ Prim b xs
-  SRC.Lam x body -> Lam x <$> trans body
-  SRC.RecLam f x body -> RecLam f x <$> trans body
+      pure $ Atomic $ Prim b xs
+  SRC.Lam x body -> (Atomic . Lam x) <$> trans body
+  SRC.RecLam f x body -> (Atomic . RecLam f x) <$> trans body
   SRC.App e1 p e2 -> do
     transId e1 $ \x1 -> do
       transId e2 $ \x2 -> do
@@ -142,11 +159,16 @@ trans = \case
   SRC.Let x rhs body -> do
     rhs <- trans rhs
     body <- trans body
-    pure $ Let x rhs body
+    pure $ mkLet x rhs body
   SRC.Case scrut arms -> do
     transId scrut $ \scrut -> do
       arms <- mapM transArm arms
       pure $ Case scrut arms
+
+mkLet :: Id -> Code -> Code -> Code
+mkLet x rhs body = case rhs of
+  Atomic rhs -> LetAtomic x rhs body
+  _ -> PushContinuation (x,body) rhs
 
 transArm :: SRC.Arm -> M Arm
 transArm (SRC.ArmTag tag xs exp) = do
@@ -159,7 +181,7 @@ transId e k = case e of
   _ -> do
     u <- Fresh "u"
     code <- trans e
-    Let u code <$> k u
+    mkLet u code <$> k u
 
 transIds :: [SRC.Exp] -> ([Id] -> M Code) -> M Code
 transIds es k = case es of
