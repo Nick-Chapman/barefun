@@ -5,7 +5,7 @@ import Data.Map (Map)
 import Stage0 (Prog,Def,Exp,Arm,Literal,Id,Cid)
 import Interaction (Interaction(..))
 import Par4 (Position(..))
-import Predefined (cUnit,cFalse,cTrue,cNil,cCons)
+import Stage0 (cUnit,cFalse,cTrue,cNil,cCons)
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map

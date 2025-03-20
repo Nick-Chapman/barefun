@@ -1,5 +1,6 @@
 module Stage0
   ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..)
+  , cUnit,cFalse,cTrue,cNil,cCons
   ) where
 
 import Builtin (Builtin)
@@ -33,6 +34,12 @@ newtype Id = Id String
 newtype Cid = Cid String
   deriving (Eq,Ord)
 
+cUnit,cFalse,cTrue,cNil,cCons :: Cid
+cUnit = Cid "Unit"
+cTrue = Cid "true"
+cFalse = Cid "false"
+cNil = Cid "[]"
+cCons = Cid "::"
 
 instance Show Prog where show (Prog defs) = intercalate "\n" (map show defs)
 instance Show Def where show = intercalate "\n" . prettyDef

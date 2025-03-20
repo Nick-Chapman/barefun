@@ -1,10 +1,9 @@
 module Predefined
   ( wrapPreDefs
-  , cUnit,cFalse,cTrue,cNil,cCons
   ) where
 
 import Builtin (Builtin(..))
-import Stage0 (Prog(..),Def(..),Exp(..),Id(..), Cid(..))
+import Stage0 (Prog(..),Def(..),Exp(..),Id(..), cCons)
 
 wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =
@@ -35,10 +34,3 @@ wrapPreDefs (Prog defs) =
         ey = Var Nothing y
         x = Id "x"
         y = Id "y"
-
-cUnit,cFalse,cTrue,cNil,cCons :: Cid
-cUnit = Cid "Unit"
-cTrue = Cid "true"
-cFalse = Cid "false"
-cNil = Cid "[]"
-cCons = Cid "::"

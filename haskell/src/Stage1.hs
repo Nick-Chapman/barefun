@@ -10,7 +10,7 @@ import Data.Set (Set,member,union,(\\),singleton)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Predefined (cUnit,cFalse,cTrue,cNil,cCons)
+import Stage0 (cUnit,cFalse,cTrue,cNil,cCons)
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
