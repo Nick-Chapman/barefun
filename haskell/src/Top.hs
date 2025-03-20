@@ -20,13 +20,13 @@ main = do
     JustParse0 -> do
       printf "[ast]\n----------\n%s\n----------\n" (show prog)
     Eval0 -> do
-      putStrLn "[haskell-eval0]"
+      putStrLn "[stage0]"
       runTerm (Eval0.executeProg prog)
     Compile1 -> do
       let e1 = Transform1.compile prog
       printf "[transform1]\n----------\n%s\n----------\n" (show e1)
     Eval1 -> do
-      putStrLn "[haskell-eval1]"
+      putStrLn "[stage1]"
       let e1 = Transform1.compile prog
       runTerm (Transform1.execute e1)
     Compile2 -> do
@@ -34,7 +34,7 @@ main = do
       let e2 = Transform2.compile e1
       printf "[transform2]\n----------\n%s\n----------\n" (show e2)
     Eval2 -> do
-      putStrLn "[haskell-eval2]"
+      putStrLn "[stage2]"
       let e1 = Transform1.compile prog
       let e2 = Transform2.compile e1
       runTerm (Transform2.execute e2)
@@ -58,6 +58,6 @@ parseCommandLine = loop
       "-compile1":xs -> loop Compile1 xs
       "-eval1":xs -> loop Eval1 xs
       "-compile2":xs -> loop Compile2 xs
-      "-eval2":xs -> loop Eval1 xs
+      "-eval2":xs -> loop Eval2 xs
       [path] -> Config { path, mode }
       xs -> error (show ("parseCommandLine",xs))

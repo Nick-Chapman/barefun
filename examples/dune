@@ -1,0 +1,13 @@
+(cram
+ (deps
+  ../haskell/main.exe
+  ../ocaml/bin/tiny.exe
+  ../ocaml/bin/small.exe
+  ../ocaml/bin/shell.exe
+  tiny.fun
+  tiny.input
+  small.fun
+  small.input
+  shell.fun
+  shell.input
+))
