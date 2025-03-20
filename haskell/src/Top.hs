@@ -6,8 +6,8 @@ import Predefined (wrapPreDefs)
 import Text.Printf (printf)
 import System.Environment (getArgs)
 import qualified Eval0 (executeProg)
-import qualified Transform1 (compile,execute)
-import qualified Transform2 (compile,execute)
+import qualified Stage1 (compile,execute)
+import qualified Stage2 (compile,execute)
 
 main :: IO ()
 main = do
@@ -23,21 +23,21 @@ main = do
       putStrLn "[stage0]"
       runTerm (Eval0.executeProg prog)
     (Stage1,Compile) -> do
-      let e1 = Transform1.compile prog
+      let e1 = Stage1.compile prog
       printf "[transform1]\n----------\n%s\n----------\n" (show e1)
     (Stage1,Eval) -> do
       putStrLn "[stage1]"
-      let e1 = Transform1.compile prog
-      runTerm (Transform1.execute e1)
+      let e1 = Stage1.compile prog
+      runTerm (Stage1.execute e1)
     (Stage2,Compile) -> do
-      let e1 = Transform1.compile prog
-      let e2 = Transform2.compile e1
+      let e1 = Stage1.compile prog
+      let e2 = Stage2.compile e1
       printf "[transform2]\n----------\n%s\n----------\n" (show e2)
     (Stage2,Eval) -> do
       putStrLn "[stage2]"
-      let e1 = Transform1.compile prog
-      let e2 = Transform2.compile e1
-      runTerm (Transform2.execute e2)
+      let e1 = Stage1.compile prog
+      let e2 = Stage2.compile e1
+      runTerm (Stage2.execute e2)
 
 data Config = Config { paths :: [String], mode :: Mode, stage :: Stage }
 

@@ -1,4 +1,4 @@
-module Exp0
+module Stage0
   ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..)
   ) where
 

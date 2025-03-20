@@ -2,14 +2,14 @@ module Eval0 (executeProg,evalLit,apply) where
 
 import Builtin (evalBuiltin)
 import Data.Map (Map)
-import Exp0 (Prog,Def,Exp,Arm,Literal,Id,Cid)
+import Stage0 (Prog,Def,Exp,Arm,Literal,Id,Cid)
 import Interaction (Interaction(..))
 import Par4 (Position(..))
 import Predefined (cUnit,cFalse,cTrue,cNil,cCons)
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
-import qualified Exp0 as AST
+import qualified Stage0 as AST
 
 executeProg :: Prog -> Interaction
 executeProg (AST.Prog defs) = loop env0 defs

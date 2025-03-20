@@ -4,7 +4,7 @@ module Predefined
   ) where
 
 import Builtin (Builtin(..))
-import Exp0 (Prog(..),Def(..),Exp(..),Id(..), Cid(..))
+import Stage0 (Prog(..),Def(..),Exp(..),Id(..), Cid(..))
 
 wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =

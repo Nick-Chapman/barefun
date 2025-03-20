@@ -1,4 +1,4 @@
-module Transform2 (compile, execute) where
+module Stage2 (compile, execute) where
 
 import Builtin (Builtin,evalBuiltin)
 import Control.Monad (ap,liftM)
@@ -10,7 +10,7 @@ import Par4 (Position(..))
 import Text.Printf (printf)
 import Value (Value(..))
 import qualified Data.Map as Map
-import qualified Transform1 as SRC
+import qualified Stage1 as SRC
 
 type Transformed = Code
 

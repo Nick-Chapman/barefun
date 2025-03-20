@@ -1,4 +1,4 @@
-module Transform1
+module Stage1
   ( Exp(..),Arm(..),Ctag(..),SRC.Literal(..),SRC.Id(..)
   , compile, execute, SRC.evalLit, SRC.apply
   ) where
@@ -15,7 +15,7 @@ import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (fromList,unions,empty)
-import qualified Exp0 as SRC
+import qualified Stage0 as SRC
 import qualified Eval0 as SRC (evalLit,apply)
 
 type Transformed = Exp
