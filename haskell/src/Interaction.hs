@@ -18,8 +18,8 @@ runTerm i = do
   where
     loop :: Interaction -> IO ()
     loop = \case
-      IDone ->
-        pure ()
+      IDone -> do
+        putStrLn "[HALT]"
       IDebug mes i -> do
         printf "[debug] %s" mes
         loop i

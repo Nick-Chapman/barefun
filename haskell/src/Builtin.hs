@@ -1,7 +1,7 @@
 module Builtin ( Builtin(..), evalBuiltin ) where
 
 import Interaction (Interaction(..))
-import Value (Value(..),tUnit,mkBool,mkList)
+import Value (Value(..),tUnit,mkBool,mkList,deUnit)
 import qualified Data.Char as Char (chr,ord)
 
 data Builtin
@@ -17,7 +17,6 @@ evalBuiltin b vs k = do
     unit = VCons tUnit []
     oneArg = \case [v] -> v; _ -> err
     twoArgs c1 c2 = \case [v1,v2] -> (c1 v1, c2 v2); _ -> err
-    deUnit = \case VCons tag [] | tag == tUnit -> (); _ -> err
     deNum = \case VNum n -> n; _ -> err
     deChar = \case VChar c -> c; _ -> err
     deString = \case VString s -> s; _ -> err

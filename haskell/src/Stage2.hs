@@ -8,7 +8,7 @@ import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
 import Text.Printf (printf)
-import Value (Value(..))
+import Value (Value(..),deUnit)
 import qualified Data.Map as Map
 import qualified Stage1 as SRC
 
@@ -131,9 +131,7 @@ runM m0 = loop 1 m0 $ \_ x -> x
 
 evalCode0 :: Code -> Interaction
 evalCode0 exp =
-  evalCode env0 exp $ \v ->
-  IDebug (printf "Final value: %s\n" (show v))
-  $ IDone
+  evalCode env0 exp $ \v -> case deUnit v of () -> IDone
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env@Env{venv} = \case

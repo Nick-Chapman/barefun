@@ -1,7 +1,7 @@
 module Value
   ( tUnit, tFalse, tTrue, tNil, tCons
   , Value(..)
-  , mkBool,mkList
+  , mkBool,mkList,deUnit
   ) where
 
 import Data.Word (Word16)
@@ -46,3 +46,6 @@ mkList :: [Value] -> Value
 mkList = \case
   [] -> vNil
   v:vs -> VCons tCons [v, mkList vs]
+
+deUnit :: Value -> ()
+deUnit = \case VCons tag [] | tag == tUnit -> (); _ -> error "deUnit"

@@ -13,7 +13,7 @@ import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Text.Printf (printf)
-import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
+import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
 
 execute :: Prog -> Interaction
@@ -127,9 +127,7 @@ executeProg (Prog defs) = loop env0 defs
     loop env@Env{venv,cenv} = \case
 
       [] -> do
-        eval env mainApp $ \v ->
-          IDebug (printf "Final value: %s\n" (show v))
-          $ IDone
+        eval env mainApp $ \v -> case deUnit v of () -> IDone
 
       ValDef name rhs : defs -> do
         eval env rhs $ \value -> do

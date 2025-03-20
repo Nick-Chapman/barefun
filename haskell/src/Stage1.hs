@@ -12,7 +12,7 @@ import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Stage0 (cUnit,cFalse,cTrue,cNil,cCons)
 import Text.Printf (printf)
-import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
+import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (fromList,unions,empty)
 import qualified Stage0 as SRC
@@ -163,9 +163,7 @@ prettyPat tag = \case
 
 executeExp :: Exp -> Interaction
 executeExp exp =
-  eval env0 exp $ \v ->
-  IDebug (printf "Final value: %s\n" (show v))
-  $ IDone
+  eval env0 exp $ \v -> case deUnit v of () -> IDone
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
 evals env es k = case es of
