@@ -21,12 +21,11 @@ import qualified Stage1 as SRC
 type Transformed = Code
 
 data Code
-  = Var (Maybe Position) Id
-  | App Id Position Id
+  = Return Id
+  | Tail Id Position Id
   | LetAtomic Id Atomic Code
   | PushContinuation (Id,Code) Code
   | Case Id [Arm]
-  | Atomic Atomic -- TODO: remove this
 
 data Arm = ArmTag Ctag [Id] Code
 
@@ -45,9 +44,8 @@ instance Show Code where show = intercalate "\n" . ("let k () = ()":) . pretty
 
 pretty :: Code -> Lines
 pretty = \case
-  Atomic a -> onHead ("k "++) $ prettyA a
-  Var _ x -> ["k "++show x]
-  App x1 _ x2 -> [printf "%s %s k" (show x1) (show x2)]
+  Return x -> ["k "++show x]
+  Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
   LetAtomic x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyA rhs)) ++ pretty body
   PushContinuation (x,later) first -> indented ("let k " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
@@ -83,9 +81,8 @@ evalCode0 exp =
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env@Env{venv} = \case
-  Atomic a -> evalA a
-  Var _pos x -> \k -> k (look x)
-  App x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
+  Return x -> \k -> k (look x)
+  Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode env { venv = Map.insert x v1 venv } c2 k
@@ -132,16 +129,28 @@ env0 = Env { venv = Map.empty }
 ----------------------------------------------------------------------
 -- Compile
 
--- | Convert to ANF. Generate name for all sub expressions.
--- | Distinguish binding of Atomic/Compound expressions
+-- | Convert to ANF. Generate name for all sub expressions, and code-returns.
+-- | Distinguish binding of Atomic/Compound expressions.
 
 compile :: SRC.Exp -> Transformed
-compile e = runM (trans e)
+compile e = runM (trans0 e)
 
-trans :: SRC.Exp -> M Code
-trans = \case
-  SRC.Var p x -> do
-    pure $ Var p x
+trans0 :: SRC.Exp -> M Code
+trans0 e = trans1 e >>= nameAtomic
+
+data AC = Compound Code | Atomic Atomic
+
+nameAtomic :: AC -> M Code
+nameAtomic = \case
+  Compound code -> pure code
+  Atomic a -> do
+    u <- Fresh "v" -- maybe name after the kind of atom being bound
+    pure $ LetAtomic u a (Return u)
+
+trans1 :: SRC.Exp -> M AC
+trans1 = \case
+  SRC.Var _pos x -> do
+    pure $ Compound $ Return x
   SRC.Lit x -> do
     pure $ Atomic $ Lit x
   SRC.ConTag tag es -> do
@@ -150,40 +159,41 @@ trans = \case
   SRC.Prim b es -> do
     transIds es $ \xs ->
       pure $ Atomic $ Prim b xs
-  SRC.Lam x body -> (Atomic . Lam x) <$> trans body
-  SRC.RecLam f x body -> (Atomic . RecLam f x) <$> trans body
+  SRC.Lam x body -> (Atomic . Lam x) <$> trans0 body
+  SRC.RecLam f x body -> (Atomic . RecLam f x) <$> trans0 body
   SRC.App e1 p e2 -> do
     transId e1 $ \x1 -> do
       transId e2 $ \x2 -> do
-        pure $ App x1 p x2
+        pure $ Compound $ Tail x1 p x2
   SRC.Let x rhs body -> do
-    rhs <- trans rhs
-    body <- trans body
-    pure $ mkLet x rhs body
+    rhs <- trans1 rhs
+    body <- trans0 body
+    pure $ Compound $ mkBind x rhs body
   SRC.Case scrut arms -> do
     transId scrut $ \scrut -> do
       arms <- mapM transArm arms
-      pure $ Case scrut arms
+      pure $ Compound $ Case scrut arms
 
-mkLet :: Id -> Code -> Code -> Code
-mkLet x rhs body = case rhs of
+mkBind :: Id -> AC -> Code -> Code
+mkBind x rhs body = case rhs of
+  Compound rhs -> PushContinuation (x,body) rhs
   Atomic rhs -> LetAtomic x rhs body
-  _ -> PushContinuation (x,body) rhs
 
 transArm :: SRC.Arm -> M Arm
 transArm (SRC.ArmTag tag xs exp) = do
-  exp <- trans exp
+  exp <- trans0 exp
   pure $ ArmTag tag xs exp
 
-transId :: SRC.Exp -> (Id -> M Code) -> M Code
-transId e k = case e of
-  SRC.Var _pos x -> k x
-  _ -> do
+transId :: SRC.Exp -> (Id -> M AC) -> M AC
+transId = \case
+  SRC.Var _pos x -> \k -> k x
+  e -> \k -> do
     u <- Fresh "u"
-    code <- trans e
-    mkLet u code <$> k u
+    code <- trans1 e
+    body <- (k u >>= nameAtomic)
+    pure $ Compound $ mkBind u code body
 
-transIds :: [SRC.Exp] -> ([Id] -> M Code) -> M Code
+transIds :: [SRC.Exp] -> ([Id] -> M AC) -> M AC
 transIds es k = case es of
   [] -> k []
   e:es -> do
