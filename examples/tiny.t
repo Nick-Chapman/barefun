@@ -9,19 +9,19 @@ Ocaml REPL
 
 Haskell REPL
 
-  $ cat tiny.input | ../haskell/main.exe -eval0 tiny.fun
+  $ cat tiny.input | ../haskell/main.exe tiny.fun -0
   [stage0]
   Hello,
   World!
   [EOF]
 
-  $ cat tiny.input | ../haskell/main.exe -eval1 tiny.fun
+  $ cat tiny.input | ../haskell/main.exe tiny.fun -1
   [stage1]
   Hello,
   World!
   [EOF]
 
-  $ cat tiny.input | ../haskell/main.exe -eval2 tiny.fun
+  $ cat tiny.input | ../haskell/main.exe tiny.fun -2
   [stage2]
   Hello,
   World!

@@ -17,7 +17,7 @@ Ocaml REPL
 
 Haskell REPL
 
-  $ cat shell.input | ../haskell/main.exe -eval0 shell.fun
+  $ cat shell.input | ../haskell/main.exe shell.fun -0
   [stage0]
   LOAD
   RUN
@@ -31,7 +31,7 @@ Haskell REPL
   You wrote: G**dbye {107}
   > [EOF]
 
-  $ cat shell.input | ../haskell/main.exe -eval1 shell.fun
+  $ cat shell.input | ../haskell/main.exe shell.fun -1
   [stage1]
   RUN
   > Hello, World!
@@ -44,7 +44,7 @@ Haskell REPL
   You wrote: G**dbye {107}
   > [EOF]
 
-  $ cat shell.input | ../haskell/main.exe -eval2 shell.fun
+  $ cat shell.input | ../haskell/main.exe shell.fun -2
   [stage2]
   RUN
   > Hello, World!

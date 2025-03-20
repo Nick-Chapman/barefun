@@ -11,53 +11,52 @@ import qualified Transform2 (compile,execute)
 
 main :: IO ()
 main = do
-  let defaultMode = Eval2
-  config <- parseCommandLine defaultMode <$> getArgs
-  let Config {path,mode} = config
+  config <- parseCommandLine <$> getArgs
+  let Config {paths,mode,stage} = config
+  let path = case paths of [] -> error "no .fun"; [x] -> x; _ -> error "too much .fun"
   s <- readFile path
   let prog = wrapPreDefs (parseProg s)
-  case mode of
-    JustParse0 -> do
+  case (stage,mode) of
+    (Stage0,Compile) -> do
       printf "[ast]\n----------\n%s\n----------\n" (show prog)
-    Eval0 -> do
+    (Stage0,Eval) -> do
       putStrLn "[stage0]"
       runTerm (Eval0.executeProg prog)
-    Compile1 -> do
+    (Stage1,Compile) -> do
       let e1 = Transform1.compile prog
       printf "[transform1]\n----------\n%s\n----------\n" (show e1)
-    Eval1 -> do
+    (Stage1,Eval) -> do
       putStrLn "[stage1]"
       let e1 = Transform1.compile prog
       runTerm (Transform1.execute e1)
-    Compile2 -> do
+    (Stage2,Compile) -> do
       let e1 = Transform1.compile prog
       let e2 = Transform2.compile e1
       printf "[transform2]\n----------\n%s\n----------\n" (show e2)
-    Eval2 -> do
+    (Stage2,Eval) -> do
       putStrLn "[stage2]"
       let e1 = Transform1.compile prog
       let e2 = Transform2.compile e1
       runTerm (Transform2.execute e2)
 
-data Config = Config { path :: String, mode :: Mode }
+data Config = Config { paths :: [String], mode :: Mode, stage :: Stage }
 
-data Mode
-  = JustParse0 | Eval0
-  | Compile1 | Eval1
-  | Compile2 | Eval2
+data Mode = Compile | Eval
 
-parseCommandLine :: Mode -> [String] -> Config
-parseCommandLine = loop
+data Stage = Stage0 | Stage1 | Stage2
+
+parseCommandLine :: [String] -> Config
+parseCommandLine = loop config0
   where
-    defaultCompilationMode = Compile2
-    loop :: Mode -> [String] -> Config
-    loop mode = \case
-      "-compile":xs -> loop defaultCompilationMode xs
-      "-parse":xs -> loop JustParse0 xs
-      "-eval0":xs -> loop Eval0 xs
-      "-compile1":xs -> loop Compile1 xs
-      "-eval1":xs -> loop Eval1 xs
-      "-compile2":xs -> loop Compile2 xs
-      "-eval2":xs -> loop Eval2 xs
-      [path] -> Config { path, mode }
-      xs -> error (show ("parseCommandLine",xs))
+    config0 = Config { paths = [], mode = Eval, stage = Stage2 }
+
+    loop :: Config -> [String] -> Config
+    loop config = \case
+      [] -> config
+      "-compile":xs     -> loop config { mode = Compile } xs
+      "-eval":xs        -> loop config { mode = Eval } xs
+      "-0":xs           -> loop config { stage = Stage0 } xs
+      "-1":xs           -> loop config { stage = Stage1 } xs
+      "-2":xs           -> loop config { stage = Stage2 } xs
+      ('-':flag):_      -> error (show ("unknown flag",flag))
+      x:xs              -> loop config { paths = paths config ++ [x] } xs
