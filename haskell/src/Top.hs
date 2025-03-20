@@ -5,7 +5,7 @@ import Parser (parseProg)
 import Predefined (wrapPreDefs)
 import Text.Printf (printf)
 import System.Environment (getArgs)
-import qualified Eval0 (executeProg)
+import qualified Stage0 (execute)
 import qualified Stage1 (compile,execute)
 import qualified Stage2 (compile,execute)
 
@@ -21,7 +21,7 @@ main = do
       printf "[ast]\n----------\n%s\n----------\n" (show prog)
     (Stage0,Eval) -> do
       putStrLn "[stage0]"
-      runTerm (Eval0.executeProg prog)
+      runTerm (Stage0.execute prog)
     (Stage1,Compile) -> do
       let e1 = Stage1.compile prog
       printf "[transform1]\n----------\n%s\n----------\n" (show e1)

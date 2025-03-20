@@ -16,7 +16,6 @@ import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (fromList,unions,empty)
 import qualified Stage0 as SRC
-import qualified Eval0 as SRC (evalLit,apply)
 
 type Transformed = Exp
 
