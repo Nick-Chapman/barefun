@@ -2,18 +2,21 @@
  (deps
   ../haskell/main.exe
 
+  ../ocaml/bin/fib.exe
   ../ocaml/bin/halts.exe
-  ../ocaml/bin/tiny.exe
-  ../ocaml/bin/small.exe
   ../ocaml/bin/shell.exe
+  ../ocaml/bin/small.exe
+  ../ocaml/bin/tiny.exe
 
+  fib.fun
   halts.fun
-  tiny.fun
-  small.fun
   shell.fun
+  small.fun
+  tiny.fun
 
   halts.input
-  tiny.input
-  small.input
   shell.input
+  small.input
+  tiny.input
+
 ))

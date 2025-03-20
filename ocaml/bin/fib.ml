@@ -10,6 +10,6 @@ let init_terminal_no_buffering () =
 let () =
   Printf.printf "[ocaml]\n";
   init_terminal_no_buffering();
-  let module M = Example_lib.Halts.F() in
+  let module M = Example_lib.Fib.F() in
   M.main();
   Printf.printf "[HALT]\n"

@@ -14,6 +14,16 @@
       )))
 
 (rule
+  (with-stdout-to fib.ml
+    (progn
+      (echo "module F() : sig val main : unit -> unit end = struct\n")
+      (echo "open Prim_lib.Prim\n")
+      (echo "#1 \"fib.fun\"\n")
+      (cat ../../examples/fib.fun)
+      (echo "end\n")
+      )))
+
+(rule
   (with-stdout-to tiny.ml
     (progn
       (echo "module F() : sig val main : unit -> unit end = struct\n")
