@@ -26,3 +26,9 @@ Haskell REPL
   Hello,
   World!
   [EOF]
+
+  $ cat tiny.input | ../haskell/main.exe tiny.fun
+  [stage3]
+  Hello,
+  World!
+  [EOF]

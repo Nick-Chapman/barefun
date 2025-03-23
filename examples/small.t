@@ -34,3 +34,11 @@ Haskell REPL
   > Good bye.
   Good bye.
   > [EOF]
+
+  $ cat small.input | ../haskell/main.exe small.fun
+  [stage3]
+  > Hello, World!
+  Hello, World!
+  > Good bye.
+  Good bye.
+  > [EOF]

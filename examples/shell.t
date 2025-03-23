@@ -100,3 +100,28 @@ Haskell REPL (stage2)
   > Goodbye
   You wrote: G**dbye {107}
   > [EOF]
+
+Haskell REPL
+
+  $ cat shell.input | ../haskell/main.exe shell.fun
+  [stage3]
+  RUN
+  > Hello, World!
+  You wrote: Hell*, W*rld! {113}
+  > fib
+  fib: ERROR: expected an argument
+  > fib xx
+  fib: ERROR: expected arg1 to be numeric
+  > fib xx yy
+  fib: ERROR: expected exactly one argument
+  > fib 20
+  fib: 20 --> 6765
+  > fib 21
+  fib: 21 --> 10946
+  > fact 6
+  fact: 6 --> 720
+  > fact 7
+  fact: 7 --> 5040
+  > Goodbye
+  You wrote: G**dbye {107}
+  > [EOF]

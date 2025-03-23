@@ -22,3 +22,8 @@ Haskell REPL
   [stage2]
   fib 20 --> 6765
   [HALT]
+
+  $ ../haskell/main.exe fib.fun
+  [stage3]
+  fib 20 --> 6765
+  [HALT]

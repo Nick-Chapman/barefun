@@ -18,3 +18,7 @@ Haskell REPL
   $ cat halts.input | ../haskell/main.exe halts.fun -2
   [stage2]
   XhYeZ[HALT]
+
+  $ cat halts.input | ../haskell/main.exe halts.fun
+  [stage3]
+  XhYeZ[HALT]

@@ -8,6 +8,7 @@ import System.Environment (getArgs)
 import qualified Stage0 (execute)
 import qualified Stage1 (compile,execute)
 import qualified Stage2 (compile,execute)
+import qualified Stage3 (compile,execute)
 
 main :: IO ()
 main = do
@@ -39,16 +40,28 @@ main = do
       let e2 = Stage2.compile e1
       runTerm (Stage2.execute e2)
 
+    (Stage3,Compile) -> do
+      let e1 = Stage1.compile prog
+      let e2 = Stage2.compile e1
+      let e3 = Stage3.compile e2
+      printf "[transform3]\n----------\n%s\n----------\n" (show e3)
+    (Stage3,Eval) -> do
+      putStrLn "[stage3]"
+      let e1 = Stage1.compile prog
+      let e2 = Stage2.compile e1
+      let e3 = Stage3.compile e2
+      runTerm (Stage3.execute e3)
+
 data Config = Config { paths :: [String], mode :: Mode, stage :: Stage }
 
 data Mode = Compile | Eval
 
-data Stage = Stage0 | Stage1 | Stage2
+data Stage = Stage0 | Stage1 | Stage2 | Stage3
 
 parseCommandLine :: [String] -> Config
 parseCommandLine = loop config0
   where
-    config0 = Config { paths = [], mode = Eval, stage = Stage2 }
+    config0 = Config { paths = [], mode = Eval, stage = Stage3 }
 
     loop :: Config -> [String] -> Config
     loop config = \case
@@ -58,5 +71,6 @@ parseCommandLine = loop config0
       "-0":xs           -> loop config { stage = Stage0 } xs
       "-1":xs           -> loop config { stage = Stage1 } xs
       "-2":xs           -> loop config { stage = Stage2 } xs
+      "-3":xs           -> loop config { stage = Stage3 } xs
       ('-':flag):_      -> error (show ("unknown flag",flag))
       x:xs              -> loop config { paths = paths config ++ [x] } xs
