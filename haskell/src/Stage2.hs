@@ -1,6 +1,6 @@
 -- | ANF style expressions. All sub-expressions named. Atomic/Compound expression forms distinguished.
 module Stage2
-  ( Code(..)
+  ( Code(..), Arm(..), Atomic(..), Fvs(..)
   , execute
   , compile
   ) where
