@@ -1,6 +1,6 @@
 -- | ANF style expressions. All sub-expressions named. Atomic/Compound expression forms distinguished.
 module Stage2
-  ( Code(..), Arm(..), Atomic(..), Fvs(..)
+  ( Code(..), Arm(..), Atomic(..)
   , execute
   , compile
   ) where
@@ -40,14 +40,10 @@ data Atomic
   | Lam Fvs Id Code
   | RecLam Fvs Id Id Code
 
-newtype Fvs = Fvs (Set Id)
+type Fvs = [Id]
 
 ----------------------------------------------------------------------
 -- Show
-
-instance Show Fvs where
-  show (Fvs set) =
-    "{" ++ intercalate "," (map show (Set.toList set)) ++ "}"
 
 instance Show Code where show = intercalate "\n" . ("let k () = ()":) . pretty
 
@@ -233,21 +229,21 @@ runM m0 = loop 1 m0 $ \_ x -> x
 -- Free Vars
 
 mkLam :: Id -> Code -> Atomic
-mkLam x code = Lam (Fvs (fvs code \\ singleton x)) x code
+mkLam x code = Lam (Set.toList (fvs code \\ singleton x)) x code
 
 mkRecLam :: Id -> Id -> Code -> Atomic
-mkRecLam f x code = RecLam (Fvs (fvs code \\ Set.fromList [f,x])) f x code
+mkRecLam f x code = RecLam (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
 
 mkPushContinuation :: (Id,Code) -> Code -> Code
 mkPushContinuation (x,body) rhs =
-  PushContinuation (Fvs (fvs rhs `union` (fvs body \\ singleton x))) (x,body) rhs
+  PushContinuation (Set.toList (fvs rhs `union` (fvs body \\ singleton x))) (x,body) rhs
 
 fvs :: Code -> Set Id
 fvs = \case
   Return x -> singleton x
   Tail x1 _ x2 -> Set.fromList [x1,x2]
   LetAtomic x rhs body-> fvsA rhs `union` (fvs body \\ singleton x)
-  PushContinuation (Fvs set) _ _ -> set
+  PushContinuation fvs _ _ -> Set.fromList fvs
   Case scrut arms -> singleton scrut `union` Set.unions (map fvsArm arms)
   where
     fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs
@@ -257,5 +253,5 @@ fvsA = \case
   Lit _ -> Set.empty
   ConTag _ xs -> Set.fromList xs
   Prim _ xs -> Set.fromList xs
-  Lam (Fvs set) _ _ -> set
-  RecLam (Fvs set) _ _ _ -> set
+  Lam fvs _ _ -> Set.fromList fvs
+  RecLam fvs _ _ _ -> Set.fromList fvs

@@ -5,10 +5,8 @@ module Stage3
   ) where
 
 import Builtin (Builtin,evalBuiltin)
---import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
---import Data.Set (Set,singleton,(\\),union)
 import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
@@ -17,32 +15,34 @@ import Stage1 (Ctag(..))
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
-
-import qualified Stage2 as SRC --(Code(..),execute)
+import qualified Stage2 as SRC (Code(..),Atomic(..),Arm(..))
 
 type Transformed = Code
 
--- TODO: Move from Using Id --> data Ref = Ref Loc Id
 -- TODO: define GCode, for seq of LetAtomic(for Atomic glob-Contag/Literal & freevar-less-Lam/RecLamm)
--- TODO: data Loc = Global Int | InFrame Int | Local Int | Arg
 
 data Code
-  = Return Id
-  | Tail Id Position Id
-  | LetAtomic Id Atomic Code
-  | PushContinuation Fvs (Id,Code) Code -- TODO: Not Fvs, but [Ref]
-  | Case Id [Arm]
+  = Return Ref
+  | Tail Ref Position Ref
+  | LetAtomic Ref Atomic Code
+  | PushContinuation [Ref] (Ref,Code) Code
+  | Case Ref [Arm]
 
-data Arm = ArmTag Ctag [Id] Code
+data Arm = ArmTag Ctag [Ref] Code
 
 data Atomic
-  = Lit Literal -- TODO Never here
-  | Prim Builtin [Id]
-  | ConTag Ctag [Id]
-  | Lam Fvs Id Code  -- TODO: Not Fvs, but [Ref]
-  | RecLam Fvs Id Id Code  -- TODO: Not Fvs, but [Ref]
+  = Lit Literal -- TODO Never here. Will always be lifted to a global
+  | Prim Builtin [Ref]
+  | ConTag Ctag [Ref]
+  | Lam [Ref] Ref Code
+  | RecLam [Ref] Ref Ref Code
 
-type Fvs = SRC.Fvs
+data Location = Global Int | InFrame Int | Temp Int | TheFrame | TheArg deriving (Eq,Ord)
+data Ref = Ref Id Location
+
+firstFrameIndex,firstTempIndex :: Int
+firstFrameIndex = 1
+firstTempIndex = 1
 
 ----------------------------------------------------------------------
 -- Show
@@ -71,10 +71,21 @@ prettyArm = \case
   ArmTag c xs rhs -> do
     indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
 
-prettyPat :: Ctag -> [Id] -> String
+prettyPat :: Ctag -> [Ref] -> String
 prettyPat tag = \case
   [] -> show tag
   xs -> printf "%s(%s)" (show tag) (intercalate "," (map show xs))
+
+instance Show Ref where show (Ref x loc) = show x ++ "_" ++ show loc
+
+instance Show Location where
+  show = \case
+    Global n -> "g" ++ show n
+    InFrame n -> "f" ++ show n
+    Temp n -> "t" ++ show n
+    TheArg -> "arg"
+    TheFrame -> "me"
+
 
 ----------------------------------------------------------------------
 -- Execute
@@ -87,15 +98,16 @@ evalCode0 exp =
   evalCode env0 exp $ \v -> case deUnit v of () -> IDone
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
-evalCode env@Env{venv} = \case
+evalCode env = \case
   Return x -> \k -> k (look x)
   Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
-      evalCode env { venv = Map.insert x v1 venv } c2 k
-  PushContinuation _ (x,later) first -> \k -> do
+      evalCode (insert x v1 env) c2 k
+  PushContinuation fvs (x,later) first -> \k -> do
     evalCode env first $ \v1 -> do
-      evalCode env { venv = Map.insert x v1 venv } later k
+      let env = mkFrameEnv look fvs
+      evalCode (insert x v1 env) later k
   Case scrut arms0 -> \k -> do
     case (look scrut) of
       VCons tagActual vArgs -> do
@@ -106,7 +118,7 @@ evalCode env@Env{venv} = \case
             ArmTag (Ctag tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
-                  let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
+                  let env' = foldr (uncurry insert) env (zip xs vArgs)
                   evalCode env' body k
         dispatch arms0
       v ->
@@ -117,43 +129,86 @@ evalCode env@Env{venv} = \case
       Lit literal -> \k -> k (evalLit literal)
       Prim b xs -> \k -> evalBuiltin b (map look xs) k
       ConTag (Ctag tag) xs -> \k -> k (VCons tag (map look xs))
-      Lam _fvs x body -> \k -> do
-        k (VFunc (\arg k -> evalCode env { venv = Map.insert x arg venv } body k))
-      RecLam _fvs f x body -> \k -> do
-        let me = VFunc (\arg k -> evalCode env { venv = Map.insert f me (Map.insert x arg venv) } body k)
+
+      Lam fvs x body -> \k -> do
+        let env = mkFrameEnv look fvs
+        k (VFunc (\arg k -> evalCode (insert x arg env) body k))
+
+      RecLam fvs f x body -> \k -> do
+        let env = mkFrameEnv look fvs
+        let me = VFunc (\arg k -> do evalCode (insert x arg (insert f me env)) body k)
         k me
 
-    look :: Id -> Value
-    look x = do
-      maybe err id $ Map.lookup x venv
-        where err = error (show ("var-lookup",x))
+    look :: Ref -> Value
+    look (Ref x loc) = do
+      let Env{venv} = env
+      maybe err id $ Map.lookup loc venv
+        where err = error (show ("var-lookup",x,loc))
 
-data Env = Env { venv :: Map Id Value }
+data Env = Env { venv :: Map Location Value }
 
 env0 :: Env
 env0 = Env { venv = Map.empty }
+
+mkFrameEnv :: (Ref -> Value) -> [Ref] -> Env
+mkFrameEnv look fvs =
+  Env $ Map.fromList $ [ (InFrame n, look ref) | (n,ref) <- zip [firstFrameIndex..] fvs ]
+
+insert :: Ref -> Value -> Env -> Env
+insert (Ref _ loc) v Env{venv} = Env { venv = Map.insert loc v venv }
 
 ----------------------------------------------------------------------
 -- Compile
 
 compile :: SRC.Code -> Transformed
-compile = walkC
+compile = compileC [] []
 
-walkC :: SRC.Code -> Code
-walkC = \case
-  SRC.Return x -> Return x
-  SRC.Tail x1 pos x2 -> Tail x1 pos x2
-  SRC.LetAtomic x a1 c2 -> LetAtomic x (walkA a1) (walkC c2)
-  SRC.PushContinuation fvs (x,later) first -> PushContinuation fvs (x,walkC later) (walkC first)
-  SRC.Case scrut arms -> Case scrut (map walkArm arms)
+compileC :: [Id] -> [(Id,Ref)] -> SRC.Code -> Code
+compileC fvs binds = walkC firstTempIndex (Map.fromList (binds ++ mkFreeCenv fvs))
 
-walkA :: SRC.Atomic -> Atomic
-walkA = \case
-  SRC.Lit literal -> Lit literal
-  SRC.Prim b xs -> Prim b xs
-  SRC.ConTag tag xs -> ConTag tag xs
-  SRC.Lam fvs x body -> Lam fvs x (walkC body)
-  SRC.RecLam fvs f x body -> RecLam fvs f x (walkC body)
+  where
+    walkC :: Int -> Cenv -> SRC.Code -> Code
+    walkC nextTemp cenv = \case
+      SRC.Return x -> Return (locate x)
+      SRC.Tail x1 pos x2 -> Tail (locate x1) pos (locate x2)
 
-walkArm :: SRC.Arm -> Arm
-walkArm (SRC.ArmTag tag xs body) = ArmTag tag xs (walkC body)
+      SRC.LetAtomic x a1 c2 -> do
+        let ref = Ref x (Temp nextTemp)
+        let cenv' = Map.insert x ref cenv
+        LetAtomic ref (walkA a1) (walkC (nextTemp+1) cenv' c2)
+
+      SRC.PushContinuation fvs (x,later) first -> do
+        let ref = Ref x TheArg
+        PushContinuation (map locate fvs) (ref,compileC fvs [(x,ref)] later) (walkC nextTemp cenv first)
+
+      SRC.Case scrut arms ->
+        Case (locate scrut) (map walkArm arms)
+
+      where
+        locate :: Id -> Ref
+        locate x = maybe err id $ Map.lookup x cenv
+          where err = error (show ("locate",x))
+
+        walkA :: SRC.Atomic -> Atomic
+        walkA = \case
+          SRC.Lit literal -> Lit literal
+          SRC.Prim b xs -> Prim b (map locate xs)
+          SRC.ConTag tag xs -> ConTag tag (map locate xs)
+          SRC.Lam fvs x body -> do
+            let ref = Ref x TheArg
+            Lam (map locate fvs) ref (compileC fvs [(x,ref)] body)
+          SRC.RecLam fvs f x body -> do
+            let fRef = Ref f TheFrame
+            let xRef = Ref x TheArg
+            RecLam (map locate fvs) fRef xRef (compileC fvs [(f,fRef),(x,xRef)]  body)
+
+        walkArm :: SRC.Arm -> Arm
+        walkArm (SRC.ArmTag tag xs body) = do
+          let refs = [ Ref x (Temp n) | (x,n) <- zip xs [nextTemp..] ]
+          let cenv' = foldr (uncurry Map.insert) cenv (zip xs refs)
+          ArmTag tag refs (walkC (nextTemp + length xs) cenv' body)
+
+mkFreeCenv :: [Id] -> [(Id,Ref)]
+mkFreeCenv free = [ (x,Ref x (InFrame n)) | (x,n) <- zip free [firstFrameIndex..] ]
+
+type Cenv = Map Id Ref -- TODO: keep global part separate, when implement global lifting
