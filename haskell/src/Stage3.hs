@@ -34,7 +34,7 @@ data Code
   = Return Ref
   | Tail Ref Position Ref
   | LetAtomic Ref Atomic Code
-  | PushContinuation [Ref] (Ref,Code) Code
+  | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Case Ref [Arm]
 
 data Arm = ArmTag Ctag [Ref] Code
@@ -43,8 +43,8 @@ data Atomic
   = Lit Literal -- TODO Never here. Will always be lifted to a global
   | Prim Builtin [Ref]
   | ConTag Ctag [Ref]
-  | Lam [Ref] Ref Code
-  | RecLam [Ref] Ref Ref Code
+  | Lam [Ref] [Ref] Ref Code
+  | RecLam [Ref] [Ref] Ref Ref Code
 
 data Location = Global Int | InFrame Int | Temp Int | TheFrame | TheArg deriving (Eq,Ord)
 data Ref = Ref Id Location
@@ -75,7 +75,7 @@ prettyC = \case
   Return x -> ["k "++show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
   LetAtomic x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyA rhs)) ++ prettyC body
-  PushContinuation fvs (x,later) first -> indented ("let k " ++ show fvs ++ " " ++ show x ++ " =") (onTail (++ " in") (prettyC later)) ++ prettyC first
+  PushContinuation pre post (x,later) first -> indented ("let k = " ++ show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " ->") (onTail (++ " in") (prettyC later)) ++ prettyC first
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
 
 prettyA :: Atomic -> Lines
@@ -84,8 +84,8 @@ prettyA = \case
   Prim b xs -> do [printf "PRIM_%s%s" (show b) (show xs)]
   ConTag tag [] -> [show tag]
   ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
-  Lam fvs x body -> bracket $ indented ("fun" ++ show fvs ++ " " ++ show x ++ " k ->") (prettyC body)
-  RecLam fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun" ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (prettyC body)
+  Lam pre post x body -> bracket $ indented (show pre ++ ", fun" ++ show post ++ " " ++ show x ++ " k ->") (prettyC body)
+  RecLam pre post f x body -> onHead ((show pre ++ ", fix ")++) $ bracket $ indented ("fun" ++ show post ++ " " ++ show f ++ " " ++ show x ++ " k ->") (prettyC body)
 
 prettyArm :: Arm -> Lines
 prettyArm = \case
@@ -141,9 +141,9 @@ evalCode genv env = \case
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode genv (insert x v1 env) c2 k
-  PushContinuation fvs (x,later) first -> \k -> do
+  PushContinuation pre _ (x,later) first -> \k -> do
     evalCode genv env first $ \v1 -> do
-      let env = mkFrameEnv genv look fvs
+      let env = mkFrameEnv genv look pre
       evalCode genv (insert x v1 env) later k
   Case scrut arms0 -> \k -> do
     case (look scrut) of
@@ -167,12 +167,12 @@ evalCode genv env = \case
       Prim b xs -> \k -> evalBuiltin b (map look xs) k
       ConTag (Ctag tag) xs -> \k -> k (VCons tag (map look xs))
 
-      Lam fvs x body -> \k -> do
-        let env = mkFrameEnv genv look fvs
+      Lam pre _ x body -> \k -> do
+        let env = mkFrameEnv genv look pre
         k (VFunc (\arg k -> evalCode genv (insert x arg env) body k))
 
-      RecLam fvs f x body -> \k -> do
-        let env = mkFrameEnv genv look fvs
+      RecLam pre _ f x body -> \k -> do
+        let env = mkFrameEnv genv look pre
         let me = VFunc (\arg k -> do evalCode genv (insert x arg (insert f me env)) body k)
         k me
 
@@ -231,9 +231,9 @@ compileC = walkC firstTempIndex
       SRC.PushContinuation fvs (x,later) first -> do
         let xRef = Ref x TheArg
         first <- walkC nextTemp cenv first
-        let (cenv,freeRefs) = frame locate fvs
+        let (cenv,pre,post) = frame locate fvs
         later <- compileC (Map.insert x xRef cenv) later
-        pure $ PushContinuation freeRefs (xRef,later) first
+        pure $ PushContinuation pre post (xRef,later) first
 
       SRC.Case scrut arms -> do
         arms <- mapM walkArm arms
@@ -259,33 +259,35 @@ compileC = walkC firstTempIndex
 
           SRC.Lam fvs x body -> do
             let xRef = Ref x TheArg
-            let (cenv,free) = frame locate fvs
+            let (cenv,pre,post) = frame locate fvs
             body <- compileC (Map.insert x xRef cenv) body
-            pure $ Lam free xRef body
+            pure $ Lam pre post xRef body
 
           SRC.RecLam fvs f x body -> do
             let fRef = Ref f TheFrame
             let xRef = Ref x TheArg
-            let (cenv,free) = frame locate fvs
+            let (cenv,pre,post) = frame locate fvs
             body <- compileC (Map.insert f fRef (Map.insert x xRef cenv)) body
-            pure $ RecLam free fRef xRef body
+            pure $ RecLam pre post fRef xRef body
 
 maybeLiftable :: Atomic -> Maybe Top
 maybeLiftable = \case
   Lit literal -> Just (TopLit literal)
-  Lam [] x body -> Just (TopLam x body)
-  RecLam [] f x body -> Just (TopRecLam f x body)
+  Lam [] [] x body -> Just (TopLam x body)
+  RecLam [] [] f x body -> Just (TopRecLam f x body)
   _ -> Nothing
 
-frame :: (Id -> Ref) -> [Id] -> (Cenv,[Ref])
+frame :: (Id -> Ref) -> [Id] -> (Cenv,[Ref],[Ref])
 frame locate fvs = do
   -- partition fvs in global/truely-free
   let globXs = [ x | x <- fvs, isGlobal (locate x) ]
   let freeXs = [ x | x <- fvs, not (isGlobal (locate x)) ]
-  let cenv = Map.fromList $
-        [ (x,locate x) | x <- globXs ] ++
-        [ (x,Ref x (InFrame n)) | (x,n) <- zip freeXs [firstFrameIndex..] ]
-  (cenv, map locate freeXs)
+
+  let pre = map locate freeXs
+  let post = [ Ref x (InFrame n) | (x,n) <- zip freeXs [firstFrameIndex..] ]
+
+  let cenv = Map.fromList $ [ (x,locate x) | x <- globXs ] ++ [ (x,ref) | ref@(Ref x _) <- post ]
+  (cenv, pre, post)
 
 -- TODO: can we regard the "me" arg of a top-level lam-rec (ie. no freevars) as being global
 isGlobal :: Ref -> Bool
