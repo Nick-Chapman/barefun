@@ -85,15 +85,15 @@ evalCode0 exp =
   evalCode env0 exp $ \v -> case deUnit v of () -> IDone
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
-evalCode env@Env{venv} = \case
+evalCode env = \case
   Return x -> \k -> k (look x)
   Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
-      evalCode env { venv = Map.insert x v1 venv } c2 k
-  PushContinuation _ (x,later) first -> \k -> do
+      evalCode (insert x v1 env) c2 k
+  PushContinuation fvs (x,later) first -> \k -> do
     evalCode env first $ \v1 -> do
-      evalCode env { venv = Map.insert x v1 venv } later k
+      evalCode (insert x v1 (limit fvs env)) later k
   Case scrut arms0 -> \k -> do
     case (look scrut) of
       VCons tagActual vArgs -> do
@@ -104,7 +104,7 @@ evalCode env@Env{venv} = \case
             ArmTag (Ctag tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
-                  let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
+                  let env' = foldr (uncurry insert) env (zip xs vArgs)
                   evalCode env' body k
         dispatch arms0
       v ->
@@ -115,18 +115,25 @@ evalCode env@Env{venv} = \case
       Lit literal -> \k -> k (evalLit literal)
       Prim b xs -> \k -> evalBuiltin b (map look xs) k
       ConTag (Ctag tag) xs -> \k -> k (VCons tag (map look xs))
-      Lam _fvs x body -> \k -> do
-        k (VFunc (\arg k -> evalCode env { venv = Map.insert x arg venv } body k))
-      RecLam _fvs f x body -> \k -> do
-        let me = VFunc (\arg k -> evalCode env { venv = Map.insert f me (Map.insert x arg venv) } body k)
+      Lam fvs x body -> \k -> do
+        k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
+      RecLam fvs f x body -> \k -> do
+        let me = VFunc (\arg k -> evalCode (insert f me (insert x arg (limit fvs env))) body k)
         k me
 
     look :: Id -> Value
     look x = do
+      let Env{venv} = env
       maybe err id $ Map.lookup x venv
         where err = error (show ("var-lookup",x))
 
 data Env = Env { venv :: Map Id Value }
+
+limit :: [Id] -> Env -> Env
+limit fvs Env{venv} = Env $ Map.fromList [ (x,v) | (x,v) <- Map.toList venv, x `elem` fvs ]
+
+insert :: Id -> Value -> Env -> Env
+insert x v Env{venv} = Env { venv = Map.insert x v venv }
 
 env0 :: Env
 env0 = Env { venv = Map.empty }
