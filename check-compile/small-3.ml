@@ -63,22 +63,21 @@ let u20_g12 = '\n' in
 let readloop_g13 =
   fix (fun readloop_me sofar_arg k ->
     let k = [readloop_me,sofar_arg], fun [readloop_f1,sofar_f2] theChar_arg ->
-      let k = [readloop_f1,sofar_f2], fun [readloop_f1,sofar_f2] gotten_arg ->
-        let k = [gotten_arg,readloop_f1,sofar_f2], fun [gotten_f1,readloop_f2,sofar_f3] u18_arg ->
-          match u18_arg with
-          | Tag_1 ->
-            let k = [sofar_f3], fun [sofar_f1] __arg -> reverse_g9 sofar_f1 k in
-            let u21_t1 = Tag_0 in
-            newline_g11 u21_t1 k
-          | Tag_0 ->
-            let k = [gotten_f1,readloop_f2,sofar_f3], fun [gotten_f1,readloop_f2,sofar_f3] __arg ->
-              let k = [readloop_f2], fun [readloop_f1] u22_arg -> readloop_f1 u22_arg k in
-              let k = [sofar_f3], fun [sofar_f1] u23_arg -> u23_arg sofar_f1 k in
-              ::_g5 gotten_f1 k in
-            put_char_g3 gotten_f1 k in
-        let k = [], fun [] u19_arg -> u19_arg u20_g12 k in
-        eq_char_g1 gotten_arg k in
-      k theChar_arg in
+      let gotten_arg = theChar_arg in
+      let k = [gotten_arg,readloop_f1,sofar_f2], fun [gotten_f1,readloop_f2,sofar_f3] u18_arg ->
+        match u18_arg with
+        | Tag_1 ->
+          let k = [sofar_f3], fun [sofar_f1] __arg -> reverse_g9 sofar_f1 k in
+          let u21_t1 = Tag_0 in
+          newline_g11 u21_t1 k
+        | Tag_0 ->
+          let k = [gotten_f1,readloop_f2,sofar_f3], fun [gotten_f1,readloop_f2,sofar_f3] __arg ->
+            let k = [readloop_f2], fun [readloop_f1] u22_arg -> readloop_f1 u22_arg k in
+            let k = [sofar_f3], fun [sofar_f1] u23_arg -> u23_arg sofar_f1 k in
+            ::_g5 gotten_f1 k in
+          put_char_g3 gotten_f1 k in
+      let k = [], fun [] u19_arg -> u19_arg u20_g12 k in
+      eq_char_g1 gotten_arg k in
     let u17_t1 = Tag_0 in
     get_char_g4 u17_t1 k) in
 let read_line_g14 =

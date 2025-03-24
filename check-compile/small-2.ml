@@ -66,24 +66,23 @@ let read_line =
     let readloop =
       fix (fun[::,eq_char,get_char,newline,put_char,reverse] readloop sofar k ->
         let k [::,eq_char,newline,put_char,readloop,reverse,sofar] theChar =
-          let k [::,eq_char,newline,put_char,readloop,reverse,sofar] gotten =
-            let k [::,gotten,newline,put_char,readloop,reverse,sofar] u18 =
-              match u18 with
-              | Tag_1 ->
-                let k [reverse,sofar] _ = reverse sofar k in
-                let u21 = Tag_0 in
-                newline u21 k
-              | Tag_0 ->
-                let k [::,gotten,readloop,sofar] _ =
-                  let k [readloop] u22 = readloop u22 k in
-                  let k [sofar] u23 = u23 sofar k in
-                  :: gotten k in
-                put_char gotten k in
-            let k [] u19 =
-              let u20 = '\n' in
-              u19 u20 k in
-            eq_char gotten k in
-          k theChar in
+          let gotten = theChar in
+          let k [::,gotten,newline,put_char,readloop,reverse,sofar] u18 =
+            match u18 with
+            | Tag_1 ->
+              let k [reverse,sofar] _ = reverse sofar k in
+              let u21 = Tag_0 in
+              newline u21 k
+            | Tag_0 ->
+              let k [::,gotten,readloop,sofar] _ =
+                let k [readloop] u22 = readloop u22 k in
+                let k [sofar] u23 = u23 sofar k in
+                :: gotten k in
+              put_char gotten k in
+          let k [] u19 =
+            let u20 = '\n' in
+            u19 u20 k in
+          eq_char gotten k in
         let u17 = Tag_0 in
         get_char u17 k) in
     let u24 = Tag_0 in

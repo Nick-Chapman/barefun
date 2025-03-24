@@ -33,6 +33,7 @@ data Top -- restriction of Atomic
 data Code
   = Return Ref
   | Tail Ref Position Ref
+  | LetAlias Ref Ref Code
   | LetAtomic Ref Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Case Ref [Arm]
@@ -74,6 +75,7 @@ prettyC :: Code -> Lines
 prettyC = \case
   Return x -> ["k "++show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
+  LetAlias x y body -> ["let " ++ show x ++ " = " ++ show y ++ " in"] ++ prettyC body
   LetAtomic x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyA rhs)) ++ prettyC body
   PushContinuation pre post (x,later) first -> indented ("let k = " ++ show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " ->") (onTail (++ " in") (prettyC later)) ++ prettyC first
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
@@ -138,6 +140,9 @@ evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return x -> \k -> k (look x)
   Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
+  LetAlias x y body -> \k -> do
+    let v = look y
+    evalCode genv (insert x v env) body k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode genv (insert x v1 env) c2 k
@@ -214,6 +219,13 @@ compileC = walkC firstTempIndex
     walkC nextTemp cenv = \case
       SRC.Return x -> pure $ Return (locate x)
       SRC.Tail x1 pos x2 -> pure $ Tail (locate x1) pos (locate x2)
+
+      SRC.LetAlias x y body -> do
+        let yRef@(Ref _ yLoc) = locate y
+        let xRef = Ref x yLoc
+        let cenv' = Map.insert x xRef cenv
+        body <- walkC nextTemp cenv' body
+        pure $ LetAlias xRef yRef body
 
       SRC.LetAtomic x rhs body -> do
         rhs <- walkA rhs

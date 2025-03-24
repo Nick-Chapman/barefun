@@ -26,6 +26,7 @@ type Transformed = Code
 data Code
   = Return Id
   | Tail Id Position Id
+  | LetAlias Id Id Code
   | LetAtomic Id Atomic Code
   | PushContinuation Fvs (Id,Code) Code
   | Case Id [Arm]
@@ -51,6 +52,7 @@ pretty :: Code -> Lines
 pretty = \case
   Return x -> ["k "++show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
+  LetAlias x y body -> ["let " ++ show x ++ " = " ++ show y ++ " in"] ++ pretty body
   LetAtomic x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyA rhs)) ++ pretty body
   PushContinuation fvs (x,later) first -> indented ("let k " ++ show fvs ++ " " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
@@ -88,6 +90,9 @@ evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env = \case
   Return x -> \k -> k (look x)
   Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
+  LetAlias x y body -> \k -> do
+    let v = look y
+    evalCode (insert x v env) body k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode (insert x v1 env) c2 k
@@ -188,6 +193,7 @@ trans1 = \case
 
 mkBind :: Id -> AC -> Code -> Code
 mkBind x rhs body = case rhs of
+  Compound (Return y) -> LetAlias x y body
   Compound rhs -> mkPushContinuation (x,body) rhs
   Atomic rhs -> LetAtomic x rhs body
 
@@ -249,6 +255,7 @@ fvs :: Code -> Set Id
 fvs = \case
   Return x -> singleton x
   Tail x1 _ x2 -> Set.fromList [x1,x2]
+  LetAlias x y body -> singleton y `union` (fvs body \\ singleton x)
   LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
   PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
   Case scrut arms -> singleton scrut `union` Set.unions (map fvsArm arms)
