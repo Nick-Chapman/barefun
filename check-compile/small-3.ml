@@ -34,11 +34,11 @@ let put_chars_g6 =
       let v8_t1 = Tag_0 in
       k v8_t1
     | Tag_1(x_t1,xsMore_t2) ->
-      let k = [put_chars_me,x_t1,xsMore_t2], fun [put_chars_f1,x_f2,xsMore_f3] __arg -> put_chars_f1 xsMore_f3 k in
+      let k = [put_chars_me,xsMore_t2], fun [put_chars_f1,xsMore_f2] __arg -> put_chars_f1 xsMore_f2 k in
       put_char_g3 x_t1 k) in
 let put_string_g7 =
   (fun s_arg k ->
-    let k = [s_arg], fun [s_f1] u9_arg -> put_chars_g6 u9_arg k in
+    let k = [], fun [] u9_arg -> put_chars_g6 u9_arg k in
     explode_g2 s_arg k) in
 let revloop_g8 =
   fix (fun revloop_me acc_arg k ->
@@ -47,9 +47,9 @@ let revloop_g8 =
         match ys_arg with
         | Tag_0 -> k acc_f1
         | Tag_1(y_t1,ysMore_t2) ->
-          let k = [acc_f1,revloop_f2,y_t1,ysMore_t2], fun [acc_f1,revloop_f2,y_f3,ysMore_f4] u10_arg -> u10_arg ysMore_f4 k in
-          let k = [acc_f1,revloop_f2,y_t1], fun [acc_f1,revloop_f2,y_f3] u11_arg -> revloop_f2 u11_arg k in
-          let k = [acc_f1,y_t1], fun [acc_f1,y_f2] u12_arg -> u12_arg acc_f1 k in
+          let k = [ysMore_t2], fun [ysMore_f1] u10_arg -> u10_arg ysMore_f1 k in
+          let k = [revloop_f2], fun [revloop_f1] u11_arg -> revloop_f1 u11_arg k in
+          let k = [acc_f1], fun [acc_f1] u12_arg -> u12_arg acc_f1 k in
           ::_g5 y_t1 k) in
     k v13_t1) in
 let reverse_g9 =
@@ -71,11 +71,11 @@ let readloop_g13 =
           newline_g11 u21_t1 k
         | Tag_0 ->
           let k = [c_f1,readloop_f2,sofar_f3], fun [c_f1,readloop_f2,sofar_f3] __arg ->
-            let k = [c_f1,readloop_f2,sofar_f3], fun [c_f1,readloop_f2,sofar_f3] u22_arg -> readloop_f2 u22_arg k in
-            let k = [c_f1,sofar_f3], fun [c_f1,sofar_f2] u23_arg -> u23_arg sofar_f2 k in
+            let k = [readloop_f2], fun [readloop_f1] u22_arg -> readloop_f1 u22_arg k in
+            let k = [sofar_f3], fun [sofar_f1] u23_arg -> u23_arg sofar_f1 k in
             ::_g5 c_f1 k in
           put_char_g3 c_f1 k in
-      let k = [c_arg], fun [c_f1] u19_arg -> u19_arg u20_g12 k in
+      let k = [], fun [] u19_arg -> u19_arg u20_g12 k in
       eq_char_g1 c_arg k in
     let u17_t1 = Tag_0 in
     get_char_g4 u17_t1 k) in

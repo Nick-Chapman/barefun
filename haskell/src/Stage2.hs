@@ -242,15 +242,15 @@ mkRecLam :: Id -> Id -> Code -> Atomic
 mkRecLam f x code = RecLam (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
 
 mkPushContinuation :: (Id,Code) -> Code -> Code
-mkPushContinuation (x,body) rhs =
-  PushContinuation (Set.toList (fvs rhs `union` (fvs body \\ singleton x))) (x,body) rhs
+mkPushContinuation (x,later) first =
+  PushContinuation (Set.toList (fvs later \\ singleton x)) (x,later) first
 
 fvs :: Code -> Set Id
 fvs = \case
   Return x -> singleton x
   Tail x1 _ x2 -> Set.fromList [x1,x2]
-  LetAtomic x rhs body-> fvsA rhs `union` (fvs body \\ singleton x)
-  PushContinuation fvs _ _ -> Set.fromList fvs
+  LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
+  PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
   Case scrut arms -> singleton scrut `union` Set.unions (map fvsArm arms)
   where
     fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs
