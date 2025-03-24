@@ -33,28 +33,28 @@ let put_chars =
     | Tag_0 ->
       let v8 = Tag_0 in
       k v8
-    | Tag_1(x,xs) ->
-      let k [put_char,put_chars,x,xs] _ = put_chars xs k in
+    | Tag_1(x,xsMore) ->
+      let k [put_char,put_chars,x,xsMore] _ = put_chars xsMore k in
       put_char x k) in
 let put_string =
   (fun[explode,put_chars] s k ->
     let k [explode,put_chars,s] u9 = put_chars u9 k in
     explode s k) in
 let reverse =
-  (fun[::] xs k ->
+  (fun[::] ysStart k ->
     let revloop =
       fix (fun[::] revloop acc k ->
         let v13 =
-          (fun[::,acc,revloop] xs k ->
-            match xs with
+          (fun[::,acc,revloop] ys k ->
+            match ys with
             | Tag_0 -> k acc
-            | Tag_1(x,xs) ->
-              let k [::,acc,revloop,x,xs] u10 = u10 xs k in
-              let k [::,acc,revloop,x] u11 = revloop u11 k in
-              let k [::,acc,x] u12 = u12 acc k in
-              :: x k) in
+            | Tag_1(y,ysMore) ->
+              let k [::,acc,revloop,y,ysMore] u10 = u10 ysMore k in
+              let k [::,acc,revloop,y] u11 = revloop u11 k in
+              let k [::,acc,y] u12 = u12 acc k in
+              :: y k) in
         k v13) in
-    let k [revloop,xs] u14 = u14 xs k in
+    let k [revloop,ysStart] u14 = u14 ysStart k in
     let u15 = Tag_0 in
     revloop u15 k) in
 let newline =
@@ -64,18 +64,18 @@ let newline =
 let read_line =
   (fun[::,eq_char,get_char,newline,put_char,reverse] _ k ->
     let readloop =
-      fix (fun[::,eq_char,get_char,newline,put_char,reverse] readloop acc k ->
-        let k [::,acc,eq_char,get_char,newline,put_char,readloop,reverse] c =
-          let k [::,acc,c,eq_char,newline,put_char,readloop,reverse] u18 =
+      fix (fun[::,eq_char,get_char,newline,put_char,reverse] readloop sofar k ->
+        let k [::,eq_char,get_char,newline,put_char,readloop,reverse,sofar] c =
+          let k [::,c,eq_char,newline,put_char,readloop,reverse,sofar] u18 =
             match u18 with
             | Tag_1 ->
-              let k [acc,newline,reverse] _ = reverse acc k in
+              let k [newline,reverse,sofar] _ = reverse sofar k in
               let u21 = Tag_0 in
               newline u21 k
             | Tag_0 ->
-              let k [::,acc,c,put_char,readloop] _ =
-                let k [::,acc,c,readloop] u22 = readloop u22 k in
-                let k [::,acc,c] u23 = u23 acc k in
+              let k [::,c,put_char,readloop,sofar] _ =
+                let k [::,c,readloop,sofar] u22 = readloop u22 k in
+                let k [::,c,sofar] u23 = u23 sofar k in
                 :: c k in
               put_char c k in
           let k [c,eq_char] u19 =

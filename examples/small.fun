@@ -2,25 +2,25 @@
 let rec put_chars xs =
   match xs with
   | [] -> ()
-  | x::xs -> put_char x; put_chars xs
+  | x::xsMore -> put_char x; put_chars xsMore
 
 let put_string s = put_chars (explode s)
 
-let reverse xs =
-  let rec revloop acc xs =
-    match xs with
+let reverse ysStart =
+  let rec revloop acc ys =
+    match ys with
     | [] -> acc
-    | x::xs -> revloop (x :: acc) xs
+    | y::ysMore -> revloop (y :: acc) ysMore
   in
-  revloop [] xs
+  revloop [] ysStart
 
 let newline () = put_char '\n'
 
 let read_line () =
-  let rec readloop acc =
+  let rec readloop sofar =
     let c = get_char () in
-    if eq_char c '\n' then (newline(); reverse acc) else
-      (put_char c; readloop (c ::  acc))
+    if eq_char c '\n' then (newline(); reverse sofar) else
+      (put_char c; readloop (c :: sofar))
   in
   readloop []
 

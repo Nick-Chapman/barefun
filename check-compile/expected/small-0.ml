@@ -18,32 +18,32 @@ let put_chars =
   fix (fun put_chars xs ->
     match xs with
     | [][] -> Unit
-    | ::[x,xs] ->
+    | ::[x,xsMore] ->
       let _ = (put_char x) in
-      (put_chars xs)) in
+      (put_chars xsMore)) in
 let put_string = (fun s -> (put_chars (explode s))) in
 let reverse =
-  (fun xs ->
+  (fun ysStart ->
     let revloop =
       fix (fun revloop acc ->
-        (fun xs ->
-          match xs with
+        (fun ys ->
+          match ys with
           | [][] -> acc
-          | ::[x,xs] -> ((revloop ((:: x) acc)) xs))) in
-    ((revloop []) xs)) in
+          | ::[y,ysMore] -> ((revloop ((:: y) acc)) ysMore))) in
+    ((revloop []) ysStart)) in
 let newline = (fun _ -> (put_char '\n')) in
 let read_line =
   (fun _ ->
     let readloop =
-      fix (fun readloop acc ->
+      fix (fun readloop sofar ->
         let c = (get_char Unit) in
         match ((eq_char c) '\n') with
         | true[] ->
           let _ = (newline Unit) in
-          (reverse acc)
+          (reverse sofar)
         | false[] ->
           let _ = (put_char c) in
-          (readloop ((:: c) acc))) in
+          (readloop ((:: c) sofar))) in
     (readloop [])) in
 let main =
   fix (fun main _ ->

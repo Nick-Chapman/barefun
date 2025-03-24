@@ -9,32 +9,32 @@ let put_chars =
   fix (fun put_chars xs ->
     match xs with
     | Tag_0[] -> Tag_0
-    | Tag_1[x,xs] ->
+    | Tag_1[x,xsMore] ->
       let _ = (put_char x) in
-      (put_chars xs)) in
+      (put_chars xsMore)) in
 let put_string = (fun s -> (put_chars (explode s))) in
 let reverse =
-  (fun xs ->
+  (fun ysStart ->
     let revloop =
       fix (fun revloop acc ->
-        (fun xs ->
-          match xs with
+        (fun ys ->
+          match ys with
           | Tag_0[] -> acc
-          | Tag_1[x,xs] -> ((revloop ((:: x) acc)) xs))) in
-    ((revloop Tag_0) xs)) in
+          | Tag_1[y,ysMore] -> ((revloop ((:: y) acc)) ysMore))) in
+    ((revloop Tag_0) ysStart)) in
 let newline = (fun _ -> (put_char '\n')) in
 let read_line =
   (fun _ ->
     let readloop =
-      fix (fun readloop acc ->
+      fix (fun readloop sofar ->
         let c = (get_char Tag_0) in
         match ((eq_char c) '\n') with
         | Tag_1[] ->
           let _ = (newline Tag_0) in
-          (reverse acc)
+          (reverse sofar)
         | Tag_0[] ->
           let _ = (put_char c) in
-          (readloop ((:: c) acc))) in
+          (readloop ((:: c) sofar))) in
     (readloop Tag_0)) in
 let main =
   fix (fun main _ ->
