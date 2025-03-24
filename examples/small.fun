@@ -18,9 +18,10 @@ let newline () = put_char '\n'
 
 let read_line () =
   let rec readloop sofar =
-    let c = get_char () in
-    if eq_char c '\n' then (newline(); reverse sofar) else
-      (put_char c; readloop (c :: sofar))
+    let theChar = get_char () in
+    let gotten = theChar in
+    if eq_char gotten '\n' then (newline(); reverse sofar) else
+      (put_char gotten; readloop (gotten :: sofar))
   in
   readloop []
 

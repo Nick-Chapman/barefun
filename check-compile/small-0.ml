@@ -36,14 +36,15 @@ let read_line =
   (fun _ ->
     let readloop =
       fix (fun readloop sofar ->
-        let c = (get_char Unit) in
-        match ((eq_char c) '\n') with
+        let theChar = (get_char Unit) in
+        let gotten = theChar in
+        match ((eq_char gotten) '\n') with
         | true[] ->
           let _ = (newline Unit) in
           (reverse sofar)
         | false[] ->
-          let _ = (put_char c) in
-          (readloop ((:: c) sofar))) in
+          let _ = (put_char gotten) in
+          (readloop ((:: gotten) sofar))) in
     (readloop [])) in
 let main =
   fix (fun main _ ->

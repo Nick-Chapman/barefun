@@ -27,14 +27,15 @@ let read_line =
   (fun _ ->
     let readloop =
       fix (fun readloop sofar ->
-        let c = (get_char Tag_0) in
-        match ((eq_char c) '\n') with
+        let theChar = (get_char Tag_0) in
+        let gotten = theChar in
+        match ((eq_char gotten) '\n') with
         | Tag_1[] ->
           let _ = (newline Tag_0) in
           (reverse sofar)
         | Tag_0[] ->
-          let _ = (put_char c) in
-          (readloop ((:: c) sofar))) in
+          let _ = (put_char gotten) in
+          (readloop ((:: gotten) sofar))) in
     (readloop Tag_0)) in
 let main =
   fix (fun main _ ->
