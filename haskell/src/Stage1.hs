@@ -8,7 +8,6 @@ module Stage1
 import Builtin (Builtin,evalBuiltin)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Data.Set (Set,member,union,(\\),singleton)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
@@ -16,7 +15,6 @@ import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Id,Cid)
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
-import qualified Data.Set as Set (fromList,unions,empty)
 import qualified Stage0 as SRC
 
 type Transformed = Exp
@@ -142,8 +140,8 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
         let body = walk cenv defs
         -- This looses top-level side effects, so should not really be done
         -- But in makes the examples small for compilation dev...
-        if name `member` fvs body then Let name (transExp cenv rhs) body else body
-        --Let name (transExp cenv rhs) body
+        --if name `member` fvs body then Let name (transExp cenv rhs) body else body
+        Let name (transExp cenv rhs) body
 
       SRC.TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
@@ -189,17 +187,3 @@ initCenv = Map.fromList
   , (cNil, tNil)
   , (cCons, tCons)
   ]
-
-fvs :: Exp -> Set Id
-fvs = \case
-  Var _ x -> singleton x
-  Lit _ -> Set.empty
-  ConTag _ es -> Set.unions (map fvs es)
-  Prim _ es -> Set.unions (map fvs es)
-  Lam x body -> fvs body \\ singleton x
-  RecLam f x body -> fvs body \\ Set.fromList [f,x]
-  App e1 _ e2 -> fvs e1 `union` fvs e2
-  Let x rhs body -> fvs rhs `union` (fvs body \\ singleton x)
-  Case scrut arms -> fvs scrut `union` Set.unions (map fvsArm arms)
-  where
-    fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs

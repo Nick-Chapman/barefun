@@ -8,6 +8,7 @@ import Builtin (Builtin,evalBuiltin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
+import Data.Set (member)
 import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
@@ -16,7 +17,7 @@ import Stage1 (Ctag(..))
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
-import qualified Stage2 as SRC (Code(..),Atomic(..),Arm(..))
+import qualified Stage2 as SRC (Code(..),Atomic(..),Arm(..), fvs)
 
 type Transformed = Loadable
 
@@ -28,7 +29,7 @@ data Top -- restriction of Atomic
   = TopLit Literal
   | TopLam Ref Code
   | TopRecLam Ref Ref Code
-  -- TODO: ConTag
+  -- TODO: TopConTag
 
 data Code
   = Return Ref
@@ -236,9 +237,15 @@ compileC = walkC firstTempIndex
             body <- walkC (nextTemp+1) cenv' body
             pure $ LetAtomic xRef rhs body
           Just rhs -> do
-            xRef <- GlobalRef x
-            let cenv' = Map.insert x xRef cenv
-            Wrap (LetTop xRef rhs) $ walkC nextTemp cenv' body
+            if x `member` SRC.fvs body
+              then
+              do
+                xRef <- GlobalRef x
+                let cenv' = Map.insert x xRef cenv
+                Wrap (LetTop xRef rhs) $ walkC nextTemp cenv' body
+              else
+              do
+                walkC nextTemp cenv body
 
       SRC.PushContinuation fvs (x,later) first -> do
         let xRef = Ref x TheArg
@@ -324,3 +331,28 @@ runM m0 = loop firstGlobalIndex m0 $ \_ x -> x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
       Wrap f m -> f (loop u m k)
       GlobalRef x -> k (u+1) (Ref x (Global u))
+
+
+--fvs :: Loadable -> Set Id
+--fvs = undefined
+
+{-
+fvs :: Code -> Set Id
+fvs = \case
+  Return x -> singleton x
+  Tail x1 _ x2 -> Set.fromList [x1,x2]
+  LetAlias x y body -> singleton y `union` (fvs body \\ singleton x)
+  LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
+  PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
+  Case scrut arms -> singleton scrut `union` Set.unions (map fvsArm arms)
+  where
+    fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs
+
+fvsA :: Atomic -> Set Id
+fvsA = \case
+  Lit _ -> Set.empty
+  ConTag _ xs -> Set.fromList xs
+  Prim _ xs -> Set.fromList xs
+  Lam fvs _ _ -> Set.fromList fvs
+  RecLam fvs _ _ _ -> Set.fromList fvs
+-}

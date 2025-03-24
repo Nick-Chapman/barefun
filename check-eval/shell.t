@@ -55,6 +55,7 @@ Haskell REPL (stage1)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -1
   [stage1]
+  LOAD
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
@@ -80,6 +81,7 @@ Haskell REPL (stage2)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -2
   [stage2]
+  LOAD
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
@@ -105,6 +107,7 @@ Haskell REPL
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun
   [stage3]
+  LOAD
   RUN
   > Hello, World!
   You wrote: Hell*, W*rld! {113}
