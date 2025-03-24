@@ -10,15 +10,16 @@ let get_char =
     let v2 = PRIM_GetChar[x] in
     k v2) in
 let k [get_char,put_char] main =
-  let u6 = Tag_0 in
-  main u6 k in
+  let u5 = Tag_0 in
+  main u5 k in
 let mainloop =
   fix (fun[get_char,put_char] mainloop _ k ->
-    let k [get_char,mainloop,put_char] _ =
-      let u5 = Tag_0 in
-      mainloop u5 k in
-    let k [get_char,put_char] u3 = put_char u3 k in
-    let u4 = Tag_0 in
-    get_char u4 k) in
+    let k [get_char,mainloop,put_char] gotten =
+      let k [gotten,mainloop,put_char] _ =
+        let u4 = Tag_0 in
+        mainloop u4 k in
+      put_char gotten k in
+    let u3 = Tag_0 in
+    get_char u3 k) in
 k mainloop
 ----------

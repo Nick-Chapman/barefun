@@ -5,7 +5,8 @@ let get_char = (fun x -> PRIM:GetChar[x]) in
 let main =
   let mainloop =
     fix (fun mainloop _ ->
-      let _ = (put_char (get_char Tag_0)) in
+      let gotten = (get_char Tag_0) in
+      let _ = (put_char gotten) in
       (mainloop Tag_0)) in
   mainloop in
 (main Tag_0)

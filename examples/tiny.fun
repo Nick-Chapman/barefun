@@ -1,7 +1,8 @@
 
 let main =
   let rec mainloop () =
-    put_char (get_char ());
+    let gotten = get_char () in
+    put_char gotten;
     mainloop ()
   in
   mainloop

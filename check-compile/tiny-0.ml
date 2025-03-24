@@ -17,7 +17,8 @@ let :: = (fun x -> (fun y -> ::(x, y))) in
 let main =
   let mainloop =
     fix (fun mainloop _ ->
-      let _ = (put_char (get_char Unit)) in
+      let gotten = (get_char Unit) in
+      let _ = (put_char gotten) in
       (mainloop Unit)) in
   mainloop in
 ----------
