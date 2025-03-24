@@ -32,16 +32,17 @@ let parse_digit =
       | Tag_0[] -> Tag_1
     | Tag_0[] -> Tag_1) in
 let parse_num =
-  let loop =
-    fix (fun loop acc ->
-      (fun xs ->
-        match xs with
-        | Tag_0[] -> Tag_0(acc)
-        | Tag_1[x,xs] ->
-          match (parse_digit x) with
-          | Tag_1[] -> Tag_1
-          | Tag_0[d] -> ((loop ((+ ((( * ) 10) acc)) d)) xs))) in
-  (loop 0) in
+  (fun s ->
+    let loop =
+      fix (fun loop acc ->
+        (fun xs ->
+          match xs with
+          | Tag_0[] -> Tag_0(acc)
+          | Tag_1[x,xs] ->
+            match (parse_digit x) with
+            | Tag_1[] -> Tag_1
+            | Tag_0[d] -> ((loop ((+ ((( * ) 10) acc)) d)) xs))) in
+    ((loop 0) s)) in
 let cons = (fun x -> (fun xs -> ((:: x) xs))) in
 let eq_list =
   fix (fun eq_list eq ->
@@ -59,7 +60,7 @@ let eq_list =
             match ((eq x) y) with
             | Tag_1[] -> (((eq_list eq) xs) ys)
             | Tag_0[] -> Tag_0))) in
-let eq_char_list = (eq_list eq_char) in
+let eq_char_list = (fun a -> (fun b -> (((eq_list eq_char) a) b))) in
 let append =
   fix (fun append xs ->
     (fun ys ->
@@ -87,15 +88,15 @@ let length =
     | Tag_0[] -> 0
     | Tag_1[_,xs] -> ((+ 1) (length xs))) in
 let chars_of_int =
-  let ord0 = (ord '0') in
-  let char_of_digit = (fun c -> (chr ((+ ord0) c))) in
-  let loop =
-    fix (fun loop acc ->
-      (fun i ->
-        match ((= i) 0) with
-        | Tag_1[] -> acc
-        | Tag_0[] -> ((loop ((cons (char_of_digit ((% i) 10))) acc)) ((/ i) 10)))) in
   (fun i ->
+    let ord0 = (ord '0') in
+    let char_of_digit = (fun c -> (chr ((+ ord0) c))) in
+    let loop =
+      fix (fun loop acc ->
+        (fun i ->
+          match ((= i) 0) with
+          | Tag_1[] -> acc
+          | Tag_0[] -> ((loop ((cons (char_of_digit ((% i) 10))) acc)) ((/ i) 10)))) in
     match ((= i) 0) with
     | Tag_1[] -> ((cons '0') Tag_0)
     | Tag_0[] -> ((loop Tag_0) i)) in
@@ -114,34 +115,35 @@ let put_string_newline =
     let _ = (put_string s) in
     (newline Tag_0)) in
 let read_line =
-  let loop =
-    fix (fun loop acc ->
-      let c = (get_char Tag_0) in
-      let n = (ord c) in
-      match ((eq_char c) '\n') with
-      | Tag_1[] ->
-        let _ = (newline Tag_0) in
-        (reverse acc)
-      | Tag_0[] ->
-        match ((<= n) 31) with
-        | Tag_1[] -> (loop acc)
+  (fun _ ->
+    let loop =
+      fix (fun loop acc ->
+        let c = (get_char Tag_0) in
+        let n = (ord c) in
+        match ((eq_char c) '\n') with
+        | Tag_1[] ->
+          let _ = (newline Tag_0) in
+          (reverse acc)
         | Tag_0[] ->
-          match ((> n) 127) with
+          match ((<= n) 31) with
           | Tag_1[] -> (loop acc)
           | Tag_0[] ->
-            match ((= n) 127) with
-            | Tag_1[] ->
-              match acc with
-              | Tag_0[] -> (loop acc)
-              | Tag_1[_,tail] ->
-                let _ = (put_char (chr 8)) in
-                let _ = (put_char ' ') in
-                let _ = (put_char (chr 8)) in
-                (loop tail)
+            match ((> n) 127) with
+            | Tag_1[] -> (loop acc)
             | Tag_0[] ->
-              let _ = (put_char c) in
-              (loop ((cons c) acc))) in
-  (fun _ -> (loop Tag_0)) in
+              match ((= n) 127) with
+              | Tag_1[] ->
+                match acc with
+                | Tag_0[] -> (loop acc)
+                | Tag_1[_,tail] ->
+                  let _ = (put_char (chr 8)) in
+                  let _ = (put_char ' ') in
+                  let _ = (put_char (chr 8)) in
+                  (loop tail)
+              | Tag_0[] ->
+                let _ = (put_char c) in
+                (loop ((cons c) acc))) in
+    (loop Tag_0)) in
 let fib =
   fix (fun fib n ->
     match ((< n) 2) with
@@ -207,17 +209,18 @@ let fallback =
     let _ = (put_char '}') in
     (newline Tag_0)) in
 let split_words =
-  let loop =
-    fix (fun loop accWs ->
-      (fun accCs ->
-        (fun xs ->
-          match xs with
-          | Tag_0[] -> (reverse ((:: (reverse accCs)) accWs))
-          | Tag_1[x,xs] ->
-            match ((eq_char x) ' ') with
-            | Tag_1[] -> (((loop ((:: (reverse accCs)) accWs)) Tag_0) xs)
-            | Tag_0[] -> (((loop accWs) ((:: x) accCs)) xs)))) in
-  ((loop Tag_0) Tag_0) in
+  (fun s ->
+    let loop =
+      fix (fun loop accWs ->
+        (fun accCs ->
+          (fun xs ->
+            match xs with
+            | Tag_0[] -> (reverse ((:: (reverse accCs)) accWs))
+            | Tag_1[x,xs] ->
+              match ((eq_char x) ' ') with
+              | Tag_1[] -> (((loop ((:: (reverse accCs)) accWs)) Tag_0) xs)
+              | Tag_0[] -> (((loop accWs) ((:: x) accCs)) xs)))) in
+    (((loop Tag_0) Tag_0) s)) in
 let execute =
   (fun line ->
     let words = (split_words line) in

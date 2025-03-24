@@ -15,7 +15,7 @@ let parse_digit c =
   (* TODO missing parens for "Some(x)" cause haskell evaluation to go wrong. parse mistake? *)
   if n >= 0 then if n <= 9 then Some(n) else None else None
 
-let parse_num =
+let parse_num s =
   let rec loop acc xs =
     match xs with
     | [] -> Some(acc)
@@ -24,7 +24,7 @@ let parse_num =
         | None -> None
         | Some d -> loop (10 * acc + d) xs
   in
-  loop 0
+  loop 0 s
 
 let cons x xs = x :: xs
 
@@ -37,7 +37,7 @@ let rec eq_list eq xs ys =
      | y::ys ->
         if eq x y then eq_list eq xs ys else false
 
-let eq_char_list = eq_list eq_char
+let eq_char_list a b = eq_list eq_char a b
 
 let rec append xs ys = (* non tail-recursive version *)
   match xs with
@@ -62,14 +62,13 @@ let rec length xs =
   | [] -> 0
   | _::xs -> (+) 1 (length xs)
 
-let chars_of_int =
+let chars_of_int i =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in
   let rec loop acc i =
     if i = 0 then acc else
       loop (cons (char_of_digit (i%10)) acc) (i/10)
   in
-  fun i ->
   if i = 0 then cons '0' [] else loop [] i
 
 let rec put_chars xs =
@@ -87,7 +86,7 @@ let put_string_newline s =
   put_string s;
   newline ()
 
-let read_line =
+let read_line () =
   let rec loop acc =
     let c = get_char () in
     let n = ord c in
@@ -106,7 +105,7 @@ let read_line =
           else
             (put_char c; loop (cons c acc))
   in
-  fun () -> loop []
+  loop []
 
 let rec fib n =
   (*put_int n; newline ();*)
@@ -162,7 +161,7 @@ let fallback line =
   put_char '}';
   newline ()
 
-let split_words =
+let split_words s =
   let rec loop accWs accCs xs =
     match xs with
     | [] -> reverse (reverse accCs :: accWs)
@@ -171,7 +170,7 @@ let split_words =
        if eq_char x ' ' then loop (reverse accCs :: accWs) [] xs
        else loop accWs (x::accCs) xs
   in
-  loop [] []
+  loop [] [] s
 
 let execute line =
   let words = split_words line in

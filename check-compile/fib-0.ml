@@ -15,15 +15,15 @@ let put_char = (fun x -> PRIM:PutChar[x]) in
 let get_char = (fun x -> PRIM:GetChar[x]) in
 let :: = (fun x -> (fun y -> ::(x, y))) in
 let chars_of_int =
-  let ord0 = (ord '0') in
-  let char_of_digit = (fun c -> (chr ((+ ord0) c))) in
-  let loop =
-    fix (fun loop acc ->
-      (fun i ->
-        match ((= i) 0) with
-        | true[] -> acc
-        | false[] -> ((loop ((:: (char_of_digit ((% i) 10))) acc)) ((/ i) 10)))) in
   (fun i ->
+    let ord0 = (ord '0') in
+    let char_of_digit = (fun c -> (chr ((+ ord0) c))) in
+    let loop =
+      fix (fun loop acc ->
+        (fun i ->
+          match ((= i) 0) with
+          | true[] -> acc
+          | false[] -> ((loop ((:: (char_of_digit ((% i) 10))) acc)) ((/ i) 10)))) in
     match ((= i) 0) with
     | true[] -> ((:: '0') [])
     | false[] -> ((loop []) i)) in

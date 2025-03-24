@@ -1,12 +1,11 @@
 
-let chars_of_int =
+let chars_of_int i =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in
   let rec loop acc i =
     if i = 0 then acc else
       loop (char_of_digit (i%10) :: acc) (i/10)
   in
-  fun i ->
   if i = 0 then '0' :: [] else loop [] i (* TODO: list syntax would improve this *)
 
 let rec put_chars xs =

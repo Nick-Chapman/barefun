@@ -84,108 +84,41 @@ let :: =
         let v22 = Tag_1[x,y] in
         k v22) in
     k v23) in
-let k [+,-,<,explode,put_char] chars_of_int =
-  let put_chars =
-    fix (fun[put_char] put_chars xs k ->
-      match xs with
-      | Tag_0 ->
-        let v50 = Tag_0 in
-        k v50
-      | Tag_1(x,xs) ->
-        let k [put_chars,xs] _ = put_chars xs k in
-        put_char x k) in
-  let put_string =
-    (fun[explode,put_chars] s k ->
-      let k [put_chars] u51 = put_chars u51 k in
-      explode s k) in
-  let put_int =
-    (fun[chars_of_int,put_chars] i k ->
-      let k [put_chars] u52 = put_chars u52 k in
-      chars_of_int i k) in
-  let newline =
-    (fun[put_char] _ k ->
-      let u53 = '\n' in
-      put_char u53 k) in
-  let fib =
-    fix (fun[+,-,<] fib n k ->
-      let k [+,-,fib,n] u54 =
-        match u54 with
-        | Tag_1 -> k n
-        | Tag_0 ->
-          let k [-,fib,n] u57 =
-            let k [u57] u62 = u57 u62 k in
-            let k [fib] u63 = fib u63 k in
-            let k [] u64 =
-              let u65 = 2 in
-              u64 u65 k in
-            - n k in
-          let k [+] u58 = + u58 k in
-          let k [fib] u59 = fib u59 k in
-          let k [] u60 =
-            let u61 = 1 in
-            u60 u61 k in
-          - n k in
-      let k [] u55 =
-        let u56 = 2 in
-        u55 u56 k in
-      < n k) in
-  let runfib =
-    (fun[fib,newline,put_int,put_string] n k ->
-      let k [n,newline,put_int,put_string] res =
-        let k [n,newline,put_int,put_string,res] _ =
-          let k [newline,put_int,put_string,res] _ =
-            let k [newline,put_int,res] _ =
-              let k [newline] _ =
-                let u68 = Tag_0 in
-                newline u68 k in
-              put_int res k in
-            let u67 = " --> " in
-            put_string u67 k in
-          put_int n k in
-        let u66 = "fib " in
-        put_string u66 k in
-      fib n k) in
-  let main =
-    (fun[runfib] _ k ->
-      let u69 = 20 in
-      runfib u69 k) in
-  let u70 = Tag_0 in
-  main u70 k in
-let k [%,+,/,::,=,chr] ord0 =
-  let char_of_digit =
-    (fun[+,chr,ord0] c k ->
-      let k [chr] u25 = chr u25 k in
-      let k [c] u26 = u26 c k in
-      + ord0 k) in
-  let loop =
-    fix (fun[%,/,::,=,char_of_digit] loop acc k ->
-      let v40 =
-        (fun[%,/,::,=,acc,char_of_digit,loop] i k ->
-          let k [%,/,::,acc,char_of_digit,i,loop] u27 =
-            match u27 with
-            | Tag_1 -> k acc
-            | Tag_0 ->
-              let k [/,i] u30 =
-                let k [u30] u37 = u30 u37 k in
-                let k [] u38 =
-                  let u39 = 10 in
-                  u38 u39 k in
-                / i k in
-              let k [loop] u31 = loop u31 k in
-              let k [acc] u32 = u32 acc k in
-              let k [::] u33 = :: u33 k in
-              let k [char_of_digit] u34 = char_of_digit u34 k in
-              let k [] u35 =
-                let u36 = 10 in
-                u35 u36 k in
-              % i k in
-          let k [] u28 =
-            let u29 = 0 in
-            u28 u29 k in
-          = i k) in
-      k v40) in
-  let v49 =
-    (fun[::,=,loop] i k ->
+let chars_of_int =
+  (fun[%,+,/,::,=,chr,ord] i k ->
+    let k [%,+,/,::,=,chr,i] ord0 =
+      let char_of_digit =
+        (fun[+,chr,ord0] c k ->
+          let k [chr] u25 = chr u25 k in
+          let k [c] u26 = u26 c k in
+          + ord0 k) in
+      let loop =
+        fix (fun[%,/,::,=,char_of_digit] loop acc k ->
+          let v40 =
+            (fun[%,/,::,=,acc,char_of_digit,loop] i k ->
+              let k [%,/,::,acc,char_of_digit,i,loop] u27 =
+                match u27 with
+                | Tag_1 -> k acc
+                | Tag_0 ->
+                  let k [/,i] u30 =
+                    let k [u30] u37 = u30 u37 k in
+                    let k [] u38 =
+                      let u39 = 10 in
+                      u38 u39 k in
+                    / i k in
+                  let k [loop] u31 = loop u31 k in
+                  let k [acc] u32 = u32 acc k in
+                  let k [::] u33 = :: u33 k in
+                  let k [char_of_digit] u34 = char_of_digit u34 k in
+                  let k [] u35 =
+                    let u36 = 10 in
+                    u35 u36 k in
+                  % i k in
+              let k [] u28 =
+                let u29 = 0 in
+                u28 u29 k in
+              = i k) in
+          k v40) in
       let k [::,i,loop] u41 =
         match u41 with
         | Tag_1 ->
@@ -201,8 +134,73 @@ let k [%,+,/,::,=,chr] ord0 =
       let k [] u42 =
         let u43 = 0 in
         u42 u43 k in
-      = i k) in
-  k v49 in
-let u24 = '0' in
-ord u24 k
+      = i k in
+    let u24 = '0' in
+    ord u24 k) in
+let put_chars =
+  fix (fun[put_char] put_chars xs k ->
+    match xs with
+    | Tag_0 ->
+      let v49 = Tag_0 in
+      k v49
+    | Tag_1(x,xs) ->
+      let k [put_chars,xs] _ = put_chars xs k in
+      put_char x k) in
+let put_string =
+  (fun[explode,put_chars] s k ->
+    let k [put_chars] u50 = put_chars u50 k in
+    explode s k) in
+let put_int =
+  (fun[chars_of_int,put_chars] i k ->
+    let k [put_chars] u51 = put_chars u51 k in
+    chars_of_int i k) in
+let newline =
+  (fun[put_char] _ k ->
+    let u52 = '\n' in
+    put_char u52 k) in
+let fib =
+  fix (fun[+,-,<] fib n k ->
+    let k [+,-,fib,n] u53 =
+      match u53 with
+      | Tag_1 -> k n
+      | Tag_0 ->
+        let k [-,fib,n] u56 =
+          let k [u56] u61 = u56 u61 k in
+          let k [fib] u62 = fib u62 k in
+          let k [] u63 =
+            let u64 = 2 in
+            u63 u64 k in
+          - n k in
+        let k [+] u57 = + u57 k in
+        let k [fib] u58 = fib u58 k in
+        let k [] u59 =
+          let u60 = 1 in
+          u59 u60 k in
+        - n k in
+    let k [] u54 =
+      let u55 = 2 in
+      u54 u55 k in
+    < n k) in
+let runfib =
+  (fun[fib,newline,put_int,put_string] n k ->
+    let k [n,newline,put_int,put_string] res =
+      let k [n,newline,put_int,put_string,res] _ =
+        let k [newline,put_int,put_string,res] _ =
+          let k [newline,put_int,res] _ =
+            let k [newline] _ =
+              let u67 = Tag_0 in
+              newline u67 k in
+            put_int res k in
+          let u66 = " --> " in
+          put_string u66 k in
+        put_int n k in
+      let u65 = "fib " in
+      put_string u65 k in
+    fib n k) in
+let main =
+  (fun[runfib] _ k ->
+    let u68 = 20 in
+    runfib u68 k) in
+let u69 = Tag_0 in
+main u69 k
 ----------
