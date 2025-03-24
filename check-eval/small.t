@@ -11,7 +11,7 @@ Ocaml REPL
 
 Haskell REPL
 
-  $ cat small.input | ../haskell/main.exe small.fun -0
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -0
   [stage0]
   > Hello, World!
   Hello, World!
@@ -19,7 +19,7 @@ Haskell REPL
   Good bye.
   > [EOF]
 
-  $ cat small.input | ../haskell/main.exe small.fun -1
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -1
   [stage1]
   > Hello, World!
   Hello, World!
@@ -27,7 +27,7 @@ Haskell REPL
   Good bye.
   > [EOF]
 
-  $ cat small.input | ../haskell/main.exe small.fun -2
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -2
   [stage2]
   > Hello, World!
   Hello, World!
@@ -35,7 +35,7 @@ Haskell REPL
   Good bye.
   > [EOF]
 
-  $ cat small.input | ../haskell/main.exe small.fun
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun
   [stage3]
   > Hello, World!
   Hello, World!

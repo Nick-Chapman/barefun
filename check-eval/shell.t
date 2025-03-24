@@ -27,7 +27,7 @@ Ocaml REPL
 
 Haskell REPL (stage0)
 
-  $ cat shell.input | ../haskell/main.exe shell.fun -0
+  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -0
   [stage0]
   LOAD
   RUN
@@ -53,7 +53,7 @@ Haskell REPL (stage0)
 
 Haskell REPL (stage1)
 
-  $ cat shell.input | ../haskell/main.exe shell.fun -1
+  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -1
   [stage1]
   RUN
   > Hello, World!
@@ -78,7 +78,7 @@ Haskell REPL (stage1)
 
 Haskell REPL (stage2)
 
-  $ cat shell.input | ../haskell/main.exe shell.fun -2
+  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -2
   [stage2]
   RUN
   > Hello, World!
@@ -103,7 +103,7 @@ Haskell REPL (stage2)
 
 Haskell REPL
 
-  $ cat shell.input | ../haskell/main.exe shell.fun
+  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun
   [stage3]
   RUN
   > Hello, World!
