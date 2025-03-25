@@ -12,8 +12,8 @@ import qualified Par4
 parseProg :: String -> Prog
 parseProg = Par4.parse gram6
 
-mkAbstraction :: [Id] -> Exp -> Exp
-mkAbstraction xs e = case xs of [] -> e; x:xs -> AST.Lam x (mkAbstraction xs e)
+mkAbstraction :: [(Position,Id)] -> Exp -> Exp
+mkAbstraction xs e = case xs of [] -> e; (pos,x):xs -> AST.Lam pos x (mkAbstraction xs e)
 
 mkApps :: Exp -> [(Position,Exp)] -> Exp
 mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
@@ -146,6 +146,12 @@ gram6 = program where
          , do openClose; pure underscore
          ]
 
+  positionedIdentOrUnit :: Par (Position,Id)
+  positionedIdentOrUnit = do
+    pos <- position
+    x <- identOrUnit
+    pure (pos,x)
+
   -- patterns...
 
   nilPat = do
@@ -248,7 +254,7 @@ gram6 = program where
   infixWeakestPrecendence = infix4
 
   bindingAbstraction = do
-    xs <- many identOrUnit
+    xs <- many positionedIdentOrUnit
     key "="
     bound <- exp
     pure (mkAbstraction xs bound)
@@ -284,7 +290,7 @@ gram6 = program where
 
   abstraction = do
     key "fun"
-    xs <- some identOrUnit
+    xs <- some positionedIdentOrUnit
     key "->"
     e <- exp
     pure (mkAbstraction xs e)

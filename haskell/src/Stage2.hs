@@ -13,7 +13,7 @@ import Data.Set (Set,singleton,(\\),union)
 import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
-import Stage0 (evalLit,apply,Literal,Id(..))
+import Stage0 (evalLit,apply,Literal,Id(..),Name(GeneratedName))
 import Stage1 (Ctag(..),provenanceExp)
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
@@ -35,10 +35,10 @@ data Arm = ArmTag Ctag [Id] Code
 
 -- Atomic expressions cause only bounded evaluation.
 data Atomic
-  = Lit Literal
-  | Prim Builtin [Id]
-  | ConTag Ctag [Id]
-  | Lam Fvs Id Code
+  = Lit Position Literal
+  | Prim Position Builtin [Id]
+  | ConTag Position Ctag [Id]
+  | Lam Position Fvs Id Code
   | RecLam Fvs Id Id Code
 
 type Fvs = [Id]
@@ -48,10 +48,10 @@ type Fvs = [Id]
 
 provenanceAtomic :: Atomic -> (String,Maybe Position)
 provenanceAtomic = \case
-  Lit{} -> ("lit",Nothing)
-  Prim{} -> ("prim",Nothing)
-  ConTag{} -> ("con",Nothing)
-  Lam{} -> ("lam",Nothing)
+  Lit pos _ -> ("lit",Just pos)
+  Prim pos _ _ -> ("prim",Just pos)
+  ConTag pos _ _ -> ("con",Just pos)
+  Lam pos _ _ _ -> ("lam",Just pos)
   RecLam{} -> undefined $ ("reclam",Nothing) -- never seen
 
 ----------------------------------------------------------------------
@@ -70,11 +70,11 @@ pretty = \case
 
 prettyA :: Atomic -> Lines
 prettyA = \case
-  Lit x -> [show x]
-  Prim b xs -> do [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
-  ConTag tag [] -> [show tag]
-  ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
-  Lam fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
+  Lit _ x -> [show x]
+  Prim _ b xs -> do [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
+  ConTag _ tag [] -> [show tag]
+  ConTag _ tag xs -> [printf "%s%s" (show tag) (show xs)]
+  Lam _ fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
   RecLam fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
 
 prettyArm :: Arm -> Lines
@@ -128,10 +128,10 @@ evalCode env = \case
   where
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
-      Lit literal -> \k -> k (evalLit literal)
-      Prim b xs -> \k -> evalBuiltin b (map look xs) k
-      ConTag (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
-      Lam fvs x body -> \k -> do
+      Lit _ literal -> \k -> k (evalLit literal)
+      Prim _ b xs -> \k -> evalBuiltin b (map look xs) k
+      ConTag _ (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
+      Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
       RecLam fvs f x body -> \k -> do
         let me = VFunc (\arg k -> evalCode (insert f me (insert x arg (limit fvs env))) body k)
@@ -181,15 +181,15 @@ trans1 :: SRC.Exp -> M AC
 trans1 = \case
   SRC.Var pos x -> do
     pure $ Compound $ Return pos x
-  SRC.Lit _ x -> do
-    pure $ Atomic $ Lit x
-  SRC.ConTag _ tag es -> do
+  SRC.Lit pos x -> do
+    pure $ Atomic $ Lit pos x
+  SRC.ConTag pos tag es -> do
     transIds es $ \xs ->
-      pure $ Atomic $ ConTag tag xs
-  SRC.Prim b es -> do
+      pure $ Atomic $ ConTag pos tag xs
+  SRC.Prim pos b es -> do
     transIds es $ \xs ->
-      pure $ Atomic $ Prim b xs
-  SRC.Lam x body -> (Atomic . mkLam x) <$> trans0 body
+      pure $ Atomic $ Prim pos b xs
+  SRC.Lam pos x body -> (Atomic . mkLam pos x) <$> trans0 body
   SRC.RecLam f x body -> (Atomic . mkRecLam f x) <$> trans0 body
   SRC.App e1 p e2 -> do
     transId e1 $ \x1 -> do
@@ -252,15 +252,15 @@ runM m0 = loop 1 m0 $ \_ x -> x
       Fresh optPos tag -> do
         let x = Id { optUnique = Just u
                    , optPos
-                   , userGivenName = tag -- TODO: hmm, bit of a lie
+                   , name = GeneratedName tag
                    }
         k (u+1) x
 
 ----------------------------------------------------------------------
 -- Free Vars
 
-mkLam :: Id -> Code -> Atomic
-mkLam x code = Lam (Set.toList (fvs code \\ singleton x)) x code
+mkLam :: Position -> Id -> Code -> Atomic
+mkLam pos x code = Lam pos (Set.toList (fvs code \\ singleton x)) x code
 
 mkRecLam :: Id -> Id -> Code -> Atomic
 mkRecLam f x code = RecLam (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
@@ -282,8 +282,8 @@ fvs = \case
 
 fvsA :: Atomic -> Set Id
 fvsA = \case
-  Lit _ -> Set.empty
-  ConTag _ xs -> Set.fromList xs
-  Prim _ xs -> Set.fromList xs
-  Lam fvs _ _ -> Set.fromList fvs
+  Lit _ _ -> Set.empty
+  ConTag _ _ xs -> Set.fromList xs
+  Prim _ _ xs -> Set.fromList xs
+  Lam _ fvs _ _ -> Set.fromList fvs
   RecLam fvs _ _ _ -> Set.fromList fvs

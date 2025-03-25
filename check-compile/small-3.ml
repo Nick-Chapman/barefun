@@ -1,29 +1,29 @@
 (*stage3*)
 let k () = ()
 let eq_char_g1 = fun x_arg k ->
-  let lam_16_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let prim_15_t1 = PRIM_EqChar(x_f1,y_arg) in
-    k prim_15_t1 in
-  k lam_16_t1 in
+  let lam_16_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let prim_15_0'0_t1 = PRIM_EqChar(x_f1,y_arg) in
+    k prim_15_0'0_t1 in
+  k lam_16_0'0_t1 in
 let explode_g2 = fun x_arg k ->
-  let prim_19_t1 = PRIM_Explode(x_arg) in
-  k prim_19_t1 in
+  let prim_19_0'0_t1 = PRIM_Explode(x_arg) in
+  k prim_19_0'0_t1 in
 let put_char_g3 = fun x_arg k ->
-  let prim_20_t1 = PRIM_PutChar(x_arg) in
-  k prim_20_t1 in
+  let prim_20_0'0_t1 = PRIM_PutChar(x_arg) in
+  k prim_20_0'0_t1 in
 let get_char_g4 = fun x_arg k ->
-  let prim_21_t1 = PRIM_GetChar(x_arg) in
-  k prim_21_t1 in
+  let prim_21_0'0_t1 = PRIM_GetChar(x_arg) in
+  k prim_21_0'0_t1 in
 let ::_g5 = fun x_arg k ->
-  let lam_23_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let con_22_t1 = Cons1[x_f1,y_arg] in
-    k con_22_t1 in
-  k lam_23_t1 in
+  let lam_23_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let con_22_0'0_t1 = Cons1[x_f1,y_arg] in
+    k con_22_0'0_t1 in
+  k lam_23_0'0_t1 in
 let put_chars_g6 = fun put_chars_me xs_arg k ->
   match xs_arg with
   | Nil0 ->
-    let con_24_t1 = Unit0 in
-    k con_24_t1
+    let con_24_4'10_t1 = Unit0 in
+    k con_24_4'10_t1
   | Cons1(x_t1,xsMore_t2) ->
     let k = [put_chars_me,xsMore_t2], fun [put_chars_f1,xsMore_f2] __arg -> put_chars_f1 xsMore_f2 k in
     put_char_g3 x_t1 k in
@@ -31,7 +31,7 @@ let put_string_g7 = fun s_arg k ->
   let k = [], fun [] app_25_7'38_arg -> put_chars_g6 app_25_7'38_arg k in
   explode_g2 s_arg k in
 let revloop_g8 = fun revloop_me acc_arg k ->
-  let lam_29_t1 = [acc_arg,revloop_me], fun [acc_f1,revloop_f2] ys_arg k ->
+  let lam_29_10'22_t1 = [acc_arg,revloop_me], fun [acc_f1,revloop_f2] ys_arg k ->
     match ys_arg with
     | Nil0 -> k acc_f1
     | Cons1(y_t1,ysMore_t2) ->
@@ -39,7 +39,7 @@ let revloop_g8 = fun revloop_me acc_arg k ->
       let k = [revloop_f2], fun [revloop_f1] app_27_13'33_arg -> revloop_f1 app_27_13'33_arg k in
       let k = [acc_f1], fun [acc_f1] app_28_13'30_arg -> app_28_13'30_arg acc_f1 k in
       ::_g5 y_t1 k in
-  k lam_29_t1 in
+  k lam_29_10'22_t1 in
 let reverse_g9 = fun ysStart_arg k ->
   let k = [ysStart_arg], fun [ysStart_f1] app_30_15'10_arg -> app_30_15'10_arg ysStart_f1 k in
   let con_31_15'10_t1 = Nil0 in

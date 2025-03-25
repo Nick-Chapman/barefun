@@ -1,65 +1,65 @@
 (*stage2*)
 let k () = ()
 let + = fun [] x k ->
-  let lam_2 = fun [x] y k ->
-    let prim_1 = PRIM_AddInt(x,y) in
-    k prim_1 in
-  k lam_2 in
+  let lam_2_0'0 = fun [x] y k ->
+    let prim_1_0'0 = PRIM_AddInt(x,y) in
+    k prim_1_0'0 in
+  k lam_2_0'0 in
 let - = fun [] x k ->
-  let lam_4 = fun [x] y k ->
-    let prim_3 = PRIM_SubInt(x,y) in
-    k prim_3 in
-  k lam_4 in
+  let lam_4_0'0 = fun [x] y k ->
+    let prim_3_0'0 = PRIM_SubInt(x,y) in
+    k prim_3_0'0 in
+  k lam_4_0'0 in
 let ( * ) = fun [] x k ->
-  let lam_6 = fun [x] y k ->
-    let prim_5 = PRIM_MulInt(x,y) in
-    k prim_5 in
-  k lam_6 in
+  let lam_6_0'0 = fun [x] y k ->
+    let prim_5_0'0 = PRIM_MulInt(x,y) in
+    k prim_5_0'0 in
+  k lam_6_0'0 in
 let / = fun [] x k ->
-  let lam_8 = fun [x] y k ->
-    let prim_7 = PRIM_DivInt(x,y) in
-    k prim_7 in
-  k lam_8 in
+  let lam_8_0'0 = fun [x] y k ->
+    let prim_7_0'0 = PRIM_DivInt(x,y) in
+    k prim_7_0'0 in
+  k lam_8_0'0 in
 let % = fun [] x k ->
-  let lam_10 = fun [x] y k ->
-    let prim_9 = PRIM_ModInt(x,y) in
-    k prim_9 in
-  k lam_10 in
+  let lam_10_0'0 = fun [x] y k ->
+    let prim_9_0'0 = PRIM_ModInt(x,y) in
+    k prim_9_0'0 in
+  k lam_10_0'0 in
 let < = fun [] x k ->
-  let lam_12 = fun [x] y k ->
-    let prim_11 = PRIM_LessInt(x,y) in
-    k prim_11 in
-  k lam_12 in
+  let lam_12_0'0 = fun [x] y k ->
+    let prim_11_0'0 = PRIM_LessInt(x,y) in
+    k prim_11_0'0 in
+  k lam_12_0'0 in
 let = = fun [] x k ->
-  let lam_14 = fun [x] y k ->
-    let prim_13 = PRIM_EqInt(x,y) in
-    k prim_13 in
-  k lam_14 in
+  let lam_14_0'0 = fun [x] y k ->
+    let prim_13_0'0 = PRIM_EqInt(x,y) in
+    k prim_13_0'0 in
+  k lam_14_0'0 in
 let eq_char = fun [] x k ->
-  let lam_16 = fun [x] y k ->
-    let prim_15 = PRIM_EqChar(x,y) in
-    k prim_15 in
-  k lam_16 in
+  let lam_16_0'0 = fun [x] y k ->
+    let prim_15_0'0 = PRIM_EqChar(x,y) in
+    k prim_15_0'0 in
+  k lam_16_0'0 in
 let ord = fun [] x k ->
-  let prim_17 = PRIM_CharOrd(x) in
-  k prim_17 in
+  let prim_17_0'0 = PRIM_CharOrd(x) in
+  k prim_17_0'0 in
 let chr = fun [] x k ->
-  let prim_18 = PRIM_CharChr(x) in
-  k prim_18 in
+  let prim_18_0'0 = PRIM_CharChr(x) in
+  k prim_18_0'0 in
 let explode = fun [] x k ->
-  let prim_19 = PRIM_Explode(x) in
-  k prim_19 in
+  let prim_19_0'0 = PRIM_Explode(x) in
+  k prim_19_0'0 in
 let put_char = fun [] x k ->
-  let prim_20 = PRIM_PutChar(x) in
-  k prim_20 in
+  let prim_20_0'0 = PRIM_PutChar(x) in
+  k prim_20_0'0 in
 let get_char = fun [] x k ->
-  let prim_21 = PRIM_GetChar(x) in
-  k prim_21 in
+  let prim_21_0'0 = PRIM_GetChar(x) in
+  k prim_21_0'0 in
 let :: = fun [] x k ->
-  let lam_23 = fun [x] y k ->
-    let con_22 = Cons1[x,y] in
-    k con_22 in
-  k lam_23 in
+  let lam_23_0'0 = fun [x] y k ->
+    let con_22_0'0 = Cons1[x,y] in
+    k con_22_0'0 in
+  k lam_23_0'0 in
 let chars_of_int = fun [%,+,/,::,=,chr,ord] i k ->
   let k [%,+,/,::,=,chr,i] ord0 =
     let char_of_digit = fun [+,chr,ord0] c k ->
@@ -67,7 +67,7 @@ let chars_of_int = fun [%,+,/,::,=,chr,ord] i k ->
       let k [c] app_26_4'34 = app_26_4'34 c k in
       + ord0 k in
     let loop = fix (fun [%,/,::,=,char_of_digit] loop acc k ->
-      let lam_40 = fun [%,/,::,=,acc,char_of_digit,loop] i k ->
+      let lam_40_5'19 = fun [%,/,::,=,acc,char_of_digit,loop] i k ->
         let k [%,/,::,acc,char_of_digit,i,loop] app_27_6'11 =
           match app_27_6'11 with
           | true1 -> k acc
@@ -90,7 +90,7 @@ let chars_of_int = fun [%,+,/,::,=,chr,ord] i k ->
           let lit_29_6'11 = 0 in
           app_28_6'9 lit_29_6'11 k in
         = i k in
-      k lam_40) in
+      k lam_40_5'19) in
     let k [::,i,loop] app_41_9'9 =
       match app_41_9'9 with
       | true1 ->
@@ -112,8 +112,8 @@ let chars_of_int = fun [%,+,/,::,=,chr,ord] i k ->
 let put_chars = fix (fun [put_char] put_chars xs k ->
   match xs with
   | Nil0 ->
-    let con_49 = Unit0 in
-    k con_49
+    let con_49_13'10 = Unit0 in
+    k con_49_13'10
   | Cons1(x,xs) ->
     let k [put_chars,xs] _ = put_chars xs k in
     put_char x k) in

@@ -1,52 +1,52 @@
 (*stage3*)
 let k () = ()
 let +_g1 = fun x_arg k ->
-  let lam_2_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let prim_1_t1 = PRIM_AddInt(x_f1,y_arg) in
-    k prim_1_t1 in
-  k lam_2_t1 in
+  let lam_2_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let prim_1_0'0_t1 = PRIM_AddInt(x_f1,y_arg) in
+    k prim_1_0'0_t1 in
+  k lam_2_0'0_t1 in
 let -_g2 = fun x_arg k ->
-  let lam_4_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let prim_3_t1 = PRIM_SubInt(x_f1,y_arg) in
-    k prim_3_t1 in
-  k lam_4_t1 in
+  let lam_4_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let prim_3_0'0_t1 = PRIM_SubInt(x_f1,y_arg) in
+    k prim_3_0'0_t1 in
+  k lam_4_0'0_t1 in
 let /_g3 = fun x_arg k ->
-  let lam_8_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let prim_7_t1 = PRIM_DivInt(x_f1,y_arg) in
-    k prim_7_t1 in
-  k lam_8_t1 in
+  let lam_8_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let prim_7_0'0_t1 = PRIM_DivInt(x_f1,y_arg) in
+    k prim_7_0'0_t1 in
+  k lam_8_0'0_t1 in
 let %_g4 = fun x_arg k ->
-  let lam_10_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let prim_9_t1 = PRIM_ModInt(x_f1,y_arg) in
-    k prim_9_t1 in
-  k lam_10_t1 in
+  let lam_10_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let prim_9_0'0_t1 = PRIM_ModInt(x_f1,y_arg) in
+    k prim_9_0'0_t1 in
+  k lam_10_0'0_t1 in
 let <_g5 = fun x_arg k ->
-  let lam_12_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let prim_11_t1 = PRIM_LessInt(x_f1,y_arg) in
-    k prim_11_t1 in
-  k lam_12_t1 in
+  let lam_12_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let prim_11_0'0_t1 = PRIM_LessInt(x_f1,y_arg) in
+    k prim_11_0'0_t1 in
+  k lam_12_0'0_t1 in
 let =_g6 = fun x_arg k ->
-  let lam_14_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let prim_13_t1 = PRIM_EqInt(x_f1,y_arg) in
-    k prim_13_t1 in
-  k lam_14_t1 in
+  let lam_14_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let prim_13_0'0_t1 = PRIM_EqInt(x_f1,y_arg) in
+    k prim_13_0'0_t1 in
+  k lam_14_0'0_t1 in
 let ord_g7 = fun x_arg k ->
-  let prim_17_t1 = PRIM_CharOrd(x_arg) in
-  k prim_17_t1 in
+  let prim_17_0'0_t1 = PRIM_CharOrd(x_arg) in
+  k prim_17_0'0_t1 in
 let chr_g8 = fun x_arg k ->
-  let prim_18_t1 = PRIM_CharChr(x_arg) in
-  k prim_18_t1 in
+  let prim_18_0'0_t1 = PRIM_CharChr(x_arg) in
+  k prim_18_0'0_t1 in
 let explode_g9 = fun x_arg k ->
-  let prim_19_t1 = PRIM_Explode(x_arg) in
-  k prim_19_t1 in
+  let prim_19_0'0_t1 = PRIM_Explode(x_arg) in
+  k prim_19_0'0_t1 in
 let put_char_g10 = fun x_arg k ->
-  let prim_20_t1 = PRIM_PutChar(x_arg) in
-  k prim_20_t1 in
+  let prim_20_0'0_t1 = PRIM_PutChar(x_arg) in
+  k prim_20_0'0_t1 in
 let ::_g11 = fun x_arg k ->
-  let lam_23_t1 = [x_arg], fun [x_f1] y_arg k ->
-    let con_22_t1 = Cons1[x_f1,y_arg] in
-    k con_22_t1 in
-  k lam_23_t1 in
+  let lam_23_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->
+    let con_22_0'0_t1 = Cons1[x_f1,y_arg] in
+    k con_22_0'0_t1 in
+  k lam_23_0'0_t1 in
 let lit_24_3'17_g12 = '0' in
 let lit_29_6'11_g13 = 0 in
 let lit_36_7'29_g14 = 10 in
@@ -60,7 +60,7 @@ let chars_of_int_g18 = fun i_arg k ->
       let k = [c_arg], fun [c_f1] app_26_4'34_arg -> app_26_4'34_arg c_f1 k in
       +_g1 ord0_f1 k in
     let loop_t2 = [char_of_digit_t1], fun [char_of_digit_f1] loop_me acc_arg k ->
-      let lam_40_t1 = [acc_arg,char_of_digit_f1,loop_me], fun [acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
+      let lam_40_5'19_t1 = [acc_arg,char_of_digit_f1,loop_me], fun [acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
         let k = [acc_f1,char_of_digit_f2,i_arg,loop_f3], fun [acc_f1,char_of_digit_f2,i_f3,loop_f4] app_27_6'11_arg ->
           match app_27_6'11_arg with
           | true1 -> k acc_f1
@@ -77,7 +77,7 @@ let chars_of_int_g18 = fun i_arg k ->
             %_g4 i_f3 k in
         let k = [], fun [] app_28_6'9_arg -> app_28_6'9_arg lit_29_6'11_g13 k in
         =_g6 i_arg k in
-      k lam_40_t1 in
+      k lam_40_5'19_t1 in
     let k = [i_f1,loop_t2], fun [i_f1,loop_f2] app_41_9'9_arg ->
       match app_41_9'9_arg with
       | true1 ->
@@ -95,8 +95,8 @@ let chars_of_int_g18 = fun i_arg k ->
 let put_chars_g19 = fun put_chars_me xs_arg k ->
   match xs_arg with
   | Nil0 ->
-    let con_49_t1 = Unit0 in
-    k con_49_t1
+    let con_49_13'10_t1 = Unit0 in
+    k con_49_13'10_t1
   | Cons1(x_t1,xs_t2) ->
     let k = [put_chars_me,xs_t2], fun [put_chars_f1,xs_f2] __arg -> put_chars_f1 xs_f2 k in
     put_char_g10 x_t1 k in

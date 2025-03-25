@@ -1,11 +1,11 @@
 (*stage3*)
 let k () = ()
 let put_char_g1 = fun x_arg k ->
-  let prim_20_t1 = PRIM_PutChar(x_arg) in
-  k prim_20_t1 in
+  let prim_20_0'0_t1 = PRIM_PutChar(x_arg) in
+  k prim_20_0'0_t1 in
 let get_char_g2 = fun x_arg k ->
-  let prim_21_t1 = PRIM_GetChar(x_arg) in
-  k prim_21_t1 in
+  let prim_21_0'0_t1 = PRIM_GetChar(x_arg) in
+  k prim_21_0'0_t1 in
 let mainloop_g3 = fun mainloop_me __arg k ->
   let k = [mainloop_me], fun [mainloop_f1] gotten_arg ->
     let k = [mainloop_f1], fun [mainloop_f1] __arg ->

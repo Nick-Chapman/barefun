@@ -1,6 +1,6 @@
 -- | Primary AST for the .fun language. As constructed by Parser
 module Stage0
-  ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..)
+  ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Name(..)
   , cUnit,cFalse,cTrue,cNil,cCons,mkUserId
   , execute,evalLit,apply
   ) where
@@ -23,8 +23,8 @@ data Exp
   = Var Position Id
   | Lit Position Literal
   | Con Position Cid [Exp]
-  | Prim Builtin [Exp]
-  | Lam Id Exp
+  | Prim Position Builtin [Exp]
+  | Lam Position Id Exp
   | RecLam Id Id Exp
   | App Exp Position Exp
   | Let Position Id Exp Exp
@@ -37,8 +37,10 @@ data Literal = LitC Char | LitN Word16 | LitS String
 data Id = Id
   { optUnique :: Maybe Int
   , optPos :: Maybe Position
-  , userGivenName :: String
+  , name :: Name
   } deriving (Eq,Ord)
+
+data Name = UserName String | GeneratedName String deriving (Eq,Ord)
 
 cUnit,cFalse,cTrue,cNil,cCons :: Cid
 cUnit = Cid "Unit"
@@ -49,8 +51,8 @@ cCons = Cid "Cons"
 
 
 mkUserId :: String -> Id
-mkUserId userGivenName =
-  Id { optUnique = Nothing, optPos = Nothing, userGivenName }
+mkUserId s =
+  Id { optUnique = Nothing, optPos = Nothing, name = UserName s }
 
 ----------------------------------------------------------------------
 -- Show
@@ -67,11 +69,23 @@ instance Show Literal where
     LitN n -> show n
     LitS s -> show s
 
+instance Show Name where
+  show = \case
+    UserName s -> s
+    GeneratedName s -> s
+
 prettyId :: Id -> String
-prettyId Id{userGivenName,optUnique,optPos} =
-  maybePos (maybeTag (maybeBracket userGivenName))
+prettyId Id{name,optUnique,optPos} =
+  maybePos (maybeTag (maybeBracket (show name)))
   where
-    maybePos s = case optPos of Nothing -> s; Just pos -> printf "%s_%s" s (show pos)
+    maybePos s =
+      case optPos of
+        Nothing ->
+          case name of
+            UserName{} -> s
+            GeneratedName{} -> undefined $ "NP_"++s -- currently we have positions for all generate names
+        Just pos ->
+          printf "%s_%s" s (show pos)
     maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n
     maybeBracket s = if needBracket s then printf "( %s )" s else s
     needBracket = \case "*" -> True; _ -> False
@@ -87,8 +101,8 @@ pretty = \case
   Lit _ x -> [show x]
   Con _ c [] -> [show c]
   Con _ c es -> onHead (show c ++) (bracket (foldl1 juxComma (map pretty es)))
-  Prim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
-  Lam x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
+  Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
+  Lam _ x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
   RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
   Let _ x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (pretty rhs)) ++ pretty body
@@ -151,10 +165,10 @@ eval env@Env{venv,cenv} = \case
     let tag = maybe err id $ Map.lookup cid cenv
           where err = error (show ("cenv-lookup",cid))
     k (VCons tag vs)
-  Prim b es -> \k -> do
+  Prim _ b es -> \k -> do
     evals env es $ \vs -> do
     evalBuiltin b vs k
-  Lam x body -> \k -> do
+  Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
   RecLam f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)

@@ -292,11 +292,11 @@ compileC = walkC firstTempIndex
         -- TODO: have walkA return a variant of Atomic or Top
         walkA :: SRC.Atomic -> M Atomic
         walkA = \case
-          SRC.Lit literal -> pure $ Lit literal
-          SRC.Prim b xs -> pure $ Prim b (map locate xs)
-          SRC.ConTag tag xs -> pure $ ConTag tag (map locate xs)
+          SRC.Lit _ literal -> pure $ Lit literal
+          SRC.Prim _ b xs -> pure $ Prim b (map locate xs)
+          SRC.ConTag _ tag xs -> pure $ ConTag tag (map locate xs)
 
-          SRC.Lam fvs x body -> do
+          SRC.Lam _ fvs x body -> do
             let xRef = Ref x TheArg
             let (cenv,pre,post) = frame locate fvs
             body <- compileC (Map.insert x xRef cenv) body

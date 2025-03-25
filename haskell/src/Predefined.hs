@@ -28,9 +28,9 @@ wrapPreDefs (Prog defs) =
       , ("::"           , construct2 cCons)
       ]
       where
-        prim1 p1 = Lam x (Prim p1 [ex])
-        prim2 p2 = Lam x (Lam y (Prim p2 [ex,ey]))
-        construct2 c2 = Lam x (Lam y (Con noPos c2 [ex,ey]))
+        prim1 p1 = Lam noPos x (Prim noPos p1 [ex])
+        prim2 p2 = Lam noPos x (Lam noPos y (Prim noPos p2 [ex,ey]))
+        construct2 c2 = Lam noPos x (Lam noPos y (Con noPos c2 [ex,ey]))
         ex = Var noPos x
         ey = Var noPos y
         x = mkUserId "x"

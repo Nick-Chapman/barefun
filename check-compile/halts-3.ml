@@ -1,11 +1,11 @@
 (*stage3*)
 let k () = ()
 let put_char_g1 = fun x_arg k ->
-  let prim_20_t1 = PRIM_PutChar(x_arg) in
-  k prim_20_t1 in
+  let prim_20_0'0_t1 = PRIM_PutChar(x_arg) in
+  k prim_20_0'0_t1 in
 let get_char_g2 = fun x_arg k ->
-  let prim_21_t1 = PRIM_GetChar(x_arg) in
-  k prim_21_t1 in
+  let prim_21_0'0_t1 = PRIM_GetChar(x_arg) in
+  k prim_21_0'0_t1 in
 let lit_24_3'11_g3 = 'X' in
 let lit_27_5'11_g4 = 'Y' in
 let lit_30_7'11_g5 = 'Z' in

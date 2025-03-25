@@ -1,90 +1,90 @@
 (*stage2*)
 let k () = ()
 let + = fun [] x k ->
-  let lam_2 = fun [x] y k ->
-    let prim_1 = PRIM_AddInt(x,y) in
-    k prim_1 in
-  k lam_2 in
+  let lam_2_0'0 = fun [x] y k ->
+    let prim_1_0'0 = PRIM_AddInt(x,y) in
+    k prim_1_0'0 in
+  k lam_2_0'0 in
 let - = fun [] x k ->
-  let lam_4 = fun [x] y k ->
-    let prim_3 = PRIM_SubInt(x,y) in
-    k prim_3 in
-  k lam_4 in
+  let lam_4_0'0 = fun [x] y k ->
+    let prim_3_0'0 = PRIM_SubInt(x,y) in
+    k prim_3_0'0 in
+  k lam_4_0'0 in
 let ( * ) = fun [] x k ->
-  let lam_6 = fun [x] y k ->
-    let prim_5 = PRIM_MulInt(x,y) in
-    k prim_5 in
-  k lam_6 in
+  let lam_6_0'0 = fun [x] y k ->
+    let prim_5_0'0 = PRIM_MulInt(x,y) in
+    k prim_5_0'0 in
+  k lam_6_0'0 in
 let / = fun [] x k ->
-  let lam_8 = fun [x] y k ->
-    let prim_7 = PRIM_DivInt(x,y) in
-    k prim_7 in
-  k lam_8 in
+  let lam_8_0'0 = fun [x] y k ->
+    let prim_7_0'0 = PRIM_DivInt(x,y) in
+    k prim_7_0'0 in
+  k lam_8_0'0 in
 let % = fun [] x k ->
-  let lam_10 = fun [x] y k ->
-    let prim_9 = PRIM_ModInt(x,y) in
-    k prim_9 in
-  k lam_10 in
+  let lam_10_0'0 = fun [x] y k ->
+    let prim_9_0'0 = PRIM_ModInt(x,y) in
+    k prim_9_0'0 in
+  k lam_10_0'0 in
 let < = fun [] x k ->
-  let lam_12 = fun [x] y k ->
-    let prim_11 = PRIM_LessInt(x,y) in
-    k prim_11 in
-  k lam_12 in
+  let lam_12_0'0 = fun [x] y k ->
+    let prim_11_0'0 = PRIM_LessInt(x,y) in
+    k prim_11_0'0 in
+  k lam_12_0'0 in
 let = = fun [] x k ->
-  let lam_14 = fun [x] y k ->
-    let prim_13 = PRIM_EqInt(x,y) in
-    k prim_13 in
-  k lam_14 in
+  let lam_14_0'0 = fun [x] y k ->
+    let prim_13_0'0 = PRIM_EqInt(x,y) in
+    k prim_13_0'0 in
+  k lam_14_0'0 in
 let eq_char = fun [] x k ->
-  let lam_16 = fun [x] y k ->
-    let prim_15 = PRIM_EqChar(x,y) in
-    k prim_15 in
-  k lam_16 in
+  let lam_16_0'0 = fun [x] y k ->
+    let prim_15_0'0 = PRIM_EqChar(x,y) in
+    k prim_15_0'0 in
+  k lam_16_0'0 in
 let ord = fun [] x k ->
-  let prim_17 = PRIM_CharOrd(x) in
-  k prim_17 in
+  let prim_17_0'0 = PRIM_CharOrd(x) in
+  k prim_17_0'0 in
 let chr = fun [] x k ->
-  let prim_18 = PRIM_CharChr(x) in
-  k prim_18 in
+  let prim_18_0'0 = PRIM_CharChr(x) in
+  k prim_18_0'0 in
 let explode = fun [] x k ->
-  let prim_19 = PRIM_Explode(x) in
-  k prim_19 in
+  let prim_19_0'0 = PRIM_Explode(x) in
+  k prim_19_0'0 in
 let put_char = fun [] x k ->
-  let prim_20 = PRIM_PutChar(x) in
-  k prim_20 in
+  let prim_20_0'0 = PRIM_PutChar(x) in
+  k prim_20_0'0 in
 let get_char = fun [] x k ->
-  let prim_21 = PRIM_GetChar(x) in
-  k prim_21 in
+  let prim_21_0'0 = PRIM_GetChar(x) in
+  k prim_21_0'0 in
 let :: = fun [] x k ->
-  let lam_23 = fun [x] y k ->
-    let con_22 = Cons1[x,y] in
-    k con_22 in
-  k lam_23 in
+  let lam_23_0'0 = fun [x] y k ->
+    let con_22_0'0 = Cons1[x,y] in
+    k con_22_0'0 in
+  k lam_23_0'0 in
 let not = fun [] b k ->
   match b with
   | true1 ->
-    let con_24 = false0 in
-    k con_24
+    let con_24_4'12 = false0 in
+    k con_24_4'12
   | false0 ->
-    let con_25 = true1 in
-    k con_25 in
+    let con_25_5'13 = true1 in
+    k con_25_5'13 in
 let > = fun [<] a k ->
-  let lam_27 = fun [<,a] b k ->
+  let lam_27_7'10 = fun [<,a] b k ->
     let k [a] app_26_7'16 = app_26_7'16 a k in
     < b k in
-  k lam_27 in
+  k lam_27_7'10 in
 let <= = fun [<,not] a k ->
-  let lam_30 = fun [<,a,not] b k ->
+  let lam_30_8'11 = fun [<,a,not] b k ->
     let k [not] app_28_8'24 = not app_28_8'24 k in
     let k [a] app_29_8'22 = app_29_8'22 a k in
     < b k in
-  k lam_30 in
+  k lam_30_8'11 in
 let >= = fun [<,not] a k ->
-  let lam_33 = fun [<,a,not] b k ->
+  let lam_33_9'11 = fun [<,a,not] b k ->
     let k [not] app_31_9'24 = not app_31_9'24 k in
     let k [b] app_32_9'22 = app_32_9'22 b k in
     < a k in
-  k lam_33 in
+  k lam_33_9'11 in
 let parse_digit = fun [-,<=,>=,ord] c k ->
   let k [<=,>=] n =
     let k [<=,n] app_38_16'10 =
@@ -93,18 +93,18 @@ let parse_digit = fun [-,<=,>=,ord] c k ->
         let k [n] app_41_16'25 =
           match app_41_16'25 with
           | true1 ->
-            let con_44 = Some0[n] in
-            k con_44
+            let con_44_16'32 = Some0[n] in
+            k con_44_16'32
           | false0 ->
-            let con_45 = None1 in
-            k con_45 in
+            let con_45_16'45 = None1 in
+            k con_45_16'45 in
         let k [] app_42_16'22 =
           let lit_43_16'25 = 9 in
           app_42_16'22 lit_43_16'25 k in
         <= n k
       | false0 ->
-        let con_46 = None1 in
-        k con_46 in
+        let con_46_16'55 = None1 in
+        k con_46_16'55 in
     let k [] app_39_16'7 =
       let lit_40_16'10 = 0 in
       app_39_16'7 lit_40_16'10 k in
@@ -117,17 +117,17 @@ let parse_digit = fun [-,<=,>=,ord] c k ->
   ord c k in
 let parse_num = fun [( * ),+,parse_digit] s k ->
   let loop = fix (fun [( * ),+,parse_digit] loop acc k ->
-    let lam_56 = fun [( * ),+,acc,loop,parse_digit] xs k ->
+    let lam_56_19'19 = fun [( * ),+,acc,loop,parse_digit] xs k ->
       match xs with
       | Nil0 ->
-        let con_47 = Some0[acc] in
-        k con_47
+        let con_47_21'12 = Some0[acc] in
+        k con_47_21'12
       | Cons1(x,xs) ->
         let k [( * ),+,acc,loop,xs] app_48_23'26 =
           match app_48_23'26 with
           | None1 ->
-            let con_49 = None1 in
-            k con_49
+            let con_49_24'18 = None1 in
+            k con_49_24'18
           | Some0(d) ->
             let k [xs] app_50_25'25 = app_50_25'25 xs k in
             let k [loop] app_51_25'37 = loop app_51_25'37 k in
@@ -137,32 +137,32 @@ let parse_num = fun [( * ),+,parse_digit] s k ->
             let lit_55_25'26 = 10 in
             ( * ) lit_55_25'26 k in
         parse_digit x k in
-    k lam_56) in
+    k lam_56_19'19) in
   let k [s] app_57_27'7 = app_57_27'7 s k in
   let lit_58_27'7 = 0 in
   loop lit_58_27'7 k in
 let cons = fun [::] x k ->
-  let lam_60 = fun [::,x] xs k ->
+  let lam_60_29'11 = fun [::,x] xs k ->
     let k [xs] app_59_29'18 = app_59_29'18 xs k in
     :: x k in
-  k lam_60 in
+  k lam_60_29'11 in
 let eq_list = fix (fun [] eq_list eq k ->
-  let lam_70 = fun [eq,eq_list] xs k ->
-    let lam_69 = fun [eq,eq_list,xs] ys k ->
+  let lam_70_31'19 = fun [eq,eq_list] xs k ->
+    let lam_69_31'22 = fun [eq,eq_list,xs] ys k ->
       match xs with
       | Nil0 ->
         match ys with
         | Nil0 ->
-          let con_61 = true1 in
-          k con_61
+          let con_61_33'33 = true1 in
+          k con_61_33'33
         | Cons1(_,_) ->
-          let con_62 = false0 in
-          k con_62
+          let con_62_33'48 = false0 in
+          k con_62_33'48
       | Cons1(x,xs) ->
         match ys with
         | Nil0 ->
-          let con_63 = false0 in
-          k con_63
+          let con_63_36'13 = false0 in
+          k con_63_36'13
         | Cons1(y,ys) ->
           let k [eq,eq_list,xs,ys] app_64_38'16 =
             match app_64_38'16 with
@@ -171,20 +171,20 @@ let eq_list = fix (fun [] eq_list eq k ->
               let k [xs] app_67_38'31 = app_67_38'31 xs k in
               eq_list eq k
             | false0 ->
-              let con_68 = false0 in
-              k con_68 in
+              let con_68_38'45 = false0 in
+              k con_68_38'45 in
           let k [y] app_65_38'14 = app_65_38'14 y k in
           eq x k in
-    k lam_69 in
-  k lam_70) in
+    k lam_69_31'22 in
+  k lam_70_31'19) in
 let eq_char_list = fun [eq_char,eq_list] a k ->
-  let lam_73 = fun [a,eq_char,eq_list] b k ->
+  let lam_73_40'19 = fun [a,eq_char,eq_list] b k ->
     let k [b] app_71_40'39 = app_71_40'39 b k in
     let k [a] app_72_40'31 = app_72_40'31 a k in
     eq_list eq_char k in
-  k lam_73 in
+  k lam_73_40'19 in
 let append = fix (fun [cons] append xs k ->
-  let lam_77 = fun [append,cons,xs] ys k ->
+  let lam_77_42'18 = fun [append,cons,xs] ys k ->
     match xs with
     | Nil0 -> k ys
     | Cons1(x,xs) ->
@@ -193,10 +193,10 @@ let append = fix (fun [cons] append xs k ->
         let k [ys] app_76_45'28 = app_76_45'28 ys k in
         append xs k in
       cons x k in
-  k lam_77) in
+  k lam_77_42'18) in
 let reverse = fun [cons] xs k ->
   let loop = fix (fun [cons] loop acc k ->
-    let lam_81 = fun [acc,cons,loop] xs k ->
+    let lam_81_48'19 = fun [acc,cons,loop] xs k ->
       match xs with
       | Nil0 -> k acc
       | Cons1(x,xs) ->
@@ -204,16 +204,16 @@ let reverse = fun [cons] xs k ->
         let k [loop] app_79_51'28 = loop app_79_51'28 k in
         let k [acc] app_80_51'26 = app_80_51'26 acc k in
         cons x k in
-    k lam_81) in
+    k lam_81_48'19) in
   let k [xs] app_82_53'7 = app_82_53'7 xs k in
   let con_83_53'7 = Nil0 in
   loop con_83_53'7 k in
 let map = fix (fun [::] map f k ->
-  let lam_89 = fun [::,f,map] xs k ->
+  let lam_89_55'14 = fun [::,f,map] xs k ->
     match xs with
     | Nil0 ->
-      let con_84 = Nil0 in
-      k con_84
+      let con_84_57'10 = Nil0 in
+      k con_84_57'10
     | Cons1(x,xs) ->
       let k [f,map,xs] app_85_58'17 =
         let k [app_85_58'17] app_87_58'26 = app_85_58'17 app_87_58'26 k in
@@ -221,12 +221,12 @@ let map = fix (fun [::] map f k ->
         map f k in
       let k [::] app_86_58'15 = :: app_86_58'15 k in
       f x k in
-  k lam_89) in
+  k lam_89_55'14) in
 let length = fix (fun [+] length xs k ->
   match xs with
   | Nil0 ->
-    let lit_90 = 0 in
-    k lit_90
+    let lit_90_62'10 = 0 in
+    k lit_90_62'10
   | Cons1(_,xs) ->
     let k [length,xs] app_91_63'17 =
       let k [app_91_63'17] app_93_63'27 = app_91_63'17 app_93_63'27 k in
@@ -240,7 +240,7 @@ let chars_of_int = fun [%,+,/,=,chr,cons,ord] i k ->
       let k [c] app_96_67'34 = app_96_67'34 c k in
       + ord0 k in
     let loop = fix (fun [%,/,=,char_of_digit,cons] loop acc k ->
-      let lam_110 = fun [%,/,=,acc,char_of_digit,cons,loop] i k ->
+      let lam_110_68'19 = fun [%,/,=,acc,char_of_digit,cons,loop] i k ->
         let k [%,/,acc,char_of_digit,cons,i,loop] app_97_69'11 =
           match app_97_69'11 with
           | true1 -> k acc
@@ -263,7 +263,7 @@ let chars_of_int = fun [%,+,/,=,chr,cons,ord] i k ->
           let lit_99_69'11 = 0 in
           app_98_69'9 lit_99_69'11 k in
         = i k in
-      k lam_110) in
+      k lam_110_68'19) in
     let k [cons,i,loop] app_111_72'9 =
       match app_111_72'9 with
       | true1 ->
@@ -285,8 +285,8 @@ let chars_of_int = fun [%,+,/,=,chr,cons,ord] i k ->
 let put_chars = fix (fun [put_char] put_chars xs k ->
   match xs with
   | Nil0 ->
-    let con_119 = Unit0 in
-    k con_119
+    let con_119_76'10 = Unit0 in
+    k con_119_76'10
   | Cons1(x,xs) ->
     let k [put_chars,xs] _ = put_chars xs k in
     put_char x k) in
@@ -401,8 +401,8 @@ let fact = fix (fun [( * ),-,>=] fact n k ->
         app_164_116'24 lit_165_116'25 k in
       - n k
     | false0 ->
-      let lit_166 = 1 in
-      k lit_166 in
+      let lit_166_116'37 = 1 in
+      k lit_166_116'37 in
   let k [] app_159_116'7 =
     let lit_160_116'10 = 2 in
     app_159_116'7 lit_160_116'10 k in
@@ -508,22 +508,22 @@ let fallback = fun [+,append,eq_char,explode,length,map,newline,put_char,put_cha
       length line k in
     let lit_189_156'10 = 100 in
     + lit_189_156'10 k in
-  let lam_183 = fun [eq_char] c k ->
+  let lam_183_155'30 = fun [eq_char] c k ->
     let k [c] app_184_155'48 =
       match app_184_155'48 with
       | true1 ->
-        let lit_187 = '*' in
-        k lit_187
+        let lit_187_155'57 = '*' in
+        k lit_187_155'57
       | false0 -> k c in
     let k [] app_185_155'46 =
       let lit_186_155'48 = 'o' in
       app_185_155'46 lit_186_155'48 k in
     eq_char c k in
-  map lam_183 k in
+  map lam_183_155'30 k in
 let split_words = fun [::,eq_char,reverse] s k ->
   let loop = fix (fun [::,eq_char,reverse] loop accWs k ->
-    let lam_217 = fun [::,accWs,eq_char,loop,reverse] accCs k ->
-      let lam_216 = fun [::,accCs,accWs,eq_char,loop,reverse] xs k ->
+    let lam_217_165'21 = fun [::,accWs,eq_char,loop,reverse] accCs k ->
+      let lam_216_165'27 = fun [::,accCs,accWs,eq_char,loop,reverse] xs k ->
         match xs with
         | Nil0 ->
           let k [reverse] app_200_167'38 = reverse app_200_167'38 k in
@@ -553,8 +553,8 @@ let split_words = fun [::,eq_char,reverse] s k ->
             let lit_205_170'20 = ' ' in
             app_204_170'18 lit_205_170'20 k in
           eq_char x k in
-      k lam_216 in
-    k lam_217) in
+      k lam_216_165'27 in
+    k lam_217_165'21) in
   let k [s] app_218_173'10 = app_218_173'10 s k in
   let k [] app_219_173'7 =
     let con_221_173'10 = Nil0 in
@@ -565,8 +565,8 @@ let execute = fun [eq_char_list,explode,fallback,runfact,runfib,split_words] lin
   let k [eq_char_list,explode,fallback,line,runfact,runfib] words =
     match words with
     | Nil0 ->
-      let con_222 = Unit0 in
-      k con_222
+      let con_222_178'10 = Unit0 in
+      k con_222_178'10
     | Cons1(command,args) ->
       let k [args,command,eq_char_list,explode,fallback,line,runfact,runfib] app_223_180'29 =
         match app_223_180'29 with

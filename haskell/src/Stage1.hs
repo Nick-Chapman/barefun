@@ -23,8 +23,8 @@ data Exp
   = Var Position Id
   | Lit Position Literal
   | ConTag Position Ctag [Exp]
-  | Prim Builtin [Exp]
-  | Lam Id Exp
+  | Prim Position Builtin [Exp]
+  | Lam Position Id Exp
   | RecLam Id Id Exp
   | App Exp Position Exp
   | Let Position Id Exp Exp
@@ -42,7 +42,7 @@ provenanceExp = \case
   App _ pos _ -> ("app", Just pos)
   Lit pos _ -> ("lit",Just pos)
   ConTag pos _ _ -> ("con",Just pos)
-  Lam{} -> ("lam",Nothing)
+  Lam pos _ _ -> ("lam",Just pos)
   -- TODO: No reason I think these cases can't occur. I've just never seen them yet in any of my examples.
   Prim{} -> undefined
   RecLam{} -> undefined
@@ -62,8 +62,8 @@ pretty = \case
   Lit _ x -> [show x]
   ConTag _ tag [] -> [show tag]
   ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
-  Prim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
-  Lam x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
+  Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
+  Lam _ x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
   RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
   Let _ x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (pretty rhs)) ++ pretty body
@@ -104,10 +104,10 @@ eval env@Env{venv} = \case
   ConTag _ (Ctag _ tag) es -> \k -> do
     evals env es $ \vs -> do
       k (VCons tag vs)
-  Prim b es -> \k -> do
+  Prim _ b es -> \k -> do
     evals env es $ \vs -> do
     evalBuiltin b vs k
-  Lam x body -> \k -> do
+  Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
   RecLam f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
@@ -186,8 +186,8 @@ transExp cenv e = trans e
       SRC.Var p x -> Var p x
       SRC.Lit p x -> Lit p x
       SRC.Con p cid es -> ConTag p (transCid cid) (map trans es)
-      SRC.Prim b xs -> Prim b (map trans xs)
-      SRC.Lam x body -> Lam x (trans body)
+      SRC.Prim pos b xs -> Prim pos b (map trans xs)
+      SRC.Lam p x body -> Lam p x (trans body)
       SRC.RecLam f x body -> RecLam f x (trans body)
       SRC.App e1 p e2 -> App (trans e1) p (trans e2)
       SRC.Let pos x rhs body -> Let pos x (trans rhs) (trans body)
