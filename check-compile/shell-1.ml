@@ -20,6 +20,25 @@ let not = (fun b ->
 let > = (fun a -> (fun b -> ((< b) a))) in
 let <= = (fun a -> (fun b -> (not ((< b) a)))) in
 let >= = (fun a -> (fun b -> (not ((< a) b)))) in
+let put_char = (fun c ->
+  let backspace = 8 in
+  let n = (ord c) in
+  match ((= n) backspace) with
+  | true1 -> (put_char c)
+  | false0 ->
+    match ((eq_char c) '\n') with
+    | true1 -> (put_char c)
+    | false0 ->
+      match ((> n) 26) with
+      | true1 -> (put_char c)
+      | false0 ->
+        let _ = (put_char '^') in
+        (put_char (chr ((- ((+ (ord 'A')) n)) 1)))) in
+let erase_char = (fun _ ->
+  let backspace = (chr 8) in
+  let _ = (put_char backspace) in
+  let _ = (put_char ' ') in
+  (put_char backspace)) in
 let parse_digit = (fun c ->
   let n = ((- (ord c)) (ord '0')) in
   match ((>= n) 0) with
@@ -108,24 +127,22 @@ let read_line = (fun _ ->
       let _ = (newline Unit0) in
       (reverse acc)
     | false0 ->
-      match ((<= n) 31) with
+      match ((> n) 127) with
       | true1 -> (loop acc)
       | false0 ->
-        match ((> n) 127) with
-        | true1 -> (loop acc)
+        match ((= n) 127) with
+        | true1 ->
+          match acc with
+          | Nil0 -> (loop acc)
+          | Cons1(c,tail) ->
+            let _ = match ((<= (ord c)) 26) with
+            | true1 -> (erase_char Unit0)
+            | false0 -> Unit0 in
+            let _ = (erase_char Unit0) in
+            (loop tail)
         | false0 ->
-          match ((= n) 127) with
-          | true1 ->
-            match acc with
-            | Nil0 -> (loop acc)
-            | Cons1(_,tail) ->
-              let _ = (put_char (chr 8)) in
-              let _ = (put_char ' ') in
-              let _ = (put_char (chr 8)) in
-              (loop tail)
-          | false0 ->
-            let _ = (put_char c) in
-            (loop ((cons c) acc))) in
+          let _ = (put_char c) in
+          (loop ((cons c) acc))) in
   (loop Nil0)) in
 let fib = fix (fun fib n ->
   match ((< n) 2) with
@@ -177,7 +194,7 @@ let fallback = (fun line ->
     match ((eq_char c) 'o') with
     | true1 -> '*'
     | false0 -> c)) in
-  let n = ((+ 100) (length line)) in
+  let n = (length line) in
   let _ = (put_chars ((append (explode "You wrote: ")) (star_the_ohs line))) in
   let _ = (put_char ' ') in
   let _ = (put_char '{') in

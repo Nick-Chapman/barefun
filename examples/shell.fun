@@ -8,6 +8,22 @@ let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
+(* Make a prettier put_char for control chars; also align with backspacing *)
+let put_char c =
+  let backspace = 8 in
+  let n = ord c in
+  if n = backspace then put_char c else
+    if eq_char c '\n' then put_char c else
+      if n > 26 then put_char c else
+        (put_char '^'; put_char (chr (ord 'A' + n - 1 )))
+
+let erase_char () =
+  let backspace = chr 8 in
+  (* erase the previously echoed char on the terminal *)
+  put_char backspace;
+  put_char ' ';
+  put_char backspace
+
 type 'a option = Some of 'a | None
 
 let parse_digit c =
@@ -91,16 +107,14 @@ let read_line () =
     let c = get_char () in
     let n = ord c in
     if eq_char c '\n' then (newline(); reverse acc) else
-      if n <= 31 then loop acc else
+      (*if n <= 31 then loop acc else*)
         if n > 127 then loop acc else
           if n = 127 then
             match acc with
             | [] -> loop acc
-            | _::tail ->
-               (* erase the previous char *)
-               put_char (chr 8);
-               put_char ' ';
-               put_char (chr 8);
+            | c::tail ->
+               (if ord c <= 26 then erase_char () else ()); (* The ^ printed for control chars *)
+               erase_char();
                loop tail
           else
             (put_char c; loop (cons c acc))
@@ -153,7 +167,7 @@ let runfact args =
 
 let fallback line =
   let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c) in
-  let n = 100 + length line in
+  let n = length line in
   put_chars (append (explode "You wrote: ") (star_the_ohs line));
   put_char ' ';
   put_char '{';

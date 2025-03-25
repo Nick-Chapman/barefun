@@ -6,7 +6,7 @@ Ocaml REPL
   LOAD
   RUN
   > Hello, World!
-  You wrote: Hell*, W*rld! {113}
+  You wrote: Hell*, W*rld! {13}
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -22,7 +22,7 @@ Ocaml REPL
   > fact 7
   fact: 7 --> 5040
   > Goodbye
-  You wrote: G**dbye {107}
+  You wrote: G**dbye {7}
   > [EOF]
 
 Haskell REPL (stage0)
@@ -32,7 +32,7 @@ Haskell REPL (stage0)
   LOAD
   RUN
   > Hello, World!
-  You wrote: Hell*, W*rld! {113}
+  You wrote: Hell*, W*rld! {13}
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -48,7 +48,7 @@ Haskell REPL (stage0)
   > fact 7
   fact: 7 --> 5040
   > Goodbye
-  You wrote: G**dbye {107}
+  You wrote: G**dbye {7}
   > [EOF]
 
 Haskell REPL (stage1)
@@ -58,7 +58,7 @@ Haskell REPL (stage1)
   LOAD
   RUN
   > Hello, World!
-  You wrote: Hell*, W*rld! {113}
+  You wrote: Hell*, W*rld! {13}
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -74,7 +74,7 @@ Haskell REPL (stage1)
   > fact 7
   fact: 7 --> 5040
   > Goodbye
-  You wrote: G**dbye {107}
+  You wrote: G**dbye {7}
   > [EOF]
 
 Haskell REPL (stage2)
@@ -84,7 +84,7 @@ Haskell REPL (stage2)
   LOAD
   RUN
   > Hello, World!
-  You wrote: Hell*, W*rld! {113}
+  You wrote: Hell*, W*rld! {13}
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -100,7 +100,7 @@ Haskell REPL (stage2)
   > fact 7
   fact: 7 --> 5040
   > Goodbye
-  You wrote: G**dbye {107}
+  You wrote: G**dbye {7}
   > [EOF]
 
 Haskell REPL
@@ -110,7 +110,7 @@ Haskell REPL
   LOAD
   RUN
   > Hello, World!
-  You wrote: Hell*, W*rld! {113}
+  You wrote: Hell*, W*rld! {13}
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -126,5 +126,5 @@ Haskell REPL
   > fact 7
   fact: 7 --> 5040
   > Goodbye
-  You wrote: G**dbye {107}
+  You wrote: G**dbye {7}
   > [EOF]
