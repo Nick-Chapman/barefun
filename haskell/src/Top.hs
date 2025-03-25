@@ -3,7 +3,6 @@ module Top (main) where
 import Interaction (runTerm)
 import Parser (parseProg)
 import Predefined (wrapPreDefs)
-import Text.Printf (printf)
 import System.Environment (getArgs)
 import qualified Stage0 (execute)
 import qualified Stage1 (compile,execute)
@@ -16,38 +15,38 @@ main = do
   let Config {paths,mode,stage} = config
   let path = case paths of [] -> error "no .fun"; [x] -> x; _ -> error "too much .fun"
   s <- readFile path
-  let prog = wrapPreDefs (parseProg s)
+  let e0 = wrapPreDefs (parseProg s)
   case (stage,mode) of
     (Stage0,Compile) -> do
-      printf "[ast]\n----------\n%s\n----------\n" (show prog)
+      putStrLn "(*stage0*)"; putStrLn (show e0)
     (Stage0,Eval) -> do
       putStrLn "[stage0]"
-      runTerm (Stage0.execute prog)
+      runTerm (Stage0.execute e0)
     (Stage1,Compile) -> do
-      let e1 = Stage1.compile prog
-      printf "[transform1]\n----------\n%s\n----------\n" (show e1)
+      let e1 = Stage1.compile e0
+      putStrLn "(*stage1*)"; putStrLn (show e1)
     (Stage1,Eval) -> do
       putStrLn "[stage1]"
-      let e1 = Stage1.compile prog
+      let e1 = Stage1.compile e0
       runTerm (Stage1.execute e1)
     (Stage2,Compile) -> do
-      let e1 = Stage1.compile prog
+      let e1 = Stage1.compile e0
       let e2 = Stage2.compile e1
-      printf "[transform2]\n----------\n%s\n----------\n" (show e2)
+      putStrLn "(*stage2*)"; putStrLn (show e2)
     (Stage2,Eval) -> do
       putStrLn "[stage2]"
-      let e1 = Stage1.compile prog
+      let e1 = Stage1.compile e0
       let e2 = Stage2.compile e1
       runTerm (Stage2.execute e2)
 
     (Stage3,Compile) -> do
-      let e1 = Stage1.compile prog
+      let e1 = Stage1.compile e0
       let e2 = Stage2.compile e1
       let e3 = Stage3.compile e2
-      printf "[transform3]\n----------\n%s\n----------\n" (show e3)
+      putStrLn "(*stage3*)"; putStrLn (show e3)
     (Stage3,Eval) -> do
       putStrLn "[stage3]"
-      let e1 = Stage1.compile prog
+      let e1 = Stage1.compile e0
       let e2 = Stage2.compile e1
       let e3 = Stage3.compile e2
       runTerm (Stage3.execute e3)

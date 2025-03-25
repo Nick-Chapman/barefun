@@ -64,30 +64,30 @@ instance Show Loadable where show = intercalate "\n" . ("let k () = ()":) . pret
 prettyL :: Loadable -> Lines
 prettyL = \case
   Run code -> prettyC code
-  LetTop x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyT rhs)) ++ prettyL body
+  LetTop x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyT rhs)) ++ prettyL body
 
 prettyT :: Top -> Lines
 prettyT = \case
   TopLit x -> [show x]
-  TopLam x body -> bracket $ indented ("fun " ++ show x ++ " k ->") (prettyC body)
+  TopLam x body -> indented ("fun " ++ show x ++ " k ->") (prettyC body)
   TopRecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " k ->") (prettyC body)
 
 prettyC :: Code -> Lines
 prettyC = \case
-  Return x -> ["k "++show x]
+  Return x -> ["k " ++ show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
   LetAlias x y body -> ["let " ++ show x ++ " = " ++ show y ++ " in"] ++ prettyC body
-  LetAtomic x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyA rhs)) ++ prettyC body
+  LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ prettyC body
   PushContinuation pre post (x,later) first -> indented ("let k = " ++ show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " ->") (onTail (++ " in") (prettyC later)) ++ prettyC first
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
 
 prettyA :: Atomic -> Lines
 prettyA = \case
   Lit x -> [show x]
-  Prim b xs -> do [printf "PRIM_%s%s" (show b) (show xs)]
+  Prim b xs -> do [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   ConTag tag [] -> [show tag]
   ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
-  Lam pre post x body -> bracket $ indented (show pre ++ ", fun" ++ show post ++ " " ++ show x ++ " k ->") (prettyC body)
+  Lam pre post x body -> indented (show pre ++ ", fun" ++ show post ++ " " ++ show x ++ " k ->") (prettyC body)
   RecLam pre post f x body -> onHead ((show pre ++ ", fix ")++) $ bracket $ indented ("fun" ++ show post ++ " " ++ show f ++ " " ++ show x ++ " k ->") (prettyC body)
 
 prettyArm :: Arm -> Lines

@@ -50,20 +50,20 @@ instance Show Code where show = intercalate "\n" . ("let k () = ()":) . pretty
 
 pretty :: Code -> Lines
 pretty = \case
-  Return x -> ["k "++show x]
+  Return x -> ["k " ++ show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
   LetAlias x y body -> ["let " ++ show x ++ " = " ++ show y ++ " in"] ++ pretty body
-  LetAtomic x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (prettyA rhs)) ++ pretty body
+  LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ pretty body
   PushContinuation fvs (x,later) first -> indented ("let k " ++ show fvs ++ " " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
 
 prettyA :: Atomic -> Lines
 prettyA = \case
   Lit x -> [show x]
-  Prim b xs -> do [printf "PRIM_%s%s" (show b) (show xs)]
+  Prim b xs -> do [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   ConTag tag [] -> [show tag]
   ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
-  Lam fvs x body -> bracket $ indented ("fun" ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
+  Lam fvs x body -> indented ("fun" ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
   RecLam fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun" ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
 
 prettyArm :: Arm -> Lines
