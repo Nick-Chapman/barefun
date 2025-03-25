@@ -20,7 +20,7 @@ import qualified Stage0 as SRC
 type Transformed = Exp
 
 data Exp
-  = Var (Maybe Position) Id
+  = Var Position Id
   | Lit Literal
   | ConTag Ctag [Exp]
   | Prim Builtin [Exp]
@@ -155,7 +155,7 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
     mainApp = App main noPos (ConTag (Ctag cUnit tUnit) [])
 
     noPos = Position 0 0
-    main = Var Nothing (SRC.mkUserId "main")
+    main = Var noPos (SRC.mkUserId "main")
 
 transExp :: Cenv -> SRC.Exp -> Exp
 transExp cenv e = trans e

@@ -20,7 +20,7 @@ data Prog = Prog [Def]
 data Def = ValDef Id Exp | TypeDef [Cid]
 
 data Exp
-  = Var (Maybe Position) Id
+  = Var Position Id
   | Lit Literal
   | Con Cid [Exp]
   | Prim Builtin [Exp]
@@ -128,7 +128,7 @@ mainApp :: Exp
 mainApp = App main noPos (Con cUnit [])
   where
     noPos = Position 0 0
-    main = Var Nothing (mkUserId "main")
+    main = Var noPos (mkUserId "main")
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
 evals env es k = case es of

@@ -178,7 +178,7 @@ gram6 = program where
   var = do
     pos <- position
     x <- alts [identifier,bracketedInfixName]
-    pure (AST.Var (Just pos) x)
+    pure (AST.Var pos x)
 
   num = AST.Lit . AST.LitN <$> number
   char = AST.Lit . AST.LitC <$> charLit
@@ -218,7 +218,7 @@ gram6 = program where
                name <- alts [ do key x; pure x | x <- names ]
                p2 <- position
                x <- sub
-               loop (mkApps (AST.Var Nothing (mkUserId name)) [(p1,acc),(p2,x)])
+               loop (mkApps (AST.Var p1 (mkUserId name)) [(p1,acc),(p2,x)])
            ]
 
   infixNames = infixGroup1 ++ infixGroup2 ++ infixGroup3 ++ infixGroup4

@@ -3,6 +3,7 @@ module Predefined
   ) where
 
 import Builtin (Builtin(..))
+import Par4 (Position(..))
 import Stage0 (Prog(..),Def(..),Exp(..), cCons, mkUserId)
 
 wrapPreDefs :: Prog -> Prog
@@ -30,7 +31,8 @@ wrapPreDefs (Prog defs) =
         prim1 p1 = Lam x (Prim p1 [ex])
         prim2 p2 = Lam x (Lam y (Prim p2 [ex,ey]))
         construct2 c2 = Lam x (Lam y (Con c2 [ex,ey]))
-        ex = Var Nothing x
-        ey = Var Nothing y
+        ex = Var noPos x
+        ey = Var noPos y
         x = mkUserId "x"
         y = mkUserId "y"
+        noPos = Position 0 0
