@@ -2,9 +2,19 @@
 module Lines
   ( Lines
   , juxComma, bracket, onHead, onTail, jux, indented
+  , (<++), (++>), (>>>)
   ) where
 
 type Lines = [String]
+
+(<++) :: String -> Lines -> Lines
+(<++) s xs = onHead (s++) xs
+
+(++>) :: Lines -> String -> Lines
+(++>) xs s = onTail (++s) xs
+
+(>>>) :: String -> Lines -> Lines
+(>>>) = indented
 
 juxComma :: Lines -> Lines -> Lines
 juxComma a b = jux (onTail (++",") a) b
