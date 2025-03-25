@@ -9,12 +9,12 @@ let get_char_g2 = fun x_arg k ->
 let mainloop_g3 = fun mainloop_me __arg k ->
   let k = [mainloop_me], fun [mainloop_f1] gotten_arg ->
     let k = [mainloop_f1], fun [mainloop_f1] __arg ->
-      let u25_t1 = Unit0 in
-      mainloop_f1 u25_t1 k in
+      let u25_6'13_t1 = Unit0 in
+      mainloop_f1 u25_6'13_t1 k in
     put_char_g1 gotten_arg k in
-  let u24_t1 = Unit0 in
-  get_char_g2 u24_t1 k in
+  let u24_4'26_t1 = Unit0 in
+  get_char_g2 u24_4'26_t1 k in
 let k = [], fun [] main_arg ->
-  let u26_t1 = Unit0 in
-  main_arg u26_t1 k in
+  let u26_0'0_t1 = Unit0 in
+  main_arg u26_0'0_t1 k in
 k mainloop_g3

@@ -42,11 +42,11 @@ let revloop_g8 = fun revloop_me acc_arg k ->
   k v29_t1 in
 let reverse_g9 = fun ysStart_arg k ->
   let k = [ysStart_arg], fun [ysStart_f1] u30_15'10_arg -> u30_15'10_arg ysStart_f1 k in
-  let u31_t1 = Nil0 in
-  revloop_g8 u31_t1 k in
-let u32_g10 = '\n' in
-let newline_g11 = fun __arg k -> put_char_g3 u32_g10 k in
-let u36_g12 = '\n' in
+  let u31_15'10_t1 = Nil0 in
+  revloop_g8 u31_15'10_t1 k in
+let u32_17'26_g10 = '\n' in
+let newline_g11 = fun __arg k -> put_char_g3 u32_17'26_g10 k in
+let u36_23'22_g12 = '\n' in
 let readloop_g13 = fun readloop_me sofar_arg k ->
   let k = [readloop_me,sofar_arg], fun [readloop_f1,sofar_f2] theChar_arg ->
     let gotten_arg = theChar_arg in
@@ -54,33 +54,33 @@ let readloop_g13 = fun readloop_me sofar_arg k ->
       match u34_23'22_arg with
       | true1 ->
         let k = [sofar_f3], fun [sofar_f1] __arg -> reverse_g9 sofar_f1 k in
-        let u37_t1 = Unit0 in
-        newline_g11 u37_t1 k
+        let u37_23'40_t1 = Unit0 in
+        newline_g11 u37_23'40_t1 k
       | false0 ->
         let k = [gotten_f1,readloop_f2,sofar_f3], fun [gotten_f1,readloop_f2,sofar_f3] __arg ->
           let k = [readloop_f2], fun [readloop_f1] u38_24'44_arg -> readloop_f1 u38_24'44_arg k in
           let k = [sofar_f3], fun [sofar_f1] u39_24'41_arg -> u39_24'41_arg sofar_f1 k in
           ::_g5 gotten_f1 k in
         put_char_g3 gotten_f1 k in
-    let k = [], fun [] u35_23'15_arg -> u35_23'15_arg u36_g12 k in
+    let k = [], fun [] u35_23'15_arg -> u35_23'15_arg u36_23'22_g12 k in
     eq_char_g1 gotten_arg k in
-  let u33_t1 = Unit0 in
-  get_char_g4 u33_t1 k in
+  let u33_21'27_t1 = Unit0 in
+  get_char_g4 u33_21'27_t1 k in
 let read_line_g14 = fun __arg k ->
-  let u40_t1 = Nil0 in
-  readloop_g13 u40_t1 k in
-let u41_g15 = "> " in
+  let u40_26'11_t1 = Nil0 in
+  readloop_g13 u40_26'11_t1 k in
+let u41_29'13_g15 = "> " in
 let main_g16 = fun main_me __arg k ->
   let k = [main_me], fun [main_f1] __arg ->
     let k = [main_f1], fun [main_f1] __arg ->
       let k = [main_f1], fun [main_f1] __arg ->
-        let u45_t1 = Unit0 in
-        main_f1 u45_t1 k in
-      let u44_t1 = Unit0 in
-      newline_g11 u44_t1 k in
+        let u45_32'6_t1 = Unit0 in
+        main_f1 u45_32'6_t1 k in
+      let u44_31'9_t1 = Unit0 in
+      newline_g11 u44_31'9_t1 k in
     let k = [], fun [] u42_30'23_arg -> put_chars_g6 u42_30'23_arg k in
-    let u43_t1 = Unit0 in
-    read_line_g14 u43_t1 k in
-  put_string_g7 u41_g15 k in
-let u46_t1 = Unit0 in
-main_g16 u46_t1 k
+    let u43_30'23_t1 = Unit0 in
+    read_line_g14 u43_30'23_t1 k in
+  put_string_g7 u41_29'13_g15 k in
+let u46_0'0_t1 = Unit0 in
+main_g16 u46_0'0_t1 k

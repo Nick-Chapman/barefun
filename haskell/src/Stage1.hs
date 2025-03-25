@@ -21,13 +21,13 @@ type Transformed = Exp
 
 data Exp
   = Var Position Id
-  | Lit Literal
-  | ConTag Ctag [Exp]
+  | Lit Position Literal
+  | ConTag Position Ctag [Exp]
   | Prim Builtin [Exp]
   | Lam Id Exp
   | RecLam Id Id Exp
   | App Exp Position Exp
-  | Let Id Exp Exp
+  | Let Position Id Exp Exp
   | Case Exp [Arm]
 
 data Arm = ArmTag Ctag [Id] Exp
@@ -40,6 +40,9 @@ optPosExp :: Exp -> Maybe Position
 optPosExp = \case
   Var pos _ -> Just pos
   App _ pos _ -> Just pos
+  -- Let pos _ _ _ -> Just pos -- TODO: Get nothing from this. why?
+  Lit pos _ -> Just pos
+  ConTag pos _ _ -> Just pos
   _ -> Nothing
 
 ----------------------------------------------------------------------
@@ -51,14 +54,14 @@ instance Show Ctag where show (Ctag cid n) = printf "%s%d" (show cid) n
 pretty :: Exp -> Lines
 pretty = \case
   Var _ x -> [show x]
-  Lit x -> [show x]
-  ConTag tag [] -> [show tag]
-  ConTag tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
+  Lit _ x -> [show x]
+  ConTag _ tag [] -> [show tag]
+  ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
   Prim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   Lam x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
   RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
-  Let x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (pretty rhs)) ++ pretty body
+  Let _ x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (pretty rhs)) ++ pretty body
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
@@ -91,9 +94,9 @@ eval env@Env{venv} = \case
   Var pos x -> \k -> do
     k (maybe err id $ Map.lookup x venv)
       where err = error (show ("var-lookup",x,pos))
-  Lit literal -> \k -> do
+  Lit _ literal -> \k -> do
     k (evalLit literal)
-  ConTag (Ctag _ tag) es -> \k -> do
+  ConTag _ (Ctag _ tag) es -> \k -> do
     evals env es $ \vs -> do
       k (VCons tag vs)
   Prim b es -> \k -> do
@@ -108,7 +111,7 @@ eval env@Env{venv} = \case
     eval env e1 $ \v1 -> do
       eval env e2 $ \v2 -> do
         apply v1 pos v2 k
-  Let x e1 e2 -> \k -> do
+  Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k
   Case e arms0 -> \k -> do
@@ -152,7 +155,7 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
         -- This looses top-level side effects, so should not really be done
         -- But in makes the examples small for compilation dev...
         --if name `member` fvs body then Let name (transExp cenv rhs) body else body
-        Let name (transExp cenv rhs) body
+        Let noPos name (transExp cenv rhs) body
 
       SRC.TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
@@ -161,7 +164,7 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
         walk cenv' defs
 
     mainApp :: Exp
-    mainApp = App main noPos (ConTag (Ctag cUnit tUnit) [])
+    mainApp = App main noPos (ConTag noPos (Ctag cUnit tUnit) [])
 
     noPos = Position 0 0
     main = Var noPos (SRC.mkUserId "main")
@@ -176,13 +179,13 @@ transExp cenv e = trans e
     trans :: SRC.Exp -> Exp
     trans = \case
       SRC.Var p x -> Var p x
-      SRC.Lit x -> Lit x
-      SRC.Con cid es -> ConTag (transCid cid) (map trans es)
+      SRC.Lit p x -> Lit p x
+      SRC.Con p cid es -> ConTag p (transCid cid) (map trans es)
       SRC.Prim b xs -> Prim b (map trans xs)
       SRC.Lam x body -> Lam x (trans body)
       SRC.RecLam f x body -> RecLam f x (trans body)
       SRC.App e1 p e2 -> App (trans e1) p (trans e2)
-      SRC.Let x rhs body -> Let x (trans rhs) (trans body)
+      SRC.Let pos x rhs body -> Let pos x (trans rhs) (trans body)
       SRC.Case scrut arms -> Case (trans scrut) (map transArm arms)
 
     transArm :: SRC.Arm -> Arm

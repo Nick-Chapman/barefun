@@ -65,17 +65,17 @@ let main = fun [get_char,put_char] _ k ->
     let k [get_char,put_char] _ =
       let k [get_char,put_char] _ =
         let k [put_char] _ =
-          let u30 = 'Z' in
-          put_char u30 k in
+          let u30_7'11 = 'Z' in
+          put_char u30_7'11 k in
         let k [put_char] u28_6'21 = put_char u28_6'21 k in
-        let u29 = Unit0 in
-        get_char u29 k in
-      let u27 = 'Y' in
-      put_char u27 k in
+        let u29_6'21 = Unit0 in
+        get_char u29_6'21 k in
+      let u27_5'11 = 'Y' in
+      put_char u27_5'11 k in
     let k [put_char] u25_4'21 = put_char u25_4'21 k in
-    let u26 = Unit0 in
-    get_char u26 k in
-  let u24 = 'X' in
-  put_char u24 k in
-let u31 = Unit0 in
-main u31 k
+    let u26_4'21 = Unit0 in
+    get_char u26_4'21 k in
+  let u24_3'11 = 'X' in
+  put_char u24_3'11 k in
+let u31_0'0 = Unit0 in
+main u31_0'0 k

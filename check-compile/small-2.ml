@@ -83,11 +83,11 @@ let reverse = fun [::] ysStart k ->
         :: y k in
     k v29) in
   let k [ysStart] u30_15'10 = u30_15'10 ysStart k in
-  let u31 = Nil0 in
-  revloop u31 k in
+  let u31_15'10 = Nil0 in
+  revloop u31_15'10 k in
 let newline = fun [put_char] _ k ->
-  let u32 = '\n' in
-  put_char u32 k in
+  let u32_17'26 = '\n' in
+  put_char u32_17'26 k in
 let read_line = fun [::,eq_char,get_char,newline,put_char,reverse] _ k ->
   let readloop = fix (fun [::,eq_char,get_char,newline,put_char,reverse] readloop sofar k ->
     let k [::,eq_char,newline,put_char,readloop,reverse,sofar] theChar =
@@ -96,8 +96,8 @@ let read_line = fun [::,eq_char,get_char,newline,put_char,reverse] _ k ->
         match u34_23'22 with
         | true1 ->
           let k [reverse,sofar] _ = reverse sofar k in
-          let u37 = Unit0 in
-          newline u37 k
+          let u37_23'40 = Unit0 in
+          newline u37_23'40 k
         | false0 ->
           let k [::,gotten,readloop,sofar] _ =
             let k [readloop] u38_24'44 = readloop u38_24'44 k in
@@ -105,25 +105,25 @@ let read_line = fun [::,eq_char,get_char,newline,put_char,reverse] _ k ->
             :: gotten k in
           put_char gotten k in
       let k [] u35_23'15 =
-        let u36 = '\n' in
-        u35_23'15 u36 k in
+        let u36_23'22 = '\n' in
+        u35_23'15 u36_23'22 k in
       eq_char gotten k in
-    let u33 = Unit0 in
-    get_char u33 k) in
-  let u40 = Nil0 in
-  readloop u40 k in
+    let u33_21'27 = Unit0 in
+    get_char u33_21'27 k) in
+  let u40_26'11 = Nil0 in
+  readloop u40_26'11 k in
 let main = fix (fun [newline,put_chars,put_string,read_line] main _ k ->
   let k [main,newline,put_chars,read_line] _ =
     let k [main,newline] _ =
       let k [main] _ =
-        let u45 = Unit0 in
-        main u45 k in
-      let u44 = Unit0 in
-      newline u44 k in
+        let u45_32'6 = Unit0 in
+        main u45_32'6 k in
+      let u44_31'9 = Unit0 in
+      newline u44_31'9 k in
     let k [put_chars] u42_30'23 = put_chars u42_30'23 k in
-    let u43 = Unit0 in
-    read_line u43 k in
-  let u41 = "> " in
-  put_string u41 k) in
-let u46 = Unit0 in
-main u46 k
+    let u43_30'23 = Unit0 in
+    read_line u43_30'23 k in
+  let u41_29'13 = "> " in
+  put_string u41_29'13 k) in
+let u46_0'0 = Unit0 in
+main u46_0'0 k

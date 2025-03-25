@@ -169,9 +169,9 @@ trans1 :: SRC.Exp -> M AC
 trans1 = \case
   SRC.Var pos x -> do
     pure $ Compound $ Return pos x
-  SRC.Lit x -> do
+  SRC.Lit _ x -> do
     pure $ Atomic $ Lit x
-  SRC.ConTag tag es -> do
+  SRC.ConTag _ tag es -> do
     transIds es $ \xs ->
       pure $ Atomic $ ConTag tag xs
   SRC.Prim b es -> do
@@ -183,7 +183,7 @@ trans1 = \case
     transId e1 $ \x1 -> do
       transId e2 $ \x2 -> do
         pure $ Compound $ Tail x1 p x2
-  SRC.Let x rhs body -> do
+  SRC.Let _ x rhs body -> do
     rhs <- trans1 rhs
     body <- trans0 body
     pure $ Compound $ mkBind x rhs body

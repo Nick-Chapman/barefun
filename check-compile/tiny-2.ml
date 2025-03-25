@@ -61,14 +61,14 @@ let :: = fun [] x k ->
     k v22 in
   k v23 in
 let k [] main =
-  let u26 = Unit0 in
-  main u26 k in
+  let u26_0'0 = Unit0 in
+  main u26_0'0 k in
 let mainloop = fix (fun [get_char,put_char] mainloop _ k ->
   let k [mainloop,put_char] gotten =
     let k [mainloop] _ =
-      let u25 = Unit0 in
-      mainloop u25 k in
+      let u25_6'13 = Unit0 in
+      mainloop u25_6'13 k in
     put_char gotten k in
-  let u24 = Unit0 in
-  get_char u24 k) in
+  let u24_4'26 = Unit0 in
+  get_char u24_4'26 k) in
 k mainloop

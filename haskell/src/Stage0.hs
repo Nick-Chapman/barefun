@@ -21,13 +21,13 @@ data Def = ValDef Id Exp | TypeDef [Cid]
 
 data Exp
   = Var Position Id
-  | Lit Literal
-  | Con Cid [Exp]
+  | Lit Position Literal
+  | Con Position Cid [Exp]
   | Prim Builtin [Exp]
   | Lam Id Exp
   | RecLam Id Id Exp
   | App Exp Position Exp
-  | Let Id Exp Exp
+  | Let Position Id Exp Exp
   | Case Exp [Arm]
 
 data Arm = Arm Cid [Id] Exp
@@ -84,14 +84,14 @@ prettyDef = \case
 pretty :: Exp -> Lines
 pretty = \case
   Var _ x -> [show x]
-  Lit x -> [show x]
-  Con c [] -> [show c]
-  Con c es -> onHead (show c ++) (bracket (foldl1 juxComma (map pretty es)))
+  Lit _ x -> [show x]
+  Con _ c [] -> [show c]
+  Con _ c es -> onHead (show c ++) (bracket (foldl1 juxComma (map pretty es)))
   Prim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   Lam x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
   RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
-  Let x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (pretty rhs)) ++ pretty body
+  Let _ x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (pretty rhs)) ++ pretty body
   Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
@@ -126,7 +126,7 @@ executeProg (Prog defs) = loop env0 defs
         loop env' defs
 
 mainApp :: Exp
-mainApp = App main noPos (Con cUnit [])
+mainApp = App main noPos (Con noPos cUnit [])
   where
     noPos = Position 0 0
     main = Var noPos (mkUserId "main")
@@ -144,9 +144,9 @@ eval env@Env{venv,cenv} = \case
   Var pos x -> \k -> do
     k (maybe err id $ Map.lookup x venv)
       where err = error (show ("var-lookup",x,pos))
-  Lit literal -> \k -> do
+  Lit _ literal -> \k -> do
     k (evalLit literal)
-  Con cid es -> \k -> do
+  Con _ cid es -> \k -> do
     evals env es $ \vs -> do
     let tag = maybe err id $ Map.lookup cid cenv
           where err = error (show ("cenv-lookup",cid))
@@ -163,7 +163,7 @@ eval env@Env{venv,cenv} = \case
     eval env e1 $ \v1 -> do
       eval env e2 $ \v2 -> do
         apply v1 pos v2 k
-  Let x e1 e2 -> \k -> do
+  Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k
   Case e arms0 -> \k -> do

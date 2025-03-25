@@ -21,8 +21,8 @@ mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 underscore :: Id
 underscore = mkUserId "_"
 
-mkSeq :: Exp -> Exp -> Exp
-mkSeq e1 e2 = AST.Let underscore e1 e2
+mkSeq :: Position -> Exp -> Exp -> Exp
+mkSeq pos e1 e2 = AST.Let pos underscore e1 e2
 
 mkIte :: Exp -> Exp -> Exp -> Exp
 mkIte i t e = AST.Case i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
@@ -180,28 +180,39 @@ gram6 = program where
     x <- alts [identifier,bracketedInfixName]
     pure (AST.Var pos x)
 
-  num = AST.Lit . AST.LitN <$> number
-  char = AST.Lit . AST.LitC <$> charLit
-  string = AST.Lit . AST.LitS <$> stringLit
-  unit = do openClose; pure (AST.Con cUnit [])
+  positionedLit = do
+    pos <- position
+    lit <- alts
+      [ AST.LitN <$> number
+      , AST.LitC <$> charLit
+      , AST.LitS <$> stringLit
+      ]
+    pure $ AST.Lit pos lit
 
-  literal = alts [num,char,string,unit]
+  unit = do
+    pos <- position
+    openClose
+    pure (AST.Con pos cUnit [])
+
+  literal = alts [positionedLit,unit]
 
   tupleExp :: Par [Exp] =
     bracketed (separated (key ",") exp)
 
   -- TODO: support syntax for list expressions
   nilExp = do
+    pos <- position
     key "["
     key "]"
-    pure (AST.Con cNil [])
+    pure (AST.Con pos cNil [])
 
   consApp = do
+    pos <- position
     c <- constructor
     alts
-      [ do es <- tupleExp; pure (AST.Con c es)
+      [ do es <- tupleExp; pure (AST.Con pos c es)
 --      , do e <- atom0; pure (AST.Con c [e]) -- TODO: How to make this work?
-      , pure (AST.Con c [])
+      , pure (AST.Con pos c [])
       ]
 
   atom = alts [literal,var,nilExp,bracketed exp,consApp]
@@ -256,10 +267,11 @@ gram6 = program where
         pure (f,rhs)
 
   let_ = do
+    pos <- position
     (x,rhs) <- binding
     key "in"
     body <- exp
-    pure (AST.Let x rhs body)
+    pure (AST.Let pos x rhs body)
 
   ite = do
     key "if"
@@ -297,9 +309,10 @@ gram6 = program where
 
   expSEQ = do
     e1 <- expITE
-    alts [ do key ";"
+    alts [ do pos <- position
+              key ";"
               e2 <- exp
-              pure (mkSeq e1 e2)
+              pure (mkSeq pos e1 e2)
          , pure e1
          ]
 
