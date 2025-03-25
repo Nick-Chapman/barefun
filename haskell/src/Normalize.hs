@@ -24,4 +24,4 @@ type Transformed = SRC.Exp
 -- Normalize
 
 normalize :: SRC.Exp -> Transformed
-normalize e = undefined e
+normalize e = e -- TODO: here

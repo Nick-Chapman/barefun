@@ -1,4 +1,10 @@
 
+;; TODO: rename un-normalized expected/gen with "u" suffix
+(rule (alias runtest) (action (diff tiny-1n.ml tiny-1n.gen)))
+
+(rule (deps ../haskell/main.exe ../examples/tiny.fun) (action (with-stdout-to tiny-1n.gen (run ../haskell/main.exe ../examples/tiny.fun -compile -1))))
+
+
 (rule (alias runtest) (action (diff tiny-0.ml tiny-0.gen)))
 (rule (alias runtest) (action (diff tiny-1.ml tiny-1.gen)))
 (rule (alias runtest) (action (diff tiny-2.ml tiny-2.gen)))
