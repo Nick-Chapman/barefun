@@ -1,7 +1,7 @@
 -- | Primary AST for the .fun language. As constructed by Parser
 module Stage0
   ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..)
-  , cUnit,cFalse,cTrue,cNil,cCons
+  , cUnit,cFalse,cTrue,cNil,cCons,mkUserId
   , execute,evalLit,apply
   ) where
 
@@ -36,6 +36,7 @@ data Literal = LitC Char | LitN Word16 | LitS String
 
 data Id = Id
   { optUniqueForGeneratedNames :: Maybe Int
+  , optPosForGenNames :: Maybe Position
   , userGivenName :: String
   } deriving (Eq,Ord)
 
@@ -45,6 +46,11 @@ cTrue = Cid "true"
 cFalse = Cid "false"
 cNil = Cid "Nil"
 cCons = Cid "Cons"
+
+
+mkUserId :: String -> Id
+mkUserId userGivenName =
+  Id { optUniqueForGeneratedNames = Nothing, optPosForGenNames = Nothing, userGivenName }
 
 ----------------------------------------------------------------------
 -- Show
@@ -122,7 +128,7 @@ mainApp :: Exp
 mainApp = App main noPos (Con cUnit [])
   where
     noPos = Position 0 0
-    main = Var Nothing (Id Nothing "main")
+    main = Var Nothing (mkUserId "main")
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
 evals env es k = case es of

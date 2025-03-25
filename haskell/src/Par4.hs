@@ -150,7 +150,7 @@ parse parStart chars0  = do
                         }
 
 
-data Position = Position { line :: Int, col :: Int }
+data Position = Position { line :: Int, col :: Int } deriving (Eq,Ord)
 
 instance Show Position where
   show Position{line,col} = "line " ++ show line ++ ", column " ++ show col

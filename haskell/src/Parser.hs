@@ -2,7 +2,7 @@ module Parser (parseProg) where
 
 import Data.Word (Word16)
 import Stage0 (Prog,Exp,Id,Arm,Cid)
-import Stage0 (cUnit,cFalse,cTrue,cNil,cCons)
+import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,mkUserId)
 import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
@@ -19,7 +19,7 @@ mkApps :: Exp -> [(Position,Exp)] -> Exp
 mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 
 underscore :: Id
-underscore = AST.Id Nothing "_"
+underscore = mkUserId "_"
 
 mkSeq :: Exp -> Exp -> Exp
 mkSeq e1 e2 = AST.Let underscore e1 e2
@@ -80,9 +80,9 @@ gram6 = program where
     s <- alts [ noError $ do mapM_ lit name; pure name
               | name <- infixNames ]
     lit ')'
-    pure (AST.Id Nothing s)
+    pure (mkUserId s)
 
-  identifier = AST.Id Nothing <$> noError name
+  identifier = mkUserId <$> noError name
     where
       name = do
         x <- sat isVariableChar1
@@ -218,7 +218,7 @@ gram6 = program where
                name <- alts [ do key x; pure x | x <- names ]
                p2 <- position
                x <- sub
-               loop (mkApps (AST.Var Nothing (AST.Id Nothing name)) [(p1,acc),(p2,x)])
+               loop (mkApps (AST.Var Nothing (mkUserId name)) [(p1,acc),(p2,x)])
            ]
 
   infixNames = infixGroup1 ++ infixGroup2 ++ infixGroup3 ++ infixGroup4

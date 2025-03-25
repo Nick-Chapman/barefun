@@ -235,8 +235,12 @@ runM m0 = loop 1 m0 $ \_ x -> x
     loop u m k = case m of
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
-      Fresh tag -> k (u+1) (Id (Just u) tag)
-
+      Fresh tag -> do
+        let x = Id { optUniqueForGeneratedNames = Just u
+                   , optPosForGenNames = Nothing
+                   , userGivenName = tag -- hmm, bit of a lie
+                   }
+        k (u+1) x
 
 ----------------------------------------------------------------------
 -- Free Vars
