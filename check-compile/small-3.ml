@@ -1,4 +1,4 @@
-(*stage3*)
+(*stage3; un-normalized*)
 let k () = ()
 let eq_char_g1 = fun x_arg k ->
   let lam_16_0'0_t1 = [x_arg], fun [x_f1] y_arg k ->

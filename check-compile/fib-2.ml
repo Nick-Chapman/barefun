@@ -1,4 +1,4 @@
-(*stage2*)
+(*stage2; un-normalized*)
 let k () = ()
 let + = fun [] x k ->
   let lam_2_0'0 = fun [x] y k ->

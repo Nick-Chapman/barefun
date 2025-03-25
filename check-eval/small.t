@@ -23,8 +23,8 @@ Haskell REPL
   Good bye.
   > [EOF]
 
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun -1
-  [stage1]
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -1u
+  [stage1; un-normalized]
   LOAD
   RUN
   > Hello, World!
@@ -33,8 +33,8 @@ Haskell REPL
   Good bye.
   > [EOF]
 
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun -2
-  [stage2]
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -2u
+  [stage2; un-normalized]
   LOAD
   RUN
   > Hello, World!
@@ -43,8 +43,8 @@ Haskell REPL
   Good bye.
   > [EOF]
 
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun
-  [stage3]
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -3u
+  [stage3; un-normalized]
   LOAD
   RUN
   > Hello, World!

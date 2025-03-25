@@ -15,20 +15,20 @@ Haskell REPL
   World!
   [EOF]
 
-  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -1
-  [stage1]
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -1u
+  [stage1; un-normalized]
   Hello,
   World!
   [EOF]
 
-  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -2
-  [stage2]
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -2u
+  [stage2; un-normalized]
   Hello,
   World!
   [EOF]
 
-  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun
-  [stage3]
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3u
+  [stage3; un-normalized]
   Hello,
   World!
   [EOF]

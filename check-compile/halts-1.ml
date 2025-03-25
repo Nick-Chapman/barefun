@@ -1,4 +1,4 @@
-(*stage1*)
+(*stage1; un-normalized*)
 let + = (fun x -> (fun y -> PRIM_AddInt(x,y))) in
 let - = (fun x -> (fun y -> PRIM_SubInt(x,y))) in
 let ( * ) = (fun x -> (fun y -> PRIM_MulInt(x,y))) in

@@ -1,4 +1,4 @@
-(*stage3*)
+(*stage3; un-normalized*)
 let k () = ()
 let put_char_g1 = fun x_arg k ->
   let prim_20_0'0_t1 = PRIM_PutChar(x_arg) in

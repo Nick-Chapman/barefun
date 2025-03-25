@@ -65,8 +65,8 @@ Haskell REPL (stage0)
 
 Haskell REPL (stage1)
 
-  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -1
-  [stage1]
+  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -1u
+  [stage1; un-normalized]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
@@ -97,8 +97,8 @@ Haskell REPL (stage1)
 
 Haskell REPL (stage2)
 
-  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -2
-  [stage2]
+  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -2u
+  [stage2; un-normalized]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
@@ -129,8 +129,8 @@ Haskell REPL (stage2)
 
 Haskell REPL
 
-  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun
-  [stage3]
+  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -3u
+  [stage3; un-normalized]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
