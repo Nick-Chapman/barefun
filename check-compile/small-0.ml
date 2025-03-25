@@ -28,6 +28,9 @@ let reverse = (fun ysStart ->
       | Cons(y,ysMore) -> ((revloop ((:: y) acc)) ysMore))) in
   ((revloop Nil) ysStart)) in
 let newline = (fun _ -> (put_char '\n')) in
+let put_string_newline = (fun s ->
+  let _ = (put_string s) in
+  (newline Unit)) in
 let read_line = (fun _ ->
   let readloop = fix (fun readloop sofar ->
     let theChar = (get_char Unit) in
@@ -40,8 +43,13 @@ let read_line = (fun _ ->
       let _ = (put_char gotten) in
       (readloop ((:: gotten) sofar))) in
   (readloop Nil)) in
-let main = fix (fun main _ ->
+let _ = (put_string_newline "LOAD") in
+let mainloop = fix (fun mainloop _ ->
   let _ = (put_string "> ") in
   let _ = (put_chars (read_line Unit)) in
   let _ = (newline Unit) in
-  (main Unit)) in
+  (mainloop Unit)) in
+let main = (fun _ ->
+  let _ = (put_string_newline "RUN") in
+  let _ = (mainloop Unit) in
+  (put_string_newline "NEVER")) in

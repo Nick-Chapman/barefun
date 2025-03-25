@@ -16,6 +16,10 @@ let reverse ysStart =
 
 let newline () = put_char '\n'
 
+let put_string_newline s = (* TODO: kill when we support \n in string literals *)
+  put_string s;
+  newline ()
+
 let read_line () =
   let rec readloop sofar =
     let theChar = get_char () in
@@ -25,8 +29,15 @@ let read_line () =
   in
   readloop []
 
-let rec main () =
+let () = put_string_newline "LOAD"
+
+let rec mainloop () =
   put_string "> ";
   put_chars (read_line ());
   newline();
-  main()
+  mainloop()
+
+let main () =
+  put_string_newline "RUN";
+  let () = mainloop () in
+  put_string_newline "NEVER"

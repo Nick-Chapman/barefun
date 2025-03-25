@@ -222,9 +222,6 @@ let rec mainloop () =
   if eq_char_list xs single_controlD then () else
     (execute xs; mainloop ())
 
-let () = put_string_newline "LOAD"
-
 let main () =
-  put_string_newline "RUN";
-  let () = mainloop () in
-  put_string_newline "EXIT"
+  put_string_newline "This is a shell prototype. Try: fib, fact, rev";
+  mainloop ()

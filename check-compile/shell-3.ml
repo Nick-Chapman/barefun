@@ -598,9 +598,7 @@ let lit_266_214'40_g103 = "fact" in
 let lit_270_215'42_g104 = "rev" in
 let lit_271_219'11_g105 = '>' in
 let lit_272_220'11_g106 = ' ' in
-let lit_278_225'28_g107 = "LOAD" in
-let lit_279_228'21_g108 = "RUN" in
-let lit_281_230'21_g109 = "EXIT" in
+let lit_278_226'21_g107 = "This is a shell prototype. Try: fib, fact, rev" in
 let k = [], fun [] single_controlD_arg ->
   let rev_t1 = [single_controlD_arg], fun [single_controlD_f1] __arg k ->
     let loop_t1 = [single_controlD_f1], fun [single_controlD_f1] loop_me __arg k ->
@@ -685,16 +683,13 @@ let k = [], fun [] single_controlD_arg ->
         read_line_g65 con_273_221'21_t1 k in
       put_char_g25 lit_272_220'11_g106 k in
     put_char_g25 lit_271_219'11_g105 k in
-  let k = [mainloop_t4], fun [mainloop_f1] __arg ->
-    let main_t1 = [mainloop_f1], fun [mainloop_f1] __arg k ->
-      let k = [mainloop_f1], fun [mainloop_f1] __arg ->
-        let k = [], fun [] __arg -> put_string_newline_g59 lit_281_230'21_g109 k in
-        let con_280_229'20_t1 = Unit0 in
-        mainloop_f1 con_280_229'20_t1 k in
-      put_string_newline_g59 lit_279_228'21_g108 k in
-    let con_282_0'0_t2 = Unit0 in
-    main_t1 con_282_0'0_t2 k in
-  put_string_newline_g59 lit_278_225'28_g107 k in
+  let main_t5 = [mainloop_t4], fun [mainloop_f1] __arg k ->
+    let k = [mainloop_f1], fun [mainloop_f1] __arg ->
+      let con_279_227'11_t1 = Unit0 in
+      mainloop_f1 con_279_227'11_t1 k in
+    put_string_newline_g59 lit_278_226'21_g107 k in
+  let con_280_0'0_t6 = Unit0 in
+  main_t5 con_280_0'0_t6 k in
 let k = [], fun [] app_207_170'28_arg ->
   let con_210_170'31_t1 = Nil0 in
   app_207_170'28_arg con_210_170'31_t1 k in

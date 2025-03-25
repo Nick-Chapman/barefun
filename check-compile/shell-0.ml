@@ -260,8 +260,6 @@ let mainloop = fix (fun mainloop _ ->
   | false ->
     let _ = (execute xs) in
     (mainloop Unit)) in
-let _ = (put_string_newline "LOAD") in
 let main = (fun _ ->
-  let _ = (put_string_newline "RUN") in
-  let _ = (mainloop Unit) in
-  (put_string_newline "EXIT")) in
+  let _ = (put_string_newline "This is a shell prototype. Try: fib, fact, rev") in
+  (mainloop Unit)) in

@@ -712,20 +712,14 @@ let k [::,append,eq_char,eq_char_list,error,explode,length,map,newline,put_char,
       put_char lit_272_220'11 k in
     let lit_271_219'11 = '>' in
     put_char lit_271_219'11 k) in
-  let k [mainloop,put_string_newline] _ =
-    let main = fun [mainloop,put_string_newline] _ k ->
-      let k [mainloop,put_string_newline] _ =
-        let k [put_string_newline] _ =
-          let lit_281_230'21 = "EXIT" in
-          put_string_newline lit_281_230'21 k in
-        let con_280_229'20 = Unit0 in
-        mainloop con_280_229'20 k in
-      let lit_279_228'21 = "RUN" in
-      put_string_newline lit_279_228'21 k in
-    let con_282_0'0 = Unit0 in
-    main con_282_0'0 k in
-  let lit_278_225'28 = "LOAD" in
-  put_string_newline lit_278_225'28 k in
+  let main = fun [mainloop,put_string_newline] _ k ->
+    let k [mainloop] _ =
+      let con_279_227'11 = Unit0 in
+      mainloop con_279_227'11 k in
+    let lit_278_226'21 = "This is a shell prototype. Try: fib, fact, rev" in
+    put_string_newline lit_278_226'21 k in
+  let con_280_0'0 = Unit0 in
+  main con_280_0'0 k in
 let k [] app_207_170'28 =
   let con_210_170'31 = Nil0 in
   app_207_170'28 con_210_170'31 k in

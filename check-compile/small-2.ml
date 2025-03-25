@@ -88,42 +88,59 @@ let reverse = fun [::] ysStart k ->
 let newline = fun [put_char] _ k ->
   let lit_32_17'26 = '\n' in
   put_char lit_32_17'26 k in
+let put_string_newline = fun [newline,put_string] s k ->
+  let k [newline] _ =
+    let con_33_21'10 = Unit0 in
+    newline con_33_21'10 k in
+  put_string s k in
 let read_line = fun [::,eq_char,get_char,newline,put_char,reverse] _ k ->
   let readloop = fix (fun [::,eq_char,get_char,newline,put_char,reverse] readloop sofar k ->
     let k [::,eq_char,newline,put_char,readloop,reverse,sofar] theChar =
       let gotten = theChar in
-      let k [::,gotten,newline,put_char,readloop,reverse,sofar] app_34_23'22 =
-        match app_34_23'22 with
+      let k [::,gotten,newline,put_char,readloop,reverse,sofar] app_35_27'22 =
+        match app_35_27'22 with
         | true1 ->
           let k [reverse,sofar] _ = reverse sofar k in
-          let con_37_23'40 = Unit0 in
-          newline con_37_23'40 k
+          let con_38_27'40 = Unit0 in
+          newline con_38_27'40 k
         | false0 ->
           let k [::,gotten,readloop,sofar] _ =
-            let k [readloop] app_38_24'44 = readloop app_38_24'44 k in
-            let k [sofar] app_39_24'41 = app_39_24'41 sofar k in
+            let k [readloop] app_39_28'44 = readloop app_39_28'44 k in
+            let k [sofar] app_40_28'41 = app_40_28'41 sofar k in
             :: gotten k in
           put_char gotten k in
-      let k [] app_35_23'15 =
-        let lit_36_23'22 = '\n' in
-        app_35_23'15 lit_36_23'22 k in
+      let k [] app_36_27'15 =
+        let lit_37_27'22 = '\n' in
+        app_36_27'15 lit_37_27'22 k in
       eq_char gotten k in
-    let con_33_21'27 = Unit0 in
-    get_char con_33_21'27 k) in
-  let con_40_26'11 = Nil0 in
-  readloop con_40_26'11 k in
-let main = fix (fun [newline,put_chars,put_string,read_line] main _ k ->
-  let k [main,newline,put_chars,read_line] _ =
-    let k [main,newline] _ =
-      let k [main] _ =
-        let con_45_32'6 = Unit0 in
-        main con_45_32'6 k in
-      let con_44_31'9 = Unit0 in
-      newline con_44_31'9 k in
-    let k [put_chars] app_42_30'23 = put_chars app_42_30'23 k in
-    let con_43_30'23 = Unit0 in
-    read_line con_43_30'23 k in
-  let lit_41_29'13 = "> " in
-  put_string lit_41_29'13 k) in
-let con_46_0'0 = Unit0 in
-main con_46_0'0 k
+    let con_34_25'27 = Unit0 in
+    get_char con_34_25'27 k) in
+  let con_41_30'11 = Nil0 in
+  readloop con_41_30'11 k in
+let k [newline,put_chars,put_string,put_string_newline,read_line] _ =
+  let mainloop = fix (fun [newline,put_chars,put_string,read_line] mainloop _ k ->
+    let k [mainloop,newline,put_chars,read_line] _ =
+      let k [mainloop,newline] _ =
+        let k [mainloop] _ =
+          let con_47_38'10 = Unit0 in
+          mainloop con_47_38'10 k in
+        let con_46_37'9 = Unit0 in
+        newline con_46_37'9 k in
+      let k [put_chars] app_44_36'23 = put_chars app_44_36'23 k in
+      let con_45_36'23 = Unit0 in
+      read_line con_45_36'23 k in
+    let lit_43_35'13 = "> " in
+    put_string lit_43_35'13 k) in
+  let main = fun [mainloop,put_string_newline] _ k ->
+    let k [mainloop,put_string_newline] _ =
+      let k [put_string_newline] _ =
+        let lit_50_43'21 = "NEVER" in
+        put_string_newline lit_50_43'21 k in
+      let con_49_42'20 = Unit0 in
+      mainloop con_49_42'20 k in
+    let lit_48_41'21 = "RUN" in
+    put_string_newline lit_48_41'21 k in
+  let con_51_0'0 = Unit0 in
+  main con_51_0'0 k in
+let lit_42_32'28 = "LOAD" in
+put_string_newline lit_42_32'28 k

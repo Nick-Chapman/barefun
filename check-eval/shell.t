@@ -3,8 +3,7 @@ Ocaml REPL
 
   $ cat shell.input | ../ocaml/bin/shell.exe
   [ocaml]
-  LOAD
-  RUN
+  This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
   > fib
@@ -36,8 +35,7 @@ Haskell REPL (stage0)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -0
   [stage0]
-  LOAD
-  RUN
+  This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
   > fib
@@ -69,8 +67,7 @@ Haskell REPL (stage1)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -1
   [stage1]
-  LOAD
-  RUN
+  This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
   > fib
@@ -102,8 +99,7 @@ Haskell REPL (stage2)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -2
   [stage2]
-  LOAD
-  RUN
+  This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
   > fib
@@ -135,8 +131,7 @@ Haskell REPL
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun
   [stage3]
-  LOAD
-  RUN
+  This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: Hell*, W*rld! {13}
   > fib
