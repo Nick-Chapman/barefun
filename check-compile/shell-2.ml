@@ -352,308 +352,383 @@ let put_string_newline = fun [newline,put_string] s k ->
     let con_142_103'10 = Unit0 in
     newline con_142_103'10 k in
   put_string s k in
-let read_line = fun [<=,=,>,cons,eq_char,erase_char,get_char,newline,ord,put_char,reverse] _ k ->
-  let loop = fix (fun [<=,=,>,cons,eq_char,erase_char,get_char,newline,ord,put_char,reverse] loop acc k ->
-    let k [<=,=,>,acc,cons,eq_char,erase_char,loop,newline,ord,put_char,reverse] c =
-      let k [<=,=,>,acc,c,cons,eq_char,erase_char,loop,newline,ord,put_char,reverse] n =
-        let k [<=,=,>,acc,c,cons,erase_char,loop,n,newline,ord,put_char,reverse] app_144_109'17 =
-          match app_144_109'17 with
-          | true1 ->
-            let k [acc,reverse] _ = reverse acc k in
-            let con_147_109'35 = Unit0 in
-            newline con_147_109'35 k
-          | false0 ->
-            let k [<=,=,acc,c,cons,erase_char,loop,n,ord,put_char] app_148_111'15 =
-              match app_148_111'15 with
-              | true1 -> loop acc k
-              | false0 ->
-                let k [<=,acc,c,cons,erase_char,loop,ord,put_char] app_151_112'17 =
-                  match app_151_112'17 with
-                  | true1 ->
-                    match acc with
-                    | Nil0 -> loop acc k
-                    | Cons1(c,tail) ->
-                      let k [erase_char,loop,tail] _ =
-                        let k [loop,tail] _ = loop tail k in
-                        let con_160_117'25 = Unit0 in
-                        erase_char con_160_117'25 k in
-                      let k [erase_char] app_154_116'28 =
-                        match app_154_116'28 with
+let read_line = fun [::,<=,=,>,chr,cons,eq_char,erase_char,get_char,newline,ord,put_char,reverse] _ k ->
+  let k [::,<=,=,>,cons,eq_char,erase_char,get_char,newline,ord,put_char,reverse] controlD =
+    let loop = fix (fun [::,<=,=,>,cons,controlD,eq_char,erase_char,get_char,newline,ord,put_char,reverse] loop acc k ->
+      let k [::,<=,=,>,acc,cons,controlD,eq_char,erase_char,loop,newline,ord,put_char,reverse] c =
+        let k [::,<=,=,>,acc,c,cons,controlD,eq_char,erase_char,loop,newline,ord,put_char,reverse] n =
+          let k [::,<=,=,>,acc,c,cons,controlD,eq_char,erase_char,loop,n,newline,ord,put_char,reverse] app_145_110'17 =
+            match app_145_110'17 with
+            | true1 ->
+              let k [acc,reverse] _ = reverse acc k in
+              let con_148_110'35 = Unit0 in
+              newline con_148_110'35 k
+            | false0 ->
+              let k [::,<=,=,>,acc,c,cons,controlD,erase_char,loop,n,newline,ord,put_char,reverse] app_149_111'19 =
+                match app_149_111'19 with
+                | true1 ->
+                  let k [::,acc,controlD,newline,reverse] _ =
+                    let k [::,acc,controlD,reverse] _ =
+                      let k [reverse] app_152_111'78 = reverse app_152_111'78 k in
+                      let k [acc] app_153_111'75 = app_153_111'75 acc k in
+                      :: controlD k in
+                    let con_151_111'53 = Unit0 in
+                    newline con_151_111'53 k in
+                  put_char c k
+                | false0 ->
+                  let k [<=,=,acc,c,cons,erase_char,loop,n,ord,put_char] app_154_112'15 =
+                    match app_154_112'15 with
+                    | true1 -> loop acc k
+                    | false0 ->
+                      let k [<=,acc,c,cons,erase_char,loop,ord,put_char] app_157_113'17 =
+                        match app_157_113'17 with
                         | true1 ->
-                          let con_158_116'47 = Unit0 in
-                          erase_char con_158_116'47 k
+                          match acc with
+                          | Nil0 -> loop acc k
+                          | Cons1(c,tail) ->
+                            let k [erase_char,loop,tail] _ =
+                              let k [loop,tail] _ = loop tail k in
+                              let con_166_118'25 = Unit0 in
+                              erase_char con_166_118'25 k in
+                            let k [erase_char] app_160_117'28 =
+                              match app_160_117'28 with
+                              | true1 ->
+                                let con_164_117'47 = Unit0 in
+                                erase_char con_164_117'47 k
+                              | false0 ->
+                                let con_165_117'55 = Unit0 in
+                                k con_165_117'55 in
+                            let k [] app_161_117'25 =
+                              let lit_163_117'28 = 26 in
+                              app_161_117'25 lit_163_117'28 k in
+                            let k [<=] app_162_117'23 = <= app_162_117'23 k in
+                            ord c k
                         | false0 ->
-                          let con_159_116'55 = Unit0 in
-                          k con_159_116'55 in
-                      let k [] app_155_116'25 =
-                        let lit_157_116'28 = 26 in
-                        app_155_116'25 lit_157_116'28 k in
-                      let k [<=] app_156_116'23 = <= app_156_116'23 k in
-                      ord c k
-                  | false0 ->
-                    let k [acc,c,cons,loop] _ =
-                      let k [loop] app_161_120'38 = loop app_161_120'38 k in
-                      let k [acc] app_162_120'36 = app_162_120'36 acc k in
-                      cons c k in
-                    put_char c k in
-                let k [] app_152_112'15 =
-                  let lit_153_112'17 = 127 in
-                  app_152_112'15 lit_153_112'17 k in
-                = n k in
-            let k [] app_149_111'13 =
-              let lit_150_111'15 = 127 in
-              app_149_111'13 lit_150_111'15 k in
-            > n k in
-        let k [] app_145_109'15 =
-          let lit_146_109'17 = '\n' in
-          app_145_109'15 lit_146_109'17 k in
-        eq_char c k in
-      ord c k in
-    let con_143_107'21 = Unit0 in
-    get_char con_143_107'21 k) in
-  let con_163_122'7 = Nil0 in
-  loop con_163_122'7 k in
+                          let k [acc,c,cons,loop] _ =
+                            let k [loop] app_167_121'38 = loop app_167_121'38 k in
+                            let k [acc] app_168_121'36 = app_168_121'36 acc k in
+                            cons c k in
+                          put_char c k in
+                      let k [] app_158_113'15 =
+                        let lit_159_113'17 = 127 in
+                        app_158_113'15 lit_159_113'17 k in
+                      = n k in
+                  let k [] app_155_112'13 =
+                    let lit_156_112'15 = 127 in
+                    app_155_112'13 lit_156_112'15 k in
+                  > n k in
+              let k [controlD] app_150_111'17 = app_150_111'17 controlD k in
+              eq_char c k in
+          let k [] app_146_110'15 =
+            let lit_147_110'17 = '\n' in
+            app_146_110'15 lit_147_110'17 k in
+          eq_char c k in
+        ord c k in
+      let con_144_108'21 = Unit0 in
+      get_char con_144_108'21 k) in
+    let con_169_123'7 = Nil0 in
+    loop con_169_123'7 k in
+  let lit_143_106'21 = 4 in
+  chr lit_143_106'21 k in
 let fib = fix (fun [+,-,<] fib n k ->
-  let k [+,-,fib,n] app_164_126'9 =
-    match app_164_126'9 with
+  let k [+,-,fib,n] app_170_127'9 =
+    match app_170_127'9 with
     | true1 -> k n
     | false0 ->
-      let k [-,fib,n] app_167_126'33 =
-        let k [app_167_126'33] app_172_126'39 = app_167_126'33 app_172_126'39 k in
-        let k [fib] app_173_126'42 = fib app_173_126'42 k in
-        let k [] app_174_126'41 =
-          let lit_175_126'42 = 2 in
-          app_174_126'41 lit_175_126'42 k in
+      let k [-,fib,n] app_173_127'33 =
+        let k [app_173_127'33] app_178_127'39 = app_173_127'33 app_178_127'39 k in
+        let k [fib] app_179_127'42 = fib app_179_127'42 k in
+        let k [] app_180_127'41 =
+          let lit_181_127'42 = 2 in
+          app_180_127'41 lit_181_127'42 k in
         - n k in
-      let k [+] app_168_126'27 = + app_168_126'27 k in
-      let k [fib] app_169_126'30 = fib app_169_126'30 k in
-      let k [] app_170_126'29 =
-        let lit_171_126'30 = 1 in
-        app_170_126'29 lit_171_126'30 k in
+      let k [+] app_174_127'27 = + app_174_127'27 k in
+      let k [fib] app_175_127'30 = fib app_175_127'30 k in
+      let k [] app_176_127'29 =
+        let lit_177_127'30 = 1 in
+        app_176_127'29 lit_177_127'30 k in
       - n k in
-  let k [] app_165_126'7 =
-    let lit_166_126'9 = 2 in
-    app_165_126'7 lit_166_126'9 k in
+  let k [] app_171_127'7 =
+    let lit_172_127'9 = 2 in
+    app_171_127'7 lit_172_127'9 k in
   < n k) in
 let fact = fix (fun [( * ),-,>=] fact n k ->
-  let k [( * ),-,fact,n] app_176_130'10 =
-    match app_176_130'10 with
+  let k [( * ),-,fact,n] app_182_131'10 =
+    match app_182_131'10 with
     | true1 ->
-      let k [n] app_179_130'28 = app_179_130'28 n k in
-      let k [( * )] app_180_130'22 = ( * ) app_180_130'22 k in
-      let k [fact] app_181_130'25 = fact app_181_130'25 k in
-      let k [] app_182_130'24 =
-        let lit_183_130'25 = 1 in
-        app_182_130'24 lit_183_130'25 k in
+      let k [n] app_185_131'28 = app_185_131'28 n k in
+      let k [( * )] app_186_131'22 = ( * ) app_186_131'22 k in
+      let k [fact] app_187_131'25 = fact app_187_131'25 k in
+      let k [] app_188_131'24 =
+        let lit_189_131'25 = 1 in
+        app_188_131'24 lit_189_131'25 k in
       - n k
     | false0 ->
-      let lit_184_130'37 = 1 in
-      k lit_184_130'37 in
-  let k [] app_177_130'7 =
-    let lit_178_130'10 = 2 in
-    app_177_130'7 lit_178_130'10 k in
+      let lit_190_131'37 = 1 in
+      k lit_190_131'37 in
+  let k [] app_183_131'7 =
+    let lit_184_131'10 = 2 in
+    app_183_131'7 lit_184_131'10 k in
   >= n k) in
 let error = fun [newline,put_string] s k ->
   let k [newline,put_string,s] _ =
     let k [newline] _ =
-      let con_186_132'58 = Unit0 in
-      newline con_186_132'58 k in
+      let con_192_133'58 = Unit0 in
+      newline con_192_133'58 k in
     put_string s k in
-  let lit_185_132'25 = "ERROR: " in
-  put_string lit_185_132'25 k in
+  let lit_191_133'25 = "ERROR: " in
+  put_string lit_191_133'25 k in
 let runfib = fun [error,fib,newline,parse_num,put_int,put_string] args k ->
   let k [args,error,fib,newline,parse_num,put_int,put_string] _ =
     match args with
     | Nil0 ->
-      let lit_188_137'16 = "expected an argument" in
-      error lit_188_137'16 k
+      let lit_194_138'16 = "expected an argument" in
+      error lit_194_138'16 k
     | Cons1(arg1,more) ->
       match more with
       | Cons1(_,_) ->
-        let lit_189_140'21 = "expected exactly one argument" in
-        error lit_189_140'21 k
+        let lit_195_141'21 = "expected exactly one argument" in
+        error lit_195_141'21 k
       | Nil0 ->
-        let k [error,fib,newline,put_int,put_string] app_190_142'24 =
-          match app_190_142'24 with
+        let k [error,fib,newline,put_int,put_string] app_196_143'24 =
+          match app_196_143'24 with
           | None1 ->
-            let lit_191_143'24 = "expected arg1 to be numeric" in
-            error lit_191_143'24 k
+            let lit_197_144'24 = "expected arg1 to be numeric" in
+            error lit_197_144'24 k
           | Some0(n) ->
             let k [n,newline,put_int,put_string] res =
               let k [newline,put_int,put_string,res] _ =
                 let k [newline,put_int,res] _ =
                   let k [newline] _ =
-                    let con_193_149'19 = Unit0 in
-                    newline con_193_149'19 k in
+                    let con_199_150'19 = Unit0 in
+                    newline con_199_150'19 k in
                   put_int res k in
-                let lit_192_147'22 = " --> " in
-                put_string lit_192_147'22 k in
+                let lit_198_148'22 = " --> " in
+                put_string lit_198_148'22 k in
               put_int n k in
             fib n k in
         parse_num arg1 k in
-  let lit_187_135'13 = "fib: " in
-  put_string lit_187_135'13 k in
+  let lit_193_136'13 = "fib: " in
+  put_string lit_193_136'13 k in
 let runfact = fun [error,fact,newline,parse_num,put_int,put_string] args k ->
   let k [args,error,fact,newline,parse_num,put_int,put_string] _ =
     match args with
     | Nil0 ->
-      let lit_195_154'16 = "expected an argument" in
-      error lit_195_154'16 k
+      let lit_201_155'16 = "expected an argument" in
+      error lit_201_155'16 k
     | Cons1(arg1,more) ->
       match more with
       | Cons1(_,_) ->
-        let lit_196_157'21 = "expected exactly one argument" in
-        error lit_196_157'21 k
+        let lit_202_158'21 = "expected exactly one argument" in
+        error lit_202_158'21 k
       | Nil0 ->
-        let k [error,fact,newline,put_int,put_string] app_197_159'24 =
-          match app_197_159'24 with
+        let k [error,fact,newline,put_int,put_string] app_203_160'24 =
+          match app_203_160'24 with
           | None1 ->
-            let lit_198_160'24 = "expected arg1 to be numeric" in
-            error lit_198_160'24 k
+            let lit_204_161'24 = "expected arg1 to be numeric" in
+            error lit_204_161'24 k
           | Some0(n) ->
             let k [n,newline,put_int,put_string] res =
               let k [newline,put_int,put_string,res] _ =
                 let k [newline,put_int,res] _ =
                   let k [newline] _ =
-                    let con_200_166'19 = Unit0 in
-                    newline con_200_166'19 k in
+                    let con_206_167'19 = Unit0 in
+                    newline con_206_167'19 k in
                   put_int res k in
-                let lit_199_164'22 = " --> " in
-                put_string lit_199_164'22 k in
+                let lit_205_165'22 = " --> " in
+                put_string lit_205_165'22 k in
               put_int n k in
             fact n k in
         parse_num arg1 k in
-  let lit_194_152'13 = "fact: " in
-  put_string lit_194_152'13 k in
-let fallback = fun [append,eq_char,explode,length,map,newline,put_char,put_chars,put_int] line k ->
-  let k [append,explode,length,line,newline,put_char,put_chars,put_int] star_the_ohs =
-    let k [append,explode,line,newline,put_char,put_chars,put_int,star_the_ohs] n =
-      let k [n,newline,put_char,put_int] _ =
+  let lit_200_153'13 = "fact: " in
+  put_string lit_200_153'13 k in
+let k [::,append,eq_char,eq_char_list,error,explode,length,map,newline,put_char,put_chars,put_int,put_string_newline,read_line,reverse,runfact,runfib] single_controlD =
+  let rev = fun [eq_char_list,newline,put_chars,read_line,reverse,single_controlD] _ k ->
+    let loop = fix (fun [eq_char_list,newline,put_chars,read_line,reverse,single_controlD] loop _ k ->
+      let k [eq_char_list,loop,newline,put_chars,reverse,single_controlD] xs =
+        let k [loop,newline,put_chars,reverse,xs] app_212_175'23 =
+          match app_212_175'23 with
+          | true1 ->
+            let con_214_175'44 = Unit0 in
+            k con_214_175'44
+          | false0 ->
+            let k [loop,newline] _ =
+              let k [loop] _ =
+                let con_217_176'46 = Unit0 in
+                loop con_217_176'46 k in
+              let con_216_176'38 = Unit0 in
+              newline con_216_176'38 k in
+            let k [put_chars] app_215_176'26 = put_chars app_215_176'26 k in
+            reverse xs k in
+        let k [single_controlD] app_213_175'20 = app_213_175'20 single_controlD k in
+        eq_char_list xs k in
+      let con_211_174'23 = Unit0 in
+      read_line con_211_174'23 k) in
+    let con_218_178'6 = Unit0 in
+    loop con_218_178'6 k in
+  let runrev = fun [error,put_string_newline,rev] args k ->
+    match args with
+    | Cons1(_,_) ->
+      let lit_219_182'18 = "rev: expected no arguments" in
+      error lit_219_182'18 k
+    | Nil0 ->
+      let k [rev] _ =
+        let con_221_185'8 = Unit0 in
+        rev con_221_185'8 k in
+      let lit_220_184'24 = "(reverse typed lines until ^D)" in
+      put_string_newline lit_220_184'24 k in
+  let fallback = fun [append,eq_char,explode,length,map,newline,put_char,put_chars,put_int] line k ->
+    let k [append,explode,length,line,newline,put_char,put_chars,put_int] star_the_ohs =
+      let k [append,explode,line,newline,put_char,put_chars,put_int,star_the_ohs] n =
         let k [n,newline,put_char,put_int] _ =
           let k [n,newline,put_char,put_int] _ =
-            let k [newline,put_char] _ =
-              let k [newline] _ =
-                let con_214_176'10 = Unit0 in
-                newline con_214_176'10 k in
-              let lit_213_175'11 = '}' in
-              put_char lit_213_175'11 k in
-            put_int n k in
-          let lit_212_173'11 = '{' in
-          put_char lit_212_173'11 k in
-        let lit_211_172'11 = ' ' in
-        put_char lit_211_172'11 k in
-      let k [put_chars] app_206_171'44 = put_chars app_206_171'44 k in
-      let k [line,star_the_ohs] app_207_171'20 =
-        let k [app_207_171'20] app_210_171'58 = app_207_171'20 app_210_171'58 k in
-        star_the_ohs line k in
-      let k [append] app_208_171'29 = append app_208_171'29 k in
-      let lit_209_171'29 = "You wrote: " in
-      explode lit_209_171'29 k in
-    length line k in
-  let lam_201_169'30 = fun [eq_char] c k ->
-    let k [c] app_202_169'48 =
-      match app_202_169'48 with
-      | true1 ->
-        let lit_205_169'57 = '*' in
-        k lit_205_169'57
-      | false0 -> k c in
-    let k [] app_203_169'46 =
-      let lit_204_169'48 = 'o' in
-      app_203_169'46 lit_204_169'48 k in
-    eq_char c k in
-  map lam_201_169'30 k in
-let split_words = fun [::,eq_char,reverse] s k ->
-  let loop = fix (fun [::,eq_char,reverse] loop accWs k ->
-    let lam_232_179'21 = fun [::,accWs,eq_char,loop,reverse] accCs k ->
-      let lam_231_179'27 = fun [::,accCs,accWs,eq_char,loop,reverse] xs k ->
-        match xs with
-        | Nil0 ->
-          let k [reverse] app_215_181'38 = reverse app_215_181'38 k in
-          let k [accWs] app_216_181'35 = app_216_181'35 accWs k in
-          let k [::] app_217_181'29 = :: app_217_181'29 k in
-          reverse accCs k
-        | Cons1(x,xs) ->
-          let k [::,accCs,accWs,loop,reverse,x,xs] app_218_184'20 =
-            match app_218_184'20 with
+            let k [n,newline,put_char,put_int] _ =
+              let k [newline,put_char] _ =
+                let k [newline] _ =
+                  let con_235_195'10 = Unit0 in
+                  newline con_235_195'10 k in
+                let lit_234_194'11 = '}' in
+                put_char lit_234_194'11 k in
+              put_int n k in
+            let lit_233_192'11 = '{' in
+            put_char lit_233_192'11 k in
+          let lit_232_191'11 = ' ' in
+          put_char lit_232_191'11 k in
+        let k [put_chars] app_227_190'44 = put_chars app_227_190'44 k in
+        let k [line,star_the_ohs] app_228_190'20 =
+          let k [app_228_190'20] app_231_190'58 = app_228_190'20 app_231_190'58 k in
+          star_the_ohs line k in
+        let k [append] app_229_190'29 = append app_229_190'29 k in
+        let lit_230_190'29 = "You wrote: " in
+        explode lit_230_190'29 k in
+      length line k in
+    let lam_222_188'30 = fun [eq_char] c k ->
+      let k [c] app_223_188'48 =
+        match app_223_188'48 with
+        | true1 ->
+          let lit_226_188'57 = '*' in
+          k lit_226_188'57
+        | false0 -> k c in
+      let k [] app_224_188'46 =
+        let lit_225_188'48 = 'o' in
+        app_224_188'46 lit_225_188'48 k in
+      eq_char c k in
+    map lam_222_188'30 k in
+  let split_words = fun [::,eq_char,reverse] s k ->
+    let loop = fix (fun [::,eq_char,reverse] loop accWs k ->
+      let lam_253_198'21 = fun [::,accWs,eq_char,loop,reverse] accCs k ->
+        let lam_252_198'27 = fun [::,accCs,accWs,eq_char,loop,reverse] xs k ->
+          match xs with
+          | Nil0 ->
+            let k [reverse] app_236_200'38 = reverse app_236_200'38 k in
+            let k [accWs] app_237_200'35 = app_237_200'35 accWs k in
+            let k [::] app_238_200'29 = :: app_238_200'29 k in
+            reverse accCs k
+          | Cons1(x,xs) ->
+            let k [::,accCs,accWs,loop,reverse,x,xs] app_239_203'20 =
+              match app_239_203'20 with
+              | true1 ->
+                let k [xs] app_242_203'59 = app_242_203'59 xs k in
+                let k [] app_243_203'34 =
+                  let con_247_203'59 = Nil0 in
+                  app_243_203'34 con_247_203'59 k in
+                let k [loop] app_244_203'52 = loop app_244_203'52 k in
+                let k [accWs] app_245_203'49 = app_245_203'49 accWs k in
+                let k [::] app_246_203'43 = :: app_246_203'43 k in
+                reverse accCs k
+              | false0 ->
+                let k [xs] app_248_204'23 = app_248_204'23 xs k in
+                let k [::,accCs,x] app_249_204'17 =
+                  let k [app_249_204'17] app_250_204'27 = app_249_204'17 app_250_204'27 k in
+                  let k [accCs] app_251_204'25 = app_251_204'25 accCs k in
+                  :: x k in
+                loop accWs k in
+            let k [] app_240_203'18 =
+              let lit_241_203'20 = ' ' in
+              app_240_203'18 lit_241_203'20 k in
+            eq_char x k in
+        k lam_252_198'27 in
+      k lam_253_198'21) in
+    let k [s] app_254_206'10 = app_254_206'10 s k in
+    let k [] app_255_206'7 =
+      let con_257_206'10 = Nil0 in
+      app_255_206'7 con_257_206'10 k in
+    let con_256_206'7 = Nil0 in
+    loop con_256_206'7 k in
+  let execute = fun [eq_char_list,explode,fallback,runfact,runfib,runrev,split_words] line k ->
+    let k [eq_char_list,explode,fallback,line,runfact,runfib,runrev] words =
+      match words with
+      | Nil0 ->
+        let con_258_211'10 = Unit0 in
+        k con_258_211'10
+      | Cons1(command,args) ->
+        let k [args,command,eq_char_list,explode,fallback,line,runfact,runfib,runrev] app_259_213'29 =
+          match app_259_213'29 with
+          | true1 -> runfib args k
+          | false0 ->
+            let k [args,command,eq_char_list,explode,fallback,line,runfact,runrev] app_263_214'31 =
+              match app_263_214'31 with
+              | true1 -> runfact args k
+              | false0 ->
+                let k [args,fallback,line,runrev] app_267_215'33 =
+                  match app_267_215'33 with
+                  | true1 -> runrev args k
+                  | false0 -> fallback line k in
+                let k [explode] app_268_215'25 =
+                  let k [app_268_215'25] app_269_215'42 = app_268_215'25 app_269_215'42 k in
+                  let lit_270_215'42 = "rev" in
+                  explode lit_270_215'42 k in
+                eq_char_list command k in
+            let k [explode] app_264_214'23 =
+              let k [app_264_214'23] app_265_214'40 = app_264_214'23 app_265_214'40 k in
+              let lit_266_214'40 = "fact" in
+              explode lit_266_214'40 k in
+            eq_char_list command k in
+        let k [explode] app_260_213'21 =
+          let k [app_260_213'21] app_261_213'38 = app_260_213'21 app_261_213'38 k in
+          let lit_262_213'38 = "fib" in
+          explode lit_262_213'38 k in
+        eq_char_list command k in
+    split_words line k in
+  let mainloop = fix (fun [eq_char_list,execute,put_char,read_line,single_controlD] mainloop _ k ->
+    let k [eq_char_list,execute,mainloop,put_char,read_line,single_controlD] _ =
+      let k [eq_char_list,execute,mainloop,read_line,single_controlD] _ =
+        let k [eq_char_list,execute,mainloop,single_controlD] xs =
+          let k [execute,mainloop,xs] app_274_222'21 =
+            match app_274_222'21 with
             | true1 ->
-              let k [xs] app_221_184'59 = app_221_184'59 xs k in
-              let k [] app_222_184'34 =
-                let con_226_184'59 = Nil0 in
-                app_222_184'34 con_226_184'59 k in
-              let k [loop] app_223_184'52 = loop app_223_184'52 k in
-              let k [accWs] app_224_184'49 = app_224_184'49 accWs k in
-              let k [::] app_225_184'43 = :: app_225_184'43 k in
-              reverse accCs k
+              let con_276_222'42 = Unit0 in
+              k con_276_222'42
             | false0 ->
-              let k [xs] app_227_185'23 = app_227_185'23 xs k in
-              let k [::,accCs,x] app_228_185'17 =
-                let k [app_228_185'17] app_229_185'27 = app_228_185'17 app_229_185'27 k in
-                let k [accCs] app_230_185'25 = app_230_185'25 accCs k in
-                :: x k in
-              loop accWs k in
-          let k [] app_219_184'18 =
-            let lit_220_184'20 = ' ' in
-            app_219_184'18 lit_220_184'20 k in
-          eq_char x k in
-      k lam_231_179'27 in
-    k lam_232_179'21) in
-  let k [s] app_233_187'10 = app_233_187'10 s k in
-  let k [] app_234_187'7 =
-    let con_236_187'10 = Nil0 in
-    app_234_187'7 con_236_187'10 k in
-  let con_235_187'7 = Nil0 in
-  loop con_235_187'7 k in
-let execute = fun [eq_char_list,explode,fallback,runfact,runfib,split_words] line k ->
-  let k [eq_char_list,explode,fallback,line,runfact,runfib] words =
-    match words with
-    | Nil0 ->
-      let con_237_192'10 = Unit0 in
-      k con_237_192'10
-    | Cons1(command,args) ->
-      let k [args,command,eq_char_list,explode,fallback,line,runfact,runfib] app_238_194'29 =
-        match app_238_194'29 with
-        | true1 -> runfib args k
-        | false0 ->
-          let k [args,fallback,line,runfact] app_242_195'31 =
-            match app_242_195'31 with
-            | true1 -> runfact args k
-            | false0 -> fallback line k in
-          let k [explode] app_243_195'23 =
-            let k [app_243_195'23] app_244_195'40 = app_243_195'23 app_244_195'40 k in
-            let lit_245_195'40 = "fact" in
-            explode lit_245_195'40 k in
-          eq_char_list command k in
-      let k [explode] app_239_194'21 =
-        let k [app_239_194'21] app_240_194'38 = app_239_194'21 app_240_194'38 k in
-        let lit_241_194'38 = "fib" in
-        explode lit_241_194'38 k in
-      eq_char_list command k in
-  split_words line k in
-let mainloop = fix (fun [execute,put_char,read_line] mainloop _ k ->
-  let k [execute,mainloop,put_char,read_line] _ =
-    let k [execute,mainloop,read_line] _ =
-      let k [execute,mainloop] xs =
-        let k [mainloop] _ =
-          let con_249_203'11 = Unit0 in
-          mainloop con_249_203'11 k in
-        execute xs k in
-      let con_248_201'21 = Unit0 in
-      read_line con_248_201'21 k in
-    let lit_247_200'11 = ' ' in
-    put_char lit_247_200'11 k in
-  let lit_246_199'11 = '>' in
-  put_char lit_246_199'11 k) in
-let k [mainloop,put_string_newline] _ =
-  let main = fun [mainloop,put_string_newline] _ k ->
-    let k [mainloop,put_string_newline] _ =
-      let k [put_string_newline] _ =
-        let lit_253_210'21 = "NEVER" in
-        put_string_newline lit_253_210'21 k in
-      let con_252_209'20 = Unit0 in
-      mainloop con_252_209'20 k in
-    let lit_251_208'21 = "RUN" in
-    put_string_newline lit_251_208'21 k in
-  let con_254_0'0 = Unit0 in
-  main con_254_0'0 k in
-let lit_250_205'28 = "LOAD" in
-put_string_newline lit_250_205'28 k
+              let k [mainloop] _ =
+                let con_277_223'26 = Unit0 in
+                mainloop con_277_223'26 k in
+              execute xs k in
+          let k [single_controlD] app_275_222'18 = app_275_222'18 single_controlD k in
+          eq_char_list xs k in
+        let con_273_221'21 = Unit0 in
+        read_line con_273_221'21 k in
+      let lit_272_220'11 = ' ' in
+      put_char lit_272_220'11 k in
+    let lit_271_219'11 = '>' in
+    put_char lit_271_219'11 k) in
+  let k [mainloop,put_string_newline] _ =
+    let main = fun [mainloop,put_string_newline] _ k ->
+      let k [mainloop,put_string_newline] _ =
+        let k [put_string_newline] _ =
+          let lit_281_230'21 = "EXIT" in
+          put_string_newline lit_281_230'21 k in
+        let con_280_229'20 = Unit0 in
+        mainloop con_280_229'20 k in
+      let lit_279_228'21 = "RUN" in
+      put_string_newline lit_279_228'21 k in
+    let con_282_0'0 = Unit0 in
+    main con_282_0'0 k in
+  let lit_278_225'28 = "LOAD" in
+  put_string_newline lit_278_225'28 k in
+let k [] app_207_170'28 =
+  let con_210_170'31 = Nil0 in
+  app_207_170'28 con_210_170'31 k in
+let k [::] app_208_170'26 = :: app_208_170'26 k in
+let lit_209_170'26 = 4 in
+chr lit_209_170'26 k

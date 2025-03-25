@@ -21,6 +21,13 @@ Ocaml REPL
   fact: 6 --> 720
   > fact 7
   fact: 7 --> 5040
+  > rev
+  (reverse typed lines until ^D)
+  Here are some words.
+  .sdrow emos era ereH
+  And here are some more.
+  .erom emos era ereh dnA
+  ^D
   > Goodbye
   You wrote: G**dbye {7}
   > [EOF]
@@ -47,6 +54,13 @@ Haskell REPL (stage0)
   fact: 6 --> 720
   > fact 7
   fact: 7 --> 5040
+  > rev
+  (reverse typed lines until ^D)
+  Here are some words.
+  .sdrow emos era ereH
+  And here are some more.
+  .erom emos era ereh dnA
+  ^D
   > Goodbye
   You wrote: G**dbye {7}
   > [EOF]
@@ -73,6 +87,13 @@ Haskell REPL (stage1)
   fact: 6 --> 720
   > fact 7
   fact: 7 --> 5040
+  > rev
+  (reverse typed lines until ^D)
+  Here are some words.
+  .sdrow emos era ereH
+  And here are some more.
+  .erom emos era ereh dnA
+  ^D
   > Goodbye
   You wrote: G**dbye {7}
   > [EOF]
@@ -99,6 +120,13 @@ Haskell REPL (stage2)
   fact: 6 --> 720
   > fact 7
   fact: 7 --> 5040
+  > rev
+  (reverse typed lines until ^D)
+  Here are some words.
+  .sdrow emos era ereH
+  And here are some more.
+  .erom emos era ereh dnA
+  ^D
   > Goodbye
   You wrote: G**dbye {7}
   > [EOF]
@@ -125,6 +153,13 @@ Haskell REPL
   fact: 6 --> 720
   > fact 7
   fact: 7 --> 5040
+  > rev
+  (reverse typed lines until ^D)
+  Here are some words.
+  .sdrow emos era ereH
+  And here are some more.
+  .erom emos era ereh dnA
+  ^D
   > Goodbye
   You wrote: G**dbye {7}
   > [EOF]

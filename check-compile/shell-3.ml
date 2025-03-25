@@ -341,177 +341,197 @@ let put_string_newline_g59 = fun s_arg k ->
     let con_142_103'10_t1 = Unit0 in
     newline_g58 con_142_103'10_t1 k in
   put_string_g55 s_arg k in
-let lit_146_109'17_g60 = '\n' in
-let lit_150_111'15_g61 = 127 in
-let lit_153_112'17_g62 = 127 in
-let lit_157_116'28_g63 = 26 in
-let loop_g64 = fun loop_me acc_arg k ->
-  let k = [acc_arg,loop_me], fun [acc_f1,loop_f2] c_arg ->
-    let k = [acc_f1,c_arg,loop_f2], fun [acc_f1,c_f2,loop_f3] n_arg ->
-      let k = [acc_f1,c_f2,loop_f3,n_arg], fun [acc_f1,c_f2,loop_f3,n_f4] app_144_109'17_arg ->
-        match app_144_109'17_arg with
-        | true1 ->
-          let k = [acc_f1], fun [acc_f1] __arg -> reverse_g42 acc_f1 k in
-          let con_147_109'35_t1 = Unit0 in
-          newline_g58 con_147_109'35_t1 k
-        | false0 ->
-          let k = [acc_f1,c_f2,loop_f3,n_f4], fun [acc_f1,c_f2,loop_f3,n_f4] app_148_111'15_arg ->
-            match app_148_111'15_arg with
-            | true1 -> loop_f3 acc_f1 k
-            | false0 ->
-              let k = [acc_f1,c_f2,loop_f3], fun [acc_f1,c_f2,loop_f3] app_151_112'17_arg ->
-                match app_151_112'17_arg with
-                | true1 ->
-                  match acc_f1 with
-                  | Nil0 -> loop_f3 acc_f1 k
-                  | Cons1(c_t1,tail_t2) ->
-                    let k = [loop_f3,tail_t2], fun [loop_f1,tail_f2] __arg ->
-                      let k = [loop_f1,tail_f2], fun [loop_f1,tail_f2] __arg -> loop_f1 tail_f2 k in
-                      let con_160_117'25_t1 = Unit0 in
-                      erase_char_g28 con_160_117'25_t1 k in
-                    let k = [], fun [] app_154_116'28_arg ->
-                      match app_154_116'28_arg with
-                      | true1 ->
-                        let con_158_116'47_t1 = Unit0 in
-                        erase_char_g28 con_158_116'47_t1 k
-                      | false0 ->
-                        let con_159_116'55_t1 = Unit0 in
-                        k con_159_116'55_t1 in
-                    let k = [], fun [] app_155_116'25_arg -> app_155_116'25_arg lit_157_116'28_g63 k in
-                    let k = [], fun [] app_156_116'23_arg -> <=_g17 app_156_116'23_arg k in
-                    ord_g9 c_t1 k
-                | false0 ->
-                  let k = [acc_f1,c_f2,loop_f3], fun [acc_f1,c_f2,loop_f3] __arg ->
-                    let k = [loop_f3], fun [loop_f1] app_161_120'38_arg -> loop_f1 app_161_120'38_arg k in
-                    let k = [acc_f1], fun [acc_f1] app_162_120'36_arg -> app_162_120'36_arg acc_f1 k in
-                    cons_g37 c_f2 k in
-                  put_char_g25 c_f2 k in
-              let k = [], fun [] app_152_112'15_arg -> app_152_112'15_arg lit_153_112'17_g62 k in
-              =_g7 n_f4 k in
-          let k = [], fun [] app_149_111'13_arg -> app_149_111'13_arg lit_150_111'15_g61 k in
-          >_g16 n_f4 k in
-      let k = [], fun [] app_145_109'15_arg -> app_145_109'15_arg lit_146_109'17_g60 k in
-      eq_char_g8 c_f2 k in
-    ord_g9 c_arg k in
-  let con_143_107'21_t1 = Unit0 in
-  get_char_g13 con_143_107'21_t1 k in
+let lit_143_106'21_g60 = 4 in
+let lit_147_110'17_g61 = '\n' in
+let lit_156_112'15_g62 = 127 in
+let lit_159_113'17_g63 = 127 in
+let lit_163_117'28_g64 = 26 in
 let read_line_g65 = fun __arg k ->
-  let con_163_122'7_t1 = Nil0 in
-  loop_g64 con_163_122'7_t1 k in
-let lit_166_126'9_g66 = 2 in
-let lit_171_126'30_g67 = 1 in
-let lit_175_126'42_g68 = 2 in
+  let k = [], fun [] controlD_arg ->
+    let loop_t1 = [controlD_arg], fun [controlD_f1] loop_me acc_arg k ->
+      let k = [acc_arg,controlD_f1,loop_me], fun [acc_f1,controlD_f2,loop_f3] c_arg ->
+        let k = [acc_f1,c_arg,controlD_f2,loop_f3], fun [acc_f1,c_f2,controlD_f3,loop_f4] n_arg ->
+          let k = [acc_f1,c_f2,controlD_f3,loop_f4,n_arg], fun [acc_f1,c_f2,controlD_f3,loop_f4,n_f5] app_145_110'17_arg ->
+            match app_145_110'17_arg with
+            | true1 ->
+              let k = [acc_f1], fun [acc_f1] __arg -> reverse_g42 acc_f1 k in
+              let con_148_110'35_t1 = Unit0 in
+              newline_g58 con_148_110'35_t1 k
+            | false0 ->
+              let k = [acc_f1,c_f2,controlD_f3,loop_f4,n_f5], fun [acc_f1,c_f2,controlD_f3,loop_f4,n_f5] app_149_111'19_arg ->
+                match app_149_111'19_arg with
+                | true1 ->
+                  let k = [acc_f1,controlD_f3], fun [acc_f1,controlD_f2] __arg ->
+                    let k = [acc_f1,controlD_f2], fun [acc_f1,controlD_f2] __arg ->
+                      let k = [], fun [] app_152_111'78_arg -> reverse_g42 app_152_111'78_arg k in
+                      let k = [acc_f1], fun [acc_f1] app_153_111'75_arg -> app_153_111'75_arg acc_f1 k in
+                      ::_g14 controlD_f2 k in
+                    let con_151_111'53_t1 = Unit0 in
+                    newline_g58 con_151_111'53_t1 k in
+                  put_char_g25 c_f2 k
+                | false0 ->
+                  let k = [acc_f1,c_f2,loop_f4,n_f5], fun [acc_f1,c_f2,loop_f3,n_f4] app_154_112'15_arg ->
+                    match app_154_112'15_arg with
+                    | true1 -> loop_f3 acc_f1 k
+                    | false0 ->
+                      let k = [acc_f1,c_f2,loop_f3], fun [acc_f1,c_f2,loop_f3] app_157_113'17_arg ->
+                        match app_157_113'17_arg with
+                        | true1 ->
+                          match acc_f1 with
+                          | Nil0 -> loop_f3 acc_f1 k
+                          | Cons1(c_t1,tail_t2) ->
+                            let k = [loop_f3,tail_t2], fun [loop_f1,tail_f2] __arg ->
+                              let k = [loop_f1,tail_f2], fun [loop_f1,tail_f2] __arg -> loop_f1 tail_f2 k in
+                              let con_166_118'25_t1 = Unit0 in
+                              erase_char_g28 con_166_118'25_t1 k in
+                            let k = [], fun [] app_160_117'28_arg ->
+                              match app_160_117'28_arg with
+                              | true1 ->
+                                let con_164_117'47_t1 = Unit0 in
+                                erase_char_g28 con_164_117'47_t1 k
+                              | false0 ->
+                                let con_165_117'55_t1 = Unit0 in
+                                k con_165_117'55_t1 in
+                            let k = [], fun [] app_161_117'25_arg -> app_161_117'25_arg lit_163_117'28_g64 k in
+                            let k = [], fun [] app_162_117'23_arg -> <=_g17 app_162_117'23_arg k in
+                            ord_g9 c_t1 k
+                        | false0 ->
+                          let k = [acc_f1,c_f2,loop_f3], fun [acc_f1,c_f2,loop_f3] __arg ->
+                            let k = [loop_f3], fun [loop_f1] app_167_121'38_arg -> loop_f1 app_167_121'38_arg k in
+                            let k = [acc_f1], fun [acc_f1] app_168_121'36_arg -> app_168_121'36_arg acc_f1 k in
+                            cons_g37 c_f2 k in
+                          put_char_g25 c_f2 k in
+                      let k = [], fun [] app_158_113'15_arg -> app_158_113'15_arg lit_159_113'17_g63 k in
+                      =_g7 n_f4 k in
+                  let k = [], fun [] app_155_112'13_arg -> app_155_112'13_arg lit_156_112'15_g62 k in
+                  >_g16 n_f5 k in
+              let k = [controlD_f3], fun [controlD_f1] app_150_111'17_arg -> app_150_111'17_arg controlD_f1 k in
+              eq_char_g8 c_f2 k in
+          let k = [], fun [] app_146_110'15_arg -> app_146_110'15_arg lit_147_110'17_g61 k in
+          eq_char_g8 c_f2 k in
+        ord_g9 c_arg k in
+      let con_144_108'21_t1 = Unit0 in
+      get_char_g13 con_144_108'21_t1 k in
+    let con_169_123'7_t2 = Nil0 in
+    loop_t1 con_169_123'7_t2 k in
+  chr_g10 lit_143_106'21_g60 k in
+let lit_172_127'9_g66 = 2 in
+let lit_177_127'30_g67 = 1 in
+let lit_181_127'42_g68 = 2 in
 let fib_g69 = fun fib_me n_arg k ->
-  let k = [fib_me,n_arg], fun [fib_f1,n_f2] app_164_126'9_arg ->
-    match app_164_126'9_arg with
+  let k = [fib_me,n_arg], fun [fib_f1,n_f2] app_170_127'9_arg ->
+    match app_170_127'9_arg with
     | true1 -> k n_f2
     | false0 ->
-      let k = [fib_f1,n_f2], fun [fib_f1,n_f2] app_167_126'33_arg ->
-        let k = [app_167_126'33_arg], fun [app_167_126'33_f1] app_172_126'39_arg -> app_167_126'33_f1 app_172_126'39_arg k in
-        let k = [fib_f1], fun [fib_f1] app_173_126'42_arg -> fib_f1 app_173_126'42_arg k in
-        let k = [], fun [] app_174_126'41_arg -> app_174_126'41_arg lit_175_126'42_g68 k in
+      let k = [fib_f1,n_f2], fun [fib_f1,n_f2] app_173_127'33_arg ->
+        let k = [app_173_127'33_arg], fun [app_173_127'33_f1] app_178_127'39_arg -> app_173_127'33_f1 app_178_127'39_arg k in
+        let k = [fib_f1], fun [fib_f1] app_179_127'42_arg -> fib_f1 app_179_127'42_arg k in
+        let k = [], fun [] app_180_127'41_arg -> app_180_127'41_arg lit_181_127'42_g68 k in
         -_g2 n_f2 k in
-      let k = [], fun [] app_168_126'27_arg -> +_g1 app_168_126'27_arg k in
-      let k = [fib_f1], fun [fib_f1] app_169_126'30_arg -> fib_f1 app_169_126'30_arg k in
-      let k = [], fun [] app_170_126'29_arg -> app_170_126'29_arg lit_171_126'30_g67 k in
+      let k = [], fun [] app_174_127'27_arg -> +_g1 app_174_127'27_arg k in
+      let k = [fib_f1], fun [fib_f1] app_175_127'30_arg -> fib_f1 app_175_127'30_arg k in
+      let k = [], fun [] app_176_127'29_arg -> app_176_127'29_arg lit_177_127'30_g67 k in
       -_g2 n_f2 k in
-  let k = [], fun [] app_165_126'7_arg -> app_165_126'7_arg lit_166_126'9_g66 k in
+  let k = [], fun [] app_171_127'7_arg -> app_171_127'7_arg lit_172_127'9_g66 k in
   <_g6 n_arg k in
-let lit_178_130'10_g70 = 2 in
-let lit_183_130'25_g71 = 1 in
-let lit_184_130'37_g72 = 1 in
+let lit_184_131'10_g70 = 2 in
+let lit_189_131'25_g71 = 1 in
+let lit_190_131'37_g72 = 1 in
 let fact_g73 = fun fact_me n_arg k ->
-  let k = [fact_me,n_arg], fun [fact_f1,n_f2] app_176_130'10_arg ->
-    match app_176_130'10_arg with
+  let k = [fact_me,n_arg], fun [fact_f1,n_f2] app_182_131'10_arg ->
+    match app_182_131'10_arg with
     | true1 ->
-      let k = [n_f2], fun [n_f1] app_179_130'28_arg -> app_179_130'28_arg n_f1 k in
-      let k = [], fun [] app_180_130'22_arg -> ( * )_g3 app_180_130'22_arg k in
-      let k = [fact_f1], fun [fact_f1] app_181_130'25_arg -> fact_f1 app_181_130'25_arg k in
-      let k = [], fun [] app_182_130'24_arg -> app_182_130'24_arg lit_183_130'25_g71 k in
+      let k = [n_f2], fun [n_f1] app_185_131'28_arg -> app_185_131'28_arg n_f1 k in
+      let k = [], fun [] app_186_131'22_arg -> ( * )_g3 app_186_131'22_arg k in
+      let k = [fact_f1], fun [fact_f1] app_187_131'25_arg -> fact_f1 app_187_131'25_arg k in
+      let k = [], fun [] app_188_131'24_arg -> app_188_131'24_arg lit_189_131'25_g71 k in
       -_g2 n_f2 k
-    | false0 -> k lit_184_130'37_g72 in
-  let k = [], fun [] app_177_130'7_arg -> app_177_130'7_arg lit_178_130'10_g70 k in
+    | false0 -> k lit_190_131'37_g72 in
+  let k = [], fun [] app_183_131'7_arg -> app_183_131'7_arg lit_184_131'10_g70 k in
   >=_g18 n_arg k in
-let lit_185_132'25_g74 = "ERROR: " in
+let lit_191_133'25_g74 = "ERROR: " in
 let error_g75 = fun s_arg k ->
   let k = [s_arg], fun [s_f1] __arg ->
     let k = [], fun [] __arg ->
-      let con_186_132'58_t1 = Unit0 in
-      newline_g58 con_186_132'58_t1 k in
+      let con_192_133'58_t1 = Unit0 in
+      newline_g58 con_192_133'58_t1 k in
     put_string_g55 s_f1 k in
-  put_string_g55 lit_185_132'25_g74 k in
-let lit_187_135'13_g76 = "fib: " in
-let lit_188_137'16_g77 = "expected an argument" in
-let lit_189_140'21_g78 = "expected exactly one argument" in
-let lit_191_143'24_g79 = "expected arg1 to be numeric" in
-let lit_192_147'22_g80 = " --> " in
+  put_string_g55 lit_191_133'25_g74 k in
+let lit_193_136'13_g76 = "fib: " in
+let lit_194_138'16_g77 = "expected an argument" in
+let lit_195_141'21_g78 = "expected exactly one argument" in
+let lit_197_144'24_g79 = "expected arg1 to be numeric" in
+let lit_198_148'22_g80 = " --> " in
 let runfib_g81 = fun args_arg k ->
   let k = [args_arg], fun [args_f1] __arg ->
     match args_f1 with
-    | Nil0 -> error_g75 lit_188_137'16_g77 k
+    | Nil0 -> error_g75 lit_194_138'16_g77 k
     | Cons1(arg1_t1,more_t2) ->
       match more_t2 with
-      | Cons1(__t3,__t4) -> error_g75 lit_189_140'21_g78 k
+      | Cons1(__t3,__t4) -> error_g75 lit_195_141'21_g78 k
       | Nil0 ->
-        let k = [], fun [] app_190_142'24_arg ->
-          match app_190_142'24_arg with
-          | None1 -> error_g75 lit_191_143'24_g79 k
+        let k = [], fun [] app_196_143'24_arg ->
+          match app_196_143'24_arg with
+          | None1 -> error_g75 lit_197_144'24_g79 k
           | Some0(n_t1) ->
             let k = [n_t1], fun [n_f1] res_arg ->
               let k = [res_arg], fun [res_f1] __arg ->
                 let k = [res_f1], fun [res_f1] __arg ->
                   let k = [], fun [] __arg ->
-                    let con_193_149'19_t1 = Unit0 in
-                    newline_g58 con_193_149'19_t1 k in
+                    let con_199_150'19_t1 = Unit0 in
+                    newline_g58 con_199_150'19_t1 k in
                   put_int_g56 res_f1 k in
-                put_string_g55 lit_192_147'22_g80 k in
+                put_string_g55 lit_198_148'22_g80 k in
               put_int_g56 n_f1 k in
             fib_g69 n_t1 k in
         parse_num_g36 arg1_t1 k in
-  put_string_g55 lit_187_135'13_g76 k in
-let lit_194_152'13_g82 = "fact: " in
-let lit_195_154'16_g83 = "expected an argument" in
-let lit_196_157'21_g84 = "expected exactly one argument" in
-let lit_198_160'24_g85 = "expected arg1 to be numeric" in
-let lit_199_164'22_g86 = " --> " in
+  put_string_g55 lit_193_136'13_g76 k in
+let lit_200_153'13_g82 = "fact: " in
+let lit_201_155'16_g83 = "expected an argument" in
+let lit_202_158'21_g84 = "expected exactly one argument" in
+let lit_204_161'24_g85 = "expected arg1 to be numeric" in
+let lit_205_165'22_g86 = " --> " in
 let runfact_g87 = fun args_arg k ->
   let k = [args_arg], fun [args_f1] __arg ->
     match args_f1 with
-    | Nil0 -> error_g75 lit_195_154'16_g83 k
+    | Nil0 -> error_g75 lit_201_155'16_g83 k
     | Cons1(arg1_t1,more_t2) ->
       match more_t2 with
-      | Cons1(__t3,__t4) -> error_g75 lit_196_157'21_g84 k
+      | Cons1(__t3,__t4) -> error_g75 lit_202_158'21_g84 k
       | Nil0 ->
-        let k = [], fun [] app_197_159'24_arg ->
-          match app_197_159'24_arg with
-          | None1 -> error_g75 lit_198_160'24_g85 k
+        let k = [], fun [] app_203_160'24_arg ->
+          match app_203_160'24_arg with
+          | None1 -> error_g75 lit_204_161'24_g85 k
           | Some0(n_t1) ->
             let k = [n_t1], fun [n_f1] res_arg ->
               let k = [res_arg], fun [res_f1] __arg ->
                 let k = [res_f1], fun [res_f1] __arg ->
                   let k = [], fun [] __arg ->
-                    let con_200_166'19_t1 = Unit0 in
-                    newline_g58 con_200_166'19_t1 k in
+                    let con_206_167'19_t1 = Unit0 in
+                    newline_g58 con_206_167'19_t1 k in
                   put_int_g56 res_f1 k in
-                put_string_g55 lit_199_164'22_g86 k in
+                put_string_g55 lit_205_165'22_g86 k in
               put_int_g56 n_f1 k in
             fact_g73 n_t1 k in
         parse_num_g36 arg1_t1 k in
-  put_string_g55 lit_194_152'13_g82 k in
-let lit_204_169'48_g88 = 'o' in
-let lit_205_169'57_g89 = '*' in
-let lam_201_169'30_g90 = fun c_arg k ->
-  let k = [c_arg], fun [c_f1] app_202_169'48_arg ->
-    match app_202_169'48_arg with
-    | true1 -> k lit_205_169'57_g89
+  put_string_g55 lit_200_153'13_g82 k in
+let lit_209_170'26_g88 = 4 in
+let lit_219_182'18_g89 = "rev: expected no arguments" in
+let lit_220_184'24_g90 = "(reverse typed lines until ^D)" in
+let lit_225_188'48_g91 = 'o' in
+let lit_226_188'57_g92 = '*' in
+let lam_222_188'30_g93 = fun c_arg k ->
+  let k = [c_arg], fun [c_f1] app_223_188'48_arg ->
+    match app_223_188'48_arg with
+    | true1 -> k lit_226_188'57_g92
     | false0 -> k c_f1 in
-  let k = [], fun [] app_203_169'46_arg -> app_203_169'46_arg lit_204_169'48_g88 k in
+  let k = [], fun [] app_224_188'46_arg -> app_224_188'46_arg lit_225_188'48_g91 k in
   eq_char_g8 c_arg k in
-let lit_209_171'29_g91 = "You wrote: " in
-let lit_211_172'11_g92 = ' ' in
-let lit_212_173'11_g93 = '{' in
-let lit_213_175'11_g94 = '}' in
-let fallback_g95 = fun line_arg k ->
+let lit_230_190'29_g94 = "You wrote: " in
+let lit_232_191'11_g95 = ' ' in
+let lit_233_192'11_g96 = '{' in
+let lit_234_194'11_g97 = '}' in
+let fallback_g98 = fun line_arg k ->
   let k = [line_arg], fun [line_f1] star_the_ohs_arg ->
     let k = [line_f1,star_the_ohs_arg], fun [line_f1,star_the_ohs_f2] n_arg ->
       let k = [n_arg], fun [n_f1] __arg ->
@@ -519,110 +539,164 @@ let fallback_g95 = fun line_arg k ->
           let k = [n_f1], fun [n_f1] __arg ->
             let k = [], fun [] __arg ->
               let k = [], fun [] __arg ->
-                let con_214_176'10_t1 = Unit0 in
-                newline_g58 con_214_176'10_t1 k in
-              put_char_g25 lit_213_175'11_g94 k in
+                let con_235_195'10_t1 = Unit0 in
+                newline_g58 con_235_195'10_t1 k in
+              put_char_g25 lit_234_194'11_g97 k in
             put_int_g56 n_f1 k in
-          put_char_g25 lit_212_173'11_g93 k in
-        put_char_g25 lit_211_172'11_g92 k in
-      let k = [], fun [] app_206_171'44_arg -> put_chars_g54 app_206_171'44_arg k in
-      let k = [line_f1,star_the_ohs_f2], fun [line_f1,star_the_ohs_f2] app_207_171'20_arg ->
-        let k = [app_207_171'20_arg], fun [app_207_171'20_f1] app_210_171'58_arg -> app_207_171'20_f1 app_210_171'58_arg k in
+          put_char_g25 lit_233_192'11_g96 k in
+        put_char_g25 lit_232_191'11_g95 k in
+      let k = [], fun [] app_227_190'44_arg -> put_chars_g54 app_227_190'44_arg k in
+      let k = [line_f1,star_the_ohs_f2], fun [line_f1,star_the_ohs_f2] app_228_190'20_arg ->
+        let k = [app_228_190'20_arg], fun [app_228_190'20_f1] app_231_190'58_arg -> app_228_190'20_f1 app_231_190'58_arg k in
         star_the_ohs_f2 line_f1 k in
-      let k = [], fun [] app_208_171'29_arg -> append_g40 app_208_171'29_arg k in
-      explode_g11 lit_209_171'29_g91 k in
+      let k = [], fun [] app_229_190'29_arg -> append_g40 app_229_190'29_arg k in
+      explode_g11 lit_230_190'29_g94 k in
     length_g46 line_f1 k in
-  map_g43 lam_201_169'30_g90 k in
-let lit_220_184'20_g96 = ' ' in
-let loop_g97 = fun loop_me accWs_arg k ->
-  let lam_232_179'21_t1 = [accWs_arg,loop_me], fun [accWs_f1,loop_f2] accCs_arg k ->
-    let lam_231_179'27_t1 = [accCs_arg,accWs_f1,loop_f2], fun [accCs_f1,accWs_f2,loop_f3] xs_arg k ->
+  map_g43 lam_222_188'30_g93 k in
+let lit_241_203'20_g99 = ' ' in
+let loop_g100 = fun loop_me accWs_arg k ->
+  let lam_253_198'21_t1 = [accWs_arg,loop_me], fun [accWs_f1,loop_f2] accCs_arg k ->
+    let lam_252_198'27_t1 = [accCs_arg,accWs_f1,loop_f2], fun [accCs_f1,accWs_f2,loop_f3] xs_arg k ->
       match xs_arg with
       | Nil0 ->
-        let k = [], fun [] app_215_181'38_arg -> reverse_g42 app_215_181'38_arg k in
-        let k = [accWs_f2], fun [accWs_f1] app_216_181'35_arg -> app_216_181'35_arg accWs_f1 k in
-        let k = [], fun [] app_217_181'29_arg -> ::_g14 app_217_181'29_arg k in
+        let k = [], fun [] app_236_200'38_arg -> reverse_g42 app_236_200'38_arg k in
+        let k = [accWs_f2], fun [accWs_f1] app_237_200'35_arg -> app_237_200'35_arg accWs_f1 k in
+        let k = [], fun [] app_238_200'29_arg -> ::_g14 app_238_200'29_arg k in
         reverse_g42 accCs_f1 k
       | Cons1(x_t1,xs_t2) ->
-        let k = [accCs_f1,accWs_f2,loop_f3,x_t1,xs_t2], fun [accCs_f1,accWs_f2,loop_f3,x_f4,xs_f5] app_218_184'20_arg ->
-          match app_218_184'20_arg with
+        let k = [accCs_f1,accWs_f2,loop_f3,x_t1,xs_t2], fun [accCs_f1,accWs_f2,loop_f3,x_f4,xs_f5] app_239_203'20_arg ->
+          match app_239_203'20_arg with
           | true1 ->
-            let k = [xs_f5], fun [xs_f1] app_221_184'59_arg -> app_221_184'59_arg xs_f1 k in
-            let k = [], fun [] app_222_184'34_arg ->
-              let con_226_184'59_t1 = Nil0 in
-              app_222_184'34_arg con_226_184'59_t1 k in
-            let k = [loop_f3], fun [loop_f1] app_223_184'52_arg -> loop_f1 app_223_184'52_arg k in
-            let k = [accWs_f2], fun [accWs_f1] app_224_184'49_arg -> app_224_184'49_arg accWs_f1 k in
-            let k = [], fun [] app_225_184'43_arg -> ::_g14 app_225_184'43_arg k in
+            let k = [xs_f5], fun [xs_f1] app_242_203'59_arg -> app_242_203'59_arg xs_f1 k in
+            let k = [], fun [] app_243_203'34_arg ->
+              let con_247_203'59_t1 = Nil0 in
+              app_243_203'34_arg con_247_203'59_t1 k in
+            let k = [loop_f3], fun [loop_f1] app_244_203'52_arg -> loop_f1 app_244_203'52_arg k in
+            let k = [accWs_f2], fun [accWs_f1] app_245_203'49_arg -> app_245_203'49_arg accWs_f1 k in
+            let k = [], fun [] app_246_203'43_arg -> ::_g14 app_246_203'43_arg k in
             reverse_g42 accCs_f1 k
           | false0 ->
-            let k = [xs_f5], fun [xs_f1] app_227_185'23_arg -> app_227_185'23_arg xs_f1 k in
-            let k = [accCs_f1,x_f4], fun [accCs_f1,x_f2] app_228_185'17_arg ->
-              let k = [app_228_185'17_arg], fun [app_228_185'17_f1] app_229_185'27_arg -> app_228_185'17_f1 app_229_185'27_arg k in
-              let k = [accCs_f1], fun [accCs_f1] app_230_185'25_arg -> app_230_185'25_arg accCs_f1 k in
+            let k = [xs_f5], fun [xs_f1] app_248_204'23_arg -> app_248_204'23_arg xs_f1 k in
+            let k = [accCs_f1,x_f4], fun [accCs_f1,x_f2] app_249_204'17_arg ->
+              let k = [app_249_204'17_arg], fun [app_249_204'17_f1] app_250_204'27_arg -> app_249_204'17_f1 app_250_204'27_arg k in
+              let k = [accCs_f1], fun [accCs_f1] app_251_204'25_arg -> app_251_204'25_arg accCs_f1 k in
               ::_g14 x_f2 k in
             loop_f3 accWs_f2 k in
-        let k = [], fun [] app_219_184'18_arg -> app_219_184'18_arg lit_220_184'20_g96 k in
+        let k = [], fun [] app_240_203'18_arg -> app_240_203'18_arg lit_241_203'20_g99 k in
         eq_char_g8 x_t1 k in
-    k lam_231_179'27_t1 in
-  k lam_232_179'21_t1 in
-let split_words_g98 = fun s_arg k ->
-  let k = [s_arg], fun [s_f1] app_233_187'10_arg -> app_233_187'10_arg s_f1 k in
-  let k = [], fun [] app_234_187'7_arg ->
-    let con_236_187'10_t1 = Nil0 in
-    app_234_187'7_arg con_236_187'10_t1 k in
-  let con_235_187'7_t1 = Nil0 in
-  loop_g97 con_235_187'7_t1 k in
-let lit_241_194'38_g99 = "fib" in
-let lit_245_195'40_g100 = "fact" in
-let execute_g101 = fun line_arg k ->
-  let k = [line_arg], fun [line_f1] words_arg ->
-    match words_arg with
+    k lam_252_198'27_t1 in
+  k lam_253_198'21_t1 in
+let split_words_g101 = fun s_arg k ->
+  let k = [s_arg], fun [s_f1] app_254_206'10_arg -> app_254_206'10_arg s_f1 k in
+  let k = [], fun [] app_255_206'7_arg ->
+    let con_257_206'10_t1 = Nil0 in
+    app_255_206'7_arg con_257_206'10_t1 k in
+  let con_256_206'7_t1 = Nil0 in
+  loop_g100 con_256_206'7_t1 k in
+let lit_262_213'38_g102 = "fib" in
+let lit_266_214'40_g103 = "fact" in
+let lit_270_215'42_g104 = "rev" in
+let lit_271_219'11_g105 = '>' in
+let lit_272_220'11_g106 = ' ' in
+let lit_278_225'28_g107 = "LOAD" in
+let lit_279_228'21_g108 = "RUN" in
+let lit_281_230'21_g109 = "EXIT" in
+let k = [], fun [] single_controlD_arg ->
+  let rev_t1 = [single_controlD_arg], fun [single_controlD_f1] __arg k ->
+    let loop_t1 = [single_controlD_f1], fun [single_controlD_f1] loop_me __arg k ->
+      let k = [loop_me,single_controlD_f1], fun [loop_f1,single_controlD_f2] xs_arg ->
+        let k = [loop_f1,xs_arg], fun [loop_f1,xs_f2] app_212_175'23_arg ->
+          match app_212_175'23_arg with
+          | true1 ->
+            let con_214_175'44_t1 = Unit0 in
+            k con_214_175'44_t1
+          | false0 ->
+            let k = [loop_f1], fun [loop_f1] __arg ->
+              let k = [loop_f1], fun [loop_f1] __arg ->
+                let con_217_176'46_t1 = Unit0 in
+                loop_f1 con_217_176'46_t1 k in
+              let con_216_176'38_t1 = Unit0 in
+              newline_g58 con_216_176'38_t1 k in
+            let k = [], fun [] app_215_176'26_arg -> put_chars_g54 app_215_176'26_arg k in
+            reverse_g42 xs_f2 k in
+        let k = [single_controlD_f2], fun [single_controlD_f1] app_213_175'20_arg -> app_213_175'20_arg single_controlD_f1 k in
+        eq_char_list_g39 xs_arg k in
+      let con_211_174'23_t1 = Unit0 in
+      read_line_g65 con_211_174'23_t1 k in
+    let con_218_178'6_t2 = Unit0 in
+    loop_t1 con_218_178'6_t2 k in
+  let runrev_t2 = [rev_t1], fun [rev_f1] args_arg k ->
+    match args_arg with
+    | Cons1(__t1,__t2) -> error_g75 lit_219_182'18_g89 k
     | Nil0 ->
-      let con_237_192'10_t1 = Unit0 in
-      k con_237_192'10_t1
-    | Cons1(command_t1,args_t2) ->
-      let k = [args_t2,command_t1,line_f1], fun [args_f1,command_f2,line_f3] app_238_194'29_arg ->
-        match app_238_194'29_arg with
-        | true1 -> runfib_g81 args_f1 k
-        | false0 ->
-          let k = [args_f1,line_f3], fun [args_f1,line_f2] app_242_195'31_arg ->
-            match app_242_195'31_arg with
-            | true1 -> runfact_g87 args_f1 k
-            | false0 -> fallback_g95 line_f2 k in
-          let k = [], fun [] app_243_195'23_arg ->
-            let k = [app_243_195'23_arg], fun [app_243_195'23_f1] app_244_195'40_arg -> app_243_195'23_f1 app_244_195'40_arg k in
-            explode_g11 lit_245_195'40_g100 k in
-          eq_char_list_g39 command_f2 k in
-      let k = [], fun [] app_239_194'21_arg ->
-        let k = [app_239_194'21_arg], fun [app_239_194'21_f1] app_240_194'38_arg -> app_239_194'21_f1 app_240_194'38_arg k in
-        explode_g11 lit_241_194'38_g99 k in
-      eq_char_list_g39 command_t1 k in
-  split_words_g98 line_arg k in
-let lit_246_199'11_g102 = '>' in
-let lit_247_200'11_g103 = ' ' in
-let mainloop_g104 = fun mainloop_me __arg k ->
-  let k = [mainloop_me], fun [mainloop_f1] __arg ->
-    let k = [mainloop_f1], fun [mainloop_f1] __arg ->
-      let k = [mainloop_f1], fun [mainloop_f1] xs_arg ->
-        let k = [mainloop_f1], fun [mainloop_f1] __arg ->
-          let con_249_203'11_t1 = Unit0 in
-          mainloop_f1 con_249_203'11_t1 k in
-        execute_g101 xs_arg k in
-      let con_248_201'21_t1 = Unit0 in
-      read_line_g65 con_248_201'21_t1 k in
-    put_char_g25 lit_247_200'11_g103 k in
-  put_char_g25 lit_246_199'11_g102 k in
-let lit_250_205'28_g105 = "LOAD" in
-let lit_251_208'21_g106 = "RUN" in
-let lit_253_210'21_g107 = "NEVER" in
-let main_g108 = fun __arg k ->
-  let k = [], fun [] __arg ->
-    let k = [], fun [] __arg -> put_string_newline_g59 lit_253_210'21_g107 k in
-    let con_252_209'20_t1 = Unit0 in
-    mainloop_g104 con_252_209'20_t1 k in
-  put_string_newline_g59 lit_251_208'21_g106 k in
-let k = [], fun [] __arg ->
-  let con_254_0'0_t1 = Unit0 in
-  main_g108 con_254_0'0_t1 k in
-put_string_newline_g59 lit_250_205'28_g105 k
+      let k = [rev_f1], fun [rev_f1] __arg ->
+        let con_221_185'8_t1 = Unit0 in
+        rev_f1 con_221_185'8_t1 k in
+      put_string_newline_g59 lit_220_184'24_g90 k in
+  let execute_t3 = [runrev_t2], fun [runrev_f1] line_arg k ->
+    let k = [line_arg,runrev_f1], fun [line_f1,runrev_f2] words_arg ->
+      match words_arg with
+      | Nil0 ->
+        let con_258_211'10_t1 = Unit0 in
+        k con_258_211'10_t1
+      | Cons1(command_t1,args_t2) ->
+        let k = [args_t2,command_t1,line_f1,runrev_f2], fun [args_f1,command_f2,line_f3,runrev_f4] app_259_213'29_arg ->
+          match app_259_213'29_arg with
+          | true1 -> runfib_g81 args_f1 k
+          | false0 ->
+            let k = [args_f1,command_f2,line_f3,runrev_f4], fun [args_f1,command_f2,line_f3,runrev_f4] app_263_214'31_arg ->
+              match app_263_214'31_arg with
+              | true1 -> runfact_g87 args_f1 k
+              | false0 ->
+                let k = [args_f1,line_f3,runrev_f4], fun [args_f1,line_f2,runrev_f3] app_267_215'33_arg ->
+                  match app_267_215'33_arg with
+                  | true1 -> runrev_f3 args_f1 k
+                  | false0 -> fallback_g98 line_f2 k in
+                let k = [], fun [] app_268_215'25_arg ->
+                  let k = [app_268_215'25_arg], fun [app_268_215'25_f1] app_269_215'42_arg -> app_268_215'25_f1 app_269_215'42_arg k in
+                  explode_g11 lit_270_215'42_g104 k in
+                eq_char_list_g39 command_f2 k in
+            let k = [], fun [] app_264_214'23_arg ->
+              let k = [app_264_214'23_arg], fun [app_264_214'23_f1] app_265_214'40_arg -> app_264_214'23_f1 app_265_214'40_arg k in
+              explode_g11 lit_266_214'40_g103 k in
+            eq_char_list_g39 command_f2 k in
+        let k = [], fun [] app_260_213'21_arg ->
+          let k = [app_260_213'21_arg], fun [app_260_213'21_f1] app_261_213'38_arg -> app_260_213'21_f1 app_261_213'38_arg k in
+          explode_g11 lit_262_213'38_g102 k in
+        eq_char_list_g39 command_t1 k in
+    split_words_g101 line_arg k in
+  let mainloop_t4 = [execute_t3,single_controlD_arg], fun [execute_f1,single_controlD_f2] mainloop_me __arg k ->
+    let k = [execute_f1,mainloop_me,single_controlD_f2], fun [execute_f1,mainloop_f2,single_controlD_f3] __arg ->
+      let k = [execute_f1,mainloop_f2,single_controlD_f3], fun [execute_f1,mainloop_f2,single_controlD_f3] __arg ->
+        let k = [execute_f1,mainloop_f2,single_controlD_f3], fun [execute_f1,mainloop_f2,single_controlD_f3] xs_arg ->
+          let k = [execute_f1,mainloop_f2,xs_arg], fun [execute_f1,mainloop_f2,xs_f3] app_274_222'21_arg ->
+            match app_274_222'21_arg with
+            | true1 ->
+              let con_276_222'42_t1 = Unit0 in
+              k con_276_222'42_t1
+            | false0 ->
+              let k = [mainloop_f2], fun [mainloop_f1] __arg ->
+                let con_277_223'26_t1 = Unit0 in
+                mainloop_f1 con_277_223'26_t1 k in
+              execute_f1 xs_f3 k in
+          let k = [single_controlD_f3], fun [single_controlD_f1] app_275_222'18_arg -> app_275_222'18_arg single_controlD_f1 k in
+          eq_char_list_g39 xs_arg k in
+        let con_273_221'21_t1 = Unit0 in
+        read_line_g65 con_273_221'21_t1 k in
+      put_char_g25 lit_272_220'11_g106 k in
+    put_char_g25 lit_271_219'11_g105 k in
+  let k = [mainloop_t4], fun [mainloop_f1] __arg ->
+    let main_t1 = [mainloop_f1], fun [mainloop_f1] __arg k ->
+      let k = [mainloop_f1], fun [mainloop_f1] __arg ->
+        let k = [], fun [] __arg -> put_string_newline_g59 lit_281_230'21_g109 k in
+        let con_280_229'20_t1 = Unit0 in
+        mainloop_f1 con_280_229'20_t1 k in
+      put_string_newline_g59 lit_279_228'21_g108 k in
+    let con_282_0'0_t2 = Unit0 in
+    main_t1 con_282_0'0_t2 k in
+  put_string_newline_g59 lit_278_225'28_g107 k in
+let k = [], fun [] app_207_170'28_arg ->
+  let con_210_170'31_t1 = Nil0 in
+  app_207_170'28_arg con_210_170'31_t1 k in
+let k = [], fun [] app_208_170'26_arg -> ::_g14 app_208_170'26_arg k in
+chr_g10 lit_209_170'26_g88 k

@@ -1,4 +1,7 @@
 
+(* TODO: reset terminal when we exit *)
+(* TODO: share this setup code across all examples *)
+
 let init_terminal_no_buffering () =
   let open Unix in
   if isatty stdin then
@@ -11,4 +14,5 @@ let () =
   Printf.printf "[ocaml]\n";
   init_terminal_no_buffering();
   let module M = Example_lib.Shell.F() in
-  M.main()
+  M.main();
+  Printf.printf "[HALT]\n"

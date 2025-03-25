@@ -98,16 +98,17 @@ let put_int i = put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
 
-let put_string_newline s =
+let put_string_newline s = (* TODO: kill when we support \n in string literals *)
   put_string s;
   newline ()
 
 let read_line () =
+  let controlD = chr 4 in
   let rec loop acc =
     let c = get_char () in
     let n = ord c in
     if eq_char c '\n' then (newline(); reverse acc) else
-      (*if n <= 31 then loop acc else*)
+      if eq_char c controlD then (put_char c; newline(); reverse (controlD :: acc)) else
         if n > 127 then loop acc else
           if n = 127 then
             match acc with
@@ -165,6 +166,24 @@ let runfact args =
            put_int res;
            newline ()
 
+
+let single_controlD = chr 4 :: []
+
+let rev() =
+  let rec loop() =
+    let xs = read_line () in
+    if eq_char_list xs single_controlD then () else
+      (put_chars (reverse xs); newline(); loop())
+  in
+  loop()
+
+let runrev args =
+  match args with
+  | _::_ -> error "rev: expected no arguments"
+  | [] ->
+     put_string_newline "(reverse typed lines until ^D)";
+     rev()
+
 let fallback line =
   let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c) in
   let n = length line in
@@ -193,18 +212,19 @@ let execute line =
   | command::args ->
      if eq_char_list command (explode "fib") then runfib args else
        if eq_char_list command (explode "fact") then runfact args else
-         fallback line
+         if eq_char_list command (explode "rev") then runrev args else
+           fallback line
 
 let rec mainloop () =
   put_char '>';
   put_char ' ';
   let xs = read_line () in
-  execute xs;
-  mainloop ()
+  if eq_char_list xs single_controlD then () else
+    (execute xs; mainloop ())
 
 let () = put_string_newline "LOAD"
 
 let main () =
   put_string_newline "RUN";
   let () = mainloop () in
-  put_string_newline "NEVER"
+  put_string_newline "EXIT"

@@ -120,6 +120,7 @@ let put_string_newline = (fun s ->
   let _ = (put_string s) in
   (newline Unit)) in
 let read_line = (fun _ ->
+  let controlD = (chr 4) in
   let loop = fix (fun loop acc ->
     let c = (get_char Unit) in
     let n = (ord c) in
@@ -128,22 +129,28 @@ let read_line = (fun _ ->
       let _ = (newline Unit) in
       (reverse acc)
     | false ->
-      match ((> n) 127) with
-      | true -> (loop acc)
+      match ((eq_char c) controlD) with
+      | true ->
+        let _ = (put_char c) in
+        let _ = (newline Unit) in
+        (reverse ((:: controlD) acc))
       | false ->
-        match ((= n) 127) with
-        | true ->
-          match acc with
-          | Nil -> (loop acc)
-          | Cons(c,tail) ->
-            let _ = match ((<= (ord c)) 26) with
-            | true -> (erase_char Unit)
-            | false -> Unit in
-            let _ = (erase_char Unit) in
-            (loop tail)
+        match ((> n) 127) with
+        | true -> (loop acc)
         | false ->
-          let _ = (put_char c) in
-          (loop ((cons c) acc))) in
+          match ((= n) 127) with
+          | true ->
+            match acc with
+            | Nil -> (loop acc)
+            | Cons(c,tail) ->
+              let _ = match ((<= (ord c)) 26) with
+              | true -> (erase_char Unit)
+              | false -> Unit in
+              let _ = (erase_char Unit) in
+              (loop tail)
+          | false ->
+            let _ = (put_char c) in
+            (loop ((cons c) acc))) in
   (loop Nil)) in
 let fib = fix (fun fib n ->
   match ((< n) 2) with
@@ -189,6 +196,23 @@ let runfact = (fun args ->
         let _ = (put_string " --> ") in
         let _ = (put_int res) in
         (newline Unit)) in
+let single_controlD = ((:: (chr 4)) Nil) in
+let rev = (fun _ ->
+  let loop = fix (fun loop _ ->
+    let xs = (read_line Unit) in
+    match ((eq_char_list xs) single_controlD) with
+    | true -> Unit
+    | false ->
+      let _ = (put_chars (reverse xs)) in
+      let _ = (newline Unit) in
+      (loop Unit)) in
+  (loop Unit)) in
+let runrev = (fun args ->
+  match args with
+  | Cons(_,_) -> (error "rev: expected no arguments")
+  | Nil ->
+    let _ = (put_string_newline "(reverse typed lines until ^D)") in
+    (rev Unit)) in
 let fallback = (fun line ->
   let star_the_ohs = (map
   (fun c ->
@@ -223,15 +247,21 @@ let execute = (fun line ->
     | false ->
       match ((eq_char_list command) (explode "fact")) with
       | true -> (runfact args)
-      | false -> (fallback line)) in
+      | false ->
+        match ((eq_char_list command) (explode "rev")) with
+        | true -> (runrev args)
+        | false -> (fallback line)) in
 let mainloop = fix (fun mainloop _ ->
   let _ = (put_char '>') in
   let _ = (put_char ' ') in
   let xs = (read_line Unit) in
-  let _ = (execute xs) in
-  (mainloop Unit)) in
+  match ((eq_char_list xs) single_controlD) with
+  | true -> Unit
+  | false ->
+    let _ = (execute xs) in
+    (mainloop Unit)) in
 let _ = (put_string_newline "LOAD") in
 let main = (fun _ ->
   let _ = (put_string_newline "RUN") in
   let _ = (mainloop Unit) in
-  (put_string_newline "NEVER")) in
+  (put_string_newline "EXIT")) in
