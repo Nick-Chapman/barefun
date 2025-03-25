@@ -33,7 +33,11 @@ data Exp
 data Arm = Arm Cid [Id] Exp
 data Cid = Cid String deriving (Eq,Ord)
 data Literal = LitC Char | LitN Word16 | LitS String
-data Id = Id String deriving (Eq,Ord)
+
+data Id = Id
+  { optUniqueForGeneratedNames :: Maybe Int
+  , userGivenName :: String
+  } deriving (Eq,Ord)
 
 cUnit,cFalse,cTrue,cNil,cCons :: Cid
 cUnit = Cid "Unit"
@@ -48,12 +52,7 @@ cCons = Cid "Cons"
 instance Show Prog where show (Prog defs) = intercalate "\n" (map show defs)
 instance Show Def where show = intercalate "\n" . prettyDef
 instance Show Exp where show = intercalate "\n" . pretty
-
-instance Show Id where
-  show (Id s) =
-    case s of
-      "*" -> "( * )" -- TODO: all infixes
-      s -> s
+instance Show Id where show = prettyId
 
 instance Show Cid where show (Cid s) = s
 instance Show Literal where
@@ -61,6 +60,14 @@ instance Show Literal where
     LitC c -> show c
     LitN n -> show n
     LitS s -> show s
+
+prettyId :: Id -> String
+prettyId Id{userGivenName,optUniqueForGeneratedNames} =
+  maybeTag (maybeBracket userGivenName)
+  where
+    maybeTag s = case optUniqueForGeneratedNames of Nothing -> s; Just n -> printf "%s%d" s n
+    maybeBracket s = if needBracket s then printf "( %s )" s else s
+    needBracket = \case "*" -> True; _ -> False -- TODO: all infixes?
 
 prettyDef :: Def -> Lines
 prettyDef = \case
@@ -115,7 +122,7 @@ mainApp :: Exp
 mainApp = App main noPos (Con cUnit [])
   where
     noPos = Position 0 0
-    main = Var Nothing (Id "main")
+    main = Var Nothing (Id Nothing "main")
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
 evals env es k = case es of

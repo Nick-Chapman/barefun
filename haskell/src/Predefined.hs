@@ -7,7 +7,7 @@ import Stage0 (Prog(..),Def(..),Exp(..),Id(..), cCons)
 
 wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =
-  Prog ([ ValDef (Id name) exp | (name,exp) <- bindings ] ++ defs)
+  Prog ([ ValDef (Id Nothing name) exp | (name,exp) <- bindings ] ++ defs)
   where
     bindings :: [(String,Exp)]
     bindings =
@@ -32,5 +32,5 @@ wrapPreDefs (Prog defs) =
         construct2 c2 = Lam x (Lam y (Con c2 [ex,ey]))
         ex = Var Nothing x
         ey = Var Nothing y
-        x = Id "x"
-        y = Id "y"
+        x = Id Nothing "x"
+        y = Id Nothing "y"

@@ -235,7 +235,7 @@ runM m0 = loop 1 m0 $ \_ x -> x
     loop u m k = case m of
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
-      Fresh tag -> k (u+1) (Id (printf "%s%d" tag u))
+      Fresh tag -> k (u+1) (Id (Just u) tag)
 
 
 ----------------------------------------------------------------------

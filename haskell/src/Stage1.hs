@@ -155,7 +155,7 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
     mainApp = App main noPos (ConTag (Ctag cUnit tUnit) [])
 
     noPos = Position 0 0
-    main = Var Nothing (SRC.Id "main")
+    main = Var Nothing (SRC.Id Nothing "main")
 
 transExp :: Cenv -> SRC.Exp -> Exp
 transExp cenv e = trans e
