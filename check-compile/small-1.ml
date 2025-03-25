@@ -12,11 +12,11 @@ let chr = (fun x -> PRIM_CharChr(x)) in
 let explode = (fun x -> PRIM_Explode(x)) in
 let put_char = (fun x -> PRIM_PutChar(x)) in
 let get_char = (fun x -> PRIM_GetChar(x)) in
-let :: = (fun x -> (fun y -> Tag_1(x, y))) in
+let :: = (fun x -> (fun y -> Cons1(x, y))) in
 let put_chars = fix (fun put_chars xs ->
   match xs with
-  | Tag_0 -> Tag_0
-  | Tag_1(x,xsMore) ->
+  | Nil0 -> Unit0
+  | Cons1(x,xsMore) ->
     let _ = (put_char x) in
     (put_chars xsMore)) in
 let put_string = (fun s -> (put_chars (explode s))) in
@@ -24,25 +24,25 @@ let reverse = (fun ysStart ->
   let revloop = fix (fun revloop acc ->
     (fun ys ->
       match ys with
-      | Tag_0 -> acc
-      | Tag_1(y,ysMore) -> ((revloop ((:: y) acc)) ysMore))) in
-  ((revloop Tag_0) ysStart)) in
+      | Nil0 -> acc
+      | Cons1(y,ysMore) -> ((revloop ((:: y) acc)) ysMore))) in
+  ((revloop Nil0) ysStart)) in
 let newline = (fun _ -> (put_char '\n')) in
 let read_line = (fun _ ->
   let readloop = fix (fun readloop sofar ->
-    let theChar = (get_char Tag_0) in
+    let theChar = (get_char Unit0) in
     let gotten = theChar in
     match ((eq_char gotten) '\n') with
-    | Tag_1 ->
-      let _ = (newline Tag_0) in
+    | true1 ->
+      let _ = (newline Unit0) in
       (reverse sofar)
-    | Tag_0 ->
+    | false0 ->
       let _ = (put_char gotten) in
       (readloop ((:: gotten) sofar))) in
-  (readloop Tag_0)) in
+  (readloop Nil0)) in
 let main = fix (fun main _ ->
   let _ = (put_string "> ") in
-  let _ = (put_chars (read_line Tag_0)) in
-  let _ = (newline Tag_0) in
-  (main Tag_0)) in
-(main Tag_0)
+  let _ = (put_chars (read_line Unit0)) in
+  let _ = (newline Unit0) in
+  (main Unit0)) in
+(main Unit0)

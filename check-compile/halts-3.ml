@@ -15,12 +15,12 @@ let main_g6 = fun __arg k ->
       let k = [], fun [] __arg ->
         let k = [], fun [] __arg -> put_char_g1 u30_g5 k in
         let k = [], fun [] u28_arg -> put_char_g1 u28_arg k in
-        let u29_t1 = Tag_0 in
+        let u29_t1 = Unit0 in
         get_char_g2 u29_t1 k in
       put_char_g1 u27_g4 k in
     let k = [], fun [] u25_arg -> put_char_g1 u25_arg k in
-    let u26_t1 = Tag_0 in
+    let u26_t1 = Unit0 in
     get_char_g2 u26_t1 k in
   put_char_g1 u24_g3 k in
-let u31_t1 = Tag_0 in
+let u31_t1 = Unit0 in
 main_g6 u31_t1 k

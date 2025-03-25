@@ -12,10 +12,10 @@ let chr = (fun x -> PRIM_CharChr(x)) in
 let explode = (fun x -> PRIM_Explode(x)) in
 let put_char = (fun x -> PRIM_PutChar(x)) in
 let get_char = (fun x -> PRIM_GetChar(x)) in
-let :: = (fun x -> (fun y -> Tag_1(x, y))) in
+let :: = (fun x -> (fun y -> Cons1(x, y))) in
 let main = let mainloop = fix (fun mainloop _ ->
-  let gotten = (get_char Tag_0) in
+  let gotten = (get_char Unit0) in
   let _ = (put_char gotten) in
-  (mainloop Tag_0)) in
+  (mainloop Unit0)) in
 mainloop in
-(main Tag_0)
+(main Unit0)

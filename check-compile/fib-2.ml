@@ -57,7 +57,7 @@ let get_char = fun[] x k ->
   k v21 in
 let :: = fun[] x k ->
   let v23 = fun[x] y k ->
-    let v22 = Tag_1[x,y] in
+    let v22 = Cons1[x,y] in
     k v22 in
   k v23 in
 let chars_of_int = fun[%,+,/,::,=,chr,ord] i k ->
@@ -70,8 +70,8 @@ let chars_of_int = fun[%,+,/,::,=,chr,ord] i k ->
       let v40 = fun[%,/,::,=,acc,char_of_digit,loop] i k ->
         let k [%,/,::,acc,char_of_digit,i,loop] u27 =
           match u27 with
-          | Tag_1 -> k acc
-          | Tag_0 ->
+          | true1 -> k acc
+          | false0 ->
             let k [/,i] u30 =
               let k [u30] u37 = u30 u37 k in
               let k [] u38 =
@@ -93,15 +93,15 @@ let chars_of_int = fun[%,+,/,::,=,chr,ord] i k ->
       k v40) in
     let k [::,i,loop] u41 =
       match u41 with
-      | Tag_1 ->
+      | true1 ->
         let k [] u44 =
-          let u46 = Tag_0 in
+          let u46 = Nil0 in
           u44 u46 k in
         let u45 = '0' in
         :: u45 k
-      | Tag_0 ->
+      | false0 ->
         let k [i] u47 = u47 i k in
-        let u48 = Tag_0 in
+        let u48 = Nil0 in
         loop u48 k in
     let k [] u42 =
       let u43 = 0 in
@@ -111,10 +111,10 @@ let chars_of_int = fun[%,+,/,::,=,chr,ord] i k ->
   ord u24 k in
 let put_chars = fix (fun[put_char] put_chars xs k ->
   match xs with
-  | Tag_0 ->
-    let v49 = Tag_0 in
+  | Nil0 ->
+    let v49 = Unit0 in
     k v49
-  | Tag_1(x,xs) ->
+  | Cons1(x,xs) ->
     let k [put_chars,xs] _ = put_chars xs k in
     put_char x k) in
 let put_string = fun[explode,put_chars] s k ->
@@ -129,8 +129,8 @@ let newline = fun[put_char] _ k ->
 let fib = fix (fun[+,-,<] fib n k ->
   let k [+,-,fib,n] u53 =
     match u53 with
-    | Tag_1 -> k n
-    | Tag_0 ->
+    | true1 -> k n
+    | false0 ->
       let k [-,fib,n] u56 =
         let k [u56] u61 = u56 u61 k in
         let k [fib] u62 = fib u62 k in
@@ -154,7 +154,7 @@ let runfib = fun[fib,newline,put_int,put_string] n k ->
       let k [newline,put_int,put_string,res] _ =
         let k [newline,put_int,res] _ =
           let k [newline] _ =
-            let u67 = Tag_0 in
+            let u67 = Unit0 in
             newline u67 k in
           put_int res k in
         let u66 = " --> " in
@@ -166,5 +166,5 @@ let runfib = fun[fib,newline,put_int,put_string] n k ->
 let main = fun[runfib] _ k ->
   let u68 = 20 in
   runfib u68 k in
-let u69 = Tag_0 in
+let u69 = Unit0 in
 main u69 k

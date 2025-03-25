@@ -106,7 +106,7 @@ evalCode env = \case
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
             [] -> error "case match failure"
-            ArmTag (Ctag tag) xs body : arms -> do
+            ArmTag (Ctag _ tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
                   let env' = foldr (uncurry insert) env (zip xs vArgs)
@@ -119,7 +119,7 @@ evalCode env = \case
     evalA = \case
       Lit literal -> \k -> k (evalLit literal)
       Prim b xs -> \k -> evalBuiltin b (map look xs) k
-      ConTag (Ctag tag) xs -> \k -> k (VCons tag (map look xs))
+      ConTag (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
       Lam fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
       RecLam fvs f x body -> \k -> do

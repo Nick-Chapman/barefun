@@ -178,7 +178,7 @@ evalCode genv env = \case
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
             [] -> error "case match failure"
-            ArmTag (Ctag tag) xs body : arms -> do
+            ArmTag (Ctag _ tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
                   let env' = foldr (uncurry insert) env (zip xs vArgs)
@@ -191,7 +191,7 @@ evalCode genv env = \case
     evalA = \case
       Lit literal -> \k -> k (evalLit literal)
       Prim b xs -> \k -> evalBuiltin b (map look xs) k
-      ConTag (Ctag tag) xs -> \k -> k (VCons tag (map look xs))
+      ConTag (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
 
       Lam pre _ x body -> \k -> do
         let env = mkFrameEnv genv look pre
@@ -351,28 +351,3 @@ runM m0 = loop firstGlobalIndex m0 $ \_ x -> x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
       Wrap f m -> f (loop u m k)
       GlobalRef x -> k (u+1) (Ref x (Global u))
-
-
---fvs :: Loadable -> Set Id
---fvs = undefined
-
-{-
-fvs :: Code -> Set Id
-fvs = \case
-  Return x -> singleton x
-  Tail x1 _ x2 -> Set.fromList [x1,x2]
-  LetAlias x y body -> singleton y `union` (fvs body \\ singleton x)
-  LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
-  PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
-  Case scrut arms -> singleton scrut `union` Set.unions (map fvsArm arms)
-  where
-    fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs
-
-fvsA :: Atomic -> Set Id
-fvsA = \case
-  Lit _ -> Set.empty
-  ConTag _ xs -> Set.fromList xs
-  Prim _ xs -> Set.fromList xs
-  Lam fvs _ _ -> Set.fromList fvs
-  RecLam fvs _ _ _ -> Set.fromList fvs
--}

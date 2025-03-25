@@ -57,18 +57,18 @@ let get_char = fun[] x k ->
   k v21 in
 let :: = fun[] x k ->
   let v23 = fun[x] y k ->
-    let v22 = Tag_1[x,y] in
+    let v22 = Cons1[x,y] in
     k v22 in
   k v23 in
 let k [] main =
-  let u26 = Tag_0 in
+  let u26 = Unit0 in
   main u26 k in
 let mainloop = fix (fun[get_char,put_char] mainloop _ k ->
   let k [mainloop,put_char] gotten =
     let k [mainloop] _ =
-      let u25 = Tag_0 in
+      let u25 = Unit0 in
       mainloop u25 k in
     put_char gotten k in
-  let u24 = Tag_0 in
+  let u24 = Unit0 in
   get_char u24 k) in
 k mainloop

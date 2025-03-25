@@ -31,13 +31,13 @@ data Exp
   | Case Exp [Arm]
 
 data Arm = ArmTag Ctag [Id] Exp
-data Ctag = Ctag Int
+data Ctag = Ctag Cid Int
 
 ----------------------------------------------------------------------
 -- Show
 
 instance Show Exp where show = intercalate "\n" . pretty
-instance Show Ctag where show (Ctag n) = printf "Tag_%d" n
+instance Show Ctag where show (Ctag cid n) = printf "%s%d" (show cid) n
 
 pretty :: Exp -> Lines
 pretty = \case
@@ -84,7 +84,7 @@ eval env@Env{venv} = \case
       where err = error (show ("var-lookup",x,pos))
   Lit literal -> \k -> do
     k (evalLit literal)
-  ConTag (Ctag tag) es -> \k -> do
+  ConTag (Ctag _ tag) es -> \k -> do
     evals env es $ \vs -> do
       k (VCons tag vs)
   Prim b es -> \k -> do
@@ -109,7 +109,7 @@ eval env@Env{venv} = \case
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
             [] -> error "case match failure"
-            ArmTag (Ctag tag) xs body : arms -> do
+            ArmTag (Ctag _ tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
                   let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
@@ -152,7 +152,7 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
         walk cenv' defs
 
     mainApp :: Exp
-    mainApp = App main noPos (ConTag (Ctag tUnit) [])
+    mainApp = App main noPos (ConTag (Ctag cUnit tUnit) [])
 
     noPos = Position 0 0
     main = Var Nothing (SRC.Id "main")
@@ -161,7 +161,7 @@ transExp :: Cenv -> SRC.Exp -> Exp
 transExp cenv e = trans e
   where
     transCid :: Cid -> Ctag
-    transCid cid = Ctag $ maybe err id $ Map.lookup cid cenv
+    transCid cid = Ctag cid $ maybe err id $ Map.lookup cid cenv
       where err = error (show ("Transform1.transCid",cid))
 
     trans :: SRC.Exp -> Exp

@@ -57,7 +57,7 @@ let get_char = fun[] x k ->
   k v21 in
 let :: = fun[] x k ->
   let v23 = fun[x] y k ->
-    let v22 = Tag_1[x,y] in
+    let v22 = Cons1[x,y] in
     k v22 in
   k v23 in
 let main = fun[get_char,put_char] _ k ->
@@ -68,14 +68,14 @@ let main = fun[get_char,put_char] _ k ->
           let u30 = 'Z' in
           put_char u30 k in
         let k [put_char] u28 = put_char u28 k in
-        let u29 = Tag_0 in
+        let u29 = Unit0 in
         get_char u29 k in
       let u27 = 'Y' in
       put_char u27 k in
     let k [put_char] u25 = put_char u25 k in
-    let u26 = Tag_0 in
+    let u26 = Unit0 in
     get_char u26 k in
   let u24 = 'X' in
   put_char u24 k in
-let u31 = Tag_0 in
+let u31 = Unit0 in
 main u31 k

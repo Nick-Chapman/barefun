@@ -44,7 +44,7 @@ let put_char_g10 = fun x_arg k ->
   k v20_t1 in
 let ::_g11 = fun x_arg k ->
   let v23_t1 = [x_arg], fun[x_f1] y_arg k ->
-    let v22_t1 = Tag_1[x_f1,y_arg] in
+    let v22_t1 = Cons1[x_f1,y_arg] in
     k v22_t1 in
   k v23_t1 in
 let u24_g12 = '0' in
@@ -63,8 +63,8 @@ let chars_of_int_g18 = fun i_arg k ->
       let v40_t1 = [acc_arg,char_of_digit_f1,loop_me], fun[acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
         let k = [acc_f1,char_of_digit_f2,i_arg,loop_f3], fun [acc_f1,char_of_digit_f2,i_f3,loop_f4] u27_arg ->
           match u27_arg with
-          | Tag_1 -> k acc_f1
-          | Tag_0 ->
+          | true1 -> k acc_f1
+          | false0 ->
             let k = [i_f3], fun [i_f1] u30_arg ->
               let k = [u30_arg], fun [u30_f1] u37_arg -> u30_f1 u37_arg k in
               let k = [], fun [] u38_arg -> u38_arg u39_g15 k in
@@ -80,24 +80,24 @@ let chars_of_int_g18 = fun i_arg k ->
       k v40_t1 in
     let k = [i_f1,loop_t2], fun [i_f1,loop_f2] u41_arg ->
       match u41_arg with
-      | Tag_1 ->
+      | true1 ->
         let k = [], fun [] u44_arg ->
-          let u46_t1 = Tag_0 in
+          let u46_t1 = Nil0 in
           u44_arg u46_t1 k in
         ::_g11 u45_g17 k
-      | Tag_0 ->
+      | false0 ->
         let k = [i_f1], fun [i_f1] u47_arg -> u47_arg i_f1 k in
-        let u48_t1 = Tag_0 in
+        let u48_t1 = Nil0 in
         loop_f2 u48_t1 k in
     let k = [], fun [] u42_arg -> u42_arg u43_g16 k in
     =_g6 i_f1 k in
   ord_g7 u24_g12 k in
 let put_chars_g19 = fun put_chars_me xs_arg k ->
   match xs_arg with
-  | Tag_0 ->
-    let v49_t1 = Tag_0 in
+  | Nil0 ->
+    let v49_t1 = Unit0 in
     k v49_t1
-  | Tag_1(x_t1,xs_t2) ->
+  | Cons1(x_t1,xs_t2) ->
     let k = [put_chars_me,xs_t2], fun [put_chars_f1,xs_f2] __arg -> put_chars_f1 xs_f2 k in
     put_char_g10 x_t1 k in
 let put_string_g20 = fun s_arg k ->
@@ -114,8 +114,8 @@ let u64_g26 = 2 in
 let fib_g27 = fun fib_me n_arg k ->
   let k = [fib_me,n_arg], fun [fib_f1,n_f2] u53_arg ->
     match u53_arg with
-    | Tag_1 -> k n_f2
-    | Tag_0 ->
+    | true1 -> k n_f2
+    | false0 ->
       let k = [fib_f1,n_f2], fun [fib_f1,n_f2] u56_arg ->
         let k = [u56_arg], fun [u56_f1] u61_arg -> u56_f1 u61_arg k in
         let k = [fib_f1], fun [fib_f1] u62_arg -> fib_f1 u62_arg k in
@@ -135,7 +135,7 @@ let runfib_g30 = fun n_arg k ->
       let k = [res_f2], fun [res_f1] __arg ->
         let k = [res_f1], fun [res_f1] __arg ->
           let k = [], fun [] __arg ->
-            let u67_t1 = Tag_0 in
+            let u67_t1 = Unit0 in
             newline_g23 u67_t1 k in
           put_int_g21 res_f1 k in
         put_string_g20 u66_g29 k in
@@ -144,5 +144,5 @@ let runfib_g30 = fun n_arg k ->
   fib_g27 n_arg k in
 let u68_g31 = 20 in
 let main_g32 = fun __arg k -> runfib_g30 u68_g31 k in
-let u69_t1 = Tag_0 in
+let u69_t1 = Unit0 in
 main_g32 u69_t1 k

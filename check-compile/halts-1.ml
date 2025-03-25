@@ -12,11 +12,11 @@ let chr = (fun x -> PRIM_CharChr(x)) in
 let explode = (fun x -> PRIM_Explode(x)) in
 let put_char = (fun x -> PRIM_PutChar(x)) in
 let get_char = (fun x -> PRIM_GetChar(x)) in
-let :: = (fun x -> (fun y -> Tag_1(x, y))) in
+let :: = (fun x -> (fun y -> Cons1(x, y))) in
 let main = (fun _ ->
   let _ = (put_char 'X') in
-  let _ = (put_char (get_char Tag_0)) in
+  let _ = (put_char (get_char Unit0)) in
   let _ = (put_char 'Y') in
-  let _ = (put_char (get_char Tag_0)) in
+  let _ = (put_char (get_char Unit0)) in
   (put_char 'Z')) in
-(main Tag_0)
+(main Unit0)
