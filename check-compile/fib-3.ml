@@ -59,7 +59,7 @@ let chars_of_int_g18 = fun i_arg k ->
       let k = [], fun [] u25_arg -> chr_g8 u25_arg k in
       let k = [c_arg], fun [c_f1] u26_arg -> u26_arg c_f1 k in
       +_g1 ord0_f1 k in
-    let loop_t2 = [char_of_digit_t1], fix (fun[char_of_digit_f1] loop_me acc_arg k ->
+    let loop_t2 = [char_of_digit_t1], fun [char_of_digit_f1] loop_me acc_arg k ->
       let v40_t1 = [acc_arg,char_of_digit_f1,loop_me], fun[acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
         let k = [acc_f1,char_of_digit_f2,i_arg,loop_f3], fun [acc_f1,char_of_digit_f2,i_f3,loop_f4] u27_arg ->
           match u27_arg with
@@ -77,7 +77,7 @@ let chars_of_int_g18 = fun i_arg k ->
             %_g4 i_f3 k in
         let k = [], fun [] u28_arg -> u28_arg u29_g13 k in
         =_g6 i_arg k in
-      k v40_t1) in
+      k v40_t1 in
     let k = [i_f1,loop_t2], fun [i_f1,loop_f2] u41_arg ->
       match u41_arg with
       | Tag_1 ->
@@ -92,14 +92,14 @@ let chars_of_int_g18 = fun i_arg k ->
     let k = [], fun [] u42_arg -> u42_arg u43_g16 k in
     =_g6 i_f1 k in
   ord_g7 u24_g12 k in
-let put_chars_g19 = fix (fun put_chars_me xs_arg k ->
+let put_chars_g19 = fun put_chars_me xs_arg k ->
   match xs_arg with
   | Tag_0 ->
     let v49_t1 = Tag_0 in
     k v49_t1
   | Tag_1(x_t1,xs_t2) ->
     let k = [put_chars_me,xs_t2], fun [put_chars_f1,xs_f2] __arg -> put_chars_f1 xs_f2 k in
-    put_char_g10 x_t1 k) in
+    put_char_g10 x_t1 k in
 let put_string_g20 = fun s_arg k ->
   let k = [], fun [] u50_arg -> put_chars_g19 u50_arg k in
   explode_g9 s_arg k in
@@ -111,7 +111,7 @@ let newline_g23 = fun __arg k -> put_char_g10 u52_g22 k in
 let u55_g24 = 2 in
 let u60_g25 = 1 in
 let u64_g26 = 2 in
-let fib_g27 = fix (fun fib_me n_arg k ->
+let fib_g27 = fun fib_me n_arg k ->
   let k = [fib_me,n_arg], fun [fib_f1,n_f2] u53_arg ->
     match u53_arg with
     | Tag_1 -> k n_f2
@@ -126,7 +126,7 @@ let fib_g27 = fix (fun fib_me n_arg k ->
       let k = [], fun [] u59_arg -> u59_arg u60_g25 k in
       -_g2 n_f2 k in
   let k = [], fun [] u54_arg -> u54_arg u55_g24 k in
-  <_g5 n_arg k) in
+  <_g5 n_arg k in
 let u65_g28 = "fib " in
 let u66_g29 = " --> " in
 let runfib_g30 = fun n_arg k ->

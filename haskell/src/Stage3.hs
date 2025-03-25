@@ -10,7 +10,7 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Set (member)
 import Interaction (Interaction(..))
-import Lines (Lines,bracket,(<++),(++>),(>>>))
+import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
 import Stage0 (evalLit,apply,Literal,Id(..))
 import Stage1 (Ctag(..))
@@ -64,7 +64,9 @@ instance Show Loadable where show = intercalate "\n" . ("let k () = ()":) . pret
 prettyL :: Loadable -> Lines
 prettyL = \case
   Run code -> prettyC code
-  LetTop x rhs body -> ("let " ++ show x ++ " = ") <++ (prettyT rhs ++> " in") ++ prettyL body
+  LetTop x rhs body ->
+    ("let " ++ show x ++ " = ") <++ prettyT rhs ++> " in"
+    ++ prettyL body
 
 prettyT :: Top -> Lines
 prettyT = \case
@@ -73,8 +75,8 @@ prettyT = \case
     ("fun " ++ show x ++ " k ->")
     >>> prettyC body
   TopRecLam f x body ->
-    "fix " <++ bracket (("fun " ++ show f ++ " " ++ show x ++ " k ->")
-                         >>> prettyC body)
+    ("fun " ++ show f ++ " " ++ show x ++ " k ->")
+    >>> prettyC body
 
 prettyC :: Code -> Lines
 prettyC = \case
@@ -104,9 +106,8 @@ prettyA = \case
     (show pre ++ ", fun" ++ show post ++ " " ++ show x ++ " k ->")
     >>> prettyC body
   RecLam pre post f x body ->
-    (show pre ++ ", fix ")
-    <++ bracket (("fun" ++ show post ++ " " ++ show f ++ " " ++ show x ++ " k ->")
-                 >>> prettyC body)
+    (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show x ++ " k ->")
+    >>> prettyC body
 
 prettyArm :: Arm -> Lines
 prettyArm = \case

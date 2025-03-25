@@ -114,7 +114,7 @@ let parse_digit_g22 = fun c_arg k ->
   let k = [], fun [] u35_arg -> -_g2 u35_arg k in
   ord_g9 c_arg k in
 let u55_g23 = 10 in
-let loop_g24 = fix (fun loop_me acc_arg k ->
+let loop_g24 = fun loop_me acc_arg k ->
   let v56_t1 = [acc_arg,loop_me], fun[acc_f1,loop_f2] xs_arg k ->
     match xs_arg with
     | Tag_0 ->
@@ -134,7 +134,7 @@ let loop_g24 = fix (fun loop_me acc_arg k ->
           let k = [acc_f1], fun [acc_f1] u54_arg -> u54_arg acc_f1 k in
           ( * )_g3 u55_g23 k in
       parse_digit_g22 x_t1 k in
-  k v56_t1) in
+  k v56_t1 in
 let u58_g25 = 0 in
 let parse_num_g26 = fun s_arg k ->
   let k = [s_arg], fun [s_f1] u57_arg -> u57_arg s_f1 k in
@@ -144,7 +144,7 @@ let cons_g27 = fun x_arg k ->
     let k = [xs_arg], fun [xs_f1] u59_arg -> u59_arg xs_f1 k in
     ::_g14 x_f1 k in
   k v60_t1 in
-let eq_list_g28 = fix (fun eq_list_me eq_arg k ->
+let eq_list_g28 = fun eq_list_me eq_arg k ->
   let v70_t1 = [eq_arg,eq_list_me], fun[eq_f1,eq_list_f2] xs_arg k ->
     let v69_t1 = [eq_f1,eq_list_f2,xs_arg], fun[eq_f1,eq_list_f2,xs_f3] ys_arg k ->
       match xs_f3 with
@@ -174,14 +174,14 @@ let eq_list_g28 = fix (fun eq_list_me eq_arg k ->
           let k = [y_t3], fun [y_f1] u65_arg -> u65_arg y_f1 k in
           eq_f1 x_t1 k in
     k v69_t1 in
-  k v70_t1) in
+  k v70_t1 in
 let eq_char_list_g29 = fun a_arg k ->
   let v73_t1 = [a_arg], fun[a_f1] b_arg k ->
     let k = [b_arg], fun [b_f1] u71_arg -> u71_arg b_f1 k in
     let k = [a_f1], fun [a_f1] u72_arg -> u72_arg a_f1 k in
     eq_list_g28 eq_char_g8 k in
   k v73_t1 in
-let append_g30 = fix (fun append_me xs_arg k ->
+let append_g30 = fun append_me xs_arg k ->
   let v77_t1 = [append_me,xs_arg], fun[append_f1,xs_f2] ys_arg k ->
     match xs_f2 with
     | Tag_0 -> k ys_arg
@@ -191,8 +191,8 @@ let append_g30 = fix (fun append_me xs_arg k ->
         let k = [ys_f3], fun [ys_f1] u76_arg -> u76_arg ys_f1 k in
         append_f1 xs_f2 k in
       cons_g27 x_t1 k in
-  k v77_t1) in
-let loop_g31 = fix (fun loop_me acc_arg k ->
+  k v77_t1 in
+let loop_g31 = fun loop_me acc_arg k ->
   let v81_t1 = [acc_arg,loop_me], fun[acc_f1,loop_f2] xs_arg k ->
     match xs_arg with
     | Tag_0 -> k acc_f1
@@ -201,12 +201,12 @@ let loop_g31 = fix (fun loop_me acc_arg k ->
       let k = [loop_f2], fun [loop_f1] u79_arg -> loop_f1 u79_arg k in
       let k = [acc_f1], fun [acc_f1] u80_arg -> u80_arg acc_f1 k in
       cons_g27 x_t1 k in
-  k v81_t1) in
+  k v81_t1 in
 let reverse_g32 = fun xs_arg k ->
   let k = [xs_arg], fun [xs_f1] u82_arg -> u82_arg xs_f1 k in
   let u83_t1 = Tag_0 in
   loop_g31 u83_t1 k in
-let map_g33 = fix (fun map_me f_arg k ->
+let map_g33 = fun map_me f_arg k ->
   let v89_t1 = [f_arg,map_me], fun[f_f1,map_f2] xs_arg k ->
     match xs_arg with
     | Tag_0 ->
@@ -219,17 +219,17 @@ let map_g33 = fix (fun map_me f_arg k ->
         map_f2 f_f1 k in
       let k = [], fun [] u86_arg -> ::_g14 u86_arg k in
       f_f1 x_t1 k in
-  k v89_t1) in
+  k v89_t1 in
 let v90_g34 = 0 in
 let u92_g35 = 1 in
-let length_g36 = fix (fun length_me xs_arg k ->
+let length_g36 = fun length_me xs_arg k ->
   match xs_arg with
   | Tag_0 -> k v90_g34
   | Tag_1(__t1,xs_t2) ->
     let k = [length_me,xs_t2], fun [length_f1,xs_f2] u91_arg ->
       let k = [u91_arg], fun [u91_f1] u93_arg -> u91_f1 u93_arg k in
       length_f1 xs_f2 k in
-    +_g1 u92_g35 k) in
+    +_g1 u92_g35 k in
 let u94_g37 = '0' in
 let u99_g38 = 0 in
 let u106_g39 = 10 in
@@ -242,7 +242,7 @@ let chars_of_int_g43 = fun i_arg k ->
       let k = [], fun [] u95_arg -> chr_g10 u95_arg k in
       let k = [c_arg], fun [c_f1] u96_arg -> u96_arg c_f1 k in
       +_g1 ord0_f1 k in
-    let loop_t2 = [char_of_digit_t1], fix (fun[char_of_digit_f1] loop_me acc_arg k ->
+    let loop_t2 = [char_of_digit_t1], fun [char_of_digit_f1] loop_me acc_arg k ->
       let v110_t1 = [acc_arg,char_of_digit_f1,loop_me], fun[acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
         let k = [acc_f1,char_of_digit_f2,i_arg,loop_f3], fun [acc_f1,char_of_digit_f2,i_f3,loop_f4] u97_arg ->
           match u97_arg with
@@ -260,7 +260,7 @@ let chars_of_int_g43 = fun i_arg k ->
             %_g5 i_f3 k in
         let k = [], fun [] u98_arg -> u98_arg u99_g38 k in
         =_g7 i_arg k in
-      k v110_t1) in
+      k v110_t1 in
     let k = [i_f1,loop_t2], fun [i_f1,loop_f2] u111_arg ->
       match u111_arg with
       | Tag_1 ->
@@ -275,14 +275,14 @@ let chars_of_int_g43 = fun i_arg k ->
     let k = [], fun [] u112_arg -> u112_arg u113_g41 k in
     =_g7 i_f1 k in
   ord_g9 u94_g37 k in
-let put_chars_g44 = fix (fun put_chars_me xs_arg k ->
+let put_chars_g44 = fun put_chars_me xs_arg k ->
   match xs_arg with
   | Tag_0 ->
     let v119_t1 = Tag_0 in
     k v119_t1
   | Tag_1(x_t1,xs_t2) ->
     let k = [put_chars_me,xs_t2], fun [put_chars_f1,xs_f2] __arg -> put_chars_f1 xs_f2 k in
-    put_char_g12 x_t1 k) in
+    put_char_g12 x_t1 k in
 let put_string_g45 = fun s_arg k ->
   let k = [], fun [] u120_arg -> put_chars_g44 u120_arg k in
   explode_g11 s_arg k in
@@ -303,7 +303,7 @@ let u137_g53 = 127 in
 let u139_g54 = 8 in
 let u140_g55 = ' ' in
 let u142_g56 = 8 in
-let loop_g57 = fix (fun loop_me acc_arg k ->
+let loop_g57 = fun loop_me acc_arg k ->
   let k = [acc_arg,loop_me], fun [acc_f1,loop_f2] c_arg ->
     let k = [acc_f1,c_arg,loop_f2], fun [acc_f1,c_f2,loop_f3] n_arg ->
       let k = [acc_f1,c_f2,loop_f3,n_arg], fun [acc_f1,c_f2,loop_f3,n_f4] u125_arg ->
@@ -351,14 +351,14 @@ let loop_g57 = fix (fun loop_me acc_arg k ->
       eq_char_g8 c_f2 k in
     ord_g9 c_arg k in
   let u124_t1 = Tag_0 in
-  get_char_g13 u124_t1 k) in
+  get_char_g13 u124_t1 k in
 let read_line_g58 = fun __arg k ->
   let u145_t1 = Tag_0 in
   loop_g57 u145_t1 k in
 let u148_g59 = 2 in
 let u153_g60 = 1 in
 let u157_g61 = 2 in
-let fib_g62 = fix (fun fib_me n_arg k ->
+let fib_g62 = fun fib_me n_arg k ->
   let k = [fib_me,n_arg], fun [fib_f1,n_f2] u146_arg ->
     match u146_arg with
     | Tag_1 -> k n_f2
@@ -373,11 +373,11 @@ let fib_g62 = fix (fun fib_me n_arg k ->
       let k = [], fun [] u152_arg -> u152_arg u153_g60 k in
       -_g2 n_f2 k in
   let k = [], fun [] u147_arg -> u147_arg u148_g59 k in
-  <_g6 n_arg k) in
+  <_g6 n_arg k in
 let u160_g63 = 2 in
 let u165_g64 = 1 in
 let v166_g65 = 1 in
-let fact_g66 = fix (fun fact_me n_arg k ->
+let fact_g66 = fun fact_me n_arg k ->
   let k = [fact_me,n_arg], fun [fact_f1,n_f2] u158_arg ->
     match u158_arg with
     | Tag_1 ->
@@ -388,7 +388,7 @@ let fact_g66 = fix (fun fact_me n_arg k ->
       -_g2 n_f2 k
     | Tag_0 -> k v166_g65 in
   let k = [], fun [] u159_arg -> u159_arg u160_g63 k in
-  >=_g18 n_arg k) in
+  >=_g18 n_arg k in
 let u167_g67 = "ERROR: " in
 let error_g68 = fun s_arg k ->
   let k = [s_arg], fun [s_f1] __arg ->
@@ -495,7 +495,7 @@ let fallback_g89 = fun line_arg k ->
     +_g1 u189_g84 k in
   map_g33 u183_g83 k in
 let u205_g90 = ' ' in
-let loop_g91 = fix (fun loop_me accWs_arg k ->
+let loop_g91 = fun loop_me accWs_arg k ->
   let v217_t1 = [accWs_arg,loop_me], fun[accWs_f1,loop_f2] accCs_arg k ->
     let v216_t1 = [accCs_arg,accWs_f1,loop_f2], fun[accCs_f1,accWs_f2,loop_f3] xs_arg k ->
       match xs_arg with
@@ -526,7 +526,7 @@ let loop_g91 = fix (fun loop_me accWs_arg k ->
         let k = [], fun [] u204_arg -> u204_arg u205_g90 k in
         eq_char_g8 x_t1 k in
     k v216_t1 in
-  k v217_t1) in
+  k v217_t1 in
 let split_words_g92 = fun s_arg k ->
   let k = [s_arg], fun [s_f1] u218_arg -> u218_arg s_f1 k in
   let k = [], fun [] u219_arg ->
@@ -562,7 +562,7 @@ let execute_g95 = fun line_arg k ->
   split_words_g92 line_arg k in
 let u231_g96 = '>' in
 let u232_g97 = ' ' in
-let mainloop_g98 = fix (fun mainloop_me __arg k ->
+let mainloop_g98 = fun mainloop_me __arg k ->
   let k = [mainloop_me], fun [mainloop_f1] __arg ->
     let k = [mainloop_f1], fun [mainloop_f1] __arg ->
       let k = [mainloop_f1], fun [mainloop_f1] xs_arg ->
@@ -573,7 +573,7 @@ let mainloop_g98 = fix (fun mainloop_me __arg k ->
       let u233_t1 = Tag_0 in
       read_line_g58 u233_t1 k in
     put_char_g12 u232_g97 k in
-  put_char_g12 u231_g96 k) in
+  put_char_g12 u231_g96 k in
 let u235_g99 = "LOAD" in
 let u236_g100 = "RUN" in
 let u238_g101 = "NEVER" in
