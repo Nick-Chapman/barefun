@@ -1,42 +1,42 @@
 (*stage3*)
 let k () = ()
 let +_g1 = fun x_arg k ->
-  let v2_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v2_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v1_t1 = PRIM_AddInt(x_f1,y_arg) in
     k v1_t1 in
   k v2_t1 in
 let -_g2 = fun x_arg k ->
-  let v4_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v4_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v3_t1 = PRIM_SubInt(x_f1,y_arg) in
     k v3_t1 in
   k v4_t1 in
 let ( * )_g3 = fun x_arg k ->
-  let v6_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v6_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v5_t1 = PRIM_MulInt(x_f1,y_arg) in
     k v5_t1 in
   k v6_t1 in
 let /_g4 = fun x_arg k ->
-  let v8_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v8_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v7_t1 = PRIM_DivInt(x_f1,y_arg) in
     k v7_t1 in
   k v8_t1 in
 let %_g5 = fun x_arg k ->
-  let v10_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v10_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v9_t1 = PRIM_ModInt(x_f1,y_arg) in
     k v9_t1 in
   k v10_t1 in
 let <_g6 = fun x_arg k ->
-  let v12_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v12_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v11_t1 = PRIM_LessInt(x_f1,y_arg) in
     k v11_t1 in
   k v12_t1 in
 let =_g7 = fun x_arg k ->
-  let v14_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v14_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v13_t1 = PRIM_EqInt(x_f1,y_arg) in
     k v13_t1 in
   k v14_t1 in
 let eq_char_g8 = fun x_arg k ->
-  let v16_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v16_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v15_t1 = PRIM_EqChar(x_f1,y_arg) in
     k v15_t1 in
   k v16_t1 in
@@ -56,7 +56,7 @@ let get_char_g13 = fun x_arg k ->
   let v21_t1 = PRIM_GetChar(x_arg) in
   k v21_t1 in
 let ::_g14 = fun x_arg k ->
-  let v23_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v23_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v22_t1 = Cons1[x_f1,y_arg] in
     k v22_t1 in
   k v23_t1 in
@@ -69,18 +69,18 @@ let not_g15 = fun b_arg k ->
     let v25_t1 = true1 in
     k v25_t1 in
 let >_g16 = fun a_arg k ->
-  let v27_t1 = [a_arg], fun[a_f1] b_arg k ->
+  let v27_t1 = [a_arg], fun [a_f1] b_arg k ->
     let k = [a_f1], fun [a_f1] u26_arg -> u26_arg a_f1 k in
     <_g6 b_arg k in
   k v27_t1 in
 let <=_g17 = fun a_arg k ->
-  let v30_t1 = [a_arg], fun[a_f1] b_arg k ->
+  let v30_t1 = [a_arg], fun [a_f1] b_arg k ->
     let k = [], fun [] u28_arg -> not_g15 u28_arg k in
     let k = [a_f1], fun [a_f1] u29_arg -> u29_arg a_f1 k in
     <_g6 b_arg k in
   k v30_t1 in
 let >=_g18 = fun a_arg k ->
-  let v33_t1 = [a_arg], fun[a_f1] b_arg k ->
+  let v33_t1 = [a_arg], fun [a_f1] b_arg k ->
     let k = [], fun [] u31_arg -> not_g15 u31_arg k in
     let k = [b_arg], fun [b_f1] u32_arg -> u32_arg b_f1 k in
     <_g6 a_f1 k in
@@ -115,7 +115,7 @@ let parse_digit_g22 = fun c_arg k ->
   ord_g9 c_arg k in
 let u55_g23 = 10 in
 let loop_g24 = fun loop_me acc_arg k ->
-  let v56_t1 = [acc_arg,loop_me], fun[acc_f1,loop_f2] xs_arg k ->
+  let v56_t1 = [acc_arg,loop_me], fun [acc_f1,loop_f2] xs_arg k ->
     match xs_arg with
     | Nil0 ->
       let v47_t1 = Some0[acc_f1] in
@@ -140,13 +140,13 @@ let parse_num_g26 = fun s_arg k ->
   let k = [s_arg], fun [s_f1] u57_arg -> u57_arg s_f1 k in
   loop_g24 u58_g25 k in
 let cons_g27 = fun x_arg k ->
-  let v60_t1 = [x_arg], fun[x_f1] xs_arg k ->
+  let v60_t1 = [x_arg], fun [x_f1] xs_arg k ->
     let k = [xs_arg], fun [xs_f1] u59_arg -> u59_arg xs_f1 k in
     ::_g14 x_f1 k in
   k v60_t1 in
 let eq_list_g28 = fun eq_list_me eq_arg k ->
-  let v70_t1 = [eq_arg,eq_list_me], fun[eq_f1,eq_list_f2] xs_arg k ->
-    let v69_t1 = [eq_f1,eq_list_f2,xs_arg], fun[eq_f1,eq_list_f2,xs_f3] ys_arg k ->
+  let v70_t1 = [eq_arg,eq_list_me], fun [eq_f1,eq_list_f2] xs_arg k ->
+    let v69_t1 = [eq_f1,eq_list_f2,xs_arg], fun [eq_f1,eq_list_f2,xs_f3] ys_arg k ->
       match xs_f3 with
       | Nil0 ->
         match ys_arg with
@@ -176,13 +176,13 @@ let eq_list_g28 = fun eq_list_me eq_arg k ->
     k v69_t1 in
   k v70_t1 in
 let eq_char_list_g29 = fun a_arg k ->
-  let v73_t1 = [a_arg], fun[a_f1] b_arg k ->
+  let v73_t1 = [a_arg], fun [a_f1] b_arg k ->
     let k = [b_arg], fun [b_f1] u71_arg -> u71_arg b_f1 k in
     let k = [a_f1], fun [a_f1] u72_arg -> u72_arg a_f1 k in
     eq_list_g28 eq_char_g8 k in
   k v73_t1 in
 let append_g30 = fun append_me xs_arg k ->
-  let v77_t1 = [append_me,xs_arg], fun[append_f1,xs_f2] ys_arg k ->
+  let v77_t1 = [append_me,xs_arg], fun [append_f1,xs_f2] ys_arg k ->
     match xs_f2 with
     | Nil0 -> k ys_arg
     | Cons1(x_t1,xs_t2) ->
@@ -193,7 +193,7 @@ let append_g30 = fun append_me xs_arg k ->
       cons_g27 x_t1 k in
   k v77_t1 in
 let loop_g31 = fun loop_me acc_arg k ->
-  let v81_t1 = [acc_arg,loop_me], fun[acc_f1,loop_f2] xs_arg k ->
+  let v81_t1 = [acc_arg,loop_me], fun [acc_f1,loop_f2] xs_arg k ->
     match xs_arg with
     | Nil0 -> k acc_f1
     | Cons1(x_t1,xs_t2) ->
@@ -207,7 +207,7 @@ let reverse_g32 = fun xs_arg k ->
   let u83_t1 = Nil0 in
   loop_g31 u83_t1 k in
 let map_g33 = fun map_me f_arg k ->
-  let v89_t1 = [f_arg,map_me], fun[f_f1,map_f2] xs_arg k ->
+  let v89_t1 = [f_arg,map_me], fun [f_f1,map_f2] xs_arg k ->
     match xs_arg with
     | Nil0 ->
       let v84_t1 = Nil0 in
@@ -238,12 +238,12 @@ let u113_g41 = 0 in
 let u115_g42 = '0' in
 let chars_of_int_g43 = fun i_arg k ->
   let k = [i_arg], fun [i_f1] ord0_arg ->
-    let char_of_digit_t1 = [ord0_arg], fun[ord0_f1] c_arg k ->
+    let char_of_digit_t1 = [ord0_arg], fun [ord0_f1] c_arg k ->
       let k = [], fun [] u95_arg -> chr_g10 u95_arg k in
       let k = [c_arg], fun [c_f1] u96_arg -> u96_arg c_f1 k in
       +_g1 ord0_f1 k in
     let loop_t2 = [char_of_digit_t1], fun [char_of_digit_f1] loop_me acc_arg k ->
-      let v110_t1 = [acc_arg,char_of_digit_f1,loop_me], fun[acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
+      let v110_t1 = [acc_arg,char_of_digit_f1,loop_me], fun [acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
         let k = [acc_f1,char_of_digit_f2,i_arg,loop_f3], fun [acc_f1,char_of_digit_f2,i_f3,loop_f4] u97_arg ->
           match u97_arg with
           | true1 -> k acc_f1
@@ -496,8 +496,8 @@ let fallback_g89 = fun line_arg k ->
   map_g33 u183_g83 k in
 let u205_g90 = ' ' in
 let loop_g91 = fun loop_me accWs_arg k ->
-  let v217_t1 = [accWs_arg,loop_me], fun[accWs_f1,loop_f2] accCs_arg k ->
-    let v216_t1 = [accCs_arg,accWs_f1,loop_f2], fun[accCs_f1,accWs_f2,loop_f3] xs_arg k ->
+  let v217_t1 = [accWs_arg,loop_me], fun [accWs_f1,loop_f2] accCs_arg k ->
+    let v216_t1 = [accCs_arg,accWs_f1,loop_f2], fun [accCs_f1,accWs_f2,loop_f3] xs_arg k ->
       match xs_arg with
       | Nil0 ->
         let k = [], fun [] u200_arg -> reverse_g32 u200_arg k in

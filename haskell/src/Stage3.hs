@@ -103,7 +103,7 @@ prettyA = \case
   ConTag tag [] -> [show tag]
   ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam pre post x body ->
-    (show pre ++ ", fun" ++ show post ++ " " ++ show x ++ " k ->")
+    (show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " k ->")
     >>> prettyC body
   RecLam pre post f x body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show x ++ " k ->")

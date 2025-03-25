@@ -1,66 +1,66 @@
 (*stage2*)
 let k () = ()
-let + = fun[] x k ->
-  let v2 = fun[x] y k ->
+let + = fun [] x k ->
+  let v2 = fun [x] y k ->
     let v1 = PRIM_AddInt(x,y) in
     k v1 in
   k v2 in
-let - = fun[] x k ->
-  let v4 = fun[x] y k ->
+let - = fun [] x k ->
+  let v4 = fun [x] y k ->
     let v3 = PRIM_SubInt(x,y) in
     k v3 in
   k v4 in
-let ( * ) = fun[] x k ->
-  let v6 = fun[x] y k ->
+let ( * ) = fun [] x k ->
+  let v6 = fun [x] y k ->
     let v5 = PRIM_MulInt(x,y) in
     k v5 in
   k v6 in
-let / = fun[] x k ->
-  let v8 = fun[x] y k ->
+let / = fun [] x k ->
+  let v8 = fun [x] y k ->
     let v7 = PRIM_DivInt(x,y) in
     k v7 in
   k v8 in
-let % = fun[] x k ->
-  let v10 = fun[x] y k ->
+let % = fun [] x k ->
+  let v10 = fun [x] y k ->
     let v9 = PRIM_ModInt(x,y) in
     k v9 in
   k v10 in
-let < = fun[] x k ->
-  let v12 = fun[x] y k ->
+let < = fun [] x k ->
+  let v12 = fun [x] y k ->
     let v11 = PRIM_LessInt(x,y) in
     k v11 in
   k v12 in
-let = = fun[] x k ->
-  let v14 = fun[x] y k ->
+let = = fun [] x k ->
+  let v14 = fun [x] y k ->
     let v13 = PRIM_EqInt(x,y) in
     k v13 in
   k v14 in
-let eq_char = fun[] x k ->
-  let v16 = fun[x] y k ->
+let eq_char = fun [] x k ->
+  let v16 = fun [x] y k ->
     let v15 = PRIM_EqChar(x,y) in
     k v15 in
   k v16 in
-let ord = fun[] x k ->
+let ord = fun [] x k ->
   let v17 = PRIM_CharOrd(x) in
   k v17 in
-let chr = fun[] x k ->
+let chr = fun [] x k ->
   let v18 = PRIM_CharChr(x) in
   k v18 in
-let explode = fun[] x k ->
+let explode = fun [] x k ->
   let v19 = PRIM_Explode(x) in
   k v19 in
-let put_char = fun[] x k ->
+let put_char = fun [] x k ->
   let v20 = PRIM_PutChar(x) in
   k v20 in
-let get_char = fun[] x k ->
+let get_char = fun [] x k ->
   let v21 = PRIM_GetChar(x) in
   k v21 in
-let :: = fun[] x k ->
-  let v23 = fun[x] y k ->
+let :: = fun [] x k ->
+  let v23 = fun [x] y k ->
     let v22 = Cons1[x,y] in
     k v22 in
   k v23 in
-let not = fun[] b k ->
+let not = fun [] b k ->
   match b with
   | true1 ->
     let v24 = false0 in
@@ -68,24 +68,24 @@ let not = fun[] b k ->
   | false0 ->
     let v25 = true1 in
     k v25 in
-let > = fun[<] a k ->
-  let v27 = fun[<,a] b k ->
+let > = fun [<] a k ->
+  let v27 = fun [<,a] b k ->
     let k [a] u26 = u26 a k in
     < b k in
   k v27 in
-let <= = fun[<,not] a k ->
-  let v30 = fun[<,a,not] b k ->
+let <= = fun [<,not] a k ->
+  let v30 = fun [<,a,not] b k ->
     let k [not] u28 = not u28 k in
     let k [a] u29 = u29 a k in
     < b k in
   k v30 in
-let >= = fun[<,not] a k ->
-  let v33 = fun[<,a,not] b k ->
+let >= = fun [<,not] a k ->
+  let v33 = fun [<,a,not] b k ->
     let k [not] u31 = not u31 k in
     let k [b] u32 = u32 b k in
     < a k in
   k v33 in
-let parse_digit = fun[-,<=,>=,ord] c k ->
+let parse_digit = fun [-,<=,>=,ord] c k ->
   let k [<=,>=] n =
     let k [<=,n] u38 =
       match u38 with
@@ -115,9 +115,9 @@ let parse_digit = fun[-,<=,>=,ord] c k ->
     ord u37 k in
   let k [-] u35 = - u35 k in
   ord c k in
-let parse_num = fun[( * ),+,parse_digit] s k ->
-  let loop = fix (fun[( * ),+,parse_digit] loop acc k ->
-    let v56 = fun[( * ),+,acc,loop,parse_digit] xs k ->
+let parse_num = fun [( * ),+,parse_digit] s k ->
+  let loop = fix (fun [( * ),+,parse_digit] loop acc k ->
+    let v56 = fun [( * ),+,acc,loop,parse_digit] xs k ->
       match xs with
       | Nil0 ->
         let v47 = Some0[acc] in
@@ -141,14 +141,14 @@ let parse_num = fun[( * ),+,parse_digit] s k ->
   let k [s] u57 = u57 s k in
   let u58 = 0 in
   loop u58 k in
-let cons = fun[::] x k ->
-  let v60 = fun[::,x] xs k ->
+let cons = fun [::] x k ->
+  let v60 = fun [::,x] xs k ->
     let k [xs] u59 = u59 xs k in
     :: x k in
   k v60 in
-let eq_list = fix (fun[] eq_list eq k ->
-  let v70 = fun[eq,eq_list] xs k ->
-    let v69 = fun[eq,eq_list,xs] ys k ->
+let eq_list = fix (fun [] eq_list eq k ->
+  let v70 = fun [eq,eq_list] xs k ->
+    let v69 = fun [eq,eq_list,xs] ys k ->
       match xs with
       | Nil0 ->
         match ys with
@@ -177,14 +177,14 @@ let eq_list = fix (fun[] eq_list eq k ->
           eq x k in
     k v69 in
   k v70) in
-let eq_char_list = fun[eq_char,eq_list] a k ->
-  let v73 = fun[a,eq_char,eq_list] b k ->
+let eq_char_list = fun [eq_char,eq_list] a k ->
+  let v73 = fun [a,eq_char,eq_list] b k ->
     let k [b] u71 = u71 b k in
     let k [a] u72 = u72 a k in
     eq_list eq_char k in
   k v73 in
-let append = fix (fun[cons] append xs k ->
-  let v77 = fun[append,cons,xs] ys k ->
+let append = fix (fun [cons] append xs k ->
+  let v77 = fun [append,cons,xs] ys k ->
     match xs with
     | Nil0 -> k ys
     | Cons1(x,xs) ->
@@ -194,9 +194,9 @@ let append = fix (fun[cons] append xs k ->
         append xs k in
       cons x k in
   k v77) in
-let reverse = fun[cons] xs k ->
-  let loop = fix (fun[cons] loop acc k ->
-    let v81 = fun[acc,cons,loop] xs k ->
+let reverse = fun [cons] xs k ->
+  let loop = fix (fun [cons] loop acc k ->
+    let v81 = fun [acc,cons,loop] xs k ->
       match xs with
       | Nil0 -> k acc
       | Cons1(x,xs) ->
@@ -208,8 +208,8 @@ let reverse = fun[cons] xs k ->
   let k [xs] u82 = u82 xs k in
   let u83 = Nil0 in
   loop u83 k in
-let map = fix (fun[::] map f k ->
-  let v89 = fun[::,f,map] xs k ->
+let map = fix (fun [::] map f k ->
+  let v89 = fun [::,f,map] xs k ->
     match xs with
     | Nil0 ->
       let v84 = Nil0 in
@@ -222,7 +222,7 @@ let map = fix (fun[::] map f k ->
       let k [::] u86 = :: u86 k in
       f x k in
   k v89) in
-let length = fix (fun[+] length xs k ->
+let length = fix (fun [+] length xs k ->
   match xs with
   | Nil0 ->
     let v90 = 0 in
@@ -233,14 +233,14 @@ let length = fix (fun[+] length xs k ->
       length xs k in
     let u92 = 1 in
     + u92 k) in
-let chars_of_int = fun[%,+,/,=,chr,cons,ord] i k ->
+let chars_of_int = fun [%,+,/,=,chr,cons,ord] i k ->
   let k [%,+,/,=,chr,cons,i] ord0 =
-    let char_of_digit = fun[+,chr,ord0] c k ->
+    let char_of_digit = fun [+,chr,ord0] c k ->
       let k [chr] u95 = chr u95 k in
       let k [c] u96 = u96 c k in
       + ord0 k in
-    let loop = fix (fun[%,/,=,char_of_digit,cons] loop acc k ->
-      let v110 = fun[%,/,=,acc,char_of_digit,cons,loop] i k ->
+    let loop = fix (fun [%,/,=,char_of_digit,cons] loop acc k ->
+      let v110 = fun [%,/,=,acc,char_of_digit,cons,loop] i k ->
         let k [%,/,acc,char_of_digit,cons,i,loop] u97 =
           match u97 with
           | true1 -> k acc
@@ -282,7 +282,7 @@ let chars_of_int = fun[%,+,/,=,chr,cons,ord] i k ->
     = i k in
   let u94 = '0' in
   ord u94 k in
-let put_chars = fix (fun[put_char] put_chars xs k ->
+let put_chars = fix (fun [put_char] put_chars xs k ->
   match xs with
   | Nil0 ->
     let v119 = Unit0 in
@@ -290,22 +290,22 @@ let put_chars = fix (fun[put_char] put_chars xs k ->
   | Cons1(x,xs) ->
     let k [put_chars,xs] _ = put_chars xs k in
     put_char x k) in
-let put_string = fun[explode,put_chars] s k ->
+let put_string = fun [explode,put_chars] s k ->
   let k [put_chars] u120 = put_chars u120 k in
   explode s k in
-let put_int = fun[chars_of_int,put_chars] i k ->
+let put_int = fun [chars_of_int,put_chars] i k ->
   let k [put_chars] u121 = put_chars u121 k in
   chars_of_int i k in
-let newline = fun[put_char] _ k ->
+let newline = fun [put_char] _ k ->
   let u122 = '\n' in
   put_char u122 k in
-let put_string_newline = fun[newline,put_string] s k ->
+let put_string_newline = fun [newline,put_string] s k ->
   let k [newline] _ =
     let u123 = Unit0 in
     newline u123 k in
   put_string s k in
-let read_line = fun[<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,reverse] _ k ->
-  let loop = fix (fun[<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,reverse] loop acc k ->
+let read_line = fun [<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,reverse] _ k ->
+  let loop = fix (fun [<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,reverse] loop acc k ->
     let k [<=,=,>,acc,chr,cons,eq_char,loop,newline,ord,put_char,reverse] c =
       let k [<=,=,>,acc,c,chr,cons,eq_char,loop,newline,put_char,reverse] n =
         let k [<=,=,>,acc,c,chr,cons,loop,n,newline,put_char,reverse] u125 =
@@ -367,7 +367,7 @@ let read_line = fun[<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,revers
     get_char u124 k) in
   let u145 = Nil0 in
   loop u145 k in
-let fib = fix (fun[+,-,<] fib n k ->
+let fib = fix (fun [+,-,<] fib n k ->
   let k [+,-,fib,n] u146 =
     match u146 with
     | true1 -> k n
@@ -389,7 +389,7 @@ let fib = fix (fun[+,-,<] fib n k ->
     let u148 = 2 in
     u147 u148 k in
   < n k) in
-let fact = fix (fun[( * ),-,>=] fact n k ->
+let fact = fix (fun [( * ),-,>=] fact n k ->
   let k [( * ),-,fact,n] u158 =
     match u158 with
     | true1 ->
@@ -407,7 +407,7 @@ let fact = fix (fun[( * ),-,>=] fact n k ->
     let u160 = 2 in
     u159 u160 k in
   >= n k) in
-let error = fun[newline,put_string] s k ->
+let error = fun [newline,put_string] s k ->
   let k [newline,put_string,s] _ =
     let k [newline] _ =
       let u168 = Unit0 in
@@ -415,7 +415,7 @@ let error = fun[newline,put_string] s k ->
     put_string s k in
   let u167 = "ERROR: " in
   put_string u167 k in
-let runfib = fun[error,fib,newline,parse_num,put_int,put_string] args k ->
+let runfib = fun [error,fib,newline,parse_num,put_int,put_string] args k ->
   let k [args,error,fib,newline,parse_num,put_int,put_string] _ =
     match args with
     | Nil0 ->
@@ -447,7 +447,7 @@ let runfib = fun[error,fib,newline,parse_num,put_int,put_string] args k ->
         parse_num arg1 k in
   let u169 = "fib: " in
   put_string u169 k in
-let runfact = fun[error,fact,newline,parse_num,put_int,put_string] args k ->
+let runfact = fun [error,fact,newline,parse_num,put_int,put_string] args k ->
   let k [args,error,fact,newline,parse_num,put_int,put_string] _ =
     match args with
     | Nil0 ->
@@ -479,7 +479,7 @@ let runfact = fun[error,fact,newline,parse_num,put_int,put_string] args k ->
         parse_num arg1 k in
   let u176 = "fact: " in
   put_string u176 k in
-let fallback = fun[+,append,eq_char,explode,length,map,newline,put_char,put_chars,put_int] line k ->
+let fallback = fun [+,append,eq_char,explode,length,map,newline,put_char,put_chars,put_int] line k ->
   let k [+,append,explode,length,line,newline,put_char,put_chars,put_int] star_the_ohs =
     let k [append,explode,line,newline,put_char,put_chars,put_int,star_the_ohs] n =
       let k [n,newline,put_char,put_int] _ =
@@ -508,7 +508,7 @@ let fallback = fun[+,append,eq_char,explode,length,map,newline,put_char,put_char
       length line k in
     let u189 = 100 in
     + u189 k in
-  let u183 = fun[eq_char] c k ->
+  let u183 = fun [eq_char] c k ->
     let k [c] u184 =
       match u184 with
       | true1 ->
@@ -520,10 +520,10 @@ let fallback = fun[+,append,eq_char,explode,length,map,newline,put_char,put_char
       u185 u186 k in
     eq_char c k in
   map u183 k in
-let split_words = fun[::,eq_char,reverse] s k ->
-  let loop = fix (fun[::,eq_char,reverse] loop accWs k ->
-    let v217 = fun[::,accWs,eq_char,loop,reverse] accCs k ->
-      let v216 = fun[::,accCs,accWs,eq_char,loop,reverse] xs k ->
+let split_words = fun [::,eq_char,reverse] s k ->
+  let loop = fix (fun [::,eq_char,reverse] loop accWs k ->
+    let v217 = fun [::,accWs,eq_char,loop,reverse] accCs k ->
+      let v216 = fun [::,accCs,accWs,eq_char,loop,reverse] xs k ->
         match xs with
         | Nil0 ->
           let k [reverse] u200 = reverse u200 k in
@@ -561,7 +561,7 @@ let split_words = fun[::,eq_char,reverse] s k ->
     u219 u221 k in
   let u220 = Nil0 in
   loop u220 k in
-let execute = fun[eq_char_list,explode,fallback,runfact,runfib,split_words] line k ->
+let execute = fun [eq_char_list,explode,fallback,runfact,runfib,split_words] line k ->
   let k [eq_char_list,explode,fallback,line,runfact,runfib] words =
     match words with
     | Nil0 ->
@@ -587,7 +587,7 @@ let execute = fun[eq_char_list,explode,fallback,runfact,runfib,split_words] line
         explode u226 k in
       eq_char_list command k in
   split_words line k in
-let mainloop = fix (fun[execute,put_char,read_line] mainloop _ k ->
+let mainloop = fix (fun [execute,put_char,read_line] mainloop _ k ->
   let k [execute,mainloop,put_char,read_line] _ =
     let k [execute,mainloop,read_line] _ =
       let k [execute,mainloop] xs =
@@ -602,7 +602,7 @@ let mainloop = fix (fun[execute,put_char,read_line] mainloop _ k ->
   let u231 = '>' in
   put_char u231 k) in
 let k [mainloop,put_string_newline] _ =
-  let main = fun[mainloop,put_string_newline] _ k ->
+  let main = fun [mainloop,put_string_newline] _ k ->
     let k [mainloop,put_string_newline] _ =
       let k [put_string_newline] _ =
         let u238 = "NEVER" in

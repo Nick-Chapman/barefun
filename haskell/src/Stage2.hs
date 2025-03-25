@@ -63,8 +63,8 @@ prettyA = \case
   Prim b xs -> do [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   ConTag tag [] -> [show tag]
   ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
-  Lam fvs x body -> indented ("fun" ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
-  RecLam fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun" ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
+  Lam fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
+  RecLam fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
 
 prettyArm :: Arm -> Lines
 prettyArm = \case

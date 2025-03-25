@@ -1,7 +1,7 @@
 (*stage3*)
 let k () = ()
 let eq_char_g1 = fun x_arg k ->
-  let v16_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v16_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v15_t1 = PRIM_EqChar(x_f1,y_arg) in
     k v15_t1 in
   k v16_t1 in
@@ -15,7 +15,7 @@ let get_char_g4 = fun x_arg k ->
   let v21_t1 = PRIM_GetChar(x_arg) in
   k v21_t1 in
 let ::_g5 = fun x_arg k ->
-  let v23_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v23_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v22_t1 = Cons1[x_f1,y_arg] in
     k v22_t1 in
   k v23_t1 in
@@ -31,7 +31,7 @@ let put_string_g7 = fun s_arg k ->
   let k = [], fun [] u25_arg -> put_chars_g6 u25_arg k in
   explode_g2 s_arg k in
 let revloop_g8 = fun revloop_me acc_arg k ->
-  let v29_t1 = [acc_arg,revloop_me], fun[acc_f1,revloop_f2] ys_arg k ->
+  let v29_t1 = [acc_arg,revloop_me], fun [acc_f1,revloop_f2] ys_arg k ->
     match ys_arg with
     | Nil0 -> k acc_f1
     | Cons1(y_t1,ysMore_t2) ->

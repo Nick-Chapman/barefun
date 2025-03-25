@@ -1,66 +1,66 @@
 (*stage2*)
 let k () = ()
-let + = fun[] x k ->
-  let v2 = fun[x] y k ->
+let + = fun [] x k ->
+  let v2 = fun [x] y k ->
     let v1 = PRIM_AddInt(x,y) in
     k v1 in
   k v2 in
-let - = fun[] x k ->
-  let v4 = fun[x] y k ->
+let - = fun [] x k ->
+  let v4 = fun [x] y k ->
     let v3 = PRIM_SubInt(x,y) in
     k v3 in
   k v4 in
-let ( * ) = fun[] x k ->
-  let v6 = fun[x] y k ->
+let ( * ) = fun [] x k ->
+  let v6 = fun [x] y k ->
     let v5 = PRIM_MulInt(x,y) in
     k v5 in
   k v6 in
-let / = fun[] x k ->
-  let v8 = fun[x] y k ->
+let / = fun [] x k ->
+  let v8 = fun [x] y k ->
     let v7 = PRIM_DivInt(x,y) in
     k v7 in
   k v8 in
-let % = fun[] x k ->
-  let v10 = fun[x] y k ->
+let % = fun [] x k ->
+  let v10 = fun [x] y k ->
     let v9 = PRIM_ModInt(x,y) in
     k v9 in
   k v10 in
-let < = fun[] x k ->
-  let v12 = fun[x] y k ->
+let < = fun [] x k ->
+  let v12 = fun [x] y k ->
     let v11 = PRIM_LessInt(x,y) in
     k v11 in
   k v12 in
-let = = fun[] x k ->
-  let v14 = fun[x] y k ->
+let = = fun [] x k ->
+  let v14 = fun [x] y k ->
     let v13 = PRIM_EqInt(x,y) in
     k v13 in
   k v14 in
-let eq_char = fun[] x k ->
-  let v16 = fun[x] y k ->
+let eq_char = fun [] x k ->
+  let v16 = fun [x] y k ->
     let v15 = PRIM_EqChar(x,y) in
     k v15 in
   k v16 in
-let ord = fun[] x k ->
+let ord = fun [] x k ->
   let v17 = PRIM_CharOrd(x) in
   k v17 in
-let chr = fun[] x k ->
+let chr = fun [] x k ->
   let v18 = PRIM_CharChr(x) in
   k v18 in
-let explode = fun[] x k ->
+let explode = fun [] x k ->
   let v19 = PRIM_Explode(x) in
   k v19 in
-let put_char = fun[] x k ->
+let put_char = fun [] x k ->
   let v20 = PRIM_PutChar(x) in
   k v20 in
-let get_char = fun[] x k ->
+let get_char = fun [] x k ->
   let v21 = PRIM_GetChar(x) in
   k v21 in
-let :: = fun[] x k ->
-  let v23 = fun[x] y k ->
+let :: = fun [] x k ->
+  let v23 = fun [x] y k ->
     let v22 = Cons1[x,y] in
     k v22 in
   k v23 in
-let put_chars = fix (fun[put_char] put_chars xs k ->
+let put_chars = fix (fun [put_char] put_chars xs k ->
   match xs with
   | Nil0 ->
     let v24 = Unit0 in
@@ -68,12 +68,12 @@ let put_chars = fix (fun[put_char] put_chars xs k ->
   | Cons1(x,xsMore) ->
     let k [put_chars,xsMore] _ = put_chars xsMore k in
     put_char x k) in
-let put_string = fun[explode,put_chars] s k ->
+let put_string = fun [explode,put_chars] s k ->
   let k [put_chars] u25 = put_chars u25 k in
   explode s k in
-let reverse = fun[::] ysStart k ->
-  let revloop = fix (fun[::] revloop acc k ->
-    let v29 = fun[::,acc,revloop] ys k ->
+let reverse = fun [::] ysStart k ->
+  let revloop = fix (fun [::] revloop acc k ->
+    let v29 = fun [::,acc,revloop] ys k ->
       match ys with
       | Nil0 -> k acc
       | Cons1(y,ysMore) ->
@@ -85,11 +85,11 @@ let reverse = fun[::] ysStart k ->
   let k [ysStart] u30 = u30 ysStart k in
   let u31 = Nil0 in
   revloop u31 k in
-let newline = fun[put_char] _ k ->
+let newline = fun [put_char] _ k ->
   let u32 = '\n' in
   put_char u32 k in
-let read_line = fun[::,eq_char,get_char,newline,put_char,reverse] _ k ->
-  let readloop = fix (fun[::,eq_char,get_char,newline,put_char,reverse] readloop sofar k ->
+let read_line = fun [::,eq_char,get_char,newline,put_char,reverse] _ k ->
+  let readloop = fix (fun [::,eq_char,get_char,newline,put_char,reverse] readloop sofar k ->
     let k [::,eq_char,newline,put_char,readloop,reverse,sofar] theChar =
       let gotten = theChar in
       let k [::,gotten,newline,put_char,readloop,reverse,sofar] u34 =
@@ -112,7 +112,7 @@ let read_line = fun[::,eq_char,get_char,newline,put_char,reverse] _ k ->
     get_char u33 k) in
   let u40 = Nil0 in
   readloop u40 k in
-let main = fix (fun[newline,put_chars,put_string,read_line] main _ k ->
+let main = fix (fun [newline,put_chars,put_string,read_line] main _ k ->
   let k [main,newline,put_chars,read_line] _ =
     let k [main,newline] _ =
       let k [main] _ =

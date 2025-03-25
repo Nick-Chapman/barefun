@@ -1,32 +1,32 @@
 (*stage3*)
 let k () = ()
 let +_g1 = fun x_arg k ->
-  let v2_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v2_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v1_t1 = PRIM_AddInt(x_f1,y_arg) in
     k v1_t1 in
   k v2_t1 in
 let -_g2 = fun x_arg k ->
-  let v4_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v4_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v3_t1 = PRIM_SubInt(x_f1,y_arg) in
     k v3_t1 in
   k v4_t1 in
 let /_g3 = fun x_arg k ->
-  let v8_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v8_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v7_t1 = PRIM_DivInt(x_f1,y_arg) in
     k v7_t1 in
   k v8_t1 in
 let %_g4 = fun x_arg k ->
-  let v10_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v10_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v9_t1 = PRIM_ModInt(x_f1,y_arg) in
     k v9_t1 in
   k v10_t1 in
 let <_g5 = fun x_arg k ->
-  let v12_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v12_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v11_t1 = PRIM_LessInt(x_f1,y_arg) in
     k v11_t1 in
   k v12_t1 in
 let =_g6 = fun x_arg k ->
-  let v14_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v14_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v13_t1 = PRIM_EqInt(x_f1,y_arg) in
     k v13_t1 in
   k v14_t1 in
@@ -43,7 +43,7 @@ let put_char_g10 = fun x_arg k ->
   let v20_t1 = PRIM_PutChar(x_arg) in
   k v20_t1 in
 let ::_g11 = fun x_arg k ->
-  let v23_t1 = [x_arg], fun[x_f1] y_arg k ->
+  let v23_t1 = [x_arg], fun [x_f1] y_arg k ->
     let v22_t1 = Cons1[x_f1,y_arg] in
     k v22_t1 in
   k v23_t1 in
@@ -55,12 +55,12 @@ let u43_g16 = 0 in
 let u45_g17 = '0' in
 let chars_of_int_g18 = fun i_arg k ->
   let k = [i_arg], fun [i_f1] ord0_arg ->
-    let char_of_digit_t1 = [ord0_arg], fun[ord0_f1] c_arg k ->
+    let char_of_digit_t1 = [ord0_arg], fun [ord0_f1] c_arg k ->
       let k = [], fun [] u25_arg -> chr_g8 u25_arg k in
       let k = [c_arg], fun [c_f1] u26_arg -> u26_arg c_f1 k in
       +_g1 ord0_f1 k in
     let loop_t2 = [char_of_digit_t1], fun [char_of_digit_f1] loop_me acc_arg k ->
-      let v40_t1 = [acc_arg,char_of_digit_f1,loop_me], fun[acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
+      let v40_t1 = [acc_arg,char_of_digit_f1,loop_me], fun [acc_f1,char_of_digit_f2,loop_f3] i_arg k ->
         let k = [acc_f1,char_of_digit_f2,i_arg,loop_f3], fun [acc_f1,char_of_digit_f2,i_f3,loop_f4] u27_arg ->
           match u27_arg with
           | true1 -> k acc_f1
