@@ -1,74 +1,74 @@
 (*stage2*)
 let k () = ()
 let + = fun [] x k ->
-  let v2 = fun [x] y k ->
-    let v1 = PRIM_AddInt(x,y) in
-    k v1 in
-  k v2 in
+  let lam_2 = fun [x] y k ->
+    let prim_1 = PRIM_AddInt(x,y) in
+    k prim_1 in
+  k lam_2 in
 let - = fun [] x k ->
-  let v4 = fun [x] y k ->
-    let v3 = PRIM_SubInt(x,y) in
-    k v3 in
-  k v4 in
+  let lam_4 = fun [x] y k ->
+    let prim_3 = PRIM_SubInt(x,y) in
+    k prim_3 in
+  k lam_4 in
 let ( * ) = fun [] x k ->
-  let v6 = fun [x] y k ->
-    let v5 = PRIM_MulInt(x,y) in
-    k v5 in
-  k v6 in
+  let lam_6 = fun [x] y k ->
+    let prim_5 = PRIM_MulInt(x,y) in
+    k prim_5 in
+  k lam_6 in
 let / = fun [] x k ->
-  let v8 = fun [x] y k ->
-    let v7 = PRIM_DivInt(x,y) in
-    k v7 in
-  k v8 in
+  let lam_8 = fun [x] y k ->
+    let prim_7 = PRIM_DivInt(x,y) in
+    k prim_7 in
+  k lam_8 in
 let % = fun [] x k ->
-  let v10 = fun [x] y k ->
-    let v9 = PRIM_ModInt(x,y) in
-    k v9 in
-  k v10 in
+  let lam_10 = fun [x] y k ->
+    let prim_9 = PRIM_ModInt(x,y) in
+    k prim_9 in
+  k lam_10 in
 let < = fun [] x k ->
-  let v12 = fun [x] y k ->
-    let v11 = PRIM_LessInt(x,y) in
-    k v11 in
-  k v12 in
+  let lam_12 = fun [x] y k ->
+    let prim_11 = PRIM_LessInt(x,y) in
+    k prim_11 in
+  k lam_12 in
 let = = fun [] x k ->
-  let v14 = fun [x] y k ->
-    let v13 = PRIM_EqInt(x,y) in
-    k v13 in
-  k v14 in
+  let lam_14 = fun [x] y k ->
+    let prim_13 = PRIM_EqInt(x,y) in
+    k prim_13 in
+  k lam_14 in
 let eq_char = fun [] x k ->
-  let v16 = fun [x] y k ->
-    let v15 = PRIM_EqChar(x,y) in
-    k v15 in
-  k v16 in
+  let lam_16 = fun [x] y k ->
+    let prim_15 = PRIM_EqChar(x,y) in
+    k prim_15 in
+  k lam_16 in
 let ord = fun [] x k ->
-  let v17 = PRIM_CharOrd(x) in
-  k v17 in
+  let prim_17 = PRIM_CharOrd(x) in
+  k prim_17 in
 let chr = fun [] x k ->
-  let v18 = PRIM_CharChr(x) in
-  k v18 in
+  let prim_18 = PRIM_CharChr(x) in
+  k prim_18 in
 let explode = fun [] x k ->
-  let v19 = PRIM_Explode(x) in
-  k v19 in
+  let prim_19 = PRIM_Explode(x) in
+  k prim_19 in
 let put_char = fun [] x k ->
-  let v20 = PRIM_PutChar(x) in
-  k v20 in
+  let prim_20 = PRIM_PutChar(x) in
+  k prim_20 in
 let get_char = fun [] x k ->
-  let v21 = PRIM_GetChar(x) in
-  k v21 in
+  let prim_21 = PRIM_GetChar(x) in
+  k prim_21 in
 let :: = fun [] x k ->
-  let v23 = fun [x] y k ->
-    let v22 = Cons1[x,y] in
-    k v22 in
-  k v23 in
+  let lam_23 = fun [x] y k ->
+    let con_22 = Cons1[x,y] in
+    k con_22 in
+  k lam_23 in
 let k [] main =
-  let u26_0'0 = Unit0 in
-  main u26_0'0 k in
+  let con_26_0'0 = Unit0 in
+  main con_26_0'0 k in
 let mainloop = fix (fun [get_char,put_char] mainloop _ k ->
   let k [mainloop,put_char] gotten =
     let k [mainloop] _ =
-      let u25_6'13 = Unit0 in
-      mainloop u25_6'13 k in
+      let con_25_6'13 = Unit0 in
+      mainloop con_25_6'13 k in
     put_char gotten k in
-  let u24_4'26 = Unit0 in
-  get_char u24_4'26 k) in
+  let con_24_4'26 = Unit0 in
+  get_char con_24_4'26 k) in
 k mainloop

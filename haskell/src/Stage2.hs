@@ -14,7 +14,7 @@ import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
 import Stage0 (evalLit,apply,Literal,Id(..))
-import Stage1 (Ctag(..),optPosExp)
+import Stage1 (Ctag(..),provenanceExp)
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
@@ -42,6 +42,17 @@ data Atomic
   | RecLam Fvs Id Id Code
 
 type Fvs = [Id]
+
+----------------------------------------------------------------------
+-- provenance
+
+provenanceAtomic :: Atomic -> (String,Maybe Position)
+provenanceAtomic = \case
+  Lit{} -> ("lit",Nothing)
+  Prim{} -> ("prim",Nothing)
+  ConTag{} -> ("con",Nothing)
+  Lam{} -> ("lam",Nothing)
+  RecLam{} -> undefined $ ("reclam",Nothing) -- never seen
 
 ----------------------------------------------------------------------
 -- Show
@@ -161,8 +172,9 @@ nameAtomic :: AC -> M Code
 nameAtomic = \case
   Compound code -> pure code
   Atomic a -> do
+    let (what,optPos) = provenanceAtomic a
+    u <- Fresh optPos what
     let noPos = Position 0 0
-    u <- Fresh Nothing "v" -- maybe name after the kind of atom being bound
     pure $ LetAtomic u a (Return noPos u)
 
 trans1 :: SRC.Exp -> M AC
@@ -207,8 +219,8 @@ transId :: SRC.Exp -> (Id -> M AC) -> M AC
 transId = \case
   SRC.Var _pos x -> \k -> k x
   e -> \k -> do
-    let optPos = optPosExp e
-    u <- Fresh optPos "u"
+    let (what,optPos) = provenanceExp e
+    u <- Fresh optPos what
     code <- trans1 e
     body <- (k u >>= nameAtomic)
     pure $ Compound $ mkBind u code body
@@ -238,9 +250,9 @@ runM m0 = loop 1 m0 $ \_ x -> x
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
       Fresh optPos tag -> do
-        let x = Id { optUniqueForGeneratedNames = Just u
-                   , optPosForGenNames = optPos
-                   , userGivenName = tag -- hmm, bit of a lie
+        let x = Id { optUnique = Just u
+                   , optPos
+                   , userGivenName = tag -- TODO: hmm, bit of a lie
                    }
         k (u+1) x
 

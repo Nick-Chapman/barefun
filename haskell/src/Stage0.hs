@@ -35,8 +35,8 @@ data Cid = Cid String deriving (Eq,Ord)
 data Literal = LitC Char | LitN Word16 | LitS String
 
 data Id = Id
-  { optUniqueForGeneratedNames :: Maybe Int
-  , optPosForGenNames :: Maybe Position
+  { optUnique :: Maybe Int
+  , optPos :: Maybe Position
   , userGivenName :: String
   } deriving (Eq,Ord)
 
@@ -50,7 +50,7 @@ cCons = Cid "Cons"
 
 mkUserId :: String -> Id
 mkUserId userGivenName =
-  Id { optUniqueForGeneratedNames = Nothing, optPosForGenNames = Nothing, userGivenName }
+  Id { optUnique = Nothing, optPos = Nothing, userGivenName }
 
 ----------------------------------------------------------------------
 -- Show
@@ -68,13 +68,13 @@ instance Show Literal where
     LitS s -> show s
 
 prettyId :: Id -> String
-prettyId Id{userGivenName,optUniqueForGeneratedNames,optPosForGenNames} =
+prettyId Id{userGivenName,optUnique,optPos} =
   maybePos (maybeTag (maybeBracket userGivenName))
   where
-    maybePos s = case optPosForGenNames of Nothing -> s; Just pos -> printf "%s_%s" s (show pos)
-    maybeTag s = case optUniqueForGeneratedNames of Nothing -> s; Just n -> printf "%s%d" s n
+    maybePos s = case optPos of Nothing -> s; Just pos -> printf "%s_%s" s (show pos)
+    maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n
     maybeBracket s = if needBracket s then printf "( %s )" s else s
-    needBracket = \case "*" -> True; _ -> False -- TODO: all infixes?
+    needBracket = \case "*" -> True; _ -> False
 
 prettyDef :: Def -> Lines
 prettyDef = \case

@@ -1,6 +1,6 @@
 -- | Simplifed language: Just expressions. Constructor names replaced by tags.
 module Stage1
-  ( Exp(..),Arm(..),Ctag(..), optPosExp
+  ( Exp(..),Arm(..),Ctag(..), provenanceExp
   , execute
   , compile
   ) where
@@ -34,16 +34,21 @@ data Arm = ArmTag Ctag [Id] Exp
 data Ctag = Ctag Cid Int
 
 ----------------------------------------------------------------------
--- position
+-- provenance
 
-optPosExp :: Exp -> Maybe Position
-optPosExp = \case
-  Var pos _ -> Just pos
-  App _ pos _ -> Just pos
-  -- Let pos _ _ _ -> Just pos -- TODO: Get nothing from this. why?
-  Lit pos _ -> Just pos
-  ConTag pos _ _ -> Just pos
-  _ -> Nothing
+provenanceExp :: Exp -> (String,Maybe Position)
+provenanceExp = \case
+  Var{} -> error "provenanceExp/Var" -- we never call on a Var
+  App _ pos _ -> ("app", Just pos)
+  Lit pos _ -> ("lit",Just pos)
+  ConTag pos _ _ -> ("con",Just pos)
+  Lam{} -> ("lam",Nothing)
+  -- TODO: No reason I think these cases can't occur. I've just never seen them yet in any of my examples.
+  Prim{} -> undefined
+  RecLam{} -> undefined
+  Let{} -> undefined
+  Case{} -> undefined
+
 
 ----------------------------------------------------------------------
 -- Show
