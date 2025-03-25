@@ -32,7 +32,7 @@ data Top -- restriction of Atomic
   -- TODO: TopConTag
 
 data Code
-  = Return Ref
+  = Return Position Ref
   | Tail Ref Position Ref
   | LetAlias Ref Ref Code
   | LetAtomic Ref Atomic Code
@@ -80,7 +80,7 @@ prettyT = \case
 
 prettyC :: Code -> Lines
 prettyC = \case
-  Return x -> ["k " ++ show x]
+  Return _ x -> ["k " ++ show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
   LetAlias x y body ->
     ["let " ++ show x ++ " = " ++ show y ++ " in"]
@@ -159,7 +159,7 @@ evalT genv = \case
 -- TODO: pickup genv from scope in stead of threading?
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
-  Return x -> \k -> k (look x)
+  Return _ x -> \k -> k (look x)
   Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
   LetAlias x y body -> \k -> do
     let v = look y
@@ -238,7 +238,7 @@ compileC = walkC firstTempIndex
   where
     walkC :: Int -> Cenv -> SRC.Code -> M Code
     walkC nextTemp cenv = \case
-      SRC.Return x -> pure $ Return (locate x)
+      SRC.Return pos x -> pure $ Return pos (locate x)
       SRC.Tail x1 pos x2 -> pure $ Tail (locate x1) pos (locate x2)
 
       SRC.LetAlias x y body -> do

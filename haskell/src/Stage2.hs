@@ -24,7 +24,7 @@ import qualified Stage1 as SRC
 type Transformed = Code
 
 data Code
-  = Return Id
+  = Return Position Id
   | Tail Id Position Id
   | LetAlias Id Id Code
   | LetAtomic Id Atomic Code
@@ -50,7 +50,7 @@ instance Show Code where show = intercalate "\n" . ("let k () = ()":) . pretty
 
 pretty :: Code -> Lines
 pretty = \case
-  Return x -> ["k " ++ show x]
+  Return _ x -> ["k " ++ show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
   LetAlias x y body -> ["let " ++ show x ++ " = " ++ show y ++ " in"] ++ pretty body
   LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ pretty body
@@ -88,7 +88,7 @@ evalCode0 exp =
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env = \case
-  Return x -> \k -> k (look x)
+  Return _ x -> \k -> k (look x)
   Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
   LetAlias x y body -> \k -> do
     let v = look y
@@ -161,13 +161,14 @@ nameAtomic :: AC -> M Code
 nameAtomic = \case
   Compound code -> pure code
   Atomic a -> do
+    let noPos = Position 0 0
     u <- Fresh "v" -- maybe name after the kind of atom being bound
-    pure $ LetAtomic u a (Return u)
+    pure $ LetAtomic u a (Return noPos u)
 
 trans1 :: SRC.Exp -> M AC
 trans1 = \case
-  SRC.Var _pos x -> do
-    pure $ Compound $ Return x
+  SRC.Var pos x -> do
+    pure $ Compound $ Return pos x
   SRC.Lit x -> do
     pure $ Atomic $ Lit x
   SRC.ConTag tag es -> do
@@ -193,7 +194,7 @@ trans1 = \case
 
 mkBind :: Id -> AC -> Code -> Code
 mkBind x rhs body = case rhs of
-  Compound (Return y) -> LetAlias x y body
+  Compound (Return _ y) -> LetAlias x y body
   Compound rhs -> mkPushContinuation (x,body) rhs
   Atomic rhs -> LetAtomic x rhs body
 
@@ -257,7 +258,7 @@ mkPushContinuation (x,later) first =
 
 fvs :: Code -> Set Id
 fvs = \case
-  Return x -> singleton x
+  Return _ x -> singleton x
   Tail x1 _ x2 -> Set.fromList [x1,x2]
   LetAlias x y body -> singleton y `union` (fvs body \\ singleton x)
   LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
