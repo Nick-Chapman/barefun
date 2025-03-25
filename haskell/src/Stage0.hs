@@ -68,9 +68,10 @@ instance Show Literal where
     LitS s -> show s
 
 prettyId :: Id -> String
-prettyId Id{userGivenName,optUniqueForGeneratedNames} =
-  maybeTag (maybeBracket userGivenName)
+prettyId Id{userGivenName,optUniqueForGeneratedNames,optPosForGenNames} =
+  maybePos (maybeTag (maybeBracket userGivenName))
   where
+    maybePos s = case optPosForGenNames of Nothing -> s; Just pos -> printf "%s_%s" s (show pos)
     maybeTag s = case optUniqueForGeneratedNames of Nothing -> s; Just n -> printf "%s%d" s n
     maybeBracket s = if needBracket s then printf "( %s )" s else s
     needBracket = \case "*" -> True; _ -> False -- TODO: all infixes?

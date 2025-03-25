@@ -1,6 +1,6 @@
 -- | Simplifed language: Just expressions. Constructor names replaced by tags.
 module Stage1
-  ( Exp(..),Arm(..),Ctag(..)
+  ( Exp(..),Arm(..),Ctag(..), optPosExp
   , execute
   , compile
   ) where
@@ -32,6 +32,15 @@ data Exp
 
 data Arm = ArmTag Ctag [Id] Exp
 data Ctag = Ctag Cid Int
+
+----------------------------------------------------------------------
+-- position
+
+optPosExp :: Exp -> Maybe Position
+optPosExp = \case
+  Var pos _ -> Just pos
+  App _ pos _ -> Just pos
+  _ -> Nothing
 
 ----------------------------------------------------------------------
 -- Show

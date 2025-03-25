@@ -14,7 +14,7 @@ import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
 import Stage0 (evalLit,apply,Literal,Id(..))
-import Stage1 (Ctag(..))
+import Stage1 (Ctag(..),optPosExp)
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
@@ -162,7 +162,7 @@ nameAtomic = \case
   Compound code -> pure code
   Atomic a -> do
     let noPos = Position 0 0
-    u <- Fresh "v" -- maybe name after the kind of atom being bound
+    u <- Fresh Nothing "v" -- maybe name after the kind of atom being bound
     pure $ LetAtomic u a (Return noPos u)
 
 trans1 :: SRC.Exp -> M AC
@@ -207,7 +207,8 @@ transId :: SRC.Exp -> (Id -> M AC) -> M AC
 transId = \case
   SRC.Var _pos x -> \k -> k x
   e -> \k -> do
-    u <- Fresh "u"
+    let _optPos = optPosExp e -- TODO
+    u <- Fresh Nothing "u"
     code <- trans1 e
     body <- (k u >>= nameAtomic)
     pure $ Compound $ mkBind u code body
@@ -227,7 +228,7 @@ instance Monad M where (>>=) = Bind
 data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
-  Fresh :: String -> M Id
+  Fresh :: Maybe Position -> String -> M Id
 
 runM :: M a -> a
 runM m0 = loop 1 m0 $ \_ x -> x
@@ -236,9 +237,9 @@ runM m0 = loop 1 m0 $ \_ x -> x
     loop u m k = case m of
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
-      Fresh tag -> do
+      Fresh optPos tag -> do
         let x = Id { optUniqueForGeneratedNames = Just u
-                   , optPosForGenNames = Nothing
+                   , optPosForGenNames = optPos
                    , userGivenName = tag -- hmm, bit of a lie
                    }
         k (u+1) x
