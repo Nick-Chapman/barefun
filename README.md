@@ -1,22 +1,27 @@
 # barefun
 
-Functional language system on baremetal. WIP
+The goal of this project is to write a small "operating system" to run on bare metal x86.
 
-Driving example: `example.fun`
+- The WIP [operating system](examples/shell.fun) is implemented in an ocaml-style language (`.fun`).
+- The WIP [compiler](haskell/src) for the ocaml-style language is written in haskell.
 
-- Can be execute directly by treating example code as ocaml.
-- Can be via using haskell-coded interpreter.
+Programming of the operating system & compiler are proceeding in tandem!
+- The operating system is just a fragment of a shell.
+- The compiler doesn't reach x86 yet.
+- There are some hand-coded x86 fragments [here](x86/examples/src/repl.asm) to guide the way.
 
-```
-(cd ocaml; dune build -w)
-(cd haskell; ghcid)
+Various examples of `.fun` code can be found [here](examples). Since `.fun` is a subset of ocaml, we can leverage the ocaml type checker for our examples: `dune build ocaml -w`
 
-(cd ocaml; dune exec bin/main.exe)
-(cd haskell; stack run)
+We test evaluation of the examples [here](check-eval), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
 
-cat sample.input | (cd ocaml; dune exec bin/main.exe)
-cat sample.input | (cd haskell; stack run)
+We have haskell interpreters for each stage of the compilation pipeline:
+- [Stage0](haskell/src/Stage0.hs): AST
+- [Stage1](haskell/src/Stage1.hs): Simplified expression language.
+- [Stage2](haskell/src/Stage2.hs): A-normal form.
+- [Stage3](haskell/src/Stage3.hs): Closure converted form.
 
-watch -n 1 'cat sample.input | (cd ocaml; dune exec bin/main.exe)'
-watch -n 1 'cat sample.input | (cd haskell; stack run)'
-```
+The expected output from each compiler stage is [here](check-compile),
+
+To run all tests, type `dune test`. (No output is good).
+
+To build the compiler; compile the main `shell.fun` example; and run it, type `make`.
