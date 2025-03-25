@@ -67,12 +67,12 @@ let main = fun [get_char,put_char] _ k ->
         let k [put_char] _ =
           let u30 = 'Z' in
           put_char u30 k in
-        let k [put_char] u28 = put_char u28 k in
+        let k [put_char] u28_6'21 = put_char u28_6'21 k in
         let u29 = Unit0 in
         get_char u29 k in
       let u27 = 'Y' in
       put_char u27 k in
-    let k [put_char] u25 = put_char u25 k in
+    let k [put_char] u25_4'21 = put_char u25_4'21 k in
     let u26 = Unit0 in
     get_char u26 k in
   let u24 = 'X' in

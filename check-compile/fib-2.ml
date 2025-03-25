@@ -63,49 +63,49 @@ let :: = fun [] x k ->
 let chars_of_int = fun [%,+,/,::,=,chr,ord] i k ->
   let k [%,+,/,::,=,chr,i] ord0 =
     let char_of_digit = fun [+,chr,ord0] c k ->
-      let k [chr] u25 = chr u25 k in
-      let k [c] u26 = u26 c k in
+      let k [chr] u25_4'36 = chr u25_4'36 k in
+      let k [c] u26_4'34 = u26_4'34 c k in
       + ord0 k in
     let loop = fix (fun [%,/,::,=,char_of_digit] loop acc k ->
       let v40 = fun [%,/,::,=,acc,char_of_digit,loop] i k ->
-        let k [%,/,::,acc,char_of_digit,i,loop] u27 =
-          match u27 with
+        let k [%,/,::,acc,char_of_digit,i,loop] u27_6'11 =
+          match u27_6'11 with
           | true1 -> k acc
           | false0 ->
-            let k [/,i] u30 =
-              let k [u30] u37 = u30 u37 k in
-              let k [] u38 =
+            let k [/,i] u30_7'11 =
+              let k [u30_7'11] u37_7'44 = u30_7'11 u37_7'44 k in
+              let k [] u38_7'43 =
                 let u39 = 10 in
-                u38 u39 k in
+                u38_7'43 u39 k in
               / i k in
-            let k [loop] u31 = loop u31 k in
-            let k [acc] u32 = u32 acc k in
-            let k [::] u33 = :: u33 k in
-            let k [char_of_digit] u34 = char_of_digit u34 k in
-            let k [] u35 =
+            let k [loop] u31_7'36 = loop u31_7'36 k in
+            let k [acc] u32_7'33 = u32_7'33 acc k in
+            let k [::] u33_7'26 = :: u33_7'26 k in
+            let k [char_of_digit] u34_7'29 = char_of_digit u34_7'29 k in
+            let k [] u35_7'28 =
               let u36 = 10 in
-              u35 u36 k in
+              u35_7'28 u36 k in
             % i k in
-        let k [] u28 =
+        let k [] u28_6'9 =
           let u29 = 0 in
-          u28 u29 k in
+          u28_6'9 u29 k in
         = i k in
       k v40) in
-    let k [::,i,loop] u41 =
-      match u41 with
+    let k [::,i,loop] u41_9'9 =
+      match u41_9'9 with
       | true1 ->
-        let k [] u44 =
+        let k [] u44_9'20 =
           let u46 = Nil0 in
-          u44 u46 k in
+          u44_9'20 u46 k in
         let u45 = '0' in
         :: u45 k
       | false0 ->
-        let k [i] u47 = u47 i k in
+        let k [i] u47_9'36 = u47_9'36 i k in
         let u48 = Nil0 in
         loop u48 k in
-    let k [] u42 =
+    let k [] u42_9'7 =
       let u43 = 0 in
-      u42 u43 k in
+      u42_9'7 u43 k in
     = i k in
   let u24 = '0' in
   ord u24 k in
@@ -118,35 +118,35 @@ let put_chars = fix (fun [put_char] put_chars xs k ->
     let k [put_chars,xs] _ = put_chars xs k in
     put_char x k) in
 let put_string = fun [explode,put_chars] s k ->
-  let k [put_chars] u50 = put_chars u50 k in
+  let k [put_chars] u50_16'38 = put_chars u50_16'38 k in
   explode s k in
 let put_int = fun [chars_of_int,put_chars] i k ->
-  let k [put_chars] u51 = put_chars u51 k in
+  let k [put_chars] u51_18'40 = put_chars u51_18'40 k in
   chars_of_int i k in
 let newline = fun [put_char] _ k ->
   let u52 = '\n' in
   put_char u52 k in
 let fib = fix (fun [+,-,<] fib n k ->
-  let k [+,-,fib,n] u53 =
-    match u53 with
+  let k [+,-,fib,n] u53_24'9 =
+    match u53_24'9 with
     | true1 -> k n
     | false0 ->
-      let k [-,fib,n] u56 =
-        let k [u56] u61 = u56 u61 k in
-        let k [fib] u62 = fib u62 k in
-        let k [] u63 =
+      let k [-,fib,n] u56_24'33 =
+        let k [u56_24'33] u61_24'39 = u56_24'33 u61_24'39 k in
+        let k [fib] u62_24'42 = fib u62_24'42 k in
+        let k [] u63_24'41 =
           let u64 = 2 in
-          u63 u64 k in
+          u63_24'41 u64 k in
         - n k in
-      let k [+] u57 = + u57 k in
-      let k [fib] u58 = fib u58 k in
-      let k [] u59 =
+      let k [+] u57_24'27 = + u57_24'27 k in
+      let k [fib] u58_24'30 = fib u58_24'30 k in
+      let k [] u59_24'29 =
         let u60 = 1 in
-        u59 u60 k in
+        u59_24'29 u60 k in
       - n k in
-  let k [] u54 =
+  let k [] u54_24'7 =
     let u55 = 2 in
-    u54 u55 k in
+    u54_24'7 u55 k in
   < n k) in
 let runfib = fun [fib,newline,put_int,put_string] n k ->
   let k [n,newline,put_int,put_string] res =

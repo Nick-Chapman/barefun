@@ -70,50 +70,50 @@ let not = fun [] b k ->
     k v25 in
 let > = fun [<] a k ->
   let v27 = fun [<,a] b k ->
-    let k [a] u26 = u26 a k in
+    let k [a] u26_7'16 = u26_7'16 a k in
     < b k in
   k v27 in
 let <= = fun [<,not] a k ->
   let v30 = fun [<,a,not] b k ->
-    let k [not] u28 = not u28 k in
-    let k [a] u29 = u29 a k in
+    let k [not] u28_8'24 = not u28_8'24 k in
+    let k [a] u29_8'22 = u29_8'22 a k in
     < b k in
   k v30 in
 let >= = fun [<,not] a k ->
   let v33 = fun [<,a,not] b k ->
-    let k [not] u31 = not u31 k in
-    let k [b] u32 = u32 b k in
+    let k [not] u31_9'24 = not u31_9'24 k in
+    let k [b] u32_9'22 = u32_9'22 b k in
     < a k in
   k v33 in
 let parse_digit = fun [-,<=,>=,ord] c k ->
   let k [<=,>=] n =
-    let k [<=,n] u38 =
-      match u38 with
+    let k [<=,n] u38_16'10 =
+      match u38_16'10 with
       | true1 ->
-        let k [n] u41 =
-          match u41 with
+        let k [n] u41_16'25 =
+          match u41_16'25 with
           | true1 ->
             let v44 = Some0[n] in
             k v44
           | false0 ->
             let v45 = None1 in
             k v45 in
-        let k [] u42 =
+        let k [] u42_16'22 =
           let u43 = 9 in
-          u42 u43 k in
+          u42_16'22 u43 k in
         <= n k
       | false0 ->
         let v46 = None1 in
         k v46 in
-    let k [] u39 =
+    let k [] u39_16'7 =
       let u40 = 0 in
-      u39 u40 k in
+      u39_16'7 u40 k in
     >= n k in
-  let k [ord] u34 =
-    let k [u34] u36 = u34 u36 k in
+  let k [ord] u34_14'16 =
+    let k [u34_14'16] u36_14'22 = u34_14'16 u36_14'22 k in
     let u37 = '0' in
     ord u37 k in
-  let k [-] u35 = - u35 k in
+  let k [-] u35_14'14 = - u35_14'14 k in
   ord c k in
 let parse_num = fun [( * ),+,parse_digit] s k ->
   let loop = fix (fun [( * ),+,parse_digit] loop acc k ->
@@ -123,27 +123,27 @@ let parse_num = fun [( * ),+,parse_digit] s k ->
         let v47 = Some0[acc] in
         k v47
       | Cons1(x,xs) ->
-        let k [( * ),+,acc,loop,xs] u48 =
-          match u48 with
+        let k [( * ),+,acc,loop,xs] u48_23'26 =
+          match u48_23'26 with
           | None1 ->
             let v49 = None1 in
             k v49
           | Some0(d) ->
-            let k [xs] u50 = u50 xs k in
-            let k [loop] u51 = loop u51 k in
-            let k [d] u52 = u52 d k in
-            let k [+] u53 = + u53 k in
-            let k [acc] u54 = u54 acc k in
+            let k [xs] u50_25'25 = u50_25'25 xs k in
+            let k [loop] u51_25'37 = loop u51_25'37 k in
+            let k [d] u52_25'35 = u52_25'35 d k in
+            let k [+] u53_25'31 = + u53_25'31 k in
+            let k [acc] u54_25'29 = u54_25'29 acc k in
             let u55 = 10 in
             ( * ) u55 k in
         parse_digit x k in
     k v56) in
-  let k [s] u57 = u57 s k in
+  let k [s] u57_27'7 = u57_27'7 s k in
   let u58 = 0 in
   loop u58 k in
 let cons = fun [::] x k ->
   let v60 = fun [::,x] xs k ->
-    let k [xs] u59 = u59 xs k in
+    let k [xs] u59_29'18 = u59_29'18 xs k in
     :: x k in
   k v60 in
 let eq_list = fix (fun [] eq_list eq k ->
@@ -164,23 +164,23 @@ let eq_list = fix (fun [] eq_list eq k ->
           let v63 = false0 in
           k v63
         | Cons1(y,ys) ->
-          let k [eq,eq_list,xs,ys] u64 =
-            match u64 with
+          let k [eq,eq_list,xs,ys] u64_38'16 =
+            match u64_38'16 with
             | true1 ->
-              let k [ys] u66 = u66 ys k in
-              let k [xs] u67 = u67 xs k in
+              let k [ys] u66_38'34 = u66_38'34 ys k in
+              let k [xs] u67_38'31 = u67_38'31 xs k in
               eq_list eq k
             | false0 ->
               let v68 = false0 in
               k v68 in
-          let k [y] u65 = u65 y k in
+          let k [y] u65_38'14 = u65_38'14 y k in
           eq x k in
     k v69 in
   k v70) in
 let eq_char_list = fun [eq_char,eq_list] a k ->
   let v73 = fun [a,eq_char,eq_list] b k ->
-    let k [b] u71 = u71 b k in
-    let k [a] u72 = u72 a k in
+    let k [b] u71_40'39 = u71_40'39 b k in
+    let k [a] u72_40'31 = u72_40'31 a k in
     eq_list eq_char k in
   k v73 in
 let append = fix (fun [cons] append xs k ->
@@ -188,9 +188,9 @@ let append = fix (fun [cons] append xs k ->
     match xs with
     | Nil0 -> k ys
     | Cons1(x,xs) ->
-      let k [append,xs,ys] u74 =
-        let k [u74] u75 = u74 u75 k in
-        let k [ys] u76 = u76 ys k in
+      let k [append,xs,ys] u74_45'18 =
+        let k [u74_45'18] u75_45'31 = u74_45'18 u75_45'31 k in
+        let k [ys] u76_45'28 = u76_45'28 ys k in
         append xs k in
       cons x k in
   k v77) in
@@ -200,12 +200,12 @@ let reverse = fun [cons] xs k ->
       match xs with
       | Nil0 -> k acc
       | Cons1(x,xs) ->
-        let k [xs] u78 = u78 xs k in
-        let k [loop] u79 = loop u79 k in
-        let k [acc] u80 = u80 acc k in
+        let k [xs] u78_51'20 = u78_51'20 xs k in
+        let k [loop] u79_51'28 = loop u79_51'28 k in
+        let k [acc] u80_51'26 = u80_51'26 acc k in
         cons x k in
     k v81) in
-  let k [xs] u82 = u82 xs k in
+  let k [xs] u82_53'7 = u82_53'7 xs k in
   let u83 = Nil0 in
   loop u83 k in
 let map = fix (fun [::] map f k ->
@@ -215,11 +215,11 @@ let map = fix (fun [::] map f k ->
       let v84 = Nil0 in
       k v84
     | Cons1(x,xs) ->
-      let k [f,map,xs] u85 =
-        let k [u85] u87 = u85 u87 k in
-        let k [xs] u88 = u88 xs k in
+      let k [f,map,xs] u85_58'17 =
+        let k [u85_58'17] u87_58'26 = u85_58'17 u87_58'26 k in
+        let k [xs] u88_58'24 = u88_58'24 xs k in
         map f k in
-      let k [::] u86 = :: u86 k in
+      let k [::] u86_58'15 = :: u86_58'15 k in
       f x k in
   k v89) in
 let length = fix (fun [+] length xs k ->
@@ -228,57 +228,57 @@ let length = fix (fun [+] length xs k ->
     let v90 = 0 in
     k v90
   | Cons1(_,xs) ->
-    let k [length,xs] u91 =
-      let k [u91] u93 = u91 u93 k in
+    let k [length,xs] u91_63'17 =
+      let k [u91_63'17] u93_63'27 = u91_63'17 u93_63'27 k in
       length xs k in
     let u92 = 1 in
     + u92 k) in
 let chars_of_int = fun [%,+,/,=,chr,cons,ord] i k ->
   let k [%,+,/,=,chr,cons,i] ord0 =
     let char_of_digit = fun [+,chr,ord0] c k ->
-      let k [chr] u95 = chr u95 k in
-      let k [c] u96 = u96 c k in
+      let k [chr] u95_67'36 = chr u95_67'36 k in
+      let k [c] u96_67'34 = u96_67'34 c k in
       + ord0 k in
     let loop = fix (fun [%,/,=,char_of_digit,cons] loop acc k ->
       let v110 = fun [%,/,=,acc,char_of_digit,cons,loop] i k ->
-        let k [%,/,acc,char_of_digit,cons,i,loop] u97 =
-          match u97 with
+        let k [%,/,acc,char_of_digit,cons,i,loop] u97_69'11 =
+          match u97_69'11 with
           | true1 -> k acc
           | false0 ->
-            let k [/,i] u100 =
-              let k [u100] u107 = u100 u107 k in
-              let k [] u108 =
+            let k [/,i] u100_70'11 =
+              let k [u100_70'11] u107_70'48 = u100_70'11 u107_70'48 k in
+              let k [] u108_70'47 =
                 let u109 = 10 in
-                u108 u109 k in
+                u108_70'47 u109 k in
               / i k in
-            let k [loop] u101 = loop u101 k in
-            let k [acc] u102 = u102 acc k in
-            let k [cons] u103 = cons u103 k in
-            let k [char_of_digit] u104 = char_of_digit u104 k in
-            let k [] u105 =
+            let k [loop] u101_70'40 = loop u101_70'40 k in
+            let k [acc] u102_70'17 = u102_70'17 acc k in
+            let k [cons] u103_70'32 = cons u103_70'32 k in
+            let k [char_of_digit] u104_70'35 = char_of_digit u104_70'35 k in
+            let k [] u105_70'34 =
               let u106 = 10 in
-              u105 u106 k in
+              u105_70'34 u106 k in
             % i k in
-        let k [] u98 =
+        let k [] u98_69'9 =
           let u99 = 0 in
-          u98 u99 k in
+          u98_69'9 u99 k in
         = i k in
       k v110) in
-    let k [cons,i,loop] u111 =
-      match u111 with
+    let k [cons,i,loop] u111_72'9 =
+      match u111_72'9 with
       | true1 ->
-        let k [] u114 =
+        let k [] u114_72'21 =
           let u116 = Nil0 in
-          u114 u116 k in
+          u114_72'21 u116 k in
         let u115 = '0' in
         cons u115 k
       | false0 ->
-        let k [i] u117 = u117 i k in
+        let k [i] u117_72'38 = u117_72'38 i k in
         let u118 = Nil0 in
         loop u118 k in
-    let k [] u112 =
+    let k [] u112_72'7 =
       let u113 = 0 in
-      u112 u113 k in
+      u112_72'7 u113 k in
     = i k in
   let u94 = '0' in
   ord u94 k in
@@ -291,10 +291,10 @@ let put_chars = fix (fun [put_char] put_chars xs k ->
     let k [put_chars,xs] _ = put_chars xs k in
     put_char x k) in
 let put_string = fun [explode,put_chars] s k ->
-  let k [put_chars] u120 = put_chars u120 k in
+  let k [put_chars] u120_79'38 = put_chars u120_79'38 k in
   explode s k in
 let put_int = fun [chars_of_int,put_chars] i k ->
-  let k [put_chars] u121 = put_chars u121 k in
+  let k [put_chars] u121_81'40 = put_chars u121_81'40 k in
   chars_of_int i k in
 let newline = fun [put_char] _ k ->
   let u122 = '\n' in
@@ -308,23 +308,23 @@ let read_line = fun [<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,rever
   let loop = fix (fun [<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,reverse] loop acc k ->
     let k [<=,=,>,acc,chr,cons,eq_char,loop,newline,ord,put_char,reverse] c =
       let k [<=,=,>,acc,c,chr,cons,eq_char,loop,newline,put_char,reverse] n =
-        let k [<=,=,>,acc,c,chr,cons,loop,n,newline,put_char,reverse] u125 =
-          match u125 with
+        let k [<=,=,>,acc,c,chr,cons,loop,n,newline,put_char,reverse] u125_93'17 =
+          match u125_93'17 with
           | true1 ->
             let k [acc,reverse] _ = reverse acc k in
             let u128 = Unit0 in
             newline u128 k
           | false0 ->
-            let k [=,>,acc,c,chr,cons,loop,n,put_char] u129 =
-              match u129 with
+            let k [=,>,acc,c,chr,cons,loop,n,put_char] u129_94'14 =
+              match u129_94'14 with
               | true1 -> loop acc k
               | false0 ->
-                let k [=,acc,c,chr,cons,loop,n,put_char] u132 =
-                  match u132 with
+                let k [=,acc,c,chr,cons,loop,n,put_char] u132_95'15 =
+                  match u132_95'15 with
                   | true1 -> loop acc k
                   | false0 ->
-                    let k [acc,c,chr,cons,loop,put_char] u135 =
-                      match u135 with
+                    let k [acc,c,chr,cons,loop,put_char] u135_96'17 =
+                      match u135_96'17 with
                       | true1 ->
                         match acc with
                         | Nil0 -> loop acc k
@@ -332,35 +332,35 @@ let read_line = fun [<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,rever
                           let k [chr,loop,put_char,tail] _ =
                             let k [chr,loop,put_char,tail] _ =
                               let k [loop,tail] _ = loop tail k in
-                              let k [put_char] u141 = put_char u141 k in
+                              let k [put_char] u141_103'29 = put_char u141_103'29 k in
                               let u142 = 8 in
                               chr u142 k in
                             let u140 = ' ' in
                             put_char u140 k in
-                          let k [put_char] u138 = put_char u138 k in
+                          let k [put_char] u138_101'29 = put_char u138_101'29 k in
                           let u139 = 8 in
                           chr u139 k
                       | false0 ->
                         let k [acc,c,cons,loop] _ =
-                          let k [loop] u143 = loop u143 k in
-                          let k [acc] u144 = u144 acc k in
+                          let k [loop] u143_106'38 = loop u143_106'38 k in
+                          let k [acc] u144_106'36 = u144_106'36 acc k in
                           cons c k in
                         put_char c k in
-                    let k [] u136 =
+                    let k [] u136_96'15 =
                       let u137 = 127 in
-                      u136 u137 k in
+                      u136_96'15 u137 k in
                     = n k in
-                let k [] u133 =
+                let k [] u133_95'13 =
                   let u134 = 127 in
-                  u133 u134 k in
+                  u133_95'13 u134 k in
                 > n k in
-            let k [] u130 =
+            let k [] u130_94'11 =
               let u131 = 31 in
-              u130 u131 k in
+              u130_94'11 u131 k in
             <= n k in
-        let k [] u126 =
+        let k [] u126_93'15 =
           let u127 = '\n' in
-          u126 u127 k in
+          u126_93'15 u127 k in
         eq_char c k in
       ord c k in
     let u124 = Unit0 in
@@ -368,44 +368,44 @@ let read_line = fun [<=,=,>,chr,cons,eq_char,get_char,newline,ord,put_char,rever
   let u145 = Nil0 in
   loop u145 k in
 let fib = fix (fun [+,-,<] fib n k ->
-  let k [+,-,fib,n] u146 =
-    match u146 with
+  let k [+,-,fib,n] u146_112'9 =
+    match u146_112'9 with
     | true1 -> k n
     | false0 ->
-      let k [-,fib,n] u149 =
-        let k [u149] u154 = u149 u154 k in
-        let k [fib] u155 = fib u155 k in
-        let k [] u156 =
+      let k [-,fib,n] u149_112'33 =
+        let k [u149_112'33] u154_112'39 = u149_112'33 u154_112'39 k in
+        let k [fib] u155_112'42 = fib u155_112'42 k in
+        let k [] u156_112'41 =
           let u157 = 2 in
-          u156 u157 k in
+          u156_112'41 u157 k in
         - n k in
-      let k [+] u150 = + u150 k in
-      let k [fib] u151 = fib u151 k in
-      let k [] u152 =
+      let k [+] u150_112'27 = + u150_112'27 k in
+      let k [fib] u151_112'30 = fib u151_112'30 k in
+      let k [] u152_112'29 =
         let u153 = 1 in
-        u152 u153 k in
+        u152_112'29 u153 k in
       - n k in
-  let k [] u147 =
+  let k [] u147_112'7 =
     let u148 = 2 in
-    u147 u148 k in
+    u147_112'7 u148 k in
   < n k) in
 let fact = fix (fun [( * ),-,>=] fact n k ->
-  let k [( * ),-,fact,n] u158 =
-    match u158 with
+  let k [( * ),-,fact,n] u158_116'10 =
+    match u158_116'10 with
     | true1 ->
-      let k [n] u161 = u161 n k in
-      let k [( * )] u162 = ( * ) u162 k in
-      let k [fact] u163 = fact u163 k in
-      let k [] u164 =
+      let k [n] u161_116'28 = u161_116'28 n k in
+      let k [( * )] u162_116'22 = ( * ) u162_116'22 k in
+      let k [fact] u163_116'25 = fact u163_116'25 k in
+      let k [] u164_116'24 =
         let u165 = 1 in
-        u164 u165 k in
+        u164_116'24 u165 k in
       - n k
     | false0 ->
       let v166 = 1 in
       k v166 in
-  let k [] u159 =
+  let k [] u159_116'7 =
     let u160 = 2 in
-    u159 u160 k in
+    u159_116'7 u160 k in
   >= n k) in
 let error = fun [newline,put_string] s k ->
   let k [newline,put_string,s] _ =
@@ -427,8 +427,8 @@ let runfib = fun [error,fib,newline,parse_num,put_int,put_string] args k ->
         let u171 = "expected exactly one argument" in
         error u171 k
       | Nil0 ->
-        let k [error,fib,newline,put_int,put_string] u172 =
-          match u172 with
+        let k [error,fib,newline,put_int,put_string] u172_128'24 =
+          match u172_128'24 with
           | None1 ->
             let u173 = "expected arg1 to be numeric" in
             error u173 k
@@ -459,8 +459,8 @@ let runfact = fun [error,fact,newline,parse_num,put_int,put_string] args k ->
         let u178 = "expected exactly one argument" in
         error u178 k
       | Nil0 ->
-        let k [error,fact,newline,put_int,put_string] u179 =
-          match u179 with
+        let k [error,fact,newline,put_int,put_string] u179_145'24 =
+          match u179_145'24 with
           | None1 ->
             let u180 = "expected arg1 to be numeric" in
             error u180 k
@@ -496,28 +496,28 @@ let fallback = fun [+,append,eq_char,explode,length,map,newline,put_char,put_cha
           put_char u197 k in
         let u196 = ' ' in
         put_char u196 k in
-      let k [put_chars] u191 = put_chars u191 k in
-      let k [line,star_the_ohs] u192 =
-        let k [u192] u195 = u192 u195 k in
+      let k [put_chars] u191_157'44 = put_chars u191_157'44 k in
+      let k [line,star_the_ohs] u192_157'20 =
+        let k [u192_157'20] u195_157'58 = u192_157'20 u195_157'58 k in
         star_the_ohs line k in
-      let k [append] u193 = append u193 k in
+      let k [append] u193_157'29 = append u193_157'29 k in
       let u194 = "You wrote: " in
       explode u194 k in
-    let k [length,line] u188 =
-      let k [u188] u190 = u188 u190 k in
+    let k [length,line] u188_156'14 =
+      let k [u188_156'14] u190_156'23 = u188_156'14 u190_156'23 k in
       length line k in
     let u189 = 100 in
     + u189 k in
   let u183 = fun [eq_char] c k ->
-    let k [c] u184 =
-      match u184 with
+    let k [c] u184_155'48 =
+      match u184_155'48 with
       | true1 ->
         let v187 = '*' in
         k v187
       | false0 -> k c in
-    let k [] u185 =
+    let k [] u185_155'46 =
       let u186 = 'o' in
-      u185 u186 k in
+      u185_155'46 u186 k in
     eq_char c k in
   map u183 k in
 let split_words = fun [::,eq_char,reverse] s k ->
@@ -526,39 +526,39 @@ let split_words = fun [::,eq_char,reverse] s k ->
       let v216 = fun [::,accCs,accWs,eq_char,loop,reverse] xs k ->
         match xs with
         | Nil0 ->
-          let k [reverse] u200 = reverse u200 k in
-          let k [accWs] u201 = u201 accWs k in
-          let k [::] u202 = :: u202 k in
+          let k [reverse] u200_167'38 = reverse u200_167'38 k in
+          let k [accWs] u201_167'35 = u201_167'35 accWs k in
+          let k [::] u202_167'29 = :: u202_167'29 k in
           reverse accCs k
         | Cons1(x,xs) ->
-          let k [::,accCs,accWs,loop,reverse,x,xs] u203 =
-            match u203 with
+          let k [::,accCs,accWs,loop,reverse,x,xs] u203_170'20 =
+            match u203_170'20 with
             | true1 ->
-              let k [xs] u206 = u206 xs k in
-              let k [] u207 =
+              let k [xs] u206_170'59 = u206_170'59 xs k in
+              let k [] u207_170'34 =
                 let u211 = Nil0 in
-                u207 u211 k in
-              let k [loop] u208 = loop u208 k in
-              let k [accWs] u209 = u209 accWs k in
-              let k [::] u210 = :: u210 k in
+                u207_170'34 u211 k in
+              let k [loop] u208_170'52 = loop u208_170'52 k in
+              let k [accWs] u209_170'49 = u209_170'49 accWs k in
+              let k [::] u210_170'43 = :: u210_170'43 k in
               reverse accCs k
             | false0 ->
-              let k [xs] u212 = u212 xs k in
-              let k [::,accCs,x] u213 =
-                let k [u213] u214 = u213 u214 k in
-                let k [accCs] u215 = u215 accCs k in
+              let k [xs] u212_171'23 = u212_171'23 xs k in
+              let k [::,accCs,x] u213_171'17 =
+                let k [u213_171'17] u214_171'27 = u213_171'17 u214_171'27 k in
+                let k [accCs] u215_171'25 = u215_171'25 accCs k in
                 :: x k in
               loop accWs k in
-          let k [] u204 =
+          let k [] u204_170'18 =
             let u205 = ' ' in
-            u204 u205 k in
+            u204_170'18 u205 k in
           eq_char x k in
       k v216 in
     k v217) in
-  let k [s] u218 = u218 s k in
-  let k [] u219 =
+  let k [s] u218_173'10 = u218_173'10 s k in
+  let k [] u219_173'7 =
     let u221 = Nil0 in
-    u219 u221 k in
+    u219_173'7 u221 k in
   let u220 = Nil0 in
   loop u220 k in
 let execute = fun [eq_char_list,explode,fallback,runfact,runfib,split_words] line k ->
@@ -568,21 +568,21 @@ let execute = fun [eq_char_list,explode,fallback,runfact,runfib,split_words] lin
       let v222 = Unit0 in
       k v222
     | Cons1(command,args) ->
-      let k [args,command,eq_char_list,explode,fallback,line,runfact,runfib] u223 =
-        match u223 with
+      let k [args,command,eq_char_list,explode,fallback,line,runfact,runfib] u223_180'29 =
+        match u223_180'29 with
         | true1 -> runfib args k
         | false0 ->
-          let k [args,fallback,line,runfact] u227 =
-            match u227 with
+          let k [args,fallback,line,runfact] u227_181'31 =
+            match u227_181'31 with
             | true1 -> runfact args k
             | false0 -> fallback line k in
-          let k [explode] u228 =
-            let k [u228] u229 = u228 u229 k in
+          let k [explode] u228_181'23 =
+            let k [u228_181'23] u229_181'40 = u228_181'23 u229_181'40 k in
             let u230 = "fact" in
             explode u230 k in
           eq_char_list command k in
-      let k [explode] u224 =
-        let k [u224] u225 = u224 u225 k in
+      let k [explode] u224_180'21 =
+        let k [u224_180'21] u225_180'38 = u224_180'21 u225_180'38 k in
         let u226 = "fib" in
         explode u226 k in
       eq_char_list command k in

@@ -207,8 +207,8 @@ transId :: SRC.Exp -> (Id -> M AC) -> M AC
 transId = \case
   SRC.Var _pos x -> \k -> k x
   e -> \k -> do
-    let _optPos = optPosExp e -- TODO
-    u <- Fresh Nothing "u"
+    let optPos = optPosExp e
+    u <- Fresh optPos "u"
     code <- trans1 e
     body <- (k u >>= nameAtomic)
     pure $ Compound $ mkBind u code body

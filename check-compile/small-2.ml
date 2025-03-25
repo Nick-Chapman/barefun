@@ -69,7 +69,7 @@ let put_chars = fix (fun [put_char] put_chars xs k ->
     let k [put_chars,xsMore] _ = put_chars xsMore k in
     put_char x k) in
 let put_string = fun [explode,put_chars] s k ->
-  let k [put_chars] u25 = put_chars u25 k in
+  let k [put_chars] u25_7'38 = put_chars u25_7'38 k in
   explode s k in
 let reverse = fun [::] ysStart k ->
   let revloop = fix (fun [::] revloop acc k ->
@@ -77,12 +77,12 @@ let reverse = fun [::] ysStart k ->
       match ys with
       | Nil0 -> k acc
       | Cons1(y,ysMore) ->
-        let k [ysMore] u26 = u26 ysMore k in
-        let k [revloop] u27 = revloop u27 k in
-        let k [acc] u28 = u28 acc k in
+        let k [ysMore] u26_13'27 = u26_13'27 ysMore k in
+        let k [revloop] u27_13'33 = revloop u27_13'33 k in
+        let k [acc] u28_13'30 = u28_13'30 acc k in
         :: y k in
     k v29) in
-  let k [ysStart] u30 = u30 ysStart k in
+  let k [ysStart] u30_15'10 = u30_15'10 ysStart k in
   let u31 = Nil0 in
   revloop u31 k in
 let newline = fun [put_char] _ k ->
@@ -92,21 +92,21 @@ let read_line = fun [::,eq_char,get_char,newline,put_char,reverse] _ k ->
   let readloop = fix (fun [::,eq_char,get_char,newline,put_char,reverse] readloop sofar k ->
     let k [::,eq_char,newline,put_char,readloop,reverse,sofar] theChar =
       let gotten = theChar in
-      let k [::,gotten,newline,put_char,readloop,reverse,sofar] u34 =
-        match u34 with
+      let k [::,gotten,newline,put_char,readloop,reverse,sofar] u34_23'22 =
+        match u34_23'22 with
         | true1 ->
           let k [reverse,sofar] _ = reverse sofar k in
           let u37 = Unit0 in
           newline u37 k
         | false0 ->
           let k [::,gotten,readloop,sofar] _ =
-            let k [readloop] u38 = readloop u38 k in
-            let k [sofar] u39 = u39 sofar k in
+            let k [readloop] u38_24'44 = readloop u38_24'44 k in
+            let k [sofar] u39_24'41 = u39_24'41 sofar k in
             :: gotten k in
           put_char gotten k in
-      let k [] u35 =
+      let k [] u35_23'15 =
         let u36 = '\n' in
-        u35 u36 k in
+        u35_23'15 u36 k in
       eq_char gotten k in
     let u33 = Unit0 in
     get_char u33 k) in
@@ -120,7 +120,7 @@ let main = fix (fun [newline,put_chars,put_string,read_line] main _ k ->
         main u45 k in
       let u44 = Unit0 in
       newline u44 k in
-    let k [put_chars] u42 = put_chars u42 k in
+    let k [put_chars] u42_30'23 = put_chars u42_30'23 k in
     let u43 = Unit0 in
     read_line u43 k in
   let u41 = "> " in
