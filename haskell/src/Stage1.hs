@@ -11,7 +11,7 @@ import Data.Map (Map)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Id,Cid)
+import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Id,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
@@ -145,6 +145,7 @@ env0 = Env { venv = Map.empty }
 
 -- | Convert constructor names to integer tags,
 -- | Convert definitions to let-expressions.
+
 compile :: SRC.Prog -> Transformed
 compile = transProg initCenv
 
@@ -155,12 +156,12 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
     walk cenv = \case
       [] -> mainApp
 
-      SRC.ValDef name rhs : defs -> do
+      SRC.ValDef _x@(Bid pos x) rhs : defs -> do
         let body = walk cenv defs
         -- This looses top-level side effects, so should not really be done
         -- But in makes the examples small for compilation dev...
         --if name `member` fvs body then Let name (transExp cenv rhs) body else body
-        Let noPos name (transExp cenv rhs) body
+        Let pos x (transExp cenv rhs) body
 
       SRC.TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
@@ -173,6 +174,8 @@ transProg cenv (SRC.Prog defs) = walk cenv defs
 
     noPos = Position 0 0
     main = Var noPos (SRC.mkUserId "main")
+
+-- TODO: propogate position info from binding identifier occurrances to each reference.
 
 transExp :: Cenv -> SRC.Exp -> Exp
 transExp cenv e = trans e
@@ -187,14 +190,15 @@ transExp cenv e = trans e
       SRC.Lit p x -> Lit p x
       SRC.Con p cid es -> ConTag p (transCid cid) (map trans es)
       SRC.Prim pos b xs -> Prim pos b (map trans xs)
-      SRC.Lam p x body -> Lam p x (trans body)
-      SRC.RecLam f x body -> RecLam f x (trans body)
+      SRC.Lam p (Bid _ x) body -> Lam p x (trans body)
+      SRC.RecLam (Bid _ f) (Bid _ x) body -> RecLam f x (trans body)
       SRC.App e1 p e2 -> App (trans e1) p (trans e2)
-      SRC.Let pos x rhs body -> Let pos x (trans rhs) (trans body)
+      SRC.Let pos (Bid _ x) rhs body -> Let pos x (trans rhs) (trans body)
       SRC.Case scrut arms -> Case (trans scrut) (map transArm arms)
 
     transArm :: SRC.Arm -> Arm
-    transArm (SRC.Arm cid xs e) = ArmTag (transCid cid) xs (trans e)
+    transArm (SRC.Arm cid xs e) = ArmTag (transCid cid) (map unBind xs) (trans e)
+      where unBind (Bid _ x) = x
 
 type Cenv = Map Cid Int
 

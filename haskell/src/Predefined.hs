@@ -4,12 +4,13 @@ module Predefined
 
 import Builtin (Builtin(..))
 import Par4 (Position(..))
-import Stage0 (Prog(..),Def(..),Exp(..), cCons, mkUserId)
+import Stage0 (Prog(..),Def(..),Exp(..), cCons, mkUserId,Bid(..))
 
 wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =
-  Prog ([ ValDef (mkUserId name) exp | (name,exp) <- bindings ] ++ defs)
+  Prog ([ ValDef (Bid noPos (mkUserId x)) exp | (x,exp) <- bindings ] ++ defs)
   where
+    noPos = Position 0 0 -- TODO: can we do better than noPos?
     bindings :: [(String,Exp)]
     bindings =
       [ ("+"            , prim2 AddInt)
@@ -31,8 +32,9 @@ wrapPreDefs (Prog defs) =
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])
         prim2 p2 = Lam noPos x (Lam noPos y (Prim noPos p2 [ex,ey]))
         construct2 c2 = Lam noPos x (Lam noPos y (Con noPos c2 [ex,ey]))
-        ex = Var noPos x
-        ey = Var noPos y
-        x = mkUserId "x"
-        y = mkUserId "y"
-        noPos = Position 0 0
+        ex = Var noPos x'
+        ey = Var noPos y'
+        x = Bid noPos x'
+        y = Bid noPos y'
+        x' = mkUserId "x"
+        y' = mkUserId "y"

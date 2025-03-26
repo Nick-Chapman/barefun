@@ -1,7 +1,7 @@
 module Parser (parseProg) where
 
 import Data.Word (Word16)
-import Stage0 (Prog,Exp,Id,Arm,Cid)
+import Stage0 (Prog,Exp,Id,Arm,Cid,Bid(..))
 import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,mkUserId)
 import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
@@ -12,8 +12,8 @@ import qualified Par4
 parseProg :: String -> Prog
 parseProg = Par4.parse gram6
 
-mkAbstraction :: [(Position,Id)] -> Exp -> Exp
-mkAbstraction xs e = case xs of [] -> e; (pos,x):xs -> AST.Lam pos x (mkAbstraction xs e)
+mkAbstraction :: [Bid] -> Exp -> Exp
+mkAbstraction xs e = case xs of [] -> e; x@(Bid pos _):xs -> AST.Lam pos x (mkAbstraction xs e)
 
 mkApps :: Exp -> [(Position,Exp)] -> Exp
 mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
@@ -21,8 +21,9 @@ mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 underscore :: Id
 underscore = mkUserId "_"
 
+-- TODO: What position should we use in a sequence expression?
 mkSeq :: Position -> Exp -> Exp -> Exp
-mkSeq pos e1 e2 = AST.Let pos underscore e1 e2
+mkSeq pos e1 e2 = AST.Let pos (Bid pos underscore) e1 e2
 
 mkIte :: Exp -> Exp -> Exp -> Exp
 mkIte i t e = AST.Case i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
@@ -123,7 +124,7 @@ gram6 = program where
     singleQuote
     pure x
 
-  stringLitChar = sat $ \c -> c /= '"' -- TODO: do escaped chars properly
+  stringLitChar = sat $ \c -> c /= '"' -- TODO: do escaped chars properly.. first step \n for newline
   doubleQuote = lit '"'
   stringLit = nibble $ do
     doubleQuote
@@ -146,12 +147,6 @@ gram6 = program where
          , do openClose; pure underscore
          ]
 
-  positionedIdentOrUnit :: Par (Position,Id)
-  positionedIdentOrUnit = do
-    pos <- position
-    x <- identOrUnit
-    pure (pos,x)
-
   -- patterns...
 
   nilPat = do
@@ -160,14 +155,14 @@ gram6 = program where
     pure (cNil,[])
 
   consPat = do
-    x <- identOrUnit
+    x <- bound identOrUnit
     key "::"
-    xs <- identOrUnit
+    xs <- bound identOrUnit
     pure (cCons,[x,xs])
 
-  tupleId :: Par [Id] =
-    alts [ bracketed (separated (key ",") identOrUnit)
-         , do x <- identOrUnit; pure [x]
+  tupleId :: Par [Bid] =
+    alts [ bracketed (separated (key ",") (bound identOrUnit))
+         , do x <- bound identOrUnit; pure [x]
          , pure []
          ]
 
@@ -176,7 +171,7 @@ gram6 = program where
     xs <- tupleId
     pure (c,xs)
 
-  pat :: Par (Cid, [Id]) =
+  pat :: Par (Cid, [Bid]) =
     alts [nilPat,consPat,constructedPat]
 
   -- expressions...
@@ -253,22 +248,28 @@ gram6 = program where
 
   infixWeakestPrecendence = infix4
 
-  bindingAbstraction = do
-    xs <- many positionedIdentOrUnit
-    key "="
-    bound <- exp
-    pure (mkAbstraction xs bound)
+  bound :: Par Id -> Par Bid
+  bound identPar = do
+    pos <- position
+    x <- identPar
+    pure (Bid pos x)
 
-  binding = do
+  bindingAbstraction = do
+    xs <- many (bound identOrUnit)
+    key "="
+    e <- exp
+    pure (mkAbstraction xs e)
+
+  binding :: Par (Bid,Exp) = do
     key "let"
     alts [do key "rec"; pure True, pure False] >>= \case
       True -> do
-        f <- alts [identifier,bracketedInfixName]
-        x1 <- identOrUnit
+        f <- bound $ alts [identifier,bracketedInfixName]
+        x1 <- bound identOrUnit
         rhs <- bindingAbstraction
         pure (f, AST.RecLam f x1 rhs)
       False -> do
-        f <- alts [identOrUnit,bracketedInfixName]
+        f <- bound $ alts [identOrUnit,bracketedInfixName]
         rhs <- bindingAbstraction
         pure (f,rhs)
 
@@ -290,7 +291,7 @@ gram6 = program where
 
   abstraction = do
     key "fun"
-    xs <- some positionedIdentOrUnit
+    xs <- some (bound identOrUnit)
     key "->"
     e <- exp
     pure (mkAbstraction xs e)

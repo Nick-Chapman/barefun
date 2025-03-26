@@ -1,6 +1,6 @@
 -- | Primary AST for the .fun language. As constructed by Parser
 module Stage0
-  ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Name(..)
+  ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Name(..),Bid(..)
   , cUnit,cFalse,cTrue,cNil,cCons,mkUserId
   , execute,evalLit,apply
   ) where
@@ -17,20 +17,20 @@ import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
 
 data Prog = Prog [Def]
-data Def = ValDef Id Exp | TypeDef [Cid]
+data Def = ValDef Bid Exp | TypeDef [Cid]
 
 data Exp
   = Var Position Id
   | Lit Position Literal
   | Con Position Cid [Exp]
   | Prim Position Builtin [Exp]
-  | Lam Position Id Exp
-  | RecLam Id Id Exp
+  | Lam Position Bid Exp
+  | RecLam Bid Bid Exp
   | App Exp Position Exp
-  | Let Position Id Exp Exp
+  | Let Position Bid Exp Exp
   | Case Exp [Arm]
 
-data Arm = Arm Cid [Id] Exp
+data Arm = Arm Cid [Bid] Exp
 data Cid = Cid String deriving (Eq,Ord)
 data Literal = LitC Char | LitN Word16 | LitS String
 
@@ -49,10 +49,11 @@ cFalse = Cid "false"
 cNil = Cid "Nil"
 cCons = Cid "Cons"
 
-
 mkUserId :: String -> Id
-mkUserId s =
-  Id { optUnique = Nothing, optPos = Nothing, name = UserName s }
+mkUserId s = Id { optUnique = Nothing, optPos = Nothing, name = UserName s }
+
+data Bid = Bid Position Id -- we always know the position of a bound identifier...
+instance Show Bid where show (Bid _ x) = show x -- ...but we never show it!
 
 ----------------------------------------------------------------------
 -- Show
@@ -83,7 +84,9 @@ prettyId Id{name,optUnique,optPos} =
         Nothing ->
           case name of
             UserName{} -> s
-            GeneratedName{} -> undefined $ "NP_"++s -- currently we have positions for all generate names
+            GeneratedName{} ->
+              --undefined $  -- currently we have positions for all generate names
+              "NP_"++s
         Just pos ->
           printf "%s_%s" s (show pos)
     maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n
@@ -111,7 +114,7 @@ pretty = \case
 prettyArm :: Arm -> Lines
 prettyArm (Arm c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
 
-prettyPat :: Cid -> [Id] -> String
+prettyPat :: Cid -> [Bid] -> String
 prettyPat c = \case
   [] -> show c
   xs -> printf "%s(%s)" (show c) (intercalate "," (map show xs))
@@ -126,12 +129,12 @@ executeProg :: Prog -> Interaction
 executeProg (Prog defs) = loop env0 defs
   where
     loop :: Env -> [Def] -> Interaction
-    loop env@Env{venv,cenv} = \case
+    loop env@Env{cenv} = \case
       [] -> do
         eval env mainApp $ \v -> case deUnit v of () -> IDone
-      ValDef name rhs : defs -> do
+      ValDef x rhs : defs -> do
         eval env rhs $ \value -> do
-          loop env { venv = Map.insert name value venv } defs
+          loop (insert x value env) defs
       TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
         let f (name,tag) cenv = Map.insert name tag cenv
@@ -169,9 +172,9 @@ eval env@Env{venv,cenv} = \case
     evals env es $ \vs -> do
     evalBuiltin b vs k
   Lam _ x body -> \k -> do
-    k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
+    k (VFunc (\arg k -> eval (insert x arg env) body k))
   RecLam f x body -> \k -> do
-    let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
+    let me = VFunc (\arg k -> eval (insert f me (insert x arg env)) body k)
     k me
   App e1 pos e2 -> \k -> do
     eval env e1 $ \v1 -> do
@@ -179,7 +182,7 @@ eval env@Env{venv,cenv} = \case
         apply v1 pos v2 k
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
-      eval env { venv = Map.insert x v1 venv } e2 k
+      eval (insert x v1 env) e2 k
   Case e arms0 -> \k -> do
     eval env e $ \case
       VCons tagActual vArgs -> do
@@ -193,11 +196,14 @@ eval env@Env{venv,cenv} = \case
                     where err = error (show ("cenv-lookup",cid))
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
-                  let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
+                  let env' = foldr (uncurry insert) env (zip xs vArgs)
                   eval env' body k
         dispatch arms0
       v ->
         error (printf "case/scrut not a constructed value: %s" (show v))
+
+insert :: Bid -> Value -> Env -> Env
+insert (Bid _ x) v env@Env{venv} = env { venv = Map.insert x v venv }
 
 apply :: Value -> Position -> Value -> (Value -> Interaction) -> Interaction
 apply func p arg k = do
