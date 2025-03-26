@@ -11,7 +11,7 @@ import Data.Map (Map)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Id,Cid,Bid(..))
+import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Id(..),Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
@@ -147,66 +147,88 @@ env0 = Env { venv = Map.empty }
 -- | Convert definitions to let-expressions.
 
 compile :: SRC.Prog -> Transformed
-compile = transProg initCenv
+compile = transProg cenv0
 
 transProg :: Cenv -> SRC.Prog -> Exp
-transProg cenv (SRC.Prog defs) = walk cenv defs
+transProg cenv0 (SRC.Prog defs) = walk cenv0 defs
   where
     walk :: Cenv -> [SRC.Def] -> Exp
     walk cenv = \case
-      [] -> mainApp
+      [] -> do
+        let mainId = transId cenv (SRC.mkUserId "main")
+        let noPos = Position 0 0
+        let main = Var noPos mainId
+        App main noPos (ConTag noPos (Ctag cUnit tUnit) [])
 
-      SRC.ValDef _x@(Bid pos x) rhs : defs -> do
-        let body = walk cenv defs
-        -- This looses top-level side effects, so should not really be done
-        -- But in makes the examples small for compilation dev...
-        --if name `member` fvs body then Let name (transExp cenv rhs) body else body
-        Let pos x (transExp cenv rhs) body
+      SRC.ValDef x@(Bid pos _) rhs : defs -> do
+        let (x1,cenv1) = posProp x cenv
+        Let pos x1 (trans cenv rhs) (walk cenv1 defs)
 
       SRC.TypeDef cids : defs -> do
         let pairs = zip cids [0::Int .. ]
-        let f (name,tag) cenv = Map.insert name tag cenv
-        let cenv' = foldr f cenv pairs
+        let cenv' = foldr (uncurry insertCid) cenv pairs
         walk cenv' defs
 
-    mainApp :: Exp
-    mainApp = App main noPos (ConTag noPos (Ctag cUnit tUnit) [])
+trans :: Cenv -> SRC.Exp -> Exp
+trans cenv = \case
+  SRC.Var p x -> Var p (transId cenv x)
+  SRC.Lit p x -> Lit p x
+  SRC.Con p cid es -> ConTag p (transCid cenv cid) (map (trans cenv) es)
+  SRC.Prim pos b xs -> Prim pos b (map (trans cenv) xs)
+  SRC.Lam p x body -> do
+    let (x',cenv1) = posProp x cenv
+    Lam p x' (trans cenv1 body)
+  SRC.RecLam f x body -> do
+    let (f',cenv1) = posProp f cenv
+    let (x',cenv2) = posProp x cenv1
+    RecLam f' x' (trans cenv2 body)
+  SRC.App e1 p e2 -> App (trans cenv e1) p (trans cenv e2)
+  SRC.Let pos x rhs body -> do
+    let (x',cenv1) = posProp x cenv
+    Let pos x' (trans cenv rhs) (trans cenv1 body)
+  SRC.Case scrut arms -> Case (trans cenv scrut) (map transArm arms)
+    where
+      transArm :: SRC.Arm -> Arm
+      transArm (SRC.Arm cid xs e) = do
+        let (xs',cenv1) = posPropList xs cenv
+        ArmTag (transCid cenv cid) xs' (trans cenv1 e)
 
-    noPos = Position 0 0
-    main = Var noPos (SRC.mkUserId "main")
+transId :: Cenv -> SRC.Id -> Id
+transId Cenv{xmap} x = maybe err id $ Map.lookup x xmap
+  where err = error (show ("transId",x))
 
--- TODO: propogate position info from binding identifier occurrances to each reference.
+transCid :: Cenv -> Cid -> Ctag
+transCid Cenv{cmap} cid = Ctag cid $ maybe err id $ Map.lookup cid cmap
+  where err = error (show ("transCid",cid))
 
-transExp :: Cenv -> SRC.Exp -> Exp
-transExp cenv e = trans e
+data Cenv = Cenv { cmap :: Map Cid Int, xmap :: Map SRC.Id Id }
+
+insertCid :: Cid -> Int -> Cenv -> Cenv
+insertCid c tag cenv@Cenv{cmap} = cenv { cmap = Map.insert c tag cmap }
+
+posPropList :: [Bid] -> Cenv -> ([Id],Cenv)
+posPropList = \case
+  [] -> \cenv -> ([],cenv)
+  b:bs -> \cenv -> do
+    let (x,cenv1) = posProp b cenv
+    let (xs,cenv2) = posPropList bs cenv1
+    (x:xs, cenv2)
+
+posProp :: Bid -> Cenv -> (Id,Cenv)
+posProp (Bid pos x) cenv = do
+  let x' = x { optPos = Just pos }
+  (x', insertId x x' cenv)
+
+insertId :: Id -> Id -> Cenv -> Cenv
+insertId x y cenv@Cenv{xmap} = cenv { xmap = Map.insert x y xmap }
+
+cenv0 :: Cenv
+cenv0 = Cenv { cmap, xmap = Map.empty }
   where
-    transCid :: Cid -> Ctag
-    transCid cid = Ctag cid $ maybe err id $ Map.lookup cid cenv
-      where err = error (show ("Transform1.transCid",cid))
-
-    trans :: SRC.Exp -> Exp
-    trans = \case
-      SRC.Var p x -> Var p x
-      SRC.Lit p x -> Lit p x
-      SRC.Con p cid es -> ConTag p (transCid cid) (map trans es)
-      SRC.Prim pos b xs -> Prim pos b (map trans xs)
-      SRC.Lam p (Bid _ x) body -> Lam p x (trans body)
-      SRC.RecLam (Bid _ f) (Bid _ x) body -> RecLam f x (trans body)
-      SRC.App e1 p e2 -> App (trans e1) p (trans e2)
-      SRC.Let pos (Bid _ x) rhs body -> Let pos x (trans rhs) (trans body)
-      SRC.Case scrut arms -> Case (trans scrut) (map transArm arms)
-
-    transArm :: SRC.Arm -> Arm
-    transArm (SRC.Arm cid xs e) = ArmTag (transCid cid) (map unBind xs) (trans e)
-      where unBind (Bid _ x) = x
-
-type Cenv = Map Cid Int
-
-initCenv :: Cenv
-initCenv = Map.fromList
-  [ (cUnit, tUnit)
-  , (cFalse, tFalse)
-  , (cTrue, tTrue)
-  , (cNil, tNil)
-  , (cCons, tCons)
-  ]
+    cmap = Map.fromList
+      [ (cUnit, tUnit)
+      , (cFalse, tFalse)
+      , (cTrue, tTrue)
+      , (cNil, tNil)
+      , (cCons, tCons)
+      ]

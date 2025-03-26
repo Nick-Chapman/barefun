@@ -84,9 +84,7 @@ prettyId Id{name,optUnique,optPos} =
         Nothing ->
           case name of
             UserName{} -> s
-            GeneratedName{} ->
-              --undefined $  -- currently we have positions for all generate names
-              "NP_"++s
+            GeneratedName{} -> undefined $ "NP_"++s -- currently we have positions for all generate names
         Just pos ->
           printf "%s_%s" s (show pos)
     maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n
