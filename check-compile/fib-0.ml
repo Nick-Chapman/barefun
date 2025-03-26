@@ -22,7 +22,7 @@ let chars_of_int = (fun i ->
       | true -> acc
       | false -> ((loop ((:: (char_of_digit ((% i) 10))) acc)) ((/ i) 10)))) in
   match ((= i) 0) with
-  | true -> ((:: '0') Nil)
+  | true -> Cons('0', Nil)
   | false -> ((loop Nil) i)) in
 let put_chars = fix (fun put_chars xs ->
   match xs with

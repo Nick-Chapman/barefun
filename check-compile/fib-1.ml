@@ -22,7 +22,7 @@ let chars_of_int_2'4 = (fun i_2'17 ->
       | true1 -> acc_5'15
       | false0 -> ((loop_5'10 ((::_0'0 (char_of_digit_4'6 ((%_0'0 i_5'19) 10))) acc_5'15)) ((/_0'0 i_5'19) 10)))) in
   match ((=_0'0 i_2'17) 0) with
-  | true1 -> ((::_0'0 '0') Nil0)
+  | true1 -> Cons1('0', Nil0)
   | false0 -> ((loop_5'10 Nil0) i_2'17)) in
 let put_chars_11'8 = fix (fun put_chars_11'8 xs_11'18 ->
   match xs_11'18 with

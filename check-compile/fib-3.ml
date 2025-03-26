@@ -52,7 +52,7 @@ let lit_29_6'11_g13 = 0 in
 let lit_36_7'29_g14 = 10 in
 let lit_39_7'44_g15 = 10 in
 let lit_43_9'9_g16 = 0 in
-let lit_45_9'16_g17 = '0' in
+let lit_44_9'17_g17 = '0' in
 let chars_of_int_2'4_g18 = fun i_2'17_arg k ->
   let k = [i_2'17_arg], fun [i_2'17_f1] ord0_3'6_arg ->
     let char_of_digit_4'6_t1 = [ord0_3'6_arg], fun [ord0_3'6_f1] c_4'20_arg k ->
@@ -81,14 +81,13 @@ let chars_of_int_2'4_g18 = fun i_2'17_arg k ->
     let k = [i_2'17_f1,loop_5'10_t2], fun [i_2'17_f1,loop_5'10_f2] app_41_9'9_arg ->
       match app_41_9'9_arg with
       | true1 ->
-        let k = [], fun [] app_44_9'20_arg ->
-          let con_46_9'23_t1 = Nil0 in
-          app_44_9'20_arg con_46_9'23_t1 k in
-        ::_0'0_g11 lit_45_9'16_g17 k
+        let con_45_9'20_t1 = Nil0 in
+        let con_46_9'17_t2 = Cons1[lit_44_9'17_g17,con_45_9'20_t1] in
+        k con_46_9'17_t2
       | false0 ->
-        let k = [i_2'17_f1], fun [i_2'17_f1] app_47_9'36_arg -> app_47_9'36_arg i_2'17_f1 k in
-        let con_48_9'36_t1 = Nil0 in
-        loop_5'10_f2 con_48_9'36_t1 k in
+        let k = [i_2'17_f1], fun [i_2'17_f1] app_47_9'32_arg -> app_47_9'32_arg i_2'17_f1 k in
+        let con_48_9'32_t1 = Nil0 in
+        loop_5'10_f2 con_48_9'32_t1 k in
     let k = [], fun [] app_42_9'7_arg -> app_42_9'7_arg lit_43_9'9_g16 k in
     =_0'0_g6 i_2'17_f1 k in
   ord_0'0_g7 lit_24_3'17_g12 k in

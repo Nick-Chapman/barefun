@@ -251,15 +251,14 @@ let execute_208'4 = (fun line_208'12 ->
         | true1 -> (runrev_180'4 args_212'13)
         | false0 -> (fallback_187'4 line_208'12)) in
 let mainloop_218'8 = fix (fun mainloop_218'8 __218'17 ->
-  let __219'14 = (put_char_12'4 '>') in
-  let __220'14 = (put_char_12'4 ' ') in
-  let xs_221'6 = (read_line_105'4 Unit0) in
-  match ((eq_char_list_56'4 xs_221'6) single_controlD_170'4) with
+  let __219'21 = (put_chars_90'8 Cons1('>', Cons1(' ', Nil0))) in
+  let xs_220'6 = (read_line_105'4 Unit0) in
+  match ((eq_char_list_56'4 xs_220'6) single_controlD_170'4) with
   | true1 -> Unit0
   | false0 ->
-    let __223'15 = (execute_208'4 xs_221'6) in
+    let __222'15 = (execute_208'4 xs_220'6) in
     (mainloop_218'8 Unit0)) in
-let main_225'4 = (fun __225'9 ->
-  let __226'69 = (put_string_newline_101'4 "This is a shell prototype. Try: fib, fact, rev") in
+let main_224'4 = (fun __224'9 ->
+  let __225'69 = (put_string_newline_101'4 "This is a shell prototype. Try: fib, fact, rev") in
   (mainloop_218'8 Unit0)) in
-(main_225'4 Unit0)
+(main_224'4 Unit0)

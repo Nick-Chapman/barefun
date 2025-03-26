@@ -252,8 +252,7 @@ let execute = (fun line ->
         | true -> (runrev args)
         | false -> (fallback line)) in
 let mainloop = fix (fun mainloop _ ->
-  let _ = (put_char '>') in
-  let _ = (put_char ' ') in
+  let _ = (put_chars Cons('>', Cons(' ', Nil))) in
   let xs = (read_line Unit) in
   match ((eq_char_list xs) single_controlD) with
   | true -> Unit

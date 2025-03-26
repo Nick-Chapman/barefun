@@ -216,8 +216,7 @@ let execute line =
            fallback line
 
 let rec mainloop () =
-  put_char '>';
-  put_char ' ';
+  put_chars ['>';' '];
   let xs = read_line () in
   if eq_char_list xs single_controlD then () else
     (execute xs; mainloop ())

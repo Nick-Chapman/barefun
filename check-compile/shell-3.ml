@@ -596,9 +596,9 @@ let split_words_197'4_g101 = fun s_197'16_arg k ->
 let lit_262_213'38_g102 = "fib" in
 let lit_266_214'40_g103 = "fact" in
 let lit_270_215'42_g104 = "rev" in
-let lit_271_219'11_g105 = '>' in
-let lit_272_220'11_g106 = ' ' in
-let lit_278_226'21_g107 = "This is a shell prototype. Try: fib, fact, rev" in
+let lit_272_219'13_g105 = '>' in
+let lit_274_219'17_g106 = ' ' in
+let lit_283_225'21_g107 = "This is a shell prototype. Try: fib, fact, rev" in
 let k = [], fun [] single_controlD_170'4_arg ->
   let rev_172'4_t1 = [single_controlD_170'4_arg], fun [single_controlD_170'4_f1] __172'7_arg k ->
     let loop_173'10_t1 = [single_controlD_170'4_f1], fun [single_controlD_170'4_f1] loop_173'10_me __173'14_arg k ->
@@ -664,32 +664,36 @@ let k = [], fun [] single_controlD_170'4_arg ->
         eq_char_list_56'4_g39 command_212'4_t1 k in
     split_words_197'4_g101 line_208'12_arg k in
   let mainloop_218'8_t4 = [single_controlD_170'4_arg,execute_208'4_t3], fun [single_controlD_170'4_f1,execute_208'4_f2] mainloop_218'8_me __218'17_arg k ->
-    let k = [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_me], fun [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3] __219'14_arg ->
-      let k = [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3], fun [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3] __220'14_arg ->
-        let k = [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3], fun [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3] xs_221'6_arg ->
-          let k = [execute_208'4_f2,mainloop_218'8_f3,xs_221'6_arg], fun [execute_208'4_f1,mainloop_218'8_f2,xs_221'6_f3] app_274_222'21_arg ->
-            match app_274_222'21_arg with
-            | true1 ->
-              let con_276_222'42_t1 = Unit0 in
-              k con_276_222'42_t1
-            | false0 ->
-              let k = [mainloop_218'8_f2], fun [mainloop_218'8_f1] __223'15_arg ->
-                let con_277_223'26_t1 = Unit0 in
-                mainloop_218'8_f1 con_277_223'26_t1 k in
-              execute_208'4_f1 xs_221'6_f3 k in
-          let k = [single_controlD_170'4_f1], fun [single_controlD_170'4_f1] app_275_222'18_arg -> app_275_222'18_arg single_controlD_170'4_f1 k in
-          eq_char_list_56'4_g39 xs_221'6_arg k in
-        let con_273_221'21_t1 = Unit0 in
-        read_line_105'4_g65 con_273_221'21_t1 k in
-      put_char_12'4_g25 lit_272_220'11_g106 k in
-    put_char_12'4_g25 lit_271_219'11_g105 k in
-  let main_225'4_t5 = [mainloop_218'8_t4], fun [mainloop_218'8_f1] __225'9_arg k ->
-    let k = [mainloop_218'8_f1], fun [mainloop_218'8_f1] __226'69_arg ->
-      let con_279_227'11_t1 = Unit0 in
-      mainloop_218'8_f1 con_279_227'11_t1 k in
-    put_string_newline_101'4_g59 lit_278_226'21_g107 k in
-  let con_280_0'0_t6 = Unit0 in
-  main_225'4_t5 con_280_0'0_t6 k in
+    let k = [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_me], fun [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3] __219'21_arg ->
+      let k = [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3], fun [single_controlD_170'4_f1,execute_208'4_f2,mainloop_218'8_f3] xs_220'6_arg ->
+        let k = [execute_208'4_f2,mainloop_218'8_f3,xs_220'6_arg], fun [execute_208'4_f1,mainloop_218'8_f2,xs_220'6_f3] app_279_221'21_arg ->
+          match app_279_221'21_arg with
+          | true1 ->
+            let con_281_221'42_t1 = Unit0 in
+            k con_281_221'42_t1
+          | false0 ->
+            let k = [mainloop_218'8_f2], fun [mainloop_218'8_f1] __222'15_arg ->
+              let con_282_222'26_t1 = Unit0 in
+              mainloop_218'8_f1 con_282_222'26_t1 k in
+            execute_208'4_f1 xs_220'6_f3 k in
+        let k = [single_controlD_170'4_f1], fun [single_controlD_170'4_f1] app_280_221'18_arg -> app_280_221'18_arg single_controlD_170'4_f1 k in
+        eq_char_list_56'4_g39 xs_220'6_arg k in
+      let con_278_220'21_t1 = Unit0 in
+      read_line_105'4_g65 con_278_220'21_t1 k in
+    let k = [], fun [] con_271_219'13_arg -> put_chars_90'8_g54 con_271_219'13_arg k in
+    let k = [], fun [] con_273_219'17_arg ->
+      let con_277_219'13_t1 = Cons1[lit_272_219'13_g105,con_273_219'17_arg] in
+      k con_277_219'13_t1 in
+    let con_275_219'20_t1 = Nil0 in
+    let con_276_219'17_t2 = Cons1[lit_274_219'17_g106,con_275_219'20_t1] in
+    k con_276_219'17_t2 in
+  let main_224'4_t5 = [mainloop_218'8_t4], fun [mainloop_218'8_f1] __224'9_arg k ->
+    let k = [mainloop_218'8_f1], fun [mainloop_218'8_f1] __225'69_arg ->
+      let con_284_226'11_t1 = Unit0 in
+      mainloop_218'8_f1 con_284_226'11_t1 k in
+    put_string_newline_101'4_g59 lit_283_225'21_g107 k in
+  let con_285_0'0_t6 = Unit0 in
+  main_224'4_t5 con_285_0'0_t6 k in
 let k = [], fun [] app_207_170'28_arg ->
   let con_210_170'31_t1 = Nil0 in
   app_207_170'28_arg con_210_170'31_t1 k in

@@ -28,6 +28,14 @@ mkSeq pos e1 e2 = AST.Let pos (Bid pos underscore) e1 e2
 mkIte :: Exp -> Exp -> Exp -> Exp
 mkIte i t e = AST.Case i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
 
+
+positioned :: Par a -> Par (Position,a)
+positioned par = do
+  pos <- position
+  x <- par
+  pure (pos,x)
+
+
 gram6 :: Par Prog
 gram6 = program where
 
@@ -200,12 +208,21 @@ gram6 = program where
   tupleExp :: Par [Exp] =
     bracketed (separated (key ",") exp)
 
-  -- TODO: support syntax for list expressions
-  nilExp = do
-    pos <- position
+  listExp = do
+    openPos <- position
     key "["
-    key "]"
-    pure (AST.Con pos cNil [])
+    alts [ do key "]"; pure $ AST.Con openPos cNil []
+         , do
+             elems <- separated (key ";") (positioned expITE)
+             closePos <- position
+             key "]"
+             let
+               mkList :: [(Position,Exp)] -> Exp
+               mkList = \case
+                 [] -> AST.Con closePos cNil []
+                 (pos,e1):es -> AST.Con pos cCons [e1,mkList es]
+             pure (mkList elems)
+         ]
 
   consApp = do
     pos <- position
@@ -216,7 +233,7 @@ gram6 = program where
       , pure (AST.Con pos c [])
       ]
 
-  atom = alts [literal,var,nilExp,bracketed exp,consApp]
+  atom = alts [literal,var,listExp,bracketed exp,consApp]
 
   application = do
     let loop f = alts [ pure f , do p <- position; e <- atom; loop (AST.App f p e)]

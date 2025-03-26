@@ -6,7 +6,7 @@ let chars_of_int i =
     if i = 0 then acc else
       loop (char_of_digit (i%10) :: acc) (i/10)
   in
-  if i = 0 then '0' :: [] else loop [] i (* TODO: list syntax would improve this *)
+  if i = 0 then ['0'] else loop [] i
 
 let rec put_chars xs =
   match xs with

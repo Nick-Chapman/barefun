@@ -690,36 +690,40 @@ let k [::_0'0,eq_char_0'0,explode_0'0,put_char_12'4,eq_char_list_56'4,append_58'
           explode_0'0 lit_262_213'38 k in
         eq_char_list_56'4 command_212'4 k in
     split_words_197'4 line_208'12 k in
-  let mainloop_218'8 = fix (fun [put_char_12'4,eq_char_list_56'4,read_line_105'4,single_controlD_170'4,execute_208'4] mainloop_218'8 __218'17 k ->
-    let k [put_char_12'4,eq_char_list_56'4,read_line_105'4,single_controlD_170'4,execute_208'4,mainloop_218'8] __219'14 =
-      let k [eq_char_list_56'4,read_line_105'4,single_controlD_170'4,execute_208'4,mainloop_218'8] __220'14 =
-        let k [eq_char_list_56'4,single_controlD_170'4,execute_208'4,mainloop_218'8] xs_221'6 =
-          let k [execute_208'4,mainloop_218'8,xs_221'6] app_274_222'21 =
-            match app_274_222'21 with
-            | true1 ->
-              let con_276_222'42 = Unit0 in
-              k con_276_222'42
-            | false0 ->
-              let k [mainloop_218'8] __223'15 =
-                let con_277_223'26 = Unit0 in
-                mainloop_218'8 con_277_223'26 k in
-              execute_208'4 xs_221'6 k in
-          let k [single_controlD_170'4] app_275_222'18 = app_275_222'18 single_controlD_170'4 k in
-          eq_char_list_56'4 xs_221'6 k in
-        let con_273_221'21 = Unit0 in
-        read_line_105'4 con_273_221'21 k in
-      let lit_272_220'11 = ' ' in
-      put_char_12'4 lit_272_220'11 k in
-    let lit_271_219'11 = '>' in
-    put_char_12'4 lit_271_219'11 k) in
-  let main_225'4 = fun [put_string_newline_101'4,mainloop_218'8] __225'9 k ->
-    let k [mainloop_218'8] __226'69 =
-      let con_279_227'11 = Unit0 in
-      mainloop_218'8 con_279_227'11 k in
-    let lit_278_226'21 = "This is a shell prototype. Try: fib, fact, rev" in
-    put_string_newline_101'4 lit_278_226'21 k in
-  let con_280_0'0 = Unit0 in
-  main_225'4 con_280_0'0 k in
+  let mainloop_218'8 = fix (fun [eq_char_list_56'4,put_chars_90'8,read_line_105'4,single_controlD_170'4,execute_208'4] mainloop_218'8 __218'17 k ->
+    let k [eq_char_list_56'4,read_line_105'4,single_controlD_170'4,execute_208'4,mainloop_218'8] __219'21 =
+      let k [eq_char_list_56'4,single_controlD_170'4,execute_208'4,mainloop_218'8] xs_220'6 =
+        let k [execute_208'4,mainloop_218'8,xs_220'6] app_279_221'21 =
+          match app_279_221'21 with
+          | true1 ->
+            let con_281_221'42 = Unit0 in
+            k con_281_221'42
+          | false0 ->
+            let k [mainloop_218'8] __222'15 =
+              let con_282_222'26 = Unit0 in
+              mainloop_218'8 con_282_222'26 k in
+            execute_208'4 xs_220'6 k in
+        let k [single_controlD_170'4] app_280_221'18 = app_280_221'18 single_controlD_170'4 k in
+        eq_char_list_56'4 xs_220'6 k in
+      let con_278_220'21 = Unit0 in
+      read_line_105'4 con_278_220'21 k in
+    let k [put_chars_90'8] con_271_219'13 = put_chars_90'8 con_271_219'13 k in
+    let lit_272_219'13 = '>' in
+    let k [lit_272_219'13] con_273_219'17 =
+      let con_277_219'13 = Cons1[lit_272_219'13,con_273_219'17] in
+      k con_277_219'13 in
+    let lit_274_219'17 = ' ' in
+    let con_275_219'20 = Nil0 in
+    let con_276_219'17 = Cons1[lit_274_219'17,con_275_219'20] in
+    k con_276_219'17) in
+  let main_224'4 = fun [put_string_newline_101'4,mainloop_218'8] __224'9 k ->
+    let k [mainloop_218'8] __225'69 =
+      let con_284_226'11 = Unit0 in
+      mainloop_218'8 con_284_226'11 k in
+    let lit_283_225'21 = "This is a shell prototype. Try: fib, fact, rev" in
+    put_string_newline_101'4 lit_283_225'21 k in
+  let con_285_0'0 = Unit0 in
+  main_224'4 con_285_0'0 k in
 let k [] app_207_170'28 =
   let con_210_170'31 = Nil0 in
   app_207_170'28 con_210_170'31 k in

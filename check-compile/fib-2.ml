@@ -91,18 +91,17 @@ let chars_of_int_2'4 = fun [%_0'0,+_0'0,/_0'0,::_0'0,=_0'0,chr_0'0,ord_0'0] i_2'
           app_28_6'9 lit_29_6'11 k in
         =_0'0 i_5'19 k in
       k lam_40_5'19) in
-    let k [::_0'0,i_2'17,loop_5'10] app_41_9'9 =
+    let k [i_2'17,loop_5'10] app_41_9'9 =
       match app_41_9'9 with
       | true1 ->
-        let k [] app_44_9'20 =
-          let con_46_9'23 = Nil0 in
-          app_44_9'20 con_46_9'23 k in
-        let lit_45_9'16 = '0' in
-        ::_0'0 lit_45_9'16 k
+        let lit_44_9'17 = '0' in
+        let con_45_9'20 = Nil0 in
+        let con_46_9'17 = Cons1[lit_44_9'17,con_45_9'20] in
+        k con_46_9'17
       | false0 ->
-        let k [i_2'17] app_47_9'36 = app_47_9'36 i_2'17 k in
-        let con_48_9'36 = Nil0 in
-        loop_5'10 con_48_9'36 k in
+        let k [i_2'17] app_47_9'32 = app_47_9'32 i_2'17 k in
+        let con_48_9'32 = Nil0 in
+        loop_5'10 con_48_9'32 k in
     let k [] app_42_9'7 =
       let lit_43_9'9 = 0 in
       app_42_9'7 lit_43_9'9 k in
