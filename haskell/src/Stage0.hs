@@ -1,6 +1,6 @@
 -- | Primary AST for the .fun language. As constructed by Parser
 module Stage0
-  ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Name(..),Bid(..)
+  ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Bid(..)
   , cUnit,cFalse,cTrue,cNil,cCons,mkUserId
   , execute,evalLit,apply
   ) where
@@ -34,13 +34,7 @@ data Arm = Arm Cid [Bid] Exp
 data Cid = Cid String deriving (Eq,Ord)
 data Literal = LitC Char | LitN Word16 | LitS String
 
-data Id = Id
-  { optUnique :: Maybe Int
-  , optPos :: Maybe Position
-  , name :: Name
-  } deriving (Eq,Ord)
-
-data Name = UserName String | GeneratedName String deriving (Eq,Ord)
+data Id = Id { name :: String } deriving (Eq,Ord)
 
 cUnit,cFalse,cTrue,cNil,cCons :: Cid
 cUnit = Cid "Unit"
@@ -50,7 +44,7 @@ cNil = Cid "Nil"
 cCons = Cid "Cons"
 
 mkUserId :: String -> Id
-mkUserId s = Id { optUnique = Nothing, optPos = Nothing, name = UserName s }
+mkUserId name = Id { name }
 
 data Bid = Bid Position Id -- we always know the position of a bound identifier...
 instance Show Bid where show (Bid _ x) = show x -- ...but we never show it!
@@ -61,7 +55,12 @@ instance Show Bid where show (Bid _ x) = show x -- ...but we never show it!
 instance Show Prog where show (Prog defs) = intercalate "\n" (map show defs)
 instance Show Def where show = intercalate "\n" . prettyDef
 instance Show Exp where show = intercalate "\n" . pretty
-instance Show Id where show = prettyId
+
+instance Show Id where
+  show Id{name} = maybeBracket name
+    where
+      maybeBracket s = if needBracket s then printf "( %s )" s else s
+      needBracket = \case "*" -> True; _ -> False
 
 instance Show Cid where show (Cid s) = s
 instance Show Literal where
@@ -69,27 +68,6 @@ instance Show Literal where
     LitC c -> show c
     LitN n -> show n
     LitS s -> show s
-
-instance Show Name where
-  show = \case
-    UserName s -> s
-    GeneratedName s -> s
-
-prettyId :: Id -> String
-prettyId Id{name,optUnique,optPos} =
-  maybePos (maybeTag (maybeBracket (show name)))
-  where
-    maybePos s =
-      case optPos of
-        Nothing ->
-          case name of
-            UserName{} -> s
-            GeneratedName{} -> undefined $ "NP_"++s -- currently we have positions for all generate names
-        Just pos ->
-          printf "%s_%s" s (show pos)
-    maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n
-    maybeBracket s = if needBracket s then printf "( %s )" s else s
-    needBracket = \case "*" -> True; _ -> False
 
 prettyDef :: Def -> Lines
 prettyDef = \case

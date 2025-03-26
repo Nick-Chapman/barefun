@@ -1,6 +1,6 @@
 -- | Simplifed language: Just expressions. Constructor names replaced by tags.
 module Stage1
-  ( Exp(..),Arm(..),Ctag(..), provenanceExp
+  ( Exp(..),Arm(..),Ctag(..),Id(..), Name(..), provenanceExp
   , execute
   , compile
   ) where
@@ -11,7 +11,7 @@ import Data.Map (Map)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Id(..),Cid,Bid(..))
+import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
@@ -33,6 +33,14 @@ data Exp
 data Arm = ArmTag Ctag [Id] Exp
 data Ctag = Ctag Cid Int
 
+data Id = Id
+  { optUnique :: Maybe Int
+  , optPos :: Maybe Position
+  , name :: Name
+  } deriving (Eq,Ord)
+
+data Name = UserName SRC.Id | GeneratedName String deriving (Eq,Ord)
+
 ----------------------------------------------------------------------
 -- provenance
 
@@ -53,8 +61,14 @@ provenanceExp = \case
 ----------------------------------------------------------------------
 -- Show
 
+instance Show Id where show = prettyId
 instance Show Exp where show = intercalate "\n" . pretty
 instance Show Ctag where show (Ctag cid n) = printf "%s%d" (show cid) n
+
+instance Show Name where
+  show = \case
+    UserName s -> show s
+    GeneratedName s -> s
 
 pretty :: Exp -> Lines
 pretty = \case
@@ -76,6 +90,22 @@ prettyPat :: Ctag -> [Id] -> String
 prettyPat c = \case
   [] -> show c
   xs -> printf "%s(%s)" (show c) (intercalate "," (map show xs))
+
+prettyId :: Id -> String
+prettyId Id{name,optUnique,optPos} =
+  maybePos (maybeTag (maybeBracket (show name)))
+  where
+    maybePos s =
+      case optPos of
+        Nothing ->
+          case name of
+            UserName{} -> s
+            GeneratedName{} -> undefined $ "NP_"++s -- currently we have positions for all generate names
+        Just pos ->
+          printf "%s_%s" s (show pos)
+    maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n
+    maybeBracket s = if needBracket s then printf "( %s )" s else s
+    needBracket = \case "*" -> True; _ -> False
 
 ----------------------------------------------------------------------
 -- Execute
@@ -216,10 +246,10 @@ posPropList = \case
 
 posProp :: Bid -> Cenv -> (Id,Cenv)
 posProp (Bid pos x) cenv = do
-  let x' = x { optPos = Just pos }
+  let x' = Id { optPos = Just pos, optUnique = Nothing, name = UserName x }
   (x', insertId x x' cenv)
 
-insertId :: Id -> Id -> Cenv -> Cenv
+insertId :: SRC.Id -> Id -> Cenv -> Cenv
 insertId x y cenv@Cenv{xmap} = cenv { xmap = Map.insert x y xmap }
 
 cenv0 :: Cenv

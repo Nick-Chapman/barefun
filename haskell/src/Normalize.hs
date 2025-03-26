@@ -7,8 +7,7 @@ import Par4 (Position(..))
 
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
-import Stage0 (Id(..))
-import Stage1 (Exp(..),Arm(..))
+import Stage1 (Exp(..),Arm(..),Id(..))
 import qualified Data.Map as Map
 
 ----------------------------------------------------------------------
