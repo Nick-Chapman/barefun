@@ -51,11 +51,14 @@ provenanceExp = \case
   Lit pos _ -> ("lit",Just pos)
   ConTag pos _ _ -> ("con",Just pos)
   Lam pos _ _ -> ("lam",Just pos)
+
   -- TODO: No reason I think these cases can't occur. I've just never seen them yet in any of my examples.
-  Prim{} -> undefined
   RecLam{} -> undefined
-  Let{} -> undefined
   Case{} -> undefined
+
+  -- These come from normalization!
+  Let pos _ _ _ -> ("uLET", Just pos)
+  Prim pos _ _ -> ("prim", Just pos)
 
 
 ----------------------------------------------------------------------
@@ -100,7 +103,9 @@ prettyId Id{name,optUnique,optPos} =
         Nothing ->
           case name of
             UserName{} -> s
-            GeneratedName{} -> undefined $ "NP_"++s -- currently we have positions for all generate names
+            GeneratedName{} ->  -- currently we have positions for all generate names
+              --"NP_"++
+              s
         Just pos ->
           printf "%s_%s" s (show pos)
     maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n

@@ -27,3 +27,23 @@ Haskell REPL
   [stage3; un-normalized]
   fib 20 --> 6765
   [HALT]
+
+  $ ../haskell/main.exe ../examples/fib.fun -1
+  [stage1]
+  fib 20 --> 6765
+  [HALT]
+
+  $ ../haskell/main.exe ../examples/fib.fun -2
+  [stage2]
+  fib 20 --> 6765
+  [HALT]
+
+  $ ../haskell/main.exe ../examples/fib.fun -3
+  [stage3]
+  fib 20 --> 6765
+  [HALT]
+
+  $ ../haskell/main.exe ../examples/fib.fun
+  [stage3]
+  fib 20 --> 6765
+  [HALT]

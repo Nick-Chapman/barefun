@@ -1,83 +1,118 @@
 -- | Normalize using NbE...
 module Normalize (normalize) where
 
---import Builtin (Builtin,evalBuiltin)
---import Data.List (intercalate)
-import Par4 (Position(..))
-
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
-import Stage1 (Exp(..),Arm(..),Id(..))
+import Par4 (Position(..))
+import Stage1 (Exp(..),Arm(..),Id(..),Name(GeneratedName))
 import qualified Data.Map as Map
 
 ----------------------------------------------------------------------
 -- Normalize
 
 normalize :: Exp -> Exp
-normalize e = runM (walk env0 e)
+normalize e = runM (norm env0 e)
 
-type Env = Map Id Id
+norm :: Env -> Exp -> M Exp
+norm env e =
+  reflect env e >>= reify
+
+data SemValue
+  = Syntax Exp
+  | Macro (SemValue -> M SemValue)
+
+syn :: Id -> SemValue
+syn x = Syntax (Var noPos x)
+  where noPos = Position 0 0
+
+reify :: SemValue -> M Exp
+reify = \case
+  Syntax e -> pure e
+  Macro f -> do
+    let noPos = Position 0 0
+    x :: Id <- fresh Id {name = GeneratedName "f", optPos = Nothing, optUnique = Nothing }
+    let arg :: SemValue = syn x
+    res :: SemValue <- f arg
+    res :: Exp <- reify res
+    pure $ Lam noPos x res
+
+share :: SemValue -> (SemValue -> M SemValue) -> M SemValue
+share sv k = do
+  let noPos = Position 0 0
+  case sv of
+    Macro{} -> k sv
+    Syntax (Var{}) -> k sv
+    _ -> do
+      x :: Id <- fresh Id {name = GeneratedName "u", optPos = Nothing, optUnique = Nothing }
+      rhs <- reify sv
+      body <- k (syn x) >>= reify
+      pure $ Syntax (Let noPos x rhs body)
+
+apply :: SemValue -> Position -> SemValue -> M SemValue
+apply fun p arg = do
+  case fun of
+    Macro fun -> do
+      share arg $ \arg -> do
+        fun arg -- inlining occurs here!
+    fun -> do
+      fun <- reify fun
+      arg <- reify arg
+      pure $ Syntax (App fun p arg)
+
+reflect :: Env -> Exp -> M SemValue
+reflect env = \case
+  Var _pos x -> do
+    pure (look env x)
+  Lit p x -> do
+    pure $ Syntax $ Lit p x
+  ConTag p tag es -> do
+    es <- mapM (norm env) es
+    pure $ Syntax $ ConTag p tag es
+  Prim p b es -> do
+    es <- mapM (norm env) es
+    pure $ Syntax $ Prim p b es
+  Lam _pos x body -> do
+    pure $ Macro $ \arg -> do
+      let env' = Map.insert x arg env
+      reflect env' body
+  RecLam f x body -> do
+    x' <- fresh x
+    f' <- fresh f
+    let env' = Map.insert x (syn x') (Map.insert f (syn f') env)
+    body <- norm env' body
+    pure $ Syntax $ RecLam f' x' body
+  App e1 p e2 -> do
+    e1 <- reflect env e1
+    e2 <- reflect env e2
+    apply e1 p e2
+  Let p x rhs body -> do
+    reflect env (App (Lam p x body) p rhs)
+  Case scrut arms -> do
+    scrut <- norm env scrut
+    arms <- mapM (normArm env) arms
+    pure $ Syntax $ Case scrut arms
+
+normArm :: Env -> Arm -> M Arm
+normArm env (ArmTag c xs body) = do
+  xys <- sequence [ do y <- fresh x; pure (x,y) | x <- xs ]
+  let env' = foldr (uncurry Map.insert) env [ (x,syn y) | (x,y) <- xys ]
+  body <- norm env' body
+  pure $ ArmTag c (map snd xys) body
+
+type Env = Map Id SemValue
 
 env0 :: Env
 env0 = Map.empty
 
-look :: Env -> Id -> Id
+look :: Env -> Id -> SemValue
 look env x = maybe err id $ Map.lookup x env
   where err = error (show ("Normalize.walk/Var",x))
-
-walk :: Env -> Exp -> M Exp
-walk env = \case
-  Var pos x -> do
-    pure $ Var pos (look env x)
-  Lit p x -> do
-    undefined $ Lit p x
-  ConTag p tag es -> do
-    es <- mapM (walk env) es
-    pure $ ConTag p tag es
-  Prim p b es -> do
-    es <- mapM (walk env) es
-    pure $ Prim p b es
-  Lam p x body -> do
-    x' <- fresh x
-    let env' = Map.insert x x' env
-    body <- walk env' body
-    pure $ Lam p x' body
-  RecLam f x body -> do
-    x' <- fresh x
-    f' <- fresh f
-    let env' = Map.insert x x' (Map.insert f f' env)
-    body <- walk env' body
-    pure $ RecLam f' x' body
-  App e1 p e2 -> do
-    e1 <- walk env e1
-    e2 <- walk env e2
-    pure $ App e1 p e2
-  Let p x rhs body -> do
-    rhs <- walk env rhs
-    x' <- fresh x
-    let env' = Map.insert x x' env
-    body <- walk env' body
-    pure $ Let p x' rhs body
-  Case scrut arms -> do
-    scrut <- walk env scrut
-    arms <- mapM (walkArm env) arms
-    pure $ Case scrut arms
-
-walkArm :: Env -> Arm -> M Arm
-walkArm env (ArmTag c xs body) = undefined $ do
-  -- TODO bind
-  body <- walk env body
-  pure $ ArmTag c xs body
 
 fresh :: Id -> M Id
 fresh Id{name,optPos} = do
   u <- Fresh
-  let _optPos = Just (Position 8 9)
   let optUnique = Just u
-  let y = Id { optUnique
-             , optPos
-             , name
-             }
+  let y = Id { optUnique, optPos, name}
   pure y
 
 instance Functor M where fmap = liftM

@@ -154,4 +154,5 @@ data Position = Position { line :: Int, col :: Int } deriving (Eq,Ord)
 
 instance Show Position where
   show Position{line,col} =
-    show line ++ "'" ++ show col
+    --if line == 0 && col == 0 then "" else -- TODO: is this hack going to catch me out?
+      show line ++ "'" ++ show col

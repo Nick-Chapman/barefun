@@ -38,3 +38,21 @@ Haskell REPL
   Hello,
   World!
   [EOF]
+
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -2
+  [stage2]
+  Hello,
+  World!
+  [EOF]
+
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3
+  [stage3]
+  Hello,
+  World!
+  [EOF]
+
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun
+  [stage3]
+  Hello,
+  World!
+  [EOF]
