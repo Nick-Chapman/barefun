@@ -28,29 +28,26 @@ let reverse_9'4 = (fun ysStart_9'12 ->
       | Cons1(y_13'6,ysMore_13'9) -> ((revloop_10'10 ((::_0'0 y_13'6) acc_10'18)) ysMore_13'9))) in
   ((revloop_10'10 Nil0) ysStart_9'12)) in
 let newline_17'4 = (fun __17'12 -> (put_char_0'0 '\n')) in
-let put_string_newline_19'4 = (fun s_19'23 ->
-  let __20'14 = (put_string_7'4 s_19'23) in
-  (newline_17'4 Unit0)) in
-let read_line_23'4 = (fun __23'14 ->
-  let readloop_24'10 = fix (fun readloop_24'10 sofar_24'19 ->
-    let theChar_25'8 = (get_char_0'0 Unit0) in
-    let gotten_26'8 = theChar_25'8 in
-    match ((eq_char_0'0 gotten_26'8) '\n') with
+let read_line_19'4 = (fun __19'14 ->
+  let readloop_20'10 = fix (fun readloop_20'10 sofar_20'19 ->
+    let theChar_21'8 = (get_char_0'0 Unit0) in
+    let gotten_22'8 = theChar_21'8 in
+    match ((eq_char_0'0 gotten_22'8) '\n') with
     | true1 ->
-      let __27'42 = (newline_17'4 Unit0) in
-      (reverse_9'4 sofar_24'19)
+      let __23'42 = (newline_17'4 Unit0) in
+      (reverse_9'4 sofar_20'19)
     | false0 ->
-      let __28'22 = (put_char_0'0 gotten_26'8) in
-      (readloop_24'10 ((::_0'0 gotten_26'8) sofar_24'19))) in
-  (readloop_24'10 Nil0)) in
-let __32'4 = (put_string_newline_19'4 "LOAD") in
-let mainloop_34'8 = fix (fun mainloop_34'8 __34'17 ->
-  let __35'17 = (put_string_7'4 "> ") in
-  let __36'26 = (put_chars_2'8 (read_line_23'4 Unit0)) in
-  let __37'11 = (newline_17'4 Unit0) in
-  (mainloop_34'8 Unit0)) in
-let main_40'4 = (fun __40'9 ->
-  let __41'26 = (put_string_newline_19'4 "RUN") in
-  let __42'6 = (mainloop_34'8 Unit0) in
-  (put_string_newline_19'4 "NEVER")) in
-(main_40'4 Unit0)
+      let __24'22 = (put_char_0'0 gotten_22'8) in
+      (readloop_20'10 ((::_0'0 gotten_22'8) sofar_20'19))) in
+  (readloop_20'10 Nil0)) in
+let __28'4 = (put_string_7'4 "LOAD\n") in
+let mainloop_30'8 = fix (fun mainloop_30'8 __30'17 ->
+  let __31'17 = (put_string_7'4 "> ") in
+  let __32'26 = (put_chars_2'8 (read_line_19'4 Unit0)) in
+  let __33'11 = (newline_17'4 Unit0) in
+  (mainloop_30'8 Unit0)) in
+let main_36'4 = (fun __36'9 ->
+  let __37'20 = (put_string_7'4 "RUN\n") in
+  let __38'6 = (mainloop_30'8 Unit0) in
+  (put_string_7'4 "NEVER\n")) in
+(main_36'4 Unit0)

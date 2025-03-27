@@ -98,10 +98,6 @@ let put_int i = put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
 
-let put_string_newline s = (* TODO: kill when we support \n in string literals *)
-  put_string s;
-  newline ()
-
 let read_line () =
   let controlD = chr 4 in
   let rec loop acc =
@@ -181,17 +177,16 @@ let runrev args =
   match args with
   | _::_ -> error "rev: expected no arguments"
   | [] ->
-     put_string_newline "(reverse typed lines until ^D)";
+     put_string "(reverse typed lines until ^D)\n";
      rev()
 
 let fallback line =
   let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c) in
   let n = length line in
-  put_chars (append (explode "You wrote: ") (star_the_ohs line));
-  put_char ' ';
-  put_char '{';
+  put_chars (append (explode "You wrote: \"") (star_the_ohs line));
+  put_string "\" (";
   put_int n;
-  put_char '}';
+  put_string " chars)";
   newline ()
 
 let split_words s =
@@ -222,5 +217,5 @@ let rec mainloop () =
     (execute xs; mainloop ())
 
 let main () =
-  put_string_newline "This is a shell prototype. Try: fib, fact, rev";
+  put_string "This is a shell prototype. Try: fib, fact, rev\n";
   mainloop ()

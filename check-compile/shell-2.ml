@@ -347,386 +347,378 @@ let put_int_97'4 = fun [chars_of_int_81'4,put_chars_90'8] i_97'12 k ->
 let newline_99'4 = fun [put_char_12'4] __99'12 k ->
   let lit_141_99'26 = '\n' in
   put_char_12'4 lit_141_99'26 k in
-let put_string_newline_101'4 = fun [put_string_95'4,newline_99'4] s_101'23 k ->
-  let k [newline_99'4] __102'14 =
-    let con_142_103'10 = Unit0 in
-    newline_99'4 con_142_103'10 k in
-  put_string_95'4 s_101'23 k in
-let read_line_105'4 = fun [::_0'0,=_0'0,chr_0'0,eq_char_0'0,get_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4] __105'14 k ->
-  let k [::_0'0,=_0'0,eq_char_0'0,get_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4] controlD_106'6 =
-    let loop_107'10 = fix (fun [::_0'0,=_0'0,eq_char_0'0,get_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_106'6] loop_107'10 acc_107'15 k ->
-      let k [::_0'0,=_0'0,eq_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_106'6,loop_107'10,acc_107'15] c_108'8 =
-        let k [::_0'0,=_0'0,eq_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_106'6,loop_107'10,acc_107'15,c_108'8] n_109'8 =
-          let k [::_0'0,=_0'0,eq_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_106'6,loop_107'10,acc_107'15,c_108'8,n_109'8] app_145_110'17 =
-            match app_145_110'17 with
+let read_line_101'4 = fun [::_0'0,=_0'0,chr_0'0,eq_char_0'0,get_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4] __101'14 k ->
+  let k [::_0'0,=_0'0,eq_char_0'0,get_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4] controlD_102'6 =
+    let loop_103'10 = fix (fun [::_0'0,=_0'0,eq_char_0'0,get_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_102'6] loop_103'10 acc_103'15 k ->
+      let k [::_0'0,=_0'0,eq_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_102'6,loop_103'10,acc_103'15] c_104'8 =
+        let k [::_0'0,=_0'0,eq_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_102'6,loop_103'10,acc_103'15,c_104'8] n_105'8 =
+          let k [::_0'0,=_0'0,eq_char_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_102'6,loop_103'10,acc_103'15,c_104'8,n_105'8] app_144_106'17 =
+            match app_144_106'17 with
             | true1 ->
-              let k [reverse_63'4,acc_107'15] __110'37 = reverse_63'4 acc_107'15 k in
-              let con_148_110'35 = Unit0 in
-              newline_99'4 con_148_110'35 k
+              let k [reverse_63'4,acc_103'15] __106'37 = reverse_63'4 acc_103'15 k in
+              let con_147_106'35 = Unit0 in
+              newline_99'4 con_147_106'35 k
             | false0 ->
-              let k [::_0'0,=_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_106'6,loop_107'10,acc_107'15,c_108'8,n_109'8] app_149_111'19 =
-                match app_149_111'19 with
+              let k [::_0'0,=_0'0,ord_0'0,>_7'4,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,reverse_63'4,newline_99'4,controlD_102'6,loop_103'10,acc_103'15,c_104'8,n_105'8] app_148_107'19 =
+                match app_148_107'19 with
                 | true1 ->
-                  let k [::_0'0,reverse_63'4,newline_99'4,controlD_106'6,acc_107'15] __111'44 =
-                    let k [::_0'0,reverse_63'4,controlD_106'6,acc_107'15] __111'55 =
-                      let k [reverse_63'4] app_152_111'78 = reverse_63'4 app_152_111'78 k in
-                      let k [acc_107'15] app_153_111'75 = app_153_111'75 acc_107'15 k in
-                      ::_0'0 controlD_106'6 k in
-                    let con_151_111'53 = Unit0 in
-                    newline_99'4 con_151_111'53 k in
-                  put_char_12'4 c_108'8 k
+                  let k [::_0'0,reverse_63'4,newline_99'4,controlD_102'6,acc_103'15] __107'44 =
+                    let k [::_0'0,reverse_63'4,controlD_102'6,acc_103'15] __107'55 =
+                      let k [reverse_63'4] app_151_107'78 = reverse_63'4 app_151_107'78 k in
+                      let k [acc_103'15] app_152_107'75 = app_152_107'75 acc_103'15 k in
+                      ::_0'0 controlD_102'6 k in
+                    let con_150_107'53 = Unit0 in
+                    newline_99'4 con_150_107'53 k in
+                  put_char_12'4 c_104'8 k
                 | false0 ->
-                  let k [=_0'0,ord_0'0,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,loop_107'10,acc_107'15,c_108'8,n_109'8] app_154_112'15 =
-                    match app_154_112'15 with
-                    | true1 -> loop_107'10 acc_107'15 k
+                  let k [=_0'0,ord_0'0,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,loop_103'10,acc_103'15,c_104'8,n_105'8] app_153_108'15 =
+                    match app_153_108'15 with
+                    | true1 -> loop_103'10 acc_103'15 k
                     | false0 ->
-                      let k [ord_0'0,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,loop_107'10,acc_107'15,c_108'8] app_157_113'17 =
-                        match app_157_113'17 with
+                      let k [ord_0'0,<=_8'4,put_char_12'4,erase_char_20'4,cons_45'4,loop_103'10,acc_103'15,c_104'8] app_156_109'17 =
+                        match app_156_109'17 with
                         | true1 ->
-                          match acc_107'15 with
-                          | Nil0 -> loop_107'10 acc_107'15 k
-                          | Cons1(c_116'14,tail_116'17) ->
-                            let k [erase_char_20'4,loop_107'10,tail_116'17] __117'58 =
-                              let k [loop_107'10,tail_116'17] __118'27 = loop_107'10 tail_116'17 k in
-                              let con_166_118'25 = Unit0 in
-                              erase_char_20'4 con_166_118'25 k in
-                            let k [erase_char_20'4] app_160_117'28 =
-                              match app_160_117'28 with
+                          match acc_103'15 with
+                          | Nil0 -> loop_103'10 acc_103'15 k
+                          | Cons1(c_112'14,tail_112'17) ->
+                            let k [erase_char_20'4,loop_103'10,tail_112'17] __113'58 =
+                              let k [loop_103'10,tail_112'17] __114'27 = loop_103'10 tail_112'17 k in
+                              let con_165_114'25 = Unit0 in
+                              erase_char_20'4 con_165_114'25 k in
+                            let k [erase_char_20'4] app_159_113'28 =
+                              match app_159_113'28 with
                               | true1 ->
-                                let con_164_117'47 = Unit0 in
-                                erase_char_20'4 con_164_117'47 k
+                                let con_163_113'47 = Unit0 in
+                                erase_char_20'4 con_163_113'47 k
                               | false0 ->
-                                let con_165_117'55 = Unit0 in
-                                k con_165_117'55 in
-                            let k [] app_161_117'25 =
-                              let lit_163_117'28 = 26 in
-                              app_161_117'25 lit_163_117'28 k in
-                            let k [<=_8'4] app_162_117'23 = <=_8'4 app_162_117'23 k in
-                            ord_0'0 c_116'14 k
+                                let con_164_113'55 = Unit0 in
+                                k con_164_113'55 in
+                            let k [] app_160_113'25 =
+                              let lit_162_113'28 = 26 in
+                              app_160_113'25 lit_162_113'28 k in
+                            let k [<=_8'4] app_161_113'23 = <=_8'4 app_161_113'23 k in
+                            ord_0'0 c_112'14 k
                         | false0 ->
-                          let k [cons_45'4,loop_107'10,acc_107'15,c_108'8] __121'23 =
-                            let k [loop_107'10] app_167_121'38 = loop_107'10 app_167_121'38 k in
-                            let k [acc_107'15] app_168_121'36 = app_168_121'36 acc_107'15 k in
-                            cons_45'4 c_108'8 k in
-                          put_char_12'4 c_108'8 k in
-                      let k [] app_158_113'15 =
-                        let lit_159_113'17 = 127 in
-                        app_158_113'15 lit_159_113'17 k in
-                      =_0'0 n_109'8 k in
-                  let k [] app_155_112'13 =
-                    let lit_156_112'15 = 127 in
-                    app_155_112'13 lit_156_112'15 k in
-                  >_7'4 n_109'8 k in
-              let k [controlD_106'6] app_150_111'17 = app_150_111'17 controlD_106'6 k in
-              eq_char_0'0 c_108'8 k in
-          let k [] app_146_110'15 =
-            let lit_147_110'17 = '\n' in
-            app_146_110'15 lit_147_110'17 k in
-          eq_char_0'0 c_108'8 k in
-        ord_0'0 c_108'8 k in
-      let con_144_108'21 = Unit0 in
-      get_char_0'0 con_144_108'21 k) in
-    let con_169_123'7 = Nil0 in
-    loop_107'10 con_169_123'7 k in
-  let lit_143_106'21 = 4 in
-  chr_0'0 lit_143_106'21 k in
-let fib_125'8 = fix (fun [+_0'0,-_0'0,<_0'0] fib_125'8 n_125'12 k ->
-  let k [+_0'0,-_0'0,fib_125'8,n_125'12] app_170_127'9 =
-    match app_170_127'9 with
-    | true1 -> k n_125'12
+                          let k [cons_45'4,loop_103'10,acc_103'15,c_104'8] __117'23 =
+                            let k [loop_103'10] app_166_117'38 = loop_103'10 app_166_117'38 k in
+                            let k [acc_103'15] app_167_117'36 = app_167_117'36 acc_103'15 k in
+                            cons_45'4 c_104'8 k in
+                          put_char_12'4 c_104'8 k in
+                      let k [] app_157_109'15 =
+                        let lit_158_109'17 = 127 in
+                        app_157_109'15 lit_158_109'17 k in
+                      =_0'0 n_105'8 k in
+                  let k [] app_154_108'13 =
+                    let lit_155_108'15 = 127 in
+                    app_154_108'13 lit_155_108'15 k in
+                  >_7'4 n_105'8 k in
+              let k [controlD_102'6] app_149_107'17 = app_149_107'17 controlD_102'6 k in
+              eq_char_0'0 c_104'8 k in
+          let k [] app_145_106'15 =
+            let lit_146_106'17 = '\n' in
+            app_145_106'15 lit_146_106'17 k in
+          eq_char_0'0 c_104'8 k in
+        ord_0'0 c_104'8 k in
+      let con_143_104'21 = Unit0 in
+      get_char_0'0 con_143_104'21 k) in
+    let con_168_119'7 = Nil0 in
+    loop_103'10 con_168_119'7 k in
+  let lit_142_102'21 = 4 in
+  chr_0'0 lit_142_102'21 k in
+let fib_121'8 = fix (fun [+_0'0,-_0'0,<_0'0] fib_121'8 n_121'12 k ->
+  let k [+_0'0,-_0'0,fib_121'8,n_121'12] app_169_123'9 =
+    match app_169_123'9 with
+    | true1 -> k n_121'12
     | false0 ->
-      let k [-_0'0,fib_125'8,n_125'12] app_173_127'33 =
-        let k [app_173_127'33] app_178_127'39 = app_173_127'33 app_178_127'39 k in
-        let k [fib_125'8] app_179_127'42 = fib_125'8 app_179_127'42 k in
-        let k [] app_180_127'41 =
-          let lit_181_127'42 = 2 in
-          app_180_127'41 lit_181_127'42 k in
-        -_0'0 n_125'12 k in
-      let k [+_0'0] app_174_127'27 = +_0'0 app_174_127'27 k in
-      let k [fib_125'8] app_175_127'30 = fib_125'8 app_175_127'30 k in
-      let k [] app_176_127'29 =
-        let lit_177_127'30 = 1 in
-        app_176_127'29 lit_177_127'30 k in
-      -_0'0 n_125'12 k in
-  let k [] app_171_127'7 =
-    let lit_172_127'9 = 2 in
-    app_171_127'7 lit_172_127'9 k in
-  <_0'0 n_125'12 k) in
-let fact_129'8 = fix (fun [( * )_0'0,-_0'0,>=_9'4] fact_129'8 n_129'13 k ->
-  let k [( * )_0'0,-_0'0,fact_129'8,n_129'13] app_182_131'10 =
-    match app_182_131'10 with
+      let k [-_0'0,fib_121'8,n_121'12] app_172_123'33 =
+        let k [app_172_123'33] app_177_123'39 = app_172_123'33 app_177_123'39 k in
+        let k [fib_121'8] app_178_123'42 = fib_121'8 app_178_123'42 k in
+        let k [] app_179_123'41 =
+          let lit_180_123'42 = 2 in
+          app_179_123'41 lit_180_123'42 k in
+        -_0'0 n_121'12 k in
+      let k [+_0'0] app_173_123'27 = +_0'0 app_173_123'27 k in
+      let k [fib_121'8] app_174_123'30 = fib_121'8 app_174_123'30 k in
+      let k [] app_175_123'29 =
+        let lit_176_123'30 = 1 in
+        app_175_123'29 lit_176_123'30 k in
+      -_0'0 n_121'12 k in
+  let k [] app_170_123'7 =
+    let lit_171_123'9 = 2 in
+    app_170_123'7 lit_171_123'9 k in
+  <_0'0 n_121'12 k) in
+let fact_125'8 = fix (fun [( * )_0'0,-_0'0,>=_9'4] fact_125'8 n_125'13 k ->
+  let k [( * )_0'0,-_0'0,fact_125'8,n_125'13] app_181_127'10 =
+    match app_181_127'10 with
     | true1 ->
-      let k [n_129'13] app_185_131'28 = app_185_131'28 n_129'13 k in
-      let k [( * )_0'0] app_186_131'22 = ( * )_0'0 app_186_131'22 k in
-      let k [fact_129'8] app_187_131'25 = fact_129'8 app_187_131'25 k in
-      let k [] app_188_131'24 =
-        let lit_189_131'25 = 1 in
-        app_188_131'24 lit_189_131'25 k in
-      -_0'0 n_129'13 k
+      let k [n_125'13] app_184_127'28 = app_184_127'28 n_125'13 k in
+      let k [( * )_0'0] app_185_127'22 = ( * )_0'0 app_185_127'22 k in
+      let k [fact_125'8] app_186_127'25 = fact_125'8 app_186_127'25 k in
+      let k [] app_187_127'24 =
+        let lit_188_127'25 = 1 in
+        app_187_127'24 lit_188_127'25 k in
+      -_0'0 n_125'13 k
     | false0 ->
-      let lit_190_131'37 = 1 in
-      k lit_190_131'37 in
-  let k [] app_183_131'7 =
-    let lit_184_131'10 = 2 in
-    app_183_131'7 lit_184_131'10 k in
-  >=_9'4 n_129'13 k) in
-let error_133'4 = fun [put_string_95'4,newline_99'4] s_133'10 k ->
-  let k [put_string_95'4,newline_99'4,s_133'10] __133'34 =
-    let k [newline_99'4] __133'48 =
-      let con_192_133'58 = Unit0 in
-      newline_99'4 con_192_133'58 k in
-    put_string_95'4 s_133'10 k in
-  let lit_191_133'25 = "ERROR: " in
-  put_string_95'4 lit_191_133'25 k in
-let runfib_135'4 = fun [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fib_125'8,error_133'4] args_135'11 k ->
-  let k [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fib_125'8,error_133'4,args_135'11] __136'20 =
-    match args_135'11 with
+      let lit_189_127'37 = 1 in
+      k lit_189_127'37 in
+  let k [] app_182_127'7 =
+    let lit_183_127'10 = 2 in
+    app_182_127'7 lit_183_127'10 k in
+  >=_9'4 n_125'13 k) in
+let error_129'4 = fun [put_string_95'4,newline_99'4] s_129'10 k ->
+  let k [put_string_95'4,newline_99'4,s_129'10] __129'34 =
+    let k [newline_99'4] __129'48 =
+      let con_191_129'58 = Unit0 in
+      newline_99'4 con_191_129'58 k in
+    put_string_95'4 s_129'10 k in
+  let lit_190_129'25 = "ERROR: " in
+  put_string_95'4 lit_190_129'25 k in
+let runfib_131'4 = fun [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fib_121'8,error_129'4] args_131'11 k ->
+  let k [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fib_121'8,error_129'4,args_131'11] __132'20 =
+    match args_131'11 with
     | Nil0 ->
-      let lit_194_138'16 = "expected an argument" in
-      error_133'4 lit_194_138'16 k
-    | Cons1(arg1_139'4,more_139'10) ->
-      match more_139'10 with
-      | Cons1(__141'7,__141'10) ->
-        let lit_195_141'21 = "expected exactly one argument" in
-        error_133'4 lit_195_141'21 k
+      let lit_193_134'16 = "expected an argument" in
+      error_129'4 lit_193_134'16 k
+    | Cons1(arg1_135'4,more_135'10) ->
+      match more_135'10 with
+      | Cons1(__137'7,__137'10) ->
+        let lit_194_137'21 = "expected exactly one argument" in
+        error_129'4 lit_194_137'21 k
       | Nil0 ->
-        let k [put_string_95'4,put_int_97'4,newline_99'4,fib_125'8,error_133'4] app_196_143'24 =
-          match app_196_143'24 with
+        let k [put_string_95'4,put_int_97'4,newline_99'4,fib_121'8,error_129'4] app_195_139'24 =
+          match app_195_139'24 with
           | None1 ->
-            let lit_197_144'24 = "expected arg1 to be numeric" in
-            error_133'4 lit_197_144'24 k
-          | Some0(n_145'15) ->
-            let k [put_string_95'4,put_int_97'4,newline_99'4,n_145'15] res_146'15 =
-              let k [put_string_95'4,put_int_97'4,newline_99'4,res_146'15] __147'20 =
-                let k [put_int_97'4,newline_99'4,res_146'15] __148'29 =
-                  let k [newline_99'4] __149'22 =
-                    let con_199_150'19 = Unit0 in
-                    newline_99'4 con_199_150'19 k in
-                  put_int_97'4 res_146'15 k in
-                let lit_198_148'22 = " --> " in
-                put_string_95'4 lit_198_148'22 k in
-              put_int_97'4 n_145'15 k in
-            fib_125'8 n_145'15 k in
-        parse_num_34'4 arg1_139'4 k in
-  let lit_193_136'13 = "fib: " in
-  put_string_95'4 lit_193_136'13 k in
-let runfact_152'4 = fun [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fact_129'8,error_133'4] args_152'12 k ->
-  let k [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fact_129'8,error_133'4,args_152'12] __153'21 =
-    match args_152'12 with
+            let lit_196_140'24 = "expected arg1 to be numeric" in
+            error_129'4 lit_196_140'24 k
+          | Some0(n_141'15) ->
+            let k [put_string_95'4,put_int_97'4,newline_99'4,n_141'15] res_142'15 =
+              let k [put_string_95'4,put_int_97'4,newline_99'4,res_142'15] __143'20 =
+                let k [put_int_97'4,newline_99'4,res_142'15] __144'29 =
+                  let k [newline_99'4] __145'22 =
+                    let con_198_146'19 = Unit0 in
+                    newline_99'4 con_198_146'19 k in
+                  put_int_97'4 res_142'15 k in
+                let lit_197_144'22 = " --> " in
+                put_string_95'4 lit_197_144'22 k in
+              put_int_97'4 n_141'15 k in
+            fib_121'8 n_141'15 k in
+        parse_num_34'4 arg1_135'4 k in
+  let lit_192_132'13 = "fib: " in
+  put_string_95'4 lit_192_132'13 k in
+let runfact_148'4 = fun [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fact_125'8,error_129'4] args_148'12 k ->
+  let k [parse_num_34'4,put_string_95'4,put_int_97'4,newline_99'4,fact_125'8,error_129'4,args_148'12] __149'21 =
+    match args_148'12 with
     | Nil0 ->
-      let lit_201_155'16 = "expected an argument" in
-      error_133'4 lit_201_155'16 k
-    | Cons1(arg1_156'4,more_156'10) ->
-      match more_156'10 with
-      | Cons1(__158'7,__158'10) ->
-        let lit_202_158'21 = "expected exactly one argument" in
-        error_133'4 lit_202_158'21 k
+      let lit_200_151'16 = "expected an argument" in
+      error_129'4 lit_200_151'16 k
+    | Cons1(arg1_152'4,more_152'10) ->
+      match more_152'10 with
+      | Cons1(__154'7,__154'10) ->
+        let lit_201_154'21 = "expected exactly one argument" in
+        error_129'4 lit_201_154'21 k
       | Nil0 ->
-        let k [put_string_95'4,put_int_97'4,newline_99'4,fact_129'8,error_133'4] app_203_160'24 =
-          match app_203_160'24 with
+        let k [put_string_95'4,put_int_97'4,newline_99'4,fact_125'8,error_129'4] app_202_156'24 =
+          match app_202_156'24 with
           | None1 ->
-            let lit_204_161'24 = "expected arg1 to be numeric" in
-            error_133'4 lit_204_161'24 k
-          | Some0(n_162'15) ->
-            let k [put_string_95'4,put_int_97'4,newline_99'4,n_162'15] res_163'15 =
-              let k [put_string_95'4,put_int_97'4,newline_99'4,res_163'15] __164'20 =
-                let k [put_int_97'4,newline_99'4,res_163'15] __165'29 =
-                  let k [newline_99'4] __166'22 =
-                    let con_206_167'19 = Unit0 in
-                    newline_99'4 con_206_167'19 k in
-                  put_int_97'4 res_163'15 k in
-                let lit_205_165'22 = " --> " in
-                put_string_95'4 lit_205_165'22 k in
-              put_int_97'4 n_162'15 k in
-            fact_129'8 n_162'15 k in
-        parse_num_34'4 arg1_156'4 k in
-  let lit_200_153'13 = "fact: " in
-  put_string_95'4 lit_200_153'13 k in
-let k [::_0'0,eq_char_0'0,explode_0'0,put_char_12'4,eq_char_list_56'4,append_58'8,reverse_63'4,map_71'8,length_76'8,put_chars_90'8,put_int_97'4,newline_99'4,put_string_newline_101'4,read_line_105'4,error_133'4,runfib_135'4,runfact_152'4] single_controlD_170'4 =
-  let rev_172'4 = fun [eq_char_list_56'4,reverse_63'4,put_chars_90'8,newline_99'4,read_line_105'4,single_controlD_170'4] __172'7 k ->
-    let loop_173'10 = fix (fun [eq_char_list_56'4,reverse_63'4,put_chars_90'8,newline_99'4,read_line_105'4,single_controlD_170'4] loop_173'10 __173'14 k ->
-      let k [eq_char_list_56'4,reverse_63'4,put_chars_90'8,newline_99'4,single_controlD_170'4,loop_173'10] xs_174'8 =
-        let k [reverse_63'4,put_chars_90'8,newline_99'4,loop_173'10,xs_174'8] app_212_175'23 =
-          match app_212_175'23 with
+            let lit_203_157'24 = "expected arg1 to be numeric" in
+            error_129'4 lit_203_157'24 k
+          | Some0(n_158'15) ->
+            let k [put_string_95'4,put_int_97'4,newline_99'4,n_158'15] res_159'15 =
+              let k [put_string_95'4,put_int_97'4,newline_99'4,res_159'15] __160'20 =
+                let k [put_int_97'4,newline_99'4,res_159'15] __161'29 =
+                  let k [newline_99'4] __162'22 =
+                    let con_205_163'19 = Unit0 in
+                    newline_99'4 con_205_163'19 k in
+                  put_int_97'4 res_159'15 k in
+                let lit_204_161'22 = " --> " in
+                put_string_95'4 lit_204_161'22 k in
+              put_int_97'4 n_158'15 k in
+            fact_125'8 n_158'15 k in
+        parse_num_34'4 arg1_152'4 k in
+  let lit_199_149'13 = "fact: " in
+  put_string_95'4 lit_199_149'13 k in
+let k [::_0'0,eq_char_0'0,explode_0'0,eq_char_list_56'4,append_58'8,reverse_63'4,map_71'8,length_76'8,put_chars_90'8,put_string_95'4,put_int_97'4,newline_99'4,read_line_101'4,error_129'4,runfib_131'4,runfact_148'4] single_controlD_166'4 =
+  let rev_168'4 = fun [eq_char_list_56'4,reverse_63'4,put_chars_90'8,newline_99'4,read_line_101'4,single_controlD_166'4] __168'7 k ->
+    let loop_169'10 = fix (fun [eq_char_list_56'4,reverse_63'4,put_chars_90'8,newline_99'4,read_line_101'4,single_controlD_166'4] loop_169'10 __169'14 k ->
+      let k [eq_char_list_56'4,reverse_63'4,put_chars_90'8,newline_99'4,single_controlD_166'4,loop_169'10] xs_170'8 =
+        let k [reverse_63'4,put_chars_90'8,newline_99'4,loop_169'10,xs_170'8] app_211_171'23 =
+          match app_211_171'23 with
           | true1 ->
-            let con_214_175'44 = Unit0 in
-            k con_214_175'44
+            let con_213_171'44 = Unit0 in
+            k con_213_171'44
           | false0 ->
-            let k [newline_99'4,loop_173'10] __176'29 =
-              let k [loop_173'10] __176'40 =
-                let con_217_176'46 = Unit0 in
-                loop_173'10 con_217_176'46 k in
-              let con_216_176'38 = Unit0 in
-              newline_99'4 con_216_176'38 k in
-            let k [put_chars_90'8] app_215_176'26 = put_chars_90'8 app_215_176'26 k in
-            reverse_63'4 xs_174'8 k in
-        let k [single_controlD_170'4] app_213_175'20 = app_213_175'20 single_controlD_170'4 k in
-        eq_char_list_56'4 xs_174'8 k in
-      let con_211_174'23 = Unit0 in
-      read_line_105'4 con_211_174'23 k) in
-    let con_218_178'6 = Unit0 in
-    loop_173'10 con_218_178'6 k in
-  let runrev_180'4 = fun [put_string_newline_101'4,error_133'4,rev_172'4] args_180'11 k ->
-    match args_180'11 with
-    | Cons1(__182'4,__182'7) ->
-      let lit_219_182'18 = "rev: expected no arguments" in
-      error_133'4 lit_219_182'18 k
+            let k [newline_99'4,loop_169'10] __172'29 =
+              let k [loop_169'10] __172'40 =
+                let con_216_172'46 = Unit0 in
+                loop_169'10 con_216_172'46 k in
+              let con_215_172'38 = Unit0 in
+              newline_99'4 con_215_172'38 k in
+            let k [put_chars_90'8] app_214_172'26 = put_chars_90'8 app_214_172'26 k in
+            reverse_63'4 xs_170'8 k in
+        let k [single_controlD_166'4] app_212_171'20 = app_212_171'20 single_controlD_166'4 k in
+        eq_char_list_56'4 xs_170'8 k in
+      let con_210_170'23 = Unit0 in
+      read_line_101'4 con_210_170'23 k) in
+    let con_217_174'6 = Unit0 in
+    loop_169'10 con_217_174'6 k in
+  let runrev_176'4 = fun [put_string_95'4,error_129'4,rev_168'4] args_176'11 k ->
+    match args_176'11 with
+    | Cons1(__178'4,__178'7) ->
+      let lit_218_178'18 = "rev: expected no arguments" in
+      error_129'4 lit_218_178'18 k
     | Nil0 ->
-      let k [rev_172'4] __184'56 =
-        let con_221_185'8 = Unit0 in
-        rev_172'4 con_221_185'8 k in
-      let lit_220_184'24 = "(reverse typed lines until ^D)" in
-      put_string_newline_101'4 lit_220_184'24 k in
-  let fallback_187'4 = fun [eq_char_0'0,explode_0'0,put_char_12'4,append_58'8,map_71'8,length_76'8,put_chars_90'8,put_int_97'4,newline_99'4] line_187'13 k ->
-    let k [explode_0'0,put_char_12'4,append_58'8,length_76'8,put_chars_90'8,put_int_97'4,newline_99'4,line_187'13] star_the_ohs_188'6 =
-      let k [explode_0'0,put_char_12'4,append_58'8,put_chars_90'8,put_int_97'4,newline_99'4,line_187'13,star_the_ohs_188'6] n_189'6 =
-        let k [put_char_12'4,put_int_97'4,newline_99'4,n_189'6] __190'64 =
-          let k [put_char_12'4,put_int_97'4,newline_99'4,n_189'6] __191'14 =
-            let k [put_char_12'4,put_int_97'4,newline_99'4,n_189'6] __192'14 =
-              let k [put_char_12'4,newline_99'4] __193'11 =
-                let k [newline_99'4] __194'14 =
-                  let con_235_195'10 = Unit0 in
-                  newline_99'4 con_235_195'10 k in
-                let lit_234_194'11 = '}' in
-                put_char_12'4 lit_234_194'11 k in
-              put_int_97'4 n_189'6 k in
-            let lit_233_192'11 = '{' in
-            put_char_12'4 lit_233_192'11 k in
-          let lit_232_191'11 = ' ' in
-          put_char_12'4 lit_232_191'11 k in
-        let k [put_chars_90'8] app_227_190'44 = put_chars_90'8 app_227_190'44 k in
-        let k [line_187'13,star_the_ohs_188'6] app_228_190'20 =
-          let k [app_228_190'20] app_231_190'58 = app_228_190'20 app_231_190'58 k in
-          star_the_ohs_188'6 line_187'13 k in
-        let k [append_58'8] app_229_190'29 = append_58'8 app_229_190'29 k in
-        let lit_230_190'29 = "You wrote: " in
-        explode_0'0 lit_230_190'29 k in
-      length_76'8 line_187'13 k in
-    let lam_222_188'30 = fun [eq_char_0'0] c_188'30 k ->
-      let k [c_188'30] app_223_188'48 =
-        match app_223_188'48 with
+      let k [rev_168'4] __180'50 =
+        let con_220_181'8 = Unit0 in
+        rev_168'4 con_220_181'8 k in
+      let lit_219_180'16 = "(reverse typed lines until ^D)\n" in
+      put_string_95'4 lit_219_180'16 k in
+  let fallback_183'4 = fun [eq_char_0'0,explode_0'0,append_58'8,map_71'8,length_76'8,put_chars_90'8,put_string_95'4,put_int_97'4,newline_99'4] line_183'13 k ->
+    let k [explode_0'0,append_58'8,length_76'8,put_chars_90'8,put_string_95'4,put_int_97'4,newline_99'4,line_183'13] star_the_ohs_184'6 =
+      let k [explode_0'0,append_58'8,put_chars_90'8,put_string_95'4,put_int_97'4,newline_99'4,line_183'13,star_the_ohs_184'6] n_185'6 =
+        let k [put_string_95'4,put_int_97'4,newline_99'4,n_185'6] __186'66 =
+          let k [put_string_95'4,put_int_97'4,newline_99'4,n_185'6] __187'19 =
+            let k [put_string_95'4,newline_99'4] __188'11 =
+              let k [newline_99'4] __189'22 =
+                let con_233_190'10 = Unit0 in
+                newline_99'4 con_233_190'10 k in
+              let lit_232_189'13 = " chars)" in
+              put_string_95'4 lit_232_189'13 k in
+            put_int_97'4 n_185'6 k in
+          let lit_231_187'13 = "\" (" in
+          put_string_95'4 lit_231_187'13 k in
+        let k [put_chars_90'8] app_226_186'46 = put_chars_90'8 app_226_186'46 k in
+        let k [line_183'13,star_the_ohs_184'6] app_227_186'20 =
+          let k [app_227_186'20] app_230_186'60 = app_227_186'20 app_230_186'60 k in
+          star_the_ohs_184'6 line_183'13 k in
+        let k [append_58'8] app_228_186'29 = append_58'8 app_228_186'29 k in
+        let lit_229_186'29 = "You wrote: \"" in
+        explode_0'0 lit_229_186'29 k in
+      length_76'8 line_183'13 k in
+    let lam_221_184'30 = fun [eq_char_0'0] c_184'30 k ->
+      let k [c_184'30] app_222_184'48 =
+        match app_222_184'48 with
         | true1 ->
-          let lit_226_188'57 = '*' in
-          k lit_226_188'57
-        | false0 -> k c_188'30 in
-      let k [] app_224_188'46 =
-        let lit_225_188'48 = 'o' in
-        app_224_188'46 lit_225_188'48 k in
-      eq_char_0'0 c_188'30 k in
-    map_71'8 lam_222_188'30 k in
-  let split_words_197'4 = fun [::_0'0,eq_char_0'0,reverse_63'4] s_197'16 k ->
-    let loop_198'10 = fix (fun [::_0'0,eq_char_0'0,reverse_63'4] loop_198'10 accWs_198'15 k ->
-      let lam_253_198'21 = fun [::_0'0,eq_char_0'0,reverse_63'4,loop_198'10,accWs_198'15] accCs_198'21 k ->
-        let lam_252_198'27 = fun [::_0'0,eq_char_0'0,reverse_63'4,loop_198'10,accWs_198'15,accCs_198'21] xs_198'27 k ->
-          match xs_198'27 with
+          let lit_225_184'57 = '*' in
+          k lit_225_184'57
+        | false0 -> k c_184'30 in
+      let k [] app_223_184'46 =
+        let lit_224_184'48 = 'o' in
+        app_223_184'46 lit_224_184'48 k in
+      eq_char_0'0 c_184'30 k in
+    map_71'8 lam_221_184'30 k in
+  let split_words_192'4 = fun [::_0'0,eq_char_0'0,reverse_63'4] s_192'16 k ->
+    let loop_193'10 = fix (fun [::_0'0,eq_char_0'0,reverse_63'4] loop_193'10 accWs_193'15 k ->
+      let lam_251_193'21 = fun [::_0'0,eq_char_0'0,reverse_63'4,loop_193'10,accWs_193'15] accCs_193'21 k ->
+        let lam_250_193'27 = fun [::_0'0,eq_char_0'0,reverse_63'4,loop_193'10,accWs_193'15,accCs_193'21] xs_193'27 k ->
+          match xs_193'27 with
           | Nil0 ->
-            let k [reverse_63'4] app_236_200'38 = reverse_63'4 app_236_200'38 k in
-            let k [accWs_198'15] app_237_200'35 = app_237_200'35 accWs_198'15 k in
-            let k [::_0'0] app_238_200'29 = ::_0'0 app_238_200'29 k in
-            reverse_63'4 accCs_198'21 k
-          | Cons1(x_202'6,xs_202'9) ->
-            let k [::_0'0,reverse_63'4,loop_198'10,accWs_198'15,accCs_198'21,x_202'6,xs_202'9] app_239_203'20 =
-              match app_239_203'20 with
+            let k [reverse_63'4] app_234_195'38 = reverse_63'4 app_234_195'38 k in
+            let k [accWs_193'15] app_235_195'35 = app_235_195'35 accWs_193'15 k in
+            let k [::_0'0] app_236_195'29 = ::_0'0 app_236_195'29 k in
+            reverse_63'4 accCs_193'21 k
+          | Cons1(x_197'6,xs_197'9) ->
+            let k [::_0'0,reverse_63'4,loop_193'10,accWs_193'15,accCs_193'21,x_197'6,xs_197'9] app_237_198'20 =
+              match app_237_198'20 with
               | true1 ->
-                let k [xs_202'9] app_242_203'59 = app_242_203'59 xs_202'9 k in
-                let k [] app_243_203'34 =
-                  let con_247_203'59 = Nil0 in
-                  app_243_203'34 con_247_203'59 k in
-                let k [loop_198'10] app_244_203'52 = loop_198'10 app_244_203'52 k in
-                let k [accWs_198'15] app_245_203'49 = app_245_203'49 accWs_198'15 k in
-                let k [::_0'0] app_246_203'43 = ::_0'0 app_246_203'43 k in
-                reverse_63'4 accCs_198'21 k
+                let k [xs_197'9] app_240_198'59 = app_240_198'59 xs_197'9 k in
+                let k [] app_241_198'34 =
+                  let con_245_198'59 = Nil0 in
+                  app_241_198'34 con_245_198'59 k in
+                let k [loop_193'10] app_242_198'52 = loop_193'10 app_242_198'52 k in
+                let k [accWs_193'15] app_243_198'49 = app_243_198'49 accWs_193'15 k in
+                let k [::_0'0] app_244_198'43 = ::_0'0 app_244_198'43 k in
+                reverse_63'4 accCs_193'21 k
               | false0 ->
-                let k [xs_202'9] app_248_204'23 = app_248_204'23 xs_202'9 k in
-                let k [::_0'0,accCs_198'21,x_202'6] app_249_204'17 =
-                  let k [app_249_204'17] app_250_204'27 = app_249_204'17 app_250_204'27 k in
-                  let k [accCs_198'21] app_251_204'25 = app_251_204'25 accCs_198'21 k in
-                  ::_0'0 x_202'6 k in
-                loop_198'10 accWs_198'15 k in
-            let k [] app_240_203'18 =
-              let lit_241_203'20 = ' ' in
-              app_240_203'18 lit_241_203'20 k in
-            eq_char_0'0 x_202'6 k in
-        k lam_252_198'27 in
-      k lam_253_198'21) in
-    let k [s_197'16] app_254_206'10 = app_254_206'10 s_197'16 k in
-    let k [] app_255_206'7 =
-      let con_257_206'10 = Nil0 in
-      app_255_206'7 con_257_206'10 k in
-    let con_256_206'7 = Nil0 in
-    loop_198'10 con_256_206'7 k in
-  let execute_208'4 = fun [explode_0'0,eq_char_list_56'4,runfib_135'4,runfact_152'4,runrev_180'4,fallback_187'4,split_words_197'4] line_208'12 k ->
-    let k [explode_0'0,eq_char_list_56'4,runfib_135'4,runfact_152'4,runrev_180'4,fallback_187'4,line_208'12] words_209'6 =
-      match words_209'6 with
+                let k [xs_197'9] app_246_199'23 = app_246_199'23 xs_197'9 k in
+                let k [::_0'0,accCs_193'21,x_197'6] app_247_199'17 =
+                  let k [app_247_199'17] app_248_199'27 = app_247_199'17 app_248_199'27 k in
+                  let k [accCs_193'21] app_249_199'25 = app_249_199'25 accCs_193'21 k in
+                  ::_0'0 x_197'6 k in
+                loop_193'10 accWs_193'15 k in
+            let k [] app_238_198'18 =
+              let lit_239_198'20 = ' ' in
+              app_238_198'18 lit_239_198'20 k in
+            eq_char_0'0 x_197'6 k in
+        k lam_250_193'27 in
+      k lam_251_193'21) in
+    let k [s_192'16] app_252_201'10 = app_252_201'10 s_192'16 k in
+    let k [] app_253_201'7 =
+      let con_255_201'10 = Nil0 in
+      app_253_201'7 con_255_201'10 k in
+    let con_254_201'7 = Nil0 in
+    loop_193'10 con_254_201'7 k in
+  let execute_203'4 = fun [explode_0'0,eq_char_list_56'4,runfib_131'4,runfact_148'4,runrev_176'4,fallback_183'4,split_words_192'4] line_203'12 k ->
+    let k [explode_0'0,eq_char_list_56'4,runfib_131'4,runfact_148'4,runrev_176'4,fallback_183'4,line_203'12] words_204'6 =
+      match words_204'6 with
       | Nil0 ->
-        let con_258_211'10 = Unit0 in
-        k con_258_211'10
-      | Cons1(command_212'4,args_212'13) ->
-        let k [explode_0'0,eq_char_list_56'4,runfib_135'4,runfact_152'4,runrev_180'4,fallback_187'4,line_208'12,command_212'4,args_212'13] app_259_213'29 =
-          match app_259_213'29 with
-          | true1 -> runfib_135'4 args_212'13 k
+        let con_256_206'10 = Unit0 in
+        k con_256_206'10
+      | Cons1(command_207'4,args_207'13) ->
+        let k [explode_0'0,eq_char_list_56'4,runfib_131'4,runfact_148'4,runrev_176'4,fallback_183'4,line_203'12,command_207'4,args_207'13] app_257_208'29 =
+          match app_257_208'29 with
+          | true1 -> runfib_131'4 args_207'13 k
           | false0 ->
-            let k [explode_0'0,eq_char_list_56'4,runfact_152'4,runrev_180'4,fallback_187'4,line_208'12,command_212'4,args_212'13] app_263_214'31 =
-              match app_263_214'31 with
-              | true1 -> runfact_152'4 args_212'13 k
+            let k [explode_0'0,eq_char_list_56'4,runfact_148'4,runrev_176'4,fallback_183'4,line_203'12,command_207'4,args_207'13] app_261_209'31 =
+              match app_261_209'31 with
+              | true1 -> runfact_148'4 args_207'13 k
               | false0 ->
-                let k [runrev_180'4,fallback_187'4,line_208'12,args_212'13] app_267_215'33 =
-                  match app_267_215'33 with
-                  | true1 -> runrev_180'4 args_212'13 k
-                  | false0 -> fallback_187'4 line_208'12 k in
-                let k [explode_0'0] app_268_215'25 =
-                  let k [app_268_215'25] app_269_215'42 = app_268_215'25 app_269_215'42 k in
-                  let lit_270_215'42 = "rev" in
-                  explode_0'0 lit_270_215'42 k in
-                eq_char_list_56'4 command_212'4 k in
-            let k [explode_0'0] app_264_214'23 =
-              let k [app_264_214'23] app_265_214'40 = app_264_214'23 app_265_214'40 k in
-              let lit_266_214'40 = "fact" in
-              explode_0'0 lit_266_214'40 k in
-            eq_char_list_56'4 command_212'4 k in
-        let k [explode_0'0] app_260_213'21 =
-          let k [app_260_213'21] app_261_213'38 = app_260_213'21 app_261_213'38 k in
-          let lit_262_213'38 = "fib" in
-          explode_0'0 lit_262_213'38 k in
-        eq_char_list_56'4 command_212'4 k in
-    split_words_197'4 line_208'12 k in
-  let mainloop_218'8 = fix (fun [eq_char_list_56'4,put_chars_90'8,read_line_105'4,single_controlD_170'4,execute_208'4] mainloop_218'8 __218'17 k ->
-    let k [eq_char_list_56'4,read_line_105'4,single_controlD_170'4,execute_208'4,mainloop_218'8] __219'21 =
-      let k [eq_char_list_56'4,single_controlD_170'4,execute_208'4,mainloop_218'8] xs_220'6 =
-        let k [execute_208'4,mainloop_218'8,xs_220'6] app_279_221'21 =
-          match app_279_221'21 with
+                let k [runrev_176'4,fallback_183'4,line_203'12,args_207'13] app_265_210'33 =
+                  match app_265_210'33 with
+                  | true1 -> runrev_176'4 args_207'13 k
+                  | false0 -> fallback_183'4 line_203'12 k in
+                let k [explode_0'0] app_266_210'25 =
+                  let k [app_266_210'25] app_267_210'42 = app_266_210'25 app_267_210'42 k in
+                  let lit_268_210'42 = "rev" in
+                  explode_0'0 lit_268_210'42 k in
+                eq_char_list_56'4 command_207'4 k in
+            let k [explode_0'0] app_262_209'23 =
+              let k [app_262_209'23] app_263_209'40 = app_262_209'23 app_263_209'40 k in
+              let lit_264_209'40 = "fact" in
+              explode_0'0 lit_264_209'40 k in
+            eq_char_list_56'4 command_207'4 k in
+        let k [explode_0'0] app_258_208'21 =
+          let k [app_258_208'21] app_259_208'38 = app_258_208'21 app_259_208'38 k in
+          let lit_260_208'38 = "fib" in
+          explode_0'0 lit_260_208'38 k in
+        eq_char_list_56'4 command_207'4 k in
+    split_words_192'4 line_203'12 k in
+  let mainloop_213'8 = fix (fun [eq_char_list_56'4,put_chars_90'8,read_line_101'4,single_controlD_166'4,execute_203'4] mainloop_213'8 __213'17 k ->
+    let k [eq_char_list_56'4,read_line_101'4,single_controlD_166'4,execute_203'4,mainloop_213'8] __214'21 =
+      let k [eq_char_list_56'4,single_controlD_166'4,execute_203'4,mainloop_213'8] xs_215'6 =
+        let k [execute_203'4,mainloop_213'8,xs_215'6] app_277_216'21 =
+          match app_277_216'21 with
           | true1 ->
-            let con_281_221'42 = Unit0 in
-            k con_281_221'42
+            let con_279_216'42 = Unit0 in
+            k con_279_216'42
           | false0 ->
-            let k [mainloop_218'8] __222'15 =
-              let con_282_222'26 = Unit0 in
-              mainloop_218'8 con_282_222'26 k in
-            execute_208'4 xs_220'6 k in
-        let k [single_controlD_170'4] app_280_221'18 = app_280_221'18 single_controlD_170'4 k in
-        eq_char_list_56'4 xs_220'6 k in
-      let con_278_220'21 = Unit0 in
-      read_line_105'4 con_278_220'21 k in
-    let k [put_chars_90'8] con_271_219'13 = put_chars_90'8 con_271_219'13 k in
-    let lit_272_219'13 = '>' in
-    let k [lit_272_219'13] con_273_219'17 =
-      let con_277_219'13 = Cons1[lit_272_219'13,con_273_219'17] in
-      k con_277_219'13 in
-    let lit_274_219'17 = ' ' in
-    let con_275_219'20 = Nil0 in
-    let con_276_219'17 = Cons1[lit_274_219'17,con_275_219'20] in
-    k con_276_219'17) in
-  let main_224'4 = fun [put_string_newline_101'4,mainloop_218'8] __224'9 k ->
-    let k [mainloop_218'8] __225'69 =
-      let con_284_226'11 = Unit0 in
-      mainloop_218'8 con_284_226'11 k in
-    let lit_283_225'21 = "This is a shell prototype. Try: fib, fact, rev" in
-    put_string_newline_101'4 lit_283_225'21 k in
-  let con_285_0'0 = Unit0 in
-  main_224'4 con_285_0'0 k in
-let k [] app_207_170'28 =
-  let con_210_170'31 = Nil0 in
-  app_207_170'28 con_210_170'31 k in
-let k [::_0'0] app_208_170'26 = ::_0'0 app_208_170'26 k in
-let lit_209_170'26 = 4 in
-chr_0'0 lit_209_170'26 k
+            let k [mainloop_213'8] __217'15 =
+              let con_280_217'26 = Unit0 in
+              mainloop_213'8 con_280_217'26 k in
+            execute_203'4 xs_215'6 k in
+        let k [single_controlD_166'4] app_278_216'18 = app_278_216'18 single_controlD_166'4 k in
+        eq_char_list_56'4 xs_215'6 k in
+      let con_276_215'21 = Unit0 in
+      read_line_101'4 con_276_215'21 k in
+    let k [put_chars_90'8] con_269_214'13 = put_chars_90'8 con_269_214'13 k in
+    let lit_270_214'13 = '>' in
+    let k [lit_270_214'13] con_271_214'17 =
+      let con_275_214'13 = Cons1[lit_270_214'13,con_271_214'17] in
+      k con_275_214'13 in
+    let lit_272_214'17 = ' ' in
+    let con_273_214'20 = Nil0 in
+    let con_274_214'17 = Cons1[lit_272_214'17,con_273_214'20] in
+    k con_274_214'17) in
+  let main_219'4 = fun [put_string_95'4,mainloop_213'8] __219'9 k ->
+    let k [mainloop_213'8] __220'63 =
+      let con_282_221'11 = Unit0 in
+      mainloop_213'8 con_282_221'11 k in
+    let lit_281_220'13 = "This is a shell prototype. Try: fib, fact, rev\n" in
+    put_string_95'4 lit_281_220'13 k in
+  let con_283_0'0 = Unit0 in
+  main_219'4 con_283_0'0 k in
+let k [] app_206_166'28 =
+  let con_209_166'31 = Nil0 in
+  app_206_166'28 con_209_166'31 k in
+let k [::_0'0] app_207_166'26 = ::_0'0 app_207_166'26 k in
+let lit_208_166'26 = 4 in
+chr_0'0 lit_208_166'26 k

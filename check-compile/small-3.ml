@@ -46,57 +46,52 @@ let reverse_9'4_g9 = fun ysStart_9'12_arg k ->
   revloop_10'10_g8 con_31_15'10_t1 k in
 let lit_32_17'26_g10 = '\n' in
 let newline_17'4_g11 = fun __17'12_arg k -> put_char_0'0_g3 lit_32_17'26_g10 k in
-let put_string_newline_19'4_g12 = fun s_19'23_arg k ->
-  let k = [], fun [] __20'14_arg ->
-    let con_33_21'10_t1 = Unit0 in
-    newline_17'4_g11 con_33_21'10_t1 k in
-  put_string_7'4_g7 s_19'23_arg k in
-let lit_37_27'22_g13 = '\n' in
-let readloop_24'10_g14 = fun readloop_24'10_me sofar_24'19_arg k ->
-  let k = [readloop_24'10_me,sofar_24'19_arg], fun [readloop_24'10_f1,sofar_24'19_f2] theChar_25'8_arg ->
-    let gotten_26'8_arg = theChar_25'8_arg in
-    let k = [readloop_24'10_f1,sofar_24'19_f2,gotten_26'8_arg], fun [readloop_24'10_f1,sofar_24'19_f2,gotten_26'8_f3] app_35_27'22_arg ->
-      match app_35_27'22_arg with
+let lit_36_23'22_g12 = '\n' in
+let readloop_20'10_g13 = fun readloop_20'10_me sofar_20'19_arg k ->
+  let k = [readloop_20'10_me,sofar_20'19_arg], fun [readloop_20'10_f1,sofar_20'19_f2] theChar_21'8_arg ->
+    let gotten_22'8_arg = theChar_21'8_arg in
+    let k = [readloop_20'10_f1,sofar_20'19_f2,gotten_22'8_arg], fun [readloop_20'10_f1,sofar_20'19_f2,gotten_22'8_f3] app_34_23'22_arg ->
+      match app_34_23'22_arg with
       | true1 ->
-        let k = [sofar_24'19_f2], fun [sofar_24'19_f1] __27'42_arg -> reverse_9'4_g9 sofar_24'19_f1 k in
-        let con_38_27'40_t1 = Unit0 in
-        newline_17'4_g11 con_38_27'40_t1 k
+        let k = [sofar_20'19_f2], fun [sofar_20'19_f1] __23'42_arg -> reverse_9'4_g9 sofar_20'19_f1 k in
+        let con_37_23'40_t1 = Unit0 in
+        newline_17'4_g11 con_37_23'40_t1 k
       | false0 ->
-        let k = [readloop_24'10_f1,sofar_24'19_f2,gotten_26'8_f3], fun [readloop_24'10_f1,sofar_24'19_f2,gotten_26'8_f3] __28'22_arg ->
-          let k = [readloop_24'10_f1], fun [readloop_24'10_f1] app_39_28'44_arg -> readloop_24'10_f1 app_39_28'44_arg k in
-          let k = [sofar_24'19_f2], fun [sofar_24'19_f1] app_40_28'41_arg -> app_40_28'41_arg sofar_24'19_f1 k in
-          ::_0'0_g5 gotten_26'8_f3 k in
-        put_char_0'0_g3 gotten_26'8_f3 k in
-    let k = [], fun [] app_36_27'15_arg -> app_36_27'15_arg lit_37_27'22_g13 k in
-    eq_char_0'0_g1 gotten_26'8_arg k in
-  let con_34_25'27_t1 = Unit0 in
-  get_char_0'0_g4 con_34_25'27_t1 k in
-let read_line_23'4_g15 = fun __23'14_arg k ->
-  let con_41_30'11_t1 = Nil0 in
-  readloop_24'10_g14 con_41_30'11_t1 k in
-let lit_42_32'28_g16 = "LOAD" in
-let lit_43_35'13_g17 = "> " in
-let mainloop_34'8_g18 = fun mainloop_34'8_me __34'17_arg k ->
-  let k = [mainloop_34'8_me], fun [mainloop_34'8_f1] __35'17_arg ->
-    let k = [mainloop_34'8_f1], fun [mainloop_34'8_f1] __36'26_arg ->
-      let k = [mainloop_34'8_f1], fun [mainloop_34'8_f1] __37'11_arg ->
-        let con_47_38'10_t1 = Unit0 in
-        mainloop_34'8_f1 con_47_38'10_t1 k in
-      let con_46_37'9_t1 = Unit0 in
-      newline_17'4_g11 con_46_37'9_t1 k in
-    let k = [], fun [] app_44_36'23_arg -> put_chars_2'8_g6 app_44_36'23_arg k in
-    let con_45_36'23_t1 = Unit0 in
-    read_line_23'4_g15 con_45_36'23_t1 k in
-  put_string_7'4_g7 lit_43_35'13_g17 k in
-let lit_48_41'21_g19 = "RUN" in
-let lit_50_43'21_g20 = "NEVER" in
-let main_40'4_g21 = fun __40'9_arg k ->
-  let k = [], fun [] __41'26_arg ->
-    let k = [], fun [] __42'6_arg -> put_string_newline_19'4_g12 lit_50_43'21_g20 k in
-    let con_49_42'20_t1 = Unit0 in
-    mainloop_34'8_g18 con_49_42'20_t1 k in
-  put_string_newline_19'4_g12 lit_48_41'21_g19 k in
-let k = [], fun [] __32'4_arg ->
-  let con_51_0'0_t1 = Unit0 in
-  main_40'4_g21 con_51_0'0_t1 k in
-put_string_newline_19'4_g12 lit_42_32'28_g16 k
+        let k = [readloop_20'10_f1,sofar_20'19_f2,gotten_22'8_f3], fun [readloop_20'10_f1,sofar_20'19_f2,gotten_22'8_f3] __24'22_arg ->
+          let k = [readloop_20'10_f1], fun [readloop_20'10_f1] app_38_24'44_arg -> readloop_20'10_f1 app_38_24'44_arg k in
+          let k = [sofar_20'19_f2], fun [sofar_20'19_f1] app_39_24'41_arg -> app_39_24'41_arg sofar_20'19_f1 k in
+          ::_0'0_g5 gotten_22'8_f3 k in
+        put_char_0'0_g3 gotten_22'8_f3 k in
+    let k = [], fun [] app_35_23'15_arg -> app_35_23'15_arg lit_36_23'22_g12 k in
+    eq_char_0'0_g1 gotten_22'8_arg k in
+  let con_33_21'27_t1 = Unit0 in
+  get_char_0'0_g4 con_33_21'27_t1 k in
+let read_line_19'4_g14 = fun __19'14_arg k ->
+  let con_40_26'11_t1 = Nil0 in
+  readloop_20'10_g13 con_40_26'11_t1 k in
+let lit_41_28'20_g15 = "LOAD\n" in
+let lit_42_31'13_g16 = "> " in
+let mainloop_30'8_g17 = fun mainloop_30'8_me __30'17_arg k ->
+  let k = [mainloop_30'8_me], fun [mainloop_30'8_f1] __31'17_arg ->
+    let k = [mainloop_30'8_f1], fun [mainloop_30'8_f1] __32'26_arg ->
+      let k = [mainloop_30'8_f1], fun [mainloop_30'8_f1] __33'11_arg ->
+        let con_46_34'10_t1 = Unit0 in
+        mainloop_30'8_f1 con_46_34'10_t1 k in
+      let con_45_33'9_t1 = Unit0 in
+      newline_17'4_g11 con_45_33'9_t1 k in
+    let k = [], fun [] app_43_32'23_arg -> put_chars_2'8_g6 app_43_32'23_arg k in
+    let con_44_32'23_t1 = Unit0 in
+    read_line_19'4_g14 con_44_32'23_t1 k in
+  put_string_7'4_g7 lit_42_31'13_g16 k in
+let lit_47_37'13_g18 = "RUN\n" in
+let lit_49_39'13_g19 = "NEVER\n" in
+let main_36'4_g20 = fun __36'9_arg k ->
+  let k = [], fun [] __37'20_arg ->
+    let k = [], fun [] __38'6_arg -> put_string_7'4_g7 lit_49_39'13_g19 k in
+    let con_48_38'20_t1 = Unit0 in
+    mainloop_30'8_g17 con_48_38'20_t1 k in
+  put_string_7'4_g7 lit_47_37'13_g18 k in
+let k = [], fun [] __28'4_arg ->
+  let con_50_0'0_t1 = Unit0 in
+  main_36'4_g20 con_50_0'0_t1 k in
+put_string_7'4_g7 lit_41_28'20_g15 k

@@ -116,9 +116,6 @@ let put_chars = fix (fun put_chars xs ->
 let put_string = (fun s -> (put_chars (explode s))) in
 let put_int = (fun i -> (put_chars (chars_of_int i))) in
 let newline = (fun _ -> (put_char '\n')) in
-let put_string_newline = (fun s ->
-  let _ = (put_string s) in
-  (newline Unit)) in
 let read_line = (fun _ ->
   let controlD = (chr 4) in
   let loop = fix (fun loop acc ->
@@ -211,7 +208,7 @@ let runrev = (fun args ->
   match args with
   | Cons(_,_) -> (error "rev: expected no arguments")
   | Nil ->
-    let _ = (put_string_newline "(reverse typed lines until ^D)") in
+    let _ = (put_string "(reverse typed lines until ^D)\n") in
     (rev Unit)) in
 let fallback = (fun line ->
   let star_the_ohs = (map
@@ -220,11 +217,10 @@ let fallback = (fun line ->
     | true -> '*'
     | false -> c)) in
   let n = (length line) in
-  let _ = (put_chars ((append (explode "You wrote: ")) (star_the_ohs line))) in
-  let _ = (put_char ' ') in
-  let _ = (put_char '{') in
+  let _ = (put_chars ((append (explode "You wrote: \"")) (star_the_ohs line))) in
+  let _ = (put_string "\" (") in
   let _ = (put_int n) in
-  let _ = (put_char '}') in
+  let _ = (put_string " chars)") in
   (newline Unit)) in
 let split_words = (fun s ->
   let loop = fix (fun loop accWs ->
@@ -260,5 +256,5 @@ let mainloop = fix (fun mainloop _ ->
     let _ = (execute xs) in
     (mainloop Unit)) in
 let main = (fun _ ->
-  let _ = (put_string_newline "This is a shell prototype. Try: fib, fact, rev") in
+  let _ = (put_string "This is a shell prototype. Try: fib, fact, rev\n") in
   (mainloop Unit)) in

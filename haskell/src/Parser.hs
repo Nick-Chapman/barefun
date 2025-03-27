@@ -116,27 +116,28 @@ gram6 = program where
 
   number = nibble $ alts [decNumber]
 
-  charLitPlain = sat $ \c -> c /= '\\' -- TODO only printable
+  charLitPlain = sat $ \c -> c /= '\\'
 
   charLitEscaped = do
     lit '\\'
     alts
       [ do lit '\\'; pure '\\'
       , do lit 'n'; pure '\n'
+      , do lit '"'; pure '"'
       ]
 
   singleQuote = lit '\''
   charLit = nibble $ do
     singleQuote
-    x <- alts [charLitPlain, charLitEscaped]
+    x <- alts [charLitEscaped, charLitPlain]
     singleQuote
     pure x
 
-  stringLitChar = sat $ \c -> c /= '"' -- TODO: do escaped chars properly.. first step \n for newline
+  stringLitChar = sat $ \c -> c /= '"' && c /= '\\'
   doubleQuote = lit '"'
   stringLit = nibble $ do
     doubleQuote
-    x <- many stringLitChar
+    x <- many (alts [charLitEscaped, stringLitChar])
     doubleQuote
     pure x
 

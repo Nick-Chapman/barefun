@@ -5,7 +5,7 @@ Ocaml REPL
   [ocaml]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
-  You wrote: Hell*, W*rld! {13}
+  You wrote: "Hell*, W*rld!" (13 chars)
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -28,7 +28,7 @@ Ocaml REPL
   .erom emos era ereh dnA
   ^D
   > Goodbye
-  You wrote: G**dbye {7}
+  You wrote: "G**dbye" (7 chars)
   > [EOF]
 
 Haskell REPL (stage0)
@@ -37,7 +37,7 @@ Haskell REPL (stage0)
   [stage0]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
-  You wrote: Hell*, W*rld! {13}
+  You wrote: "Hell*, W*rld!" (13 chars)
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -60,7 +60,7 @@ Haskell REPL (stage0)
   .erom emos era ereh dnA
   ^D
   > Goodbye
-  You wrote: G**dbye {7}
+  You wrote: "G**dbye" (7 chars)
   > [EOF]
 
 Haskell REPL (stage1)
@@ -69,7 +69,7 @@ Haskell REPL (stage1)
   [stage1; un-normalized]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
-  You wrote: Hell*, W*rld! {13}
+  You wrote: "Hell*, W*rld!" (13 chars)
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -92,7 +92,7 @@ Haskell REPL (stage1)
   .erom emos era ereh dnA
   ^D
   > Goodbye
-  You wrote: G**dbye {7}
+  You wrote: "G**dbye" (7 chars)
   > [EOF]
 
 Haskell REPL (stage2)
@@ -101,7 +101,7 @@ Haskell REPL (stage2)
   [stage2; un-normalized]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
-  You wrote: Hell*, W*rld! {13}
+  You wrote: "Hell*, W*rld!" (13 chars)
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -124,7 +124,7 @@ Haskell REPL (stage2)
   .erom emos era ereh dnA
   ^D
   > Goodbye
-  You wrote: G**dbye {7}
+  You wrote: "G**dbye" (7 chars)
   > [EOF]
 
 Haskell REPL
@@ -133,7 +133,7 @@ Haskell REPL
   [stage3; un-normalized]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
-  You wrote: Hell*, W*rld! {13}
+  You wrote: "Hell*, W*rld!" (13 chars)
   > fib
   fib: ERROR: expected an argument
   > fib xx
@@ -156,5 +156,5 @@ Haskell REPL
   .erom emos era ereh dnA
   ^D
   > Goodbye
-  You wrote: G**dbye {7}
+  You wrote: "G**dbye" (7 chars)
   > [EOF]

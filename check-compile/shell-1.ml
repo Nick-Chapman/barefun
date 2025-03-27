@@ -115,150 +115,146 @@ let put_chars_90'8 = fix (fun put_chars_90'8 xs_90'18 ->
 let put_string_95'4 = (fun s_95'15 -> (put_chars_90'8 (explode_0'0 s_95'15))) in
 let put_int_97'4 = (fun i_97'12 -> (put_chars_90'8 (chars_of_int_81'4 i_97'12))) in
 let newline_99'4 = (fun __99'12 -> (put_char_12'4 '\n')) in
-let put_string_newline_101'4 = (fun s_101'23 ->
-  let __102'14 = (put_string_95'4 s_101'23) in
-  (newline_99'4 Unit0)) in
-let read_line_105'4 = (fun __105'14 ->
-  let controlD_106'6 = (chr_0'0 4) in
-  let loop_107'10 = fix (fun loop_107'10 acc_107'15 ->
-    let c_108'8 = (get_char_0'0 Unit0) in
-    let n_109'8 = (ord_0'0 c_108'8) in
-    match ((eq_char_0'0 c_108'8) '\n') with
+let read_line_101'4 = (fun __101'14 ->
+  let controlD_102'6 = (chr_0'0 4) in
+  let loop_103'10 = fix (fun loop_103'10 acc_103'15 ->
+    let c_104'8 = (get_char_0'0 Unit0) in
+    let n_105'8 = (ord_0'0 c_104'8) in
+    match ((eq_char_0'0 c_104'8) '\n') with
     | true1 ->
-      let __110'37 = (newline_99'4 Unit0) in
-      (reverse_63'4 acc_107'15)
+      let __106'37 = (newline_99'4 Unit0) in
+      (reverse_63'4 acc_103'15)
     | false0 ->
-      match ((eq_char_0'0 c_108'8) controlD_106'6) with
+      match ((eq_char_0'0 c_104'8) controlD_102'6) with
       | true1 ->
-        let __111'44 = (put_char_12'4 c_108'8) in
-        let __111'55 = (newline_99'4 Unit0) in
-        (reverse_63'4 ((::_0'0 controlD_106'6) acc_107'15))
+        let __107'44 = (put_char_12'4 c_104'8) in
+        let __107'55 = (newline_99'4 Unit0) in
+        (reverse_63'4 ((::_0'0 controlD_102'6) acc_103'15))
       | false0 ->
-        match ((>_7'4 n_109'8) 127) with
-        | true1 -> (loop_107'10 acc_107'15)
+        match ((>_7'4 n_105'8) 127) with
+        | true1 -> (loop_103'10 acc_103'15)
         | false0 ->
-          match ((=_0'0 n_109'8) 127) with
+          match ((=_0'0 n_105'8) 127) with
           | true1 ->
-            match acc_107'15 with
-            | Nil0 -> (loop_107'10 acc_107'15)
-            | Cons1(c_116'14,tail_116'17) ->
-              let __117'58 = match ((<=_8'4 (ord_0'0 c_116'14)) 26) with
+            match acc_103'15 with
+            | Nil0 -> (loop_103'10 acc_103'15)
+            | Cons1(c_112'14,tail_112'17) ->
+              let __113'58 = match ((<=_8'4 (ord_0'0 c_112'14)) 26) with
               | true1 -> (erase_char_20'4 Unit0)
               | false0 -> Unit0 in
-              let __118'27 = (erase_char_20'4 Unit0) in
-              (loop_107'10 tail_116'17)
+              let __114'27 = (erase_char_20'4 Unit0) in
+              (loop_103'10 tail_112'17)
           | false0 ->
-            let __121'23 = (put_char_12'4 c_108'8) in
-            (loop_107'10 ((cons_45'4 c_108'8) acc_107'15))) in
-  (loop_107'10 Nil0)) in
-let fib_125'8 = fix (fun fib_125'8 n_125'12 ->
-  match ((<_0'0 n_125'12) 2) with
-  | true1 -> n_125'12
-  | false0 -> ((+_0'0 (fib_125'8 ((-_0'0 n_125'12) 1))) (fib_125'8 ((-_0'0 n_125'12) 2)))) in
-let fact_129'8 = fix (fun fact_129'8 n_129'13 ->
-  match ((>=_9'4 n_129'13) 2) with
-  | true1 -> ((( * )_0'0 (fact_129'8 ((-_0'0 n_129'13) 1))) n_129'13)
+            let __117'23 = (put_char_12'4 c_104'8) in
+            (loop_103'10 ((cons_45'4 c_104'8) acc_103'15))) in
+  (loop_103'10 Nil0)) in
+let fib_121'8 = fix (fun fib_121'8 n_121'12 ->
+  match ((<_0'0 n_121'12) 2) with
+  | true1 -> n_121'12
+  | false0 -> ((+_0'0 (fib_121'8 ((-_0'0 n_121'12) 1))) (fib_121'8 ((-_0'0 n_121'12) 2)))) in
+let fact_125'8 = fix (fun fact_125'8 n_125'13 ->
+  match ((>=_9'4 n_125'13) 2) with
+  | true1 -> ((( * )_0'0 (fact_125'8 ((-_0'0 n_125'13) 1))) n_125'13)
   | false0 -> 1) in
-let error_133'4 = (fun s_133'10 ->
-  let __133'34 = (put_string_95'4 "ERROR: ") in
-  let __133'48 = (put_string_95'4 s_133'10) in
+let error_129'4 = (fun s_129'10 ->
+  let __129'34 = (put_string_95'4 "ERROR: ") in
+  let __129'48 = (put_string_95'4 s_129'10) in
   (newline_99'4 Unit0)) in
-let runfib_135'4 = (fun args_135'11 ->
-  let __136'20 = (put_string_95'4 "fib: ") in
-  match args_135'11 with
-  | Nil0 -> (error_133'4 "expected an argument")
-  | Cons1(arg1_139'4,more_139'10) ->
-    match more_139'10 with
-    | Cons1(__141'7,__141'10) -> (error_133'4 "expected exactly one argument")
+let runfib_131'4 = (fun args_131'11 ->
+  let __132'20 = (put_string_95'4 "fib: ") in
+  match args_131'11 with
+  | Nil0 -> (error_129'4 "expected an argument")
+  | Cons1(arg1_135'4,more_135'10) ->
+    match more_135'10 with
+    | Cons1(__137'7,__137'10) -> (error_129'4 "expected exactly one argument")
     | Nil0 ->
-      match (parse_num_34'4 arg1_139'4) with
-      | None1 -> (error_133'4 "expected arg1 to be numeric")
-      | Some0(n_145'15) ->
-        let res_146'15 = (fib_125'8 n_145'15) in
-        let __147'20 = (put_int_97'4 n_145'15) in
-        let __148'29 = (put_string_95'4 " --> ") in
-        let __149'22 = (put_int_97'4 res_146'15) in
+      match (parse_num_34'4 arg1_135'4) with
+      | None1 -> (error_129'4 "expected arg1 to be numeric")
+      | Some0(n_141'15) ->
+        let res_142'15 = (fib_121'8 n_141'15) in
+        let __143'20 = (put_int_97'4 n_141'15) in
+        let __144'29 = (put_string_95'4 " --> ") in
+        let __145'22 = (put_int_97'4 res_142'15) in
         (newline_99'4 Unit0)) in
-let runfact_152'4 = (fun args_152'12 ->
-  let __153'21 = (put_string_95'4 "fact: ") in
-  match args_152'12 with
-  | Nil0 -> (error_133'4 "expected an argument")
-  | Cons1(arg1_156'4,more_156'10) ->
-    match more_156'10 with
-    | Cons1(__158'7,__158'10) -> (error_133'4 "expected exactly one argument")
+let runfact_148'4 = (fun args_148'12 ->
+  let __149'21 = (put_string_95'4 "fact: ") in
+  match args_148'12 with
+  | Nil0 -> (error_129'4 "expected an argument")
+  | Cons1(arg1_152'4,more_152'10) ->
+    match more_152'10 with
+    | Cons1(__154'7,__154'10) -> (error_129'4 "expected exactly one argument")
     | Nil0 ->
-      match (parse_num_34'4 arg1_156'4) with
-      | None1 -> (error_133'4 "expected arg1 to be numeric")
-      | Some0(n_162'15) ->
-        let res_163'15 = (fact_129'8 n_162'15) in
-        let __164'20 = (put_int_97'4 n_162'15) in
-        let __165'29 = (put_string_95'4 " --> ") in
-        let __166'22 = (put_int_97'4 res_163'15) in
+      match (parse_num_34'4 arg1_152'4) with
+      | None1 -> (error_129'4 "expected arg1 to be numeric")
+      | Some0(n_158'15) ->
+        let res_159'15 = (fact_125'8 n_158'15) in
+        let __160'20 = (put_int_97'4 n_158'15) in
+        let __161'29 = (put_string_95'4 " --> ") in
+        let __162'22 = (put_int_97'4 res_159'15) in
         (newline_99'4 Unit0)) in
-let single_controlD_170'4 = ((::_0'0 (chr_0'0 4)) Nil0) in
-let rev_172'4 = (fun __172'7 ->
-  let loop_173'10 = fix (fun loop_173'10 __173'14 ->
-    let xs_174'8 = (read_line_105'4 Unit0) in
-    match ((eq_char_list_56'4 xs_174'8) single_controlD_170'4) with
+let single_controlD_166'4 = ((::_0'0 (chr_0'0 4)) Nil0) in
+let rev_168'4 = (fun __168'7 ->
+  let loop_169'10 = fix (fun loop_169'10 __169'14 ->
+    let xs_170'8 = (read_line_101'4 Unit0) in
+    match ((eq_char_list_56'4 xs_170'8) single_controlD_166'4) with
     | true1 -> Unit0
     | false0 ->
-      let __176'29 = (put_chars_90'8 (reverse_63'4 xs_174'8)) in
-      let __176'40 = (newline_99'4 Unit0) in
-      (loop_173'10 Unit0)) in
-  (loop_173'10 Unit0)) in
-let runrev_180'4 = (fun args_180'11 ->
-  match args_180'11 with
-  | Cons1(__182'4,__182'7) -> (error_133'4 "rev: expected no arguments")
+      let __172'29 = (put_chars_90'8 (reverse_63'4 xs_170'8)) in
+      let __172'40 = (newline_99'4 Unit0) in
+      (loop_169'10 Unit0)) in
+  (loop_169'10 Unit0)) in
+let runrev_176'4 = (fun args_176'11 ->
+  match args_176'11 with
+  | Cons1(__178'4,__178'7) -> (error_129'4 "rev: expected no arguments")
   | Nil0 ->
-    let __184'56 = (put_string_newline_101'4 "(reverse typed lines until ^D)") in
-    (rev_172'4 Unit0)) in
-let fallback_187'4 = (fun line_187'13 ->
-  let star_the_ohs_188'6 = (map_71'8
-  (fun c_188'30 ->
-    match ((eq_char_0'0 c_188'30) 'o') with
+    let __180'50 = (put_string_95'4 "(reverse typed lines until ^D)\n") in
+    (rev_168'4 Unit0)) in
+let fallback_183'4 = (fun line_183'13 ->
+  let star_the_ohs_184'6 = (map_71'8
+  (fun c_184'30 ->
+    match ((eq_char_0'0 c_184'30) 'o') with
     | true1 -> '*'
-    | false0 -> c_188'30)) in
-  let n_189'6 = (length_76'8 line_187'13) in
-  let __190'64 = (put_chars_90'8 ((append_58'8 (explode_0'0 "You wrote: ")) (star_the_ohs_188'6 line_187'13))) in
-  let __191'14 = (put_char_12'4 ' ') in
-  let __192'14 = (put_char_12'4 '{') in
-  let __193'11 = (put_int_97'4 n_189'6) in
-  let __194'14 = (put_char_12'4 '}') in
+    | false0 -> c_184'30)) in
+  let n_185'6 = (length_76'8 line_183'13) in
+  let __186'66 = (put_chars_90'8 ((append_58'8 (explode_0'0 "You wrote: \"")) (star_the_ohs_184'6 line_183'13))) in
+  let __187'19 = (put_string_95'4 "\" (") in
+  let __188'11 = (put_int_97'4 n_185'6) in
+  let __189'22 = (put_string_95'4 " chars)") in
   (newline_99'4 Unit0)) in
-let split_words_197'4 = (fun s_197'16 ->
-  let loop_198'10 = fix (fun loop_198'10 accWs_198'15 ->
-    (fun accCs_198'21 ->
-      (fun xs_198'27 ->
-        match xs_198'27 with
-        | Nil0 -> (reverse_63'4 ((::_0'0 (reverse_63'4 accCs_198'21)) accWs_198'15))
-        | Cons1(x_202'6,xs_202'9) ->
-          match ((eq_char_0'0 x_202'6) ' ') with
-          | true1 -> (((loop_198'10 ((::_0'0 (reverse_63'4 accCs_198'21)) accWs_198'15)) Nil0) xs_202'9)
-          | false0 -> (((loop_198'10 accWs_198'15) ((::_0'0 x_202'6) accCs_198'21)) xs_202'9)))) in
-  (((loop_198'10 Nil0) Nil0) s_197'16)) in
-let execute_208'4 = (fun line_208'12 ->
-  let words_209'6 = (split_words_197'4 line_208'12) in
-  match words_209'6 with
+let split_words_192'4 = (fun s_192'16 ->
+  let loop_193'10 = fix (fun loop_193'10 accWs_193'15 ->
+    (fun accCs_193'21 ->
+      (fun xs_193'27 ->
+        match xs_193'27 with
+        | Nil0 -> (reverse_63'4 ((::_0'0 (reverse_63'4 accCs_193'21)) accWs_193'15))
+        | Cons1(x_197'6,xs_197'9) ->
+          match ((eq_char_0'0 x_197'6) ' ') with
+          | true1 -> (((loop_193'10 ((::_0'0 (reverse_63'4 accCs_193'21)) accWs_193'15)) Nil0) xs_197'9)
+          | false0 -> (((loop_193'10 accWs_193'15) ((::_0'0 x_197'6) accCs_193'21)) xs_197'9)))) in
+  (((loop_193'10 Nil0) Nil0) s_192'16)) in
+let execute_203'4 = (fun line_203'12 ->
+  let words_204'6 = (split_words_192'4 line_203'12) in
+  match words_204'6 with
   | Nil0 -> Unit0
-  | Cons1(command_212'4,args_212'13) ->
-    match ((eq_char_list_56'4 command_212'4) (explode_0'0 "fib")) with
-    | true1 -> (runfib_135'4 args_212'13)
+  | Cons1(command_207'4,args_207'13) ->
+    match ((eq_char_list_56'4 command_207'4) (explode_0'0 "fib")) with
+    | true1 -> (runfib_131'4 args_207'13)
     | false0 ->
-      match ((eq_char_list_56'4 command_212'4) (explode_0'0 "fact")) with
-      | true1 -> (runfact_152'4 args_212'13)
+      match ((eq_char_list_56'4 command_207'4) (explode_0'0 "fact")) with
+      | true1 -> (runfact_148'4 args_207'13)
       | false0 ->
-        match ((eq_char_list_56'4 command_212'4) (explode_0'0 "rev")) with
-        | true1 -> (runrev_180'4 args_212'13)
-        | false0 -> (fallback_187'4 line_208'12)) in
-let mainloop_218'8 = fix (fun mainloop_218'8 __218'17 ->
-  let __219'21 = (put_chars_90'8 Cons1('>', Cons1(' ', Nil0))) in
-  let xs_220'6 = (read_line_105'4 Unit0) in
-  match ((eq_char_list_56'4 xs_220'6) single_controlD_170'4) with
+        match ((eq_char_list_56'4 command_207'4) (explode_0'0 "rev")) with
+        | true1 -> (runrev_176'4 args_207'13)
+        | false0 -> (fallback_183'4 line_203'12)) in
+let mainloop_213'8 = fix (fun mainloop_213'8 __213'17 ->
+  let __214'21 = (put_chars_90'8 Cons1('>', Cons1(' ', Nil0))) in
+  let xs_215'6 = (read_line_101'4 Unit0) in
+  match ((eq_char_list_56'4 xs_215'6) single_controlD_166'4) with
   | true1 -> Unit0
   | false0 ->
-    let __222'15 = (execute_208'4 xs_220'6) in
-    (mainloop_218'8 Unit0)) in
-let main_224'4 = (fun __224'9 ->
-  let __225'69 = (put_string_newline_101'4 "This is a shell prototype. Try: fib, fact, rev") in
-  (mainloop_218'8 Unit0)) in
-(main_224'4 Unit0)
+    let __217'15 = (execute_203'4 xs_215'6) in
+    (mainloop_213'8 Unit0)) in
+let main_219'4 = (fun __219'9 ->
+  let __220'63 = (put_string_95'4 "This is a shell prototype. Try: fib, fact, rev\n") in
+  (mainloop_213'8 Unit0)) in
+(main_219'4 Unit0)
