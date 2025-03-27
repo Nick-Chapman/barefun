@@ -1,0 +1,47 @@
+Barefun project log...
+
+Wed 12 Feb 2025 : setup barefun repo; init from quarter forth; reduce to minimal get/put char repl
+Thu 13 Feb 2025 : by hand x86; manage own continuation; small readline example with heap allocated chars
+Fri 14 Feb 2025 :
+
+Mon 17 Feb 2025 :
+Tue 18 Feb 2025 :
+Wed 19 Feb 2025 :
+Thu 20 Feb 2025 :
+Fri 21 Feb 2025 :
+
+Mon 24 Feb 2025 :
+Tue 25 Feb 2025 :
+Wed 26 Feb 2025 :
+Thu 27 Feb 2025 :
+Fri 28 Feb 2025 :
+
+Mon 03 Mar 2025 :
+Tue 04 Mar 2025 :
+Wed 05 Mar 2025 :
+Thu 06 Mar 2025 :
+Fri 07 Mar 2025 : repl/readline example in ocaml
+
+Mon 10 Mar 2025 : begin haskell compiler: Ast,Parser,Pretty-printer
+Tue 11 Mar 2025 : haskell evaluation
+Wed 12 Mar 2025 : [BIRTHDAY] drive ocaml/haskell from same examples; refactoring
+Thu 13 Mar 2025 : examples and parsing; ocaml no pervasives; evaluation: cids -> tags
+Fri 14 Mar 2025 : examples and parsing
+
+Mon 17 Mar 2025 : burn bootable USB stick ; setup for multiple x86 examples; enter protected mode; write char to video memory
+Tue 18 Mar 2025 : dune/cram setup; stage1 (Ast->simple Exp); fvs: remove unused defs
+Wed 19 Mar 2025 : stage2: ANF
+Thu 20 Mar 2025 : refactoring; compute/show free vars after stage2 -- too many!
+Fri 21 Mar 2025 : (day off)
+
+Mon 24 Mar 2025 : setup expected compilation tests; stage3: locate vars and lift globals
+Tue 25 Mar 2025 : improve pp for compiler output; track positions; examples: ^D in shell & rev; project README; prep for normalization
+Wed 26 Mar 2025 : begin code normalization pass: walk tree, uniquify; BID: track position of every binding occurrence; parse: list syntax
+Thu 27 Mar 2025 : reconstruct docs/dev.log
+Fri 28 Mar 2025 :
+
+Mon 31 Mar 2025 :
+Tue 01 Apr 2025 :
+Wed 02 Apr 2025 :
+Thu 03 Apr 2025 :
+Fri 04 Apr 2025 :
