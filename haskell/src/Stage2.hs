@@ -19,6 +19,7 @@ import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (toList,fromList,unions,empty)
+import qualified Interaction as I (Tickable(..))
 import qualified Stage1 as SRC
 
 type Transformed = Code
@@ -99,15 +100,15 @@ evalCode0 exp =
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env = \case
-  Return _ x -> \k -> k (look x)
-  Tail x1 pos x2 -> \k -> ITickApp $ apply (look x1) pos (look x2) k
+  Return _ x -> \k -> ITick I.Return $ k (look x)
+  Tail x1 pos x2 -> \k -> ITick I.Enter $ apply (look x1) pos (look x2) k
   LetAlias x y body -> \k -> do
     let v = look y
     evalCode (insert x v env) body k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode (insert x v1 env) c2 k
-  PushContinuation fvs (x,later) first -> \k -> do
+  PushContinuation fvs (x,later) first -> \k -> ITick I.PushContinuation $ do
     evalCode env first $ \v1 -> do
       evalCode (insert x v1 (limit fvs env)) later k
   Case scrut arms0 -> \k -> do

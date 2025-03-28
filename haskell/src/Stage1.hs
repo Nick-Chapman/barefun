@@ -15,6 +15,7 @@ import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
+import qualified Interaction as I (Tickable(App))
 import qualified Stage0 as SRC
 
 type Transformed = Exp
@@ -149,7 +150,7 @@ eval env@Env{venv} = \case
   App e1 pos e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env e2 $ \v2 -> do
-        ITickApp $ apply v1 pos v2 k
+        ITick I.App $ apply v1 pos v2 k
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k

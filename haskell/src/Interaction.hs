@@ -1,12 +1,15 @@
-module Interaction ( Interaction(..), runTerm ) where
+module Interaction ( Interaction(..), runTerm, Tickable(..) ) where
 
 import Data.Char (showLitChar,ord)
+import Data.List (intercalate)
+import Data.Map (Map)
 import System.IO (stdin,stdout,hIsEOF,hFlush,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
 import Text.Printf (printf)
+import qualified Data.Map as Map
 
 data Interaction
   = IDone
-  | ITickApp Interaction
+  | ITick Tickable Interaction
   | IDebug String Interaction
   | IPut Char Interaction
   | IGet (Char -> Interaction)
@@ -19,12 +22,12 @@ runTerm i = do
   where
     loop :: Counts -> Interaction -> IO ()
     loop counts = \case
-      ITickApp i -> do
-        loop (tickApp counts) i
+      ITick t i -> do
+        loop (tick t counts) i
       IDone -> do
-        printf "[HALT:%s]" (show counts)
+        printf "[HALT:%s]\n" (show counts)
       IDebug mes i -> do
-        printf "[debug] %s" mes
+        printf "[debug] %s\n" mes
         loop counts i
       IPut c i -> do
         let n = ord c
@@ -34,16 +37,33 @@ runTerm i = do
         loop counts i
       IGet f -> do
         b <- hIsEOF stdin
-        if b then printf "[EOF:%s]" (show counts) else do
+        if b then printf "[EOF:%s]\n" (show counts) else do
           c <- getChar
           loop counts (f c)
 
-data Counts = Counts { nApps :: Int }
+data Counts = Counts { m :: Map Tickable Int }
 
-instance Show Counts where show Counts{nApps} = printf "#apps=%d" nApps
+instance Show Counts where
+  show Counts{m} =
+    intercalate ", " [ printf "#%s=%d" (show t) v | t <- all, Just v <- [Map.lookup t m] ]
+    where
+      all = [App,PushContinuation,Enter,Return]
 
 counts0 :: Counts
-counts0 = Counts { nApps = 0 }
+counts0 = Counts { m = Map.empty }
 
-tickApp :: Counts -> Counts
-tickApp c@Counts{nApps} = c { nApps = 1 + nApps }
+tick :: Tickable -> Counts -> Counts
+tick t c@Counts{m} = c { m = Map.insert t (v+1) m }
+  where v = maybe 0 id $ Map.lookup t m
+
+
+data Tickable
+  = App
+  | PushContinuation | Enter | Return deriving (Eq,Ord)
+
+instance Show Tickable where
+  show = \case
+    App -> "apps"
+    PushContinuation -> "push-continuation"
+    Enter -> "enter"
+    Return -> "return"

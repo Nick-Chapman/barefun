@@ -17,6 +17,7 @@ import Stage1 (Id(..),Ctag(..))
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
+import qualified Interaction as I (Tickable(..))
 import qualified Stage2 as SRC (Code(..),Atomic(..),Arm(..), fvs)
 
 type Transformed = Loadable
@@ -159,15 +160,15 @@ evalT genv = \case
 -- TODO: pickup genv from scope in stead of threading?
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
-  Return _ x -> \k -> k (look x)
-  Tail x1 pos x2 -> \k -> ITickApp $ apply (look x1) pos (look x2) k
+  Return _ x -> \k -> ITick I.Return $ k (look x)
+  Tail x1 pos x2 -> \k -> ITick I.Enter $ apply (look x1) pos (look x2) k
   LetAlias x y body -> \k -> do
     let v = look y
     evalCode genv (insert x v env) body k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode genv (insert x v1 env) c2 k
-  PushContinuation pre _ (x,later) first -> \k -> do
+  PushContinuation pre _ (x,later) first -> \k -> ITick I.PushContinuation $ do
     evalCode genv env first $ \v1 -> do
       let env = mkFrameEnv genv look pre
       evalCode genv (insert x v1 env) later k

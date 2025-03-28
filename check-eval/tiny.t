@@ -25,13 +25,13 @@ Haskell REPL
   [stage2; un-normalized]
   Hello,
   World!
-  [EOF:#apps=44]
+  [EOF:#push-continuation=29, #enter=44, #return=28]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3u
   [stage3; un-normalized]
   Hello,
   World!
-  [EOF:#apps=44]
+  [EOF:#push-continuation=29, #enter=44, #return=28]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -1
   [stage1]
@@ -43,16 +43,16 @@ Haskell REPL
   [stage2]
   Hello,
   World!
-  [EOF:#apps=15]
+  [EOF:#enter=15]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3
   [stage3]
   Hello,
   World!
-  [EOF:#apps=15]
+  [EOF:#enter=15]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun
   [stage3]
   Hello,
   World!
-  [EOF:#apps=15]
+  [EOF:#enter=15]

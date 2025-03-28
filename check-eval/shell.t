@@ -125,7 +125,7 @@ Haskell REPL (stage2u)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#apps=355451]
+  > [EOF:#push-continuation=324088, #enter=355451, #return=324086]
 
 Haskell REPL (stage3u)
 
@@ -157,7 +157,7 @@ Haskell REPL (stage3u)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#apps=355451]
+  > [EOF:#push-continuation=324088, #enter=355451, #return=324086]
 
 Haskell REPL (stage1)
 
@@ -221,7 +221,7 @@ Haskell REPL (stage2)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#apps=87943]
+  > [EOF:#push-continuation=58908, #enter=87943, #return=58907]
 
 Haskell REPL (stage3)
 
@@ -253,7 +253,7 @@ Haskell REPL (stage3)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#apps=87943]
+  > [EOF:#push-continuation=58908, #enter=87943, #return=58907]
 
 Haskell REPL
 
@@ -285,4 +285,4 @@ Haskell REPL
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#apps=87943]
+  > [EOF:#push-continuation=58908, #enter=87943, #return=58907]
