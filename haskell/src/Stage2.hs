@@ -167,7 +167,7 @@ compile e = runM (trans0 e)
 trans0 :: SRC.Exp -> M Code
 trans0 e = trans1 e >>= nameAtomic
 
-data AC = Compound Code | Atomic Atomic
+data AC = Compound Code | Atomic Atomic -- TODO: just use Either?
 
 nameAtomic :: AC -> M Code
 nameAtomic = \case
@@ -178,12 +178,10 @@ nameAtomic = \case
     let noPos = Position 0 0
     pure $ LetAtomic u a (Return noPos u)
 
-
-
 trans1 :: SRC.Exp -> M AC
 trans1 e = trans1k e pure
 
-trans1k :: SRC.Exp -> (AC -> M AC) -> M AC
+trans1k :: SRC.Exp -> (AC -> M AC) -> M AC -- TODO: improve function naming
 trans1k = \case
   SRC.Var pos x -> \k -> do
     k $ Compound $ Return pos x
@@ -195,41 +193,21 @@ trans1k = \case
   SRC.Prim pos b es -> \k -> do
     transIds es $ \xs ->
       k $ Atomic $ Prim pos b xs
-
   SRC.Lam pos x body -> \k -> do
     body <- trans0 body
     k $ Atomic $ mkLam pos x body
-
   SRC.RecLam f x body -> \k -> do
     body <- trans0 body
     k $ Atomic $ mkRecLam f x body
-
   SRC.App e1 p e2 -> \k -> do
     transId e1 $ \x1 -> do
       transId e2 $ \x2 -> do
         k $ Compound $ Tail x1 p x2
-
   SRC.Let _pos x rhs body -> \k -> do
-    -- TODO: want eval counts to show 7/8 is improvement over 1
-    let version :: Int = 8 -- SELECT HERE
-    case version of
-      1 -> do -- Original
-        rhs <- trans1 rhs
-        body <- trans0 body
-        k $ Compound $ mkBind x rhs body
-      7 -> do -- Latest attempt... Oh Yes, it works!
-        transId rhs $ \rhs -> do
-          body <- trans1k body k >>= nameAtomic
-          pure $ Compound $ LetAlias x rhs body
-
-      8 -> do -- Nice, even better that 7. Less alias-names!
-        trans1k rhs $ \rhs -> do
-          body <- trans1k body k >>= nameAtomic
-          pure $ Compound $ mkBind x rhs body
-
-      v -> error (show ("stage2/let/compile/version",v))
-
-  SRC.Case scrut arms -> \k -> do
+    trans1k rhs $ \rhs -> do
+      body <- trans1k body k >>= nameAtomic
+      pure $ Compound $ mkBind x rhs body
+  SRC.Case scrut arms -> \k -> do -- TODO: push/duplicate k through case arms
     transId scrut $ \scrut -> do
       arms <- mapM transArm arms
       k $ Compound $ Case scrut arms
@@ -251,10 +229,9 @@ transId = \case
   e -> \k -> do
     let (what,optPos) = provenanceExp e
     u <- Fresh optPos what
-    trans1k e $ \code -> do -- TODO: should I do this?
-    --code <- trans1 e
-    body <- (k u >>= nameAtomic)
-    pure $ Compound $ mkBind u code body
+    trans1k e $ \code -> do
+      body <- (k u >>= nameAtomic)
+      pure $ Compound $ mkBind u code body
 
 transIds :: [SRC.Exp] -> ([Id] -> M AC) -> M AC
 transIds es k = case es of
