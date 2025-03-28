@@ -13,9 +13,10 @@ let explode = (fun x -> PRIM_Explode(x)) in
 let put_char = (fun x -> PRIM_PutChar(x)) in
 let get_char = (fun x -> PRIM_GetChar(x)) in
 let :: = (fun x -> (fun y -> Cons(x, y))) in
-let main = (fun _ ->
-  let _ = (put_char 'X') in
-  let _ = (put_char (get_char Unit)) in
-  let _ = (put_char 'Y') in
-  let _ = (put_char (get_char Unit)) in
-  (put_char 'Z')) in
+let main =
+  (fun _ ->
+    let _ = (put_char 'X') in
+    let _ = (put_char (get_char Unit)) in
+    let _ = (put_char 'Y') in
+    let _ = (put_char (get_char Unit)) in
+    (put_char 'Z')) in
