@@ -61,21 +61,23 @@ let ::_0'0 = fun [] x_0'0 k ->
     k con_22_0'0 in
   k lam_23_0'0 in
 let main_2'4 = fun [get_char_0'0,put_char_0'0] __2'9 k ->
-  let k [get_char_0'0,put_char_0'0] __3'14 =
-    let k [get_char_0'0,put_char_0'0] __4'24 =
-      let k [get_char_0'0,put_char_0'0] __5'14 =
-        let k [put_char_0'0] __6'24 =
-          let lit_30_7'11 = 'Z' in
-          put_char_0'0 lit_30_7'11 k in
-        let k [put_char_0'0] app_28_6'21 = put_char_0'0 app_28_6'21 k in
-        let con_29_6'21 = Unit0 in
-        get_char_0'0 con_29_6'21 k in
-      let lit_27_5'11 = 'Y' in
-      put_char_0'0 lit_27_5'11 k in
-    let k [put_char_0'0] app_25_4'21 = put_char_0'0 app_25_4'21 k in
-    let con_26_4'21 = Unit0 in
-    get_char_0'0 con_26_4'21 k in
   let lit_24_3'11 = 'X' in
+  let k [get_char_0'0,put_char_0'0] __3'14 =
+    let con_26_4'21 = Unit0 in
+    let k [get_char_0'0,put_char_0'0] app_25_4'21 =
+      let k [get_char_0'0,put_char_0'0] __4'24 =
+        let lit_27_5'11 = 'Y' in
+        let k [get_char_0'0,put_char_0'0] __5'14 =
+          let con_29_6'21 = Unit0 in
+          let k [put_char_0'0] app_28_6'21 =
+            let k [put_char_0'0] __6'24 =
+              let lit_30_7'11 = 'Z' in
+              put_char_0'0 lit_30_7'11 k in
+            put_char_0'0 app_28_6'21 k in
+          get_char_0'0 con_29_6'21 k in
+        put_char_0'0 lit_27_5'11 k in
+      put_char_0'0 app_25_4'21 k in
+    get_char_0'0 con_26_4'21 k in
   put_char_0'0 lit_24_3'11 k in
 let con_31_0'0 = Unit0 in
 main_2'4 con_31_0'0 k

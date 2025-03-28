@@ -210,7 +210,7 @@ trans1k = \case
 
   SRC.Let _pos x rhs body -> \k -> do
     -- TODO: want eval counts to show 7/8 is improvement over 1
-    let version :: Int = 1 -- SELECT HERE
+    let version :: Int = 8 -- SELECT HERE
     case version of
       1 -> do -- Original
         rhs <- trans1 rhs
@@ -250,8 +250,8 @@ transId = \case
   e -> \k -> do
     let (what,optPos) = provenanceExp e
     u <- Fresh optPos what
-    --trans1k e $ \code -> do -- TODO: should I do this? -- YES
-    code <- trans1 e
+    trans1k e $ \code -> do -- TODO: should I do this?
+    --code <- trans1 e
     body <- (k u >>= nameAtomic)
     pure $ Compound $ mkBind u code body
 

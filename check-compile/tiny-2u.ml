@@ -60,15 +60,14 @@ let ::_0'0 = fun [] x_0'0 k ->
     let con_22_0'0 = Cons1[x_0'0,y_0'0] in
     k con_22_0'0 in
   k lam_23_0'0 in
-let k [] main_2'4 =
-  let con_26_0'0 = Unit0 in
-  main_2'4 con_26_0'0 k in
 let mainloop_3'10 = fix (fun [get_char_0'0,put_char_0'0] mainloop_3'10 __3'19 k ->
+  let con_24_4'26 = Unit0 in
   let k [put_char_0'0,mainloop_3'10] gotten_4'8 =
     let k [mainloop_3'10] __5'19 =
       let con_25_6'13 = Unit0 in
       mainloop_3'10 con_25_6'13 k in
     put_char_0'0 gotten_4'8 k in
-  let con_24_4'26 = Unit0 in
   get_char_0'0 con_24_4'26 k) in
-k mainloop_3'10
+let main_2'4 = mainloop_3'10 in
+let con_26_0'0 = Unit0 in
+main_2'4 con_26_0'0 k
