@@ -26,10 +26,10 @@ data Exp
   | ConTag Position Ctag [Exp]
   | Prim Position Builtin [Exp]
   | Lam Position Id Exp
-  | RecLam Id Id Exp -- TODO: why no position here?
+  | RecLam Position Id Id Exp
   | App Exp Position Exp
   | Let Position Id Exp Exp
-  | Case Exp [Arm] -- TODO: or here?
+  | Case Position Exp [Arm]
 
 data Arm = ArmTag Ctag [Id] Exp
 data Ctag = Ctag Cid Int
@@ -53,12 +53,10 @@ provenanceExp = \case
   ConTag pos _ _ -> ("con",Just pos)
   Lam pos _ _ -> ("lam",Just pos)
 
-  -- These come from normalization!
   Let pos _ _ _ -> ("uLET", Just pos)
   Prim pos _ _ -> ("prim", Just pos)
-
-  RecLam _ _ _ -> ("reclam",Nothing) -- TODO: need pos
-  Case _ _ -> ("case",Nothing) -- TODO: need pos
+  RecLam pos _ _ _ -> ("reclam",Just pos)
+  Case pos _ _ -> ("case",Just pos)
 
 
 ----------------------------------------------------------------------
@@ -81,10 +79,10 @@ pretty = \case
   ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
   Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   Lam _ x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
-  RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
+  RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
   Let _ x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
-  Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
+  Case _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
 prettyArm (ArmTag c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
@@ -144,7 +142,7 @@ eval env@Env{venv} = \case
     evalBuiltin b vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
-  RecLam f x body -> \k -> do
+  RecLam _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
   App e1 pos e2 -> \k -> do
@@ -154,7 +152,7 @@ eval env@Env{venv} = \case
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k
-  Case e arms0 -> \k -> do
+  Case _ e arms0 -> \k -> do
     eval env e $ \case
       VCons tagActual vArgs -> do
         let
@@ -213,15 +211,15 @@ trans cenv = \case
   SRC.Lam p x body -> do
     let (x',cenv1) = posProp x cenv
     Lam p x' (trans cenv1 body)
-  SRC.RecLam f x body -> do
+  SRC.RecLam p f x body -> do
     let (f',cenv1) = posProp f cenv
     let (x',cenv2) = posProp x cenv1
-    RecLam f' x' (trans cenv2 body)
+    RecLam p f' x' (trans cenv2 body)
   SRC.App e1 p e2 -> App (trans cenv e1) p (trans cenv e2)
   SRC.Let pos x rhs body -> do
     let (x',cenv1) = posProp x cenv
     Let pos x' (trans cenv rhs) (trans cenv1 body)
-  SRC.Case scrut arms -> Case (trans cenv scrut) (map transArm arms)
+  SRC.Case p scrut arms -> Case p (trans cenv scrut) (map transArm arms)
     where
       transArm :: SRC.Arm -> Arm
       transArm (SRC.Arm cid xs e) = do

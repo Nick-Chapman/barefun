@@ -303,7 +303,7 @@ compileC = walkC firstTempIndex
             body <- compileC (Map.insert x xRef cenv) body
             pure $ Lam pre post xRef body
 
-          SRC.RecLam fvs f x body -> do
+          SRC.RecLam _ fvs f x body -> do
             let fRef = Ref f TheFrame
             let xRef = Ref x TheArg
             let (cenv,pre,post) = frame locate fvs

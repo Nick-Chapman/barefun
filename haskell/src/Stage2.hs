@@ -40,7 +40,7 @@ data Atomic
   | Prim Position Builtin [Id]
   | ConTag Position Ctag [Id]
   | Lam Position Fvs Id Code
-  | RecLam Fvs Id Id Code
+  | RecLam Position Fvs Id Id Code
 
 type Fvs = [Id]
 
@@ -53,7 +53,7 @@ provenanceAtomic = \case
   Prim pos _ _ -> ("prim",Just pos)
   ConTag pos _ _ -> ("con",Just pos)
   Lam pos _ _ _ -> ("lam",Just pos)
-  RecLam{} -> undefined $ ("reclam",Nothing) -- never seen
+  RecLam pos _ _ _ _ -> undefined $ ("reclam",Just pos)
 
 ----------------------------------------------------------------------
 -- Show
@@ -76,7 +76,7 @@ prettyA = \case
   ConTag _ tag [] -> [show tag]
   ConTag _ tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam _ fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
-  RecLam fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
+  RecLam _ fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
 
 prettyArm :: Arm -> Lines
 prettyArm = \case
@@ -134,7 +134,7 @@ evalCode env = \case
       ConTag _ (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
       Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
-      RecLam fvs f x body -> \k -> do
+      RecLam _ fvs f x body -> \k -> do
         let me = VFunc (\arg k -> evalCode (insert f me (insert x arg (limit fvs env))) body k)
         k me
 
@@ -196,9 +196,9 @@ trans1k = \case
   SRC.Lam pos x body -> \k -> do
     body <- trans0 body
     k $ Atomic $ mkLam pos x body
-  SRC.RecLam f x body -> \k -> do
+  SRC.RecLam pos f x body -> \k -> do
     body <- trans0 body
-    k $ Atomic $ mkRecLam f x body
+    k $ Atomic $ mkRecLam pos f x body
   SRC.App e1 p e2 -> \k -> do
     transId e1 $ \x1 -> do
       transId e2 $ \x2 -> do
@@ -207,7 +207,7 @@ trans1k = \case
     trans1k rhs $ \rhs -> do
       body <- trans1k body k >>= nameAtomic
       pure $ Compound $ mkBind x rhs body
-  SRC.Case scrut arms -> \k -> do -- TODO: push/duplicate k through case arms
+  SRC.Case _pos scrut arms -> \k -> do -- TODO: push/duplicate k through case arms
     transId scrut $ \scrut -> do
       arms <- mapM transArm arms
       k $ Compound $ Case scrut arms
@@ -270,8 +270,8 @@ runM m0 = loop 1 m0 $ \_ x -> x
 mkLam :: Position -> Id -> Code -> Atomic
 mkLam pos x code = Lam pos (Set.toList (fvs code \\ singleton x)) x code
 
-mkRecLam :: Id -> Id -> Code -> Atomic
-mkRecLam f x code = RecLam (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
+mkRecLam :: Position -> Id -> Id -> Code -> Atomic
+mkRecLam pos f x code = RecLam pos (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
 
 mkPushContinuation :: (Id,Code) -> Code -> Code
 mkPushContinuation (x,later) first =
@@ -294,4 +294,4 @@ fvsA = \case
   ConTag _ _ xs -> Set.fromList xs
   Prim _ _ xs -> Set.fromList xs
   Lam _ fvs _ _ -> Set.fromList fvs
-  RecLam fvs _ _ _ -> Set.fromList fvs
+  RecLam _ fvs _ _ _ -> Set.fromList fvs

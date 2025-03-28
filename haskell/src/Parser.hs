@@ -25,8 +25,8 @@ underscore = mkUserId "_"
 mkSeq :: Position -> Exp -> Exp -> Exp
 mkSeq pos e1 e2 = AST.Let pos (Bid pos underscore) e1 e2
 
-mkIte :: Exp -> Exp -> Exp -> Exp
-mkIte i t e = AST.Case i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
+mkIte :: Position -> Exp -> Exp -> Exp -> Exp
+mkIte p i t e = AST.Case p i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
 
 
 positioned :: Par a -> Par (Position,a)
@@ -280,12 +280,13 @@ gram6 = program where
 
   binding :: Par (Bid,Exp) = do
     key "let"
+    pos <- position
     alts [do key "rec"; pure True, pure False] >>= \case
       True -> do
         f <- bound $ alts [identifier,bracketedInfixName]
         x1 <- bound identOrUnit
         rhs <- bindingAbstraction
-        pure (f, AST.RecLam f x1 rhs)
+        pure (f, AST.RecLam pos f x1 rhs)
       False -> do
         f <- bound $ alts [identOrUnit,bracketedInfixName]
         rhs <- bindingAbstraction
@@ -299,13 +300,14 @@ gram6 = program where
     pure (AST.Let pos x rhs body)
 
   ite = do
+    pos <- position
     key "if"
     i <- exp
     key "then"
     t <- exp
     key "else"
     e <- exp
-    pure (mkIte i t e)
+    pure (mkIte pos i t e)
 
   abstraction = do
     key "fun"
@@ -322,11 +324,12 @@ gram6 = program where
     pure (AST.Arm c xs e)
 
   match_ = do
+    pos <- position
     key "match"
     e <- exp
     key "with"
     as <- many arm
-    pure (AST.Case e as)
+    pure (AST.Case pos e as)
 
   expITE = alts
     [ infixWeakestPrecendence

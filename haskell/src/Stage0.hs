@@ -26,10 +26,10 @@ data Exp
   | Con Position Cid [Exp]
   | Prim Position Builtin [Exp]
   | Lam Position Bid Exp
-  | RecLam Bid Bid Exp
+  | RecLam Position Bid Bid Exp
   | App Exp Position Exp
   | Let Position Bid Exp Exp
-  | Case Exp [Arm]
+  | Case Position Exp [Arm]
 
 data Arm = Arm Cid [Bid] Exp
 data Cid = Cid String deriving (Eq,Ord)
@@ -83,10 +83,10 @@ pretty = \case
   Con _ c es -> onHead (show c ++) (bracket (foldl1 juxComma (map pretty es)))
   Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   Lam _ x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
-  RecLam f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
+  RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
   Let _ x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
-  Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
+  Case _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
 prettyArm (Arm c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
@@ -150,7 +150,7 @@ eval env@Env{venv,cenv} = \case
     evalBuiltin b vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval (insert x arg env) body k))
-  RecLam f x body -> \k -> do
+  RecLam _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval (insert f me (insert x arg env)) body k)
     k me
   App e1 pos e2 -> \k -> do
@@ -160,7 +160,7 @@ eval env@Env{venv,cenv} = \case
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval (insert x v1 env) e2 k
-  Case e arms0 -> \k -> do
+  Case _ e arms0 -> \k -> do
     eval env e $ \case
       VCons tagActual vArgs -> do
         let

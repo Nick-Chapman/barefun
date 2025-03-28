@@ -75,22 +75,22 @@ reflect env = \case
     pure $ Macro $ \arg -> do
       let env' = Map.insert x arg env
       reflect env' body
-  RecLam f x body -> do
+  RecLam pos f x body -> do
     x' <- fresh x
     f' <- fresh f
     let env' = Map.insert x (syn x') (Map.insert f (syn f') env)
     body <- norm env' body
-    pure $ Syntax $ RecLam f' x' body
+    pure $ Syntax $ RecLam pos f' x' body
   App e1 p e2 -> do
     e1 <- reflect env e1
     e2 <- reflect env e2
     apply e1 p e2
   Let p x rhs body -> do
     reflect env (App (Lam p x body) p rhs)
-  Case scrut arms -> do
+  Case pos scrut arms -> do
     scrut <- norm env scrut
     arms <- mapM (normArm env) arms
-    pure $ Syntax $ Case scrut arms
+    pure $ Syntax $ Case pos scrut arms
 
 normArm :: Env -> Arm -> M Arm
 normArm env (ArmTag c xs body) = do
