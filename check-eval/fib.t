@@ -11,39 +11,39 @@ Haskell REPL
   $ ../haskell/main.exe ../examples/fib.fun -0
   [stage0]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=131487]
 
   $ ../haskell/main.exe ../examples/fib.fun -1u
   [stage1; un-normalized]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=131487]
 
   $ ../haskell/main.exe ../examples/fib.fun -2u
   [stage2; un-normalized]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=131487]
 
   $ ../haskell/main.exe ../examples/fib.fun -3u
   [stage3; un-normalized]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=131487]
 
   $ ../haskell/main.exe ../examples/fib.fun -1
   [stage1]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=32877]
 
   $ ../haskell/main.exe ../examples/fib.fun -2
   [stage2]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=32877]
 
   $ ../haskell/main.exe ../examples/fib.fun -3
   [stage3]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=32877]
 
   $ ../haskell/main.exe ../examples/fib.fun
   [stage3]
   fib 20 --> 6765
-  [HALT]
+  [HALT:#apps=32877]

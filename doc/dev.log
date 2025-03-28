@@ -37,7 +37,7 @@ Fri 21 Mar 2025 : (day off)
 Mon 24 Mar 2025 : setup expected compilation tests; stage3: locate vars and lift globals
 Tue 25 Mar 2025 : improve pp for compiler output; track positions; examples: ^D in shell & rev; project README; prep for normalization
 Wed 26 Mar 2025 : begin code normalization pass: walk tree, uniquify; BID: track position of every binding occurrence; parse: list syntax
-Thu 27 Mar 2025 : reconstruct docs/dev.log
+Thu 27 Mar 2025 : reconstruct docs/dev.log ; first cut normalization: inlining!
 Fri 28 Mar 2025 :
 
 Mon 31 Mar 2025 :

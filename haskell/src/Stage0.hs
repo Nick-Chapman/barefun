@@ -155,7 +155,7 @@ eval env@Env{venv,cenv} = \case
   App e1 pos e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env e2 $ \v2 -> do
-        apply v1 pos v2 k
+        ITickApp $ apply v1 pos v2 k
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval (insert x v1 env) e2 k

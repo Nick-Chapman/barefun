@@ -21,7 +21,7 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=364]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -1u
   [stage1; un-normalized]
@@ -31,7 +31,7 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=364]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -2u
   [stage2; un-normalized]
@@ -41,7 +41,7 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=364]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -3u
   [stage3; un-normalized]
@@ -51,7 +51,7 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=364]
 
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -1
@@ -62,7 +62,7 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=120]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -2
   [stage2]
@@ -72,7 +72,7 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=120]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -3
   [stage3]
@@ -82,7 +82,7 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=120]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun
   [stage3]
@@ -92,4 +92,4 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF]
+  > [EOF:#apps=120]

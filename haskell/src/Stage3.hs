@@ -160,7 +160,7 @@ evalT genv = \case
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return _ x -> \k -> k (look x)
-  Tail x1 pos x2 -> \k -> apply (look x1) pos (look x2) k
+  Tail x1 pos x2 -> \k -> ITickApp $ apply (look x1) pos (look x2) k
   LetAlias x y body -> \k -> do
     let v = look y
     evalCode genv (insert x v env) body k
