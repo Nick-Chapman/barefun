@@ -25,10 +25,10 @@ data Exp
   | ConTag Position Ctag [Exp]
   | Prim Position Builtin [Exp]
   | Lam Position Id Exp
-  | RecLam Id Id Exp
+  | RecLam Id Id Exp -- TODO: why no position here?
   | App Exp Position Exp
   | Let Position Id Exp Exp
-  | Case Exp [Arm]
+  | Case Exp [Arm] -- TODO: or here?
 
 data Arm = ArmTag Ctag [Id] Exp
 data Ctag = Ctag Cid Int
@@ -52,13 +52,12 @@ provenanceExp = \case
   ConTag pos _ _ -> ("con",Just pos)
   Lam pos _ _ -> ("lam",Just pos)
 
-  -- TODO: No reason I think these cases can't occur. I've just never seen them yet in any of my examples.
-  RecLam{} -> undefined
-  Case{} -> undefined
-
   -- These come from normalization!
   Let pos _ _ _ -> ("uLET", Just pos)
   Prim pos _ _ -> ("prim", Just pos)
+
+  RecLam _ _ _ -> ("reclam",Nothing) -- TODO: need pos
+  Case _ _ -> ("case",Nothing) -- TODO: need pos
 
 
 ----------------------------------------------------------------------
