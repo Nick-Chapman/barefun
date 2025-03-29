@@ -1,20 +1,20 @@
 (*stage1*)
-let u_1 = Unit0 in
-let u_3 =
-  let u_2 = 'X' in
-  PRIM_PutChar(u_2) in
-let u_6 =
-  let u_5 =
-    let u_4 = Unit0 in
-    PRIM_GetChar(u_4) in
-  PRIM_PutChar(u_5) in
-let u_8 =
-  let u_7 = 'Y' in
-  PRIM_PutChar(u_7) in
-let u_11 =
-  let u_10 =
-    let u_9 = Unit0 in
-    PRIM_GetChar(u_9) in
-  PRIM_PutChar(u_10) in
-let u_12 = 'Z' in
-PRIM_PutChar(u_12)
+let __1_2'9 = Unit0 in
+let __3_3'14 =
+  let x_2_0'0 = 'X' in
+  PRIM_PutChar(x_2_0'0) in
+let __6_4'24 =
+  let x_5_0'0 =
+    let x_4_0'0 = Unit0 in
+    PRIM_GetChar(x_4_0'0) in
+  PRIM_PutChar(x_5_0'0) in
+let __8_5'14 =
+  let x_7_0'0 = 'Y' in
+  PRIM_PutChar(x_7_0'0) in
+let __11_6'24 =
+  let x_10_0'0 =
+    let x_9_0'0 = Unit0 in
+    PRIM_GetChar(x_9_0'0) in
+  PRIM_PutChar(x_10_0'0) in
+let x_12_0'0 = 'Z' in
+PRIM_PutChar(x_12_0'0)

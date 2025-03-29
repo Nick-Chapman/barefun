@@ -18,5 +18,6 @@ let main =
     fix (fun mainloop _ ->
       let gotten = (get_char Unit) in
       let _ = (put_char gotten) in
+      let _ = (put_char gotten) in
       (mainloop Unit)) in
   mainloop in

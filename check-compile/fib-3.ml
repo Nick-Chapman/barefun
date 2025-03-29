@@ -1,102 +1,102 @@
 (*stage3*)
 let k () = ()
-let u_6_g1 = fun put_chars_2_11'8_me xs_1_11'18_arg k ->
+let put_chars_6_11'8_g1 = fun put_chars_2_11'8_me xs_1_11'18_arg k ->
   match xs_1_11'18_arg with
   | Nil0 ->
     let con_1_13'10_t1 = Unit0 in
     k con_1_13'10_t1
   | Cons1(x_3_14'4_t1,xs_4_14'7_t2) ->
-    let u_5_t3 = PRIM_PutChar(x_3_14'4_t1) in
+    let __5_14'23_t3 = PRIM_PutChar(x_3_14'4_t1) in
     put_chars_2_11'8_me xs_4_14'7_t2 k in
-let u_9_g2 = 2 in
-let u_10_g3 = 1 in
-let u_13_g4 = 2 in
-let u_14_g5 = fun fib_8_22'8_me n_7_22'12_arg k ->
-  let uLET_2_0'0_t1 = PRIM_LessInt(n_7_22'12_arg,u_9_g2) in
+let y_9_0'0_g2 = 2 in
+let y_10_0'0_g3 = 1 in
+let y_13_0'0_g4 = 2 in
+let fib_14_22'8_g5 = fun fib_8_22'8_me n_7_22'12_arg k ->
+  let uLET_2_0'0_t1 = PRIM_LessInt(n_7_22'12_arg,y_9_0'0_g2) in
   match uLET_2_0'0_t1 with
   | true1 -> k n_7_22'12_arg
   | false0 ->
-    let uLET_4_0'0_t2 = PRIM_SubInt(n_7_22'12_arg,u_10_g3) in
-    let k = [n_7_22'12_arg,fib_8_22'8_me], fun [n_7_22'12_f1,fib_8_22'8_f2] u_11_arg ->
-      let uLET_3_0'0_t1 = [u_11_arg], fun [u_11_f1] f_12_arg k ->
-        let prim_5_0'0_t1 = PRIM_AddInt(u_11_f1,f_12_arg) in
+    let uLET_4_0'0_t2 = PRIM_SubInt(n_7_22'12_arg,y_10_0'0_g3) in
+    let k = [n_7_22'12_arg,fib_8_22'8_me], fun [n_7_22'12_f1,fib_8_22'8_f2] x_11_0'0_arg ->
+      let uLET_3_0'0_t1 = [x_11_0'0_arg], fun [x_11_0'0_f1] y_12_0'0_arg k ->
+        let prim_5_0'0_t1 = PRIM_AddInt(x_11_0'0_f1,y_12_0'0_arg) in
         k prim_5_0'0_t1 in
-      let uLET_7_0'0_t2 = PRIM_SubInt(n_7_22'12_f1,u_13_g4) in
+      let uLET_7_0'0_t2 = PRIM_SubInt(n_7_22'12_f1,y_13_0'0_g4) in
       let k = [uLET_3_0'0_t1], fun [uLET_3_0'0_f1] app_6_24'39_arg -> uLET_3_0'0_f1 app_6_24'39_arg k in
       fib_8_22'8_f2 uLET_7_0'0_t2 k in
     fib_8_22'8_me uLET_4_0'0_t2 k in
-let u_16_g6 = 20 in
-let u_18_g7 = "fib " in
-let u_20_g8 = '0' in
-let u_25_g9 = 0 in
-let u_26_g10 = 10 in
-let u_31_g11 = 10 in
-let u_33_g12 = 0 in
+let n_16_26'11_g6 = 20 in
+let s_18_16'15_g7 = "fib " in
+let x_20_0'0_g8 = '0' in
+let y_25_0'0_g9 = 0 in
+let y_26_0'0_g10 = 10 in
+let y_31_0'0_g11 = 10 in
+let y_33_0'0_g12 = 0 in
 let lit_18_9'17_g13 = '0' in
-let u_35_g14 = " --> " in
-let u_37_g15 = '0' in
-let u_42_g16 = 0 in
-let u_43_g17 = 10 in
-let u_48_g18 = 10 in
-let u_50_g19 = 0 in
+let s_35_16'15_g14 = " --> " in
+let x_37_0'0_g15 = '0' in
+let y_42_0'0_g16 = 0 in
+let y_43_0'0_g17 = 10 in
+let y_48_0'0_g18 = 10 in
+let y_50_0'0_g19 = 0 in
 let lit_33_9'17_g20 = '0' in
-let u_53_g21 = '\n' in
-let u_15_t1 = Unit0 in
-let k = [], fun [] u_17_arg ->
-  let prim_8_0'0_t1 = PRIM_Explode(u_18_g7) in
-  let k = [u_17_arg], fun [u_17_f1] u_19_arg ->
-    let u_21_t1 = PRIM_CharOrd(u_20_g8) in
-    let u_32_t2 = [u_21_t1], fun [u_21_f1] loop_23_5'10_me acc_22_5'15_arg k ->
-      let lam_16_0'0_t1 = [u_21_f1,acc_22_5'15_arg,loop_23_5'10_me], fun [u_21_f1,acc_22_5'15_f2,loop_23_5'10_f3] f_24_arg k ->
-        let uLET_10_0'0_t1 = PRIM_EqInt(f_24_arg,u_25_g9) in
+let x_53_0'0_g21 = '\n' in
+let __15_34'9_t1 = Unit0 in
+let k = [], fun [] res_17_27'6_arg ->
+  let prim_8_0'0_t1 = PRIM_Explode(s_18_16'15_g7) in
+  let k = [res_17_27'6_arg], fun [res_17_27'6_f1] __19_28'19_arg ->
+    let ord0_21_3'6_t1 = PRIM_CharOrd(x_20_0'0_g8) in
+    let loop_32_5'10_t2 = [ord0_21_3'6_t1], fun [ord0_21_3'6_f1] loop_23_5'10_me acc_22_5'15_arg k ->
+      let lam_16_5'19_t1 = [ord0_21_3'6_f1,acc_22_5'15_arg,loop_23_5'10_me], fun [ord0_21_3'6_f1,acc_22_5'15_f2,loop_23_5'10_f3] i_24_5'19_arg k ->
+        let uLET_10_0'0_t1 = PRIM_EqInt(i_24_5'19_arg,y_25_0'0_g9) in
         match uLET_10_0'0_t1 with
         | true1 -> k acc_22_5'15_f2
         | false0 ->
-          let u_27_t2 = PRIM_ModInt(f_24_arg,u_26_g10) in
-          let u_28_t3 = PRIM_AddInt(u_21_f1,u_27_t2) in
-          let u_29_t4 = PRIM_CharChr(u_28_t3) in
-          let uLET_13_0'0_t5 = [u_29_t4], fun [u_29_f1] f_30_arg k ->
-            let con_14_0'0_t1 = Cons1[u_29_f1,f_30_arg] in
+          let c_27_4'20_t2 = PRIM_ModInt(i_24_5'19_arg,y_26_0'0_g10) in
+          let x_28_0'0_t3 = PRIM_AddInt(ord0_21_3'6_f1,c_27_4'20_t2) in
+          let x_29_0'0_t4 = PRIM_CharChr(x_28_0'0_t3) in
+          let uLET_13_0'0_t5 = [x_29_0'0_t4], fun [x_29_0'0_f1] y_30_0'0_arg k ->
+            let con_14_0'0_t1 = Cons1[x_29_0'0_f1,y_30_0'0_arg] in
             k con_14_0'0_t1 in
-          let k = [loop_23_5'10_f3,f_24_arg], fun [loop_23_5'10_f1,f_24_f2] app_12_7'36_arg ->
-            let k = [f_24_f2], fun [f_24_f1] app_11_7'11_arg ->
-              let uLET_15_0'0_t1 = PRIM_DivInt(f_24_f1,u_31_g11) in
+          let k = [loop_23_5'10_f3,i_24_5'19_arg], fun [loop_23_5'10_f1,i_24_5'19_f2] app_12_7'36_arg ->
+            let k = [i_24_5'19_f2], fun [i_24_5'19_f1] app_11_7'11_arg ->
+              let uLET_15_0'0_t1 = PRIM_DivInt(i_24_5'19_f1,y_31_0'0_g11) in
               app_11_7'11_arg uLET_15_0'0_t1 k in
             loop_23_5'10_f1 app_12_7'36_arg k in
           uLET_13_0'0_t5 acc_22_5'15_f2 k in
-      k lam_16_0'0_t1 in
-    let uLET_17_0'0_t3 = PRIM_EqInt(u_16_g6,u_33_g12) in
-    let k = [u_17_f1], fun [u_17_f1] uLET_9_0'0_arg ->
-      let k = [u_17_f1], fun [u_17_f1] u_34_arg ->
-        let prim_23_0'0_t1 = PRIM_Explode(u_35_g14) in
-        let k = [u_17_f1], fun [u_17_f1] u_36_arg ->
-          let u_38_t1 = PRIM_CharOrd(u_37_g15) in
-          let u_49_t2 = [u_38_t1], fun [u_38_f1] loop_40_5'10_me acc_39_5'15_arg k ->
-            let lam_31_0'0_t1 = [u_38_f1,acc_39_5'15_arg,loop_40_5'10_me], fun [u_38_f1,acc_39_5'15_f2,loop_40_5'10_f3] f_41_arg k ->
-              let uLET_25_0'0_t1 = PRIM_EqInt(f_41_arg,u_42_g16) in
+      k lam_16_5'19_t1 in
+    let uLET_17_0'0_t3 = PRIM_EqInt(n_16_26'11_g6,y_33_0'0_g12) in
+    let k = [res_17_27'6_f1], fun [res_17_27'6_f1] uLET_9_3'6_arg ->
+      let k = [res_17_27'6_f1], fun [res_17_27'6_f1] __34_29'11_arg ->
+        let prim_23_0'0_t1 = PRIM_Explode(s_35_16'15_g14) in
+        let k = [res_17_27'6_f1], fun [res_17_27'6_f1] __36_30'20_arg ->
+          let ord0_38_3'6_t1 = PRIM_CharOrd(x_37_0'0_g15) in
+          let loop_49_5'10_t2 = [ord0_38_3'6_t1], fun [ord0_38_3'6_f1] loop_40_5'10_me acc_39_5'15_arg k ->
+            let lam_31_5'19_t1 = [ord0_38_3'6_f1,acc_39_5'15_arg,loop_40_5'10_me], fun [ord0_38_3'6_f1,acc_39_5'15_f2,loop_40_5'10_f3] i_41_5'19_arg k ->
+              let uLET_25_0'0_t1 = PRIM_EqInt(i_41_5'19_arg,y_42_0'0_g16) in
               match uLET_25_0'0_t1 with
               | true1 -> k acc_39_5'15_f2
               | false0 ->
-                let u_44_t2 = PRIM_ModInt(f_41_arg,u_43_g17) in
-                let u_45_t3 = PRIM_AddInt(u_38_f1,u_44_t2) in
-                let u_46_t4 = PRIM_CharChr(u_45_t3) in
-                let uLET_28_0'0_t5 = [u_46_t4], fun [u_46_f1] f_47_arg k ->
-                  let con_29_0'0_t1 = Cons1[u_46_f1,f_47_arg] in
+                let c_44_4'20_t2 = PRIM_ModInt(i_41_5'19_arg,y_43_0'0_g17) in
+                let x_45_0'0_t3 = PRIM_AddInt(ord0_38_3'6_f1,c_44_4'20_t2) in
+                let x_46_0'0_t4 = PRIM_CharChr(x_45_0'0_t3) in
+                let uLET_28_0'0_t5 = [x_46_0'0_t4], fun [x_46_0'0_f1] y_47_0'0_arg k ->
+                  let con_29_0'0_t1 = Cons1[x_46_0'0_f1,y_47_0'0_arg] in
                   k con_29_0'0_t1 in
-                let k = [loop_40_5'10_f3,f_41_arg], fun [loop_40_5'10_f1,f_41_f2] app_27_7'36_arg ->
-                  let k = [f_41_f2], fun [f_41_f1] app_26_7'11_arg ->
-                    let uLET_30_0'0_t1 = PRIM_DivInt(f_41_f1,u_48_g18) in
+                let k = [loop_40_5'10_f3,i_41_5'19_arg], fun [loop_40_5'10_f1,i_41_5'19_f2] app_27_7'36_arg ->
+                  let k = [i_41_5'19_f2], fun [i_41_5'19_f1] app_26_7'11_arg ->
+                    let uLET_30_0'0_t1 = PRIM_DivInt(i_41_5'19_f1,y_48_0'0_g18) in
                     app_26_7'11_arg uLET_30_0'0_t1 k in
                   loop_40_5'10_f1 app_27_7'36_arg k in
                 uLET_28_0'0_t5 acc_39_5'15_f2 k in
-            k lam_31_0'0_t1 in
-          let uLET_32_0'0_t3 = PRIM_EqInt(u_17_f1,u_50_g19) in
-          let k = [], fun [] uLET_24_0'0_arg ->
-            let k = [], fun [] u_51_arg ->
-              let u_52_t1 = Unit0 in
-              let prim_38_0'0_t2 = PRIM_PutChar(u_53_g21) in
+            k lam_31_5'19_t1 in
+          let uLET_32_0'0_t3 = PRIM_EqInt(res_17_27'6_f1,y_50_0'0_g19) in
+          let k = [], fun [] uLET_24_3'6_arg ->
+            let k = [], fun [] __51_31'13_arg ->
+              let __52_20'12_t1 = Unit0 in
+              let prim_38_0'0_t2 = PRIM_PutChar(x_53_0'0_g21) in
               k prim_38_0'0_t2 in
-            u_6_g1 uLET_24_0'0_arg k in
+            put_chars_6_11'8_g1 uLET_24_3'6_arg k in
           match uLET_32_0'0_t3 with
           | true1 ->
             let con_34_9'20_t4 = Nil0 in
@@ -104,10 +104,10 @@ let k = [], fun [] u_17_arg ->
             k con_35_9'17_t5
           | false0 ->
             let con_37_9'32_t4 = Nil0 in
-            let k = [u_17_f1], fun [u_17_f1] app_36_9'32_arg -> app_36_9'32_arg u_17_f1 k in
-            u_49_t2 con_37_9'32_t4 k in
-        u_6_g1 prim_23_0'0_t1 k in
-      u_6_g1 uLET_9_0'0_arg k in
+            let k = [res_17_27'6_f1], fun [res_17_27'6_f1] app_36_9'32_arg -> app_36_9'32_arg res_17_27'6_f1 k in
+            loop_49_5'10_t2 con_37_9'32_t4 k in
+        put_chars_6_11'8_g1 prim_23_0'0_t1 k in
+      put_chars_6_11'8_g1 uLET_9_3'6_arg k in
     match uLET_17_0'0_t3 with
     | true1 ->
       let con_19_9'20_t4 = Nil0 in
@@ -115,7 +115,7 @@ let k = [], fun [] u_17_arg ->
       k con_20_9'17_t5
     | false0 ->
       let con_22_9'32_t4 = Nil0 in
-      let k = [], fun [] app_21_9'32_arg -> app_21_9'32_arg u_16_g6 k in
-      u_32_t2 con_22_9'32_t4 k in
-  u_6_g1 prim_8_0'0_t1 k in
-u_14_g5 u_16_g6 k
+      let k = [], fun [] app_21_9'32_arg -> app_21_9'32_arg n_16_26'11_g6 k in
+      loop_32_5'10_t2 con_22_9'32_t4 k in
+  put_chars_6_11'8_g1 prim_8_0'0_t1 k in
+fib_14_22'8_g5 n_16_26'11_g6 k

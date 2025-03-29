@@ -63,9 +63,11 @@ let ::_0'0 = fun [] x_0'0 k ->
 let mainloop_3'10 = fix (fun [get_char_0'0,put_char_0'0] mainloop_3'10 __3'19 k ->
   let con_24_4'26 = Unit0 in
   let k [put_char_0'0,mainloop_3'10] gotten_4'8 =
-    let k [mainloop_3'10] __5'19 =
-      let con_25_6'13 = Unit0 in
-      mainloop_3'10 con_25_6'13 k in
+    let k [put_char_0'0,mainloop_3'10,gotten_4'8] __5'19 =
+      let k [mainloop_3'10] __6'19 =
+        let con_25_7'13 = Unit0 in
+        mainloop_3'10 con_25_7'13 k in
+      put_char_0'0 gotten_4'8 k in
     put_char_0'0 gotten_4'8 k in
   get_char_0'0 con_24_4'26 k) in
 let main_2'4 = mainloop_3'10 in

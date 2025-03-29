@@ -1,88 +1,88 @@
 (*stage1*)
-let u_6 =
+let put_chars_6_11'8 =
   fix (fun put_chars_2_11'8 xs_1_11'18 ->
     match xs_1_11'18 with
     | Nil0 -> Unit0
     | Cons1(x_3_14'4,xs_4_14'7) ->
-      let u_5 = PRIM_PutChar(x_3_14'4) in
+      let __5_14'23 = PRIM_PutChar(x_3_14'4) in
       (put_chars_2_11'8 xs_4_14'7)) in
-let u_14 =
+let fib_14_22'8 =
   fix (fun fib_8_22'8 n_7_22'12 ->
-    match let u_9 = 2 in
-    PRIM_LessInt(n_7_22'12,u_9) with
+    match let y_9_0'0 = 2 in
+    PRIM_LessInt(n_7_22'12,y_9_0'0) with
     | true1 -> n_7_22'12
     | false0 ->
-      (let u_11 =
+      (let x_11_0'0 =
         (fib_8_22'8
-        let u_10 = 1 in
-        PRIM_SubInt(n_7_22'12,u_10)) in
-      (fun f_12 -> PRIM_AddInt(u_11,f_12))
+        let y_10_0'0 = 1 in
+        PRIM_SubInt(n_7_22'12,y_10_0'0)) in
+      (fun y_12_0'0 -> PRIM_AddInt(x_11_0'0,y_12_0'0))
       (fib_8_22'8
-      let u_13 = 2 in
-      PRIM_SubInt(n_7_22'12,u_13)))) in
-let u_15 = Unit0 in
-let u_16 = 20 in
-let u_17 = (u_14 u_16) in
-let u_19 =
-  let u_18 = "fib " in
-  (u_6 PRIM_Explode(u_18)) in
-let u_34 =
-  (u_6
-  let u_21 =
-    let u_20 = '0' in
-    PRIM_CharOrd(u_20) in
-  let u_32 =
+      let y_13_0'0 = 2 in
+      PRIM_SubInt(n_7_22'12,y_13_0'0)))) in
+let __15_34'9 = Unit0 in
+let n_16_26'11 = 20 in
+let res_17_27'6 = (fib_14_22'8 n_16_26'11) in
+let __19_28'19 =
+  let s_18_16'15 = "fib " in
+  (put_chars_6_11'8 PRIM_Explode(s_18_16'15)) in
+let __34_29'11 =
+  (put_chars_6_11'8
+  let ord0_21_3'6 =
+    let x_20_0'0 = '0' in
+    PRIM_CharOrd(x_20_0'0) in
+  let loop_32_5'10 =
     fix (fun loop_23_5'10 acc_22_5'15 ->
-      (fun f_24 ->
-        match let u_25 = 0 in
-        PRIM_EqInt(f_24,u_25) with
+      (fun i_24_5'19 ->
+        match let y_25_0'0 = 0 in
+        PRIM_EqInt(i_24_5'19,y_25_0'0) with
         | true1 -> acc_22_5'15
         | false0 ->
           ((loop_23_5'10
-          (let u_29 =
-            let u_27 =
-              let u_26 = 10 in
-              PRIM_ModInt(f_24,u_26) in
-            let u_28 = PRIM_AddInt(u_21,u_27) in
-            PRIM_CharChr(u_28) in
-          (fun f_30 -> Cons1(u_29, f_30))
+          (let x_29_0'0 =
+            let c_27_4'20 =
+              let y_26_0'0 = 10 in
+              PRIM_ModInt(i_24_5'19,y_26_0'0) in
+            let x_28_0'0 = PRIM_AddInt(ord0_21_3'6,c_27_4'20) in
+            PRIM_CharChr(x_28_0'0) in
+          (fun y_30_0'0 -> Cons1(x_29_0'0, y_30_0'0))
           acc_22_5'15))
-          let u_31 = 10 in
-          PRIM_DivInt(f_24,u_31)))) in
-  match let u_33 = 0 in
-  PRIM_EqInt(u_16,u_33) with
+          let y_31_0'0 = 10 in
+          PRIM_DivInt(i_24_5'19,y_31_0'0)))) in
+  match let y_33_0'0 = 0 in
+  PRIM_EqInt(n_16_26'11,y_33_0'0) with
   | true1 -> Cons1('0', Nil0)
-  | false0 -> ((u_32 Nil0) u_16)) in
-let u_36 =
-  let u_35 = " --> " in
-  (u_6 PRIM_Explode(u_35)) in
-let u_51 =
-  (u_6
-  let u_38 =
-    let u_37 = '0' in
-    PRIM_CharOrd(u_37) in
-  let u_49 =
+  | false0 -> ((loop_32_5'10 Nil0) n_16_26'11)) in
+let __36_30'20 =
+  let s_35_16'15 = " --> " in
+  (put_chars_6_11'8 PRIM_Explode(s_35_16'15)) in
+let __51_31'13 =
+  (put_chars_6_11'8
+  let ord0_38_3'6 =
+    let x_37_0'0 = '0' in
+    PRIM_CharOrd(x_37_0'0) in
+  let loop_49_5'10 =
     fix (fun loop_40_5'10 acc_39_5'15 ->
-      (fun f_41 ->
-        match let u_42 = 0 in
-        PRIM_EqInt(f_41,u_42) with
+      (fun i_41_5'19 ->
+        match let y_42_0'0 = 0 in
+        PRIM_EqInt(i_41_5'19,y_42_0'0) with
         | true1 -> acc_39_5'15
         | false0 ->
           ((loop_40_5'10
-          (let u_46 =
-            let u_44 =
-              let u_43 = 10 in
-              PRIM_ModInt(f_41,u_43) in
-            let u_45 = PRIM_AddInt(u_38,u_44) in
-            PRIM_CharChr(u_45) in
-          (fun f_47 -> Cons1(u_46, f_47))
+          (let x_46_0'0 =
+            let c_44_4'20 =
+              let y_43_0'0 = 10 in
+              PRIM_ModInt(i_41_5'19,y_43_0'0) in
+            let x_45_0'0 = PRIM_AddInt(ord0_38_3'6,c_44_4'20) in
+            PRIM_CharChr(x_45_0'0) in
+          (fun y_47_0'0 -> Cons1(x_46_0'0, y_47_0'0))
           acc_39_5'15))
-          let u_48 = 10 in
-          PRIM_DivInt(f_41,u_48)))) in
-  match let u_50 = 0 in
-  PRIM_EqInt(u_17,u_50) with
+          let y_48_0'0 = 10 in
+          PRIM_DivInt(i_41_5'19,y_48_0'0)))) in
+  match let y_50_0'0 = 0 in
+  PRIM_EqInt(res_17_27'6,y_50_0'0) with
   | true1 -> Cons1('0', Nil0)
-  | false0 -> ((u_49 Nil0) u_17)) in
-let u_52 = Unit0 in
-let u_53 = '\n' in
-PRIM_PutChar(u_53)
+  | false0 -> ((loop_49_5'10 Nil0) res_17_27'6)) in
+let __52_20'12 = Unit0 in
+let x_53_0'0 = '\n' in
+PRIM_PutChar(x_53_0'0)

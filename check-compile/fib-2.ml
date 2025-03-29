@@ -1,100 +1,100 @@
 (*stage2*)
 let k () = ()
-let u_6 = fix (fun [] put_chars_2_11'8 xs_1_11'18 k ->
+let put_chars_6_11'8 = fix (fun [] put_chars_2_11'8 xs_1_11'18 k ->
   match xs_1_11'18 with
   | Nil0 ->
     let con_1_13'10 = Unit0 in
     k con_1_13'10
   | Cons1(x_3_14'4,xs_4_14'7) ->
-    let u_5 = PRIM_PutChar(x_3_14'4) in
+    let __5_14'23 = PRIM_PutChar(x_3_14'4) in
     put_chars_2_11'8 xs_4_14'7 k) in
-let u_14 = fix (fun [] fib_8_22'8 n_7_22'12 k ->
-  let u_9 = 2 in
-  let uLET_2_0'0 = PRIM_LessInt(n_7_22'12,u_9) in
+let fib_14_22'8 = fix (fun [] fib_8_22'8 n_7_22'12 k ->
+  let y_9_0'0 = 2 in
+  let uLET_2_0'0 = PRIM_LessInt(n_7_22'12,y_9_0'0) in
   match uLET_2_0'0 with
   | true1 -> k n_7_22'12
   | false0 ->
-    let u_10 = 1 in
-    let uLET_4_0'0 = PRIM_SubInt(n_7_22'12,u_10) in
-    let k [n_7_22'12,fib_8_22'8] u_11 =
-      let uLET_3_0'0 = fun [u_11] f_12 k ->
-        let prim_5_0'0 = PRIM_AddInt(u_11,f_12) in
+    let y_10_0'0 = 1 in
+    let uLET_4_0'0 = PRIM_SubInt(n_7_22'12,y_10_0'0) in
+    let k [n_7_22'12,fib_8_22'8] x_11_0'0 =
+      let uLET_3_0'0 = fun [x_11_0'0] y_12_0'0 k ->
+        let prim_5_0'0 = PRIM_AddInt(x_11_0'0,y_12_0'0) in
         k prim_5_0'0 in
-      let u_13 = 2 in
-      let uLET_7_0'0 = PRIM_SubInt(n_7_22'12,u_13) in
+      let y_13_0'0 = 2 in
+      let uLET_7_0'0 = PRIM_SubInt(n_7_22'12,y_13_0'0) in
       let k [uLET_3_0'0] app_6_24'39 = uLET_3_0'0 app_6_24'39 k in
       fib_8_22'8 uLET_7_0'0 k in
     fib_8_22'8 uLET_4_0'0 k) in
-let u_15 = Unit0 in
-let u_16 = 20 in
-let k [u_6,u_16] u_17 =
-  let u_18 = "fib " in
-  let prim_8_0'0 = PRIM_Explode(u_18) in
-  let k [u_6,u_16,u_17] u_19 =
-    let u_20 = '0' in
-    let u_21 = PRIM_CharOrd(u_20) in
-    let u_32 = fix (fun [u_21] loop_23_5'10 acc_22_5'15 k ->
-      let lam_16_0'0 = fun [u_21,acc_22_5'15,loop_23_5'10] f_24 k ->
-        let u_25 = 0 in
-        let uLET_10_0'0 = PRIM_EqInt(f_24,u_25) in
+let __15_34'9 = Unit0 in
+let n_16_26'11 = 20 in
+let k [put_chars_6_11'8,n_16_26'11] res_17_27'6 =
+  let s_18_16'15 = "fib " in
+  let prim_8_0'0 = PRIM_Explode(s_18_16'15) in
+  let k [put_chars_6_11'8,n_16_26'11,res_17_27'6] __19_28'19 =
+    let x_20_0'0 = '0' in
+    let ord0_21_3'6 = PRIM_CharOrd(x_20_0'0) in
+    let loop_32_5'10 = fix (fun [ord0_21_3'6] loop_23_5'10 acc_22_5'15 k ->
+      let lam_16_5'19 = fun [ord0_21_3'6,acc_22_5'15,loop_23_5'10] i_24_5'19 k ->
+        let y_25_0'0 = 0 in
+        let uLET_10_0'0 = PRIM_EqInt(i_24_5'19,y_25_0'0) in
         match uLET_10_0'0 with
         | true1 -> k acc_22_5'15
         | false0 ->
-          let u_26 = 10 in
-          let u_27 = PRIM_ModInt(f_24,u_26) in
-          let u_28 = PRIM_AddInt(u_21,u_27) in
-          let u_29 = PRIM_CharChr(u_28) in
-          let uLET_13_0'0 = fun [u_29] f_30 k ->
-            let con_14_0'0 = Cons1[u_29,f_30] in
+          let y_26_0'0 = 10 in
+          let c_27_4'20 = PRIM_ModInt(i_24_5'19,y_26_0'0) in
+          let x_28_0'0 = PRIM_AddInt(ord0_21_3'6,c_27_4'20) in
+          let x_29_0'0 = PRIM_CharChr(x_28_0'0) in
+          let uLET_13_0'0 = fun [x_29_0'0] y_30_0'0 k ->
+            let con_14_0'0 = Cons1[x_29_0'0,y_30_0'0] in
             k con_14_0'0 in
-          let k [loop_23_5'10,f_24] app_12_7'36 =
-            let k [f_24] app_11_7'11 =
-              let u_31 = 10 in
-              let uLET_15_0'0 = PRIM_DivInt(f_24,u_31) in
+          let k [loop_23_5'10,i_24_5'19] app_12_7'36 =
+            let k [i_24_5'19] app_11_7'11 =
+              let y_31_0'0 = 10 in
+              let uLET_15_0'0 = PRIM_DivInt(i_24_5'19,y_31_0'0) in
               app_11_7'11 uLET_15_0'0 k in
             loop_23_5'10 app_12_7'36 k in
           uLET_13_0'0 acc_22_5'15 k in
-      k lam_16_0'0) in
-    let u_33 = 0 in
-    let uLET_17_0'0 = PRIM_EqInt(u_16,u_33) in
-    let k [u_6,u_17] uLET_9_0'0 =
-      let k [u_6,u_17] u_34 =
-        let u_35 = " --> " in
-        let prim_23_0'0 = PRIM_Explode(u_35) in
-        let k [u_6,u_17] u_36 =
-          let u_37 = '0' in
-          let u_38 = PRIM_CharOrd(u_37) in
-          let u_49 = fix (fun [u_38] loop_40_5'10 acc_39_5'15 k ->
-            let lam_31_0'0 = fun [u_38,acc_39_5'15,loop_40_5'10] f_41 k ->
-              let u_42 = 0 in
-              let uLET_25_0'0 = PRIM_EqInt(f_41,u_42) in
+      k lam_16_5'19) in
+    let y_33_0'0 = 0 in
+    let uLET_17_0'0 = PRIM_EqInt(n_16_26'11,y_33_0'0) in
+    let k [put_chars_6_11'8,res_17_27'6] uLET_9_3'6 =
+      let k [put_chars_6_11'8,res_17_27'6] __34_29'11 =
+        let s_35_16'15 = " --> " in
+        let prim_23_0'0 = PRIM_Explode(s_35_16'15) in
+        let k [put_chars_6_11'8,res_17_27'6] __36_30'20 =
+          let x_37_0'0 = '0' in
+          let ord0_38_3'6 = PRIM_CharOrd(x_37_0'0) in
+          let loop_49_5'10 = fix (fun [ord0_38_3'6] loop_40_5'10 acc_39_5'15 k ->
+            let lam_31_5'19 = fun [ord0_38_3'6,acc_39_5'15,loop_40_5'10] i_41_5'19 k ->
+              let y_42_0'0 = 0 in
+              let uLET_25_0'0 = PRIM_EqInt(i_41_5'19,y_42_0'0) in
               match uLET_25_0'0 with
               | true1 -> k acc_39_5'15
               | false0 ->
-                let u_43 = 10 in
-                let u_44 = PRIM_ModInt(f_41,u_43) in
-                let u_45 = PRIM_AddInt(u_38,u_44) in
-                let u_46 = PRIM_CharChr(u_45) in
-                let uLET_28_0'0 = fun [u_46] f_47 k ->
-                  let con_29_0'0 = Cons1[u_46,f_47] in
+                let y_43_0'0 = 10 in
+                let c_44_4'20 = PRIM_ModInt(i_41_5'19,y_43_0'0) in
+                let x_45_0'0 = PRIM_AddInt(ord0_38_3'6,c_44_4'20) in
+                let x_46_0'0 = PRIM_CharChr(x_45_0'0) in
+                let uLET_28_0'0 = fun [x_46_0'0] y_47_0'0 k ->
+                  let con_29_0'0 = Cons1[x_46_0'0,y_47_0'0] in
                   k con_29_0'0 in
-                let k [loop_40_5'10,f_41] app_27_7'36 =
-                  let k [f_41] app_26_7'11 =
-                    let u_48 = 10 in
-                    let uLET_30_0'0 = PRIM_DivInt(f_41,u_48) in
+                let k [loop_40_5'10,i_41_5'19] app_27_7'36 =
+                  let k [i_41_5'19] app_26_7'11 =
+                    let y_48_0'0 = 10 in
+                    let uLET_30_0'0 = PRIM_DivInt(i_41_5'19,y_48_0'0) in
                     app_26_7'11 uLET_30_0'0 k in
                   loop_40_5'10 app_27_7'36 k in
                 uLET_28_0'0 acc_39_5'15 k in
-            k lam_31_0'0) in
-          let u_50 = 0 in
-          let uLET_32_0'0 = PRIM_EqInt(u_17,u_50) in
-          let k [u_6] uLET_24_0'0 =
-            let k [] u_51 =
-              let u_52 = Unit0 in
-              let u_53 = '\n' in
-              let prim_38_0'0 = PRIM_PutChar(u_53) in
+            k lam_31_5'19) in
+          let y_50_0'0 = 0 in
+          let uLET_32_0'0 = PRIM_EqInt(res_17_27'6,y_50_0'0) in
+          let k [put_chars_6_11'8] uLET_24_3'6 =
+            let k [] __51_31'13 =
+              let __52_20'12 = Unit0 in
+              let x_53_0'0 = '\n' in
+              let prim_38_0'0 = PRIM_PutChar(x_53_0'0) in
               k prim_38_0'0 in
-            u_6 uLET_24_0'0 k in
+            put_chars_6_11'8 uLET_24_3'6 k in
           match uLET_32_0'0 with
           | true1 ->
             let lit_33_9'17 = '0' in
@@ -103,10 +103,10 @@ let k [u_6,u_16] u_17 =
             k con_35_9'17
           | false0 ->
             let con_37_9'32 = Nil0 in
-            let k [u_17] app_36_9'32 = app_36_9'32 u_17 k in
-            u_49 con_37_9'32 k in
-        u_6 prim_23_0'0 k in
-      u_6 uLET_9_0'0 k in
+            let k [res_17_27'6] app_36_9'32 = app_36_9'32 res_17_27'6 k in
+            loop_49_5'10 con_37_9'32 k in
+        put_chars_6_11'8 prim_23_0'0 k in
+      put_chars_6_11'8 uLET_9_3'6 k in
     match uLET_17_0'0 with
     | true1 ->
       let lit_18_9'17 = '0' in
@@ -115,7 +115,7 @@ let k [u_6,u_16] u_17 =
       k con_20_9'17
     | false0 ->
       let con_22_9'32 = Nil0 in
-      let k [u_16] app_21_9'32 = app_21_9'32 u_16 k in
-      u_32 con_22_9'32 k in
-  u_6 prim_8_0'0 k in
-u_14 u_16 k
+      let k [n_16_26'11] app_21_9'32 = app_21_9'32 n_16_26'11 k in
+      loop_32_5'10 con_22_9'32 k in
+  put_chars_6_11'8 prim_8_0'0 k in
+fib_14_22'8 n_16_26'11 k

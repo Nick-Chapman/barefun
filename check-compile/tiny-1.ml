@@ -1,11 +1,12 @@
 (*stage1*)
-let u_7 =
-  let u_6 =
+let main_8_2'4 =
+  let mainloop_7_3'10 =
     fix (fun mainloop_2_3'10 __1_3'19 ->
-      let u_4 =
-        let u_3 = Unit0 in
-        PRIM_GetChar(u_3) in
-      let u_5 = PRIM_PutChar(u_4) in
+      let gotten_4_4'8 =
+        let x_3_0'0 = Unit0 in
+        PRIM_GetChar(x_3_0'0) in
+      let __5_5'19 = PRIM_PutChar(gotten_4_4'8) in
+      let __6_6'19 = PRIM_PutChar(gotten_4_4'8) in
       (mainloop_2_3'10 Unit0)) in
-  u_6 in
-(u_7 Unit0)
+  mainloop_7_3'10 in
+(main_8_2'4 Unit0)

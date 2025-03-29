@@ -1,16 +1,16 @@
 (*stage2*)
 let k () = ()
-let u_1 = Unit0 in
-let u_2 = 'X' in
-let u_3 = PRIM_PutChar(u_2) in
-let u_4 = Unit0 in
-let u_5 = PRIM_GetChar(u_4) in
-let u_6 = PRIM_PutChar(u_5) in
-let u_7 = 'Y' in
-let u_8 = PRIM_PutChar(u_7) in
-let u_9 = Unit0 in
-let u_10 = PRIM_GetChar(u_9) in
-let u_11 = PRIM_PutChar(u_10) in
-let u_12 = 'Z' in
-let prim_1_0'0 = PRIM_PutChar(u_12) in
+let __1_2'9 = Unit0 in
+let x_2_0'0 = 'X' in
+let __3_3'14 = PRIM_PutChar(x_2_0'0) in
+let x_4_0'0 = Unit0 in
+let x_5_0'0 = PRIM_GetChar(x_4_0'0) in
+let __6_4'24 = PRIM_PutChar(x_5_0'0) in
+let x_7_0'0 = 'Y' in
+let __8_5'14 = PRIM_PutChar(x_7_0'0) in
+let x_9_0'0 = Unit0 in
+let x_10_0'0 = PRIM_GetChar(x_9_0'0) in
+let __11_6'24 = PRIM_PutChar(x_10_0'0) in
+let x_12_0'0 = 'Z' in
+let prim_1_0'0 = PRIM_PutChar(x_12_0'0) in
 k prim_1_0'0

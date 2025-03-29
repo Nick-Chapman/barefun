@@ -18,6 +18,7 @@ let main_2'4 =
     fix (fun mainloop_3'10 __3'19 ->
       let gotten_4'8 = (get_char_0'0 Unit0) in
       let __5'19 = (put_char_0'0 gotten_4'8) in
+      let __6'19 = (put_char_0'0 gotten_4'8) in
       (mainloop_3'10 Unit0)) in
   mainloop_3'10 in
 (main_2'4 Unit0)

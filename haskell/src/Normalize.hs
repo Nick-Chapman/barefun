@@ -4,7 +4,7 @@ module Normalize (normalize) where
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Par4 (Position(..))
-import Stage1 (Exp(..),Arm(..),Id(..),Name(GeneratedName))
+import Stage1 (Exp(..),Arm(..),Id(..)) --,Name(GeneratedName))
 import qualified Data.Map as Map
 
 ----------------------------------------------------------------------
@@ -19,40 +19,41 @@ norm env e =
 
 data SemValue
   = Syntax Exp
-  | Macro (SemValue -> M SemValue)
+  | Macro Id (SemValue -> M SemValue)
+
+posOfId :: Id -> Position
+posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos -- TODO: mandatory pos in ident
+  where noPos = Position 0 0
 
 syn :: Id -> SemValue
-syn x = Syntax (Var noPos x)
-  where noPos = Position 0 0
+syn x = Syntax (Var (posOfId x) x)
 
 reify :: SemValue -> M Exp
 reify = \case
   Syntax e -> pure e
-  Macro f -> do
-    let noPos = Position 0 0
-    x :: Id <- fresh Id {name = GeneratedName "f", optPos = Nothing, optUnique = Nothing }
+  Macro x f -> do
+    x <- fresh x
     let arg :: SemValue = syn x
     res :: SemValue <- f arg
     res :: Exp <- reify res
-    pure $ Lam noPos x res
+    pure $ Lam (posOfId x) x res
 
-share :: SemValue -> (SemValue -> M SemValue) -> M SemValue
-share sv k = do
-  let noPos = Position 0 0
+share :: Id -> SemValue -> (SemValue -> M SemValue) -> M SemValue
+share x sv k = do
   case sv of
     Macro{} -> k sv
     Syntax (Var{}) -> k sv
     _ -> do
-      x :: Id <- fresh Id {name = GeneratedName "u", optPos = Nothing, optUnique = Nothing }
+      x <- fresh x
       rhs <- reify sv
       body <- k (syn x) >>= reify
-      pure $ Syntax (Let noPos x rhs body)
+      pure $ Syntax (Let (posOfId x) x rhs body)
 
 apply :: SemValue -> Position -> SemValue -> M SemValue
 apply fun p arg = do
   case fun of
-    Macro fun -> do
-      share arg $ \arg -> do
+    Macro x fun -> do
+      share x arg $ \arg -> do
         fun arg -- inlining occurs here!
     fun -> do
       fun <- reify fun
@@ -72,7 +73,7 @@ reflect env = \case
     es <- mapM (norm env) es
     pure $ Syntax $ Prim p b es
   Lam _pos x body -> do
-    pure $ Macro $ \arg -> do
+    pure $ Macro x $ \arg -> do
       let env' = Map.insert x arg env
       reflect env' body
   RecLam pos f x body -> do
