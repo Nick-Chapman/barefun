@@ -30,7 +30,7 @@ data Top -- restriction of Atomic
   = TopLit Literal
   | TopLam Ref Code
   | TopRecLam Ref Ref Code
-  -- TODO: TopConTag
+  | TopConTag Ctag [Ref]
 
 data Code
   = Return Position Ref
@@ -45,7 +45,7 @@ data Arm = ArmTag Ctag [Ref] Code
 data Atomic
   = Lit Literal -- TODO Never here. Will always be lifted to a global
   | Prim Builtin [Ref]
-  | ConTag Ctag [Ref]
+  | ConTag Ctag [Ref] -- TODO: rename Con/ConTag as ConApp
   | Lam [Ref] [Ref] Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code
 
@@ -78,6 +78,8 @@ prettyT = \case
   TopRecLam f x body ->
     ("fun " ++ show f ++ " " ++ show x ++ " k ->")
     >>> prettyC body
+  TopConTag tag [] -> [show tag]
+  TopConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
 
 prettyC :: Code -> Lines
 prettyC = \case
@@ -156,6 +158,13 @@ evalT genv = \case
   TopRecLam f x body -> \k -> do
     let me = VFunc (\arg k -> do evalCode genv (insert x arg (insert f me genv)) body k)
     k me
+  TopConTag (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
+  where
+    look :: Ref -> Value -- TODO: dedup evalCode
+    look (Ref x loc) = do
+      let Env{venv} = genv
+          err = error (show ("evalT-lookup",x,loc,venv))
+      maybe err id $ Map.lookup loc venv
 
 -- TODO: pickup genv from scope in stead of threading?
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
@@ -315,6 +324,8 @@ maybeLiftable = \case
   Lit literal -> Just (TopLit literal)
   Lam [] [] x body -> Just (TopLam x body)
   RecLam [] [] f x body -> Just (TopRecLam f x body)
+  ConTag c [] -> Just (TopConTag c [])
+  --ConTag c xs -> Just (TopConTag c xs) -- TODO: when xs only contain globals
   _ -> Nothing
 
 frame :: (Id -> Ref) -> [Id] -> (Cenv,[Ref],[Ref])
