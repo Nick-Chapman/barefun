@@ -162,12 +162,12 @@ env0 = Env { venv = Map.empty }
 -- | Distinguish binding of Atomic/Compound expressions.
 
 compile :: SRC.Exp -> Transformed
-compile e = runM (trans0 e)
+compile e = runM (compileTop e)
 
-trans0 :: SRC.Exp -> M Code
-trans0 e = trans1 e >>= nameAtomic
+compileTop :: SRC.Exp -> M Code
+compileTop e = compileExp e pure >>= nameAtomic
 
-data AC = Compound Code | Atomic Atomic -- TODO: just use Either?
+data AC = Compound Code | Atomic Atomic
 
 nameAtomic :: AC -> M Code
 nameAtomic = \case
@@ -178,68 +178,65 @@ nameAtomic = \case
     let noPos = Position 0 0
     pure $ LetAtomic u a (Return noPos u)
 
-trans1 :: SRC.Exp -> M AC
-trans1 e = trans1k e pure
-
-trans1k :: SRC.Exp -> (AC -> M AC) -> M AC -- TODO: improve function naming
-trans1k = \case
+compileExp :: SRC.Exp -> (AC -> M AC) -> M AC
+compileExp = \case
   SRC.Var pos x -> \k -> do
     k $ Compound $ Return pos x
   SRC.Lit pos x -> \k -> do
     k $ Atomic $ Lit pos x
   SRC.ConTag pos tag es -> \k -> do
-    transIds es $ \xs ->
+    compileAsIds es $ \xs ->
       k $ Atomic $ ConTag pos tag xs
   SRC.Prim pos b es -> \k -> do
-    transIds es $ \xs ->
+    compileAsIds es $ \xs ->
       k $ Atomic $ Prim pos b xs
   SRC.Lam pos x body -> \k -> do
-    body <- trans0 body
+    body <- compileTop body
     k $ Atomic $ mkLam pos x body
   SRC.RecLam pos f x body -> \k -> do
-    body <- trans0 body
+    body <- compileTop body
     k $ Atomic $ mkRecLam pos f x body
   SRC.App e1 p e2 -> \k -> do
-    transId e1 $ \x1 -> do
-      transId e2 $ \x2 -> do
+    compileAsId e1 $ \x1 -> do
+      compileAsId e2 $ \x2 -> do
         k $ Compound $ Tail x1 p x2
   SRC.Let _pos x rhs body -> \k -> do
-    trans1k rhs $ \rhs -> do
-      body <- trans1k body k >>= nameAtomic
+    compileExp rhs $ \rhs -> do
+      body <- compileExp body k >>= nameAtomic
       pure $ Compound $ mkBind x rhs body
   SRC.Case _pos scrut arms -> \k -> do -- TODO: push/duplicate k through case arms
-    transId scrut $ \scrut -> do
-      arms <- mapM transArm arms
+    compileAsId scrut $ \scrut -> do
+      arms <- mapM compileArm arms
       k $ Compound $ Case scrut arms
+
+compileArm :: SRC.Arm -> M Arm
+compileArm (SRC.ArmTag tag xs exp) = do
+  exp <- compileTop exp
+  pure $ ArmTag tag xs exp
+
+compileAsIds :: [SRC.Exp] -> ([Id] -> M AC) -> M AC
+compileAsIds es k = case es of
+  [] -> k []
+  e:es -> do
+    compileAsId e $ \x -> do
+      compileAsIds es $ \xs ->
+        k (x:xs)
+
+compileAsId :: SRC.Exp -> (Id -> M AC) -> M AC
+compileAsId = \case
+  SRC.Var _pos x -> \k -> k x
+  e -> \k -> do
+    let (what,optPos) = provenanceExp e
+    u <- Fresh optPos what
+    compileExp e $ \code -> do
+      body <- (k u >>= nameAtomic)
+      pure $ Compound $ mkBind u code body
 
 mkBind :: Id -> AC -> Code -> Code
 mkBind x rhs body = case rhs of
   Compound (Return _ y) -> LetAlias x y body
   Compound rhs -> mkPushContinuation (x,body) rhs
   Atomic rhs -> LetAtomic x rhs body
-
-transArm :: SRC.Arm -> M Arm
-transArm (SRC.ArmTag tag xs exp) = do
-  exp <- trans0 exp
-  pure $ ArmTag tag xs exp
-
-transId :: SRC.Exp -> (Id -> M AC) -> M AC
-transId = \case
-  SRC.Var _pos x -> \k -> k x
-  e -> \k -> do
-    let (what,optPos) = provenanceExp e
-    u <- Fresh optPos what
-    trans1k e $ \code -> do
-      body <- (k u >>= nameAtomic)
-      pure $ Compound $ mkBind u code body
-
-transIds :: [SRC.Exp] -> ([Id] -> M AC) -> M AC
-transIds es k = case es of
-  [] -> k []
-  e:es -> do
-    transId e $ \x -> do
-      transIds es $ \xs ->
-        k (x:xs)
 
 instance Functor M where fmap = liftM
 instance Applicative M where pure = Ret; (<*>) = ap
