@@ -1,6 +1,6 @@
 -- | Simplifed language: Just expressions. Constructor names replaced by tags.
 module Stage1
-  ( Exp(..),Arm(..),Ctag(..),Id(..), Name(..), provenanceExp
+  ( Exp(..),Arm(..),Ctag(..),Id(..), Name(..), provenanceExp, sizeExp
   , execute
   , compile
   ) where
@@ -43,6 +43,21 @@ data Id = Id
 data Name = UserName SRC.Id | GeneratedName String deriving (Eq,Ord)
 
 ----------------------------------------------------------------------
+-- size
+
+sizeExp :: Exp -> Int
+sizeExp = \case
+  Var{} -> 1
+  Lit{} -> 1
+  ConTag _ _ es -> 1 + sum (map sizeExp es)
+  Prim _ _ es -> 1 + sum (map sizeExp es)
+  Lam _ _ body -> 1 + sizeExp body
+  RecLam _ _ _ body -> 2 + sizeExp body
+  App e1 _ e2 -> sizeExp e1 + sizeExp e2
+  Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
+  Case _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _ xs rhs <- arms ]
+
+----------------------------------------------------------------------
 -- provenance
 
 provenanceExp :: Exp -> (String,Maybe Position)
@@ -57,7 +72,6 @@ provenanceExp = \case
   Prim pos _ _ -> ("prim", Just pos)
   RecLam pos _ _ _ -> ("reclam",Just pos)
   Case pos _ _ -> ("case",Just pos)
-
 
 ----------------------------------------------------------------------
 -- Show

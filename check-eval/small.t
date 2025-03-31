@@ -55,7 +55,7 @@ Haskell REPL
 
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -1
-  [stage1]
+  [stage1; normalization: 176 -> 107]
   LOAD
   RUN
   > Hello, World!
@@ -65,7 +65,7 @@ Haskell REPL
   > [EOF:#apps=120]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -2
-  [stage2]
+  [stage2; normalization: 176 -> 107]
   LOAD
   RUN
   > Hello, World!
@@ -75,7 +75,7 @@ Haskell REPL
   > [EOF:#push-continuation=35, #enter=120, #return=33]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -3
-  [stage3]
+  [stage3; normalization: 176 -> 107]
   LOAD
   RUN
   > Hello, World!
@@ -85,7 +85,7 @@ Haskell REPL
   > [EOF:#push-continuation=35, #enter=120, #return=33]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun
-  [stage3]
+  [stage3; normalization: 176 -> 107]
   LOAD
   RUN
   > Hello, World!

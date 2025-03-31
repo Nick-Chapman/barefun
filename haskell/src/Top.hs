@@ -5,7 +5,7 @@ import Parser (parseProg)
 import Predefined (wrapPreDefs)
 import System.Environment (getArgs)
 import qualified Stage0 (execute)
-import qualified Stage1 (compile,execute)
+import qualified Stage1 (compile,execute,sizeExp)
 import qualified Stage2 (compile,execute)
 import qualified Stage3 (compile,execute)
 import Normalize (normalize)
@@ -17,12 +17,6 @@ main = do
   let Config {paths,mode,stage,doNorm} = config
   let path = case paths of [] -> error "no .fun"; [x] -> x; _ -> error "too much .fun"
   s <- readFile path
-  let
-    tag = (case stage of
-      Stage0 -> "stage0"
-      Stage1 -> "stage1"
-      Stage2 -> "stage2"
-      Stage3 -> "stage3") ++ if doNorm then "" else "; un-normalized"
 
   let e0 = wrapPreDefs (parseProg s)
   let e1u = Stage1.compile e0
@@ -37,6 +31,19 @@ main = do
   let e2 = if doNorm then e2n else e2u
   let e3 = if doNorm then e3n else e3u
 
+  let
+    tag = (case stage of
+      Stage0 -> "stage0"
+      Stage1 -> "stage1"
+      Stage2 -> "stage2"
+      Stage3 -> "stage3") ++ if doNorm then "" else "; un-normalized"
+
+  let
+    tagZ =
+      if doNorm then printf "; normalization: %d -> %d" sizeU sizeN else ""
+      where sizeU = Stage1.sizeExp e1u
+            sizeN = Stage1.sizeExp e1n
+
   case (stage,mode) of
     (Stage0,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e0)
     (Stage1,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e1)
@@ -44,9 +51,9 @@ main = do
     (Stage3,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e3)
 
     (Stage0,Eval) -> do printf "[%s]\n" tag; runTerm (Stage0.execute e0)
-    (Stage1,Eval) -> do printf "[%s]\n" tag; runTerm (Stage1.execute e1)
-    (Stage2,Eval) -> do printf "[%s]\n" tag; runTerm (Stage2.execute e2)
-    (Stage3,Eval) -> do printf "[%s]\n" tag; runTerm (Stage3.execute e3)
+    (Stage1,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage1.execute e1)
+    (Stage2,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage2.execute e2)
+    (Stage3,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage3.execute e3)
 
 data Config = Config { paths :: [String], mode :: Mode, stage :: Stage, doNorm :: Bool}
 
