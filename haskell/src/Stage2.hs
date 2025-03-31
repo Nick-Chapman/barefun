@@ -204,7 +204,7 @@ compileExp = \case
     compileExp rhs $ \rhs -> do
       body <- compileExp body k >>= nameAtomic
       pure $ Compound $ mkBind x rhs body
-  SRC.Case _pos scrut arms -> \k -> do -- TODO: push/duplicate k through case arms
+  SRC.Case _pos scrut arms -> \k -> do
     compileAsId scrut $ \scrut -> do
       arms <- mapM compileArm arms
       k $ Compound $ Case scrut arms
