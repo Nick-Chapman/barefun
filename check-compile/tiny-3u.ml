@@ -1,20 +1,20 @@
 (*stage3; un-normalized*)
 let k () = ()
-let g1 = fun arg k ->
+let g12 = fun arg k ->
   let t1 = PRIM_PutChar(arg) in
   k t1 in
-let g2 = fun arg k ->
+let g13 = fun arg k ->
   let t1 = PRIM_GetChar(arg) in
   k t1 in
-let g3 = Unit0 in
-let g4 = Unit0 in
-let g5 = fun me arg k ->
+let g15 = Unit0 in
+let g16 = Unit0 in
+let g17 = fun me arg k ->
   let k = [me], fun [f1] arg ->
     let k = [f1,arg], fun [f1,f2] arg ->
-      let k = [f1], fun [f1] arg -> f1 g4 k in
-      g1 f2 k in
-    g1 arg k in
-  g2 g3 k in
-let g6 = Unit0 in
-let g5 = g5 in
-g5 g6 k
+      let k = [f1], fun [f1] arg -> f1 g16 k in
+      g12 f2 k in
+    g12 arg k in
+  g13 g15 k in
+let g18 = Unit0 in
+let g17 = g17 in
+g17 g18 k

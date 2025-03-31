@@ -264,8 +264,8 @@ compileCtop = compileC firstTempIndex
             pure $ LetAtomic xRef rhs body
           Right rhs -> do -- globalized
             -- liftable things can have no effetcs, so if they are not even used we can just drop them
+            xRefG <- GlobalRef x
             if x `notMember` SRC.fvs body then compileC nextTemp cenv body else do
-              xRefG <- GlobalRef x
               cenv <- pure $ Map.insert x xRefG cenv
               Wrap (LetTop xRefG rhs) $ compileC nextTemp cenv body
 
