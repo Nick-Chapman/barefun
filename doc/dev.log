@@ -40,7 +40,7 @@ Wed 26 Mar 2025 : begin code normalization pass: walk tree, uniquify; BID: track
 Thu 27 Mar 2025 : reconstruct docs/dev.log ; first cut normalization: inlining!
 Fri 28 Mar 2025 : instrument haskell eval; improve ANF
 
-Mon 31 Mar 2025 :
+Mon 31 Mar 2025 : instrument norm; improve globalization
 Tue 01 Apr 2025 :
 Wed 02 Apr 2025 :
 Thu 03 Apr 2025 :
