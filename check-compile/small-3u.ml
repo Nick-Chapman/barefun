@@ -20,25 +20,25 @@ let g14 = fun arg k ->
     k t1 in
   k t1 in
 let g16 = Unit0 in
-let g15 = fun me arg k ->
+let g15 = fun arg k ->
   match arg with
   | Nil0 -> k g16
   | Cons1(t1,t2) ->
-    let k = [me,t2], fun [f1,f2] arg -> f1 f2 k in
+    let k = [t2], fun [f1] arg -> g15 f1 k in
     g12 t1 k in
 let g17 = fun arg k ->
   let k = [], fun [] arg -> g15 arg k in
   g11 arg k in
-let g18 = fun me arg k ->
-  let t1 = [me,arg], fun [f1,f2] arg k ->
+let g18 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
-    | Nil0 -> k f2
+    | Nil0 -> k f1
     | Cons1(t1,t2) ->
-      let k = [f1,f2,t2], fun [f1,f2,f3] arg ->
-        let k = [f1,f3], fun [f1,f2] arg ->
-          let k = [f2], fun [f1] arg -> arg f1 k in
-          f1 arg k in
-        arg f2 k in
+      let k = [f1,t2], fun [f1,f2] arg ->
+        let k = [f2], fun [f1] arg ->
+          let k = [f1], fun [f1] arg -> arg f1 k in
+          g18 arg k in
+        arg f1 k in
       g14 t1 k in
   k t1 in
 let g19 = Nil0 in
@@ -50,22 +50,22 @@ let g22 = fun arg k -> g12 g21 k in
 let g24 = Unit0 in
 let g25 = '\n' in
 let g26 = Unit0 in
-let g23 = fun me arg k ->
-  let k = [me,arg], fun [f1,f2] arg ->
+let g23 = fun arg k ->
+  let k = [arg], fun [f1] arg ->
     let arg = arg in
-    let k = [f1,f2,arg], fun [f1,f2,f3] arg ->
-      let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
+    let k = [f1,arg], fun [f1,f2] arg ->
+      let k = [f1,f2], fun [f1,f2] arg ->
         match arg with
         | true1 ->
-          let k = [f2], fun [f1] arg -> g20 f1 k in
+          let k = [f1], fun [f1] arg -> g20 f1 k in
           g22 g26 k
         | false0 ->
-          let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
-            let k = [f1,f2], fun [f1,f2] arg ->
-              let k = [f1], fun [f1] arg -> f1 arg k in
-              arg f2 k in
-            g14 f3 k in
-          g12 f3 k in
+          let k = [f1,f2], fun [f1,f2] arg ->
+            let k = [f1], fun [f1] arg ->
+              let k = [], fun [] arg -> g23 arg k in
+              arg f1 k in
+            g14 f2 k in
+          g12 f2 k in
       arg g25 k in
     g8 arg k in
   g13 g24 k in
@@ -76,11 +76,11 @@ let g31 = "> " in
 let g32 = Unit0 in
 let g33 = Unit0 in
 let g34 = Unit0 in
-let g30 = fun me arg k ->
-  let k = [me], fun [f1] arg ->
-    let k = [f1], fun [f1] arg ->
-      let k = [f1], fun [f1] arg ->
-        let k = [f1], fun [f1] arg -> f1 g34 k in
+let g30 = fun arg k ->
+  let k = [], fun [] arg ->
+    let k = [], fun [] arg ->
+      let k = [], fun [] arg ->
+        let k = [], fun [] arg -> g30 g34 k in
         g22 g33 k in
       g15 arg k in
     g28 g32 k in

@@ -28,8 +28,7 @@ data Loadable -- restriction of Code
 
 data Top -- restriction of Atomic
   = TopLit Literal
-  | TopLam Ref Code
-  | TopRecLam Ref Ref Code
+  | TopLam Ref Code -- always allowing recursion
   | TopConApp Ctag [Ref]
 
 data Code
@@ -73,9 +72,6 @@ prettyT = \case
   TopLit x -> [show x]
   TopLam x body ->
     ("fun " ++ show x ++ " k ->")
-    >>> prettyC body
-  TopRecLam f x body ->
-    ("fun " ++ show f ++ " " ++ show x ++ " k ->")
     >>> prettyC body
   TopConApp tag [] -> [show tag]
   TopConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
@@ -148,19 +144,16 @@ evalLoadable0 exp =
 evalLoadable :: Env -> Loadable -> (Value -> Interaction) -> Interaction
 evalLoadable env = \case
   Run code -> evalCode env env code
-  LetTop x top body -> \k ->
-    evalT env top $ \v -> do
-      evalLoadable (insert x v env) body k
+  LetTop x top body -> \k -> do
+    let env' = insert x (evalT env' top) env
+    evalLoadable env' body k
 
-evalT :: Env -> Top -> (Value -> Interaction) -> Interaction
+evalT :: Env -> Top -> Value
 evalT genv = \case
-  TopLit literal -> \k -> k (evalLit literal)
-  TopLam x body -> \k -> do
-    k (VFunc (\arg k -> evalCode genv (insert x arg genv) body k))
-  TopRecLam f x body -> \k -> do
-    let me = VFunc (\arg k -> do evalCode genv (insert x arg (insert f me genv)) body k)
-    k me
-  TopConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
+  TopLit literal -> evalLit literal
+  TopLam x body -> do
+    VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
+  TopConApp (Ctag _ tag) xs -> VCons tag (map look xs)
   where
     look :: Ref -> Value -- TODO: dedup evalCode
     look (Ref x loc) = do
@@ -264,7 +257,6 @@ compileCtop = compileC firstTempIndex
             pure $ LetAtomic xRef rhs body
           Right (xRefG, rhs) -> do -- globalized
             -- liftable things can have no effetcs, so if they are not even used we can just drop them
-            --xRefG <- GlobalRef x
             if x `notMember` SRC.fvs body then compileC nextTemp cenv body else do
               cenv <- pure $ Map.insert x xRefG cenv
               Wrap (LetTop xRefG rhs) $ compileC nextTemp cenv body
@@ -324,9 +316,9 @@ compileA x cenv = \case
     case (pre,post) of
       ([],[]) -> do
         g <- GlobalRef x
-        let fRef = Ref f TheFrame -- TODO: use the global reference!
+        let fRef = g
         body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body
-        pure $ Right (g, TopRecLam fRef xRef body)
+        pure $ Right (g, TopLam xRef body)
       _ -> do
         let fRef = Ref f TheFrame
         body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body

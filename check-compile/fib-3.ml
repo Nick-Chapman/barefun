@@ -1,29 +1,29 @@
 (*stage3*)
 let k () = ()
 let g2 = Unit0 in
-let g1 = fun me arg k ->
+let g1 = fun arg k ->
   match arg with
   | Nil0 -> k g2
   | Cons1(t1,t2) ->
     let t3 = PRIM_PutChar(t1) in
-    me t2 k in
+    g1 t2 k in
 let g4 = 2 in
 let g5 = 1 in
 let g6 = 2 in
-let g3 = fun me arg k ->
+let g3 = fun arg k ->
   let t1 = PRIM_LessInt(arg,g4) in
   match t1 with
   | true1 -> k arg
   | false0 ->
     let t2 = PRIM_SubInt(arg,g5) in
-    let k = [arg,me], fun [f1,f2] arg ->
+    let k = [arg], fun [f1] arg ->
       let t1 = [arg], fun [f1] arg k ->
         let t1 = PRIM_AddInt(f1,arg) in
         k t1 in
       let t2 = PRIM_SubInt(f1,g6) in
       let k = [t1], fun [f1] arg -> f1 arg k in
-      f2 t2 k in
-    me t2 k in
+      g3 t2 k in
+    g3 t2 k in
 let g8 = 20 in
 let g9 = "fib " in
 let g10 = '0' in

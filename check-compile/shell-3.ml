@@ -4,10 +4,10 @@ let g2 = true1 in
 let g3 = false0 in
 let g4 = false0 in
 let g5 = false0 in
-let g1 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
-    let t1 = [f1,f2,arg], fun [f1,f2,f3] arg k ->
-      match f3 with
+let g1 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = [f1,arg], fun [f1,f2] arg k ->
+      match f2 with
       | Nil0 ->
         match arg with
         | Nil0 -> k g2
@@ -16,21 +16,21 @@ let g1 = fun me arg k ->
         match arg with
         | Nil0 -> k g4
         | Cons1(t3,t4) ->
-          let k = [f1,f2,t2,t3,t4], fun [f1,f2,f3,f4,f5] arg ->
-            let k = [f1,f2,f3,f5], fun [f1,f2,f3,f4] arg ->
+          let k = [f1,t2,t3,t4], fun [f1,f2,f3,f4] arg ->
+            let k = [f1,f2,f4], fun [f1,f2,f3] arg ->
               match arg with
               | true1 ->
-                let k = [f3,f4], fun [f1,f2] arg ->
+                let k = [f2,f3], fun [f1,f2] arg ->
                   let k = [f2], fun [f1] arg -> arg f1 k in
                   arg f1 k in
-                f2 f1 k
+                g1 f1 k
               | false0 -> k g5 in
-            arg f4 k in
+            arg f3 k in
           f1 t1 k in
     k t1 in
   k t1 in
-let g6 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g6 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match f1 with
     | Nil0 -> k arg
     | Cons1(t1,t2) ->
@@ -39,22 +39,22 @@ let g6 = fun me arg k ->
           let t1 = Cons1[f1,arg] in
           k t1 in
         arg f1 k in
-      f2 t2 k in
+      g6 t2 k in
   k t1 in
 let g8 = Nil0 in
-let g7 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g7 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k g8
     | Cons1(t1,t2) ->
-      let k = [f1,f2,t2], fun [f1,f2,f3] arg ->
+      let k = [f1,t2], fun [f1,f2] arg ->
         let t1 = [arg], fun [f1] arg k ->
           let t1 = Cons1[f1,arg] in
           k t1 in
-        let k = [t1,f3], fun [f1,f2] arg ->
+        let k = [t1,f2], fun [f1,f2] arg ->
           let k = [f1], fun [f1] arg -> f1 arg k in
           arg f2 k in
-        f2 f1 k in
+        g7 f1 k in
       f1 t1 k in
   k t1 in
 let g10 = 0 in
@@ -62,12 +62,12 @@ let g11 = 1 in
 let g12 = fun arg k ->
   let t1 = PRIM_AddInt(g11,arg) in
   k t1 in
-let g9 = fun me arg k ->
+let g9 = fun arg k ->
   match arg with
   | Nil0 -> k g10
   | Cons1(t1,t2) ->
     let k = [], fun [] arg -> g12 arg k in
-    me t2 k in
+    g9 t2 k in
 let g14 = Unit0 in
 let g15 = 8 in
 let g16 = '\n' in
@@ -75,13 +75,13 @@ let g17 = 26 in
 let g18 = '^' in
 let g19 = 'A' in
 let g20 = 1 in
-let g13 = fun me arg k ->
+let g13 = fun arg k ->
   match arg with
   | Nil0 -> k g14
   | Cons1(t1,t2) ->
     let t3 = PRIM_CharOrd(t1) in
     let t4 = PRIM_EqInt(t3,g15) in
-    let k = [me,t2], fun [f1,f2] arg -> f1 f2 k in
+    let k = [t2], fun [f1] arg -> g13 f1 k in
     match t4 with
     | true1 ->
       let t5 = PRIM_PutChar(t1) in
@@ -117,28 +117,28 @@ let g13 = fun me arg k ->
 let g22 = 2 in
 let g23 = 1 in
 let g24 = 2 in
-let g21 = fun me arg k ->
+let g21 = fun arg k ->
   let t1 = PRIM_LessInt(arg,g22) in
   match t1 with
   | true1 -> k arg
   | false0 ->
     let t2 = PRIM_SubInt(arg,g23) in
-    let k = [arg,me], fun [f1,f2] arg ->
+    let k = [arg], fun [f1] arg ->
       let t1 = [arg], fun [f1] arg k ->
         let t1 = PRIM_AddInt(f1,arg) in
         k t1 in
       let t2 = PRIM_SubInt(f1,g24) in
       let k = [t1], fun [f1] arg -> f1 arg k in
-      f2 t2 k in
-    me t2 k in
+      g21 t2 k in
+    g21 t2 k in
 let g26 = 2 in
 let g27 = false0 in
 let g28 = true1 in
 let g29 = 1 in
 let g30 = 1 in
-let g25 = fun me arg k ->
+let g25 = fun arg k ->
   let t1 = PRIM_LessInt(arg,g26) in
-  let k = [arg,me], fun [f1,f2] arg ->
+  let k = [arg], fun [f1] arg ->
     match arg with
     | true1 ->
       let t1 = PRIM_SubInt(f1,g29) in
@@ -147,7 +147,7 @@ let g25 = fun me arg k ->
           let t1 = PRIM_MulInt(f1,arg) in
           k t1 in
         t1 f1 k in
-      f2 t1 k
+      g25 t1 k
     | false0 -> k g30 in
   match t1 with
   | true1 -> k g27
@@ -169,14 +169,14 @@ let g46 = 26 in
 let g47 = '^' in
 let g48 = 'A' in
 let g49 = 1 in
-let g50 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g50 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g50 t3 k in
   k t1 in
 let g51 = Nil0 in
 let g52 = 8 in
@@ -192,14 +192,14 @@ let g62 = 26 in
 let g63 = '^' in
 let g64 = 'A' in
 let g65 = 1 in
-let g66 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g66 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g66 t3 k in
   k t1 in
 let g67 = Nil0 in
 let g68 = 127 in
@@ -261,44 +261,44 @@ let g123 = fun arg k ->
     k t1 in
   k t1 in
 let g124 = Unit0 in
-let g126 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g126 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g126 t3 k in
   k t1 in
 let g127 = Nil0 in
-let g128 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g128 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g128 t3 k in
   k t1 in
 let g129 = Nil0 in
 let g130 = ' ' in
-let g131 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g131 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g131 t3 k in
   k t1 in
 let g132 = Nil0 in
 let g133 = Nil0 in
-let g125 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
-    let t1 = [f1,f2,arg], fun [f1,f2,f3] arg k ->
+let g125 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = [f1,arg], fun [f1,f2] arg k ->
       match arg with
       | Nil0 ->
-        let k = [f1,f3], fun [f1,f2] arg ->
+        let k = [f1,f2], fun [f1,f2] arg ->
           let k = [f1], fun [f1] arg ->
             let t1 = [arg], fun [f1] arg k ->
               let t1 = Cons1[f1,arg] in
@@ -313,25 +313,25 @@ let g125 = fun me arg k ->
         let t3 = PRIM_EqChar(t1,g130) in
         match t3 with
         | true1 ->
-          let k = [f1,f2,f3,t2], fun [f1,f2,f3,f4] arg ->
-            let k = [f1,f2,f4], fun [f1,f2,f3] arg ->
+          let k = [f1,f2,t2], fun [f1,f2,f3] arg ->
+            let k = [f1,f3], fun [f1,f2] arg ->
               let t1 = [arg], fun [f1] arg k ->
                 let t1 = Cons1[f1,arg] in
                 k t1 in
-              let k = [f2,f3], fun [f1,f2] arg ->
-                let k = [f2], fun [f1] arg ->
+              let k = [f2], fun [f1] arg ->
+                let k = [f1], fun [f1] arg ->
                   let k = [f1], fun [f1] arg -> arg f1 k in
                   arg g133 k in
-                f1 arg k in
+                g125 arg k in
               t1 f1 k in
-            arg f3 k in
+            arg f2 k in
           g131 g132 k
         | false0 ->
-          let k = [f3,t1,t2], fun [f1,f2,f3] arg ->
+          let k = [f2,t1,t2], fun [f1,f2,f3] arg ->
             let t1 = Cons1[f2,f1] in
             let k = [f3], fun [f1] arg -> arg f1 k in
             arg t1 k in
-          f2 f1 k in
+          g125 f1 k in
     k t1 in
   k t1 in
 let g134 = Nil0 in
@@ -376,8 +376,8 @@ let g171 = 10 in
 let g172 = fun arg k ->
   let t1 = PRIM_MulInt(g171,arg) in
   k t1 in
-let g160 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g160 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 ->
       let t1 = Some0[f1] in
@@ -388,26 +388,26 @@ let g160 = fun me arg k ->
         let t1 = PRIM_SubInt(f1,arg) in
         k t1 in
       let t5 = PRIM_CharOrd(g161) in
-      let k = [f1,f2,t2], fun [f1,f2,f3] arg ->
+      let k = [f1,t2], fun [f1,f2] arg ->
         let t1 = PRIM_LessInt(arg,g162) in
-        let k = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg ->
-          let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
+        let k = [f1,f2,arg], fun [f1,f2,f3] arg ->
+          let k = [f1,f2], fun [f1,f2] arg ->
             match arg with
             | None1 -> k g170
             | Some0(t1) ->
-              let k = [f2,f3,t1], fun [f1,f2,f3] arg ->
+              let k = [f2,t1], fun [f1,f2] arg ->
                 let t1 = [arg], fun [f1] arg k ->
                   let t1 = PRIM_AddInt(f1,arg) in
                   k t1 in
-                let k = [f1,f2], fun [f1,f2] arg ->
-                  let k = [f2], fun [f1] arg -> arg f1 k in
-                  f1 arg k in
-                t1 f3 k in
+                let k = [f1], fun [f1] arg ->
+                  let k = [f1], fun [f1] arg -> arg f1 k in
+                  g160 arg k in
+                t1 f2 k in
               g172 f1 k in
           match arg with
           | true1 ->
-            let t1 = PRIM_LessInt(g165,f4) in
-            let k = [f4], fun [f1] arg ->
+            let t1 = PRIM_LessInt(g165,f3) in
+            let k = [f3], fun [f1] arg ->
               match arg with
               | true1 ->
                 let t1 = Some0[f1] in
@@ -501,8 +501,8 @@ let g245 = 10 in
 let g246 = fun arg k ->
   let t1 = PRIM_MulInt(g245,arg) in
   k t1 in
-let g234 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g234 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 ->
       let t1 = Some0[f1] in
@@ -513,26 +513,26 @@ let g234 = fun me arg k ->
         let t1 = PRIM_SubInt(f1,arg) in
         k t1 in
       let t5 = PRIM_CharOrd(g235) in
-      let k = [f1,f2,t2], fun [f1,f2,f3] arg ->
+      let k = [f1,t2], fun [f1,f2] arg ->
         let t1 = PRIM_LessInt(arg,g236) in
-        let k = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg ->
-          let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
+        let k = [f1,f2,arg], fun [f1,f2,f3] arg ->
+          let k = [f1,f2], fun [f1,f2] arg ->
             match arg with
             | None1 -> k g244
             | Some0(t1) ->
-              let k = [f2,f3,t1], fun [f1,f2,f3] arg ->
+              let k = [f2,t1], fun [f1,f2] arg ->
                 let t1 = [arg], fun [f1] arg k ->
                   let t1 = PRIM_AddInt(f1,arg) in
                   k t1 in
-                let k = [f1,f2], fun [f1,f2] arg ->
-                  let k = [f2], fun [f1] arg -> arg f1 k in
-                  f1 arg k in
-                t1 f3 k in
+                let k = [f1], fun [f1] arg ->
+                  let k = [f1], fun [f1] arg -> arg f1 k in
+                  g234 arg k in
+                t1 f2 k in
               g246 f1 k in
           match arg with
           | true1 ->
-            let t1 = PRIM_LessInt(g239,f4) in
-            let k = [f4], fun [f1] arg ->
+            let t1 = PRIM_LessInt(g239,f3) in
+            let k = [f3], fun [f1] arg ->
               match arg with
               | true1 ->
                 let t1 = Some0[f1] in
@@ -613,14 +613,14 @@ let g307 = 26 in
 let g308 = '^' in
 let g309 = 'A' in
 let g310 = 1 in
-let g311 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g311 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g311 t3 k in
   k t1 in
 let g312 = Nil0 in
 let g313 = 8 in
@@ -636,14 +636,14 @@ let g323 = 26 in
 let g324 = '^' in
 let g325 = 'A' in
 let g326 = 1 in
-let g327 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g327 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g327 t3 k in
   k t1 in
 let g328 = Nil0 in
 let g329 = 127 in
@@ -705,14 +705,14 @@ let g384 = fun arg k ->
     k t1 in
   k t1 in
 let g385 = Unit0 in
-let g386 = fun me arg k ->
-  let t1 = [arg,me], fun [f1,f2] arg k ->
+let g386 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      f2 t3 k in
+      g386 t3 k in
   k t1 in
 let g387 = Nil0 in
 let g389 = '\n' in
