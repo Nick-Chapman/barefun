@@ -5,7 +5,7 @@ module Stage1
   , compile
   ) where
 
-import Builtin (Builtin,evalBuiltin)
+import Builtin (Builtin,executeBuiltin)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Interaction (Interaction(..))
@@ -162,7 +162,7 @@ eval env@Env{venv} = \case
       k (VCons tag vs)
   Prim _ b es -> \k -> do
     evals env es $ \vs -> do
-    evalBuiltin b vs k
+    executeBuiltin b vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
   RecLam _ f x body -> \k -> do

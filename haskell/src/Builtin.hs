@@ -1,4 +1,4 @@
-module Builtin ( Builtin(..), evalBuiltin ) where
+module Builtin ( Builtin(..), executeBuiltin ) where
 
 import Interaction (Interaction(..))
 import Value (Value(..),tUnit,mkBool,mkList,deUnit)
@@ -15,8 +15,8 @@ data Semantics
   = Pure ([Value] -> Value)
   | Impure ([Value] -> (Value -> Interaction) -> Interaction)
 
-evalBuiltin :: Builtin -> [Value] -> (Value -> Interaction) -> Interaction
-evalBuiltin b args =
+executeBuiltin :: Builtin -> [Value] -> (Value -> Interaction) -> Interaction
+executeBuiltin b args =
   case defineBuiltin b of
     Impure f -> f args
     Pure f -> \k -> k (f args)

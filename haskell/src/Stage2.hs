@@ -5,7 +5,7 @@ module Stage2
   , compile
   ) where
 
-import Builtin (Builtin,evalBuiltin)
+import Builtin (Builtin,executeBuiltin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
@@ -130,7 +130,7 @@ evalCode env = \case
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
       Lit _ literal -> \k -> k (evalLit literal)
-      Prim _ b xs -> \k -> evalBuiltin b (map look xs) k
+      Prim _ b xs -> \k -> executeBuiltin b (map look xs) k
       ConTag _ (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
       Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
