@@ -4,7 +4,7 @@ module Stage3
   , compile
   ) where
 
-import Builtin (Builtin,executeBuiltin)
+import Builtin (Builtin,executeBuiltin,isPure,evaluatePureBuiltin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
@@ -28,6 +28,7 @@ data Loadable -- restriction of Code
 
 data Top -- restriction of Atomic
   = TopLit Literal
+  | TopPrim Builtin [Ref]
   | TopLam Ref Code -- always allowing recursion
   | TopConApp Ctag [Ref]
 
@@ -70,6 +71,7 @@ prettyL = \case
 prettyT :: Top -> Lines
 prettyT = \case
   TopLit x -> [show x]
+  TopPrim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   TopLam x body ->
     ("fun " ++ show x ++ " k ->")
     >>> prettyC body
@@ -156,8 +158,8 @@ look Env{venv} (Ref x loc) = do
 evalT :: Env -> Top -> Value
 evalT genv = \case
   TopLit literal -> evalLit literal
-  TopLam x body -> do
-    VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
+  TopPrim b xs -> evaluatePureBuiltin b (map (look genv) xs)
+  TopLam x body -> VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
   TopConApp (Ctag _ tag) xs -> VCons tag (map (look genv) xs)
 
 -- TODO: pickup genv from scope in stead of threading?
@@ -279,9 +281,14 @@ compileA x cenv = \case
     g <- GlobalRef x
     pure $ Right (g, TopLit literal)
 
-  SRC.Prim _ b xs ->
-    -- TODO: pure primitive could/should be lifted
-    pure $ Left $ Prim b (map (locate cenv) xs)
+  SRC.Prim _ b xs -> do
+    let xs' = map (locate cenv) xs
+    if isPure b && all isGlobal xs' then
+      do
+        g <- GlobalRef x
+        pure $ Right (g, TopPrim b xs')
+      else do
+        pure $ Left $ Prim b xs'
 
   SRC.ConTag _ c xs -> do
     let xs' = map (locate cenv) xs

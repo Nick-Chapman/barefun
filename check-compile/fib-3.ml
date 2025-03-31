@@ -26,91 +26,91 @@ let g3 = fun arg k ->
     g3 t2 k in
 let g8 = 20 in
 let g9 = "fib " in
-let g10 = '0' in
-let g11 = 0 in
-let g12 = 10 in
-let g13 = 10 in
+let g10 = PRIM_Explode(g9) in
+let g11 = '0' in
+let g12 = PRIM_CharOrd(g11) in
 let g14 = 0 in
-let g15 = '0' in
-let g16 = Nil0 in
-let g17 = Cons1[g15,g16] in
-let g18 = Nil0 in
-let g19 = " --> " in
-let g20 = '0' in
-let g21 = 0 in
-let g22 = 10 in
-let g23 = 10 in
-let g24 = 0 in
+let g15 = 10 in
+let g16 = 10 in
+let g13 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_EqInt(arg,g14) in
+    match t1 with
+    | true1 -> k f1
+    | false0 ->
+      let t2 = PRIM_ModInt(arg,g15) in
+      let t3 = PRIM_AddInt(g12,t2) in
+      let t4 = PRIM_CharChr(t3) in
+      let t5 = [t4], fun [f1] arg k ->
+        let t1 = Cons1[f1,arg] in
+        k t1 in
+      let k = [arg], fun [f1] arg ->
+        let k = [f1], fun [f1] arg ->
+          let t1 = PRIM_DivInt(f1,g16) in
+          arg t1 k in
+        g13 arg k in
+      t5 f1 k in
+  k t1 in
+let g17 = 0 in
+let g18 = PRIM_EqInt(g8,g17) in
+let g19 = '0' in
+let g20 = Nil0 in
+let g21 = Cons1[g19,g20] in
+let g22 = Nil0 in
+let g23 = " --> " in
+let g24 = PRIM_Explode(g23) in
 let g25 = '0' in
-let g26 = Nil0 in
-let g27 = Cons1[g25,g26] in
-let g28 = Nil0 in
-let g30 = '\n' in
+let g26 = PRIM_CharOrd(g25) in
+let g28 = 0 in
+let g29 = 10 in
+let g30 = 10 in
+let g27 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_EqInt(arg,g28) in
+    match t1 with
+    | true1 -> k f1
+    | false0 ->
+      let t2 = PRIM_ModInt(arg,g29) in
+      let t3 = PRIM_AddInt(g26,t2) in
+      let t4 = PRIM_CharChr(t3) in
+      let t5 = [t4], fun [f1] arg k ->
+        let t1 = Cons1[f1,arg] in
+        k t1 in
+      let k = [arg], fun [f1] arg ->
+        let k = [f1], fun [f1] arg ->
+          let t1 = PRIM_DivInt(f1,g30) in
+          arg t1 k in
+        g27 arg k in
+      t5 f1 k in
+  k t1 in
+let g31 = 0 in
+let g32 = '0' in
+let g33 = Nil0 in
+let g34 = Cons1[g32,g33] in
+let g35 = Nil0 in
+let g37 = '\n' in
 let k = [], fun [] arg ->
-  let t1 = PRIM_Explode(g9) in
   let k = [arg], fun [f1] arg ->
-    let t1 = PRIM_CharOrd(g10) in
-    let t2 = [t1], fun [f1] me arg k ->
-      let t1 = [f1,arg,me], fun [f1,f2,f3] arg k ->
-        let t1 = PRIM_EqInt(arg,g11) in
-        match t1 with
-        | true1 -> k f2
-        | false0 ->
-          let t2 = PRIM_ModInt(arg,g12) in
-          let t3 = PRIM_AddInt(f1,t2) in
-          let t4 = PRIM_CharChr(t3) in
-          let t5 = [t4], fun [f1] arg k ->
-            let t1 = Cons1[f1,arg] in
-            k t1 in
-          let k = [f3,arg], fun [f1,f2] arg ->
-            let k = [f2], fun [f1] arg ->
-              let t1 = PRIM_DivInt(f1,g13) in
-              arg t1 k in
-            f1 arg k in
-          t5 f2 k in
-      k t1 in
-    let t3 = PRIM_EqInt(g8,g14) in
     let k = [f1], fun [f1] arg ->
       let k = [f1], fun [f1] arg ->
-        let t1 = PRIM_Explode(g19) in
         let k = [f1], fun [f1] arg ->
-          let t1 = PRIM_CharOrd(g20) in
-          let t2 = [t1], fun [f1] me arg k ->
-            let t1 = [f1,arg,me], fun [f1,f2,f3] arg k ->
-              let t1 = PRIM_EqInt(arg,g21) in
-              match t1 with
-              | true1 -> k f2
-              | false0 ->
-                let t2 = PRIM_ModInt(arg,g22) in
-                let t3 = PRIM_AddInt(f1,t2) in
-                let t4 = PRIM_CharChr(t3) in
-                let t5 = [t4], fun [f1] arg k ->
-                  let t1 = Cons1[f1,arg] in
-                  k t1 in
-                let k = [f3,arg], fun [f1,f2] arg ->
-                  let k = [f2], fun [f1] arg ->
-                    let t1 = PRIM_DivInt(f1,g23) in
-                    arg t1 k in
-                  f1 arg k in
-                t5 f2 k in
-            k t1 in
-          let t3 = PRIM_EqInt(f1,g24) in
+          let t1 = PRIM_EqInt(f1,g31) in
           let k = [], fun [] arg ->
             let k = [], fun [] arg ->
-              let t1 = PRIM_PutChar(g30) in
+              let t1 = PRIM_PutChar(g37) in
               k t1 in
             g1 arg k in
-          match t3 with
-          | true1 -> k g27
+          match t1 with
+          | true1 -> k g34
           | false0 ->
             let k = [f1], fun [f1] arg -> arg f1 k in
-            t2 g28 k in
-        g1 t1 k in
+            g27 g35 k in
+        g1 g24 k in
       g1 arg k in
-    match t3 with
-    | true1 -> k g17
+    match g18 with
+    | true1 -> k g21
     | false0 ->
       let k = [], fun [] arg -> arg g8 k in
-      t2 g18 k in
-  g1 t1 k in
+      g13 g22 k in
+  g1 g10 k in
 g3 g8 k
