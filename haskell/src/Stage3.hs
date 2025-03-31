@@ -324,8 +324,7 @@ maybeLiftable = \case
   Lit literal -> Just (TopLit literal)
   Lam [] [] x body -> Just (TopLam x body)
   RecLam [] [] f x body -> Just (TopRecLam f x body)
-  ConTag c [] -> Just (TopConTag c [])
-  --ConTag c xs -> Just (TopConTag c xs) -- TODO: when xs only contain globals
+  ConTag c xs -> if all isGlobal xs then Just (TopConTag c xs) else Nothing
   _ -> Nothing
 
 frame :: (Id -> Ref) -> [Id] -> (Cenv,[Ref],[Ref])

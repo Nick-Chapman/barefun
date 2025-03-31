@@ -646,12 +646,14 @@ let lit_268_210'42_g138 = "rev" in
 let lit_270_214'13_g139 = '>' in
 let lit_272_214'17_g140 = ' ' in
 let con_273_214'20_g141 = Nil0 in
-let con_274_215'21_g142 = Unit0 in
-let con_277_216'42_g143 = Unit0 in
-let con_278_217'26_g144 = Unit0 in
-let lit_279_220'13_g145 = "This is a shell prototype. Try: fib, fact, rev\n" in
-let con_280_221'11_g146 = Unit0 in
-let con_281_0'0_g147 = Unit0 in
+let con_271_214'17_g142 = Cons1[lit_272_214'17_g140,con_273_214'20_g141] in
+let con_269_214'13_g143 = Cons1[lit_270_214'13_g139,con_271_214'17_g142] in
+let con_274_215'21_g144 = Unit0 in
+let con_277_216'42_g145 = Unit0 in
+let con_278_217'26_g146 = Unit0 in
+let lit_279_220'13_g147 = "This is a shell prototype. Try: fib, fact, rev\n" in
+let con_280_221'11_g148 = Unit0 in
+let con_281_0'0_g149 = Unit0 in
 let k = [], fun [] app_207_166'26_arg ->
   let k = [], fun [] app_206_166'28_arg ->
     let k = [], fun [] single_controlD_166'4_arg ->
@@ -713,25 +715,23 @@ let k = [], fun [] app_207_166'26_arg ->
             eq_char_list_56'4_g48 command_207'4_t1 k in
         split_words_192'4_g134 line_203'12_arg k in
       let mainloop_213'8_t4 = [single_controlD_166'4_arg,execute_203'4_t3], fun [single_controlD_166'4_f1,execute_203'4_f2] mainloop_213'8_me __213'17_arg k ->
-        let con_271_214'17_t1 = Cons1[lit_272_214'17_g140,con_273_214'20_g141] in
-        let con_269_214'13_t2 = Cons1[lit_270_214'13_g139,con_271_214'17_t1] in
         let k = [single_controlD_166'4_f1,execute_203'4_f2,mainloop_213'8_me], fun [single_controlD_166'4_f1,execute_203'4_f2,mainloop_213'8_f3] __214'21_arg ->
           let k = [single_controlD_166'4_f1,execute_203'4_f2,mainloop_213'8_f3], fun [single_controlD_166'4_f1,execute_203'4_f2,mainloop_213'8_f3] xs_215'6_arg ->
             let k = [single_controlD_166'4_f1,execute_203'4_f2,mainloop_213'8_f3,xs_215'6_arg], fun [single_controlD_166'4_f1,execute_203'4_f2,mainloop_213'8_f3,xs_215'6_f4] app_276_216'18_arg ->
               let k = [execute_203'4_f2,mainloop_213'8_f3,xs_215'6_f4], fun [execute_203'4_f1,mainloop_213'8_f2,xs_215'6_f3] app_275_216'21_arg ->
                 match app_275_216'21_arg with
-                | true1 -> k con_277_216'42_g143
+                | true1 -> k con_277_216'42_g145
                 | false0 ->
-                  let k = [mainloop_213'8_f2], fun [mainloop_213'8_f1] __217'15_arg -> mainloop_213'8_f1 con_278_217'26_g144 k in
+                  let k = [mainloop_213'8_f2], fun [mainloop_213'8_f1] __217'15_arg -> mainloop_213'8_f1 con_278_217'26_g146 k in
                   execute_203'4_f1 xs_215'6_f3 k in
               app_276_216'18_arg single_controlD_166'4_f1 k in
             eq_char_list_56'4_g48 xs_215'6_arg k in
-          read_line_101'4_g85 con_274_215'21_g142 k in
-        put_chars_90'8_g68 con_269_214'13_t2 k in
+          read_line_101'4_g85 con_274_215'21_g144 k in
+        put_chars_90'8_g68 con_269_214'13_g143 k in
       let main_219'4_t5 = [mainloop_213'8_t4], fun [mainloop_213'8_f1] __219'9_arg k ->
-        let k = [mainloop_213'8_f1], fun [mainloop_213'8_f1] __220'63_arg -> mainloop_213'8_f1 con_280_221'11_g146 k in
-        put_string_95'4_g69 lit_279_220'13_g145 k in
-      main_219'4_t5 con_281_0'0_g147 k in
+        let k = [mainloop_213'8_f1], fun [mainloop_213'8_f1] __220'63_arg -> mainloop_213'8_f1 con_280_221'11_g148 k in
+        put_string_95'4_g69 lit_279_220'13_g147 k in
+      main_219'4_t5 con_281_0'0_g149 k in
     app_206_166'28_arg con_209_166'31_g112 k in
   ::_0'0_g14 app_207_166'26_arg k in
 chr_0'0_g10 lit_208_166'26_g111 k
