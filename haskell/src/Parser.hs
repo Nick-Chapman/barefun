@@ -21,20 +21,11 @@ mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 underscore :: Id
 underscore = mkUserId "_"
 
--- TODO: What position should we use in a sequence expression?
-mkSeq :: Position -> Exp -> Exp -> Exp
-mkSeq pos e1 e2 = AST.Let pos (Bid pos underscore) e1 e2
-
-mkIte :: Position -> Exp -> Exp -> Exp -> Exp
-mkIte p i t e = AST.Case p i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ]
-
-
 positioned :: Par a -> Par (Position,a)
 positioned par = do
   pos <- position
   x <- par
   pure (pos,x)
-
 
 gram6 :: Par Prog
 gram6 = program where
@@ -105,7 +96,6 @@ gram6 = program where
     let s = x:xs
     nibble (pure s)
 
-  -- TODO: false/true allows them to be applied to args which is silly
   constructor = alts
     [ constructor0
     , do key "true"; pure cTrue
@@ -307,7 +297,7 @@ gram6 = program where
     t <- exp
     key "else"
     e <- exp
-    pure (mkIte pos i t e)
+    pure (AST.Case pos i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ])
 
   abstraction = do
     key "fun"
@@ -340,7 +330,7 @@ gram6 = program where
     alts [ do pos <- position
               key ";"
               e2 <- exp
-              pure (mkSeq pos e1 e2)
+              pure (AST.Let pos (Bid pos underscore) e1 e2)
          , pure e1
          ]
 
