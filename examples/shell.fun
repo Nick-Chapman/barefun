@@ -1,4 +1,6 @@
 
+let noinline = let rec r f = let _ = r in f in r
+
 let not b =
   match b with
   | true -> false
@@ -9,13 +11,13 @@ let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
 (* Make a prettier put_char for control chars; also align with backspacing *)
-let put_char c =
+let put_char = noinline (fun c ->
   let backspace = 8 in
   let n = ord c in
   if n = backspace then put_char c else
     if eq_char c '\n' then put_char c else
       if n > 26 then put_char c else
-        (put_char '^'; put_char (chr (ord 'A' + n - 1 )))
+        (put_char '^'; put_char (chr (ord 'A' + n - 1 ))))
 
 let erase_char () =
   let backspace = chr 8 in

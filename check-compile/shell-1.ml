@@ -1,4 +1,38 @@
 (*stage1*)
+let noinline =
+  let r = fix (fun r f -> f) in
+  r in
+let put_char =
+  (noinline
+  (fun c ->
+    let backspace = 8 in
+    let n = PRIM_CharOrd(c) in
+    match PRIM_EqInt(n,backspace) with
+    | true1 -> PRIM_PutChar(c)
+    | false0 ->
+      match let y = '\n' in
+      PRIM_EqChar(c,y) with
+      | true1 -> PRIM_PutChar(c)
+      | false0 ->
+        match let b = 26 in
+        PRIM_LessInt(b,n) with
+        | true1 -> PRIM_PutChar(c)
+        | false0 ->
+          let _ =
+            let x = '^' in
+            PRIM_PutChar(x) in
+          let x =
+            let x =
+              (let x =
+                (let x =
+                  let x = 'A' in
+                  PRIM_CharOrd(x) in
+                (fun y -> PRIM_AddInt(x,y))
+                n) in
+              (fun y -> PRIM_SubInt(x,y))
+              1) in
+            PRIM_CharChr(x) in
+          PRIM_PutChar(x))) in
 let eq_list =
   fix (fun eq_list eq ->
     (fun xs ->
@@ -45,35 +79,7 @@ let put_chars =
     match xs with
     | Nil0 -> Unit0
     | Cons1(x,xs) ->
-      let _ =
-        let backspace = 8 in
-        let n = PRIM_CharOrd(x) in
-        match PRIM_EqInt(n,backspace) with
-        | true1 -> PRIM_PutChar(x)
-        | false0 ->
-          match let y = '\n' in
-          PRIM_EqChar(x,y) with
-          | true1 -> PRIM_PutChar(x)
-          | false0 ->
-            match let b = 26 in
-            PRIM_LessInt(b,n) with
-            | true1 -> PRIM_PutChar(x)
-            | false0 ->
-              let _ =
-                let x = '^' in
-                PRIM_PutChar(x) in
-              let x =
-                let x =
-                  (let x =
-                    (let x =
-                      let x = 'A' in
-                      PRIM_CharOrd(x) in
-                    (fun y -> PRIM_AddInt(x,y))
-                    n) in
-                  (fun y -> PRIM_SubInt(x,y))
-                  1) in
-                PRIM_CharChr(x) in
-              PRIM_PutChar(x) in
+      let _ = (put_char x) in
       (put_chars xs)) in
 let fib =
   fix (fun fib n ->
@@ -129,35 +135,7 @@ let mainloop =
           | true1 ->
             let _ =
               let _ = Unit0 in
-              let c = '\n' in
-              let backspace = 8 in
-              let n = PRIM_CharOrd(c) in
-              match PRIM_EqInt(n,backspace) with
-              | true1 -> PRIM_PutChar(c)
-              | false0 ->
-                match let y = '\n' in
-                PRIM_EqChar(c,y) with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match let b = 26 in
-                  PRIM_LessInt(b,n) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    let _ =
-                      let x = '^' in
-                      PRIM_PutChar(x) in
-                    let x =
-                      let x =
-                        (let x =
-                          (let x =
-                            let x = 'A' in
-                            PRIM_CharOrd(x) in
-                          (fun y -> PRIM_AddInt(x,y))
-                          n) in
-                        (fun y -> PRIM_SubInt(x,y))
-                        1) in
-                      PRIM_CharChr(x) in
-                    PRIM_PutChar(x) in
+              (put_char '\n') in
             let loop =
               fix (fun loop acc ->
                 (fun xs ->
@@ -168,66 +146,10 @@ let mainloop =
           | false0 ->
             match PRIM_EqChar(c,controlD) with
             | true1 ->
-              let _ =
-                let backspace = 8 in
-                let n = PRIM_CharOrd(c) in
-                match PRIM_EqInt(n,backspace) with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match let y = '\n' in
-                  PRIM_EqChar(c,y) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let b = 26 in
-                    PRIM_LessInt(b,n) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      let _ =
-                        let x = '^' in
-                        PRIM_PutChar(x) in
-                      let x =
-                        let x =
-                          (let x =
-                            (let x =
-                              let x = 'A' in
-                              PRIM_CharOrd(x) in
-                            (fun y -> PRIM_AddInt(x,y))
-                            n) in
-                          (fun y -> PRIM_SubInt(x,y))
-                          1) in
-                        PRIM_CharChr(x) in
-                      PRIM_PutChar(x) in
+              let _ = (put_char c) in
               let _ =
                 let _ = Unit0 in
-                let c = '\n' in
-                let backspace = 8 in
-                let n = PRIM_CharOrd(c) in
-                match PRIM_EqInt(n,backspace) with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match let y = '\n' in
-                  PRIM_EqChar(c,y) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let b = 26 in
-                    PRIM_LessInt(b,n) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      let _ =
-                        let x = '^' in
-                        PRIM_PutChar(x) in
-                      let x =
-                        let x =
-                          (let x =
-                            (let x =
-                              let x = 'A' in
-                              PRIM_CharOrd(x) in
-                            (fun y -> PRIM_AddInt(x,y))
-                            n) in
-                          (fun y -> PRIM_SubInt(x,y))
-                          1) in
-                        PRIM_CharChr(x) in
-                      PRIM_PutChar(x) in
+                (put_char '\n') in
               let xs = Cons1(controlD, acc) in
               let loop =
                 fix (fun loop acc ->
@@ -260,217 +182,21 @@ let mainloop =
                         let backspace =
                           let x = 8 in
                           PRIM_CharChr(x) in
-                        let _ =
-                          let backspace = 8 in
-                          let n = PRIM_CharOrd(backspace) in
-                          match PRIM_EqInt(n,backspace) with
-                          | true1 -> PRIM_PutChar(backspace)
-                          | false0 ->
-                            match let y = '\n' in
-                            PRIM_EqChar(backspace,y) with
-                            | true1 -> PRIM_PutChar(backspace)
-                            | false0 ->
-                              match let b = 26 in
-                              PRIM_LessInt(b,n) with
-                              | true1 -> PRIM_PutChar(backspace)
-                              | false0 ->
-                                let _ =
-                                  let x = '^' in
-                                  PRIM_PutChar(x) in
-                                let x =
-                                  let x =
-                                    (let x =
-                                      (let x =
-                                        let x = 'A' in
-                                        PRIM_CharOrd(x) in
-                                      (fun y -> PRIM_AddInt(x,y))
-                                      n) in
-                                    (fun y -> PRIM_SubInt(x,y))
-                                    1) in
-                                  PRIM_CharChr(x) in
-                                PRIM_PutChar(x) in
-                        let _ =
-                          let c = ' ' in
-                          let backspace = 8 in
-                          let n = PRIM_CharOrd(c) in
-                          match PRIM_EqInt(n,backspace) with
-                          | true1 -> PRIM_PutChar(c)
-                          | false0 ->
-                            match let y = '\n' in
-                            PRIM_EqChar(c,y) with
-                            | true1 -> PRIM_PutChar(c)
-                            | false0 ->
-                              match let b = 26 in
-                              PRIM_LessInt(b,n) with
-                              | true1 -> PRIM_PutChar(c)
-                              | false0 ->
-                                let _ =
-                                  let x = '^' in
-                                  PRIM_PutChar(x) in
-                                let x =
-                                  let x =
-                                    (let x =
-                                      (let x =
-                                        let x = 'A' in
-                                        PRIM_CharOrd(x) in
-                                      (fun y -> PRIM_AddInt(x,y))
-                                      n) in
-                                    (fun y -> PRIM_SubInt(x,y))
-                                    1) in
-                                  PRIM_CharChr(x) in
-                                PRIM_PutChar(x) in
-                        let backspace = 8 in
-                        let n = PRIM_CharOrd(backspace) in
-                        match PRIM_EqInt(n,backspace) with
-                        | true1 -> PRIM_PutChar(backspace)
-                        | false0 ->
-                          match let y = '\n' in
-                          PRIM_EqChar(backspace,y) with
-                          | true1 -> PRIM_PutChar(backspace)
-                          | false0 ->
-                            match let b = 26 in
-                            PRIM_LessInt(b,n) with
-                            | true1 -> PRIM_PutChar(backspace)
-                            | false0 ->
-                              let _ =
-                                let x = '^' in
-                                PRIM_PutChar(x) in
-                              let x =
-                                let x =
-                                  (let x =
-                                    (let x =
-                                      let x = 'A' in
-                                      PRIM_CharOrd(x) in
-                                    (fun y -> PRIM_AddInt(x,y))
-                                    n) in
-                                  (fun y -> PRIM_SubInt(x,y))
-                                  1) in
-                                PRIM_CharChr(x) in
-                              PRIM_PutChar(x)
+                        let _ = (put_char backspace) in
+                        let _ = (put_char ' ') in
+                        (put_char backspace)
                       | false0 -> Unit0 in
                     let _ =
                       let _ = Unit0 in
                       let backspace =
                         let x = 8 in
                         PRIM_CharChr(x) in
-                      let _ =
-                        let backspace = 8 in
-                        let n = PRIM_CharOrd(backspace) in
-                        match PRIM_EqInt(n,backspace) with
-                        | true1 -> PRIM_PutChar(backspace)
-                        | false0 ->
-                          match let y = '\n' in
-                          PRIM_EqChar(backspace,y) with
-                          | true1 -> PRIM_PutChar(backspace)
-                          | false0 ->
-                            match let b = 26 in
-                            PRIM_LessInt(b,n) with
-                            | true1 -> PRIM_PutChar(backspace)
-                            | false0 ->
-                              let _ =
-                                let x = '^' in
-                                PRIM_PutChar(x) in
-                              let x =
-                                let x =
-                                  (let x =
-                                    (let x =
-                                      let x = 'A' in
-                                      PRIM_CharOrd(x) in
-                                    (fun y -> PRIM_AddInt(x,y))
-                                    n) in
-                                  (fun y -> PRIM_SubInt(x,y))
-                                  1) in
-                                PRIM_CharChr(x) in
-                              PRIM_PutChar(x) in
-                      let _ =
-                        let c = ' ' in
-                        let backspace = 8 in
-                        let n = PRIM_CharOrd(c) in
-                        match PRIM_EqInt(n,backspace) with
-                        | true1 -> PRIM_PutChar(c)
-                        | false0 ->
-                          match let y = '\n' in
-                          PRIM_EqChar(c,y) with
-                          | true1 -> PRIM_PutChar(c)
-                          | false0 ->
-                            match let b = 26 in
-                            PRIM_LessInt(b,n) with
-                            | true1 -> PRIM_PutChar(c)
-                            | false0 ->
-                              let _ =
-                                let x = '^' in
-                                PRIM_PutChar(x) in
-                              let x =
-                                let x =
-                                  (let x =
-                                    (let x =
-                                      let x = 'A' in
-                                      PRIM_CharOrd(x) in
-                                    (fun y -> PRIM_AddInt(x,y))
-                                    n) in
-                                  (fun y -> PRIM_SubInt(x,y))
-                                  1) in
-                                PRIM_CharChr(x) in
-                              PRIM_PutChar(x) in
-                      let backspace = 8 in
-                      let n = PRIM_CharOrd(backspace) in
-                      match PRIM_EqInt(n,backspace) with
-                      | true1 -> PRIM_PutChar(backspace)
-                      | false0 ->
-                        match let y = '\n' in
-                        PRIM_EqChar(backspace,y) with
-                        | true1 -> PRIM_PutChar(backspace)
-                        | false0 ->
-                          match let b = 26 in
-                          PRIM_LessInt(b,n) with
-                          | true1 -> PRIM_PutChar(backspace)
-                          | false0 ->
-                            let _ =
-                              let x = '^' in
-                              PRIM_PutChar(x) in
-                            let x =
-                              let x =
-                                (let x =
-                                  (let x =
-                                    let x = 'A' in
-                                    PRIM_CharOrd(x) in
-                                  (fun y -> PRIM_AddInt(x,y))
-                                  n) in
-                                (fun y -> PRIM_SubInt(x,y))
-                                1) in
-                              PRIM_CharChr(x) in
-                            PRIM_PutChar(x) in
+                      let _ = (put_char backspace) in
+                      let _ = (put_char ' ') in
+                      (put_char backspace) in
                     (loop tail)
                 | false0 ->
-                  let _ =
-                    let backspace = 8 in
-                    let n = PRIM_CharOrd(c) in
-                    match PRIM_EqInt(n,backspace) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      match let y = '\n' in
-                      PRIM_EqChar(c,y) with
-                      | true1 -> PRIM_PutChar(c)
-                      | false0 ->
-                        match let b = 26 in
-                        PRIM_LessInt(b,n) with
-                        | true1 -> PRIM_PutChar(c)
-                        | false0 ->
-                          let _ =
-                            let x = '^' in
-                            PRIM_PutChar(x) in
-                          let x =
-                            let x =
-                              (let x =
-                                (let x =
-                                  let x = 'A' in
-                                  PRIM_CharOrd(x) in
-                                (fun y -> PRIM_AddInt(x,y))
-                                n) in
-                              (fun y -> PRIM_SubInt(x,y))
-                              1) in
-                            PRIM_CharChr(x) in
-                          PRIM_PutChar(x) in
+                  let _ = (put_char c) in
                   (loop Cons1(c, acc))) in
       (loop Nil0) in
     match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) xs) single_controlD) with
@@ -540,35 +266,7 @@ let mainloop =
                 (put_chars PRIM_Explode(s)) in
               let _ = (put_chars PRIM_Explode(s)) in
               let _ = Unit0 in
-              let c = '\n' in
-              let backspace = 8 in
-              let n = PRIM_CharOrd(c) in
-              match PRIM_EqInt(n,backspace) with
-              | true1 -> PRIM_PutChar(c)
-              | false0 ->
-                match let y = '\n' in
-                PRIM_EqChar(c,y) with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match let b = 26 in
-                  PRIM_LessInt(b,n) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    let _ =
-                      let x = '^' in
-                      PRIM_PutChar(x) in
-                    let x =
-                      let x =
-                        (let x =
-                          (let x =
-                            let x = 'A' in
-                            PRIM_CharOrd(x) in
-                          (fun y -> PRIM_AddInt(x,y))
-                          n) in
-                        (fun y -> PRIM_SubInt(x,y))
-                        1) in
-                      PRIM_CharChr(x) in
-                    PRIM_PutChar(x)
+              (put_char '\n')
             | Cons1(arg1,more) ->
               match more with
               | Cons1(_,_) ->
@@ -578,35 +276,7 @@ let mainloop =
                   (put_chars PRIM_Explode(s)) in
                 let _ = (put_chars PRIM_Explode(s)) in
                 let _ = Unit0 in
-                let c = '\n' in
-                let backspace = 8 in
-                let n = PRIM_CharOrd(c) in
-                match PRIM_EqInt(n,backspace) with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match let y = '\n' in
-                  PRIM_EqChar(c,y) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let b = 26 in
-                    PRIM_LessInt(b,n) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      let _ =
-                        let x = '^' in
-                        PRIM_PutChar(x) in
-                      let x =
-                        let x =
-                          (let x =
-                            (let x =
-                              let x = 'A' in
-                              PRIM_CharOrd(x) in
-                            (fun y -> PRIM_AddInt(x,y))
-                            n) in
-                          (fun y -> PRIM_SubInt(x,y))
-                          1) in
-                        PRIM_CharChr(x) in
-                      PRIM_PutChar(x)
+                (put_char '\n')
               | Nil0 ->
                 match let loop =
                   fix (fun loop acc ->
@@ -651,35 +321,7 @@ let mainloop =
                     (put_chars PRIM_Explode(s)) in
                   let _ = (put_chars PRIM_Explode(s)) in
                   let _ = Unit0 in
-                  let c = '\n' in
-                  let backspace = 8 in
-                  let n = PRIM_CharOrd(c) in
-                  match PRIM_EqInt(n,backspace) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let y = '\n' in
-                    PRIM_EqChar(c,y) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      match let b = 26 in
-                      PRIM_LessInt(b,n) with
-                      | true1 -> PRIM_PutChar(c)
-                      | false0 ->
-                        let _ =
-                          let x = '^' in
-                          PRIM_PutChar(x) in
-                        let x =
-                          let x =
-                            (let x =
-                              (let x =
-                                let x = 'A' in
-                                PRIM_CharOrd(x) in
-                              (fun y -> PRIM_AddInt(x,y))
-                              n) in
-                            (fun y -> PRIM_SubInt(x,y))
-                            1) in
-                          PRIM_CharChr(x) in
-                        PRIM_PutChar(x)
+                  (put_char '\n')
                 | Some0(n) ->
                   let res = (fib n) in
                   let _ =
@@ -746,35 +388,7 @@ let mainloop =
                       Nil0)
                     | false0 -> ((loop Nil0) res)) in
                   let _ = Unit0 in
-                  let c = '\n' in
-                  let backspace = 8 in
-                  let n = PRIM_CharOrd(c) in
-                  match PRIM_EqInt(n,backspace) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let y = '\n' in
-                    PRIM_EqChar(c,y) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      match let b = 26 in
-                      PRIM_LessInt(b,n) with
-                      | true1 -> PRIM_PutChar(c)
-                      | false0 ->
-                        let _ =
-                          let x = '^' in
-                          PRIM_PutChar(x) in
-                        let x =
-                          let x =
-                            (let x =
-                              (let x =
-                                let x = 'A' in
-                                PRIM_CharOrd(x) in
-                              (fun y -> PRIM_AddInt(x,y))
-                              n) in
-                            (fun y -> PRIM_SubInt(x,y))
-                            1) in
-                          PRIM_CharChr(x) in
-                        PRIM_PutChar(x)
+                  (put_char '\n')
           | false0 ->
             match let b =
               let x = "fact" in
@@ -792,35 +406,7 @@ let mainloop =
                   (put_chars PRIM_Explode(s)) in
                 let _ = (put_chars PRIM_Explode(s)) in
                 let _ = Unit0 in
-                let c = '\n' in
-                let backspace = 8 in
-                let n = PRIM_CharOrd(c) in
-                match PRIM_EqInt(n,backspace) with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match let y = '\n' in
-                  PRIM_EqChar(c,y) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let b = 26 in
-                    PRIM_LessInt(b,n) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      let _ =
-                        let x = '^' in
-                        PRIM_PutChar(x) in
-                      let x =
-                        let x =
-                          (let x =
-                            (let x =
-                              let x = 'A' in
-                              PRIM_CharOrd(x) in
-                            (fun y -> PRIM_AddInt(x,y))
-                            n) in
-                          (fun y -> PRIM_SubInt(x,y))
-                          1) in
-                        PRIM_CharChr(x) in
-                      PRIM_PutChar(x)
+                (put_char '\n')
               | Cons1(arg1,more) ->
                 match more with
                 | Cons1(_,_) ->
@@ -830,35 +416,7 @@ let mainloop =
                     (put_chars PRIM_Explode(s)) in
                   let _ = (put_chars PRIM_Explode(s)) in
                   let _ = Unit0 in
-                  let c = '\n' in
-                  let backspace = 8 in
-                  let n = PRIM_CharOrd(c) in
-                  match PRIM_EqInt(n,backspace) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let y = '\n' in
-                    PRIM_EqChar(c,y) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      match let b = 26 in
-                      PRIM_LessInt(b,n) with
-                      | true1 -> PRIM_PutChar(c)
-                      | false0 ->
-                        let _ =
-                          let x = '^' in
-                          PRIM_PutChar(x) in
-                        let x =
-                          let x =
-                            (let x =
-                              (let x =
-                                let x = 'A' in
-                                PRIM_CharOrd(x) in
-                              (fun y -> PRIM_AddInt(x,y))
-                              n) in
-                            (fun y -> PRIM_SubInt(x,y))
-                            1) in
-                          PRIM_CharChr(x) in
-                        PRIM_PutChar(x)
+                  (put_char '\n')
                 | Nil0 ->
                   match let loop =
                     fix (fun loop acc ->
@@ -903,35 +461,7 @@ let mainloop =
                       (put_chars PRIM_Explode(s)) in
                     let _ = (put_chars PRIM_Explode(s)) in
                     let _ = Unit0 in
-                    let c = '\n' in
-                    let backspace = 8 in
-                    let n = PRIM_CharOrd(c) in
-                    match PRIM_EqInt(n,backspace) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      match let y = '\n' in
-                      PRIM_EqChar(c,y) with
-                      | true1 -> PRIM_PutChar(c)
-                      | false0 ->
-                        match let b = 26 in
-                        PRIM_LessInt(b,n) with
-                        | true1 -> PRIM_PutChar(c)
-                        | false0 ->
-                          let _ =
-                            let x = '^' in
-                            PRIM_PutChar(x) in
-                          let x =
-                            let x =
-                              (let x =
-                                (let x =
-                                  let x = 'A' in
-                                  PRIM_CharOrd(x) in
-                                (fun y -> PRIM_AddInt(x,y))
-                                n) in
-                              (fun y -> PRIM_SubInt(x,y))
-                              1) in
-                            PRIM_CharChr(x) in
-                          PRIM_PutChar(x)
+                    (put_char '\n')
                   | Some0(n) ->
                     let res = (fact n) in
                     let _ =
@@ -998,35 +528,7 @@ let mainloop =
                         Nil0)
                       | false0 -> ((loop Nil0) res)) in
                     let _ = Unit0 in
-                    let c = '\n' in
-                    let backspace = 8 in
-                    let n = PRIM_CharOrd(c) in
-                    match PRIM_EqInt(n,backspace) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      match let y = '\n' in
-                      PRIM_EqChar(c,y) with
-                      | true1 -> PRIM_PutChar(c)
-                      | false0 ->
-                        match let b = 26 in
-                        PRIM_LessInt(b,n) with
-                        | true1 -> PRIM_PutChar(c)
-                        | false0 ->
-                          let _ =
-                            let x = '^' in
-                            PRIM_PutChar(x) in
-                          let x =
-                            let x =
-                              (let x =
-                                (let x =
-                                  let x = 'A' in
-                                  PRIM_CharOrd(x) in
-                                (fun y -> PRIM_AddInt(x,y))
-                                n) in
-                              (fun y -> PRIM_SubInt(x,y))
-                              1) in
-                            PRIM_CharChr(x) in
-                          PRIM_PutChar(x)
+                    (put_char '\n')
             | false0 ->
               match let b =
                 let x = "rev" in
@@ -1041,35 +543,7 @@ let mainloop =
                     (put_chars PRIM_Explode(s)) in
                   let _ = (put_chars PRIM_Explode(s)) in
                   let _ = Unit0 in
-                  let c = '\n' in
-                  let backspace = 8 in
-                  let n = PRIM_CharOrd(c) in
-                  match PRIM_EqInt(n,backspace) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let y = '\n' in
-                    PRIM_EqChar(c,y) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      match let b = 26 in
-                      PRIM_LessInt(b,n) with
-                      | true1 -> PRIM_PutChar(c)
-                      | false0 ->
-                        let _ =
-                          let x = '^' in
-                          PRIM_PutChar(x) in
-                        let x =
-                          let x =
-                            (let x =
-                              (let x =
-                                let x = 'A' in
-                                PRIM_CharOrd(x) in
-                              (fun y -> PRIM_AddInt(x,y))
-                              n) in
-                            (fun y -> PRIM_SubInt(x,y))
-                            1) in
-                          PRIM_CharChr(x) in
-                        PRIM_PutChar(x)
+                  (put_char '\n')
                 | Nil0 ->
                   let _ =
                     let s = "(reverse typed lines until ^D)\n" in
@@ -1093,35 +567,7 @@ let mainloop =
                             | true1 ->
                               let _ =
                                 let _ = Unit0 in
-                                let c = '\n' in
-                                let backspace = 8 in
-                                let n = PRIM_CharOrd(c) in
-                                match PRIM_EqInt(n,backspace) with
-                                | true1 -> PRIM_PutChar(c)
-                                | false0 ->
-                                  match let y = '\n' in
-                                  PRIM_EqChar(c,y) with
-                                  | true1 -> PRIM_PutChar(c)
-                                  | false0 ->
-                                    match let b = 26 in
-                                    PRIM_LessInt(b,n) with
-                                    | true1 -> PRIM_PutChar(c)
-                                    | false0 ->
-                                      let _ =
-                                        let x = '^' in
-                                        PRIM_PutChar(x) in
-                                      let x =
-                                        let x =
-                                          (let x =
-                                            (let x =
-                                              let x = 'A' in
-                                              PRIM_CharOrd(x) in
-                                            (fun y -> PRIM_AddInt(x,y))
-                                            n) in
-                                          (fun y -> PRIM_SubInt(x,y))
-                                          1) in
-                                        PRIM_CharChr(x) in
-                                      PRIM_PutChar(x) in
+                                (put_char '\n') in
                               let loop =
                                 fix (fun loop acc ->
                                   (fun xs ->
@@ -1132,66 +578,10 @@ let mainloop =
                             | false0 ->
                               match PRIM_EqChar(c,controlD) with
                               | true1 ->
-                                let _ =
-                                  let backspace = 8 in
-                                  let n = PRIM_CharOrd(c) in
-                                  match PRIM_EqInt(n,backspace) with
-                                  | true1 -> PRIM_PutChar(c)
-                                  | false0 ->
-                                    match let y = '\n' in
-                                    PRIM_EqChar(c,y) with
-                                    | true1 -> PRIM_PutChar(c)
-                                    | false0 ->
-                                      match let b = 26 in
-                                      PRIM_LessInt(b,n) with
-                                      | true1 -> PRIM_PutChar(c)
-                                      | false0 ->
-                                        let _ =
-                                          let x = '^' in
-                                          PRIM_PutChar(x) in
-                                        let x =
-                                          let x =
-                                            (let x =
-                                              (let x =
-                                                let x = 'A' in
-                                                PRIM_CharOrd(x) in
-                                              (fun y -> PRIM_AddInt(x,y))
-                                              n) in
-                                            (fun y -> PRIM_SubInt(x,y))
-                                            1) in
-                                          PRIM_CharChr(x) in
-                                        PRIM_PutChar(x) in
+                                let _ = (put_char c) in
                                 let _ =
                                   let _ = Unit0 in
-                                  let c = '\n' in
-                                  let backspace = 8 in
-                                  let n = PRIM_CharOrd(c) in
-                                  match PRIM_EqInt(n,backspace) with
-                                  | true1 -> PRIM_PutChar(c)
-                                  | false0 ->
-                                    match let y = '\n' in
-                                    PRIM_EqChar(c,y) with
-                                    | true1 -> PRIM_PutChar(c)
-                                    | false0 ->
-                                      match let b = 26 in
-                                      PRIM_LessInt(b,n) with
-                                      | true1 -> PRIM_PutChar(c)
-                                      | false0 ->
-                                        let _ =
-                                          let x = '^' in
-                                          PRIM_PutChar(x) in
-                                        let x =
-                                          let x =
-                                            (let x =
-                                              (let x =
-                                                let x = 'A' in
-                                                PRIM_CharOrd(x) in
-                                              (fun y -> PRIM_AddInt(x,y))
-                                              n) in
-                                            (fun y -> PRIM_SubInt(x,y))
-                                            1) in
-                                          PRIM_CharChr(x) in
-                                        PRIM_PutChar(x) in
+                                  (put_char '\n') in
                                 let xs = Cons1(controlD, acc) in
                                 let loop =
                                   fix (fun loop acc ->
@@ -1224,217 +614,21 @@ let mainloop =
                                           let backspace =
                                             let x = 8 in
                                             PRIM_CharChr(x) in
-                                          let _ =
-                                            let backspace = 8 in
-                                            let n = PRIM_CharOrd(backspace) in
-                                            match PRIM_EqInt(n,backspace) with
-                                            | true1 -> PRIM_PutChar(backspace)
-                                            | false0 ->
-                                              match let y = '\n' in
-                                              PRIM_EqChar(backspace,y) with
-                                              | true1 -> PRIM_PutChar(backspace)
-                                              | false0 ->
-                                                match let b = 26 in
-                                                PRIM_LessInt(b,n) with
-                                                | true1 -> PRIM_PutChar(backspace)
-                                                | false0 ->
-                                                  let _ =
-                                                    let x = '^' in
-                                                    PRIM_PutChar(x) in
-                                                  let x =
-                                                    let x =
-                                                      (let x =
-                                                        (let x =
-                                                          let x = 'A' in
-                                                          PRIM_CharOrd(x) in
-                                                        (fun y -> PRIM_AddInt(x,y))
-                                                        n) in
-                                                      (fun y -> PRIM_SubInt(x,y))
-                                                      1) in
-                                                    PRIM_CharChr(x) in
-                                                  PRIM_PutChar(x) in
-                                          let _ =
-                                            let c = ' ' in
-                                            let backspace = 8 in
-                                            let n = PRIM_CharOrd(c) in
-                                            match PRIM_EqInt(n,backspace) with
-                                            | true1 -> PRIM_PutChar(c)
-                                            | false0 ->
-                                              match let y = '\n' in
-                                              PRIM_EqChar(c,y) with
-                                              | true1 -> PRIM_PutChar(c)
-                                              | false0 ->
-                                                match let b = 26 in
-                                                PRIM_LessInt(b,n) with
-                                                | true1 -> PRIM_PutChar(c)
-                                                | false0 ->
-                                                  let _ =
-                                                    let x = '^' in
-                                                    PRIM_PutChar(x) in
-                                                  let x =
-                                                    let x =
-                                                      (let x =
-                                                        (let x =
-                                                          let x = 'A' in
-                                                          PRIM_CharOrd(x) in
-                                                        (fun y -> PRIM_AddInt(x,y))
-                                                        n) in
-                                                      (fun y -> PRIM_SubInt(x,y))
-                                                      1) in
-                                                    PRIM_CharChr(x) in
-                                                  PRIM_PutChar(x) in
-                                          let backspace = 8 in
-                                          let n = PRIM_CharOrd(backspace) in
-                                          match PRIM_EqInt(n,backspace) with
-                                          | true1 -> PRIM_PutChar(backspace)
-                                          | false0 ->
-                                            match let y = '\n' in
-                                            PRIM_EqChar(backspace,y) with
-                                            | true1 -> PRIM_PutChar(backspace)
-                                            | false0 ->
-                                              match let b = 26 in
-                                              PRIM_LessInt(b,n) with
-                                              | true1 -> PRIM_PutChar(backspace)
-                                              | false0 ->
-                                                let _ =
-                                                  let x = '^' in
-                                                  PRIM_PutChar(x) in
-                                                let x =
-                                                  let x =
-                                                    (let x =
-                                                      (let x =
-                                                        let x = 'A' in
-                                                        PRIM_CharOrd(x) in
-                                                      (fun y -> PRIM_AddInt(x,y))
-                                                      n) in
-                                                    (fun y -> PRIM_SubInt(x,y))
-                                                    1) in
-                                                  PRIM_CharChr(x) in
-                                                PRIM_PutChar(x)
+                                          let _ = (put_char backspace) in
+                                          let _ = (put_char ' ') in
+                                          (put_char backspace)
                                         | false0 -> Unit0 in
                                       let _ =
                                         let _ = Unit0 in
                                         let backspace =
                                           let x = 8 in
                                           PRIM_CharChr(x) in
-                                        let _ =
-                                          let backspace = 8 in
-                                          let n = PRIM_CharOrd(backspace) in
-                                          match PRIM_EqInt(n,backspace) with
-                                          | true1 -> PRIM_PutChar(backspace)
-                                          | false0 ->
-                                            match let y = '\n' in
-                                            PRIM_EqChar(backspace,y) with
-                                            | true1 -> PRIM_PutChar(backspace)
-                                            | false0 ->
-                                              match let b = 26 in
-                                              PRIM_LessInt(b,n) with
-                                              | true1 -> PRIM_PutChar(backspace)
-                                              | false0 ->
-                                                let _ =
-                                                  let x = '^' in
-                                                  PRIM_PutChar(x) in
-                                                let x =
-                                                  let x =
-                                                    (let x =
-                                                      (let x =
-                                                        let x = 'A' in
-                                                        PRIM_CharOrd(x) in
-                                                      (fun y -> PRIM_AddInt(x,y))
-                                                      n) in
-                                                    (fun y -> PRIM_SubInt(x,y))
-                                                    1) in
-                                                  PRIM_CharChr(x) in
-                                                PRIM_PutChar(x) in
-                                        let _ =
-                                          let c = ' ' in
-                                          let backspace = 8 in
-                                          let n = PRIM_CharOrd(c) in
-                                          match PRIM_EqInt(n,backspace) with
-                                          | true1 -> PRIM_PutChar(c)
-                                          | false0 ->
-                                            match let y = '\n' in
-                                            PRIM_EqChar(c,y) with
-                                            | true1 -> PRIM_PutChar(c)
-                                            | false0 ->
-                                              match let b = 26 in
-                                              PRIM_LessInt(b,n) with
-                                              | true1 -> PRIM_PutChar(c)
-                                              | false0 ->
-                                                let _ =
-                                                  let x = '^' in
-                                                  PRIM_PutChar(x) in
-                                                let x =
-                                                  let x =
-                                                    (let x =
-                                                      (let x =
-                                                        let x = 'A' in
-                                                        PRIM_CharOrd(x) in
-                                                      (fun y -> PRIM_AddInt(x,y))
-                                                      n) in
-                                                    (fun y -> PRIM_SubInt(x,y))
-                                                    1) in
-                                                  PRIM_CharChr(x) in
-                                                PRIM_PutChar(x) in
-                                        let backspace = 8 in
-                                        let n = PRIM_CharOrd(backspace) in
-                                        match PRIM_EqInt(n,backspace) with
-                                        | true1 -> PRIM_PutChar(backspace)
-                                        | false0 ->
-                                          match let y = '\n' in
-                                          PRIM_EqChar(backspace,y) with
-                                          | true1 -> PRIM_PutChar(backspace)
-                                          | false0 ->
-                                            match let b = 26 in
-                                            PRIM_LessInt(b,n) with
-                                            | true1 -> PRIM_PutChar(backspace)
-                                            | false0 ->
-                                              let _ =
-                                                let x = '^' in
-                                                PRIM_PutChar(x) in
-                                              let x =
-                                                let x =
-                                                  (let x =
-                                                    (let x =
-                                                      let x = 'A' in
-                                                      PRIM_CharOrd(x) in
-                                                    (fun y -> PRIM_AddInt(x,y))
-                                                    n) in
-                                                  (fun y -> PRIM_SubInt(x,y))
-                                                  1) in
-                                                PRIM_CharChr(x) in
-                                              PRIM_PutChar(x) in
+                                        let _ = (put_char backspace) in
+                                        let _ = (put_char ' ') in
+                                        (put_char backspace) in
                                       (loop tail)
                                   | false0 ->
-                                    let _ =
-                                      let backspace = 8 in
-                                      let n = PRIM_CharOrd(c) in
-                                      match PRIM_EqInt(n,backspace) with
-                                      | true1 -> PRIM_PutChar(c)
-                                      | false0 ->
-                                        match let y = '\n' in
-                                        PRIM_EqChar(c,y) with
-                                        | true1 -> PRIM_PutChar(c)
-                                        | false0 ->
-                                          match let b = 26 in
-                                          PRIM_LessInt(b,n) with
-                                          | true1 -> PRIM_PutChar(c)
-                                          | false0 ->
-                                            let _ =
-                                              let x = '^' in
-                                              PRIM_PutChar(x) in
-                                            let x =
-                                              let x =
-                                                (let x =
-                                                  (let x =
-                                                    let x = 'A' in
-                                                    PRIM_CharOrd(x) in
-                                                  (fun y -> PRIM_AddInt(x,y))
-                                                  n) in
-                                                (fun y -> PRIM_SubInt(x,y))
-                                                1) in
-                                              PRIM_CharChr(x) in
-                                            PRIM_PutChar(x) in
+                                    let _ = (put_char c) in
                                     (loop Cons1(c, acc))) in
                         (loop Nil0) in
                       match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) xs) single_controlD) with
@@ -1451,35 +645,7 @@ let mainloop =
                           ((loop Nil0) xs)) in
                         let _ =
                           let _ = Unit0 in
-                          let c = '\n' in
-                          let backspace = 8 in
-                          let n = PRIM_CharOrd(c) in
-                          match PRIM_EqInt(n,backspace) with
-                          | true1 -> PRIM_PutChar(c)
-                          | false0 ->
-                            match let y = '\n' in
-                            PRIM_EqChar(c,y) with
-                            | true1 -> PRIM_PutChar(c)
-                            | false0 ->
-                              match let b = 26 in
-                              PRIM_LessInt(b,n) with
-                              | true1 -> PRIM_PutChar(c)
-                              | false0 ->
-                                let _ =
-                                  let x = '^' in
-                                  PRIM_PutChar(x) in
-                                let x =
-                                  let x =
-                                    (let x =
-                                      (let x =
-                                        let x = 'A' in
-                                        PRIM_CharOrd(x) in
-                                      (fun y -> PRIM_AddInt(x,y))
-                                      n) in
-                                    (fun y -> PRIM_SubInt(x,y))
-                                    1) in
-                                  PRIM_CharChr(x) in
-                                PRIM_PutChar(x) in
+                          (put_char '\n') in
                         (loop Unit0)) in
                   (loop Unit0)
               | false0 ->
@@ -1534,35 +700,7 @@ let mainloop =
                   let s = " chars)" in
                   (put_chars PRIM_Explode(s)) in
                 let _ = Unit0 in
-                let c = '\n' in
-                let backspace = 8 in
-                let n = PRIM_CharOrd(c) in
-                match PRIM_EqInt(n,backspace) with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match let y = '\n' in
-                  PRIM_EqChar(c,y) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    match let b = 26 in
-                    PRIM_LessInt(b,n) with
-                    | true1 -> PRIM_PutChar(c)
-                    | false0 ->
-                      let _ =
-                        let x = '^' in
-                        PRIM_PutChar(x) in
-                      let x =
-                        let x =
-                          (let x =
-                            (let x =
-                              let x = 'A' in
-                              PRIM_CharOrd(x) in
-                            (fun y -> PRIM_AddInt(x,y))
-                            n) in
-                          (fun y -> PRIM_SubInt(x,y))
-                          1) in
-                        PRIM_CharChr(x) in
-                      PRIM_PutChar(x) in
+                (put_char '\n') in
       (mainloop Unit0)) in
 let _ = Unit0 in
 let _ =

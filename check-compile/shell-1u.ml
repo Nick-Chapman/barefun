@@ -13,6 +13,12 @@ let explode = (fun x -> PRIM_Explode(x)) in
 let put_char = (fun x -> PRIM_PutChar(x)) in
 let get_char = (fun x -> PRIM_GetChar(x)) in
 let :: = (fun x -> (fun y -> Cons1(x, y))) in
+let noinline =
+  let r =
+    fix (fun r f ->
+      let _ = r in
+      f) in
+  r in
 let not =
   (fun b ->
     match b with
@@ -22,6 +28,7 @@ let > = (fun a -> (fun b -> ((< b) a))) in
 let <= = (fun a -> (fun b -> (not ((< b) a)))) in
 let >= = (fun a -> (fun b -> (not ((< a) b)))) in
 let put_char =
+  (noinline
   (fun c ->
     let backspace = 8 in
     let n = (ord c) in
@@ -35,7 +42,7 @@ let put_char =
         | true1 -> (put_char c)
         | false0 ->
           let _ = (put_char '^') in
-          (put_char (chr ((- ((+ (ord 'A')) n)) 1)))) in
+          (put_char (chr ((- ((+ (ord 'A')) n)) 1))))) in
 let erase_char =
   (fun _ ->
     let backspace = (chr 8) in
