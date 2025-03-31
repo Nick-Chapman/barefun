@@ -256,15 +256,15 @@ compileCtop = compileC firstTempIndex
         pure $ LetAlias xRef yRef body
 
       SRC.LetAtomic x rhs body -> do
-        compileA cenv rhs >>= \case
+        compileA x cenv rhs >>= \case
           Left rhs -> do -- not gloablized
             let xRef = Ref x (Temp nextTemp)
             cenv <- pure $ Map.insert x xRef cenv
             body <- compileC (nextTemp+1) cenv body
             pure $ LetAtomic xRef rhs body
-          Right rhs -> do -- globalized
+          Right (xRefG, rhs) -> do -- globalized
             -- liftable things can have no effetcs, so if they are not even used we can just drop them
-            xRefG <- GlobalRef x
+            --xRefG <- GlobalRef x
             if x `notMember` SRC.fvs body then compileC nextTemp cenv body else do
               cenv <- pure $ Map.insert x xRefG cenv
               Wrap (LetTop xRefG rhs) $ compileC nextTemp cenv body
@@ -288,10 +288,11 @@ compileCtop = compileC firstTempIndex
           body <- compileC (nextTemp + length xs) cenv body
           pure $ ArmTag tag refs body
 
-compileA ::Cenv -> SRC.Atomic -> M (Either Atomic Top)
-compileA cenv = \case
-  SRC.Lit _ literal ->
-    pure $ Right $ TopLit literal
+compileA ::Id -> Cenv -> SRC.Atomic -> M (Either Atomic (Ref,Top))
+compileA x cenv = \case
+  SRC.Lit _ literal -> do
+    g <- GlobalRef x
+    pure $ Right (g, TopLit literal)
 
   SRC.Prim _ b xs ->
     -- TODO: pure primitive could/should be lifted
@@ -299,24 +300,33 @@ compileA cenv = \case
 
   SRC.ConTag _ c xs -> do
     let xs' = map (locate cenv) xs
-    pure $ if all isGlobal xs' then Right (TopConApp c xs') else Left (ConApp c xs')
+    if all isGlobal xs' then
+      do
+        g <- GlobalRef x
+        pure $ Right (g, TopConApp c xs')
+      else do
+        pure $ Left (ConApp c xs')
 
   SRC.Lam _ fvs x body -> do
     let xRef = Ref x TheArg
     (cenv,pre,post) <- pure $ frame cenv fvs
     body <- compileCtop (Map.insert x xRef cenv) body
     case (pre,post) of
-      ([],[]) -> pure $ Right (TopLam xRef body)
-      _ -> pure $ Left (Lam pre post xRef body)
+      ([],[]) -> do
+        g <- GlobalRef x
+        pure $ Right (g, TopLam xRef body)
+      _ ->
+        pure $ Left (Lam pre post xRef body)
 
   SRC.RecLam _ fvs f x body -> do
     (cenv,pre,post) <- pure $ frame cenv fvs
     let xRef = Ref x TheArg
     case (pre,post) of
       ([],[]) -> do
-        let fRef = Ref f TheFrame -- TODO: use a global reference!
+        g <- GlobalRef x
+        let fRef = Ref f TheFrame -- TODO: use the global reference!
         body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body
-        pure $ Right (TopRecLam fRef xRef body)
+        pure $ Right (g, TopRecLam fRef xRef body)
       _ -> do
         let fRef = Ref f TheFrame
         body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body

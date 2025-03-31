@@ -99,25 +99,25 @@ let g24 = fun arg k ->
       arg g19 k in
     g7 f1 k in
   g9 g15 k in
-let g25 = Unit0 in
-let g26 = fun me arg k ->
+let g26 = Unit0 in
+let g25 = fun me arg k ->
   match arg with
-  | Nil0 -> k g25
+  | Nil0 -> k g26
   | Cons1(t1,t2) ->
     let k = [me,t2], fun [f1,f2] arg -> f1 f2 k in
     g12 t1 k in
 let g27 = fun arg k ->
-  let k = [], fun [] arg -> g26 arg k in
+  let k = [], fun [] arg -> g25 arg k in
   g11 arg k in
 let g28 = fun arg k ->
-  let k = [], fun [] arg -> g26 arg k in
+  let k = [], fun [] arg -> g25 arg k in
   g24 arg k in
 let g29 = '\n' in
 let g30 = fun arg k -> g12 g29 k in
-let g31 = 2 in
-let g32 = 1 in
-let g33 = 2 in
-let g34 = fun me arg k ->
+let g32 = 2 in
+let g33 = 1 in
+let g34 = 2 in
+let g31 = fun me arg k ->
   let k = [me,arg], fun [f1,f2] arg ->
     let k = [f1,f2], fun [f1,f2] arg ->
       match arg with
@@ -131,13 +131,13 @@ let g34 = fun me arg k ->
                   let k = [f1,f2], fun [f1,f2] arg ->
                     let k = [f2], fun [f1] arg -> f1 arg k in
                     f1 arg k in
-                  arg g33 k in
+                  arg g34 k in
                 g2 f2 k in
               g1 arg k in
             f1 arg k in
-          arg g32 k in
+          arg g33 k in
         g2 f2 k in
-    arg g31 k in
+    arg g32 k in
   g6 arg k in
 let g35 = "fib " in
 let g36 = " --> " in
@@ -152,7 +152,7 @@ let g38 = fun arg k ->
         g27 g36 k in
       g28 f1 k in
     g27 g35 k in
-  g34 arg k in
+  g31 arg k in
 let g39 = 20 in
 let g40 = fun arg k -> g38 g39 k in
 let g41 = Unit0 in

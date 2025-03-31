@@ -1,26 +1,26 @@
 (*stage3*)
 let k () = ()
-let g1 = Unit0 in
-let g2 = fun me arg k ->
+let g2 = Unit0 in
+let g1 = fun me arg k ->
   match arg with
-  | Nil0 -> k g1
+  | Nil0 -> k g2
   | Cons1(t1,t2) ->
     let t3 = PRIM_PutChar(t1) in
     me t2 k in
-let g3 = 2 in
-let g4 = 1 in
-let g5 = 2 in
-let g6 = fun me arg k ->
-  let t1 = PRIM_LessInt(arg,g3) in
+let g4 = 2 in
+let g5 = 1 in
+let g6 = 2 in
+let g3 = fun me arg k ->
+  let t1 = PRIM_LessInt(arg,g4) in
   match t1 with
   | true1 -> k arg
   | false0 ->
-    let t2 = PRIM_SubInt(arg,g4) in
+    let t2 = PRIM_SubInt(arg,g5) in
     let k = [arg,me], fun [f1,f2] arg ->
       let t1 = [arg], fun [f1] arg k ->
         let t1 = PRIM_AddInt(f1,arg) in
         k t1 in
-      let t2 = PRIM_SubInt(f1,g5) in
+      let t2 = PRIM_SubInt(f1,g6) in
       let k = [t1], fun [f1] arg -> f1 arg k in
       f2 t2 k in
     me t2 k in
@@ -99,18 +99,18 @@ let k = [], fun [] arg ->
             let k = [], fun [] arg ->
               let t1 = PRIM_PutChar(g30) in
               k t1 in
-            g2 arg k in
+            g1 arg k in
           match t3 with
           | true1 -> k g27
           | false0 ->
             let k = [f1], fun [f1] arg -> arg f1 k in
             t2 g28 k in
-        g2 t1 k in
-      g2 arg k in
+        g1 t1 k in
+      g1 arg k in
     match t3 with
     | true1 -> k g17
     | false0 ->
       let k = [], fun [] arg -> arg g8 k in
       t2 g18 k in
-  g2 t1 k in
-g6 g8 k
+  g1 t1 k in
+g3 g8 k
