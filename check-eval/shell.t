@@ -1,7 +1,7 @@
 
 Ocaml REPL
 
-  $ cat shell.input | ../ocaml/bin/shell.exe
+  $ cat shell.input | ../ocaml/bin/main.exe Shell
   [ocaml]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!

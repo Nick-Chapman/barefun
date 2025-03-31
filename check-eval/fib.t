@@ -1,7 +1,7 @@
 
 Ocaml REPL
 
-  $ ../ocaml/bin/fib.exe
+  $ ../ocaml/bin/main.exe Fib
   [ocaml]
   fib 20 --> 6765
   [HALT]

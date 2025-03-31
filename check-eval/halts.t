@@ -1,7 +1,7 @@
 
 Ocaml REPL
 
-  $ cat halts.input | ../ocaml/bin/halts.exe
+  $ cat halts.input | ../ocaml/bin/main.exe Halts
   [ocaml]
   XhYeZ[HALT]
 

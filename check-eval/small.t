@@ -1,7 +1,7 @@
 
 Ocaml REPL
 
-  $ cat small.input | ../ocaml/bin/small.exe
+  $ cat small.input | ../ocaml/bin/main.exe Small
   [ocaml]
   LOAD
   RUN
