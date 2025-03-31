@@ -148,36 +148,35 @@ evalLoadable env = \case
     let env' = insert x (evalT env' top) env
     evalLoadable env' body k
 
+look :: Env -> Ref -> Value
+look Env{venv} (Ref x loc) = do
+  maybe err id $ Map.lookup loc venv
+  where err = error (show ("Stage3.look",x,loc,venv))
+
 evalT :: Env -> Top -> Value
 evalT genv = \case
   TopLit literal -> evalLit literal
   TopLam x body -> do
     VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
-  TopConApp (Ctag _ tag) xs -> VCons tag (map look xs)
-  where
-    look :: Ref -> Value -- TODO: dedup evalCode
-    look (Ref x loc) = do
-      let Env{venv} = genv
-          err = error (show ("evalT-lookup",x,loc,venv))
-      maybe err id $ Map.lookup loc venv
+  TopConApp (Ctag _ tag) xs -> VCons tag (map (look genv) xs)
 
 -- TODO: pickup genv from scope in stead of threading?
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
-  Return _ x -> \k -> ITick I.Return $ k (look x)
-  Tail x1 pos x2 -> \k -> ITick I.Enter $ apply (look x1) pos (look x2) k
+  Return _ x -> \k -> ITick I.Return $ k (look env x)
+  Tail x1 pos x2 -> \k -> ITick I.Enter $ apply (look env x1) pos (look env x2) k
   LetAlias x y body -> \k -> do
-    let v = look y
+    let v = look env y
     evalCode genv (insert x v env) body k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode genv (insert x v1 env) c2 k
   PushContinuation pre _ (x,later) first -> \k -> ITick I.PushContinuation $ do
     evalCode genv env first $ \v1 -> do
-      let env = mkFrameEnv genv look pre
-      evalCode genv (insert x v1 env) later k
+      let env' = mkFrameEnv genv env pre
+      evalCode genv (insert x v1 env') later k
   Case scrut arms0 -> \k -> do
-    case (look scrut) of
+    case (look env scrut) of
       VCons tagActual vArgs -> do
         let
           dispatch :: [Arm] -> Interaction
@@ -194,32 +193,26 @@ evalCode genv env = \case
   where
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
-      Prim b xs -> \k -> evalBuiltin b (map look xs) k
-      ConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
+      Prim b xs -> \k -> evalBuiltin b (map (look env) xs) k
+      ConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map (look env) xs))
 
       Lam pre _ x body -> \k -> do
-        let env = mkFrameEnv genv look pre
-        k (VFunc (\arg k -> evalCode genv (insert x arg env) body k))
+        let env' = mkFrameEnv genv env pre
+        k (VFunc (\arg k -> evalCode genv (insert x arg env') body k))
 
       RecLam pre _ f x body -> \k -> do
-        let env = mkFrameEnv genv look pre
-        let me = VFunc (\arg k -> do evalCode genv (insert x arg (insert f me env)) body k)
+        let env' = mkFrameEnv genv env pre
+        let me = VFunc (\arg k -> do evalCode genv (insert x arg (insert f me env')) body k)
         k me
-
-    look :: Ref -> Value
-    look (Ref x loc) = do
-      let Env{venv} = env
-          err = error (show ("var-lookup",x,loc,venv))
-      maybe err id $ Map.lookup loc venv
 
 data Env = Env { venv :: Map Location Value }
 
 env0 :: Env
 env0 = Env { venv = Map.empty }
 
-mkFrameEnv :: Env -> (Ref -> Value) -> [Ref] -> Env
-mkFrameEnv genv look fvs =
-  foldr (uncurry insert) genv [ (Ref undefined (InFrame n), look ref) | (n,ref) <- zip [firstFrameIndex..] fvs ]
+mkFrameEnv :: Env -> Env -> [Ref] -> Env
+mkFrameEnv genv env fvs =
+  foldr (uncurry insert) genv [ (Ref undefined (InFrame n), look env ref) | (n,ref) <- zip [firstFrameIndex..] fvs ]
 
 insert :: Ref -> Value -> Env -> Env
 insert (Ref _ loc) v Env{venv} = Env { venv = Map.insert loc v venv }
@@ -341,8 +334,6 @@ locate :: Cenv -> Id -> Ref
 locate cenv x = maybe err id $ Map.lookup x cenv
   where err = error (show ("Stage3.locate",x))
 
-
--- TODO: can we regard the "me" arg of a top-level lam-rec (ie. no freevars) as being global
 isGlobal :: Ref -> Bool
 isGlobal = \case Ref _ (Global _) -> True; _ -> False
 
