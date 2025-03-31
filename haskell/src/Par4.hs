@@ -64,30 +64,30 @@ data Par a where
   NoError :: Par a -> Par a
   Alt :: Par a -> Par a -> Par a
 
-type Res a = Either [Char] (a,[Char])
+type Res a = Either Int (a,Int)
 
 -- Four continuations:
 data K4 a b = K4
   { eps :: a -> Res b            -- success; *no* input consumed
-  , succ :: [Char] -> a -> Res b -- success; input consumed
+  , succ :: Int -> [Char] -> a -> Res b -- success; input consumed
   , fail :: () -> Res b          -- failure; *no* input consumed
-  , err :: [Char] -> Res b       -- failure; input consumed (so an error!)
+  , err :: Int -> [Char] -> Res b       -- failure; input consumed (so an error!)
   }
 
 parse :: Par a -> String -> a
 parse parStart chars0  = do
 
-  case (run chars0 parStart kFinal) of
-    Left remains -> error $ "failed to parse: " ++ report remains
-    Right (a,[]) -> a
-    Right (_,remains) -> error $ "unparsed input from: " ++ report remains
+  case (run 0 chars0 parStart kFinal) of
+    Left i -> error $ "failed to parse: " ++ report i
+    Right (a,i) -> do
+      if i == length chars0 then a else
+        error $ "unparsed input from: " ++ report i
 
   where
-    report :: String -> String
-    report remains = item ++ " at " ++ show (mkPosition pos)
+    report :: Int -> String
+    report i = item ++ " at " ++ show (mkPosition i)
       where
-        item = if pos == length chars0 then "<EOF>" else show (chars0 !! pos)
-        pos = length chars0 - length remains
+        item = if i == length chars0 then "<EOF>" else show (chars0 !! i)
 
     mkPosition :: Int -> Position
     mkPosition p = Position {line,col}
@@ -95,18 +95,18 @@ parse parStart chars0  = do
         line :: Int = 1 + length [ () | c <- take p chars0, c == '\n' ]
         col :: Int = length (takeWhile (/= '\n') (reverse (take p chars0)))
 
-    kFinal = K4 { eps = \a -> Right (a,chars0)
-                , succ = \chars a -> Right (a,chars)
-                , fail = \() -> Left chars0
-                , err = \chars -> Left chars
+    kFinal = K4 { eps = \a -> Right (a,0)
+                , succ = \i _ a -> Right (a,i)
+                , fail = \() -> Left 0
+                , err = \i _ -> Left i
                 }
 
-    run :: [Char] -> Par a -> K4 a b -> Res b
-    run chars par k@K4{eps,succ,fail,err} = case par of
+    run :: Int -> [Char] -> Par a -> K4 a b -> Res b
+    run i chars par k@K4{eps,succ,fail,err} = case par of
 
       Pos -> do
-        let p = length chars0 - length chars -- TODO: meh
-        let position = mkPosition p
+        -- TODO: compute line/col incrementally
+        let position = mkPosition i
         eps position
 
       Ret x -> eps x
@@ -116,43 +116,41 @@ parse parStart chars0  = do
       Satisfy pred -> do
         case chars of
           [] -> fail ()
-          c:chars -> if pred c then succ chars c else fail ()
+          c:chars -> if pred c then succ (i+1) chars c else fail ()
 
       NoError par -> do
-        run chars par K4 { eps = eps
-                         , succ = succ
-                         , fail = fail
-                         , err = \_ -> fail ()
-                         }
+        run i chars par K4 { eps = eps
+                           , succ = succ
+                           , fail = fail
+                           , err = \_ _ -> fail ()
+                           }
 
       Alt p1 p2 -> do
-        run chars p1 K4{ eps = \a1 ->
-                           run chars p2 K4{ eps = \_ -> eps a1 -- left biased
-                                          , succ
-                                          , fail = \() -> eps a1
-                                          , err
-                                          }
-                       , succ
-                       , fail = \() -> run chars p2 k
-                       , err
-                       }
-
-      Bind par f -> do
-        run chars par K4{ eps = \a -> run chars (f a) k
-                        , succ = \chars a ->
-                            run chars (f a) K4{ eps = \a -> succ chars a -- consume
+        run i chars p1 K4{ eps = \a1 ->
+                             run i chars p2 K4{ eps = \_ -> eps a1 -- left biased
                                               , succ
-                                              , fail = \() -> err chars -- fail->error
+                                              , fail = \() -> eps a1
                                               , err
                                               }
-                        , fail
-                        , err
-                        }
+                         , succ
+                         , fail = \() -> run i chars p2 k
+                         , err
+                         }
+
+      Bind par f -> do
+        run i chars par K4{ eps = \a -> run i chars (f a) k
+                          , succ = \i chars a ->
+                                     run i chars (f a) K4{ eps = \a -> succ i chars a -- consume
+                                                         , succ
+                                                         , fail = \() -> err i chars -- fail->error
+                                                         , err
+                                                         }
+                          , fail
+                          , err
+                          }
 
 
 data Position = Position { line :: Int, col :: Int } deriving (Eq,Ord)
 
 instance Show Position where
-  show Position{line,col} =
-    --if line == 0 && col == 0 then "" else -- TODO: is this hack going to catch me out?
-      show line ++ "'" ++ show col
+  show Position{line,col} = show line ++ "'" ++ show col
