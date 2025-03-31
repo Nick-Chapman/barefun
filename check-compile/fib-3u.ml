@@ -1,159 +1,159 @@
 (*stage3; un-normalized*)
 let k () = ()
-let +_0'0_g1 = fun x_0'0_arg k ->
-  let lam_2_0'0_t1 = [x_0'0_arg], fun [x_0'0_f1] y_0'0_arg k ->
-    let prim_1_0'0_t1 = PRIM_AddInt(x_0'0_f1,y_0'0_arg) in
-    k prim_1_0'0_t1 in
-  k lam_2_0'0_t1 in
-let -_0'0_g2 = fun x_0'0_arg k ->
-  let lam_4_0'0_t1 = [x_0'0_arg], fun [x_0'0_f1] y_0'0_arg k ->
-    let prim_3_0'0_t1 = PRIM_SubInt(x_0'0_f1,y_0'0_arg) in
-    k prim_3_0'0_t1 in
-  k lam_4_0'0_t1 in
-let /_0'0_g3 = fun x_0'0_arg k ->
-  let lam_8_0'0_t1 = [x_0'0_arg], fun [x_0'0_f1] y_0'0_arg k ->
-    let prim_7_0'0_t1 = PRIM_DivInt(x_0'0_f1,y_0'0_arg) in
-    k prim_7_0'0_t1 in
-  k lam_8_0'0_t1 in
-let %_0'0_g4 = fun x_0'0_arg k ->
-  let lam_10_0'0_t1 = [x_0'0_arg], fun [x_0'0_f1] y_0'0_arg k ->
-    let prim_9_0'0_t1 = PRIM_ModInt(x_0'0_f1,y_0'0_arg) in
-    k prim_9_0'0_t1 in
-  k lam_10_0'0_t1 in
-let <_0'0_g5 = fun x_0'0_arg k ->
-  let lam_12_0'0_t1 = [x_0'0_arg], fun [x_0'0_f1] y_0'0_arg k ->
-    let prim_11_0'0_t1 = PRIM_LessInt(x_0'0_f1,y_0'0_arg) in
-    k prim_11_0'0_t1 in
-  k lam_12_0'0_t1 in
-let =_0'0_g6 = fun x_0'0_arg k ->
-  let lam_14_0'0_t1 = [x_0'0_arg], fun [x_0'0_f1] y_0'0_arg k ->
-    let prim_13_0'0_t1 = PRIM_EqInt(x_0'0_f1,y_0'0_arg) in
-    k prim_13_0'0_t1 in
-  k lam_14_0'0_t1 in
-let ord_0'0_g7 = fun x_0'0_arg k ->
-  let prim_17_0'0_t1 = PRIM_CharOrd(x_0'0_arg) in
-  k prim_17_0'0_t1 in
-let chr_0'0_g8 = fun x_0'0_arg k ->
-  let prim_18_0'0_t1 = PRIM_CharChr(x_0'0_arg) in
-  k prim_18_0'0_t1 in
-let explode_0'0_g9 = fun x_0'0_arg k ->
-  let prim_19_0'0_t1 = PRIM_Explode(x_0'0_arg) in
-  k prim_19_0'0_t1 in
-let put_char_0'0_g10 = fun x_0'0_arg k ->
-  let prim_20_0'0_t1 = PRIM_PutChar(x_0'0_arg) in
-  k prim_20_0'0_t1 in
-let ::_0'0_g11 = fun x_0'0_arg k ->
-  let lam_23_0'0_t1 = [x_0'0_arg], fun [x_0'0_f1] y_0'0_arg k ->
-    let con_22_0'0_t1 = Cons1[x_0'0_f1,y_0'0_arg] in
-    k con_22_0'0_t1 in
-  k lam_23_0'0_t1 in
-let lit_24_3'17_g12 = '0' in
-let lit_29_6'11_g13 = 0 in
-let lit_36_7'29_g14 = 10 in
-let lit_39_7'44_g15 = 10 in
-let lit_43_9'9_g16 = 0 in
-let lit_44_9'17_g17 = '0' in
-let con_45_9'20_g18 = Nil0 in
-let con_46_9'17_g19 = Cons1[lit_44_9'17_g17,con_45_9'20_g18] in
-let con_48_9'32_g20 = Nil0 in
-let chars_of_int_2'4_g21 = fun i_2'17_arg k ->
-  let k = [i_2'17_arg], fun [i_2'17_f1] ord0_3'6_arg ->
-    let char_of_digit_4'6_t1 = [ord0_3'6_arg], fun [ord0_3'6_f1] c_4'20_arg k ->
-      let k = [c_4'20_arg], fun [c_4'20_f1] app_26_4'34_arg ->
-        let k = [], fun [] app_25_4'36_arg -> chr_0'0_g8 app_25_4'36_arg k in
-        app_26_4'34_arg c_4'20_f1 k in
-      +_0'0_g1 ord0_3'6_f1 k in
-    let loop_5'10_t2 = [char_of_digit_4'6_t1], fun [char_of_digit_4'6_f1] loop_5'10_me acc_5'15_arg k ->
-      let lam_40_5'19_t1 = [char_of_digit_4'6_f1,loop_5'10_me,acc_5'15_arg], fun [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3] i_5'19_arg k ->
-        let k = [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_arg], fun [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_f4] app_28_6'9_arg ->
-          let k = [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_f4], fun [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_f4] app_27_6'11_arg ->
-            match app_27_6'11_arg with
-            | true1 -> k acc_5'15_f3
+let g1 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_AddInt(f1,arg) in
+    k t1 in
+  k t1 in
+let g2 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_SubInt(f1,arg) in
+    k t1 in
+  k t1 in
+let g3 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_DivInt(f1,arg) in
+    k t1 in
+  k t1 in
+let g4 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_ModInt(f1,arg) in
+    k t1 in
+  k t1 in
+let g5 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_LessInt(f1,arg) in
+    k t1 in
+  k t1 in
+let g6 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_EqInt(f1,arg) in
+    k t1 in
+  k t1 in
+let g7 = fun arg k ->
+  let t1 = PRIM_CharOrd(arg) in
+  k t1 in
+let g8 = fun arg k ->
+  let t1 = PRIM_CharChr(arg) in
+  k t1 in
+let g9 = fun arg k ->
+  let t1 = PRIM_Explode(arg) in
+  k t1 in
+let g10 = fun arg k ->
+  let t1 = PRIM_PutChar(arg) in
+  k t1 in
+let g11 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = Cons1[f1,arg] in
+    k t1 in
+  k t1 in
+let g12 = '0' in
+let g13 = 0 in
+let g14 = 10 in
+let g15 = 10 in
+let g16 = 0 in
+let g17 = '0' in
+let g18 = Nil0 in
+let g19 = Cons1[g17,g18] in
+let g20 = Nil0 in
+let g21 = fun arg k ->
+  let k = [arg], fun [f1] arg ->
+    let t1 = [arg], fun [f1] arg k ->
+      let k = [arg], fun [f1] arg ->
+        let k = [], fun [] arg -> g8 arg k in
+        arg f1 k in
+      g1 f1 k in
+    let t2 = [t1], fun [f1] me arg k ->
+      let t1 = [f1,me,arg], fun [f1,f2,f3] arg k ->
+        let k = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg ->
+          let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
+            match arg with
+            | true1 -> k f3
             | false0 ->
-              let k = [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_f4], fun [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_f4] app_35_7'28_arg ->
-                let k = [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_f4], fun [char_of_digit_4'6_f1,loop_5'10_f2,acc_5'15_f3,i_5'19_f4] app_34_7'29_arg ->
-                  let k = [loop_5'10_f2,acc_5'15_f3,i_5'19_f4], fun [loop_5'10_f1,acc_5'15_f2,i_5'19_f3] app_33_7'26_arg ->
-                    let k = [loop_5'10_f1,acc_5'15_f2,i_5'19_f3], fun [loop_5'10_f1,acc_5'15_f2,i_5'19_f3] app_32_7'33_arg ->
-                      let k = [loop_5'10_f1,i_5'19_f3], fun [loop_5'10_f1,i_5'19_f2] app_31_7'36_arg ->
-                        let k = [i_5'19_f2], fun [i_5'19_f1] app_30_7'11_arg ->
-                          let k = [app_30_7'11_arg], fun [app_30_7'11_f1] app_38_7'43_arg ->
-                            let k = [app_30_7'11_f1], fun [app_30_7'11_f1] app_37_7'44_arg -> app_30_7'11_f1 app_37_7'44_arg k in
-                            app_38_7'43_arg lit_39_7'44_g15 k in
-                          /_0'0_g3 i_5'19_f1 k in
-                        loop_5'10_f1 app_31_7'36_arg k in
-                      app_32_7'33_arg acc_5'15_f2 k in
-                    ::_0'0_g11 app_33_7'26_arg k in
-                  char_of_digit_4'6_f1 app_34_7'29_arg k in
-                app_35_7'28_arg lit_36_7'29_g14 k in
-              %_0'0_g4 i_5'19_f4 k in
-          app_28_6'9_arg lit_29_6'11_g13 k in
-        =_0'0_g6 i_5'19_arg k in
-      k lam_40_5'19_t1 in
-    let k = [i_2'17_f1,loop_5'10_t2], fun [i_2'17_f1,loop_5'10_f2] app_42_9'7_arg ->
-      let k = [i_2'17_f1,loop_5'10_f2], fun [i_2'17_f1,loop_5'10_f2] app_41_9'9_arg ->
-        match app_41_9'9_arg with
-        | true1 -> k con_46_9'17_g19
+              let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
+                let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
+                  let k = [f2,f3,f4], fun [f1,f2,f3] arg ->
+                    let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
+                      let k = [f1,f3], fun [f1,f2] arg ->
+                        let k = [f2], fun [f1] arg ->
+                          let k = [arg], fun [f1] arg ->
+                            let k = [f1], fun [f1] arg -> f1 arg k in
+                            arg g15 k in
+                          g3 f1 k in
+                        f1 arg k in
+                      arg f2 k in
+                    g11 arg k in
+                  f1 arg k in
+                arg g14 k in
+              g4 f4 k in
+          arg g13 k in
+        g6 arg k in
+      k t1 in
+    let k = [f1,t2], fun [f1,f2] arg ->
+      let k = [f1,f2], fun [f1,f2] arg ->
+        match arg with
+        | true1 -> k g19
         | false0 ->
-          let k = [i_2'17_f1], fun [i_2'17_f1] app_47_9'32_arg -> app_47_9'32_arg i_2'17_f1 k in
-          loop_5'10_f2 con_48_9'32_g20 k in
-      app_42_9'7_arg lit_43_9'9_g16 k in
-    =_0'0_g6 i_2'17_f1 k in
-  ord_0'0_g7 lit_24_3'17_g12 k in
-let con_49_13'10_g22 = Unit0 in
-let put_chars_11'8_g23 = fun put_chars_11'8_me xs_11'18_arg k ->
-  match xs_11'18_arg with
-  | Nil0 -> k con_49_13'10_g22
-  | Cons1(x_14'4_t1,xs_14'7_t2) ->
-    let k = [put_chars_11'8_me,xs_14'7_t2], fun [put_chars_11'8_f1,xs_14'7_f2] __14'23_arg -> put_chars_11'8_f1 xs_14'7_f2 k in
-    put_char_0'0_g10 x_14'4_t1 k in
-let put_string_16'4_g24 = fun s_16'15_arg k ->
-  let k = [], fun [] app_50_16'38_arg -> put_chars_11'8_g23 app_50_16'38_arg k in
-  explode_0'0_g9 s_16'15_arg k in
-let put_int_18'4_g25 = fun i_18'12_arg k ->
-  let k = [], fun [] app_51_18'40_arg -> put_chars_11'8_g23 app_51_18'40_arg k in
-  chars_of_int_2'4_g21 i_18'12_arg k in
-let lit_52_20'26_g26 = '\n' in
-let newline_20'4_g27 = fun __20'12_arg k -> put_char_0'0_g10 lit_52_20'26_g26 k in
-let lit_55_24'9_g28 = 2 in
-let lit_60_24'30_g29 = 1 in
-let lit_64_24'42_g30 = 2 in
-let fib_22'8_g31 = fun fib_22'8_me n_22'12_arg k ->
-  let k = [fib_22'8_me,n_22'12_arg], fun [fib_22'8_f1,n_22'12_f2] app_54_24'7_arg ->
-    let k = [fib_22'8_f1,n_22'12_f2], fun [fib_22'8_f1,n_22'12_f2] app_53_24'9_arg ->
-      match app_53_24'9_arg with
-      | true1 -> k n_22'12_f2
+          let k = [f1], fun [f1] arg -> arg f1 k in
+          f2 g20 k in
+      arg g16 k in
+    g6 f1 k in
+  g7 g12 k in
+let g22 = Unit0 in
+let g23 = fun me arg k ->
+  match arg with
+  | Nil0 -> k g22
+  | Cons1(t1,t2) ->
+    let k = [me,t2], fun [f1,f2] arg -> f1 f2 k in
+    g10 t1 k in
+let g24 = fun arg k ->
+  let k = [], fun [] arg -> g23 arg k in
+  g9 arg k in
+let g25 = fun arg k ->
+  let k = [], fun [] arg -> g23 arg k in
+  g21 arg k in
+let g26 = '\n' in
+let g27 = fun arg k -> g10 g26 k in
+let g28 = 2 in
+let g29 = 1 in
+let g30 = 2 in
+let g31 = fun me arg k ->
+  let k = [me,arg], fun [f1,f2] arg ->
+    let k = [f1,f2], fun [f1,f2] arg ->
+      match arg with
+      | true1 -> k f2
       | false0 ->
-        let k = [fib_22'8_f1,n_22'12_f2], fun [fib_22'8_f1,n_22'12_f2] app_59_24'29_arg ->
-          let k = [fib_22'8_f1,n_22'12_f2], fun [fib_22'8_f1,n_22'12_f2] app_58_24'30_arg ->
-            let k = [fib_22'8_f1,n_22'12_f2], fun [fib_22'8_f1,n_22'12_f2] app_57_24'27_arg ->
-              let k = [fib_22'8_f1,n_22'12_f2], fun [fib_22'8_f1,n_22'12_f2] app_56_24'33_arg ->
-                let k = [fib_22'8_f1,app_56_24'33_arg], fun [fib_22'8_f1,app_56_24'33_f2] app_63_24'41_arg ->
-                  let k = [fib_22'8_f1,app_56_24'33_f2], fun [fib_22'8_f1,app_56_24'33_f2] app_62_24'42_arg ->
-                    let k = [app_56_24'33_f2], fun [app_56_24'33_f1] app_61_24'39_arg -> app_56_24'33_f1 app_61_24'39_arg k in
-                    fib_22'8_f1 app_62_24'42_arg k in
-                  app_63_24'41_arg lit_64_24'42_g30 k in
-                -_0'0_g2 n_22'12_f2 k in
-              +_0'0_g1 app_57_24'27_arg k in
-            fib_22'8_f1 app_58_24'30_arg k in
-          app_59_24'29_arg lit_60_24'30_g29 k in
-        -_0'0_g2 n_22'12_f2 k in
-    app_54_24'7_arg lit_55_24'9_g28 k in
-  <_0'0_g5 n_22'12_arg k in
-let lit_65_28'13_g32 = "fib " in
-let lit_66_30'13_g33 = " --> " in
-let con_67_32'10_g34 = Unit0 in
-let runfib_26'4_g35 = fun n_26'11_arg k ->
-  let k = [n_26'11_arg], fun [n_26'11_f1] res_27'6_arg ->
-    let k = [n_26'11_f1,res_27'6_arg], fun [n_26'11_f1,res_27'6_f2] __28'19_arg ->
-      let k = [res_27'6_f2], fun [res_27'6_f1] __29'11_arg ->
-        let k = [res_27'6_f1], fun [res_27'6_f1] __30'20_arg ->
-          let k = [], fun [] __31'13_arg -> newline_20'4_g27 con_67_32'10_g34 k in
-          put_int_18'4_g25 res_27'6_f1 k in
-        put_string_16'4_g24 lit_66_30'13_g33 k in
-      put_int_18'4_g25 n_26'11_f1 k in
-    put_string_16'4_g24 lit_65_28'13_g32 k in
-  fib_22'8_g31 n_26'11_arg k in
-let lit_68_34'21_g36 = 20 in
-let main_34'4_g37 = fun __34'9_arg k -> runfib_26'4_g35 lit_68_34'21_g36 k in
-let con_69_0'0_g38 = Unit0 in
-main_34'4_g37 con_69_0'0_g38 k
+        let k = [f1,f2], fun [f1,f2] arg ->
+          let k = [f1,f2], fun [f1,f2] arg ->
+            let k = [f1,f2], fun [f1,f2] arg ->
+              let k = [f1,f2], fun [f1,f2] arg ->
+                let k = [f1,arg], fun [f1,f2] arg ->
+                  let k = [f1,f2], fun [f1,f2] arg ->
+                    let k = [f2], fun [f1] arg -> f1 arg k in
+                    f1 arg k in
+                  arg g30 k in
+                g2 f2 k in
+              g1 arg k in
+            f1 arg k in
+          arg g29 k in
+        g2 f2 k in
+    arg g28 k in
+  g5 arg k in
+let g32 = "fib " in
+let g33 = " --> " in
+let g34 = Unit0 in
+let g35 = fun arg k ->
+  let k = [arg], fun [f1] arg ->
+    let k = [f1,arg], fun [f1,f2] arg ->
+      let k = [f2], fun [f1] arg ->
+        let k = [f1], fun [f1] arg ->
+          let k = [], fun [] arg -> g27 g34 k in
+          g25 f1 k in
+        g24 g33 k in
+      g25 f1 k in
+    g24 g32 k in
+  g31 arg k in
+let g36 = 20 in
+let g37 = fun arg k -> g35 g36 k in
+let g38 = Unit0 in
+g37 g38 k

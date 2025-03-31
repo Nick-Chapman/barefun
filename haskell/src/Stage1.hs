@@ -110,17 +110,26 @@ prettyId :: Id -> String
 prettyId Id{name,optUnique,optPos} =
   maybePos (maybeTag (maybeBracket (show name)))
   where
+    verbose = False
     maybePos s =
-      case optPos of
-        Nothing ->
-          case name of
-            UserName{} -> s
-            GeneratedName{} ->  -- currently we have positions for all generate names
-              --"NP_"++
-              s
-        Just pos ->
-          printf "%s_%s" s (show pos)
-    maybeTag s = case optUnique of Nothing -> s; Just n -> printf "%s_%d" s n
+      case name of
+        UserName{} ->
+          if not verbose then s else
+            case optPos of
+              Nothing -> printf "%s_NoPos" s
+              Just pos -> printf "%s_%s" s (show pos)
+        GeneratedName{} ->
+          case optPos of
+            Nothing -> printf "%s_NoPos" s
+            Just pos -> printf "%s_%s" s (show pos)
+
+    maybeTag s =
+      case optUnique of
+        Nothing -> s
+        Just n ->
+          if not verbose then s else
+            printf "%s_%d" s n
+
     maybeBracket s = if needBracket s then printf "( %s )" s else s
     needBracket = \case "*" -> True; _ -> False
 

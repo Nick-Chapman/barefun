@@ -1,20 +1,20 @@
 (*stage3; un-normalized*)
 let k () = ()
-let put_char_0'0_g1 = fun x_0'0_arg k ->
-  let prim_20_0'0_t1 = PRIM_PutChar(x_0'0_arg) in
-  k prim_20_0'0_t1 in
-let get_char_0'0_g2 = fun x_0'0_arg k ->
-  let prim_21_0'0_t1 = PRIM_GetChar(x_0'0_arg) in
-  k prim_21_0'0_t1 in
-let con_24_4'26_g3 = Unit0 in
-let con_25_7'13_g4 = Unit0 in
-let mainloop_3'10_g5 = fun mainloop_3'10_me __3'19_arg k ->
-  let k = [mainloop_3'10_me], fun [mainloop_3'10_f1] gotten_4'8_arg ->
-    let k = [mainloop_3'10_f1,gotten_4'8_arg], fun [mainloop_3'10_f1,gotten_4'8_f2] __5'19_arg ->
-      let k = [mainloop_3'10_f1], fun [mainloop_3'10_f1] __6'19_arg -> mainloop_3'10_f1 con_25_7'13_g4 k in
-      put_char_0'0_g1 gotten_4'8_f2 k in
-    put_char_0'0_g1 gotten_4'8_arg k in
-  get_char_0'0_g2 con_24_4'26_g3 k in
-let con_26_0'0_g6 = Unit0 in
-let main_2'4_g5 = mainloop_3'10_g5 in
-main_2'4_g5 con_26_0'0_g6 k
+let g1 = fun arg k ->
+  let t1 = PRIM_PutChar(arg) in
+  k t1 in
+let g2 = fun arg k ->
+  let t1 = PRIM_GetChar(arg) in
+  k t1 in
+let g3 = Unit0 in
+let g4 = Unit0 in
+let g5 = fun me arg k ->
+  let k = [me], fun [f1] arg ->
+    let k = [f1,arg], fun [f1,f2] arg ->
+      let k = [f1], fun [f1] arg -> f1 g4 k in
+      g1 f2 k in
+    g1 arg k in
+  g2 g3 k in
+let g6 = Unit0 in
+let g5 = g5 in
+g5 g6 k

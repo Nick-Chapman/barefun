@@ -123,7 +123,11 @@ prettyPat tag = \case
   [] -> show tag
   xs -> printf "%s(%s)" (show tag) (intercalate "," (map show xs))
 
-instance Show Ref where show (Ref x loc) = show x ++ "_" ++ show loc
+instance Show Ref where
+  show (Ref x loc) = do
+    let verbose = False
+    if not verbose then show loc else
+      show x ++ "_" ++ show loc
 
 instance Show Location where
   show = \case
