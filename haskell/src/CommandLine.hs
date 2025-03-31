@@ -1,4 +1,4 @@
-module Top (main) where -- TODO: rename CommandLine
+module CommandLine (main) where
 
 import Interaction (runTerm)
 import Parser (parseProg)
