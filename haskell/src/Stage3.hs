@@ -37,7 +37,7 @@ data Code
   | Tail Ref Position Ref
   | LetAlias Ref Ref Code
   | LetAtomic Ref Atomic Code
-  | PushContinuation [Ref] [Ref] (Ref,Code) Code -- TODO better rep to zip these two Ref lists.
+  | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Case Ref [Arm]
 
 data Arm = ArmTag Ctag [Ref] Code
@@ -162,7 +162,6 @@ evalT genv = \case
   TopLam x body -> VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
   TopConApp (Ctag _ tag) xs -> VCons tag (map (look genv) xs)
 
--- TODO: pickup genv from scope in stead of threading?
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return _ x -> \k -> ITick I.Return $ k (look env x)
