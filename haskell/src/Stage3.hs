@@ -8,7 +8,7 @@ import Builtin (Builtin,evalBuiltin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Data.Set (member)
+import Data.Set (notMember)
 import Interaction (Interaction(..))
 import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
@@ -30,22 +30,21 @@ data Top -- restriction of Atomic
   = TopLit Literal
   | TopLam Ref Code
   | TopRecLam Ref Ref Code
-  | TopConTag Ctag [Ref]
+  | TopConApp Ctag [Ref]
 
 data Code
   = Return Position Ref
   | Tail Ref Position Ref
   | LetAlias Ref Ref Code
   | LetAtomic Ref Atomic Code
-  | PushContinuation [Ref] [Ref] (Ref,Code) Code
+  | PushContinuation [Ref] [Ref] (Ref,Code) Code -- TODO better rep to zip these two Ref lists.
   | Case Ref [Arm]
 
 data Arm = ArmTag Ctag [Ref] Code
 
 data Atomic
-  = Lit Literal -- TODO Never here. Will always be lifted to a global
-  | Prim Builtin [Ref]
-  | ConTag Ctag [Ref] -- TODO: rename Con/ConTag as ConApp
+  = Prim Builtin [Ref]
+  | ConApp Ctag [Ref]
   | Lam [Ref] [Ref] Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code
 
@@ -78,8 +77,8 @@ prettyT = \case
   TopRecLam f x body ->
     ("fun " ++ show f ++ " " ++ show x ++ " k ->")
     >>> prettyC body
-  TopConTag tag [] -> [show tag]
-  TopConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
+  TopConApp tag [] -> [show tag]
+  TopConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
 
 prettyC :: Code -> Lines
 prettyC = \case
@@ -101,10 +100,9 @@ prettyC = \case
 
 prettyA :: Atomic -> Lines
 prettyA = \case
-  Lit x -> [show x]
   Prim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
-  ConTag tag [] -> [show tag]
-  ConTag tag xs -> [printf "%s%s" (show tag) (show xs)]
+  ConApp tag [] -> [show tag]
+  ConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam pre post x body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " k ->")
     >>> prettyC body
@@ -162,7 +160,7 @@ evalT genv = \case
   TopRecLam f x body -> \k -> do
     let me = VFunc (\arg k -> do evalCode genv (insert x arg (insert f me genv)) body k)
     k me
-  TopConTag (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
+  TopConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
   where
     look :: Ref -> Value -- TODO: dedup evalCode
     look (Ref x loc) = do
@@ -203,9 +201,8 @@ evalCode genv env = \case
   where
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
-      Lit literal -> \k -> k (evalLit literal)
       Prim b xs -> \k -> evalBuiltin b (map look xs) k
-      ConTag (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
+      ConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
 
       Lam pre _ x body -> \k -> do
         let env = mkFrameEnv genv look pre
@@ -239,109 +236,109 @@ insert (Ref _ loc) v Env{venv} = Env { venv = Map.insert loc v venv }
 
 type Cenv = Map Id Ref
 
-locateCenv :: Cenv -> Id -> Ref
-locateCenv cenv x = maybe err id $ Map.lookup x cenv
-  where err = error (show ("locateCenv",x))
-
 compile :: SRC.Code -> Transformed
-compile c = runM (Run <$> compileC Map.empty c)
+compile c = runM (Run <$> compileCtop Map.empty c)
 
-compileC :: Cenv -> SRC.Code -> M Code
-compileC = walkC firstTempIndex
+compileCtop :: Cenv -> SRC.Code -> M Code
+compileCtop = compileC firstTempIndex
 
   where
-    walkC :: Int -> Cenv -> SRC.Code -> M Code
-    walkC nextTemp cenv = \case
-      SRC.Return pos x -> pure $ Return pos (locate x)
-      SRC.Tail x1 pos x2 -> pure $ Tail (locate x1) pos (locate x2)
+    compileC :: Int -> Cenv -> SRC.Code -> M Code
+    compileC nextTemp cenv = \case
+      SRC.Return pos x -> pure $ Return pos (locate cenv x)
+      SRC.Tail x1 pos x2 -> pure $ Tail (locate cenv x1) pos (locate cenv x2)
 
       SRC.LetAlias x y body -> do
-        let yRef@(Ref _ yLoc) = locate y
+        let yRef@(Ref _ yLoc) = locate cenv y
         let xRef = Ref x yLoc
-        let cenv' = Map.insert x xRef cenv
-        body <- walkC nextTemp cenv' body
+        cenv <- pure $ Map.insert x xRef cenv
+        body <- compileC nextTemp cenv body
         pure $ LetAlias xRef yRef body
 
       SRC.LetAtomic x rhs body -> do
-        rhs <- walkA rhs
-        case maybeLiftable rhs of
-          Nothing -> do
+        compileA cenv rhs >>= \case
+          Left rhs -> do -- not gloablized
             let xRef = Ref x (Temp nextTemp)
-            let cenv' = Map.insert x xRef cenv
-            body <- walkC (nextTemp+1) cenv' body
+            cenv <- pure $ Map.insert x xRef cenv
+            body <- compileC (nextTemp+1) cenv body
             pure $ LetAtomic xRef rhs body
-          Just rhs -> do
-            if x `member` SRC.fvs body
-              then
-              do
-                xRef <- GlobalRef x
-                let cenv' = Map.insert x xRef cenv
-                Wrap (LetTop xRef rhs) $ walkC nextTemp cenv' body
-              else
-              do
-                walkC nextTemp cenv body
+          Right rhs -> do -- globalized
+            -- liftable things can have no effetcs, so if they are not even used we can just drop them
+            if x `notMember` SRC.fvs body then compileC nextTemp cenv body else do
+              xRefG <- GlobalRef x
+              cenv <- pure $ Map.insert x xRefG cenv
+              Wrap (LetTop xRefG rhs) $ compileC nextTemp cenv body
 
       SRC.PushContinuation fvs (x,later) first -> do
         let xRef = Ref x TheArg
-        first <- walkC nextTemp cenv first
-        let (cenv,pre,post) = frame locate fvs
-        later <- compileC (Map.insert x xRef cenv) later
+        first <- compileC nextTemp cenv first
+        (cenv,pre,post) <- pure $ frame cenv fvs
+        later <- compileCtop (Map.insert x xRef cenv) later
         pure $ PushContinuation pre post (xRef,later) first
 
       SRC.Case scrut arms -> do
-        arms <- mapM walkArm arms
-        pure $ Case (locate scrut) arms
+        arms <- mapM compileArm arms
+        pure $ Case (locate cenv scrut) arms
 
       where
-        walkArm :: SRC.Arm -> M Arm
-        walkArm (SRC.ArmTag tag xs body) = do
+        compileArm :: SRC.Arm -> M Arm
+        compileArm (SRC.ArmTag tag xs body) = do
           let refs = [ Ref x (Temp n) | (x,n) <- zip xs [nextTemp..] ]
-          let cenv' = foldr (uncurry Map.insert) cenv (zip xs refs)
-          body <- walkC (nextTemp + length xs) cenv' body
+          cenv <- pure $ foldr (uncurry Map.insert) cenv (zip xs refs)
+          body <- compileC (nextTemp + length xs) cenv body
           pure $ ArmTag tag refs body
 
-        locate :: Id -> Ref
-        locate = locateCenv cenv
+compileA ::Cenv -> SRC.Atomic -> M (Either Atomic Top)
+compileA cenv = \case
+  SRC.Lit _ literal ->
+    pure $ Right $ TopLit literal
 
-        -- TODO: have walkA return a variant of Atomic or Top
-        walkA :: SRC.Atomic -> M Atomic
-        walkA = \case
-          SRC.Lit _ literal -> pure $ Lit literal
-          SRC.Prim _ b xs -> pure $ Prim b (map locate xs)
-          SRC.ConTag _ tag xs -> pure $ ConTag tag (map locate xs)
+  SRC.Prim _ b xs ->
+    -- TODO: pure primitive could/should be lifted
+    pure $ Left $ Prim b (map (locate cenv) xs)
 
-          SRC.Lam _ fvs x body -> do
-            let xRef = Ref x TheArg
-            let (cenv,pre,post) = frame locate fvs
-            body <- compileC (Map.insert x xRef cenv) body
-            pure $ Lam pre post xRef body
+  SRC.ConTag _ c xs -> do
+    let xs' = map (locate cenv) xs
+    pure $ if all isGlobal xs' then Right (TopConApp c xs') else Left (ConApp c xs')
 
-          SRC.RecLam _ fvs f x body -> do
-            let fRef = Ref f TheFrame
-            let xRef = Ref x TheArg
-            let (cenv,pre,post) = frame locate fvs
-            body <- compileC (Map.insert f fRef (Map.insert x xRef cenv)) body
-            pure $ RecLam pre post fRef xRef body
+  SRC.Lam _ fvs x body -> do
+    let xRef = Ref x TheArg
+    (cenv,pre,post) <- pure $ frame cenv fvs
+    body <- compileCtop (Map.insert x xRef cenv) body
+    case (pre,post) of
+      ([],[]) -> pure $ Right (TopLam xRef body)
+      _ -> pure $ Left (Lam pre post xRef body)
 
-maybeLiftable :: Atomic -> Maybe Top
-maybeLiftable = \case
-  Lit literal -> Just (TopLit literal)
-  Lam [] [] x body -> Just (TopLam x body)
-  RecLam [] [] f x body -> Just (TopRecLam f x body)
-  ConTag c xs -> if all isGlobal xs then Just (TopConTag c xs) else Nothing
-  _ -> Nothing
+  SRC.RecLam _ fvs f x body -> do
+    (cenv,pre,post) <- pure $ frame cenv fvs
+    let xRef = Ref x TheArg
+    case (pre,post) of
+      ([],[]) -> do
+        let fRef = Ref f TheFrame -- TODO: use a global reference!
+        body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body
+        pure $ Right (TopRecLam fRef xRef body)
+      _ -> do
+        let fRef = Ref f TheFrame
+        body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body
+        pure $ Left (RecLam pre post fRef xRef body)
 
-frame :: (Id -> Ref) -> [Id] -> (Cenv,[Ref],[Ref])
-frame locate fvs = do
+
+frame :: Cenv -> [Id] -> (Cenv,[Ref],[Ref])
+frame cenv fvs = do
   -- partition fvs in global/truely-free
-  let globXs = [ x | x <- fvs, isGlobal (locate x) ]
-  let freeXs = [ x | x <- fvs, not (isGlobal (locate x)) ]
+  let globXs = [ x | x <- fvs, isGlobal (locate cenv x) ]
+  let freeXs = [ x | x <- fvs, not (isGlobal (locate cenv x)) ]
 
-  let pre = map locate freeXs
+  let pre = map (locate cenv) freeXs
   let post = [ Ref x (InFrame n) | (x,n) <- zip freeXs [firstFrameIndex..] ]
 
-  let cenv = Map.fromList $ [ (x,locate x) | x <- globXs ] ++ [ (x,ref) | ref@(Ref x _) <- post ]
-  (cenv, pre, post)
+  let cenv' = Map.fromList $ [ (x,locate cenv x) | x <- globXs ] ++ [ (x,ref) | ref@(Ref x _) <- post ]
+  (cenv', pre, post)
+
+locate :: Cenv -> Id -> Ref
+locate cenv x = maybe err id $ Map.lookup x cenv
+  where err = error (show ("Stage3.locate",x))
+
 
 -- TODO: can we regard the "me" arg of a top-level lam-rec (ie. no freevars) as being global
 isGlobal :: Ref -> Bool
