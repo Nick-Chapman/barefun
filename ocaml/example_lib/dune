@@ -62,3 +62,13 @@
       (cat ../../examples/thrice.fun)
       (echo "end\n")
       )))
+
+(rule
+  (with-stdout-to hello.ml
+    (progn
+      (echo "module F() : sig val main : unit -> unit end = struct\n")
+      (echo "open Prim_lib.Prim\n")
+      (echo "#1 \"hello.fun\"\n")
+      (cat ../../examples/hello.fun)
+      (echo "end\n")
+      )))
