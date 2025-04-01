@@ -25,17 +25,17 @@ Haskell REPL
 
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -1
-  [stage1; normalization: 94 -> 32]
+  [stage1; normalization: 94 -> 26]
   XhYeZ[HALT:#prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -2
-  [stage2; normalization: 94 -> 32]
+  [stage2; normalization: 94 -> 26]
   XhYeZ[HALT:#return=1, #prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -3
-  [stage3; normalization: 94 -> 32]
+  [stage3; normalization: 94 -> 26]
   XhYeZ[HALT:#return=1, #prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun
-  [stage3; normalization: 94 -> 32]
+  [stage3; normalization: 94 -> 26]
   XhYeZ[HALT:#return=1, #prim=7]

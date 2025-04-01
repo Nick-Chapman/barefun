@@ -9,39 +9,39 @@ let put_chars = fix (fun [] put_chars xs k ->
     let _ = PRIM_PutChar(x) in
     put_chars xs k) in
 let fib = fix (fun [] fib n k ->
-  let y = 2 in
-  let uLET_0'0 = PRIM_LessInt(n,y) in
-  match uLET_0'0 with
+  let lit_24'9 = 2 in
+  let prim_0'0 = PRIM_LessInt(n,lit_24'9) in
+  match prim_0'0 with
   | true1 -> k n
   | false0 ->
-    let y = 1 in
-    let uLET_0'0 = PRIM_SubInt(n,y) in
+    let lit_24'30 = 1 in
+    let prim_0'0 = PRIM_SubInt(n,lit_24'30) in
     let k [n,fib] x =
       let uLET_0'0 = fun [x] y k ->
         let prim_0'0 = PRIM_AddInt(x,y) in
         k prim_0'0 in
-      let y = 2 in
-      let uLET_0'0 = PRIM_SubInt(n,y) in
+      let lit_24'42 = 2 in
+      let prim_0'0 = PRIM_SubInt(n,lit_24'42) in
       let k [uLET_0'0] app_24'39 = uLET_0'0 app_24'39 k in
-      fib uLET_0'0 k in
-    fib uLET_0'0 k) in
+      fib prim_0'0 k in
+    fib prim_0'0 k) in
 let _ = Unit0 in
-let n = 20 in
-let k [put_chars,n] res =
-  let s = "fib " in
-  let prim_0'0 = PRIM_Explode(s) in
-  let k [put_chars,n,res] _ =
-    let x = '0' in
-    let ord0 = PRIM_CharOrd(x) in
+let lit_34'21 = 20 in
+let k [put_chars] res =
+  let lit_28'13 = "fib " in
+  let prim_0'0 = PRIM_Explode(lit_28'13) in
+  let k [put_chars,res] _ =
+    let lit_3'17 = '0' in
+    let ord0 = PRIM_CharOrd(lit_3'17) in
     let loop = fix (fun [ord0] loop acc k ->
       let lam_5'19 = fun [ord0,acc,loop] i k ->
-        let y = 0 in
-        let uLET_0'0 = PRIM_EqInt(i,y) in
-        match uLET_0'0 with
+        let lit_6'11 = 0 in
+        let prim_0'0 = PRIM_EqInt(i,lit_6'11) in
+        match prim_0'0 with
         | true1 -> k acc
         | false0 ->
-          let y = 10 in
-          let c = PRIM_ModInt(i,y) in
+          let lit_7'29 = 10 in
+          let c = PRIM_ModInt(i,lit_7'29) in
           let x = PRIM_AddInt(ord0,c) in
           let x = PRIM_CharChr(x) in
           let uLET_0'0 = fun [x] y k ->
@@ -49,30 +49,31 @@ let k [put_chars,n] res =
             k con_0'0 in
           let k [loop,i] app_7'36 =
             let k [i] app_7'11 =
-              let y = 10 in
-              let uLET_0'0 = PRIM_DivInt(i,y) in
-              app_7'11 uLET_0'0 k in
+              let lit_7'44 = 10 in
+              let prim_0'0 = PRIM_DivInt(i,lit_7'44) in
+              app_7'11 prim_0'0 k in
             loop app_7'36 k in
           uLET_0'0 acc k in
       k lam_5'19) in
-    let y = 0 in
-    let uLET_0'0 = PRIM_EqInt(n,y) in
+    let lit_34'21 = 20 in
+    let lit_9'9 = 0 in
+    let prim_0'0 = PRIM_EqInt(lit_34'21,lit_9'9) in
     let k [put_chars,res] uLET_3'6 =
       let k [put_chars,res] _ =
-        let s = " --> " in
-        let prim_0'0 = PRIM_Explode(s) in
+        let lit_30'13 = " --> " in
+        let prim_0'0 = PRIM_Explode(lit_30'13) in
         let k [put_chars,res] _ =
-          let x = '0' in
-          let ord0 = PRIM_CharOrd(x) in
+          let lit_3'17 = '0' in
+          let ord0 = PRIM_CharOrd(lit_3'17) in
           let loop = fix (fun [ord0] loop acc k ->
             let lam_5'19 = fun [ord0,acc,loop] i k ->
-              let y = 0 in
-              let uLET_0'0 = PRIM_EqInt(i,y) in
-              match uLET_0'0 with
+              let lit_6'11 = 0 in
+              let prim_0'0 = PRIM_EqInt(i,lit_6'11) in
+              match prim_0'0 with
               | true1 -> k acc
               | false0 ->
-                let y = 10 in
-                let c = PRIM_ModInt(i,y) in
+                let lit_7'29 = 10 in
+                let c = PRIM_ModInt(i,lit_7'29) in
                 let x = PRIM_AddInt(ord0,c) in
                 let x = PRIM_CharChr(x) in
                 let uLET_0'0 = fun [x] y k ->
@@ -80,22 +81,22 @@ let k [put_chars,n] res =
                   k con_0'0 in
                 let k [loop,i] app_7'36 =
                   let k [i] app_7'11 =
-                    let y = 10 in
-                    let uLET_0'0 = PRIM_DivInt(i,y) in
-                    app_7'11 uLET_0'0 k in
+                    let lit_7'44 = 10 in
+                    let prim_0'0 = PRIM_DivInt(i,lit_7'44) in
+                    app_7'11 prim_0'0 k in
                   loop app_7'36 k in
                 uLET_0'0 acc k in
             k lam_5'19) in
-          let y = 0 in
-          let uLET_0'0 = PRIM_EqInt(res,y) in
+          let lit_9'9 = 0 in
+          let prim_0'0 = PRIM_EqInt(res,lit_9'9) in
           let k [put_chars] uLET_3'6 =
             let k [] _ =
               let _ = Unit0 in
-              let x = '\n' in
-              let prim_0'0 = PRIM_PutChar(x) in
+              let lit_20'26 = '\n' in
+              let prim_0'0 = PRIM_PutChar(lit_20'26) in
               k prim_0'0 in
             put_chars uLET_3'6 k in
-          match uLET_0'0 with
+          match prim_0'0 with
           | true1 ->
             let lit_9'17 = '0' in
             let con_9'20 = Nil0 in
@@ -107,7 +108,7 @@ let k [put_chars,n] res =
             loop con_9'32 k in
         put_chars prim_0'0 k in
       put_chars uLET_3'6 k in
-    match uLET_0'0 with
+    match prim_0'0 with
     | true1 ->
       let lit_9'17 = '0' in
       let con_9'20 = Nil0 in
@@ -115,7 +116,9 @@ let k [put_chars,n] res =
       k con_9'17
     | false0 ->
       let con_9'32 = Nil0 in
-      let k [n] app_9'32 = app_9'32 n k in
+      let k [] app_9'32 =
+        let lit_34'21 = 20 in
+        app_9'32 lit_34'21 k in
       loop con_9'32 k in
   put_chars prim_0'0 k in
-fib n k
+fib lit_34'21 k

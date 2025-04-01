@@ -1,10 +1,13 @@
 -- | Normalize using NbE...
 module Normalize (normalize) where
 
+import Builtin (Builtin,isPure,evaluatePureBuiltin)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Par4 (Position(..))
-import Stage1 (Exp(..),Arm(..),Id(..)) --,Name(GeneratedName))
+import Stage0 (Literal(..),evalLit,Cid(..))
+import Stage1 (Exp(..),Arm(..),Id(..),Ctag(..))
+import Value (Value(..))
 import qualified Data.Map as Map
 
 ----------------------------------------------------------------------
@@ -20,6 +23,7 @@ norm env e =
 data SemValue
   = Syntax Exp
   | Macro Id (SemValue -> M SemValue)
+  | Constant Position Value -- TODO: should only be base values here
 
 posOfId :: Id -> Position
 posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos -- TODO: mandatory pos in ident
@@ -28,8 +32,21 @@ posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos -- TODO: mandatory pos in
 syn :: Id -> SemValue
 syn x = Syntax (Var (posOfId x) x)
 
+reifyValue :: Position -> Value -> Exp
+reifyValue pos = \case
+  VNum n -> Lit pos (LitN n)
+  VChar c -> Lit pos (LitC c)
+  VString s -> Lit pos (LitS s)
+  VCons tag vs -> do
+    let es = map (reifyValue pos) vs
+    let cid = Cid "unknown-cid-because-of-normalization"
+    ConTag pos (Ctag cid tag) es
+  v@VFunc{} ->
+    error (show ("refifyValue",pos,v))
+
 reify :: SemValue -> M Exp
 reify = \case
+  Constant pos v -> pure (reifyValue pos v)
   Syntax e -> pure e
   Macro x f -> do
     x <- fresh x
@@ -41,12 +58,14 @@ reify = \case
 share :: Id -> SemValue -> (SemValue -> M SemValue) -> M SemValue
 share x sv k = do
   case sv of
+    Constant{} -> k sv
     Macro{} -> k sv
     Syntax (Var{}) -> k sv
-    _ -> do
+    Syntax{} -> do
       x <- fresh x
       rhs <- reify sv
       body <- k (syn x) >>= reify
+      -- TODO: I think we need to lift this let binding outwards, by managing the continuation in M
       pure $ Syntax (Let (posOfId x) x rhs body)
 
 apply :: SemValue -> Position -> SemValue -> M SemValue
@@ -60,18 +79,38 @@ apply fun p arg = do
       arg <- reify arg
       pure $ Syntax (App fun p arg)
 
+maybeAllConstant :: [SemValue] -> Maybe [Value]
+maybeAllConstant svs = do
+  let vs = [ v | Constant _ v <- svs ]
+  if length vs == length svs then Just vs else Nothing
+
+reflectBuiltin :: Position -> Builtin -> [SemValue] -> M SemValue
+reflectBuiltin pos b es = do
+  let enableConstantFolding = False -- TODO: enable it whne it works properly!
+
+  if not enableConstantFolding || not (isPure b) then syntax else
+    case maybeAllConstant es of
+      Just vs -> do
+        let res :: Value = evaluatePureBuiltin b vs
+        pure $ Constant pos res
+      Nothing -> syntax
+  where
+    syntax = do
+      es <- mapM reify es
+      pure $ Syntax $ Prim pos b es
+
 reflect :: Env -> Exp -> M SemValue
 reflect env = \case
   Var _pos x -> do
     pure (look env x)
-  Lit p x -> do
-    pure $ Syntax $ Lit p x
-  ConTag p tag es -> do
+  Lit pos x -> do
+    pure $ Constant pos (evalLit x)
+  ConTag p tag es -> do -- TODO: special case constants
     es <- mapM (norm env) es
     pure $ Syntax $ ConTag p tag es
   Prim p b es -> do
-    es <- mapM (norm env) es
-    pure $ Syntax $ Prim p b es
+    es <- mapM (reflect env) es
+    reflectBuiltin p b es
   Lam _pos x body -> do
     pure $ Macro x $ \arg -> do
       let env' = Map.insert x arg env

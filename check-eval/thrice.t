@@ -25,16 +25,16 @@
   [HALT:#push-continuation=115, #enter=158, #return=116, #prim=85]
 
   $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -1
-  [stage1; normalization: 106 -> 341]
+  [stage1; normalization: 106 -> 283]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#prim=85]
 
   $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -2
-  [stage2; normalization: 106 -> 341]
+  [stage2; normalization: 106 -> 283]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#return=1, #prim=85]
 
   $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -3
-  [stage3; normalization: 106 -> 341]
+  [stage3; normalization: 106 -> 283]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#return=1, #prim=29]
