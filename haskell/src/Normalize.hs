@@ -57,20 +57,8 @@ reify = \case
       pure res
     pure $ Lam (posOfId x) x body
 
-_old_share :: Id -> SemValue -> (SemValue -> M SemValue) -> M SemValue -- TODO: kill
-_old_share x sv k = do
-  case sv of
-    Constant{} -> k sv
-    Macro{} -> k sv
-    Syntax (Var{}) -> k sv
-    Syntax{} -> do
-      x <- fresh x
-      rhs <- reify sv
-      body <- k (syn x) >>= reify
-      pure $ Syntax (Let (posOfId x) x rhs body)
-
-_new_share :: Id -> SemValue -> M SemValue
-_new_share x sv = do
+share :: Id -> SemValue -> M SemValue
+share x sv = do
   case sv of
     Constant{} -> pure sv
     Macro{} -> pure sv
@@ -83,8 +71,10 @@ _new_share x sv = do
 apply :: SemValue -> Position -> SemValue -> M SemValue
 apply fun p arg = do
   case fun of
-    --Macro x fun -> _old_share x arg $ \arg -> fun arg -- inlining occurs here! -- OLD, TODO kill
-    Macro x fun -> do arg <- _new_share x arg; fun arg -- inlining occurs here
+    Macro x fun -> do
+      arg <- share x arg
+      fun arg -- inlining occurs here
+
     fun -> do
       fun <- reify fun
       arg <- reify arg
