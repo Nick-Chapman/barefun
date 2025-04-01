@@ -10,6 +10,7 @@ let select : string -> (module S) =
   | "Tiny" -> (module Example_lib.Tiny.F() : S)
   | "Small" -> (module Example_lib.Small.F() : S)
   | "Shell" -> (module Example_lib.Shell.F() : S)
+  | "Thrice" -> (module Example_lib.Thrice.F() : S)
   | example -> failwith (Printf.sprintf "%s: select: unknown example: %s" __FILE__ example)
 
 let with_terminal_no_buffering f =

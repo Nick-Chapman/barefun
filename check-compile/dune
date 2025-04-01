@@ -26,6 +26,11 @@
 (rule (alias runtest) (action (diff shell-2.ml shell-2.gen)))
 (rule (alias runtest) (action (diff shell-3.ml shell-3.gen)))
 
+(rule (alias runtest) (action (diff thrice-0.ml thrice-0.gen)))
+(rule (alias runtest) (action (diff thrice-1.ml thrice-1.gen)))
+(rule (alias runtest) (action (diff thrice-2.ml thrice-2.gen)))
+(rule (alias runtest) (action (diff thrice-3.ml thrice-3.gen)))
+
 (rule (deps ../haskell/main.exe ../examples/tiny.fun) (action (with-stdout-to tiny-0.gen (run ../haskell/main.exe ../examples/tiny.fun -compile -0))))
 (rule (deps ../haskell/main.exe ../examples/tiny.fun) (action (with-stdout-to tiny-1.gen (run ../haskell/main.exe ../examples/tiny.fun -compile -1))))
 (rule (deps ../haskell/main.exe ../examples/tiny.fun) (action (with-stdout-to tiny-2.gen (run ../haskell/main.exe ../examples/tiny.fun -compile -2))))
@@ -51,6 +56,10 @@
 (rule (deps ../haskell/main.exe ../examples/shell.fun) (action (with-stdout-to shell-2.gen (run ../haskell/main.exe ../examples/shell.fun -compile -2))))
 (rule (deps ../haskell/main.exe ../examples/shell.fun) (action (with-stdout-to shell-3.gen (run ../haskell/main.exe ../examples/shell.fun -compile -3))))
 
+(rule (deps ../haskell/main.exe ../examples/thrice.fun) (action (with-stdout-to thrice-0.gen (run ../haskell/main.exe ../examples/thrice.fun -compile -0))))
+(rule (deps ../haskell/main.exe ../examples/thrice.fun) (action (with-stdout-to thrice-1.gen (run ../haskell/main.exe ../examples/thrice.fun -compile -1))))
+(rule (deps ../haskell/main.exe ../examples/thrice.fun) (action (with-stdout-to thrice-2.gen (run ../haskell/main.exe ../examples/thrice.fun -compile -2))))
+(rule (deps ../haskell/main.exe ../examples/thrice.fun) (action (with-stdout-to thrice-3.gen (run ../haskell/main.exe ../examples/thrice.fun -compile -3))))
 
 ;; un-normalized compilation output 1,2,3
 
@@ -74,6 +83,10 @@
 (rule (alias runtest) (action (diff shell-2u.ml shell-2u.gen)))
 (rule (alias runtest) (action (diff shell-3u.ml shell-3u.gen)))
 
+(rule (alias runtest) (action (diff thrice-1u.ml thrice-1u.gen)))
+(rule (alias runtest) (action (diff thrice-2u.ml thrice-2u.gen)))
+(rule (alias runtest) (action (diff thrice-3u.ml thrice-3u.gen)))
+
 (rule (deps ../haskell/main.exe ../examples/tiny.fun) (action (with-stdout-to tiny-1u.gen (run ../haskell/main.exe ../examples/tiny.fun -compile -1u))))
 (rule (deps ../haskell/main.exe ../examples/tiny.fun) (action (with-stdout-to tiny-2u.gen (run ../haskell/main.exe ../examples/tiny.fun -compile -2u))))
 (rule (deps ../haskell/main.exe ../examples/tiny.fun) (action (with-stdout-to tiny-3u.gen (run ../haskell/main.exe ../examples/tiny.fun -compile -3u))))
@@ -94,3 +107,6 @@
 (rule (deps ../haskell/main.exe ../examples/shell.fun) (action (with-stdout-to shell-2u.gen (run ../haskell/main.exe ../examples/shell.fun -compile -2u))))
 (rule (deps ../haskell/main.exe ../examples/shell.fun) (action (with-stdout-to shell-3u.gen (run ../haskell/main.exe ../examples/shell.fun -compile -3u))))
 
+(rule (deps ../haskell/main.exe ../examples/thrice.fun) (action (with-stdout-to thrice-1u.gen (run ../haskell/main.exe ../examples/thrice.fun -compile -1u))))
+(rule (deps ../haskell/main.exe ../examples/thrice.fun) (action (with-stdout-to thrice-2u.gen (run ../haskell/main.exe ../examples/thrice.fun -compile -2u))))
+(rule (deps ../haskell/main.exe ../examples/thrice.fun) (action (with-stdout-to thrice-3u.gen (run ../haskell/main.exe ../examples/thrice.fun -compile -3u))))

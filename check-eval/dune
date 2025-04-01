@@ -9,10 +9,12 @@
   ../examples/shell.fun
   ../examples/small.fun
   ../examples/tiny.fun
+  ../examples/thrice.fun
 
   halts.input
   shell.input
   small.input
   tiny.input
+  thrice.input
 
 ))

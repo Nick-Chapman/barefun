@@ -52,3 +52,13 @@
       (cat ../../examples/shell.fun)
       (echo "end\n")
       )))
+
+(rule
+  (with-stdout-to thrice.ml
+    (progn
+      (echo "module F() : sig val main : unit -> unit end = struct\n")
+      (echo "open Prim_lib.Prim\n")
+      (echo "#1 \"thrice.fun\"\n")
+      (cat ../../examples/thrice.fun)
+      (echo "end\n")
+      )))
