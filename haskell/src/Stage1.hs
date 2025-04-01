@@ -15,7 +15,7 @@ import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
-import qualified Interaction as I (Tickable(App))
+import qualified Interaction as I (Tickable(Prim,App))
 import qualified Stage0 as SRC
 
 type Transformed = Exp
@@ -161,8 +161,8 @@ eval env@Env{venv} = \case
     evals env es $ \vs -> do
       k (VCons tag vs)
   Prim _ b es -> \k -> do
-    evals env es $ \vs -> do
-    executeBuiltin b vs k
+    evals env es $ \vs -> ITick I.Prim $ do
+      executeBuiltin b vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
   RecLam _ f x body -> \k -> do

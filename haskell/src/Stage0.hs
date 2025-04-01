@@ -15,7 +15,7 @@ import Par4 (Position(..))
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
-import qualified Interaction as I (Tickable(App))
+import qualified Interaction as I (Tickable(Prim,App))
 
 data Prog = Prog [Def]
 data Def = ValDef Bid Exp | TypeDef [Cid]
@@ -146,8 +146,8 @@ eval env@Env{venv,cenv} = \case
           where err = error (show ("cenv-lookup",cid))
     k (VCons tag vs)
   Prim _ b es -> \k -> do
-    evals env es $ \vs -> do
-    executeBuiltin b vs k
+    evals env es $ \vs -> ITick I.Prim $ do
+      executeBuiltin b vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval (insert x arg env) body k))
   RecLam _ f x body -> \k -> do

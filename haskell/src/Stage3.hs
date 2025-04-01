@@ -194,7 +194,7 @@ evalCode genv env = \case
   where
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
-      Prim b xs -> \k -> executeBuiltin b (map (look env) xs) k
+      Prim b xs -> \k -> ITick I.Prim $ executeBuiltin b (map (look env) xs) k
       ConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map (look env) xs))
 
       Lam pre _ x body -> \k -> do
