@@ -44,7 +44,7 @@ Haskell REPL
   [EOF:#push-continuation=43, #enter=58, #return=42, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -1
-  [stage1; normalization: 92 -> 20]
+  [stage1; normalization: 92 -> 18]
   HHeelllloo,,
   
   WWoorrlldd!!
@@ -52,7 +52,7 @@ Haskell REPL
   [EOF:#apps=15, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -2
-  [stage2; normalization: 92 -> 20]
+  [stage2; normalization: 92 -> 18]
   HHeelllloo,,
   
   WWoorrlldd!!
@@ -60,7 +60,7 @@ Haskell REPL
   [EOF:#enter=15, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3
-  [stage3; normalization: 92 -> 20]
+  [stage3; normalization: 92 -> 18]
   HHeelllloo,,
   
   WWoorrlldd!!
@@ -68,7 +68,7 @@ Haskell REPL
   [EOF:#enter=15, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun
-  [stage3; normalization: 92 -> 20]
+  [stage3; normalization: 92 -> 18]
   HHeelllloo,,
   
   WWoorrlldd!!

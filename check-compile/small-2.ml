@@ -43,14 +43,14 @@ let k [put_chars] _ =
           let con_0'0 = Cons1[theChar,sofar] in
           readloop con_0'0 k) in
       let con_26'11 = Nil0 in
-      let k [put_chars,mainloop] uLET_19'14 =
+      let k [put_chars,mainloop] app_26'11 =
         let k [mainloop] _ =
           let _ = Unit0 in
           let lit_17'26 = '\n' in
           let _ = PRIM_PutChar(lit_17'26) in
           let con_34'10 = Unit0 in
           mainloop con_34'10 k in
-        put_chars uLET_19'14 k in
+        put_chars app_26'11 k in
       readloop con_26'11 k in
     put_chars prim_0'0 k) in
   let _ = Unit0 in

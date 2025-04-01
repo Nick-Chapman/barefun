@@ -7,6 +7,5 @@ let mainloop = fix (fun [] mainloop _ k ->
   let _ = PRIM_PutChar(gotten) in
   let con_7'13 = Unit0 in
   mainloop con_7'13 k) in
-let main = mainloop in
 let con_0'0 = Unit0 in
-main con_0'0 k
+mainloop con_0'0 k

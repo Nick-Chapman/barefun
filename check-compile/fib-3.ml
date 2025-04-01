@@ -17,12 +17,11 @@ let g3 = fun arg k ->
   | false0 ->
     let t2 = PRIM_SubInt(arg,g5) in
     let k = [arg], fun [f1] arg ->
-      let t1 = [arg], fun [f1] arg k ->
+      let t1 = PRIM_SubInt(f1,g6) in
+      let k = [arg], fun [f1] arg ->
         let t1 = PRIM_AddInt(f1,arg) in
         k t1 in
-      let t2 = PRIM_SubInt(f1,g6) in
-      let k = [t1], fun [f1] arg -> f1 arg k in
-      g3 t2 k in
+      g3 t1 k in
     g3 t2 k in
 let g8 = 20 in
 let g9 = "fib " in
@@ -41,15 +40,11 @@ let g13 = fun arg k ->
       let t2 = PRIM_ModInt(arg,g15) in
       let t3 = PRIM_AddInt(g12,t2) in
       let t4 = PRIM_CharChr(t3) in
-      let t5 = [t4], fun [f1] arg k ->
-        let t1 = Cons1[f1,arg] in
-        k t1 in
+      let t5 = Cons1[t4,f1] in
       let k = [arg], fun [f1] arg ->
-        let k = [f1], fun [f1] arg ->
-          let t1 = PRIM_DivInt(f1,g16) in
-          arg t1 k in
-        g13 arg k in
-      t5 f1 k in
+        let t1 = PRIM_DivInt(f1,g16) in
+        arg t1 k in
+      g13 t5 k in
   k t1 in
 let g17 = 20 in
 let g18 = 0 in
@@ -75,15 +70,11 @@ let g29 = fun arg k ->
       let t2 = PRIM_ModInt(arg,g31) in
       let t3 = PRIM_AddInt(g28,t2) in
       let t4 = PRIM_CharChr(t3) in
-      let t5 = [t4], fun [f1] arg k ->
-        let t1 = Cons1[f1,arg] in
-        k t1 in
+      let t5 = Cons1[t4,f1] in
       let k = [arg], fun [f1] arg ->
-        let k = [f1], fun [f1] arg ->
-          let t1 = PRIM_DivInt(f1,g32) in
-          arg t1 k in
-        g29 arg k in
-      t5 f1 k in
+        let t1 = PRIM_DivInt(f1,g32) in
+        arg t1 k in
+      g29 t5 k in
   k t1 in
 let g33 = 0 in
 let g34 = '0' in

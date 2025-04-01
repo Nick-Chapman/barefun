@@ -8,5 +8,4 @@ let g1 = fun arg k ->
   let t3 = PRIM_PutChar(t1) in
   g1 g3 k in
 let g4 = Unit0 in
-let g1 = g1 in
 g1 g4 k

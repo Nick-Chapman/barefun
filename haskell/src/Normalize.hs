@@ -83,8 +83,8 @@ _new_share x sv = do
 apply :: SemValue -> Position -> SemValue -> M SemValue
 apply fun p arg = do
   case fun of
-    Macro x fun -> _old_share x arg $ \arg -> fun arg -- inlining occurs here! -- OLD, TODO kill
-    --Macro x fun -> do arg <- _new_share x arg; fun arg -- inlining occurs here
+    --Macro x fun -> _old_share x arg $ \arg -> fun arg -- inlining occurs here! -- OLD, TODO kill
+    Macro x fun -> do arg <- _new_share x arg; fun arg -- inlining occurs here
     fun -> do
       fun <- reify fun
       arg <- reify arg
