@@ -27,13 +27,18 @@ let fib = fix (fun [] fib n k ->
 let _ = Unit0 in
 let lit_34'21 = 20 in
 let k [put_chars] res =
-  let lit_28'13 = "fib " in
-  let prim_0'0 = PRIM_Explode(lit_28'13) in
+  let lit_0'0 = 'f' in
+  let lit_0'0 = 'i' in
+  let lit_0'0 = 'b' in
+  let lit_0'0 = ' ' in
+  let con_0'0 = CID0 in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
   let k [put_chars,res] _ =
-    let lit_3'17 = '0' in
-    let ord0 = PRIM_CharOrd(lit_3'17) in
-    let loop = fix (fun [ord0] loop acc k ->
-      let lam_5'19 = fun [ord0,acc,loop] i k ->
+    let loop = fix (fun [] loop acc k ->
+      let lam_5'19 = fun [acc,loop] i k ->
         let lit_6'11 = 0 in
         let prim_0'0 = PRIM_EqInt(i,lit_6'11) in
         match prim_0'0 with
@@ -41,7 +46,8 @@ let k [put_chars] res =
         | false0 ->
           let lit_7'29 = 10 in
           let c = PRIM_ModInt(i,lit_7'29) in
-          let x = PRIM_AddInt(ord0,c) in
+          let lit_0'0 = 48 in
+          let x = PRIM_AddInt(lit_0'0,c) in
           let x = PRIM_CharChr(x) in
           let con_0'0 = Cons1[x,acc] in
           let k [i] app_7'11 =
@@ -50,18 +56,23 @@ let k [put_chars] res =
             app_7'11 prim_0'0 k in
           loop con_0'0 k in
       k lam_5'19) in
-    let lit_34'21 = 20 in
-    let lit_9'9 = 0 in
-    let prim_0'0 = PRIM_EqInt(lit_34'21,lit_9'9) in
+    let con_0'0 = CID0 in
     let k [put_chars,res] case_9'2 =
       let k [put_chars,res] _ =
-        let lit_30'13 = " --> " in
-        let prim_0'0 = PRIM_Explode(lit_30'13) in
+        let lit_0'0 = ' ' in
+        let lit_0'0 = '-' in
+        let lit_0'0 = '-' in
+        let lit_0'0 = '>' in
+        let lit_0'0 = ' ' in
+        let con_0'0 = CID0 in
+        let con_0'0 = CID1[lit_0'0,con_0'0] in
+        let con_0'0 = CID1[lit_0'0,con_0'0] in
+        let con_0'0 = CID1[lit_0'0,con_0'0] in
+        let con_0'0 = CID1[lit_0'0,con_0'0] in
+        let con_0'0 = CID1[lit_0'0,con_0'0] in
         let k [put_chars,res] _ =
-          let lit_3'17 = '0' in
-          let ord0 = PRIM_CharOrd(lit_3'17) in
-          let loop = fix (fun [ord0] loop acc k ->
-            let lam_5'19 = fun [ord0,acc,loop] i k ->
+          let loop = fix (fun [] loop acc k ->
+            let lam_5'19 = fun [acc,loop] i k ->
               let lit_6'11 = 0 in
               let prim_0'0 = PRIM_EqInt(i,lit_6'11) in
               match prim_0'0 with
@@ -69,7 +80,8 @@ let k [put_chars] res =
               | false0 ->
                 let lit_7'29 = 10 in
                 let c = PRIM_ModInt(i,lit_7'29) in
-                let x = PRIM_AddInt(ord0,c) in
+                let lit_0'0 = 48 in
+                let x = PRIM_AddInt(lit_0'0,c) in
                 let x = PRIM_CharChr(x) in
                 let con_0'0 = Cons1[x,acc] in
                 let k [i] app_7'11 =
@@ -97,9 +109,9 @@ let k [put_chars] res =
             let con_9'32 = Nil0 in
             let k [res] app_9'32 = app_9'32 res k in
             loop con_9'32 k in
-        put_chars prim_0'0 k in
+        put_chars con_0'0 k in
       put_chars case_9'2 k in
-    match prim_0'0 with
+    match con_0'0 with
     | true1 ->
       let lit_9'17 = '0' in
       let con_9'20 = Nil0 in
@@ -111,5 +123,5 @@ let k [put_chars] res =
         let lit_34'21 = 20 in
         app_9'32 lit_34'21 k in
       loop con_9'32 k in
-  put_chars prim_0'0 k in
+  put_chars con_0'0 k in
 fib lit_34'21 k

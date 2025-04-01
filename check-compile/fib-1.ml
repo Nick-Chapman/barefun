@@ -16,8 +16,7 @@ let fib =
       PRIM_AddInt(x,y)) in
 let _ = Unit0 in
 let res = (fib 20) in
-let _ = (put_chars PRIM_Explode("fib ")) in
-let ord0 = PRIM_CharOrd('0') in
+let _ = (put_chars CID1('f', CID1('i', CID1('b', CID1(' ', CID0))))) in
 let loop =
   fix (fun loop acc ->
     (fun i ->
@@ -25,16 +24,15 @@ let loop =
       | true1 -> acc
       | false0 ->
         let c = PRIM_ModInt(i,10) in
-        let x = PRIM_AddInt(ord0,c) in
+        let x = PRIM_AddInt(48,c) in
         let x = PRIM_CharChr(x) in
         ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
 let _ =
   (put_chars
-  match PRIM_EqInt(20,0) with
+  match CID0 with
   | true1 -> Cons1('0', Nil0)
   | false0 -> ((loop Nil0) 20)) in
-let _ = (put_chars PRIM_Explode(" --> ")) in
-let ord0 = PRIM_CharOrd('0') in
+let _ = (put_chars CID1(' ', CID1('-', CID1('-', CID1('>', CID1(' ', CID0)))))) in
 let loop =
   fix (fun loop acc ->
     (fun i ->
@@ -42,7 +40,7 @@ let loop =
       | true1 -> acc
       | false0 ->
         let c = PRIM_ModInt(i,10) in
-        let x = PRIM_AddInt(ord0,c) in
+        let x = PRIM_AddInt(48,c) in
         let x = PRIM_CharChr(x) in
         ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
 let _ =

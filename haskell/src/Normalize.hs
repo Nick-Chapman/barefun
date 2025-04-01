@@ -39,7 +39,7 @@ reifyValue pos = \case
   VString s -> Lit pos (LitS s)
   VCons tag vs -> do
     let es = map (reifyValue pos) vs
-    let cid = Cid "unknown-cid-because-of-normalization"
+    let cid = Cid "CID" -- TODO: need to solve this issue?
     ConTag pos (Ctag cid tag) es
   v@VFunc{} ->
     error (show ("refifyValue",pos,v))
@@ -87,9 +87,7 @@ maybeAllConstant svs = do
 
 reflectBuiltin :: Position -> Builtin -> [SemValue] -> M SemValue
 reflectBuiltin pos b es = do
-  let enableConstantFolding = False -- TODO: enable it whne it works properly!
-
-  if not enableConstantFolding || not (isPure b) then syntax else
+  if not (isPure b) then syntax else
     case maybeAllConstant es of
       Just vs -> do
         let res :: Value = evaluatePureBuiltin b vs
@@ -106,7 +104,7 @@ reflect env = \case
     pure (look env x)
   Lit pos x -> do
     pure $ Constant pos (evalLit x)
-  ConTag p tag es -> do -- TODO: special case constants
+  ConTag p tag es -> do -- TODO: propogate constant-ness
     es <- mapM (norm env) es
     pure $ Syntax $ ConTag p tag es
   Prim p b es -> do
@@ -128,7 +126,7 @@ reflect env = \case
     apply e1 p e2
   Let p x rhs body -> do
     reflect env (App (Lam p x body) p rhs)
-  Case pos scrut arms -> do
+  Case pos scrut arms -> do -- TODO: simplify constant scrut
     scrut <- norm env scrut
     arms <- mapM (normArm env) arms
     pure $ Syntax $ Case pos scrut arms

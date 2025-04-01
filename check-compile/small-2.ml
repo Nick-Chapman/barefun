@@ -8,12 +8,24 @@ let put_chars = fix (fun [] put_chars xs k ->
   | Cons1(x,xsMore) ->
     let _ = PRIM_PutChar(x) in
     put_chars xsMore k) in
-let lit_28'20 = "LOAD\n" in
-let prim_0'0 = PRIM_Explode(lit_28'20) in
+let lit_0'0 = 'L' in
+let lit_0'0 = 'O' in
+let lit_0'0 = 'A' in
+let lit_0'0 = 'D' in
+let lit_0'0 = '\n' in
+let con_0'0 = CID0 in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
 let k [put_chars] _ =
   let mainloop = fix (fun [put_chars] mainloop _ k ->
-    let lit_31'13 = "> " in
-    let prim_0'0 = PRIM_Explode(lit_31'13) in
+    let lit_0'0 = '>' in
+    let lit_0'0 = ' ' in
+    let con_0'0 = CID0 in
+    let con_0'0 = CID1[lit_0'0,con_0'0] in
+    let con_0'0 = CID1[lit_0'0,con_0'0] in
     let k [put_chars,mainloop] _ =
       let _ = Unit0 in
       let readloop = fix (fun [] readloop sofar k ->
@@ -52,16 +64,34 @@ let k [put_chars] _ =
           mainloop con_34'10 k in
         put_chars app_26'11 k in
       readloop con_26'11 k in
-    put_chars prim_0'0 k) in
+    put_chars con_0'0 k) in
   let _ = Unit0 in
-  let lit_37'13 = "RUN\n" in
-  let prim_0'0 = PRIM_Explode(lit_37'13) in
+  let lit_0'0 = 'R' in
+  let lit_0'0 = 'U' in
+  let lit_0'0 = 'N' in
+  let lit_0'0 = '\n' in
+  let con_0'0 = CID0 in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
   let k [put_chars,mainloop] _ =
     let con_38'20 = Unit0 in
     let k [put_chars] _ =
-      let lit_39'13 = "NEVER\n" in
-      let prim_0'0 = PRIM_Explode(lit_39'13) in
-      put_chars prim_0'0 k in
+      let lit_0'0 = 'N' in
+      let lit_0'0 = 'E' in
+      let lit_0'0 = 'V' in
+      let lit_0'0 = 'E' in
+      let lit_0'0 = 'R' in
+      let lit_0'0 = '\n' in
+      let con_0'0 = CID0 in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      put_chars con_0'0 k in
     mainloop con_38'20 k in
-  put_chars prim_0'0 k in
-put_chars prim_0'0 k
+  put_chars con_0'0 k in
+put_chars con_0'0 k

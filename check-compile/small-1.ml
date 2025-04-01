@@ -6,10 +6,10 @@ let put_chars =
     | Cons1(x,xsMore) ->
       let _ = PRIM_PutChar(x) in
       (put_chars xsMore)) in
-let _ = (put_chars PRIM_Explode("LOAD\n")) in
+let _ = (put_chars CID1('L', CID1('O', CID1('A', CID1('D', CID1('\n', CID0)))))) in
 let mainloop =
   fix (fun mainloop _ ->
-    let _ = (put_chars PRIM_Explode("> ")) in
+    let _ = (put_chars CID1('>', CID1(' ', CID0))) in
     let _ = Unit0 in
     let readloop =
       fix (fun readloop sofar ->
@@ -34,6 +34,6 @@ let mainloop =
     let _ = PRIM_PutChar('\n') in
     (mainloop Unit0)) in
 let _ = Unit0 in
-let _ = (put_chars PRIM_Explode("RUN\n")) in
+let _ = (put_chars CID1('R', CID1('U', CID1('N', CID1('\n', CID0))))) in
 let _ = (mainloop Unit0) in
-(put_chars PRIM_Explode("NEVER\n"))
+(put_chars CID1('N', CID1('E', CID1('V', CID1('E', CID1('R', CID1('\n', CID0)))))))

@@ -14,8 +14,7 @@ let put_char =
         | true1 -> PRIM_PutChar(c)
         | false0 ->
           let _ = PRIM_PutChar('^') in
-          let x = PRIM_CharOrd('A') in
-          let x = PRIM_AddInt(x,n) in
+          let x = PRIM_AddInt(65,n) in
           let x = PRIM_SubInt(x,1) in
           let x = PRIM_CharChr(x) in
           PRIM_PutChar(x))) in
@@ -84,14 +83,12 @@ let fact =
       let x = (fact PRIM_SubInt(n,1)) in
       PRIM_MulInt(x,n)
     | false0 -> 1) in
-let x = PRIM_CharChr(4) in
 let y = Nil0 in
-let single_controlD = Cons1(x, y) in
+let single_controlD = Cons1('\EOT', y) in
 let mainloop =
   fix (fun mainloop _ ->
     let _ = (put_chars Cons1('>', Cons1(' ', Nil0))) in
     let _ = Unit0 in
-    let controlD = PRIM_CharChr(4) in
     let loop =
       fix (fun loop acc ->
         let x = Unit0 in
@@ -109,12 +106,12 @@ let mainloop =
                 | Cons1(x,xs) -> ((loop Cons1(x, acc)) xs))) in
           ((loop Nil0) acc)
         | false0 ->
-          match PRIM_EqChar(c,controlD) with
+          match PRIM_EqChar(c,'\EOT') with
           | true1 ->
             let _ = (put_char c) in
             let _ = Unit0 in
             let _ = (put_char '\n') in
-            let xs = Cons1(controlD, acc) in
+            let xs = Cons1('\EOT', acc) in
             let loop =
               fix (fun loop acc ->
                 (fun xs ->
@@ -139,16 +136,14 @@ let mainloop =
                     | false0 -> true1 with
                     | true1 ->
                       let _ = Unit0 in
-                      let backspace = PRIM_CharChr(8) in
-                      let _ = (put_char backspace) in
+                      let _ = (put_char '\b') in
                       let _ = (put_char ' ') in
-                      (put_char backspace)
+                      (put_char '\b')
                     | false0 -> Unit0 in
                   let _ = Unit0 in
-                  let backspace = PRIM_CharChr(8) in
-                  let _ = (put_char backspace) in
+                  let _ = (put_char '\b') in
                   let _ = (put_char ' ') in
-                  let _ = (put_char backspace) in
+                  let _ = (put_char '\b') in
                   (loop tail)
               | false0 ->
                 let _ = (put_char c) in
@@ -195,21 +190,20 @@ let mainloop =
         match words with
         | Nil0 -> Unit0
         | Cons1(command,args) ->
-          let b = PRIM_Explode("fib") in
-          match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) b) with
+          match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) CID1('f', CID1('i', CID1('b', CID0)))) with
           | true1 ->
-            let _ = (put_chars PRIM_Explode("fib: ")) in
+            let _ = (put_chars CID1('f', CID1('i', CID1('b', CID1(':', CID1(' ', CID0)))))) in
             match args with
             | Nil0 ->
-              let _ = (put_chars PRIM_Explode("ERROR: ")) in
-              let _ = (put_chars PRIM_Explode("expected an argument")) in
+              let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
+              let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('n', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0))))))))))))))))))))) in
               let _ = Unit0 in
               (put_char '\n')
             | Cons1(arg1,more) ->
               match more with
               | Cons1(_,_) ->
-                let _ = (put_chars PRIM_Explode("ERROR: ")) in
-                let _ = (put_chars PRIM_Explode("expected exactly one argument")) in
+                let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
+                let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('e', CID1('x', CID1('a', CID1('c', CID1('t', CID1('l', CID1('y', CID1(' ', CID1('o', CID1('n', CID1('e', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0)))))))))))))))))))))))))))))) in
                 let _ = Unit0 in
                 (put_char '\n')
               | Nil0 ->
@@ -220,8 +214,7 @@ let mainloop =
                       | Nil0 -> Some0(acc)
                       | Cons1(x,xs) ->
                         let x = PRIM_CharOrd(x) in
-                        let y = PRIM_CharOrd('0') in
-                        let n = PRIM_SubInt(x,y) in
+                        let n = PRIM_SubInt(x,48) in
                         let b = PRIM_LessInt(n,0) in
                         match match match b with
                         | true1 -> false0
@@ -240,13 +233,12 @@ let mainloop =
                           ((loop PRIM_AddInt(x,d)) xs))) in
                 match ((loop 0) arg1) with
                 | None1 ->
-                  let _ = (put_chars PRIM_Explode("ERROR: ")) in
-                  let _ = (put_chars PRIM_Explode("expected arg1 to be numeric")) in
+                  let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
+                  let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('1', CID1(' ', CID1('t', CID1('o', CID1(' ', CID1('b', CID1('e', CID1(' ', CID1('n', CID1('u', CID1('m', CID1('e', CID1('r', CID1('i', CID1('c', CID0)))))))))))))))))))))))))))) in
                   let _ = Unit0 in
                   (put_char '\n')
                 | Some0(n) ->
                   let res = (fib n) in
-                  let ord0 = PRIM_CharOrd('0') in
                   let loop =
                     fix (fun loop acc ->
                       (fun i ->
@@ -254,7 +246,7 @@ let mainloop =
                         | true1 -> acc
                         | false0 ->
                           let c = PRIM_ModInt(i,10) in
-                          let x = PRIM_AddInt(ord0,c) in
+                          let x = PRIM_AddInt(48,c) in
                           let x = PRIM_CharChr(x) in
                           ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
                   let _ =
@@ -264,8 +256,7 @@ let mainloop =
                       let xs = Nil0 in
                       Cons1('0', xs)
                     | false0 -> ((loop Nil0) n)) in
-                  let _ = (put_chars PRIM_Explode(" --> ")) in
-                  let ord0 = PRIM_CharOrd('0') in
+                  let _ = (put_chars CID1(' ', CID1('-', CID1('-', CID1('>', CID1(' ', CID0)))))) in
                   let loop =
                     fix (fun loop acc ->
                       (fun i ->
@@ -273,7 +264,7 @@ let mainloop =
                         | true1 -> acc
                         | false0 ->
                           let c = PRIM_ModInt(i,10) in
-                          let x = PRIM_AddInt(ord0,c) in
+                          let x = PRIM_AddInt(48,c) in
                           let x = PRIM_CharChr(x) in
                           ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
                   let _ =
@@ -286,21 +277,20 @@ let mainloop =
                   let _ = Unit0 in
                   (put_char '\n')
           | false0 ->
-            let b = PRIM_Explode("fact") in
-            match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) b) with
+            match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) CID1('f', CID1('a', CID1('c', CID1('t', CID0))))) with
             | true1 ->
-              let _ = (put_chars PRIM_Explode("fact: ")) in
+              let _ = (put_chars CID1('f', CID1('a', CID1('c', CID1('t', CID1(':', CID1(' ', CID0))))))) in
               match args with
               | Nil0 ->
-                let _ = (put_chars PRIM_Explode("ERROR: ")) in
-                let _ = (put_chars PRIM_Explode("expected an argument")) in
+                let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
+                let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('n', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0))))))))))))))))))))) in
                 let _ = Unit0 in
                 (put_char '\n')
               | Cons1(arg1,more) ->
                 match more with
                 | Cons1(_,_) ->
-                  let _ = (put_chars PRIM_Explode("ERROR: ")) in
-                  let _ = (put_chars PRIM_Explode("expected exactly one argument")) in
+                  let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
+                  let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('e', CID1('x', CID1('a', CID1('c', CID1('t', CID1('l', CID1('y', CID1(' ', CID1('o', CID1('n', CID1('e', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0)))))))))))))))))))))))))))))) in
                   let _ = Unit0 in
                   (put_char '\n')
                 | Nil0 ->
@@ -311,8 +301,7 @@ let mainloop =
                         | Nil0 -> Some0(acc)
                         | Cons1(x,xs) ->
                           let x = PRIM_CharOrd(x) in
-                          let y = PRIM_CharOrd('0') in
-                          let n = PRIM_SubInt(x,y) in
+                          let n = PRIM_SubInt(x,48) in
                           let b = PRIM_LessInt(n,0) in
                           match match match b with
                           | true1 -> false0
@@ -331,13 +320,12 @@ let mainloop =
                             ((loop PRIM_AddInt(x,d)) xs))) in
                   match ((loop 0) arg1) with
                   | None1 ->
-                    let _ = (put_chars PRIM_Explode("ERROR: ")) in
-                    let _ = (put_chars PRIM_Explode("expected arg1 to be numeric")) in
+                    let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
+                    let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('1', CID1(' ', CID1('t', CID1('o', CID1(' ', CID1('b', CID1('e', CID1(' ', CID1('n', CID1('u', CID1('m', CID1('e', CID1('r', CID1('i', CID1('c', CID0)))))))))))))))))))))))))))) in
                     let _ = Unit0 in
                     (put_char '\n')
                   | Some0(n) ->
                     let res = (fact n) in
-                    let ord0 = PRIM_CharOrd('0') in
                     let loop =
                       fix (fun loop acc ->
                         (fun i ->
@@ -345,7 +333,7 @@ let mainloop =
                           | true1 -> acc
                           | false0 ->
                             let c = PRIM_ModInt(i,10) in
-                            let x = PRIM_AddInt(ord0,c) in
+                            let x = PRIM_AddInt(48,c) in
                             let x = PRIM_CharChr(x) in
                             ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
                     let _ =
@@ -355,8 +343,7 @@ let mainloop =
                         let xs = Nil0 in
                         Cons1('0', xs)
                       | false0 -> ((loop Nil0) n)) in
-                    let _ = (put_chars PRIM_Explode(" --> ")) in
-                    let ord0 = PRIM_CharOrd('0') in
+                    let _ = (put_chars CID1(' ', CID1('-', CID1('-', CID1('>', CID1(' ', CID0)))))) in
                     let loop =
                       fix (fun loop acc ->
                         (fun i ->
@@ -364,7 +351,7 @@ let mainloop =
                           | true1 -> acc
                           | false0 ->
                             let c = PRIM_ModInt(i,10) in
-                            let x = PRIM_AddInt(ord0,c) in
+                            let x = PRIM_AddInt(48,c) in
                             let x = PRIM_CharChr(x) in
                             ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
                     let _ =
@@ -377,22 +364,20 @@ let mainloop =
                     let _ = Unit0 in
                     (put_char '\n')
             | false0 ->
-              let b = PRIM_Explode("rev") in
-              match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) b) with
+              match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) CID1('r', CID1('e', CID1('v', CID0)))) with
               | true1 ->
                 match args with
                 | Cons1(_,_) ->
-                  let _ = (put_chars PRIM_Explode("ERROR: ")) in
-                  let _ = (put_chars PRIM_Explode("rev: expected no arguments")) in
+                  let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
+                  let _ = (put_chars CID1('r', CID1('e', CID1('v', CID1(':', CID1(' ', CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('n', CID1('o', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID1('s', CID0))))))))))))))))))))))))))) in
                   let _ = Unit0 in
                   (put_char '\n')
                 | Nil0 ->
-                  let _ = (put_chars PRIM_Explode("(reverse typed lines until ^D)\n")) in
+                  let _ = (put_chars CID1('(', CID1('r', CID1('e', CID1('v', CID1('e', CID1('r', CID1('s', CID1('e', CID1(' ', CID1('t', CID1('y', CID1('p', CID1('e', CID1('d', CID1(' ', CID1('l', CID1('i', CID1('n', CID1('e', CID1('s', CID1(' ', CID1('u', CID1('n', CID1('t', CID1('i', CID1('l', CID1(' ', CID1('^', CID1('D', CID1(')', CID1('\n', CID0)))))))))))))))))))))))))))))))) in
                   let _ = Unit0 in
                   let loop =
                     fix (fun loop _ ->
                       let _ = Unit0 in
-                      let controlD = PRIM_CharChr(4) in
                       let loop =
                         fix (fun loop acc ->
                           let x = Unit0 in
@@ -410,12 +395,12 @@ let mainloop =
                                   | Cons1(x,xs) -> ((loop Cons1(x, acc)) xs))) in
                             ((loop Nil0) acc)
                           | false0 ->
-                            match PRIM_EqChar(c,controlD) with
+                            match PRIM_EqChar(c,'\EOT') with
                             | true1 ->
                               let _ = (put_char c) in
                               let _ = Unit0 in
                               let _ = (put_char '\n') in
-                              let xs = Cons1(controlD, acc) in
+                              let xs = Cons1('\EOT', acc) in
                               let loop =
                                 fix (fun loop acc ->
                                   (fun xs ->
@@ -440,16 +425,14 @@ let mainloop =
                                       | false0 -> true1 with
                                       | true1 ->
                                         let _ = Unit0 in
-                                        let backspace = PRIM_CharChr(8) in
-                                        let _ = (put_char backspace) in
+                                        let _ = (put_char '\b') in
                                         let _ = (put_char ' ') in
-                                        (put_char backspace)
+                                        (put_char '\b')
                                       | false0 -> Unit0 in
                                     let _ = Unit0 in
-                                    let backspace = PRIM_CharChr(8) in
-                                    let _ = (put_char backspace) in
+                                    let _ = (put_char '\b') in
                                     let _ = (put_char ' ') in
-                                    let _ = (put_char backspace) in
+                                    let _ = (put_char '\b') in
                                     (loop tail)
                                 | false0 ->
                                   let _ = (put_char c) in
@@ -477,9 +460,8 @@ let mainloop =
                     | true1 -> '*'
                     | false0 -> c)) in
                 let n = (length xs) in
-                let _ = (put_chars ((append PRIM_Explode("You wrote: \"")) (star_the_ohs xs))) in
-                let _ = (put_chars PRIM_Explode("\" (")) in
-                let ord0 = PRIM_CharOrd('0') in
+                let _ = (put_chars ((append CID1('Y', CID1('o', CID1('u', CID1(' ', CID1('w', CID1('r', CID1('o', CID1('t', CID1('e', CID1(':', CID1(' ', CID1('"', CID0))))))))))))) (star_the_ohs xs))) in
+                let _ = (put_chars CID1('"', CID1(' ', CID1('(', CID0)))) in
                 let loop =
                   fix (fun loop acc ->
                     (fun i ->
@@ -487,7 +469,7 @@ let mainloop =
                       | true1 -> acc
                       | false0 ->
                         let c = PRIM_ModInt(i,10) in
-                        let x = PRIM_AddInt(ord0,c) in
+                        let x = PRIM_AddInt(48,c) in
                         let x = PRIM_CharChr(x) in
                         ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
                 let _ =
@@ -497,10 +479,10 @@ let mainloop =
                     let xs = Nil0 in
                     Cons1('0', xs)
                   | false0 -> ((loop Nil0) n)) in
-                let _ = (put_chars PRIM_Explode(" chars)")) in
+                let _ = (put_chars CID1(' ', CID1('c', CID1('h', CID1('a', CID1('r', CID1('s', CID1(')', CID0)))))))) in
                 let _ = Unit0 in
                 (put_char '\n') in
       (mainloop Unit0)) in
 let _ = Unit0 in
-let _ = (put_chars PRIM_Explode("This is a shell prototype. Try: fib, fact, rev\n")) in
+let _ = (put_chars CID1('T', CID1('h', CID1('i', CID1('s', CID1(' ', CID1('i', CID1('s', CID1(' ', CID1('a', CID1(' ', CID1('s', CID1('h', CID1('e', CID1('l', CID1('l', CID1(' ', CID1('p', CID1('r', CID1('o', CID1('t', CID1('o', CID1('t', CID1('y', CID1('p', CID1('e', CID1('.', CID1(' ', CID1('T', CID1('r', CID1('y', CID1(':', CID1(' ', CID1('f', CID1('i', CID1('b', CID1(',', CID1(' ', CID1('f', CID1('a', CID1('c', CID1('t', CID1(',', CID1(' ', CID1('r', CID1('e', CID1('v', CID1('\n', CID0)))))))))))))))))))))))))))))))))))))))))))))))) in
 (mainloop Unit0)
