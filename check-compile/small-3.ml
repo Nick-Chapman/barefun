@@ -1,6 +1,6 @@
 (*stage3*)
 let k () = ()
-let g2 = Unit0 in
+let g2 = CID0 in
 let g1 = fun arg k ->
   match arg with
   | Nil0 -> k g2
@@ -23,69 +23,69 @@ let g16 = ' ' in
 let g17 = CID0 in
 let g18 = CID1[g16,g17] in
 let g19 = CID1[g15,g18] in
-let g22 = Unit0 in
+let g21 = CID0 in
+let g22 = '\n' in
 let g23 = '\n' in
-let g25 = '\n' in
-let g26 = fun arg k ->
+let g24 = fun arg k ->
   let t1 = [arg], fun [f1] arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
-      let t3 = Cons1[t1,f1] in
+      let t3 = CID1[t1,f1] in
       let k = [t2], fun [f1] arg -> arg f1 k in
-      g26 t3 k in
+      g24 t3 k in
   k t1 in
-let g27 = Nil0 in
-let g21 = fun arg k ->
-  let t1 = PRIM_GetChar(g22) in
-  let t2 = PRIM_EqChar(t1,g23) in
+let g25 = CID0 in
+let g20 = fun arg k ->
+  let t1 = PRIM_GetChar(g21) in
+  let t2 = PRIM_EqChar(t1,g22) in
   match t2 with
   | true1 ->
-    let t3 = PRIM_PutChar(g25) in
+    let t3 = PRIM_PutChar(g23) in
     let k = [arg], fun [f1] arg -> arg f1 k in
-    g26 g27 k
+    g24 g25 k
   | false0 ->
     let t3 = PRIM_PutChar(t1) in
-    let t4 = Cons1[t1,arg] in
-    g21 t4 k in
-let g28 = Nil0 in
-let g30 = '\n' in
-let g31 = Unit0 in
+    let t4 = CID1[t1,arg] in
+    g20 t4 k in
+let g26 = CID0 in
+let g27 = '\n' in
+let g28 = CID0 in
 let g14 = fun arg k ->
   let k = [], fun [] arg ->
     let k = [], fun [] arg ->
       let k = [], fun [] arg ->
-        let t1 = PRIM_PutChar(g30) in
-        g14 g31 k in
+        let t1 = PRIM_PutChar(g27) in
+        g14 g28 k in
       g1 arg k in
-    g21 g28 k in
+    g20 g26 k in
   g1 g19 k in
-let g33 = 'R' in
-let g34 = 'U' in
-let g35 = 'N' in
-let g36 = '\n' in
-let g37 = CID0 in
-let g38 = CID1[g36,g37] in
-let g39 = CID1[g35,g38] in
-let g40 = CID1[g34,g39] in
-let g41 = CID1[g33,g40] in
-let g42 = Unit0 in
-let g43 = 'N' in
-let g44 = 'E' in
-let g45 = 'V' in
-let g46 = 'E' in
-let g47 = 'R' in
-let g48 = '\n' in
-let g49 = CID0 in
-let g50 = CID1[g48,g49] in
-let g51 = CID1[g47,g50] in
-let g52 = CID1[g46,g51] in
-let g53 = CID1[g45,g52] in
-let g54 = CID1[g44,g53] in
-let g55 = CID1[g43,g54] in
+let g29 = 'R' in
+let g30 = 'U' in
+let g31 = 'N' in
+let g32 = '\n' in
+let g33 = CID0 in
+let g34 = CID1[g32,g33] in
+let g35 = CID1[g31,g34] in
+let g36 = CID1[g30,g35] in
+let g37 = CID1[g29,g36] in
+let g38 = CID0 in
+let g39 = 'N' in
+let g40 = 'E' in
+let g41 = 'V' in
+let g42 = 'E' in
+let g43 = 'R' in
+let g44 = '\n' in
+let g45 = CID0 in
+let g46 = CID1[g44,g45] in
+let g47 = CID1[g43,g46] in
+let g48 = CID1[g42,g47] in
+let g49 = CID1[g41,g48] in
+let g50 = CID1[g40,g49] in
+let g51 = CID1[g39,g50] in
 let k = [], fun [] arg ->
   let k = [], fun [] arg ->
-    let k = [], fun [] arg -> g1 g55 k in
-    g14 g42 k in
-  g1 g41 k in
+    let k = [], fun [] arg -> g1 g51 k in
+    g14 g38 k in
+  g1 g37 k in
 g1 g13 k

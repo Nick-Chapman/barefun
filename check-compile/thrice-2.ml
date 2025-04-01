@@ -1,6 +1,5 @@
 (*stage2*)
 let k () = ()
-let _ = Unit0 in
 let lit_0'0 = '@' in
 let _ = PRIM_PutChar(lit_0'0) in
 let lit_0'0 = 'A' in

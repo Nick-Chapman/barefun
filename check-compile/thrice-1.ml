@@ -1,5 +1,4 @@
 (*stage1*)
-let _ = Unit0 in
 let _ = PRIM_PutChar('@') in
 let _ = PRIM_PutChar('A') in
 let _ = PRIM_PutChar('B') in

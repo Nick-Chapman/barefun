@@ -24,6 +24,7 @@ data SemValue
   = Syntax Exp
   | Macro Id (SemValue -> M SemValue)
   | Constant Position Value -- TODO: should only be base values here
+  | Constructed Position Int [SemValue]
 
 posOfId :: Id -> Position
 posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos -- TODO: mandatory pos in ident
@@ -46,6 +47,10 @@ reifyValue pos = \case
 
 reify :: SemValue -> M Exp
 reify = \case
+  Constructed pos tag args -> do
+    es <- mapM reify args
+    let cid = Cid "CID" -- TODO: need to solve this issue?
+    pure $ ConTag pos (Ctag cid tag) es
   Constant pos v -> pure (reifyValue pos v)
   Syntax e -> pure e
   Macro x f -> do
@@ -60,6 +65,7 @@ reify = \case
 share :: Id -> SemValue -> M SemValue
 share x sv = do
   case sv of
+    Constructed{} -> pure sv
     Constant{} -> pure sv
     Macro{} -> pure sv
     Syntax (Var{}) -> pure sv
@@ -104,9 +110,16 @@ reflect env = \case
     pure (look env x)
   Lit pos x -> do
     pure $ Constant pos (evalLit x)
-  ConTag p tag es -> do -- TODO: propogate constant-ness
-    es <- mapM (norm env) es
-    pure $ Syntax $ ConTag p tag es
+  ConTag pos c@(Ctag _ tag) args -> do
+    args <- mapM (reflect env) args
+    let new = True
+    case new of
+      False -> do
+        args <- mapM reify args
+        pure $ Syntax $ ConTag pos c args
+      True -> do
+        pure $ Constructed pos tag args
+
   Prim p b es -> do
     es <- mapM (reflect env) es
     reflectBuiltin p b es
@@ -129,23 +142,24 @@ reflect env = \case
   Case pos scrut arms -> do
     scrut <- reflect env scrut
     case scrut of
-      Constant pos (VCons cScrut vs) -> do
-        -- constant branch selection
-        let
-          (xs,body) :: ([Id],Exp) =
-            case [ (xs,body) | ArmTag (Ctag _ cArm) xs body <- arms, cArm == cScrut ] of
-              [] -> error "reflect: case match failure"
-              x:_ -> x
-        let env' = foldr (uncurry Map.insert) env [ (x,Constant pos v) | (x,v) <- zip xs vs ]
-        reflect env' body
-
+      Constructed _ tag args -> undefined $ caseSelect tag args env arms -- TODO: no exammple provokes yet
+      Constant pos (VCons tag vs) -> caseSelect tag (map (Constant pos) vs) env arms
       Constant{} -> error "reflect: case-scrut a non-constucted constant"
       Macro{} -> error "reflect: case-scrut a function"
-
       Syntax{} -> do
         scrut <- reify scrut
         arms <- mapM (normArm env) arms
         pure $ Syntax $ Case pos scrut arms
+
+caseSelect :: Int -> [SemValue] -> Env -> [Arm] -> M SemValue
+caseSelect tag vs env arms = do
+  let
+    (xs,body) :: ([Id],Exp) =
+      case [ (xs,body) | ArmTag (Ctag _ cArm) xs body <- arms, cArm == tag ] of
+        [] -> error "reflect: case match failure"
+        x:_ -> x
+  reflect (foldr (uncurry Map.insert) env (zip xs vs)) body
+
 
 normArm :: Env -> Arm -> M Arm
 normArm env (ArmTag c xs body) = do
