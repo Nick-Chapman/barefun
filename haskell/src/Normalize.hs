@@ -10,6 +10,9 @@ import Stage1 (Exp(..),Arm(..),Id(..),Ctag(..))
 import Value (Value(..))
 import qualified Data.Map as Map
 
+enabled :: Bool
+enabled = True -- controls 4 places -- TODO: pass from command line?
+
 ----------------------------------------------------------------------
 -- Normalize
 
@@ -76,12 +79,12 @@ share x sv = do
 
 apply :: SemValue -> Position -> SemValue -> M SemValue
 apply fun p arg = do
-  case fun of
-    Macro x fun -> do
+  case (enabled,fun) of
+    -- (1) Normalize: Function Inlining
+    (True, Macro x fun) -> do
       arg <- share x arg
-      fun arg -- inlining occurs here
-
-    fun -> do
+      fun arg
+    _ -> do
       fun <- reify fun
       arg <- reify arg
       pure $ Syntax (App fun p arg)
@@ -93,14 +96,11 @@ maybeAllConstant svs = do
 
 reflectBuiltin :: Position -> Builtin -> [SemValue] -> M SemValue
 reflectBuiltin pos b es = do
-  if not (isPure b) then syntax else
-    case maybeAllConstant es of
-      Just vs -> do
-        let res :: Value = evaluatePureBuiltin b vs
-        pure $ Constant pos res
-      Nothing -> syntax
-  where
-    syntax = do
+  case (enabled && isPure b, maybeAllConstant es) of
+    -- (2) Normalize: Constant Propogation
+    (True, Just vs) -> do
+      pure $ Constant pos (evaluatePureBuiltin b vs)
+    _ -> do
       es <- mapM reify es
       pure $ Syntax $ Prim pos b es
 
@@ -110,16 +110,9 @@ reflect env = \case
     pure (look env x)
   Lit pos x -> do
     pure $ Constant pos (evalLit x)
-  ConTag pos c@(Ctag _ tag) args -> do
+  ConTag pos (Ctag _ tag) args -> do
     args <- mapM (reflect env) args
-    let new = True
-    case new of
-      False -> do
-        args <- mapM reify args
-        pure $ Syntax $ ConTag pos c args
-      True -> do
-        pure $ Constructed pos tag args
-
+    pure $ Constructed pos tag args
   Prim p b es -> do
     es <- mapM (reflect env) es
     reflectBuiltin p b es
@@ -138,15 +131,25 @@ reflect env = \case
     e2 <- reflect env e2
     apply e1 p e2
   Let p x rhs body -> do
-    reflect env (App (Lam p x body) p rhs)
+    case enabled of
+      -- (3) Normalize: Lets as Applied-Lambdas
+      True -> reflect env (App (Lam p x body) p rhs)
+      False -> do
+        -- when not enabled, we preserve the user lets
+        x' <- fresh x
+        rhs <- norm env rhs
+        body <- norm (Map.insert x (syn x') env) body
+        pure $ Syntax $ Let p x' rhs body
+
   Case pos scrut arms -> do
     scrut <- reflect env scrut
-    case scrut of
-      Constructed _ tag args -> undefined $ caseSelect tag args env arms -- TODO: no exammple provokes yet
-      Constant pos (VCons tag vs) -> caseSelect tag (map (Constant pos) vs) env arms
-      Constant{} -> error "reflect: case-scrut a non-constucted constant"
-      Macro{} -> error "reflect: case-scrut a function"
-      Syntax{} -> do
+    case (enabled,scrut) of
+      -- (4) Normalize: Constant Branch Selection
+      (True,Constructed _ tag args) -> undefined $ caseSelect tag args env arms -- TODO: no exammple provokes yet
+      (True,Constant pos (VCons tag vs)) -> caseSelect tag (map (Constant pos) vs) env arms
+      (_,Constant{}) -> error "reflect: case-scrut a non-constucted constant"
+      (_,Macro{}) -> error "reflect: case-scrut a function"
+      _ -> do
         scrut <- reify scrut
         arms <- mapM (normArm env) arms
         pure $ Syntax $ Case pos scrut arms
@@ -159,7 +162,6 @@ caseSelect tag vs env arms = do
         [] -> error "reflect: case match failure"
         x:_ -> x
   reflect (foldr (uncurry Map.insert) env (zip xs vs)) body
-
 
 normArm :: Env -> Arm -> M Arm
 normArm env (ArmTag c xs body) = do
