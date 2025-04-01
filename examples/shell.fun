@@ -1,5 +1,5 @@
 
-let noinline = let rec r f = let _ = r in f in r
+(*let noinline = let rec r f = let _ = r in f in r*) (* TODO: have principled noinline construct *)
 
 let not b =
   match b with
@@ -11,7 +11,7 @@ let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
 (* Make a prettier put_char for control chars; also align with backspacing *)
-let put_char = noinline (fun c ->
+let put_char = (*noinline*) (fun c -> (* TODO: inline_only_constant_argument *)
   let backspace = 8 in
   let n = ord c in
   if n = backspace then put_char c else
@@ -106,7 +106,7 @@ let read_line () =
     let c = get_char () in
     let n = ord c in
     if eq_char c '\n' then (newline(); reverse acc) else
-      if eq_char c controlD then (put_char c; newline(); reverse (controlD :: acc)) else
+      if eq_char c controlD then (put_char c; newline(); reverse (controlD :: acc)) else (* TODO put_char controlD *)
         if n > 127 then loop acc else
           if n = 127 then
             match acc with
