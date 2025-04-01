@@ -1,5 +1,7 @@
 
-(*let noinline = let rec r f = let _ = r in f in r*) (* TODO: have principled noinline construct *)
+let noinline = let rec block f a = let _ = block in f a in block (* TODO: have principled noinline construct *)
+
+let explode = noinline explode
 
 let not b =
   match b with
@@ -11,7 +13,7 @@ let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
 (* Make a prettier put_char for control chars; also align with backspacing *)
-let put_char = (*noinline*) (fun c -> (* TODO: inline_only_constant_argument *)
+let put_char = (fun c -> (* TODO: inline_only_constant_argument *)
   let backspace = 8 in
   let n = ord c in
   if n = backspace then put_char c else
@@ -55,20 +57,19 @@ let rec eq_list eq xs ys =
      | y::ys ->
         if eq x y then eq_list eq xs ys else false
 
-let eq_char_list a b = eq_list eq_char a b
+let eq_char_list xs ys = eq_list eq_char xs ys
 
 let rec append xs ys = (* non tail-recursive version *)
   match xs with
   | [] -> ys
   | x::xs -> cons x (append xs ys)
 
-let reverse xs = (* eta reduce case ocaml type issue for multiple uses *)
-  let rec loop acc xs =
-    match xs with
-    | [] -> acc
-    | x::xs -> loop (cons x acc) xs
-  in
-  loop [] xs
+let rec revloop acc xs =
+  match xs with
+  | [] -> acc
+  | x::xs -> revloop (cons x acc) xs
+
+let reverse xs = revloop [] xs
 
 let rec map f xs =
   match xs with
@@ -94,31 +95,30 @@ let rec put_chars xs =
   | [] -> ()
   | x::xs -> put_char x; put_chars xs
 
-let put_string s = put_chars (explode s)
+let put_string s = noinline (fun s -> put_chars (explode s)) s
 
 let put_int i = put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
 
-let read_line () =
+let rec readloop acc =
+  let c = get_char () in
+  let n = ord c in
   let controlD = chr 4 in
-  let rec loop acc =
-    let c = get_char () in
-    let n = ord c in
-    if eq_char c '\n' then (newline(); reverse acc) else
-      if eq_char c controlD then (put_char c; newline(); reverse (controlD :: acc)) else (* TODO put_char controlD *)
-        if n > 127 then loop acc else
-          if n = 127 then
-            match acc with
-            | [] -> loop acc
-            | c::tail ->
-               (if ord c <= 26 then erase_char () else ()); (* The ^ printed for control chars *)
-               erase_char();
-               loop tail
-          else
-            (put_char c; loop (cons c acc))
-  in
-  loop []
+  if eq_char c '\n' then (newline(); reverse acc) else
+    if eq_char c controlD then (put_char c; newline(); reverse (controlD :: acc)) else (* TODO put_char controlD *)
+      if n > 127 then readloop acc else
+        if n = 127 then
+          match acc with
+          | [] -> readloop acc
+          | c::tail ->
+             (if ord c <= 26 then erase_char () else ()); (* The ^ printed for control chars *)
+             erase_char();
+             readloop tail
+        else
+          (put_char c; readloop (cons c acc))
+
+let read_line () = readloop []
 
 let rec fib n =
   (*put_int n; newline ();*)
@@ -191,16 +191,16 @@ let fallback line =
   put_string " chars)";
   newline ()
 
-let split_words s =
-  let rec loop accWs accCs xs =
-    match xs with
-    | [] -> reverse (reverse accCs :: accWs)
-    (* TODO: handle multiple space seps *)
-    | x::xs ->
-       if eq_char x ' ' then loop (reverse accCs :: accWs) [] xs
-       else loop accWs (x::accCs) xs
-  in
-  loop [] [] s
+let rec splitloop accWs accCs xs =
+  match xs with
+  | [] -> reverse (reverse accCs :: accWs)
+  (* TODO: handle multiple space seps *)
+  | x::xs ->
+     if eq_char x ' ' then splitloop (reverse accCs :: accWs) [] xs
+     else splitloop accWs (x::accCs) xs
+
+let split_words s = (* eta expand for efficiency; smaller continuation frames *)
+  splitloop [] [] s
 
 let execute line =
   let words = split_words line in
