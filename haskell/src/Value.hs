@@ -9,7 +9,7 @@ import Interaction (Interaction)
 import Text.Printf (printf)
 
 data Value
-  = VCons Int [Value]
+  = VCons Int [Value] -- TODO: should define and use Ctag here
   | VString String
   | VChar Char
   | VNum Word16

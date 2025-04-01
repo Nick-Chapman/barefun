@@ -93,18 +93,7 @@ let mainloop =
         match PRIM_EqChar(c,'\n') with
         | true1 ->
           let _ = Unit0 in
-          let _ =
-            match CID0 with
-            | true1 -> PRIM_PutChar('\n')
-            | false0 ->
-              match CID1 with
-              | true1 -> PRIM_PutChar('\n')
-              | false0 ->
-                match CID0 with
-                | true1 -> PRIM_PutChar('\n')
-                | false0 ->
-                  let _ = PRIM_PutChar('^') in
-                  PRIM_PutChar('J') in
+          let _ = PRIM_PutChar('\n') in
           let loop =
             fix (fun loop acc ->
               (fun xs ->
@@ -132,18 +121,7 @@ let mainloop =
                     let x = PRIM_CharChr(x) in
                     PRIM_PutChar(x) in
             let _ = Unit0 in
-            let _ =
-              match CID0 with
-              | true1 -> PRIM_PutChar('\n')
-              | false0 ->
-                match CID1 with
-                | true1 -> PRIM_PutChar('\n')
-                | false0 ->
-                  match CID0 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    let _ = PRIM_PutChar('^') in
-                    PRIM_PutChar('J') in
+            let _ = PRIM_PutChar('\n') in
             let xs = Cons1('\EOT', acc) in
             let loop =
               fix (fun loop acc ->
@@ -169,79 +147,14 @@ let mainloop =
                     | false0 -> true1 with
                     | true1 ->
                       let _ = Unit0 in
-                      let _ =
-                        match CID1 with
-                        | true1 -> PRIM_PutChar('\b')
-                        | false0 ->
-                          match CID0 with
-                          | true1 -> PRIM_PutChar('\b')
-                          | false0 ->
-                            match CID0 with
-                            | true1 -> PRIM_PutChar('\b')
-                            | false0 ->
-                              let _ = PRIM_PutChar('^') in
-                              PRIM_PutChar('H') in
-                      let _ =
-                        match CID0 with
-                        | true1 -> PRIM_PutChar(' ')
-                        | false0 ->
-                          match CID0 with
-                          | true1 -> PRIM_PutChar(' ')
-                          | false0 ->
-                            match CID1 with
-                            | true1 -> PRIM_PutChar(' ')
-                            | false0 ->
-                              let _ = PRIM_PutChar('^') in
-                              PRIM_PutChar('`') in
-                      match CID1 with
-                      | true1 -> PRIM_PutChar('\b')
-                      | false0 ->
-                        match CID0 with
-                        | true1 -> PRIM_PutChar('\b')
-                        | false0 ->
-                          match CID0 with
-                          | true1 -> PRIM_PutChar('\b')
-                          | false0 ->
-                            let _ = PRIM_PutChar('^') in
-                            PRIM_PutChar('H')
+                      let _ = PRIM_PutChar('\b') in
+                      let _ = PRIM_PutChar(' ') in
+                      PRIM_PutChar('\b')
                     | false0 -> Unit0 in
                   let _ = Unit0 in
-                  let _ =
-                    match CID1 with
-                    | true1 -> PRIM_PutChar('\b')
-                    | false0 ->
-                      match CID0 with
-                      | true1 -> PRIM_PutChar('\b')
-                      | false0 ->
-                        match CID0 with
-                        | true1 -> PRIM_PutChar('\b')
-                        | false0 ->
-                          let _ = PRIM_PutChar('^') in
-                          PRIM_PutChar('H') in
-                  let _ =
-                    match CID0 with
-                    | true1 -> PRIM_PutChar(' ')
-                    | false0 ->
-                      match CID0 with
-                      | true1 -> PRIM_PutChar(' ')
-                      | false0 ->
-                        match CID1 with
-                        | true1 -> PRIM_PutChar(' ')
-                        | false0 ->
-                          let _ = PRIM_PutChar('^') in
-                          PRIM_PutChar('`') in
-                  let _ =
-                    match CID1 with
-                    | true1 -> PRIM_PutChar('\b')
-                    | false0 ->
-                      match CID0 with
-                      | true1 -> PRIM_PutChar('\b')
-                      | false0 ->
-                        match CID0 with
-                        | true1 -> PRIM_PutChar('\b')
-                        | false0 ->
-                          let _ = PRIM_PutChar('^') in
-                          PRIM_PutChar('H') in
+                  let _ = PRIM_PutChar('\b') in
+                  let _ = PRIM_PutChar(' ') in
+                  let _ = PRIM_PutChar('\b') in
                   (loop tail)
               | false0 ->
                 let n = PRIM_CharOrd(c) in
@@ -311,34 +224,14 @@ let mainloop =
               let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
               let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('n', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0))))))))))))))))))))) in
               let _ = Unit0 in
-              match CID0 with
-              | true1 -> PRIM_PutChar('\n')
-              | false0 ->
-                match CID1 with
-                | true1 -> PRIM_PutChar('\n')
-                | false0 ->
-                  match CID0 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    let _ = PRIM_PutChar('^') in
-                    PRIM_PutChar('J')
+              PRIM_PutChar('\n')
             | Cons1(arg1,more) ->
               match more with
               | Cons1(_,_) ->
                 let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
                 let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('e', CID1('x', CID1('a', CID1('c', CID1('t', CID1('l', CID1('y', CID1(' ', CID1('o', CID1('n', CID1('e', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0)))))))))))))))))))))))))))))) in
                 let _ = Unit0 in
-                match CID0 with
-                | true1 -> PRIM_PutChar('\n')
-                | false0 ->
-                  match CID1 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    match CID0 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      let _ = PRIM_PutChar('^') in
-                      PRIM_PutChar('J')
+                PRIM_PutChar('\n')
               | Nil0 ->
                 let loop =
                   fix (fun loop acc ->
@@ -369,17 +262,7 @@ let mainloop =
                   let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
                   let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('1', CID1(' ', CID1('t', CID1('o', CID1(' ', CID1('b', CID1('e', CID1(' ', CID1('n', CID1('u', CID1('m', CID1('e', CID1('r', CID1('i', CID1('c', CID0)))))))))))))))))))))))))))) in
                   let _ = Unit0 in
-                  match CID0 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    match CID1 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      match CID0 with
-                      | true1 -> PRIM_PutChar('\n')
-                      | false0 ->
-                        let _ = PRIM_PutChar('^') in
-                        PRIM_PutChar('J')
+                  PRIM_PutChar('\n')
                 | Some0(n) ->
                   let res = (fib n) in
                   let loop =
@@ -418,17 +301,7 @@ let mainloop =
                       Cons1('0', xs)
                     | false0 -> ((loop Nil0) res)) in
                   let _ = Unit0 in
-                  match CID0 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    match CID1 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      match CID0 with
-                      | true1 -> PRIM_PutChar('\n')
-                      | false0 ->
-                        let _ = PRIM_PutChar('^') in
-                        PRIM_PutChar('J')
+                  PRIM_PutChar('\n')
           | false0 ->
             match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) CID1('f', CID1('a', CID1('c', CID1('t', CID0))))) with
             | true1 ->
@@ -438,34 +311,14 @@ let mainloop =
                 let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
                 let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('n', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0))))))))))))))))))))) in
                 let _ = Unit0 in
-                match CID0 with
-                | true1 -> PRIM_PutChar('\n')
-                | false0 ->
-                  match CID1 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    match CID0 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      let _ = PRIM_PutChar('^') in
-                      PRIM_PutChar('J')
+                PRIM_PutChar('\n')
               | Cons1(arg1,more) ->
                 match more with
                 | Cons1(_,_) ->
                   let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
                   let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('e', CID1('x', CID1('a', CID1('c', CID1('t', CID1('l', CID1('y', CID1(' ', CID1('o', CID1('n', CID1('e', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID0)))))))))))))))))))))))))))))) in
                   let _ = Unit0 in
-                  match CID0 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    match CID1 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      match CID0 with
-                      | true1 -> PRIM_PutChar('\n')
-                      | false0 ->
-                        let _ = PRIM_PutChar('^') in
-                        PRIM_PutChar('J')
+                  PRIM_PutChar('\n')
                 | Nil0 ->
                   let loop =
                     fix (fun loop acc ->
@@ -496,17 +349,7 @@ let mainloop =
                     let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
                     let _ = (put_chars CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('1', CID1(' ', CID1('t', CID1('o', CID1(' ', CID1('b', CID1('e', CID1(' ', CID1('n', CID1('u', CID1('m', CID1('e', CID1('r', CID1('i', CID1('c', CID0)))))))))))))))))))))))))))) in
                     let _ = Unit0 in
-                    match CID0 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      match CID1 with
-                      | true1 -> PRIM_PutChar('\n')
-                      | false0 ->
-                        match CID0 with
-                        | true1 -> PRIM_PutChar('\n')
-                        | false0 ->
-                          let _ = PRIM_PutChar('^') in
-                          PRIM_PutChar('J')
+                    PRIM_PutChar('\n')
                   | Some0(n) ->
                     let res = (fact n) in
                     let loop =
@@ -545,17 +388,7 @@ let mainloop =
                         Cons1('0', xs)
                       | false0 -> ((loop Nil0) res)) in
                     let _ = Unit0 in
-                    match CID0 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      match CID1 with
-                      | true1 -> PRIM_PutChar('\n')
-                      | false0 ->
-                        match CID0 with
-                        | true1 -> PRIM_PutChar('\n')
-                        | false0 ->
-                          let _ = PRIM_PutChar('^') in
-                          PRIM_PutChar('J')
+                    PRIM_PutChar('\n')
             | false0 ->
               match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) CID1('r', CID1('e', CID1('v', CID0)))) with
               | true1 ->
@@ -564,17 +397,7 @@ let mainloop =
                   let _ = (put_chars CID1('E', CID1('R', CID1('R', CID1('O', CID1('R', CID1(':', CID1(' ', CID0)))))))) in
                   let _ = (put_chars CID1('r', CID1('e', CID1('v', CID1(':', CID1(' ', CID1('e', CID1('x', CID1('p', CID1('e', CID1('c', CID1('t', CID1('e', CID1('d', CID1(' ', CID1('n', CID1('o', CID1(' ', CID1('a', CID1('r', CID1('g', CID1('u', CID1('m', CID1('e', CID1('n', CID1('t', CID1('s', CID0))))))))))))))))))))))))))) in
                   let _ = Unit0 in
-                  match CID0 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    match CID1 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      match CID0 with
-                      | true1 -> PRIM_PutChar('\n')
-                      | false0 ->
-                        let _ = PRIM_PutChar('^') in
-                        PRIM_PutChar('J')
+                  PRIM_PutChar('\n')
                 | Nil0 ->
                   let _ = (put_chars CID1('(', CID1('r', CID1('e', CID1('v', CID1('e', CID1('r', CID1('s', CID1('e', CID1(' ', CID1('t', CID1('y', CID1('p', CID1('e', CID1('d', CID1(' ', CID1('l', CID1('i', CID1('n', CID1('e', CID1('s', CID1(' ', CID1('u', CID1('n', CID1('t', CID1('i', CID1('l', CID1(' ', CID1('^', CID1('D', CID1(')', CID1('\n', CID0)))))))))))))))))))))))))))))))) in
                   let _ = Unit0 in
@@ -589,18 +412,7 @@ let mainloop =
                           match PRIM_EqChar(c,'\n') with
                           | true1 ->
                             let _ = Unit0 in
-                            let _ =
-                              match CID0 with
-                              | true1 -> PRIM_PutChar('\n')
-                              | false0 ->
-                                match CID1 with
-                                | true1 -> PRIM_PutChar('\n')
-                                | false0 ->
-                                  match CID0 with
-                                  | true1 -> PRIM_PutChar('\n')
-                                  | false0 ->
-                                    let _ = PRIM_PutChar('^') in
-                                    PRIM_PutChar('J') in
+                            let _ = PRIM_PutChar('\n') in
                             let loop =
                               fix (fun loop acc ->
                                 (fun xs ->
@@ -628,18 +440,7 @@ let mainloop =
                                       let x = PRIM_CharChr(x) in
                                       PRIM_PutChar(x) in
                               let _ = Unit0 in
-                              let _ =
-                                match CID0 with
-                                | true1 -> PRIM_PutChar('\n')
-                                | false0 ->
-                                  match CID1 with
-                                  | true1 -> PRIM_PutChar('\n')
-                                  | false0 ->
-                                    match CID0 with
-                                    | true1 -> PRIM_PutChar('\n')
-                                    | false0 ->
-                                      let _ = PRIM_PutChar('^') in
-                                      PRIM_PutChar('J') in
+                              let _ = PRIM_PutChar('\n') in
                               let xs = Cons1('\EOT', acc) in
                               let loop =
                                 fix (fun loop acc ->
@@ -665,79 +466,14 @@ let mainloop =
                                       | false0 -> true1 with
                                       | true1 ->
                                         let _ = Unit0 in
-                                        let _ =
-                                          match CID1 with
-                                          | true1 -> PRIM_PutChar('\b')
-                                          | false0 ->
-                                            match CID0 with
-                                            | true1 -> PRIM_PutChar('\b')
-                                            | false0 ->
-                                              match CID0 with
-                                              | true1 -> PRIM_PutChar('\b')
-                                              | false0 ->
-                                                let _ = PRIM_PutChar('^') in
-                                                PRIM_PutChar('H') in
-                                        let _ =
-                                          match CID0 with
-                                          | true1 -> PRIM_PutChar(' ')
-                                          | false0 ->
-                                            match CID0 with
-                                            | true1 -> PRIM_PutChar(' ')
-                                            | false0 ->
-                                              match CID1 with
-                                              | true1 -> PRIM_PutChar(' ')
-                                              | false0 ->
-                                                let _ = PRIM_PutChar('^') in
-                                                PRIM_PutChar('`') in
-                                        match CID1 with
-                                        | true1 -> PRIM_PutChar('\b')
-                                        | false0 ->
-                                          match CID0 with
-                                          | true1 -> PRIM_PutChar('\b')
-                                          | false0 ->
-                                            match CID0 with
-                                            | true1 -> PRIM_PutChar('\b')
-                                            | false0 ->
-                                              let _ = PRIM_PutChar('^') in
-                                              PRIM_PutChar('H')
+                                        let _ = PRIM_PutChar('\b') in
+                                        let _ = PRIM_PutChar(' ') in
+                                        PRIM_PutChar('\b')
                                       | false0 -> Unit0 in
                                     let _ = Unit0 in
-                                    let _ =
-                                      match CID1 with
-                                      | true1 -> PRIM_PutChar('\b')
-                                      | false0 ->
-                                        match CID0 with
-                                        | true1 -> PRIM_PutChar('\b')
-                                        | false0 ->
-                                          match CID0 with
-                                          | true1 -> PRIM_PutChar('\b')
-                                          | false0 ->
-                                            let _ = PRIM_PutChar('^') in
-                                            PRIM_PutChar('H') in
-                                    let _ =
-                                      match CID0 with
-                                      | true1 -> PRIM_PutChar(' ')
-                                      | false0 ->
-                                        match CID0 with
-                                        | true1 -> PRIM_PutChar(' ')
-                                        | false0 ->
-                                          match CID1 with
-                                          | true1 -> PRIM_PutChar(' ')
-                                          | false0 ->
-                                            let _ = PRIM_PutChar('^') in
-                                            PRIM_PutChar('`') in
-                                    let _ =
-                                      match CID1 with
-                                      | true1 -> PRIM_PutChar('\b')
-                                      | false0 ->
-                                        match CID0 with
-                                        | true1 -> PRIM_PutChar('\b')
-                                        | false0 ->
-                                          match CID0 with
-                                          | true1 -> PRIM_PutChar('\b')
-                                          | false0 ->
-                                            let _ = PRIM_PutChar('^') in
-                                            PRIM_PutChar('H') in
+                                    let _ = PRIM_PutChar('\b') in
+                                    let _ = PRIM_PutChar(' ') in
+                                    let _ = PRIM_PutChar('\b') in
                                     (loop tail)
                                 | false0 ->
                                   let n = PRIM_CharOrd(c) in
@@ -769,18 +505,7 @@ let mainloop =
                               | Cons1(x,xs) -> ((loop Cons1(x, acc)) xs))) in
                         let _ = (put_chars ((loop Nil0) xs)) in
                         let _ = Unit0 in
-                        let _ =
-                          match CID0 with
-                          | true1 -> PRIM_PutChar('\n')
-                          | false0 ->
-                            match CID1 with
-                            | true1 -> PRIM_PutChar('\n')
-                            | false0 ->
-                              match CID0 with
-                              | true1 -> PRIM_PutChar('\n')
-                              | false0 ->
-                                let _ = PRIM_PutChar('^') in
-                                PRIM_PutChar('J') in
+                        let _ = PRIM_PutChar('\n') in
                         (loop Unit0)) in
                   (loop Unit0)
               | false0 ->
@@ -812,17 +537,7 @@ let mainloop =
                   | false0 -> ((loop Nil0) n)) in
                 let _ = (put_chars CID1(' ', CID1('c', CID1('h', CID1('a', CID1('r', CID1('s', CID1(')', CID0)))))))) in
                 let _ = Unit0 in
-                match CID0 with
-                | true1 -> PRIM_PutChar('\n')
-                | false0 ->
-                  match CID1 with
-                  | true1 -> PRIM_PutChar('\n')
-                  | false0 ->
-                    match CID0 with
-                    | true1 -> PRIM_PutChar('\n')
-                    | false0 ->
-                      let _ = PRIM_PutChar('^') in
-                      PRIM_PutChar('J') in
+                PRIM_PutChar('\n') in
       (mainloop Unit0)) in
 let _ = Unit0 in
 let _ = (put_chars CID1('T', CID1('h', CID1('i', CID1('s', CID1(' ', CID1('i', CID1('s', CID1(' ', CID1('a', CID1(' ', CID1('s', CID1('h', CID1('e', CID1('l', CID1('l', CID1(' ', CID1('p', CID1('r', CID1('o', CID1('t', CID1('o', CID1('t', CID1('y', CID1('p', CID1('e', CID1('.', CID1(' ', CID1('T', CID1('r', CID1('y', CID1(':', CID1(' ', CID1('f', CID1('i', CID1('b', CID1(',', CID1(' ', CID1('f', CID1('a', CID1('c', CID1('t', CID1(',', CID1(' ', CID1('r', CID1('e', CID1('v', CID1('\n', CID0)))))))))))))))))))))))))))))))))))))))))))))))) in

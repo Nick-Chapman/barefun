@@ -168,45 +168,20 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
       match prim_0'0 with
       | true1 ->
         let _ = Unit0 in
-        let con_0'0 = CID0 in
-        let k [acc] _ =
-          let loop = fix (fun [] loop acc k ->
-            let lam_66'19 = fun [acc,loop] xs k ->
-              match xs with
-              | Nil0 -> k acc
-              | Cons1(x,xs) ->
-                let con_0'0 = Cons1[x,acc] in
-                let k [xs] app_69'20 = app_69'20 xs k in
-                loop con_0'0 k in
-            k lam_66'19) in
-          let con_71'7 = Nil0 in
-          let k [acc] app_71'7 = app_71'7 acc k in
-          loop con_71'7 k in
-        match con_0'0 with
-        | true1 ->
-          let lit_101'26 = '\n' in
-          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-          k prim_0'0
-        | false0 ->
-          let con_0'0 = CID1 in
-          match con_0'0 with
-          | true1 ->
-            let lit_101'26 = '\n' in
-            let prim_0'0 = PRIM_PutChar(lit_101'26) in
-            k prim_0'0
-          | false0 ->
-            let con_0'0 = CID0 in
-            match con_0'0 with
-            | true1 ->
-              let lit_101'26 = '\n' in
-              let prim_0'0 = PRIM_PutChar(lit_101'26) in
-              k prim_0'0
-            | false0 ->
-              let lit_20'18 = '^' in
-              let _ = PRIM_PutChar(lit_20'18) in
-              let lit_0'0 = 'J' in
-              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-              k prim_0'0
+        let lit_101'26 = '\n' in
+        let _ = PRIM_PutChar(lit_101'26) in
+        let loop = fix (fun [] loop acc k ->
+          let lam_66'19 = fun [acc,loop] xs k ->
+            match xs with
+            | Nil0 -> k acc
+            | Cons1(x,xs) ->
+              let con_0'0 = Cons1[x,acc] in
+              let k [xs] app_69'20 = app_69'20 xs k in
+              loop con_0'0 k in
+          k lam_66'19) in
+        let con_71'7 = Nil0 in
+        let k [acc] app_71'7 = app_71'7 acc k in
+        loop con_71'7 k
       | false0 ->
         let lit_0'0 = '\EOT' in
         let prim_0'0 = PRIM_EqChar(c,lit_0'0) in
@@ -217,47 +192,22 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
           let prim_0'0 = PRIM_EqInt(n,lit_15'18) in
           let k [acc] _ =
             let _ = Unit0 in
-            let con_0'0 = CID0 in
-            let k [acc] _ =
-              let lit_0'0 = '\EOT' in
-              let xs = Cons1[lit_0'0,acc] in
-              let loop = fix (fun [] loop acc k ->
-                let lam_66'19 = fun [acc,loop] xs k ->
-                  match xs with
-                  | Nil0 -> k acc
-                  | Cons1(x,xs) ->
-                    let con_0'0 = Cons1[x,acc] in
-                    let k [xs] app_69'20 = app_69'20 xs k in
-                    loop con_0'0 k in
-                k lam_66'19) in
-              let con_71'7 = Nil0 in
-              let k [xs] app_71'7 = app_71'7 xs k in
-              loop con_71'7 k in
-            match con_0'0 with
-            | true1 ->
-              let lit_101'26 = '\n' in
-              let prim_0'0 = PRIM_PutChar(lit_101'26) in
-              k prim_0'0
-            | false0 ->
-              let con_0'0 = CID1 in
-              match con_0'0 with
-              | true1 ->
-                let lit_101'26 = '\n' in
-                let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                k prim_0'0
-              | false0 ->
-                let con_0'0 = CID0 in
-                match con_0'0 with
-                | true1 ->
-                  let lit_101'26 = '\n' in
-                  let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                  k prim_0'0
-                | false0 ->
-                  let lit_20'18 = '^' in
-                  let _ = PRIM_PutChar(lit_20'18) in
-                  let lit_0'0 = 'J' in
-                  let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                  k prim_0'0 in
+            let lit_101'26 = '\n' in
+            let _ = PRIM_PutChar(lit_101'26) in
+            let lit_0'0 = '\EOT' in
+            let xs = Cons1[lit_0'0,acc] in
+            let loop = fix (fun [] loop acc k ->
+              let lam_66'19 = fun [acc,loop] xs k ->
+                match xs with
+                | Nil0 -> k acc
+                | Cons1(x,xs) ->
+                  let con_0'0 = Cons1[x,acc] in
+                  let k [xs] app_69'20 = app_69'20 xs k in
+                  loop con_0'0 k in
+              k lam_66'19) in
+            let con_71'7 = Nil0 in
+            let k [xs] app_71'7 = app_71'7 xs k in
+            loop con_71'7 k in
           match prim_0'0 with
           | true1 ->
             let prim_0'0 = PRIM_PutChar(c) in
@@ -305,170 +255,23 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                 let k [loop,tail] case_5'2 =
                   let k [loop,tail] _ =
                     let _ = Unit0 in
-                    let con_0'0 = CID1 in
-                    let k [loop,tail] _ =
-                      let con_0'0 = CID0 in
-                      let k [loop,tail] _ =
-                        let con_0'0 = CID1 in
-                        let k [loop,tail] _ = loop tail k in
-                        match con_0'0 with
-                        | true1 ->
-                          let lit_0'0 = '\b' in
-                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                          k prim_0'0
-                        | false0 ->
-                          let con_0'0 = CID0 in
-                          match con_0'0 with
-                          | true1 ->
-                            let lit_0'0 = '\b' in
-                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                            k prim_0'0
-                          | false0 ->
-                            let con_0'0 = CID0 in
-                            match con_0'0 with
-                            | true1 ->
-                              let lit_0'0 = '\b' in
-                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                              k prim_0'0
-                            | false0 ->
-                              let lit_20'18 = '^' in
-                              let _ = PRIM_PutChar(lit_20'18) in
-                              let lit_0'0 = 'H' in
-                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                              k prim_0'0 in
-                      match con_0'0 with
-                      | true1 ->
-                        let lit_26'11 = ' ' in
-                        let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                        k prim_0'0
-                      | false0 ->
-                        let con_0'0 = CID0 in
-                        match con_0'0 with
-                        | true1 ->
-                          let lit_26'11 = ' ' in
-                          let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                          k prim_0'0
-                        | false0 ->
-                          let con_0'0 = CID1 in
-                          match con_0'0 with
-                          | true1 ->
-                            let lit_26'11 = ' ' in
-                            let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                            k prim_0'0
-                          | false0 ->
-                            let lit_20'18 = '^' in
-                            let _ = PRIM_PutChar(lit_20'18) in
-                            let lit_0'0 = '`' in
-                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                            k prim_0'0 in
-                    match con_0'0 with
-                    | true1 ->
-                      let lit_0'0 = '\b' in
-                      let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                      k prim_0'0
-                    | false0 ->
-                      let con_0'0 = CID0 in
-                      match con_0'0 with
-                      | true1 ->
-                        let lit_0'0 = '\b' in
-                        let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                        k prim_0'0
-                      | false0 ->
-                        let con_0'0 = CID0 in
-                        match con_0'0 with
-                        | true1 ->
-                          let lit_0'0 = '\b' in
-                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                          k prim_0'0
-                        | false0 ->
-                          let lit_20'18 = '^' in
-                          let _ = PRIM_PutChar(lit_20'18) in
-                          let lit_0'0 = 'H' in
-                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                          k prim_0'0 in
+                    let lit_0'0 = '\b' in
+                    let _ = PRIM_PutChar(lit_0'0) in
+                    let lit_26'11 = ' ' in
+                    let _ = PRIM_PutChar(lit_26'11) in
+                    let lit_0'0 = '\b' in
+                    let _ = PRIM_PutChar(lit_0'0) in
+                    loop tail k in
                   match case_5'2 with
                   | true1 ->
                     let _ = Unit0 in
-                    let con_0'0 = CID1 in
-                    let k [] _ =
-                      let con_0'0 = CID0 in
-                      let k [] _ =
-                        let con_0'0 = CID1 in
-                        match con_0'0 with
-                        | true1 ->
-                          let lit_0'0 = '\b' in
-                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                          k prim_0'0
-                        | false0 ->
-                          let con_0'0 = CID0 in
-                          match con_0'0 with
-                          | true1 ->
-                            let lit_0'0 = '\b' in
-                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                            k prim_0'0
-                          | false0 ->
-                            let con_0'0 = CID0 in
-                            match con_0'0 with
-                            | true1 ->
-                              let lit_0'0 = '\b' in
-                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                              k prim_0'0
-                            | false0 ->
-                              let lit_20'18 = '^' in
-                              let _ = PRIM_PutChar(lit_20'18) in
-                              let lit_0'0 = 'H' in
-                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                              k prim_0'0 in
-                      match con_0'0 with
-                      | true1 ->
-                        let lit_26'11 = ' ' in
-                        let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                        k prim_0'0
-                      | false0 ->
-                        let con_0'0 = CID0 in
-                        match con_0'0 with
-                        | true1 ->
-                          let lit_26'11 = ' ' in
-                          let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                          k prim_0'0
-                        | false0 ->
-                          let con_0'0 = CID1 in
-                          match con_0'0 with
-                          | true1 ->
-                            let lit_26'11 = ' ' in
-                            let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                            k prim_0'0
-                          | false0 ->
-                            let lit_20'18 = '^' in
-                            let _ = PRIM_PutChar(lit_20'18) in
-                            let lit_0'0 = '`' in
-                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                            k prim_0'0 in
-                    match con_0'0 with
-                    | true1 ->
-                      let lit_0'0 = '\b' in
-                      let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                      k prim_0'0
-                    | false0 ->
-                      let con_0'0 = CID0 in
-                      match con_0'0 with
-                      | true1 ->
-                        let lit_0'0 = '\b' in
-                        let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                        k prim_0'0
-                      | false0 ->
-                        let con_0'0 = CID0 in
-                        match con_0'0 with
-                        | true1 ->
-                          let lit_0'0 = '\b' in
-                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                          k prim_0'0
-                        | false0 ->
-                          let lit_20'18 = '^' in
-                          let _ = PRIM_PutChar(lit_20'18) in
-                          let lit_0'0 = 'H' in
-                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                          k prim_0'0
+                    let lit_0'0 = '\b' in
+                    let _ = PRIM_PutChar(lit_0'0) in
+                    let lit_26'11 = ' ' in
+                    let _ = PRIM_PutChar(lit_26'11) in
+                    let lit_0'0 = '\b' in
+                    let prim_0'0 = PRIM_PutChar(lit_0'0) in
+                    k prim_0'0
                   | false0 ->
                     let con_115'55 = Unit0 in
                     k con_115'55 in
@@ -697,32 +500,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                     let con_0'0 = CID1[lit_0'0,con_0'0] in
                                     let k [] _ =
                                       let _ = Unit0 in
-                                      let con_0'0 = CID0 in
-                                      match con_0'0 with
-                                      | true1 ->
-                                        let lit_101'26 = '\n' in
-                                        let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                        k prim_0'0
-                                      | false0 ->
-                                        let con_0'0 = CID1 in
-                                        match con_0'0 with
-                                        | true1 ->
-                                          let lit_101'26 = '\n' in
-                                          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                          k prim_0'0
-                                        | false0 ->
-                                          let con_0'0 = CID0 in
-                                          match con_0'0 with
-                                          | true1 ->
-                                            let lit_101'26 = '\n' in
-                                            let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                            k prim_0'0
-                                          | false0 ->
-                                            let lit_20'18 = '^' in
-                                            let _ = PRIM_PutChar(lit_20'18) in
-                                            let lit_0'0 = 'J' in
-                                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                            k prim_0'0 in
+                                      let lit_101'26 = '\n' in
+                                      let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                      k prim_0'0 in
                                     put_chars con_0'0 k in
                                   put_chars con_0'0 k
                                 | Cons1(arg1,more) ->
@@ -805,32 +585,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                       let con_0'0 = CID1[lit_0'0,con_0'0] in
                                       let k [] _ =
                                         let _ = Unit0 in
-                                        let con_0'0 = CID0 in
-                                        match con_0'0 with
-                                        | true1 ->
-                                          let lit_101'26 = '\n' in
-                                          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                          k prim_0'0
-                                        | false0 ->
-                                          let con_0'0 = CID1 in
-                                          match con_0'0 with
-                                          | true1 ->
-                                            let lit_101'26 = '\n' in
-                                            let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                            k prim_0'0
-                                          | false0 ->
-                                            let con_0'0 = CID0 in
-                                            match con_0'0 with
-                                            | true1 ->
-                                              let lit_101'26 = '\n' in
-                                              let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                              k prim_0'0
-                                            | false0 ->
-                                              let lit_20'18 = '^' in
-                                              let _ = PRIM_PutChar(lit_20'18) in
-                                              let lit_0'0 = 'J' in
-                                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                              k prim_0'0 in
+                                        let lit_101'26 = '\n' in
+                                        let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                        k prim_0'0 in
                                       put_chars con_0'0 k in
                                     put_chars con_0'0 k
                                   | Nil0 ->
@@ -966,32 +723,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                             let con_0'0 = CID1[lit_0'0,con_0'0] in
                                             let k [] _ =
                                               let _ = Unit0 in
-                                              let con_0'0 = CID0 in
-                                              match con_0'0 with
-                                              | true1 ->
-                                                let lit_101'26 = '\n' in
-                                                let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                k prim_0'0
-                                              | false0 ->
-                                                let con_0'0 = CID1 in
-                                                match con_0'0 with
-                                                | true1 ->
-                                                  let lit_101'26 = '\n' in
-                                                  let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                  k prim_0'0
-                                                | false0 ->
-                                                  let con_0'0 = CID0 in
-                                                  match con_0'0 with
-                                                  | true1 ->
-                                                    let lit_101'26 = '\n' in
-                                                    let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                    k prim_0'0
-                                                  | false0 ->
-                                                    let lit_20'18 = '^' in
-                                                    let _ = PRIM_PutChar(lit_20'18) in
-                                                    let lit_0'0 = 'J' in
-                                                    let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                    k prim_0'0 in
+                                              let lit_101'26 = '\n' in
+                                              let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                              k prim_0'0 in
                                             put_chars con_0'0 k in
                                           put_chars con_0'0 k
                                         | Some0(n) ->
@@ -1055,32 +789,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                   let k [put_chars] case_90'2 =
                                                     let k [] _ =
                                                       let _ = Unit0 in
-                                                      let con_0'0 = CID0 in
-                                                      match con_0'0 with
-                                                      | true1 ->
-                                                        let lit_101'26 = '\n' in
-                                                        let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                        k prim_0'0
-                                                      | false0 ->
-                                                        let con_0'0 = CID1 in
-                                                        match con_0'0 with
-                                                        | true1 ->
-                                                          let lit_101'26 = '\n' in
-                                                          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                          k prim_0'0
-                                                        | false0 ->
-                                                          let con_0'0 = CID0 in
-                                                          match con_0'0 with
-                                                          | true1 ->
-                                                            let lit_101'26 = '\n' in
-                                                            let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                            k prim_0'0
-                                                          | false0 ->
-                                                            let lit_20'18 = '^' in
-                                                            let _ = PRIM_PutChar(lit_20'18) in
-                                                            let lit_0'0 = 'J' in
-                                                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                            k prim_0'0 in
+                                                      let lit_101'26 = '\n' in
+                                                      let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                                      k prim_0'0 in
                                                     put_chars case_90'2 k in
                                                   match prim_0'0 with
                                                   | true1 ->
@@ -1203,32 +914,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                             let con_0'0 = CID1[lit_0'0,con_0'0] in
                                             let k [] _ =
                                               let _ = Unit0 in
-                                              let con_0'0 = CID0 in
-                                              match con_0'0 with
-                                              | true1 ->
-                                                let lit_101'26 = '\n' in
-                                                let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                k prim_0'0
-                                              | false0 ->
-                                                let con_0'0 = CID1 in
-                                                match con_0'0 with
-                                                | true1 ->
-                                                  let lit_101'26 = '\n' in
-                                                  let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                  k prim_0'0
-                                                | false0 ->
-                                                  let con_0'0 = CID0 in
-                                                  match con_0'0 with
-                                                  | true1 ->
-                                                    let lit_101'26 = '\n' in
-                                                    let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                    k prim_0'0
-                                                  | false0 ->
-                                                    let lit_20'18 = '^' in
-                                                    let _ = PRIM_PutChar(lit_20'18) in
-                                                    let lit_0'0 = 'J' in
-                                                    let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                    k prim_0'0 in
+                                              let lit_101'26 = '\n' in
+                                              let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                              k prim_0'0 in
                                             put_chars con_0'0 k in
                                           put_chars con_0'0 k
                                         | Cons1(arg1,more) ->
@@ -1311,32 +999,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                               let con_0'0 = CID1[lit_0'0,con_0'0] in
                                               let k [] _ =
                                                 let _ = Unit0 in
-                                                let con_0'0 = CID0 in
-                                                match con_0'0 with
-                                                | true1 ->
-                                                  let lit_101'26 = '\n' in
-                                                  let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                  k prim_0'0
-                                                | false0 ->
-                                                  let con_0'0 = CID1 in
-                                                  match con_0'0 with
-                                                  | true1 ->
-                                                    let lit_101'26 = '\n' in
-                                                    let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                    k prim_0'0
-                                                  | false0 ->
-                                                    let con_0'0 = CID0 in
-                                                    match con_0'0 with
-                                                    | true1 ->
-                                                      let lit_101'26 = '\n' in
-                                                      let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                      k prim_0'0
-                                                    | false0 ->
-                                                      let lit_20'18 = '^' in
-                                                      let _ = PRIM_PutChar(lit_20'18) in
-                                                      let lit_0'0 = 'J' in
-                                                      let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                      k prim_0'0 in
+                                                let lit_101'26 = '\n' in
+                                                let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                                k prim_0'0 in
                                               put_chars con_0'0 k in
                                             put_chars con_0'0 k
                                           | Nil0 ->
@@ -1472,32 +1137,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                     let con_0'0 = CID1[lit_0'0,con_0'0] in
                                                     let k [] _ =
                                                       let _ = Unit0 in
-                                                      let con_0'0 = CID0 in
-                                                      match con_0'0 with
-                                                      | true1 ->
-                                                        let lit_101'26 = '\n' in
-                                                        let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                        k prim_0'0
-                                                      | false0 ->
-                                                        let con_0'0 = CID1 in
-                                                        match con_0'0 with
-                                                        | true1 ->
-                                                          let lit_101'26 = '\n' in
-                                                          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                          k prim_0'0
-                                                        | false0 ->
-                                                          let con_0'0 = CID0 in
-                                                          match con_0'0 with
-                                                          | true1 ->
-                                                            let lit_101'26 = '\n' in
-                                                            let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                            k prim_0'0
-                                                          | false0 ->
-                                                            let lit_20'18 = '^' in
-                                                            let _ = PRIM_PutChar(lit_20'18) in
-                                                            let lit_0'0 = 'J' in
-                                                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                            k prim_0'0 in
+                                                      let lit_101'26 = '\n' in
+                                                      let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                                      k prim_0'0 in
                                                     put_chars con_0'0 k in
                                                   put_chars con_0'0 k
                                                 | Some0(n) ->
@@ -1561,32 +1203,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                           let k [put_chars] case_90'2 =
                                                             let k [] _ =
                                                               let _ = Unit0 in
-                                                              let con_0'0 = CID0 in
-                                                              match con_0'0 with
-                                                              | true1 ->
-                                                                let lit_101'26 = '\n' in
-                                                                let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                k prim_0'0
-                                                              | false0 ->
-                                                                let con_0'0 = CID1 in
-                                                                match con_0'0 with
-                                                                | true1 ->
-                                                                  let lit_101'26 = '\n' in
-                                                                  let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                  k prim_0'0
-                                                                | false0 ->
-                                                                  let con_0'0 = CID0 in
-                                                                  match con_0'0 with
-                                                                  | true1 ->
-                                                                    let lit_101'26 = '\n' in
-                                                                    let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                    k prim_0'0
-                                                                  | false0 ->
-                                                                    let lit_20'18 = '^' in
-                                                                    let _ = PRIM_PutChar(lit_20'18) in
-                                                                    let lit_0'0 = 'J' in
-                                                                    let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                    k prim_0'0 in
+                                                              let lit_101'26 = '\n' in
+                                                              let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                                              k prim_0'0 in
                                                             put_chars case_90'2 k in
                                                           match prim_0'0 with
                                                           | true1 ->
@@ -1705,32 +1324,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                   let con_0'0 = CID1[lit_0'0,con_0'0] in
                                                   let k [] _ =
                                                     let _ = Unit0 in
-                                                    let con_0'0 = CID0 in
-                                                    match con_0'0 with
-                                                    | true1 ->
-                                                      let lit_101'26 = '\n' in
-                                                      let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                      k prim_0'0
-                                                    | false0 ->
-                                                      let con_0'0 = CID1 in
-                                                      match con_0'0 with
-                                                      | true1 ->
-                                                        let lit_101'26 = '\n' in
-                                                        let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                        k prim_0'0
-                                                      | false0 ->
-                                                        let con_0'0 = CID0 in
-                                                        match con_0'0 with
-                                                        | true1 ->
-                                                          let lit_101'26 = '\n' in
-                                                          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                          k prim_0'0
-                                                        | false0 ->
-                                                          let lit_20'18 = '^' in
-                                                          let _ = PRIM_PutChar(lit_20'18) in
-                                                          let lit_0'0 = 'J' in
-                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                          k prim_0'0 in
+                                                    let lit_101'26 = '\n' in
+                                                    let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                                    k prim_0'0 in
                                                   put_chars con_0'0 k in
                                                 put_chars con_0'0 k
                                               | Nil0 ->
@@ -1810,45 +1406,20 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                       match prim_0'0 with
                                                       | true1 ->
                                                         let _ = Unit0 in
-                                                        let con_0'0 = CID0 in
-                                                        let k [acc] _ =
-                                                          let loop = fix (fun [] loop acc k ->
-                                                            let lam_66'19 = fun [acc,loop] xs k ->
-                                                              match xs with
-                                                              | Nil0 -> k acc
-                                                              | Cons1(x,xs) ->
-                                                                let con_0'0 = Cons1[x,acc] in
-                                                                let k [xs] app_69'20 = app_69'20 xs k in
-                                                                loop con_0'0 k in
-                                                            k lam_66'19) in
-                                                          let con_71'7 = Nil0 in
-                                                          let k [acc] app_71'7 = app_71'7 acc k in
-                                                          loop con_71'7 k in
-                                                        match con_0'0 with
-                                                        | true1 ->
-                                                          let lit_101'26 = '\n' in
-                                                          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                          k prim_0'0
-                                                        | false0 ->
-                                                          let con_0'0 = CID1 in
-                                                          match con_0'0 with
-                                                          | true1 ->
-                                                            let lit_101'26 = '\n' in
-                                                            let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                            k prim_0'0
-                                                          | false0 ->
-                                                            let con_0'0 = CID0 in
-                                                            match con_0'0 with
-                                                            | true1 ->
-                                                              let lit_101'26 = '\n' in
-                                                              let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                              k prim_0'0
-                                                            | false0 ->
-                                                              let lit_20'18 = '^' in
-                                                              let _ = PRIM_PutChar(lit_20'18) in
-                                                              let lit_0'0 = 'J' in
-                                                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                              k prim_0'0
+                                                        let lit_101'26 = '\n' in
+                                                        let _ = PRIM_PutChar(lit_101'26) in
+                                                        let loop = fix (fun [] loop acc k ->
+                                                          let lam_66'19 = fun [acc,loop] xs k ->
+                                                            match xs with
+                                                            | Nil0 -> k acc
+                                                            | Cons1(x,xs) ->
+                                                              let con_0'0 = Cons1[x,acc] in
+                                                              let k [xs] app_69'20 = app_69'20 xs k in
+                                                              loop con_0'0 k in
+                                                          k lam_66'19) in
+                                                        let con_71'7 = Nil0 in
+                                                        let k [acc] app_71'7 = app_71'7 acc k in
+                                                        loop con_71'7 k
                                                       | false0 ->
                                                         let lit_0'0 = '\EOT' in
                                                         let prim_0'0 = PRIM_EqChar(c,lit_0'0) in
@@ -1859,47 +1430,22 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                           let prim_0'0 = PRIM_EqInt(n,lit_15'18) in
                                                           let k [acc] _ =
                                                             let _ = Unit0 in
-                                                            let con_0'0 = CID0 in
-                                                            let k [acc] _ =
-                                                              let lit_0'0 = '\EOT' in
-                                                              let xs = Cons1[lit_0'0,acc] in
-                                                              let loop = fix (fun [] loop acc k ->
-                                                                let lam_66'19 = fun [acc,loop] xs k ->
-                                                                  match xs with
-                                                                  | Nil0 -> k acc
-                                                                  | Cons1(x,xs) ->
-                                                                    let con_0'0 = Cons1[x,acc] in
-                                                                    let k [xs] app_69'20 = app_69'20 xs k in
-                                                                    loop con_0'0 k in
-                                                                k lam_66'19) in
-                                                              let con_71'7 = Nil0 in
-                                                              let k [xs] app_71'7 = app_71'7 xs k in
-                                                              loop con_71'7 k in
-                                                            match con_0'0 with
-                                                            | true1 ->
-                                                              let lit_101'26 = '\n' in
-                                                              let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                              k prim_0'0
-                                                            | false0 ->
-                                                              let con_0'0 = CID1 in
-                                                              match con_0'0 with
-                                                              | true1 ->
-                                                                let lit_101'26 = '\n' in
-                                                                let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                k prim_0'0
-                                                              | false0 ->
-                                                                let con_0'0 = CID0 in
-                                                                match con_0'0 with
-                                                                | true1 ->
-                                                                  let lit_101'26 = '\n' in
-                                                                  let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                  k prim_0'0
-                                                                | false0 ->
-                                                                  let lit_20'18 = '^' in
-                                                                  let _ = PRIM_PutChar(lit_20'18) in
-                                                                  let lit_0'0 = 'J' in
-                                                                  let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                  k prim_0'0 in
+                                                            let lit_101'26 = '\n' in
+                                                            let _ = PRIM_PutChar(lit_101'26) in
+                                                            let lit_0'0 = '\EOT' in
+                                                            let xs = Cons1[lit_0'0,acc] in
+                                                            let loop = fix (fun [] loop acc k ->
+                                                              let lam_66'19 = fun [acc,loop] xs k ->
+                                                                match xs with
+                                                                | Nil0 -> k acc
+                                                                | Cons1(x,xs) ->
+                                                                  let con_0'0 = Cons1[x,acc] in
+                                                                  let k [xs] app_69'20 = app_69'20 xs k in
+                                                                  loop con_0'0 k in
+                                                              k lam_66'19) in
+                                                            let con_71'7 = Nil0 in
+                                                            let k [xs] app_71'7 = app_71'7 xs k in
+                                                            loop con_71'7 k in
                                                           match prim_0'0 with
                                                           | true1 ->
                                                             let prim_0'0 = PRIM_PutChar(c) in
@@ -1947,170 +1493,23 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                                 let k [loop,tail] case_5'2 =
                                                                   let k [loop,tail] _ =
                                                                     let _ = Unit0 in
-                                                                    let con_0'0 = CID1 in
-                                                                    let k [loop,tail] _ =
-                                                                      let con_0'0 = CID0 in
-                                                                      let k [loop,tail] _ =
-                                                                        let con_0'0 = CID1 in
-                                                                        let k [loop,tail] _ = loop tail k in
-                                                                        match con_0'0 with
-                                                                        | true1 ->
-                                                                          let lit_0'0 = '\b' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                          k prim_0'0
-                                                                        | false0 ->
-                                                                          let con_0'0 = CID0 in
-                                                                          match con_0'0 with
-                                                                          | true1 ->
-                                                                            let lit_0'0 = '\b' in
-                                                                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                            k prim_0'0
-                                                                          | false0 ->
-                                                                            let con_0'0 = CID0 in
-                                                                            match con_0'0 with
-                                                                            | true1 ->
-                                                                              let lit_0'0 = '\b' in
-                                                                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                              k prim_0'0
-                                                                            | false0 ->
-                                                                              let lit_20'18 = '^' in
-                                                                              let _ = PRIM_PutChar(lit_20'18) in
-                                                                              let lit_0'0 = 'H' in
-                                                                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                              k prim_0'0 in
-                                                                      match con_0'0 with
-                                                                      | true1 ->
-                                                                        let lit_26'11 = ' ' in
-                                                                        let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                                                                        k prim_0'0
-                                                                      | false0 ->
-                                                                        let con_0'0 = CID0 in
-                                                                        match con_0'0 with
-                                                                        | true1 ->
-                                                                          let lit_26'11 = ' ' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                                                                          k prim_0'0
-                                                                        | false0 ->
-                                                                          let con_0'0 = CID1 in
-                                                                          match con_0'0 with
-                                                                          | true1 ->
-                                                                            let lit_26'11 = ' ' in
-                                                                            let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                                                                            k prim_0'0
-                                                                          | false0 ->
-                                                                            let lit_20'18 = '^' in
-                                                                            let _ = PRIM_PutChar(lit_20'18) in
-                                                                            let lit_0'0 = '`' in
-                                                                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                            k prim_0'0 in
-                                                                    match con_0'0 with
-                                                                    | true1 ->
-                                                                      let lit_0'0 = '\b' in
-                                                                      let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                      k prim_0'0
-                                                                    | false0 ->
-                                                                      let con_0'0 = CID0 in
-                                                                      match con_0'0 with
-                                                                      | true1 ->
-                                                                        let lit_0'0 = '\b' in
-                                                                        let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                        k prim_0'0
-                                                                      | false0 ->
-                                                                        let con_0'0 = CID0 in
-                                                                        match con_0'0 with
-                                                                        | true1 ->
-                                                                          let lit_0'0 = '\b' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                          k prim_0'0
-                                                                        | false0 ->
-                                                                          let lit_20'18 = '^' in
-                                                                          let _ = PRIM_PutChar(lit_20'18) in
-                                                                          let lit_0'0 = 'H' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                          k prim_0'0 in
+                                                                    let lit_0'0 = '\b' in
+                                                                    let _ = PRIM_PutChar(lit_0'0) in
+                                                                    let lit_26'11 = ' ' in
+                                                                    let _ = PRIM_PutChar(lit_26'11) in
+                                                                    let lit_0'0 = '\b' in
+                                                                    let _ = PRIM_PutChar(lit_0'0) in
+                                                                    loop tail k in
                                                                   match case_5'2 with
                                                                   | true1 ->
                                                                     let _ = Unit0 in
-                                                                    let con_0'0 = CID1 in
-                                                                    let k [] _ =
-                                                                      let con_0'0 = CID0 in
-                                                                      let k [] _ =
-                                                                        let con_0'0 = CID1 in
-                                                                        match con_0'0 with
-                                                                        | true1 ->
-                                                                          let lit_0'0 = '\b' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                          k prim_0'0
-                                                                        | false0 ->
-                                                                          let con_0'0 = CID0 in
-                                                                          match con_0'0 with
-                                                                          | true1 ->
-                                                                            let lit_0'0 = '\b' in
-                                                                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                            k prim_0'0
-                                                                          | false0 ->
-                                                                            let con_0'0 = CID0 in
-                                                                            match con_0'0 with
-                                                                            | true1 ->
-                                                                              let lit_0'0 = '\b' in
-                                                                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                              k prim_0'0
-                                                                            | false0 ->
-                                                                              let lit_20'18 = '^' in
-                                                                              let _ = PRIM_PutChar(lit_20'18) in
-                                                                              let lit_0'0 = 'H' in
-                                                                              let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                              k prim_0'0 in
-                                                                      match con_0'0 with
-                                                                      | true1 ->
-                                                                        let lit_26'11 = ' ' in
-                                                                        let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                                                                        k prim_0'0
-                                                                      | false0 ->
-                                                                        let con_0'0 = CID0 in
-                                                                        match con_0'0 with
-                                                                        | true1 ->
-                                                                          let lit_26'11 = ' ' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                                                                          k prim_0'0
-                                                                        | false0 ->
-                                                                          let con_0'0 = CID1 in
-                                                                          match con_0'0 with
-                                                                          | true1 ->
-                                                                            let lit_26'11 = ' ' in
-                                                                            let prim_0'0 = PRIM_PutChar(lit_26'11) in
-                                                                            k prim_0'0
-                                                                          | false0 ->
-                                                                            let lit_20'18 = '^' in
-                                                                            let _ = PRIM_PutChar(lit_20'18) in
-                                                                            let lit_0'0 = '`' in
-                                                                            let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                            k prim_0'0 in
-                                                                    match con_0'0 with
-                                                                    | true1 ->
-                                                                      let lit_0'0 = '\b' in
-                                                                      let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                      k prim_0'0
-                                                                    | false0 ->
-                                                                      let con_0'0 = CID0 in
-                                                                      match con_0'0 with
-                                                                      | true1 ->
-                                                                        let lit_0'0 = '\b' in
-                                                                        let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                        k prim_0'0
-                                                                      | false0 ->
-                                                                        let con_0'0 = CID0 in
-                                                                        match con_0'0 with
-                                                                        | true1 ->
-                                                                          let lit_0'0 = '\b' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                          k prim_0'0
-                                                                        | false0 ->
-                                                                          let lit_20'18 = '^' in
-                                                                          let _ = PRIM_PutChar(lit_20'18) in
-                                                                          let lit_0'0 = 'H' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                          k prim_0'0
+                                                                    let lit_0'0 = '\b' in
+                                                                    let _ = PRIM_PutChar(lit_0'0) in
+                                                                    let lit_26'11 = ' ' in
+                                                                    let _ = PRIM_PutChar(lit_26'11) in
+                                                                    let lit_0'0 = '\b' in
+                                                                    let prim_0'0 = PRIM_PutChar(lit_0'0) in
+                                                                    k prim_0'0
                                                                   | false0 ->
                                                                     let con_115'55 = Unit0 in
                                                                     k con_115'55 in
@@ -2185,35 +1584,10 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                                 let k [put_chars,loop] app_71'10 =
                                                                   let k [loop] _ =
                                                                     let _ = Unit0 in
-                                                                    let con_0'0 = CID0 in
-                                                                    let k [loop] _ =
-                                                                      let con_174'46 = Unit0 in
-                                                                      loop con_174'46 k in
-                                                                    match con_0'0 with
-                                                                    | true1 ->
-                                                                      let lit_101'26 = '\n' in
-                                                                      let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                      k prim_0'0
-                                                                    | false0 ->
-                                                                      let con_0'0 = CID1 in
-                                                                      match con_0'0 with
-                                                                      | true1 ->
-                                                                        let lit_101'26 = '\n' in
-                                                                        let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                        k prim_0'0
-                                                                      | false0 ->
-                                                                        let con_0'0 = CID0 in
-                                                                        match con_0'0 with
-                                                                        | true1 ->
-                                                                          let lit_101'26 = '\n' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                          k prim_0'0
-                                                                        | false0 ->
-                                                                          let lit_20'18 = '^' in
-                                                                          let _ = PRIM_PutChar(lit_20'18) in
-                                                                          let lit_0'0 = 'J' in
-                                                                          let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                          k prim_0'0 in
+                                                                    let lit_101'26 = '\n' in
+                                                                    let _ = PRIM_PutChar(lit_101'26) in
+                                                                    let con_174'46 = Unit0 in
+                                                                    loop con_174'46 k in
                                                                   put_chars app_71'10 k in
                                                                 app_71'7 xs k in
                                                               loop con_71'7 k in
@@ -2312,32 +1686,9 @@ let mainloop = fix (fun [eq_list,append,map,length,put_chars,fib,fact,single_con
                                                                 let con_0'0 = CID1[lit_0'0,con_0'0] in
                                                                 let k [] _ =
                                                                   let _ = Unit0 in
-                                                                  let con_0'0 = CID0 in
-                                                                  match con_0'0 with
-                                                                  | true1 ->
-                                                                    let lit_101'26 = '\n' in
-                                                                    let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                    k prim_0'0
-                                                                  | false0 ->
-                                                                    let con_0'0 = CID1 in
-                                                                    match con_0'0 with
-                                                                    | true1 ->
-                                                                      let lit_101'26 = '\n' in
-                                                                      let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                      k prim_0'0
-                                                                    | false0 ->
-                                                                      let con_0'0 = CID0 in
-                                                                      match con_0'0 with
-                                                                      | true1 ->
-                                                                        let lit_101'26 = '\n' in
-                                                                        let prim_0'0 = PRIM_PutChar(lit_101'26) in
-                                                                        k prim_0'0
-                                                                      | false0 ->
-                                                                        let lit_20'18 = '^' in
-                                                                        let _ = PRIM_PutChar(lit_20'18) in
-                                                                        let lit_0'0 = 'J' in
-                                                                        let prim_0'0 = PRIM_PutChar(lit_0'0) in
-                                                                        k prim_0'0 in
+                                                                  let lit_101'26 = '\n' in
+                                                                  let prim_0'0 = PRIM_PutChar(lit_101'26) in
+                                                                  k prim_0'0 in
                                                                 put_chars con_0'0 k in
                                                               put_chars case_90'2 k in
                                                             match prim_0'0 with

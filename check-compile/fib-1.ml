@@ -27,11 +27,7 @@ let loop =
         let x = PRIM_AddInt(48,c) in
         let x = PRIM_CharChr(x) in
         ((loop Cons1(x, acc)) PRIM_DivInt(i,10)))) in
-let _ =
-  (put_chars
-  match CID0 with
-  | true1 -> Cons1('0', Nil0)
-  | false0 -> ((loop Nil0) 20)) in
+let _ = (put_chars ((loop Nil0) 20)) in
 let _ = (put_chars CID1(' ', CID1('-', CID1('-', CID1('>', CID1(' ', CID0)))))) in
 let loop =
   fix (fun loop acc ->

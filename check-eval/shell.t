@@ -162,7 +162,7 @@ Haskell REPL (stage3u)
 Haskell REPL (stage1)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -1
-  [stage1; normalization: 775 -> 2528]
+  [stage1; normalization: 775 -> 2042]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
@@ -194,7 +194,7 @@ Haskell REPL (stage1)
 Haskell REPL (stage2)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -2
-  [stage2; normalization: 775 -> 2528]
+  [stage2; normalization: 775 -> 2042]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
@@ -221,12 +221,12 @@ Haskell REPL (stage2)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=58843, #enter=59172, #return=58842, #prim=146843]
+  > [EOF:#push-continuation=58828, #enter=59172, #return=58827, #prim=146843]
 
 Haskell REPL (stage3)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -3
-  [stage3; normalization: 775 -> 2528]
+  [stage3; normalization: 775 -> 2042]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
@@ -253,12 +253,12 @@ Haskell REPL (stage3)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=58843, #enter=59172, #return=58842, #prim=146843]
+  > [EOF:#push-continuation=58828, #enter=59172, #return=58827, #prim=146843]
 
 Haskell REPL
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun
-  [stage3; normalization: 775 -> 2528]
+  [stage3; normalization: 775 -> 2042]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
@@ -285,4 +285,4 @@ Haskell REPL
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=58843, #enter=59172, #return=58842, #prim=146843]
+  > [EOF:#push-continuation=58828, #enter=59172, #return=58827, #prim=146843]

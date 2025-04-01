@@ -126,10 +126,26 @@ reflect env = \case
     apply e1 p e2
   Let p x rhs body -> do
     reflect env (App (Lam p x body) p rhs)
-  Case pos scrut arms -> do -- TODO: simplify constant scrut
-    scrut <- norm env scrut
-    arms <- mapM (normArm env) arms
-    pure $ Syntax $ Case pos scrut arms
+  Case pos scrut arms -> do
+    scrut <- reflect env scrut
+    case scrut of
+      Constant pos (VCons cScrut vs) -> do
+        -- constant branch selection
+        let
+          (xs,body) :: ([Id],Exp) =
+            case [ (xs,body) | ArmTag (Ctag _ cArm) xs body <- arms, cArm == cScrut ] of
+              [] -> error "reflect: case match failure"
+              x:_ -> x
+        let env' = foldr (uncurry Map.insert) env [ (x,Constant pos v) | (x,v) <- zip xs vs ]
+        reflect env' body
+
+      Constant{} -> error "reflect: case-scrut a non-constucted constant"
+      Macro{} -> error "reflect: case-scrut a function"
+
+      Syntax{} -> do
+        scrut <- reify scrut
+        arms <- mapM (normArm env) arms
+        pure $ Syntax $ Case pos scrut arms
 
 normArm :: Env -> Arm -> M Arm
 normArm env (ArmTag c xs body) = do
