@@ -95,70 +95,6 @@ Haskell REPL (stage1u)
   You wrote: "G**dbye" (7 chars)
   > [EOF:#apps=355671, #prim=147098]
 
-Haskell REPL (stage2u)
-
-  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -2u
-  [stage2; un-normalized]
-  This is a shell prototype. Try: fib, fact, rev
-  > Hello, World!
-  You wrote: "Hell*, W*rld!" (13 chars)
-  > fib
-  fib: ERROR: expected an argument
-  > fib xx
-  fib: ERROR: expected arg1 to be numeric
-  > fib xx yy
-  fib: ERROR: expected exactly one argument
-  > fib 20
-  fib: 20 --> 6765
-  > fib 21
-  fib: 21 --> 10946
-  > fact 6
-  fact: 6 --> 720
-  > fact 7
-  fact: 7 --> 5040
-  > rev
-  (reverse typed lines until ^D)
-  Here are some words.
-  .sdrow emos era ereH
-  And here are some more.
-  .erom emos era ereh dnA
-  ^D
-  > Goodbye
-  You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=324219, #enter=355671, #return=324217, #prim=147098]
-
-Haskell REPL (stage3u)
-
-  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -3u
-  [stage3; un-normalized]
-  This is a shell prototype. Try: fib, fact, rev
-  > Hello, World!
-  You wrote: "Hell*, W*rld!" (13 chars)
-  > fib
-  fib: ERROR: expected an argument
-  > fib xx
-  fib: ERROR: expected arg1 to be numeric
-  > fib xx yy
-  fib: ERROR: expected exactly one argument
-  > fib 20
-  fib: 20 --> 6765
-  > fib 21
-  fib: 21 --> 10946
-  > fact 6
-  fact: 6 --> 720
-  > fact 7
-  fact: 7 --> 5040
-  > rev
-  (reverse typed lines until ^D)
-  Here are some words.
-  .sdrow emos era ereH
-  And here are some more.
-  .erom emos era ereh dnA
-  ^D
-  > Goodbye
-  You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=324219, #enter=355671, #return=324217, #prim=147098]
-
 Haskell REPL (stage1)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -1
@@ -226,38 +162,6 @@ Haskell REPL (stage2)
 Haskell REPL (stage3)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -3
-  [stage3; normalization: 791 -> 1089]
-  This is a shell prototype. Try: fib, fact, rev
-  > Hello, World!
-  You wrote: "Hell*, W*rld!" (13 chars)
-  > fib
-  fib: ERROR: expected an argument
-  > fib xx
-  fib: ERROR: expected arg1 to be numeric
-  > fib xx yy
-  fib: ERROR: expected exactly one argument
-  > fib 20
-  fib: 20 --> 6765
-  > fib 21
-  fib: 21 --> 10946
-  > fact 6
-  fact: 6 --> 720
-  > fact 7
-  fact: 7 --> 5040
-  > rev
-  (reverse typed lines until ^D)
-  Here are some words.
-  .sdrow emos era ereH
-  And here are some more.
-  .erom emos era ereh dnA
-  ^D
-  > Goodbye
-  You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=58895, #enter=59328, #return=58894, #prim=146886]
-
-Haskell REPL
-
-  $ cat shell.input | ../haskell/main.exe ../examples/shell.fun
   [stage3; normalization: 791 -> 1089]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!

@@ -33,27 +33,6 @@ Haskell REPL
   Good bye.
   > [EOF:#apps=364, #prim=117]
 
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun -2u
-  [stage2; un-normalized]
-  LOAD
-  RUN
-  > Hello, World!
-  Hello, World!
-  > Good bye.
-  Good bye.
-  > [EOF:#push-continuation=264, #enter=364, #return=261, #prim=117]
-
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun -3u
-  [stage3; un-normalized]
-  LOAD
-  RUN
-  > Hello, World!
-  Hello, World!
-  > Good bye.
-  Good bye.
-  > [EOF:#push-continuation=264, #enter=364, #return=261, #prim=117]
-
-
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -1
   [stage1; normalization: 176 -> 113]
   LOAD
@@ -75,16 +54,6 @@ Haskell REPL
   > [EOF:#push-continuation=35, #enter=120, #return=33, #prim=112]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -3
-  [stage3; normalization: 176 -> 113]
-  LOAD
-  RUN
-  > Hello, World!
-  Hello, World!
-  > Good bye.
-  Good bye.
-  > [EOF:#push-continuation=35, #enter=120, #return=33, #prim=112]
-
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun
   [stage3; normalization: 176 -> 113]
   LOAD
   RUN
