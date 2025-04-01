@@ -50,13 +50,15 @@ reify = \case
   Syntax e -> pure e
   Macro x f -> do
     x <- fresh x
-    let arg :: SemValue = syn x
-    res :: SemValue <- f arg
-    res :: Exp <- reify res
-    pure $ Lam (posOfId x) x res
+    body <- Reset $ do
+      let arg :: SemValue = syn x
+      res :: SemValue <- f arg
+      res :: Exp <- reify res
+      pure res
+    pure $ Lam (posOfId x) x body
 
-share :: Id -> SemValue -> (SemValue -> M SemValue) -> M SemValue
-share x sv k = do
+_old_share :: Id -> SemValue -> (SemValue -> M SemValue) -> M SemValue -- TODO: kill
+_old_share x sv k = do
   case sv of
     Constant{} -> k sv
     Macro{} -> k sv
@@ -65,15 +67,24 @@ share x sv k = do
       x <- fresh x
       rhs <- reify sv
       body <- k (syn x) >>= reify
-      -- TODO: I think we need to lift this let binding outwards, by managing the continuation in M
       pure $ Syntax (Let (posOfId x) x rhs body)
+
+_new_share :: Id -> SemValue -> M SemValue
+_new_share x sv = do
+  case sv of
+    Constant{} -> pure sv
+    Macro{} -> pure sv
+    Syntax (Var{}) -> pure sv
+    Syntax{} -> do
+      x <- fresh x
+      rhs <- reify sv
+      Wrap (Let (posOfId x) x rhs) (pure (syn x))
 
 apply :: SemValue -> Position -> SemValue -> M SemValue
 apply fun p arg = do
   case fun of
-    Macro x fun -> do
-      share x arg $ \arg -> do
-        fun arg -- inlining occurs here!
+    Macro x fun -> _old_share x arg $ \arg -> fun arg -- inlining occurs here! -- OLD, TODO kill
+    --Macro x fun -> do arg <- _new_share x arg; fun arg -- inlining occurs here
     fun -> do
       fun <- reify fun
       arg <- reify arg
@@ -119,7 +130,7 @@ reflect env = \case
     x' <- fresh x
     f' <- fresh f
     let env' = Map.insert x (syn x') (Map.insert f (syn f') env)
-    body <- norm env' body
+    body <- Reset (norm env' body)
     pure $ Syntax $ RecLam pos f' x' body
   App e1 p e2 -> do
     e1 <- reflect env e1
@@ -136,7 +147,7 @@ normArm :: Env -> Arm -> M Arm
 normArm env (ArmTag c xs body) = do
   xys <- sequence [ do y <- fresh x; pure (x,y) | x <- xs ]
   let env' = foldr (uncurry Map.insert) env [ (x,syn y) | (x,y) <- xys ]
-  body <- norm env' body
+  body <- Reset (norm env' body)
   pure $ ArmTag c (map snd xys) body
 
 type Env = Map Id SemValue
@@ -163,12 +174,21 @@ data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
   Fresh :: M Int
+  Wrap :: (Exp -> Exp) -> M a -> M a
+  Reset :: M Exp -> M Exp
 
-runM :: M a -> a
-runM m0 = loop 1 m0 $ \_ x -> x
+runM :: M Exp -> Exp
+runM m0 = snd $ loop 1 m0 k0
   where
-    loop :: Int -> M a -> (Int -> a -> b) -> b
+    k0 = \u x -> (u,x)
+
+    loop :: Int -> M a -> (Int -> a -> Res) -> Res
     loop u m k = case m of
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
       Fresh -> k (u+1) u
+      Wrap f m  -> (u', f x) where (u',x) = loop u m k
+      Reset m -> k u' x where (u',x) = loop u m k0
+
+type Res = (State,Exp)
+type State = Int
