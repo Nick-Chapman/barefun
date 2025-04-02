@@ -1,6 +1,77 @@
-(*stage1*)
-let block = fix (fun block f -> (fun a -> (f a))) in
-let explode = (block (fun x -> PRIM_Explode(x))) in
+(*Stage1 (Exp)*)
+let + = (fun x -> (fun y -> PRIM_AddInt(x,y))) in
+let - = (fun x -> (fun y -> PRIM_SubInt(x,y))) in
+let ( * ) = (fun x -> (fun y -> PRIM_MulInt(x,y))) in
+let / = (fun x -> (fun y -> PRIM_DivInt(x,y))) in
+let % = (fun x -> (fun y -> PRIM_ModInt(x,y))) in
+let < = (fun x -> (fun y -> PRIM_LessInt(x,y))) in
+let = = (fun x -> (fun y -> PRIM_EqInt(x,y))) in
+let eq_char = (fun x -> (fun y -> PRIM_EqChar(x,y))) in
+let ord = (fun x -> PRIM_CharOrd(x)) in
+let chr = (fun x -> PRIM_CharChr(x)) in
+let explode = (fun x -> PRIM_Explode(x)) in
+let put_char = (fun x -> PRIM_PutChar(x)) in
+let get_char = (fun x -> PRIM_GetChar(x)) in
+let :: = (fun x -> (fun y -> Cons1(x, y))) in
+let noinline =
+  let block =
+    fix (fun block f ->
+      (fun a ->
+        let _ = block in
+        (f a))) in
+  block in
+let explode = (noinline explode) in
+let not =
+  (fun b ->
+    match b with
+    | true1 -> false0
+    | false0 -> true1) in
+let > = (fun a -> (fun b -> ((< b) a))) in
+let <= = (fun a -> (fun b -> (not ((< b) a)))) in
+let >= = (fun a -> (fun b -> (not ((< a) b)))) in
+let put_char =
+  (fun c ->
+    let backspace = 8 in
+    let n = (ord c) in
+    match ((= n) backspace) with
+    | true1 -> (put_char c)
+    | false0 ->
+      match ((eq_char c) '\n') with
+      | true1 -> (put_char c)
+      | false0 ->
+        match ((> n) 26) with
+        | true1 -> (put_char c)
+        | false0 ->
+          let _ = (put_char '^') in
+          (put_char (chr ((- ((+ (ord 'A')) n)) 1)))) in
+let erase_char =
+  (fun _ ->
+    let backspace = (chr 8) in
+    let _ = (put_char backspace) in
+    let _ = (put_char ' ') in
+    (put_char backspace)) in
+let parse_digit =
+  (fun c ->
+    let n = ((- (ord c)) (ord '0')) in
+    match ((>= n) 0) with
+    | true1 ->
+      match ((<= n) 9) with
+      | true1 -> Some0(n)
+      | false0 -> None1
+    | false0 -> None1) in
+let parse_num =
+  (fun s ->
+    let loop =
+      fix (fun loop acc ->
+        (fun xs ->
+          match xs with
+          | Nil0 -> Some0(acc)
+          | Cons1(x,xs) ->
+            match (parse_digit x) with
+            | None1 -> None1
+            | Some0(d) -> ((loop ((+ ((( * ) 10) acc)) d)) xs))) in
+    ((loop 0) s)) in
+let cons = (fun x -> (fun xs -> ((:: x) xs))) in
 let eq_list =
   fix (fun eq_list eq ->
     (fun xs ->
@@ -8,389 +79,217 @@ let eq_list =
         match xs with
         | Nil0 ->
           match ys with
-          | Nil0 -> CID1
-          | Cons1(_,_) -> CID0
+          | Nil0 -> true1
+          | Cons1(_,_) -> false0
         | Cons1(x,xs) ->
           match ys with
-          | Nil0 -> CID0
+          | Nil0 -> false0
           | Cons1(y,ys) ->
             match ((eq x) y) with
             | true1 -> (((eq_list eq) xs) ys)
-            | false0 -> CID0))) in
+            | false0 -> false0))) in
+let eq_char_list = (fun xs -> (fun ys -> (((eq_list eq_char) xs) ys))) in
 let append =
   fix (fun append xs ->
     (fun ys ->
       match xs with
       | Nil0 -> ys
-      | Cons1(x,xs) ->
-        let xs = ((append xs) ys) in
-        CID1(x, xs))) in
+      | Cons1(x,xs) -> ((cons x) ((append xs) ys)))) in
 let revloop =
   fix (fun revloop acc ->
     (fun xs ->
       match xs with
       | Nil0 -> acc
-      | Cons1(x,xs) -> ((revloop CID1(x, acc)) xs))) in
+      | Cons1(x,xs) -> ((revloop ((cons x) acc)) xs))) in
+let reverse = (fun xs -> ((revloop Nil0) xs)) in
 let map =
   fix (fun map f ->
     (fun xs ->
       match xs with
-      | Nil0 -> CID0
-      | Cons1(x,xs) ->
-        let x = (f x) in
-        let y = ((map f) xs) in
-        CID1(x, y))) in
+      | Nil0 -> Nil0
+      | Cons1(x,xs) -> ((:: (f x)) ((map f) xs)))) in
 let length =
   fix (fun length xs ->
     match xs with
     | Nil0 -> 0
-    | Cons1(_,xs) ->
-      let y = (length xs) in
-      PRIM_AddInt(1,y)) in
+    | Cons1(_,xs) -> ((+ 1) (length xs))) in
+let chars_of_int =
+  (fun i ->
+    let ord0 = (ord '0') in
+    let char_of_digit = (fun c -> (chr ((+ ord0) c))) in
+    let loop =
+      fix (fun loop acc ->
+        (fun i ->
+          match ((= i) 0) with
+          | true1 -> acc
+          | false0 -> ((loop ((cons (char_of_digit ((% i) 10))) acc)) ((/ i) 10)))) in
+    match ((= i) 0) with
+    | true1 -> ((cons '0') Nil0)
+    | false0 -> ((loop Nil0) i)) in
 let put_chars =
   fix (fun put_chars xs ->
     match xs with
-    | Nil0 -> CID0
+    | Nil0 -> Unit0
     | Cons1(x,xs) ->
-      let n = PRIM_CharOrd(x) in
-      let _ =
-        match PRIM_EqInt(n,8) with
-        | true1 -> PRIM_PutChar(x)
-        | false0 ->
-          match PRIM_EqChar(x,'\n') with
-          | true1 -> PRIM_PutChar(x)
-          | false0 ->
-            match PRIM_LessInt(26,n) with
-            | true1 -> PRIM_PutChar(x)
-            | false0 ->
-              let _ = PRIM_PutChar('^') in
-              let x = PRIM_AddInt(65,n) in
-              let x = PRIM_SubInt(x,1) in
-              let x = PRIM_CharChr(x) in
-              PRIM_PutChar(x) in
+      let _ = (put_char x) in
       (put_chars xs)) in
+let put_string = (fun s -> ((noinline (fun s -> (put_chars (explode s)))) s)) in
+let put_int = (fun i -> (put_chars (chars_of_int i))) in
+let newline = (fun _ -> (put_char '\n')) in
 let readloop =
   fix (fun readloop acc ->
-    let c = PRIM_GetChar(CID0) in
-    let n = PRIM_CharOrd(c) in
-    match PRIM_EqChar(c,'\n') with
+    let c = (get_char Unit0) in
+    let n = (ord c) in
+    let controlD = (chr 4) in
+    match ((eq_char c) '\n') with
     | true1 ->
-      let _ = PRIM_PutChar('\n') in
-      ((revloop CID0) acc)
+      let _ = (newline Unit0) in
+      (reverse acc)
     | false0 ->
-      match PRIM_EqChar(c,'\EOT') with
+      match ((eq_char c) controlD) with
       | true1 ->
-        let n = PRIM_CharOrd(c) in
-        let _ =
-          match PRIM_EqInt(n,8) with
-          | true1 -> PRIM_PutChar(c)
-          | false0 ->
-            match PRIM_EqChar(c,'\n') with
-            | true1 -> PRIM_PutChar(c)
-            | false0 ->
-              match PRIM_LessInt(26,n) with
-              | true1 -> PRIM_PutChar(c)
-              | false0 ->
-                let _ = PRIM_PutChar('^') in
-                let x = PRIM_AddInt(65,n) in
-                let x = PRIM_SubInt(x,1) in
-                let x = PRIM_CharChr(x) in
-                PRIM_PutChar(x) in
-        let _ = PRIM_PutChar('\n') in
-        ((revloop CID0) CID1('\EOT', acc))
+        let _ = (put_char c) in
+        let _ = (newline Unit0) in
+        (reverse ((:: controlD) acc))
       | false0 ->
-        match PRIM_LessInt(127,n) with
+        match ((> n) 127) with
         | true1 -> (readloop acc)
         | false0 ->
-          match PRIM_EqInt(n,127) with
+          match ((= n) 127) with
           | true1 ->
             match acc with
             | Nil0 -> (readloop acc)
             | Cons1(c,tail) ->
-              let a = PRIM_CharOrd(c) in
-              let b = PRIM_LessInt(26,a) in
               let _ =
-                match match b with
-                | true1 -> CID0
-                | false0 -> CID1 with
-                | true1 ->
-                  let _ = PRIM_PutChar('\b') in
-                  let _ = PRIM_PutChar(' ') in
-                  PRIM_PutChar('\b')
-                | false0 -> CID0 in
-              let _ = PRIM_PutChar('\b') in
-              let _ = PRIM_PutChar(' ') in
-              let _ = PRIM_PutChar('\b') in
+                match ((<= (ord c)) 26) with
+                | true1 -> (erase_char Unit0)
+                | false0 -> Unit0 in
+              let _ = (erase_char Unit0) in
               (readloop tail)
           | false0 ->
-            let n = PRIM_CharOrd(c) in
-            let _ =
-              match PRIM_EqInt(n,8) with
-              | true1 -> PRIM_PutChar(c)
-              | false0 ->
-                match PRIM_EqChar(c,'\n') with
-                | true1 -> PRIM_PutChar(c)
-                | false0 ->
-                  match PRIM_LessInt(26,n) with
-                  | true1 -> PRIM_PutChar(c)
-                  | false0 ->
-                    let _ = PRIM_PutChar('^') in
-                    let x = PRIM_AddInt(65,n) in
-                    let x = PRIM_SubInt(x,1) in
-                    let x = PRIM_CharChr(x) in
-                    PRIM_PutChar(x) in
-            (readloop CID1(c, acc))) in
+            let _ = (put_char c) in
+            (readloop ((cons c) acc))) in
+let read_line = (fun _ -> (readloop Nil0)) in
 let fib =
   fix (fun fib n ->
-    match PRIM_LessInt(n,2) with
+    match ((< n) 2) with
     | true1 -> n
-    | false0 ->
-      let x = (fib PRIM_SubInt(n,1)) in
-      let y = (fib PRIM_SubInt(n,2)) in
-      PRIM_AddInt(x,y)) in
+    | false0 -> ((+ (fib ((- n) 1))) (fib ((- n) 2)))) in
 let fact =
   fix (fun fact n ->
-    let b = PRIM_LessInt(n,2) in
-    match match b with
-    | true1 -> CID0
-    | false0 -> CID1 with
-    | true1 ->
-      let x = (fact PRIM_SubInt(n,1)) in
-      PRIM_MulInt(x,n)
+    match ((>= n) 2) with
+    | true1 -> ((( * ) (fact ((- n) 1))) n)
     | false0 -> 1) in
+let error =
+  (fun s ->
+    let _ = (put_string "ERROR: ") in
+    let _ = (put_string s) in
+    (newline Unit0)) in
+let runfib =
+  (fun args ->
+    let _ = (put_string "fib: ") in
+    match args with
+    | Nil0 -> (error "expected an argument")
+    | Cons1(arg1,more) ->
+      match more with
+      | Cons1(_,_) -> (error "expected exactly one argument")
+      | Nil0 ->
+        match (parse_num arg1) with
+        | None1 -> (error "expected arg1 to be numeric")
+        | Some0(n) ->
+          let res = (fib n) in
+          let _ = (put_int n) in
+          let _ = (put_string " --> ") in
+          let _ = (put_int res) in
+          (newline Unit0)) in
+let runfact =
+  (fun args ->
+    let _ = (put_string "fact: ") in
+    match args with
+    | Nil0 -> (error "expected an argument")
+    | Cons1(arg1,more) ->
+      match more with
+      | Cons1(_,_) -> (error "expected exactly one argument")
+      | Nil0 ->
+        match (parse_num arg1) with
+        | None1 -> (error "expected arg1 to be numeric")
+        | Some0(n) ->
+          let res = (fact n) in
+          let _ = (put_int n) in
+          let _ = (put_string " --> ") in
+          let _ = (put_int res) in
+          (newline Unit0)) in
+let single_controlD = ((:: (chr 4)) Nil0) in
+let rev =
+  (fun _ ->
+    let loop =
+      fix (fun loop _ ->
+        let xs = (read_line Unit0) in
+        match ((eq_char_list xs) single_controlD) with
+        | true1 -> Unit0
+        | false0 ->
+          let _ = (put_chars (reverse xs)) in
+          let _ = (newline Unit0) in
+          (loop Unit0)) in
+    (loop Unit0)) in
+let runrev =
+  (fun args ->
+    match args with
+    | Cons1(_,_) -> (error "rev: expected no arguments")
+    | Nil0 ->
+      let _ = (put_string "(reverse typed lines until ^D)\n") in
+      (rev Unit0)) in
+let fallback =
+  (fun line ->
+    let star_the_ohs =
+      (map
+      (fun c ->
+        match ((eq_char c) 'o') with
+        | true1 -> '*'
+        | false0 -> c)) in
+    let n = (length line) in
+    let _ = (put_chars ((append (explode "You wrote: \"")) (star_the_ohs line))) in
+    let _ = (put_string "\" (") in
+    let _ = (put_int n) in
+    let _ = (put_string " chars)") in
+    (newline Unit0)) in
 let splitloop =
   fix (fun splitloop accWs ->
     (fun accCs ->
       (fun xs ->
         match xs with
-        | Nil0 ->
-          let x = ((revloop CID0) accCs) in
-          ((revloop CID0) CID1(x, accWs))
+        | Nil0 -> (reverse ((:: (reverse accCs)) accWs))
         | Cons1(x,xs) ->
-          match PRIM_EqChar(x,' ') with
-          | true1 ->
-            let x = ((revloop CID0) accCs) in
-            (((splitloop CID1(x, accWs)) CID0) xs)
-          | false0 -> (((splitloop accWs) CID1(x, accCs)) xs)))) in
+          match ((eq_char x) ' ') with
+          | true1 -> (((splitloop ((:: (reverse accCs)) accWs)) Nil0) xs)
+          | false0 -> (((splitloop accWs) ((:: x) accCs)) xs)))) in
+let split_words = (fun s -> (((splitloop Nil0) Nil0) s)) in
+let execute =
+  (fun line ->
+    let words = (split_words line) in
+    match words with
+    | Nil0 -> Unit0
+    | Cons1(command,args) ->
+      match ((eq_char_list command) (explode "fib")) with
+      | true1 -> (runfib args)
+      | false0 ->
+        match ((eq_char_list command) (explode "fact")) with
+        | true1 -> (runfact args)
+        | false0 ->
+          match ((eq_char_list command) (explode "rev")) with
+          | true1 -> (runrev args)
+          | false0 -> (fallback line)) in
 let mainloop =
   fix (fun mainloop _ ->
-    let _ = (put_chars CID1('>', CID1(' ', CID0))) in
-    let xs = (readloop CID0) in
-    match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) xs) CID1('\EOT', CID0)) with
-    | true1 -> CID0
+    let _ = (put_chars Cons1('>', Cons1(' ', Nil0))) in
+    let xs = (read_line Unit0) in
+    match ((eq_char_list xs) single_controlD) with
+    | true1 -> Unit0
     | false0 ->
-      let words = (((splitloop CID0) CID0) xs) in
-      let _ =
-        match words with
-        | Nil0 -> CID0
-        | Cons1(command,args) ->
-          let ys = (explode "fib") in
-          match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) ys) with
-          | true1 ->
-            let _ = ((block (fun s -> (put_chars (explode s)))) "fib: ") in
-            match args with
-            | Nil0 ->
-              let _ = ((block (fun s -> (put_chars (explode s)))) "ERROR: ") in
-              let _ = ((block (fun s -> (put_chars (explode s)))) "expected an argument") in
-              PRIM_PutChar('\n')
-            | Cons1(arg1,more) ->
-              match more with
-              | Cons1(_,_) ->
-                let _ = ((block (fun s -> (put_chars (explode s)))) "ERROR: ") in
-                let _ = ((block (fun s -> (put_chars (explode s)))) "expected exactly one argument") in
-                PRIM_PutChar('\n')
-              | Nil0 ->
-                let loop =
-                  fix (fun loop acc ->
-                    (fun xs ->
-                      match xs with
-                      | Nil0 -> CID0(acc)
-                      | Cons1(x,xs) ->
-                        let x = PRIM_CharOrd(x) in
-                        let n = PRIM_SubInt(x,48) in
-                        let b = PRIM_LessInt(n,0) in
-                        match match match b with
-                        | true1 -> CID0
-                        | false0 -> CID1 with
-                        | true1 ->
-                          let b = PRIM_LessInt(9,n) in
-                          match match b with
-                          | true1 -> CID0
-                          | false0 -> CID1 with
-                          | true1 -> CID0(n)
-                          | false0 -> CID1
-                        | false0 -> CID1 with
-                        | None1 -> CID1
-                        | Some0(d) ->
-                          let x = PRIM_MulInt(10,acc) in
-                          ((loop PRIM_AddInt(x,d)) xs))) in
-                match ((loop 0) arg1) with
-                | None1 ->
-                  let _ = ((block (fun s -> (put_chars (explode s)))) "ERROR: ") in
-                  let _ = ((block (fun s -> (put_chars (explode s)))) "expected arg1 to be numeric") in
-                  PRIM_PutChar('\n')
-                | Some0(n) ->
-                  let res = (fib n) in
-                  let loop =
-                    fix (fun loop acc ->
-                      (fun i ->
-                        match PRIM_EqInt(i,0) with
-                        | true1 -> acc
-                        | false0 ->
-                          let c = PRIM_ModInt(i,10) in
-                          let x = PRIM_AddInt(48,c) in
-                          let x = PRIM_CharChr(x) in
-                          ((loop CID1(x, acc)) PRIM_DivInt(i,10)))) in
-                  let _ =
-                    (put_chars
-                    match PRIM_EqInt(n,0) with
-                    | true1 -> CID1('0', CID0)
-                    | false0 -> ((loop CID0) n)) in
-                  let _ = ((block (fun s -> (put_chars (explode s)))) " --> ") in
-                  let loop =
-                    fix (fun loop acc ->
-                      (fun i ->
-                        match PRIM_EqInt(i,0) with
-                        | true1 -> acc
-                        | false0 ->
-                          let c = PRIM_ModInt(i,10) in
-                          let x = PRIM_AddInt(48,c) in
-                          let x = PRIM_CharChr(x) in
-                          ((loop CID1(x, acc)) PRIM_DivInt(i,10)))) in
-                  let _ =
-                    (put_chars
-                    match PRIM_EqInt(res,0) with
-                    | true1 -> CID1('0', CID0)
-                    | false0 -> ((loop CID0) res)) in
-                  PRIM_PutChar('\n')
-          | false0 ->
-            let ys = (explode "fact") in
-            match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) ys) with
-            | true1 ->
-              let _ = ((block (fun s -> (put_chars (explode s)))) "fact: ") in
-              match args with
-              | Nil0 ->
-                let _ = ((block (fun s -> (put_chars (explode s)))) "ERROR: ") in
-                let _ = ((block (fun s -> (put_chars (explode s)))) "expected an argument") in
-                PRIM_PutChar('\n')
-              | Cons1(arg1,more) ->
-                match more with
-                | Cons1(_,_) ->
-                  let _ = ((block (fun s -> (put_chars (explode s)))) "ERROR: ") in
-                  let _ = ((block (fun s -> (put_chars (explode s)))) "expected exactly one argument") in
-                  PRIM_PutChar('\n')
-                | Nil0 ->
-                  let loop =
-                    fix (fun loop acc ->
-                      (fun xs ->
-                        match xs with
-                        | Nil0 -> CID0(acc)
-                        | Cons1(x,xs) ->
-                          let x = PRIM_CharOrd(x) in
-                          let n = PRIM_SubInt(x,48) in
-                          let b = PRIM_LessInt(n,0) in
-                          match match match b with
-                          | true1 -> CID0
-                          | false0 -> CID1 with
-                          | true1 ->
-                            let b = PRIM_LessInt(9,n) in
-                            match match b with
-                            | true1 -> CID0
-                            | false0 -> CID1 with
-                            | true1 -> CID0(n)
-                            | false0 -> CID1
-                          | false0 -> CID1 with
-                          | None1 -> CID1
-                          | Some0(d) ->
-                            let x = PRIM_MulInt(10,acc) in
-                            ((loop PRIM_AddInt(x,d)) xs))) in
-                  match ((loop 0) arg1) with
-                  | None1 ->
-                    let _ = ((block (fun s -> (put_chars (explode s)))) "ERROR: ") in
-                    let _ = ((block (fun s -> (put_chars (explode s)))) "expected arg1 to be numeric") in
-                    PRIM_PutChar('\n')
-                  | Some0(n) ->
-                    let res = (fact n) in
-                    let loop =
-                      fix (fun loop acc ->
-                        (fun i ->
-                          match PRIM_EqInt(i,0) with
-                          | true1 -> acc
-                          | false0 ->
-                            let c = PRIM_ModInt(i,10) in
-                            let x = PRIM_AddInt(48,c) in
-                            let x = PRIM_CharChr(x) in
-                            ((loop CID1(x, acc)) PRIM_DivInt(i,10)))) in
-                    let _ =
-                      (put_chars
-                      match PRIM_EqInt(n,0) with
-                      | true1 -> CID1('0', CID0)
-                      | false0 -> ((loop CID0) n)) in
-                    let _ = ((block (fun s -> (put_chars (explode s)))) " --> ") in
-                    let loop =
-                      fix (fun loop acc ->
-                        (fun i ->
-                          match PRIM_EqInt(i,0) with
-                          | true1 -> acc
-                          | false0 ->
-                            let c = PRIM_ModInt(i,10) in
-                            let x = PRIM_AddInt(48,c) in
-                            let x = PRIM_CharChr(x) in
-                            ((loop CID1(x, acc)) PRIM_DivInt(i,10)))) in
-                    let _ =
-                      (put_chars
-                      match PRIM_EqInt(res,0) with
-                      | true1 -> CID1('0', CID0)
-                      | false0 -> ((loop CID0) res)) in
-                    PRIM_PutChar('\n')
-            | false0 ->
-              let ys = (explode "rev") in
-              match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) command) ys) with
-              | true1 ->
-                match args with
-                | Cons1(_,_) ->
-                  let _ = ((block (fun s -> (put_chars (explode s)))) "ERROR: ") in
-                  let _ = ((block (fun s -> (put_chars (explode s)))) "rev: expected no arguments") in
-                  PRIM_PutChar('\n')
-                | Nil0 ->
-                  let _ = ((block (fun s -> (put_chars (explode s)))) "(reverse typed lines until ^D)\n") in
-                  let loop =
-                    fix (fun loop _ ->
-                      let xs = (readloop CID0) in
-                      match (((eq_list (fun x -> (fun y -> PRIM_EqChar(x,y)))) xs) CID1('\EOT', CID0)) with
-                      | true1 -> CID0
-                      | false0 ->
-                        let _ = (put_chars ((revloop CID0) xs)) in
-                        let _ = PRIM_PutChar('\n') in
-                        (loop CID0)) in
-                  (loop CID0)
-              | false0 ->
-                let star_the_ohs =
-                  (map
-                  (fun c ->
-                    match PRIM_EqChar(c,'o') with
-                    | true1 -> '*'
-                    | false0 -> c)) in
-                let n = (length xs) in
-                let _ = (put_chars ((append (explode "You wrote: \"")) (star_the_ohs xs))) in
-                let _ = ((block (fun s -> (put_chars (explode s)))) "\" (") in
-                let loop =
-                  fix (fun loop acc ->
-                    (fun i ->
-                      match PRIM_EqInt(i,0) with
-                      | true1 -> acc
-                      | false0 ->
-                        let c = PRIM_ModInt(i,10) in
-                        let x = PRIM_AddInt(48,c) in
-                        let x = PRIM_CharChr(x) in
-                        ((loop CID1(x, acc)) PRIM_DivInt(i,10)))) in
-                let _ =
-                  (put_chars
-                  match PRIM_EqInt(n,0) with
-                  | true1 -> CID1('0', CID0)
-                  | false0 -> ((loop CID0) n)) in
-                let _ = ((block (fun s -> (put_chars (explode s)))) " chars)") in
-                PRIM_PutChar('\n') in
-      (mainloop CID0)) in
-let _ = ((block (fun s -> (put_chars (explode s)))) "This is a shell prototype. Try: fib, fact, rev\n") in
-(mainloop CID0)
+      let _ = (execute xs) in
+      (mainloop Unit0)) in
+let main =
+  (fun _ ->
+    let _ = (put_string "This is a shell prototype. Try: fib, fact, rev\n") in
+    (mainloop Unit0)) in
+(main Unit0)

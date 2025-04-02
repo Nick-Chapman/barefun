@@ -1,41 +1,47 @@
-(*stage3*)
+(*Stage3 (ANF)*)
 let k () = ()
-let g2 = 0 in
-let g3 = CID1 in
-let g4 = 1 in
-let g5 = 0 in
-let g6 = CID0 in
-let g7 = 1 in
-let g1 = fun arg k ->
-  let t1 = PRIM_EqInt(arg,g2) in
-  match t1 with
-  | true1 -> k g3
+let is_even = fix (fun [] is_even n k ->
+  let lit_4'25 = 0 in
+  let prim_0'0 = PRIM_EqInt(n,lit_4'25) in
+  match prim_0'0 with
+  | true1 ->
+    let con_4'32 = CID1 in
+    k con_4'32
   | false0 ->
-    let t2 = PRIM_SubInt(arg,g4) in
-    let t3 = PRIM_EqInt(t2,g5) in
-    match t3 with
-    | true1 -> k g6
+    let lit_4'52 = 1 in
+    let n = PRIM_SubInt(n,lit_4'52) in
+    let lit_3'24 = 0 in
+    let prim_0'0 = PRIM_EqInt(n,lit_3'24) in
+    match prim_0'0 with
+    | true1 ->
+      let con_3'31 = CID0 in
+      k con_3'31
     | false0 ->
-      let t4 = PRIM_SubInt(t2,g7) in
-      g1 t4 k in
-let g8 = 42 in
-let g9 = 'E' in
-let g10 = 'O' in
-let g11 = 13 in
-let g12 = 'E' in
-let g13 = 'O' in
-let k = [], fun [] arg ->
-  let k = [], fun [] arg ->
-    let t1 = PRIM_PutChar(arg) in
-    let k = [], fun [] arg ->
-      let k = [], fun [] arg ->
-        let t1 = PRIM_PutChar(arg) in
-        k t1 in
-      match arg with
-      | true1 -> k g12
-      | false0 -> k g13 in
-    g1 g11 k in
-  match arg with
-  | true1 -> k g9
-  | false0 -> k g10 in
-g1 g8 k
+      let lit_3'53 = 1 in
+      let prim_0'0 = PRIM_SubInt(n,lit_3'53) in
+      is_even prim_0'0 k) in
+let lit_11'8 = 42 in
+let k [is_even] app_8'23 =
+  let k [is_even] x =
+    let _ = PRIM_PutChar(x) in
+    let lit_12'8 = 13 in
+    let k [] app_8'23 =
+      let k [] x =
+        let prim_0'0 = PRIM_PutChar(x) in
+        k prim_0'0 in
+      match app_8'23 with
+      | true1 ->
+        let lit_8'30 = 'E' in
+        k lit_8'30
+      | false0 ->
+        let lit_8'39 = 'O' in
+        k lit_8'39 in
+    is_even lit_12'8 k in
+  match app_8'23 with
+  | true1 ->
+    let lit_8'30 = 'E' in
+    k lit_8'30
+  | false0 ->
+    let lit_8'39 = 'O' in
+    k lit_8'39 in
+is_even lit_11'8 k

@@ -8,5 +8,5 @@ Ocaml REPL
 Haskell REPL
 
   $ ../haskell/main.exe ../examples/tree.fun
-  [stage3; normalization: 178 -> 95]
+  [Stage4 (CCF); normalization: 178 -> 95]
   955[HALT:#push-continuation=10, #enter=17, #return=11, #prim=22]

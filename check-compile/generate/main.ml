@@ -6,7 +6,7 @@ let generate_rules x m =
  |} x m x m  x x m  x m
 
 let generate_rules_set example =
-  ["0";"1u";"1";"2";"3"]
+  ["0";"1";"2";"3";"4"]
   |> List.iter (generate_rules example)
 
 let () =

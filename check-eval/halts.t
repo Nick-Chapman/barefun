@@ -8,21 +8,21 @@ Ocaml REPL
 Haskell REPL
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -0
-  [stage0]
-  XhYeZ[HALT:#apps=8, #prim=7]
-
-  $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -1u
-  [stage1; un-normalized]
+  [Stage0 (AST)]
   XhYeZ[HALT:#apps=8, #prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -1
-  [stage1; normalization: 94 -> 20]
-  XhYeZ[HALT:#prim=7]
+  [Stage1 (Exp)]
+  XhYeZ[HALT:#apps=8, #prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -2
-  [stage2; normalization: 94 -> 20]
-  XhYeZ[HALT:#return=1, #prim=7]
+  [Stage2 (NbE); normalization: 94 -> 20]
+  XhYeZ[HALT:#prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -3
-  [stage3; normalization: 94 -> 20]
+  [Stage3 (ANF); normalization: 94 -> 20]
+  XhYeZ[HALT:#return=1, #prim=7]
+
+  $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -4
+  [Stage4 (CCF); normalization: 94 -> 20]
   XhYeZ[HALT:#return=1, #prim=7]

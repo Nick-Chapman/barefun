@@ -1,30 +1,26 @@
-(*stage1*)
-let _ = PRIM_PutChar('@') in
-let _ = PRIM_PutChar('A') in
-let _ = PRIM_PutChar('B') in
-let _ = PRIM_PutChar('C') in
-let _ = PRIM_PutChar('D') in
-let _ = PRIM_PutChar('E') in
-let _ = PRIM_PutChar('F') in
-let _ = PRIM_PutChar('G') in
-let _ = PRIM_PutChar('H') in
-let _ = PRIM_PutChar('I') in
-let _ = PRIM_PutChar('J') in
-let _ = PRIM_PutChar('K') in
-let _ = PRIM_PutChar('L') in
-let _ = PRIM_PutChar('M') in
-let _ = PRIM_PutChar('N') in
-let _ = PRIM_PutChar('O') in
-let _ = PRIM_PutChar('P') in
-let _ = PRIM_PutChar('Q') in
-let _ = PRIM_PutChar('R') in
-let _ = PRIM_PutChar('S') in
-let _ = PRIM_PutChar('T') in
-let _ = PRIM_PutChar('U') in
-let _ = PRIM_PutChar('V') in
-let _ = PRIM_PutChar('W') in
-let _ = PRIM_PutChar('X') in
-let _ = PRIM_PutChar('Y') in
-let _ = PRIM_PutChar('Z') in
-let _ = PRIM_PutChar('[') in
-PRIM_PutChar('\n')
+(*Stage1 (Exp)*)
+let + = (fun x -> (fun y -> PRIM_AddInt(x,y))) in
+let - = (fun x -> (fun y -> PRIM_SubInt(x,y))) in
+let ( * ) = (fun x -> (fun y -> PRIM_MulInt(x,y))) in
+let / = (fun x -> (fun y -> PRIM_DivInt(x,y))) in
+let % = (fun x -> (fun y -> PRIM_ModInt(x,y))) in
+let < = (fun x -> (fun y -> PRIM_LessInt(x,y))) in
+let = = (fun x -> (fun y -> PRIM_EqInt(x,y))) in
+let eq_char = (fun x -> (fun y -> PRIM_EqChar(x,y))) in
+let ord = (fun x -> PRIM_CharOrd(x)) in
+let chr = (fun x -> PRIM_CharChr(x)) in
+let explode = (fun x -> PRIM_Explode(x)) in
+let put_char = (fun x -> PRIM_PutChar(x)) in
+let get_char = (fun x -> PRIM_GetChar(x)) in
+let :: = (fun x -> (fun y -> Cons1(x, y))) in
+let thrice = (fun f -> (fun x -> (f (f (f x))))) in
+let main =
+  (fun _ ->
+    let start = '@' in
+    let next =
+      (fun x ->
+        let _ = (put_char (chr x)) in
+        ((+ x) 1)) in
+    let _ = (put_char (chr (((thrice thrice) next) (ord start)))) in
+    (put_char '\n')) in
+(main Unit0)

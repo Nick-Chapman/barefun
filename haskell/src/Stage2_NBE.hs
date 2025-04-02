@@ -1,17 +1,28 @@
--- | Normalize using NbE...
-module Normalize (normalize) where
+-- | Normalize using "Normalization by Evaluation" (Inlining & Constant Folding).
+module Stage2_NBE (compile,execute) where
 
 import Builtin (Builtin,isPure,evaluatePureBuiltin)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
+import Interaction (Interaction)
 import Par4 (Position(..))
-import Stage0 (Literal(..),evalLit,Cid(..))
-import Stage1 (Exp(..),Arm(..),Id(..),Ctag(..))
+import Stage0_AST (Literal(..),evalLit,Cid(..))
+import Stage1_EXP (Exp(..),Arm(..),Id(..),Ctag(..))
 import Value (Value(..))
 import qualified Data.Map as Map
+import qualified Stage1_EXP as SRC
+
+-- The NBE compilation stage does not change the representation
+type Transformed = SRC.Exp
+
+compile :: SRC.Exp -> Transformed
+compile = normalize
+
+execute :: Transformed -> Interaction
+execute = SRC.execute
 
 enabled :: Bool
-enabled = True -- controls 4 places -- TODO: pass from command line?
+enabled = True -- controls 4 places
 
 ----------------------------------------------------------------------
 -- Normalize

@@ -14,17 +14,7 @@ Ocaml REPL
 Haskell REPL
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -0
-  [stage0]
-  LOAD
-  RUN
-  > Hello, World!
-  Hello, World!
-  > Good bye.
-  Good bye.
-  > [EOF:#apps=364, #prim=117]
-
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun -1u
-  [stage1; un-normalized]
+  [Stage0 (AST)]
   LOAD
   RUN
   > Hello, World!
@@ -34,7 +24,17 @@ Haskell REPL
   > [EOF:#apps=364, #prim=117]
 
   $ cat small.input | ../haskell/main.exe ../examples/small.fun -1
-  [stage1; normalization: 176 -> 113]
+  [Stage1 (Exp)]
+  LOAD
+  RUN
+  > Hello, World!
+  Hello, World!
+  > Good bye.
+  Good bye.
+  > [EOF:#apps=364, #prim=117]
+
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -2
+  [Stage2 (NbE); normalization: 176 -> 113]
   LOAD
   RUN
   > Hello, World!
@@ -43,8 +43,8 @@ Haskell REPL
   Good bye.
   > [EOF:#apps=120, #prim=112]
 
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun -2
-  [stage2; normalization: 176 -> 113]
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -3
+  [Stage3 (ANF); normalization: 176 -> 113]
   LOAD
   RUN
   > Hello, World!
@@ -53,8 +53,8 @@ Haskell REPL
   Good bye.
   > [EOF:#push-continuation=35, #enter=120, #return=33, #prim=112]
 
-  $ cat small.input | ../haskell/main.exe ../examples/small.fun -3
-  [stage3; normalization: 176 -> 113]
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -4
+  [Stage4 (CCF); normalization: 176 -> 113]
   LOAD
   RUN
   > Hello, World!

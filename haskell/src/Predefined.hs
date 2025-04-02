@@ -4,7 +4,7 @@ module Predefined
 
 import Builtin (Builtin(..))
 import Par4 (Position(..))
-import Stage0 (Prog(..),Def(..),Exp(..), cCons, mkUserId,Bid(..))
+import Stage0_AST (Prog(..),Def(..),Exp(..), cCons, mkUserId,Bid(..))
 
 wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =

@@ -1,15 +1,16 @@
-(*stage3*)
+(*Stage3 (ANF)*)
 let k () = ()
-let g2 = CID0 in
-let g1 = fun arg k ->
-  match arg with
-  | Nil0 -> k g2
-  | Cons1(t1,t2) ->
-    let t3 = PRIM_PutChar(t1) in
-    g1 t2 k in
-let g3 = fun arg k -> k arg in
-let g4 = "Hello, world!\n" in
-let k = [], fun [] arg ->
-  let t1 = PRIM_Explode(arg) in
-  g1 t1 k in
-g3 g4 k
+let put_chars = fix (fun [] put_chars xs k ->
+  match xs with
+  | Nil0 ->
+    let con_4'10 = CID0 in
+    k con_4'10
+  | Cons1(x,xsMore) ->
+    let _ = PRIM_PutChar(x) in
+    put_chars xsMore k) in
+let block = fix (fun [] block x k -> k x) in
+let lit_12'13 = "Hello, world!\n" in
+let k [put_chars] x =
+  let prim_0'0 = PRIM_Explode(x) in
+  put_chars prim_0'0 k in
+block lit_12'13 k

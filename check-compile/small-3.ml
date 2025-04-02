@@ -1,91 +1,93 @@
-(*stage3*)
+(*Stage3 (ANF)*)
 let k () = ()
-let g2 = CID0 in
-let g1 = fun arg k ->
-  match arg with
-  | Nil0 -> k g2
-  | Cons1(t1,t2) ->
-    let t3 = PRIM_PutChar(t1) in
-    g1 t2 k in
-let g3 = 'L' in
-let g4 = 'O' in
-let g5 = 'A' in
-let g6 = 'D' in
-let g7 = '\n' in
-let g8 = CID0 in
-let g9 = CID1[g7,g8] in
-let g10 = CID1[g6,g9] in
-let g11 = CID1[g5,g10] in
-let g12 = CID1[g4,g11] in
-let g13 = CID1[g3,g12] in
-let g15 = '>' in
-let g16 = ' ' in
-let g17 = CID0 in
-let g18 = CID1[g16,g17] in
-let g19 = CID1[g15,g18] in
-let g21 = CID0 in
-let g22 = '\n' in
-let g23 = '\n' in
-let g24 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    match arg with
-    | Nil0 -> k f1
-    | Cons1(t1,t2) ->
-      let t3 = CID1[t1,f1] in
-      let k = [t2], fun [f1] arg -> arg f1 k in
-      g24 t3 k in
-  k t1 in
-let g25 = CID0 in
-let g20 = fun arg k ->
-  let t1 = PRIM_GetChar(g21) in
-  let t2 = PRIM_EqChar(t1,g22) in
-  match t2 with
-  | true1 ->
-    let t3 = PRIM_PutChar(g23) in
-    let k = [arg], fun [f1] arg -> arg f1 k in
-    g24 g25 k
-  | false0 ->
-    let t3 = PRIM_PutChar(t1) in
-    let t4 = CID1[t1,arg] in
-    g20 t4 k in
-let g26 = CID0 in
-let g27 = '\n' in
-let g28 = CID0 in
-let g14 = fun arg k ->
-  let k = [], fun [] arg ->
-    let k = [], fun [] arg ->
-      let k = [], fun [] arg ->
-        let t1 = PRIM_PutChar(g27) in
-        g14 g28 k in
-      g1 arg k in
-    g20 g26 k in
-  g1 g19 k in
-let g29 = 'R' in
-let g30 = 'U' in
-let g31 = 'N' in
-let g32 = '\n' in
-let g33 = CID0 in
-let g34 = CID1[g32,g33] in
-let g35 = CID1[g31,g34] in
-let g36 = CID1[g30,g35] in
-let g37 = CID1[g29,g36] in
-let g38 = CID0 in
-let g39 = 'N' in
-let g40 = 'E' in
-let g41 = 'V' in
-let g42 = 'E' in
-let g43 = 'R' in
-let g44 = '\n' in
-let g45 = CID0 in
-let g46 = CID1[g44,g45] in
-let g47 = CID1[g43,g46] in
-let g48 = CID1[g42,g47] in
-let g49 = CID1[g41,g48] in
-let g50 = CID1[g40,g49] in
-let g51 = CID1[g39,g50] in
-let k = [], fun [] arg ->
-  let k = [], fun [] arg ->
-    let k = [], fun [] arg -> g1 g51 k in
-    g14 g38 k in
-  g1 g37 k in
-g1 g13 k
+let put_chars = fix (fun [] put_chars xs k ->
+  match xs with
+  | Nil0 ->
+    let con_4'10 = CID0 in
+    k con_4'10
+  | Cons1(x,xsMore) ->
+    let _ = PRIM_PutChar(x) in
+    put_chars xsMore k) in
+let lit_0'0 = 'L' in
+let lit_0'0 = 'O' in
+let lit_0'0 = 'A' in
+let lit_0'0 = 'D' in
+let lit_0'0 = '\n' in
+let con_0'0 = CID0 in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let con_0'0 = CID1[lit_0'0,con_0'0] in
+let k [put_chars] _ =
+  let mainloop = fix (fun [put_chars] mainloop _ k ->
+    let lit_0'0 = '>' in
+    let lit_0'0 = ' ' in
+    let con_0'0 = CID0 in
+    let con_0'0 = CID1[lit_0'0,con_0'0] in
+    let con_0'0 = CID1[lit_0'0,con_0'0] in
+    let k [put_chars,mainloop] _ =
+      let readloop = fix (fun [] readloop sofar k ->
+        let con_21'27 = CID0 in
+        let theChar = PRIM_GetChar(con_21'27) in
+        let lit_23'22 = '\n' in
+        let prim_0'0 = PRIM_EqChar(theChar,lit_23'22) in
+        match prim_0'0 with
+        | true1 ->
+          let lit_17'26 = '\n' in
+          let _ = PRIM_PutChar(lit_17'26) in
+          let revloop = fix (fun [] revloop acc k ->
+            let lam_10'22 = fun [acc,revloop] ys k ->
+              match ys with
+              | Nil0 -> k acc
+              | Cons1(y,ysMore) ->
+                let con_0'0 = CID1[y,acc] in
+                let k [ysMore] app_13'27 = app_13'27 ysMore k in
+                revloop con_0'0 k in
+            k lam_10'22) in
+          let con_15'10 = CID0 in
+          let k [sofar] app_15'10 = app_15'10 sofar k in
+          revloop con_15'10 k
+        | false0 ->
+          let _ = PRIM_PutChar(theChar) in
+          let con_0'0 = CID1[theChar,sofar] in
+          readloop con_0'0 k) in
+      let con_26'11 = CID0 in
+      let k [put_chars,mainloop] app_26'11 =
+        let k [mainloop] _ =
+          let lit_17'26 = '\n' in
+          let _ = PRIM_PutChar(lit_17'26) in
+          let con_34'10 = CID0 in
+          mainloop con_34'10 k in
+        put_chars app_26'11 k in
+      readloop con_26'11 k in
+    put_chars con_0'0 k) in
+  let lit_0'0 = 'R' in
+  let lit_0'0 = 'U' in
+  let lit_0'0 = 'N' in
+  let lit_0'0 = '\n' in
+  let con_0'0 = CID0 in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let con_0'0 = CID1[lit_0'0,con_0'0] in
+  let k [put_chars,mainloop] _ =
+    let con_38'20 = CID0 in
+    let k [put_chars] _ =
+      let lit_0'0 = 'N' in
+      let lit_0'0 = 'E' in
+      let lit_0'0 = 'V' in
+      let lit_0'0 = 'E' in
+      let lit_0'0 = 'R' in
+      let lit_0'0 = '\n' in
+      let con_0'0 = CID0 in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      let con_0'0 = CID1[lit_0'0,con_0'0] in
+      put_chars con_0'0 k in
+    mainloop con_38'20 k in
+  put_chars con_0'0 k in
+put_chars con_0'0 k

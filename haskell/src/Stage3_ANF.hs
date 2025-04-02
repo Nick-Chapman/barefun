@@ -1,5 +1,5 @@
 -- | ANF style expressions. All sub-expressions named. Atomic/Compound expression forms distinguished.
-module Stage2
+module Stage3_ANF
   ( Code(..), Arm(..), Atomic(..), fvs
   , execute
   , compile
@@ -13,14 +13,14 @@ import Data.Set (Set,singleton,(\\),union)
 import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
-import Stage0 (evalLit,apply,Literal)
-import Stage1 (Id(..),Name(GeneratedName),Ctag(..),provenanceExp)
+import Stage0_AST (evalLit,apply,Literal)
+import Stage1_EXP (Id(..),Name(GeneratedName),Ctag(..),provenanceExp)
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (toList,fromList,unions,empty)
 import qualified Interaction as I (Tickable(..))
-import qualified Stage1 as SRC
+import qualified Stage1_EXP as SRC
 
 type Transformed = Code
 

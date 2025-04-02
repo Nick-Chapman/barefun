@@ -15,10 +15,11 @@ Various examples of `.fun` code can be found [here](examples). Since `.fun` is a
 We test evaluation of the examples [here](check-eval), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
 
 We have haskell interpreters for each stage of the compilation pipeline:
-- [Stage0](haskell/src/Stage0.hs): AST
-- [Stage1](haskell/src/Stage1.hs): Simplified expression language.
-- [Stage2](haskell/src/Stage2.hs): A-normal form.
-- [Stage3](haskell/src/Stage3.hs): Closure converted form.
+- [Stage0](haskell/src/Stage0_AST.hs): AST
+- [Stage1](haskell/src/Stage1_EXP.hs): Simplified expression language.
+- [Stage2](haskell/src/Stage2_NBE.hs): Normalization by Evaluation. (Inlining & Constant Folding).
+- [Stage3](haskell/src/Stage3_ANF.hs): A-normal form.
+- [Stage4](haskell/src/Stage4_CCF.hs): Closure converted form.
 
 The expected output from each compiler stage is [here](check-compile),
 

@@ -1,981 +1,1020 @@
-(*stage3*)
+(*Stage3 (ANF)*)
 let k () = ()
-let g1 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k -> f1 arg k in
-  k t1 in
-let g2 = fun arg k ->
-  let t1 = PRIM_Explode(arg) in
-  k t1 in
-let g4 = CID1 in
-let g5 = CID0 in
-let g6 = CID0 in
-let g7 = CID0 in
-let g3 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = [f1,arg], fun [f1,f2] arg k ->
-      match f2 with
+let block = fix (fun [] block f k ->
+  let lam_2'31 = fun [f] a k -> f a k in
+  k lam_2'31) in
+let lam_0'0 = fun [] x k ->
+  let prim_0'0 = PRIM_Explode(x) in
+  k prim_0'0 in
+let k [block] explode =
+  let eq_list = fix (fun [] eq_list eq k ->
+    let lam_51'19 = fun [eq,eq_list] xs k ->
+      let lam_51'22 = fun [eq,eq_list,xs] ys k ->
+        match xs with
+        | Nil0 ->
+          match ys with
+          | Nil0 ->
+            let con_53'33 = CID1 in
+            k con_53'33
+          | Cons1(_,_) ->
+            let con_53'48 = CID0 in
+            k con_53'48
+        | Cons1(x,xs) ->
+          match ys with
+          | Nil0 ->
+            let con_56'13 = CID0 in
+            k con_56'13
+          | Cons1(y,ys) ->
+            let k [eq,eq_list,xs,y,ys] app_58'14 =
+              let k [eq,eq_list,xs,ys] app_58'16 =
+                match app_58'16 with
+                | true1 ->
+                  let k [xs,ys] app_58'31 =
+                    let k [ys] app_58'34 = app_58'34 ys k in
+                    app_58'31 xs k in
+                  eq_list eq k
+                | false0 ->
+                  let con_58'45 = CID0 in
+                  k con_58'45 in
+              app_58'14 y k in
+            eq x k in
+      k lam_51'22 in
+    k lam_51'19) in
+  let append = fix (fun [] append xs k ->
+    let lam_62'18 = fun [xs,append] ys k ->
+      match xs with
+      | Nil0 -> k ys
+      | Cons1(x,xs) ->
+        let k [ys,x] app_65'28 =
+          let k [x] xs =
+            let con_0'0 = CID1[x,xs] in
+            k con_0'0 in
+          app_65'28 ys k in
+        append xs k in
+    k lam_62'18) in
+  let revloop = fix (fun [] revloop acc k ->
+    let lam_67'20 = fun [acc,revloop] xs k ->
+      match xs with
+      | Nil0 -> k acc
+      | Cons1(x,xs) ->
+        let con_0'0 = CID1[x,acc] in
+        let k [xs] app_70'21 = app_70'21 xs k in
+        revloop con_0'0 k in
+    k lam_67'20) in
+  let map = fix (fun [] map f k ->
+    let lam_74'14 = fun [f,map] xs k ->
+      match xs with
       | Nil0 ->
-        match arg with
-        | Nil0 -> k g4
-        | Cons1(t1,t2) -> k g5
-      | Cons1(t1,t2) ->
-        match arg with
-        | Nil0 -> k g6
-        | Cons1(t3,t4) ->
-          let k = [f1,t2,t3,t4], fun [f1,f2,f3,f4] arg ->
-            let k = [f1,f2,f4], fun [f1,f2,f3] arg ->
-              match arg with
-              | true1 ->
-                let k = [f2,f3], fun [f1,f2] arg ->
-                  let k = [f2], fun [f1] arg -> arg f1 k in
-                  arg f1 k in
-                g3 f1 k
-              | false0 -> k g7 in
-            arg f3 k in
-          f1 t1 k in
-    k t1 in
-  k t1 in
-let g8 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    match f1 with
-    | Nil0 -> k arg
-    | Cons1(t1,t2) ->
-      let k = [arg,t1], fun [f1,f2] arg ->
-        let k = [f2], fun [f1] arg ->
-          let t1 = CID1[f1,arg] in
-          k t1 in
-        arg f1 k in
-      g8 t2 k in
-  k t1 in
-let g9 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    match arg with
-    | Nil0 -> k f1
-    | Cons1(t1,t2) ->
-      let t3 = CID1[t1,f1] in
-      let k = [t2], fun [f1] arg -> arg f1 k in
-      g9 t3 k in
-  k t1 in
-let g11 = CID0 in
-let g10 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    match arg with
-    | Nil0 -> k g11
-    | Cons1(t1,t2) ->
-      let k = [f1,t2], fun [f1,f2] arg ->
-        let k = [f2,arg], fun [f1,f2] arg ->
-          let k = [f2], fun [f1] arg ->
-            let t1 = CID1[f1,arg] in
-            k t1 in
-          arg f1 k in
-        g10 f1 k in
-      f1 t1 k in
-  k t1 in
-let g13 = 0 in
-let g14 = 1 in
-let g12 = fun arg k ->
-  match arg with
-  | Nil0 -> k g13
-  | Cons1(t1,t2) ->
-    let k = [], fun [] arg ->
-      let t1 = PRIM_AddInt(g14,arg) in
-      k t1 in
-    g12 t2 k in
-let g16 = CID0 in
-let g17 = 8 in
-let g18 = '\n' in
-let g19 = 26 in
-let g20 = '^' in
-let g21 = 65 in
-let g22 = 1 in
-let g15 = fun arg k ->
-  match arg with
-  | Nil0 -> k g16
-  | Cons1(t1,t2) ->
-    let t3 = PRIM_CharOrd(t1) in
-    let t4 = PRIM_EqInt(t3,g17) in
-    let k = [t2], fun [f1] arg -> g15 f1 k in
-    match t4 with
-    | true1 ->
-      let t5 = PRIM_PutChar(t1) in
-      k t5
-    | false0 ->
-      let t5 = PRIM_EqChar(t1,g18) in
-      match t5 with
+        let con_76'10 = CID0 in
+        k con_76'10
+      | Cons1(x,xs) ->
+        let k [f,map,xs] x =
+          let k [xs,x] app_77'24 =
+            let k [x] y =
+              let con_0'0 = CID1[x,y] in
+              k con_0'0 in
+            app_77'24 xs k in
+          map f k in
+        f x k in
+    k lam_74'14) in
+  let length = fix (fun [] length xs k ->
+    match xs with
+    | Nil0 ->
+      let lit_81'10 = 0 in
+      k lit_81'10
+    | Cons1(_,xs) ->
+      let k [] y =
+        let lit_82'17 = 1 in
+        let prim_0'0 = PRIM_AddInt(lit_82'17,y) in
+        k prim_0'0 in
+      length xs k) in
+  let put_chars = fix (fun [] put_chars xs k ->
+    match xs with
+    | Nil0 ->
+      let con_95'10 = CID0 in
+      k con_95'10
+    | Cons1(x,xs) ->
+      let n = PRIM_CharOrd(x) in
+      let lit_17'18 = 8 in
+      let prim_0'0 = PRIM_EqInt(n,lit_17'18) in
+      let k [put_chars,xs] _ = put_chars xs k in
+      match prim_0'0 with
       | true1 ->
-        let t6 = PRIM_PutChar(t1) in
-        k t6
+        let prim_0'0 = PRIM_PutChar(x) in
+        k prim_0'0
       | false0 ->
-        let t6 = PRIM_LessInt(g19,t3) in
-        match t6 with
+        let lit_20'17 = '\n' in
+        let prim_0'0 = PRIM_EqChar(x,lit_20'17) in
+        match prim_0'0 with
         | true1 ->
-          let t7 = PRIM_PutChar(t1) in
-          k t7
+          let prim_0'0 = PRIM_PutChar(x) in
+          k prim_0'0
         | false0 ->
-          let t7 = PRIM_PutChar(g20) in
-          let t8 = PRIM_AddInt(g21,t3) in
-          let t9 = PRIM_SubInt(t8,g22) in
-          let t10 = PRIM_CharChr(t9) in
-          let t11 = PRIM_PutChar(t10) in
-          k t11 in
-let g24 = CID0 in
-let g25 = '\n' in
-let g26 = '\n' in
-let g27 = CID0 in
-let g28 = '\EOT' in
-let g29 = 8 in
-let g30 = '\n' in
-let g31 = 26 in
-let g32 = '^' in
-let g33 = 65 in
-let g34 = 1 in
-let g35 = '\n' in
-let g36 = CID0 in
-let g37 = '\EOT' in
-let g38 = 127 in
-let g39 = 127 in
-let g40 = 26 in
-let g41 = CID0 in
-let g42 = CID1 in
-let g43 = '\b' in
-let g44 = ' ' in
-let g45 = '\b' in
-let g46 = CID0 in
-let g47 = '\b' in
-let g48 = ' ' in
-let g49 = '\b' in
-let g50 = 8 in
-let g51 = '\n' in
-let g52 = 26 in
-let g53 = '^' in
-let g54 = 65 in
-let g55 = 1 in
-let g23 = fun arg k ->
-  let t1 = PRIM_GetChar(g24) in
-  let t2 = PRIM_CharOrd(t1) in
-  let t3 = PRIM_EqChar(t1,g25) in
-  match t3 with
-  | true1 ->
-    let t4 = PRIM_PutChar(g26) in
-    let k = [arg], fun [f1] arg -> arg f1 k in
-    g9 g27 k
-  | false0 ->
-    let t4 = PRIM_EqChar(t1,g28) in
-    match t4 with
+          let lit_21'13 = 26 in
+          let prim_0'0 = PRIM_LessInt(lit_21'13,n) in
+          match prim_0'0 with
+          | true1 ->
+            let prim_0'0 = PRIM_PutChar(x) in
+            k prim_0'0
+          | false0 ->
+            let lit_22'18 = '^' in
+            let _ = PRIM_PutChar(lit_22'18) in
+            let lit_0'0 = 65 in
+            let x = PRIM_AddInt(lit_0'0,n) in
+            let lit_22'52 = 1 in
+            let x = PRIM_SubInt(x,lit_22'52) in
+            let x = PRIM_CharChr(x) in
+            let prim_0'0 = PRIM_PutChar(x) in
+            k prim_0'0) in
+  let readloop = fix (fun [revloop] readloop acc k ->
+    let con_105'19 = CID0 in
+    let c = PRIM_GetChar(con_105'19) in
+    let n = PRIM_CharOrd(c) in
+    let lit_108'15 = '\n' in
+    let prim_0'0 = PRIM_EqChar(c,lit_108'15) in
+    match prim_0'0 with
     | true1 ->
-      let t5 = PRIM_CharOrd(t1) in
-      let t6 = PRIM_EqInt(t5,g29) in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_PutChar(g35) in
-        let k = [f1], fun [f1] arg ->
-          let t1 = CID1[g37,f1] in
-          arg t1 k in
-        g9 g36 k in
-      match t6 with
-      | true1 ->
-        let t7 = PRIM_PutChar(t1) in
-        k t7
-      | false0 ->
-        let t7 = PRIM_EqChar(t1,g30) in
-        match t7 with
-        | true1 ->
-          let t8 = PRIM_PutChar(t1) in
-          k t8
-        | false0 ->
-          let t8 = PRIM_LessInt(g31,t5) in
-          match t8 with
-          | true1 ->
-            let t9 = PRIM_PutChar(t1) in
-            k t9
-          | false0 ->
-            let t9 = PRIM_PutChar(g32) in
-            let t10 = PRIM_AddInt(g33,t5) in
-            let t11 = PRIM_SubInt(t10,g34) in
-            let t12 = PRIM_CharChr(t11) in
-            let t13 = PRIM_PutChar(t12) in
-            k t13
+      let lit_102'26 = '\n' in
+      let _ = PRIM_PutChar(lit_102'26) in
+      let con_72'25 = CID0 in
+      let k [acc] app_72'25 = app_72'25 acc k in
+      revloop con_72'25 k
     | false0 ->
-      let t5 = PRIM_LessInt(g38,t2) in
-      match t5 with
-      | true1 -> g23 arg k
-      | false0 ->
-        let t6 = PRIM_EqInt(t2,g39) in
-        match t6 with
+      let lit_0'0 = '\EOT' in
+      let prim_0'0 = PRIM_EqChar(c,lit_0'0) in
+      match prim_0'0 with
+      | true1 ->
+        let n = PRIM_CharOrd(c) in
+        let lit_17'18 = 8 in
+        let prim_0'0 = PRIM_EqInt(n,lit_17'18) in
+        let k [revloop,acc] _ =
+          let lit_102'26 = '\n' in
+          let _ = PRIM_PutChar(lit_102'26) in
+          let con_72'25 = CID0 in
+          let k [acc] app_72'25 =
+            let lit_0'0 = '\EOT' in
+            let con_0'0 = CID1[lit_0'0,acc] in
+            app_72'25 con_0'0 k in
+          revloop con_72'25 k in
+        match prim_0'0 with
         | true1 ->
-          match arg with
-          | Nil0 -> g23 arg k
-          | Cons1(t7,t8) ->
-            let t9 = PRIM_CharOrd(t7) in
-            let t10 = PRIM_LessInt(g40,t9) in
-            let k = [t8], fun [f1] arg ->
-              let k = [f1], fun [f1] arg ->
-                let t1 = PRIM_PutChar(g47) in
-                let t2 = PRIM_PutChar(g48) in
-                let t3 = PRIM_PutChar(g49) in
-                g23 f1 k in
-              match arg with
-              | true1 ->
-                let t1 = PRIM_PutChar(g43) in
-                let t2 = PRIM_PutChar(g44) in
-                let t3 = PRIM_PutChar(g45) in
-                k t3
-              | false0 -> k g46 in
-            match t10 with
-            | true1 -> k g41
-            | false0 -> k g42
+          let prim_0'0 = PRIM_PutChar(c) in
+          k prim_0'0
         | false0 ->
-          let t7 = PRIM_CharOrd(t1) in
-          let t8 = PRIM_EqInt(t7,g50) in
-          let k = [arg,t1], fun [f1,f2] arg ->
-            let t1 = CID1[f2,f1] in
-            g23 t1 k in
-          match t8 with
+          let lit_20'17 = '\n' in
+          let prim_0'0 = PRIM_EqChar(c,lit_20'17) in
+          match prim_0'0 with
           | true1 ->
-            let t9 = PRIM_PutChar(t1) in
-            k t9
+            let prim_0'0 = PRIM_PutChar(c) in
+            k prim_0'0
           | false0 ->
-            let t9 = PRIM_EqChar(t1,g51) in
-            match t9 with
+            let lit_21'13 = 26 in
+            let prim_0'0 = PRIM_LessInt(lit_21'13,n) in
+            match prim_0'0 with
             | true1 ->
-              let t10 = PRIM_PutChar(t1) in
-              k t10
+              let prim_0'0 = PRIM_PutChar(c) in
+              k prim_0'0
             | false0 ->
-              let t10 = PRIM_LessInt(g52,t7) in
-              match t10 with
-              | true1 ->
-                let t11 = PRIM_PutChar(t1) in
-                k t11
-              | false0 ->
-                let t11 = PRIM_PutChar(g53) in
-                let t12 = PRIM_AddInt(g54,t7) in
-                let t13 = PRIM_SubInt(t12,g55) in
-                let t14 = PRIM_CharChr(t13) in
-                let t15 = PRIM_PutChar(t14) in
-                k t15 in
-let g57 = 2 in
-let g58 = 1 in
-let g59 = 2 in
-let g56 = fun arg k ->
-  let t1 = PRIM_LessInt(arg,g57) in
-  match t1 with
-  | true1 -> k arg
-  | false0 ->
-    let t2 = PRIM_SubInt(arg,g58) in
-    let k = [arg], fun [f1] arg ->
-      let t1 = PRIM_SubInt(f1,g59) in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_AddInt(f1,arg) in
-        k t1 in
-      g56 t1 k in
-    g56 t2 k in
-let g61 = 2 in
-let g62 = CID0 in
-let g63 = CID1 in
-let g64 = 1 in
-let g65 = 1 in
-let g60 = fun arg k ->
-  let t1 = PRIM_LessInt(arg,g61) in
-  let k = [arg], fun [f1] arg ->
-    match arg with
-    | true1 ->
-      let t1 = PRIM_SubInt(f1,g64) in
-      let k = [f1], fun [f1] arg ->
-        let t1 = PRIM_MulInt(arg,f1) in
-        k t1 in
-      g60 t1 k
-    | false0 -> k g65 in
-  match t1 with
-  | true1 -> k g62
-  | false0 -> k g63 in
-let g67 = CID0 in
-let g68 = CID0 in
-let g69 = ' ' in
-let g70 = CID0 in
-let g71 = CID0 in
-let g66 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = [f1,arg], fun [f1,f2] arg k ->
-      match arg with
-      | Nil0 ->
-        let k = [f1,f2], fun [f1,f2] arg ->
-          let k = [f1], fun [f1] arg ->
-            let k = [f1,arg], fun [f1,f2] arg ->
-              let t1 = CID1[f2,f1] in
-              arg t1 k in
-            g9 g68 k in
-          arg f2 k in
-        g9 g67 k
-      | Cons1(t1,t2) ->
-        let t3 = PRIM_EqChar(t1,g69) in
-        match t3 with
-        | true1 ->
-          let k = [f1,f2,t2], fun [f1,f2,f3] arg ->
-            let k = [f1,f3], fun [f1,f2] arg ->
-              let t1 = CID1[arg,f1] in
-              let k = [f2], fun [f1] arg ->
-                let k = [f1], fun [f1] arg -> arg f1 k in
-                arg g71 k in
-              g66 t1 k in
-            arg f2 k in
-          g9 g70 k
+              let lit_22'18 = '^' in
+              let _ = PRIM_PutChar(lit_22'18) in
+              let lit_0'0 = 65 in
+              let x = PRIM_AddInt(lit_0'0,n) in
+              let lit_22'52 = 1 in
+              let x = PRIM_SubInt(x,lit_22'52) in
+              let x = PRIM_CharChr(x) in
+              let prim_0'0 = PRIM_PutChar(x) in
+              k prim_0'0
+      | false0 ->
+        let lit_110'13 = 127 in
+        let prim_0'0 = PRIM_LessInt(lit_110'13,n) in
+        match prim_0'0 with
+        | true1 -> readloop acc k
         | false0 ->
-          let k = [f2,t1,t2], fun [f1,f2,f3] arg ->
-            let t1 = CID1[f2,f1] in
-            let k = [f3], fun [f1] arg -> arg f1 k in
-            arg t1 k in
-          g66 f1 k in
-    k t1 in
-  k t1 in
-let g72 = '>' in
-let g73 = ' ' in
-let g74 = CID0 in
-let g75 = CID1[g73,g74] in
-let g76 = CID1[g72,g75] in
-let g77 = CID0 in
-let g78 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqChar(f1,arg) in
-    k t1 in
-  k t1 in
-let g79 = '\EOT' in
-let g80 = CID0 in
-let g81 = CID1[g79,g80] in
-let g82 = CID0 in
-let g83 = CID0 in
-let g84 = CID0 in
-let g85 = CID0 in
-let g86 = "fib" in
-let g87 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqChar(f1,arg) in
-    k t1 in
-  k t1 in
-let g88 = "fib: " in
-let g89 = "ERROR: " in
-let g90 = "expected an argument" in
-let g91 = '\n' in
-let g92 = "ERROR: " in
-let g93 = "expected exactly one argument" in
-let g94 = '\n' in
-let g96 = 48 in
-let g97 = 0 in
-let g98 = CID0 in
-let g99 = CID1 in
-let g100 = 9 in
-let g101 = CID0 in
-let g102 = CID1 in
-let g103 = CID1 in
-let g104 = CID1 in
-let g105 = CID1 in
-let g106 = 10 in
-let g95 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    match arg with
-    | Nil0 ->
-      let t1 = CID0[f1] in
-      k t1
-    | Cons1(t1,t2) ->
-      let t3 = PRIM_CharOrd(t1) in
-      let t4 = PRIM_SubInt(t3,g96) in
-      let t5 = PRIM_LessInt(t4,g97) in
-      let k = [f1,t2,t4], fun [f1,f2,f3] arg ->
-        let k = [f1,f2], fun [f1,f2] arg ->
-          match arg with
-          | None1 -> k g105
-          | Some0(t1) ->
-            let t2 = PRIM_MulInt(g106,f1) in
-            let t3 = PRIM_AddInt(t2,t1) in
-            let k = [f2], fun [f1] arg -> arg f1 k in
-            g95 t3 k in
-        match arg with
-        | true1 ->
-          let t1 = PRIM_LessInt(g100,f3) in
-          let k = [f3], fun [f1] arg ->
-            match arg with
-            | true1 ->
-              let t1 = CID0[f1] in
-              k t1
-            | false0 -> k g103 in
-          match t1 with
-          | true1 -> k g101
-          | false0 -> k g102
-        | false0 -> k g104 in
-      match t5 with
-      | true1 -> k g98
-      | false0 -> k g99 in
-  k t1 in
-let g107 = 0 in
-let g108 = "ERROR: " in
-let g109 = "expected arg1 to be numeric" in
-let g110 = '\n' in
-let g112 = 0 in
-let g113 = 10 in
-let g114 = 48 in
-let g115 = 10 in
-let g111 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqInt(arg,g112) in
-    match t1 with
-    | true1 -> k f1
-    | false0 ->
-      let t2 = PRIM_ModInt(arg,g113) in
-      let t3 = PRIM_AddInt(g114,t2) in
-      let t4 = PRIM_CharChr(t3) in
-      let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g115) in
-        arg t1 k in
-      g111 t5 k in
-  k t1 in
-let g116 = 0 in
-let g117 = '0' in
-let g118 = CID0 in
-let g119 = CID1[g117,g118] in
-let g120 = CID0 in
-let g121 = " --> " in
-let g123 = 0 in
-let g124 = 10 in
-let g125 = 48 in
-let g126 = 10 in
-let g122 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqInt(arg,g123) in
-    match t1 with
-    | true1 -> k f1
-    | false0 ->
-      let t2 = PRIM_ModInt(arg,g124) in
-      let t3 = PRIM_AddInt(g125,t2) in
-      let t4 = PRIM_CharChr(t3) in
-      let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g126) in
-        arg t1 k in
-      g122 t5 k in
-  k t1 in
-let g127 = 0 in
-let g128 = '0' in
-let g129 = CID0 in
-let g130 = CID1[g128,g129] in
-let g131 = CID0 in
-let g132 = '\n' in
-let g133 = "fact" in
-let g134 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqChar(f1,arg) in
-    k t1 in
-  k t1 in
-let g135 = "fact: " in
-let g136 = "ERROR: " in
-let g137 = "expected an argument" in
-let g138 = '\n' in
-let g139 = "ERROR: " in
-let g140 = "expected exactly one argument" in
-let g141 = '\n' in
-let g143 = 48 in
-let g144 = 0 in
-let g145 = CID0 in
-let g146 = CID1 in
-let g147 = 9 in
-let g148 = CID0 in
-let g149 = CID1 in
-let g150 = CID1 in
-let g151 = CID1 in
-let g152 = CID1 in
-let g153 = 10 in
-let g142 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    match arg with
-    | Nil0 ->
-      let t1 = CID0[f1] in
-      k t1
-    | Cons1(t1,t2) ->
-      let t3 = PRIM_CharOrd(t1) in
-      let t4 = PRIM_SubInt(t3,g143) in
-      let t5 = PRIM_LessInt(t4,g144) in
-      let k = [f1,t2,t4], fun [f1,f2,f3] arg ->
-        let k = [f1,f2], fun [f1,f2] arg ->
-          match arg with
-          | None1 -> k g152
-          | Some0(t1) ->
-            let t2 = PRIM_MulInt(g153,f1) in
-            let t3 = PRIM_AddInt(t2,t1) in
-            let k = [f2], fun [f1] arg -> arg f1 k in
-            g142 t3 k in
-        match arg with
-        | true1 ->
-          let t1 = PRIM_LessInt(g147,f3) in
-          let k = [f3], fun [f1] arg ->
-            match arg with
-            | true1 ->
-              let t1 = CID0[f1] in
-              k t1
-            | false0 -> k g150 in
-          match t1 with
-          | true1 -> k g148
-          | false0 -> k g149
-        | false0 -> k g151 in
-      match t5 with
-      | true1 -> k g145
-      | false0 -> k g146 in
-  k t1 in
-let g154 = 0 in
-let g155 = "ERROR: " in
-let g156 = "expected arg1 to be numeric" in
-let g157 = '\n' in
-let g159 = 0 in
-let g160 = 10 in
-let g161 = 48 in
-let g162 = 10 in
-let g158 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqInt(arg,g159) in
-    match t1 with
-    | true1 -> k f1
-    | false0 ->
-      let t2 = PRIM_ModInt(arg,g160) in
-      let t3 = PRIM_AddInt(g161,t2) in
-      let t4 = PRIM_CharChr(t3) in
-      let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g162) in
-        arg t1 k in
-      g158 t5 k in
-  k t1 in
-let g163 = 0 in
-let g164 = '0' in
-let g165 = CID0 in
-let g166 = CID1[g164,g165] in
-let g167 = CID0 in
-let g168 = " --> " in
-let g170 = 0 in
-let g171 = 10 in
-let g172 = 48 in
-let g173 = 10 in
-let g169 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqInt(arg,g170) in
-    match t1 with
-    | true1 -> k f1
-    | false0 ->
-      let t2 = PRIM_ModInt(arg,g171) in
-      let t3 = PRIM_AddInt(g172,t2) in
-      let t4 = PRIM_CharChr(t3) in
-      let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g173) in
-        arg t1 k in
-      g169 t5 k in
-  k t1 in
-let g174 = 0 in
-let g175 = '0' in
-let g176 = CID0 in
-let g177 = CID1[g175,g176] in
-let g178 = CID0 in
-let g179 = '\n' in
-let g180 = "rev" in
-let g181 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqChar(f1,arg) in
-    k t1 in
-  k t1 in
-let g182 = "ERROR: " in
-let g183 = "rev: expected no arguments" in
-let g184 = '\n' in
-let g185 = "(reverse typed lines until ^D)\n" in
-let g187 = CID0 in
-let g188 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqChar(f1,arg) in
-    k t1 in
-  k t1 in
-let g189 = '\EOT' in
-let g190 = CID0 in
-let g191 = CID1[g189,g190] in
-let g192 = CID0 in
-let g193 = CID0 in
-let g194 = '\n' in
-let g195 = CID0 in
-let g186 = fun arg k ->
-  let k = [], fun [] arg ->
-    let k = [arg], fun [f1] arg ->
-      let k = [f1], fun [f1] arg ->
-        let k = [f1], fun [f1] arg ->
-          match arg with
-          | true1 -> k g192
-          | false0 ->
-            let k = [f1], fun [f1] arg ->
-              let k = [], fun [] arg ->
-                let k = [], fun [] arg ->
-                  let t1 = PRIM_PutChar(g194) in
-                  g186 g195 k in
-                g15 arg k in
-              arg f1 k in
-            g9 g193 k in
-        arg g191 k in
-      arg f1 k in
-    g3 g188 k in
-  g23 g187 k in
-let g196 = CID0 in
-let g197 = 'o' in
-let g198 = '*' in
-let g199 = fun arg k ->
-  let t1 = PRIM_EqChar(arg,g197) in
-  match t1 with
-  | true1 -> k g198
-  | false0 -> k arg in
-let g200 = "You wrote: \"" in
-let g201 = "\" (" in
-let g203 = 0 in
-let g204 = 10 in
-let g205 = 48 in
-let g206 = 10 in
-let g202 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqInt(arg,g203) in
-    match t1 with
-    | true1 -> k f1
-    | false0 ->
-      let t2 = PRIM_ModInt(arg,g204) in
-      let t3 = PRIM_AddInt(g205,t2) in
-      let t4 = PRIM_CharChr(t3) in
-      let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g206) in
-        arg t1 k in
-      g202 t5 k in
-  k t1 in
-let g207 = 0 in
-let g208 = '0' in
-let g209 = CID0 in
-let g210 = CID1[g208,g209] in
-let g211 = CID0 in
-let g212 = " chars)" in
-let g213 = '\n' in
-let g214 = CID0 in
-let g215 = "This is a shell prototype. Try: fib, fact, rev\n" in
-let g216 = CID0 in
-let k = [], fun [] arg ->
-  let t1 = [arg], fun [f1] me arg k ->
-    let k = [f1,me], fun [f1,f2] arg ->
-      let k = [f1,f2], fun [f1,f2] arg ->
-        let k = [f1,f2,arg], fun [f1,f2,f3] arg ->
-          let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
-            let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
-              match arg with
-              | true1 -> k g82
+          let lit_111'15 = 127 in
+          let prim_0'0 = PRIM_EqInt(n,lit_111'15) in
+          match prim_0'0 with
+          | true1 ->
+            match acc with
+            | Nil0 -> readloop acc k
+            | Cons1(c,tail) ->
+              let a = PRIM_CharOrd(c) in
+              let lit_115'26 = 26 in
+              let b = PRIM_LessInt(lit_115'26,a) in
+              let k [readloop,tail] case_7'2 =
+                let k [readloop,tail] _ =
+                  let lit_0'0 = '\b' in
+                  let _ = PRIM_PutChar(lit_0'0) in
+                  let lit_28'11 = ' ' in
+                  let _ = PRIM_PutChar(lit_28'11) in
+                  let lit_0'0 = '\b' in
+                  let _ = PRIM_PutChar(lit_0'0) in
+                  readloop tail k in
+                match case_7'2 with
+                | true1 ->
+                  let lit_0'0 = '\b' in
+                  let _ = PRIM_PutChar(lit_0'0) in
+                  let lit_28'11 = ' ' in
+                  let _ = PRIM_PutChar(lit_28'11) in
+                  let lit_0'0 = '\b' in
+                  let prim_0'0 = PRIM_PutChar(lit_0'0) in
+                  k prim_0'0
+                | false0 ->
+                  let con_115'53 = CID0 in
+                  k con_115'53 in
+              match b with
+              | true1 ->
+                let con_8'12 = CID0 in
+                k con_8'12
               | false0 ->
-                let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
-                  let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
-                    let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
-                      let k = [f2], fun [f1] arg -> f1 g214 k in
-                      match arg with
-                      | Nil0 -> k g85
-                      | Cons1(t1,t2) ->
-                        let k = [f1,f3,t1,t2], fun [f1,f2,f3,f4] arg ->
-                          let k = [f1,f2,f3,f4,arg], fun [f1,f2,f3,f4,f5] arg ->
-                            let k = [f1,f2,f3,f4,f5], fun [f1,f2,f3,f4,f5] arg ->
-                              let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
-                                match arg with
+                let con_9'13 = CID1 in
+                k con_9'13
+          | false0 ->
+            let n = PRIM_CharOrd(c) in
+            let lit_17'18 = 8 in
+            let prim_0'0 = PRIM_EqInt(n,lit_17'18) in
+            let k [acc,readloop,c] _ =
+              let con_0'0 = CID1[c,acc] in
+              readloop con_0'0 k in
+            match prim_0'0 with
+            | true1 ->
+              let prim_0'0 = PRIM_PutChar(c) in
+              k prim_0'0
+            | false0 ->
+              let lit_20'17 = '\n' in
+              let prim_0'0 = PRIM_EqChar(c,lit_20'17) in
+              match prim_0'0 with
+              | true1 ->
+                let prim_0'0 = PRIM_PutChar(c) in
+                k prim_0'0
+              | false0 ->
+                let lit_21'13 = 26 in
+                let prim_0'0 = PRIM_LessInt(lit_21'13,n) in
+                match prim_0'0 with
+                | true1 ->
+                  let prim_0'0 = PRIM_PutChar(c) in
+                  k prim_0'0
+                | false0 ->
+                  let lit_22'18 = '^' in
+                  let _ = PRIM_PutChar(lit_22'18) in
+                  let lit_0'0 = 65 in
+                  let x = PRIM_AddInt(lit_0'0,n) in
+                  let lit_22'52 = 1 in
+                  let x = PRIM_SubInt(x,lit_22'52) in
+                  let x = PRIM_CharChr(x) in
+                  let prim_0'0 = PRIM_PutChar(x) in
+                  k prim_0'0) in
+  let fib = fix (fun [] fib n k ->
+    let lit_125'9 = 2 in
+    let prim_0'0 = PRIM_LessInt(n,lit_125'9) in
+    match prim_0'0 with
+    | true1 -> k n
+    | false0 ->
+      let lit_125'30 = 1 in
+      let prim_0'0 = PRIM_SubInt(n,lit_125'30) in
+      let k [n,fib] x =
+        let lit_125'42 = 2 in
+        let prim_0'0 = PRIM_SubInt(n,lit_125'42) in
+        let k [x] y =
+          let prim_0'0 = PRIM_AddInt(x,y) in
+          k prim_0'0 in
+        fib prim_0'0 k in
+      fib prim_0'0 k) in
+  let fact = fix (fun [] fact n k ->
+    let lit_129'10 = 2 in
+    let b = PRIM_LessInt(n,lit_129'10) in
+    let k [n,fact] case_7'2 =
+      match case_7'2 with
+      | true1 ->
+        let lit_129'25 = 1 in
+        let prim_0'0 = PRIM_SubInt(n,lit_129'25) in
+        let k [n] x =
+          let prim_0'0 = PRIM_MulInt(x,n) in
+          k prim_0'0 in
+        fact prim_0'0 k
+      | false0 ->
+        let lit_129'37 = 1 in
+        k lit_129'37 in
+    match b with
+    | true1 ->
+      let con_8'12 = CID0 in
+      k con_8'12
+    | false0 ->
+      let con_9'13 = CID1 in
+      k con_9'13) in
+  let splitloop = fix (fun [revloop] splitloop accWs k ->
+    let lam_194'24 = fun [revloop,accWs,splitloop] accCs k ->
+      let lam_194'30 = fun [revloop,accWs,splitloop,accCs] xs k ->
+        match xs with
+        | Nil0 ->
+          let con_72'25 = CID0 in
+          let k [revloop,accWs,accCs] app_72'25 =
+            let k [revloop,accWs] x =
+              let con_72'25 = CID0 in
+              let k [accWs,x] app_72'25 =
+                let con_0'0 = CID1[x,accWs] in
+                app_72'25 con_0'0 k in
+              revloop con_72'25 k in
+            app_72'25 accCs k in
+          revloop con_72'25 k
+        | Cons1(x,xs) ->
+          let lit_199'18 = ' ' in
+          let prim_0'0 = PRIM_EqChar(x,lit_199'18) in
+          match prim_0'0 with
+          | true1 ->
+            let con_72'25 = CID0 in
+            let k [accWs,splitloop,accCs,xs] app_72'25 =
+              let k [accWs,splitloop,xs] x =
+                let con_0'0 = CID1[x,accWs] in
+                let k [xs] app_199'37 =
+                  let con_199'62 = CID0 in
+                  let k [xs] app_199'62 = app_199'62 xs k in
+                  app_199'37 con_199'62 k in
+                splitloop con_0'0 k in
+              app_72'25 accCs k in
+            revloop con_72'25 k
+          | false0 ->
+            let k [accCs,x,xs] app_200'20 =
+              let con_0'0 = CID1[x,accCs] in
+              let k [xs] app_200'26 = app_200'26 xs k in
+              app_200'20 con_0'0 k in
+            splitloop accWs k in
+      k lam_194'30 in
+    k lam_194'24) in
+  let mainloop = fix (fun [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,splitloop] mainloop _ k ->
+    let lit_216'13 = '>' in
+    let lit_216'17 = ' ' in
+    let con_216'20 = CID0 in
+    let con_216'17 = CID1[lit_216'17,con_216'20] in
+    let con_216'13 = CID1[lit_216'13,con_216'17] in
+    let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,splitloop,mainloop] _ =
+      let con_121'28 = CID0 in
+      let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,splitloop,mainloop] xs =
+        let lam_0'0 = fun [] x k ->
+          let lam_0'0 = fun [x] y k ->
+            let prim_0'0 = PRIM_EqChar(x,y) in
+            k prim_0'0 in
+          k lam_0'0 in
+        let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,splitloop,mainloop,xs] app_60'33 =
+          let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,splitloop,mainloop,xs] app_60'41 =
+            let lit_0'0 = '\EOT' in
+            let con_168'31 = CID0 in
+            let con_0'0 = CID1[lit_0'0,con_168'31] in
+            let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,splitloop,mainloop,xs] app_60'44 =
+              match app_60'44 with
+              | true1 ->
+                let con_218'42 = CID0 in
+                k con_218'42
+              | false0 ->
+                let con_203'12 = CID0 in
+                let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,mainloop,xs] app_203'12 =
+                  let con_203'15 = CID0 in
+                  let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,mainloop,xs] app_203'15 =
+                    let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,mainloop,xs] words =
+                      let k [mainloop] _ =
+                        let con_219'26 = CID0 in
+                        mainloop con_219'26 k in
+                      match words with
+                      | Nil0 ->
+                        let con_208'10 = CID0 in
+                        k con_208'10
+                      | Cons1(command,args) ->
+                        let lit_210'38 = "fib" in
+                        let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,xs,command,args] ys =
+                          let lam_0'0 = fun [] x k ->
+                            let lam_0'0 = fun [x] y k ->
+                              let prim_0'0 = PRIM_EqChar(x,y) in
+                              k prim_0'0 in
+                            k lam_0'0 in
+                          let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,xs,command,args,ys] app_60'33 =
+                            let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,xs,command,args,ys] app_60'41 =
+                              let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fib,fact,xs,command,args] app_60'44 =
+                                match app_60'44 with
                                 | true1 ->
-                                  let t1 = [f1], fun [f1] arg k ->
-                                    let k = [], fun [] arg -> g15 arg k in
-                                    f1 arg k in
-                                  let k = [f1,f4], fun [f1,f2] arg ->
-                                    let k = [f1,f2], fun [f1,f2] arg ->
-                                      match f2 with
+                                  let lam_98'33 = fun [explode,put_chars] s k ->
+                                    let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                    explode s k in
+                                  let k [block,explode,put_chars,fib,args] app_98'28 =
+                                    let lit_134'13 = "fib: " in
+                                    let k [block,explode,put_chars,fib,args] _ =
+                                      match args with
                                       | Nil0 ->
-                                        let t1 = [f1], fun [f1] arg k ->
-                                          let k = [], fun [] arg -> g15 arg k in
-                                          f1 arg k in
-                                        let k = [f1], fun [f1] arg ->
-                                          let k = [f1], fun [f1] arg ->
-                                            let t1 = [f1], fun [f1] arg k ->
-                                              let k = [], fun [] arg -> g15 arg k in
-                                              f1 arg k in
-                                            let k = [], fun [] arg ->
-                                              let k = [], fun [] arg ->
-                                                let t1 = PRIM_PutChar(g91) in
-                                                k t1 in
-                                              arg g90 k in
-                                            g1 t1 k in
-                                          arg g89 k in
-                                        g1 t1 k
-                                      | Cons1(t1,t2) ->
-                                        match t2 with
-                                        | Cons1(t3,t4) ->
-                                          let t5 = [f1], fun [f1] arg k ->
-                                            let k = [], fun [] arg -> g15 arg k in
-                                            f1 arg k in
-                                          let k = [f1], fun [f1] arg ->
-                                            let k = [f1], fun [f1] arg ->
-                                              let t1 = [f1], fun [f1] arg k ->
-                                                let k = [], fun [] arg -> g15 arg k in
-                                                f1 arg k in
-                                              let k = [], fun [] arg ->
-                                                let k = [], fun [] arg ->
-                                                  let t1 = PRIM_PutChar(g94) in
-                                                  k t1 in
-                                                arg g93 k in
-                                              g1 t1 k in
-                                            arg g92 k in
-                                          g1 t5 k
+                                        let lam_98'33 = fun [explode,put_chars] s k ->
+                                          let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                          explode s k in
+                                        let k [block,explode,put_chars] app_98'28 =
+                                          let lit_131'25 = "ERROR: " in
+                                          let k [block,explode,put_chars] _ =
+                                            let lam_98'33 = fun [explode,put_chars] s k ->
+                                              let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                              explode s k in
+                                            let k [] app_98'28 =
+                                              let lit_136'16 = "expected an argument" in
+                                              let k [] _ =
+                                                let lit_102'26 = '\n' in
+                                                let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                k prim_0'0 in
+                                              app_98'28 lit_136'16 k in
+                                            block lam_98'33 k in
+                                          app_98'28 lit_131'25 k in
+                                        block lam_98'33 k
+                                      | Cons1(arg1,more) ->
+                                        match more with
+                                        | Cons1(_,_) ->
+                                          let lam_98'33 = fun [explode,put_chars] s k ->
+                                            let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                            explode s k in
+                                          let k [block,explode,put_chars] app_98'28 =
+                                            let lit_131'25 = "ERROR: " in
+                                            let k [block,explode,put_chars] _ =
+                                              let lam_98'33 = fun [explode,put_chars] s k ->
+                                                let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                explode s k in
+                                              let k [] app_98'28 =
+                                                let lit_139'21 = "expected exactly one argument" in
+                                                let k [] _ =
+                                                  let lit_102'26 = '\n' in
+                                                  let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                  k prim_0'0 in
+                                                app_98'28 lit_139'21 k in
+                                              block lam_98'33 k in
+                                            app_98'28 lit_131'25 k in
+                                          block lam_98'33 k
                                         | Nil0 ->
-                                          let k = [f1,t1], fun [f1,f2] arg ->
-                                            let k = [f1], fun [f1] arg ->
-                                              match arg with
-                                              | None1 ->
-                                                let t1 = [f1], fun [f1] arg k ->
-                                                  let k = [], fun [] arg -> g15 arg k in
-                                                  f1 arg k in
-                                                let k = [f1], fun [f1] arg ->
-                                                  let k = [f1], fun [f1] arg ->
-                                                    let t1 = [f1], fun [f1] arg k ->
-                                                      let k = [], fun [] arg -> g15 arg k in
-                                                      f1 arg k in
-                                                    let k = [], fun [] arg ->
-                                                      let k = [], fun [] arg ->
-                                                        let t1 = PRIM_PutChar(g110) in
-                                                        k t1 in
-                                                      arg g109 k in
-                                                    g1 t1 k in
-                                                  arg g108 k in
-                                                g1 t1 k
-                                              | Some0(t1) ->
-                                                let k = [f1,t1], fun [f1,f2] arg ->
-                                                  let t1 = PRIM_EqInt(f2,g116) in
-                                                  let k = [f1,arg], fun [f1,f2] arg ->
-                                                    let k = [f1,f2], fun [f1,f2] arg ->
-                                                      let t1 = [f1], fun [f1] arg k ->
-                                                        let k = [], fun [] arg -> g15 arg k in
-                                                        f1 arg k in
-                                                      let k = [f2], fun [f1] arg ->
-                                                        let k = [f1], fun [f1] arg ->
-                                                          let t1 = PRIM_EqInt(f1,g127) in
-                                                          let k = [], fun [] arg ->
-                                                            let k = [], fun [] arg ->
-                                                              let t1 = PRIM_PutChar(g132) in
-                                                              k t1 in
-                                                            g15 arg k in
-                                                          match t1 with
-                                                          | true1 -> k g130
-                                                          | false0 ->
-                                                            let k = [f1], fun [f1] arg -> arg f1 k in
-                                                            g122 g131 k in
-                                                        arg g121 k in
-                                                      g1 t1 k in
-                                                    g15 arg k in
-                                                  match t1 with
-                                                  | true1 -> k g119
-                                                  | false0 ->
-                                                    let k = [f2], fun [f1] arg -> arg f1 k in
-                                                    g111 g120 k in
-                                                g56 t1 k in
-                                            arg f2 k in
-                                          g95 g107 k in
-                                    arg g88 k in
-                                  g1 t1 k
-                                | false0 ->
-                                  let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
-                                    let k = [f1,f2,f3,f4,arg], fun [f1,f2,f3,f4,f5] arg ->
-                                      let k = [f1,f2,f3,f4,f5], fun [f1,f2,f3,f4,f5] arg ->
-                                        let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
-                                          match arg with
-                                          | true1 ->
-                                            let t1 = [f1], fun [f1] arg k ->
-                                              let k = [], fun [] arg -> g15 arg k in
-                                              f1 arg k in
-                                            let k = [f1,f4], fun [f1,f2] arg ->
-                                              let k = [f1,f2], fun [f1,f2] arg ->
-                                                match f2 with
-                                                | Nil0 ->
-                                                  let t1 = [f1], fun [f1] arg k ->
-                                                    let k = [], fun [] arg -> g15 arg k in
-                                                    f1 arg k in
-                                                  let k = [f1], fun [f1] arg ->
-                                                    let k = [f1], fun [f1] arg ->
-                                                      let t1 = [f1], fun [f1] arg k ->
-                                                        let k = [], fun [] arg -> g15 arg k in
-                                                        f1 arg k in
-                                                      let k = [], fun [] arg ->
-                                                        let k = [], fun [] arg ->
-                                                          let t1 = PRIM_PutChar(g138) in
-                                                          k t1 in
-                                                        arg g137 k in
-                                                      g1 t1 k in
-                                                    arg g136 k in
-                                                  g1 t1 k
-                                                | Cons1(t1,t2) ->
-                                                  match t2 with
-                                                  | Cons1(t3,t4) ->
-                                                    let t5 = [f1], fun [f1] arg k ->
-                                                      let k = [], fun [] arg -> g15 arg k in
-                                                      f1 arg k in
-                                                    let k = [f1], fun [f1] arg ->
-                                                      let k = [f1], fun [f1] arg ->
-                                                        let t1 = [f1], fun [f1] arg k ->
-                                                          let k = [], fun [] arg -> g15 arg k in
-                                                          f1 arg k in
-                                                        let k = [], fun [] arg ->
-                                                          let k = [], fun [] arg ->
-                                                            let t1 = PRIM_PutChar(g141) in
-                                                            k t1 in
-                                                          arg g140 k in
-                                                        g1 t1 k in
-                                                      arg g139 k in
-                                                    g1 t5 k
-                                                  | Nil0 ->
-                                                    let k = [f1,t1], fun [f1,f2] arg ->
-                                                      let k = [f1], fun [f1] arg ->
-                                                        match arg with
-                                                        | None1 ->
-                                                          let t1 = [f1], fun [f1] arg k ->
-                                                            let k = [], fun [] arg -> g15 arg k in
-                                                            f1 arg k in
-                                                          let k = [f1], fun [f1] arg ->
-                                                            let k = [f1], fun [f1] arg ->
-                                                              let t1 = [f1], fun [f1] arg k ->
-                                                                let k = [], fun [] arg -> g15 arg k in
-                                                                f1 arg k in
-                                                              let k = [], fun [] arg ->
-                                                                let k = [], fun [] arg ->
-                                                                  let t1 = PRIM_PutChar(g157) in
-                                                                  k t1 in
-                                                                arg g156 k in
-                                                              g1 t1 k in
-                                                            arg g155 k in
-                                                          g1 t1 k
-                                                        | Some0(t1) ->
-                                                          let k = [f1,t1], fun [f1,f2] arg ->
-                                                            let t1 = PRIM_EqInt(f2,g163) in
-                                                            let k = [f1,arg], fun [f1,f2] arg ->
-                                                              let k = [f1,f2], fun [f1,f2] arg ->
-                                                                let t1 = [f1], fun [f1] arg k ->
-                                                                  let k = [], fun [] arg -> g15 arg k in
-                                                                  f1 arg k in
-                                                                let k = [f2], fun [f1] arg ->
-                                                                  let k = [f1], fun [f1] arg ->
-                                                                    let t1 = PRIM_EqInt(f1,g174) in
-                                                                    let k = [], fun [] arg ->
-                                                                      let k = [], fun [] arg ->
-                                                                        let t1 = PRIM_PutChar(g179) in
-                                                                        k t1 in
-                                                                      g15 arg k in
-                                                                    match t1 with
-                                                                    | true1 -> k g177
-                                                                    | false0 ->
-                                                                      let k = [f1], fun [f1] arg -> arg f1 k in
-                                                                      g169 g178 k in
-                                                                  arg g168 k in
-                                                                g1 t1 k in
-                                                              g15 arg k in
-                                                            match t1 with
-                                                            | true1 -> k g166
-                                                            | false0 ->
-                                                              let k = [f2], fun [f1] arg -> arg f1 k in
-                                                              g158 g167 k in
-                                                          g60 t1 k in
-                                                      arg f2 k in
-                                                    g142 g154 k in
-                                              arg g135 k in
-                                            g1 t1 k
-                                          | false0 ->
-                                            let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
-                                              let k = [f1,f2,f3,f4,arg], fun [f1,f2,f3,f4,f5] arg ->
-                                                let k = [f1,f2,f4,f5], fun [f1,f2,f3,f4] arg ->
-                                                  let k = [f1,f2,f3], fun [f1,f2,f3] arg ->
-                                                    match arg with
+                                          let loop = fix (fun [] loop acc k ->
+                                            let lam_39'19 = fun [acc,loop] xs k ->
+                                              match xs with
+                                              | Nil0 ->
+                                                let con_41'12 = CID0[acc] in
+                                                k con_41'12
+                                              | Cons1(x,xs) ->
+                                                let x = PRIM_CharOrd(x) in
+                                                let lit_0'0 = 48 in
+                                                let n = PRIM_SubInt(x,lit_0'0) in
+                                                let lit_36'10 = 0 in
+                                                let b = PRIM_LessInt(n,lit_36'10) in
+                                                let k [acc,loop,xs,n] case_7'2 =
+                                                  let k [acc,loop,xs] case_36'2 =
+                                                    match case_36'2 with
+                                                    | None1 ->
+                                                      let con_44'18 = CID1 in
+                                                      k con_44'18
+                                                    | Some0(d) ->
+                                                      let lit_45'26 = 10 in
+                                                      let x = PRIM_MulInt(lit_45'26,acc) in
+                                                      let prim_0'0 = PRIM_AddInt(x,d) in
+                                                      let k [xs] app_45'25 = app_45'25 xs k in
+                                                      loop prim_0'0 k in
+                                                  match case_7'2 with
+                                                  | true1 ->
+                                                    let lit_36'25 = 9 in
+                                                    let b = PRIM_LessInt(lit_36'25,n) in
+                                                    let k [n] case_7'2 =
+                                                      match case_7'2 with
+                                                      | true1 ->
+                                                        let con_36'32 = CID0[n] in
+                                                        k con_36'32
+                                                      | false0 ->
+                                                        let con_36'45 = CID1 in
+                                                        k con_36'45 in
+                                                    match b with
                                                     | true1 ->
-                                                      match f3 with
-                                                      | Cons1(t1,t2) ->
-                                                        let t3 = [f1], fun [f1] arg k ->
-                                                          let k = [], fun [] arg -> g15 arg k in
-                                                          f1 arg k in
-                                                        let k = [f1], fun [f1] arg ->
-                                                          let k = [f1], fun [f1] arg ->
-                                                            let t1 = [f1], fun [f1] arg k ->
-                                                              let k = [], fun [] arg -> g15 arg k in
-                                                              f1 arg k in
-                                                            let k = [], fun [] arg ->
-                                                              let k = [], fun [] arg ->
-                                                                let t1 = PRIM_PutChar(g184) in
-                                                                k t1 in
-                                                              arg g183 k in
-                                                            g1 t1 k in
-                                                          arg g182 k in
-                                                        g1 t3 k
-                                                      | Nil0 ->
-                                                        let t1 = [f1], fun [f1] arg k ->
-                                                          let k = [], fun [] arg -> g15 arg k in
-                                                          f1 arg k in
-                                                        let k = [], fun [] arg ->
-                                                          let k = [], fun [] arg -> g186 g196 k in
-                                                          arg g185 k in
-                                                        g1 t1 k
+                                                      let con_8'12 = CID0 in
+                                                      k con_8'12
                                                     | false0 ->
-                                                      let k = [f1,f2], fun [f1,f2] arg ->
-                                                        let k = [f1,f2,arg], fun [f1,f2,f3] arg ->
-                                                          let k = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg ->
-                                                            let k = [f1,f2,f3,f4], fun [f1,f2,f3,f4] arg ->
-                                                              let k = [f1,f4,arg], fun [f1,f2,f3] arg ->
-                                                                let k = [f1,f2], fun [f1,f2] arg ->
-                                                                  let k = [f1,f2], fun [f1,f2] arg ->
-                                                                    let t1 = [f1], fun [f1] arg k ->
-                                                                      let k = [], fun [] arg -> g15 arg k in
-                                                                      f1 arg k in
-                                                                    let k = [f1,f2], fun [f1,f2] arg ->
-                                                                      let k = [f1,f2], fun [f1,f2] arg ->
-                                                                        let t1 = PRIM_EqInt(f2,g207) in
-                                                                        let k = [f1], fun [f1] arg ->
-                                                                          let k = [f1], fun [f1] arg ->
-                                                                            let t1 = [f1], fun [f1] arg k ->
-                                                                              let k = [], fun [] arg -> g15 arg k in
-                                                                              f1 arg k in
-                                                                            let k = [], fun [] arg ->
-                                                                              let k = [], fun [] arg ->
-                                                                                let t1 = PRIM_PutChar(g213) in
-                                                                                k t1 in
-                                                                              arg g212 k in
-                                                                            g1 t1 k in
-                                                                          g15 arg k in
-                                                                        match t1 with
-                                                                        | true1 -> k g210
+                                                      let con_9'13 = CID1 in
+                                                      k con_9'13
+                                                  | false0 ->
+                                                    let con_36'55 = CID1 in
+                                                    k con_36'55 in
+                                                match b with
+                                                | true1 ->
+                                                  let con_8'12 = CID0 in
+                                                  k con_8'12
+                                                | false0 ->
+                                                  let con_9'13 = CID1 in
+                                                  k con_9'13 in
+                                            k lam_39'19) in
+                                          let lit_47'7 = 0 in
+                                          let k [block,explode,put_chars,fib,arg1] app_47'7 =
+                                            let k [block,explode,put_chars,fib] app_47'9 =
+                                              match app_47'9 with
+                                              | None1 ->
+                                                let lam_98'33 = fun [explode,put_chars] s k ->
+                                                  let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                  explode s k in
+                                                let k [block,explode,put_chars] app_98'28 =
+                                                  let lit_131'25 = "ERROR: " in
+                                                  let k [block,explode,put_chars] _ =
+                                                    let lam_98'33 = fun [explode,put_chars] s k ->
+                                                      let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                      explode s k in
+                                                    let k [] app_98'28 =
+                                                      let lit_142'24 = "expected arg1 to be numeric" in
+                                                      let k [] _ =
+                                                        let lit_102'26 = '\n' in
+                                                        let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                        k prim_0'0 in
+                                                      app_98'28 lit_142'24 k in
+                                                    block lam_98'33 k in
+                                                  app_98'28 lit_131'25 k in
+                                                block lam_98'33 k
+                                              | Some0(n) ->
+                                                let k [block,explode,put_chars,n] res =
+                                                  let loop = fix (fun [] loop acc k ->
+                                                    let lam_87'19 = fun [acc,loop] i k ->
+                                                      let lit_88'11 = 0 in
+                                                      let prim_0'0 = PRIM_EqInt(i,lit_88'11) in
+                                                      match prim_0'0 with
+                                                      | true1 -> k acc
+                                                      | false0 ->
+                                                        let lit_89'35 = 10 in
+                                                        let c = PRIM_ModInt(i,lit_89'35) in
+                                                        let lit_0'0 = 48 in
+                                                        let x = PRIM_AddInt(lit_0'0,c) in
+                                                        let x = PRIM_CharChr(x) in
+                                                        let con_0'0 = CID1[x,acc] in
+                                                        let k [i] app_89'11 =
+                                                          let lit_89'48 = 10 in
+                                                          let prim_0'0 = PRIM_DivInt(i,lit_89'48) in
+                                                          app_89'11 prim_0'0 k in
+                                                        loop con_0'0 k in
+                                                    k lam_87'19) in
+                                                  let lit_91'9 = 0 in
+                                                  let prim_0'0 = PRIM_EqInt(n,lit_91'9) in
+                                                  let k [block,explode,put_chars,res] case_91'2 =
+                                                    let k [block,explode,put_chars,res] _ =
+                                                      let lam_98'33 = fun [explode,put_chars] s k ->
+                                                        let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                        explode s k in
+                                                      let k [put_chars,res] app_98'28 =
+                                                        let lit_146'22 = " --> " in
+                                                        let k [put_chars,res] _ =
+                                                          let loop = fix (fun [] loop acc k ->
+                                                            let lam_87'19 = fun [acc,loop] i k ->
+                                                              let lit_88'11 = 0 in
+                                                              let prim_0'0 = PRIM_EqInt(i,lit_88'11) in
+                                                              match prim_0'0 with
+                                                              | true1 -> k acc
+                                                              | false0 ->
+                                                                let lit_89'35 = 10 in
+                                                                let c = PRIM_ModInt(i,lit_89'35) in
+                                                                let lit_0'0 = 48 in
+                                                                let x = PRIM_AddInt(lit_0'0,c) in
+                                                                let x = PRIM_CharChr(x) in
+                                                                let con_0'0 = CID1[x,acc] in
+                                                                let k [i] app_89'11 =
+                                                                  let lit_89'48 = 10 in
+                                                                  let prim_0'0 = PRIM_DivInt(i,lit_89'48) in
+                                                                  app_89'11 prim_0'0 k in
+                                                                loop con_0'0 k in
+                                                            k lam_87'19) in
+                                                          let lit_91'9 = 0 in
+                                                          let prim_0'0 = PRIM_EqInt(res,lit_91'9) in
+                                                          let k [put_chars] case_91'2 =
+                                                            let k [] _ =
+                                                              let lit_102'26 = '\n' in
+                                                              let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                              k prim_0'0 in
+                                                            put_chars case_91'2 k in
+                                                          match prim_0'0 with
+                                                          | true1 ->
+                                                            let lit_91'21 = '0' in
+                                                            let con_91'25 = CID0 in
+                                                            let con_0'0 = CID1[lit_91'21,con_91'25] in
+                                                            k con_0'0
+                                                          | false0 ->
+                                                            let con_91'38 = CID0 in
+                                                            let k [res] app_91'38 = app_91'38 res k in
+                                                            loop con_91'38 k in
+                                                        app_98'28 lit_146'22 k in
+                                                      block lam_98'33 k in
+                                                    put_chars case_91'2 k in
+                                                  match prim_0'0 with
+                                                  | true1 ->
+                                                    let lit_91'21 = '0' in
+                                                    let con_91'25 = CID0 in
+                                                    let con_0'0 = CID1[lit_91'21,con_91'25] in
+                                                    k con_0'0
+                                                  | false0 ->
+                                                    let con_91'38 = CID0 in
+                                                    let k [n] app_91'38 = app_91'38 n k in
+                                                    loop con_91'38 k in
+                                                fib n k in
+                                            app_47'7 arg1 k in
+                                          loop lit_47'7 k in
+                                    app_98'28 lit_134'13 k in
+                                  block lam_98'33 k
+                                | false0 ->
+                                  let lit_211'40 = "fact" in
+                                  let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fact,xs,command,args] ys =
+                                    let lam_0'0 = fun [] x k ->
+                                      let lam_0'0 = fun [x] y k ->
+                                        let prim_0'0 = PRIM_EqChar(x,y) in
+                                        k prim_0'0 in
+                                      k lam_0'0 in
+                                    let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fact,xs,command,args,ys] app_60'33 =
+                                      let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fact,xs,command,args,ys] app_60'41 =
+                                        let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,fact,xs,command,args] app_60'44 =
+                                          match app_60'44 with
+                                          | true1 ->
+                                            let lam_98'33 = fun [explode,put_chars] s k ->
+                                              let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                              explode s k in
+                                            let k [block,explode,put_chars,fact,args] app_98'28 =
+                                              let lit_151'13 = "fact: " in
+                                              let k [block,explode,put_chars,fact,args] _ =
+                                                match args with
+                                                | Nil0 ->
+                                                  let lam_98'33 = fun [explode,put_chars] s k ->
+                                                    let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                    explode s k in
+                                                  let k [block,explode,put_chars] app_98'28 =
+                                                    let lit_131'25 = "ERROR: " in
+                                                    let k [block,explode,put_chars] _ =
+                                                      let lam_98'33 = fun [explode,put_chars] s k ->
+                                                        let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                        explode s k in
+                                                      let k [] app_98'28 =
+                                                        let lit_153'16 = "expected an argument" in
+                                                        let k [] _ =
+                                                          let lit_102'26 = '\n' in
+                                                          let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                          k prim_0'0 in
+                                                        app_98'28 lit_153'16 k in
+                                                      block lam_98'33 k in
+                                                    app_98'28 lit_131'25 k in
+                                                  block lam_98'33 k
+                                                | Cons1(arg1,more) ->
+                                                  match more with
+                                                  | Cons1(_,_) ->
+                                                    let lam_98'33 = fun [explode,put_chars] s k ->
+                                                      let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                      explode s k in
+                                                    let k [block,explode,put_chars] app_98'28 =
+                                                      let lit_131'25 = "ERROR: " in
+                                                      let k [block,explode,put_chars] _ =
+                                                        let lam_98'33 = fun [explode,put_chars] s k ->
+                                                          let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                          explode s k in
+                                                        let k [] app_98'28 =
+                                                          let lit_156'21 = "expected exactly one argument" in
+                                                          let k [] _ =
+                                                            let lit_102'26 = '\n' in
+                                                            let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                            k prim_0'0 in
+                                                          app_98'28 lit_156'21 k in
+                                                        block lam_98'33 k in
+                                                      app_98'28 lit_131'25 k in
+                                                    block lam_98'33 k
+                                                  | Nil0 ->
+                                                    let loop = fix (fun [] loop acc k ->
+                                                      let lam_39'19 = fun [acc,loop] xs k ->
+                                                        match xs with
+                                                        | Nil0 ->
+                                                          let con_41'12 = CID0[acc] in
+                                                          k con_41'12
+                                                        | Cons1(x,xs) ->
+                                                          let x = PRIM_CharOrd(x) in
+                                                          let lit_0'0 = 48 in
+                                                          let n = PRIM_SubInt(x,lit_0'0) in
+                                                          let lit_36'10 = 0 in
+                                                          let b = PRIM_LessInt(n,lit_36'10) in
+                                                          let k [acc,loop,xs,n] case_7'2 =
+                                                            let k [acc,loop,xs] case_36'2 =
+                                                              match case_36'2 with
+                                                              | None1 ->
+                                                                let con_44'18 = CID1 in
+                                                                k con_44'18
+                                                              | Some0(d) ->
+                                                                let lit_45'26 = 10 in
+                                                                let x = PRIM_MulInt(lit_45'26,acc) in
+                                                                let prim_0'0 = PRIM_AddInt(x,d) in
+                                                                let k [xs] app_45'25 = app_45'25 xs k in
+                                                                loop prim_0'0 k in
+                                                            match case_7'2 with
+                                                            | true1 ->
+                                                              let lit_36'25 = 9 in
+                                                              let b = PRIM_LessInt(lit_36'25,n) in
+                                                              let k [n] case_7'2 =
+                                                                match case_7'2 with
+                                                                | true1 ->
+                                                                  let con_36'32 = CID0[n] in
+                                                                  k con_36'32
+                                                                | false0 ->
+                                                                  let con_36'45 = CID1 in
+                                                                  k con_36'45 in
+                                                              match b with
+                                                              | true1 ->
+                                                                let con_8'12 = CID0 in
+                                                                k con_8'12
+                                                              | false0 ->
+                                                                let con_9'13 = CID1 in
+                                                                k con_9'13
+                                                            | false0 ->
+                                                              let con_36'55 = CID1 in
+                                                              k con_36'55 in
+                                                          match b with
+                                                          | true1 ->
+                                                            let con_8'12 = CID0 in
+                                                            k con_8'12
+                                                          | false0 ->
+                                                            let con_9'13 = CID1 in
+                                                            k con_9'13 in
+                                                      k lam_39'19) in
+                                                    let lit_47'7 = 0 in
+                                                    let k [block,explode,put_chars,fact,arg1] app_47'7 =
+                                                      let k [block,explode,put_chars,fact] app_47'9 =
+                                                        match app_47'9 with
+                                                        | None1 ->
+                                                          let lam_98'33 = fun [explode,put_chars] s k ->
+                                                            let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                            explode s k in
+                                                          let k [block,explode,put_chars] app_98'28 =
+                                                            let lit_131'25 = "ERROR: " in
+                                                            let k [block,explode,put_chars] _ =
+                                                              let lam_98'33 = fun [explode,put_chars] s k ->
+                                                                let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                                explode s k in
+                                                              let k [] app_98'28 =
+                                                                let lit_159'24 = "expected arg1 to be numeric" in
+                                                                let k [] _ =
+                                                                  let lit_102'26 = '\n' in
+                                                                  let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                                  k prim_0'0 in
+                                                                app_98'28 lit_159'24 k in
+                                                              block lam_98'33 k in
+                                                            app_98'28 lit_131'25 k in
+                                                          block lam_98'33 k
+                                                        | Some0(n) ->
+                                                          let k [block,explode,put_chars,n] res =
+                                                            let loop = fix (fun [] loop acc k ->
+                                                              let lam_87'19 = fun [acc,loop] i k ->
+                                                                let lit_88'11 = 0 in
+                                                                let prim_0'0 = PRIM_EqInt(i,lit_88'11) in
+                                                                match prim_0'0 with
+                                                                | true1 -> k acc
+                                                                | false0 ->
+                                                                  let lit_89'35 = 10 in
+                                                                  let c = PRIM_ModInt(i,lit_89'35) in
+                                                                  let lit_0'0 = 48 in
+                                                                  let x = PRIM_AddInt(lit_0'0,c) in
+                                                                  let x = PRIM_CharChr(x) in
+                                                                  let con_0'0 = CID1[x,acc] in
+                                                                  let k [i] app_89'11 =
+                                                                    let lit_89'48 = 10 in
+                                                                    let prim_0'0 = PRIM_DivInt(i,lit_89'48) in
+                                                                    app_89'11 prim_0'0 k in
+                                                                  loop con_0'0 k in
+                                                              k lam_87'19) in
+                                                            let lit_91'9 = 0 in
+                                                            let prim_0'0 = PRIM_EqInt(n,lit_91'9) in
+                                                            let k [block,explode,put_chars,res] case_91'2 =
+                                                              let k [block,explode,put_chars,res] _ =
+                                                                let lam_98'33 = fun [explode,put_chars] s k ->
+                                                                  let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                                  explode s k in
+                                                                let k [put_chars,res] app_98'28 =
+                                                                  let lit_163'22 = " --> " in
+                                                                  let k [put_chars,res] _ =
+                                                                    let loop = fix (fun [] loop acc k ->
+                                                                      let lam_87'19 = fun [acc,loop] i k ->
+                                                                        let lit_88'11 = 0 in
+                                                                        let prim_0'0 = PRIM_EqInt(i,lit_88'11) in
+                                                                        match prim_0'0 with
+                                                                        | true1 -> k acc
                                                                         | false0 ->
-                                                                          let k = [f2], fun [f1] arg -> arg f1 k in
-                                                                          g202 g211 k in
-                                                                      arg g201 k in
-                                                                    g1 t1 k in
-                                                                  g15 arg k in
-                                                                f3 arg k in
-                                                              f3 f2 k in
-                                                            g8 arg k in
-                                                          f1 g200 k in
-                                                        g12 f2 k in
-                                                      g10 g199 k in
-                                                  arg f4 k in
-                                                arg f3 k in
-                                              g3 g181 k in
-                                            f1 g180 k in
-                                        arg f5 k in
-                                      arg f3 k in
-                                    g3 g134 k in
-                                  f1 g133 k in
-                              arg f5 k in
-                            arg f3 k in
-                          g3 g87 k in
-                        f1 g86 k in
-                    arg f3 k in
-                  arg g84 k in
-                g66 g83 k in
-            arg g81 k in
-          arg f3 k in
-        g3 g78 k in
-      g23 g77 k in
-    g15 g76 k in
-  let t2 = [arg], fun [f1] arg k ->
-    let k = [], fun [] arg -> g15 arg k in
-    f1 arg k in
-  let k = [t1], fun [f1] arg ->
-    let k = [f1], fun [f1] arg -> f1 g216 k in
-    arg g215 k in
-  g1 t2 k in
-g1 g2 k
+                                                                          let lit_89'35 = 10 in
+                                                                          let c = PRIM_ModInt(i,lit_89'35) in
+                                                                          let lit_0'0 = 48 in
+                                                                          let x = PRIM_AddInt(lit_0'0,c) in
+                                                                          let x = PRIM_CharChr(x) in
+                                                                          let con_0'0 = CID1[x,acc] in
+                                                                          let k [i] app_89'11 =
+                                                                            let lit_89'48 = 10 in
+                                                                            let prim_0'0 = PRIM_DivInt(i,lit_89'48) in
+                                                                            app_89'11 prim_0'0 k in
+                                                                          loop con_0'0 k in
+                                                                      k lam_87'19) in
+                                                                    let lit_91'9 = 0 in
+                                                                    let prim_0'0 = PRIM_EqInt(res,lit_91'9) in
+                                                                    let k [put_chars] case_91'2 =
+                                                                      let k [] _ =
+                                                                        let lit_102'26 = '\n' in
+                                                                        let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                                        k prim_0'0 in
+                                                                      put_chars case_91'2 k in
+                                                                    match prim_0'0 with
+                                                                    | true1 ->
+                                                                      let lit_91'21 = '0' in
+                                                                      let con_91'25 = CID0 in
+                                                                      let con_0'0 = CID1[lit_91'21,con_91'25] in
+                                                                      k con_0'0
+                                                                    | false0 ->
+                                                                      let con_91'38 = CID0 in
+                                                                      let k [res] app_91'38 = app_91'38 res k in
+                                                                      loop con_91'38 k in
+                                                                  app_98'28 lit_163'22 k in
+                                                                block lam_98'33 k in
+                                                              put_chars case_91'2 k in
+                                                            match prim_0'0 with
+                                                            | true1 ->
+                                                              let lit_91'21 = '0' in
+                                                              let con_91'25 = CID0 in
+                                                              let con_0'0 = CID1[lit_91'21,con_91'25] in
+                                                              k con_0'0
+                                                            | false0 ->
+                                                              let con_91'38 = CID0 in
+                                                              let k [n] app_91'38 = app_91'38 n k in
+                                                              loop con_91'38 k in
+                                                          fact n k in
+                                                      app_47'7 arg1 k in
+                                                    loop lit_47'7 k in
+                                              app_98'28 lit_151'13 k in
+                                            block lam_98'33 k
+                                          | false0 ->
+                                            let lit_212'42 = "rev" in
+                                            let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,xs,command,args] ys =
+                                              let lam_0'0 = fun [] x k ->
+                                                let lam_0'0 = fun [x] y k ->
+                                                  let prim_0'0 = PRIM_EqChar(x,y) in
+                                                  k prim_0'0 in
+                                                k lam_0'0 in
+                                              let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,xs,command,args,ys] app_60'33 =
+                                                let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,xs,args,ys] app_60'41 =
+                                                  let k [block,explode,eq_list,append,revloop,map,length,put_chars,readloop,xs,args] app_60'44 =
+                                                    match app_60'44 with
+                                                    | true1 ->
+                                                      match args with
+                                                      | Cons1(_,_) ->
+                                                        let lam_98'33 = fun [explode,put_chars] s k ->
+                                                          let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                          explode s k in
+                                                        let k [block,explode,put_chars] app_98'28 =
+                                                          let lit_131'25 = "ERROR: " in
+                                                          let k [block,explode,put_chars] _ =
+                                                            let lam_98'33 = fun [explode,put_chars] s k ->
+                                                              let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                              explode s k in
+                                                            let k [] app_98'28 =
+                                                              let lit_180'18 = "rev: expected no arguments" in
+                                                              let k [] _ =
+                                                                let lit_102'26 = '\n' in
+                                                                let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                                k prim_0'0 in
+                                                              app_98'28 lit_180'18 k in
+                                                            block lam_98'33 k in
+                                                          app_98'28 lit_131'25 k in
+                                                        block lam_98'33 k
+                                                      | Nil0 ->
+                                                        let lam_98'33 = fun [explode,put_chars] s k ->
+                                                          let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                          explode s k in
+                                                        let k [eq_list,revloop,put_chars,readloop] app_98'28 =
+                                                          let lit_182'16 = "(reverse typed lines until ^D)\n" in
+                                                          let k [eq_list,revloop,put_chars,readloop] _ =
+                                                            let loop = fix (fun [eq_list,revloop,put_chars,readloop] loop _ k ->
+                                                              let con_121'28 = CID0 in
+                                                              let k [eq_list,revloop,put_chars,loop] xs =
+                                                                let lam_0'0 = fun [] x k ->
+                                                                  let lam_0'0 = fun [x] y k ->
+                                                                    let prim_0'0 = PRIM_EqChar(x,y) in
+                                                                    k prim_0'0 in
+                                                                  k lam_0'0 in
+                                                                let k [revloop,put_chars,loop,xs] app_60'33 =
+                                                                  let k [revloop,put_chars,loop,xs] app_60'41 =
+                                                                    let lit_0'0 = '\EOT' in
+                                                                    let con_168'31 = CID0 in
+                                                                    let con_0'0 = CID1[lit_0'0,con_168'31] in
+                                                                    let k [revloop,put_chars,loop,xs] app_60'44 =
+                                                                      match app_60'44 with
+                                                                      | true1 ->
+                                                                        let con_173'44 = CID0 in
+                                                                        k con_173'44
+                                                                      | false0 ->
+                                                                        let con_72'25 = CID0 in
+                                                                        let k [put_chars,loop,xs] app_72'25 =
+                                                                          let k [put_chars,loop] app_72'28 =
+                                                                            let k [loop] _ =
+                                                                              let lit_102'26 = '\n' in
+                                                                              let _ = PRIM_PutChar(lit_102'26) in
+                                                                              let con_174'46 = CID0 in
+                                                                              loop con_174'46 k in
+                                                                            put_chars app_72'28 k in
+                                                                          app_72'25 xs k in
+                                                                        revloop con_72'25 k in
+                                                                    app_60'41 con_0'0 k in
+                                                                  app_60'33 xs k in
+                                                                eq_list lam_0'0 k in
+                                                              readloop con_121'28 k) in
+                                                            let con_176'6 = CID0 in
+                                                            loop con_176'6 k in
+                                                          app_98'28 lit_182'16 k in
+                                                        block lam_98'33 k
+                                                    | false0 ->
+                                                      let lam_186'30 = fun [] c k ->
+                                                        let lit_186'48 = 'o' in
+                                                        let prim_0'0 = PRIM_EqChar(c,lit_186'48) in
+                                                        match prim_0'0 with
+                                                        | true1 ->
+                                                          let lit_186'57 = '*' in
+                                                          k lit_186'57
+                                                        | false0 -> k c in
+                                                      let k [block,explode,append,length,put_chars,xs] star_the_ohs =
+                                                        let k [block,explode,append,put_chars,xs,star_the_ohs] n =
+                                                          let lit_188'29 = "You wrote: \"" in
+                                                          let k [block,explode,append,put_chars,xs,star_the_ohs,n] app_188'29 =
+                                                            let k [block,explode,put_chars,xs,star_the_ohs,n] app_188'20 =
+                                                              let k [block,explode,put_chars,n,app_188'20] app_188'60 =
+                                                                let k [block,explode,put_chars,n] app_188'46 =
+                                                                  let k [block,explode,put_chars,n] _ =
+                                                                    let lam_98'33 = fun [explode,put_chars] s k ->
+                                                                      let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                                      explode s k in
+                                                                    let k [block,explode,put_chars,n] app_98'28 =
+                                                                      let lit_189'13 = "\" (" in
+                                                                      let k [block,explode,put_chars,n] _ =
+                                                                        let loop = fix (fun [] loop acc k ->
+                                                                          let lam_87'19 = fun [acc,loop] i k ->
+                                                                            let lit_88'11 = 0 in
+                                                                            let prim_0'0 = PRIM_EqInt(i,lit_88'11) in
+                                                                            match prim_0'0 with
+                                                                            | true1 -> k acc
+                                                                            | false0 ->
+                                                                              let lit_89'35 = 10 in
+                                                                              let c = PRIM_ModInt(i,lit_89'35) in
+                                                                              let lit_0'0 = 48 in
+                                                                              let x = PRIM_AddInt(lit_0'0,c) in
+                                                                              let x = PRIM_CharChr(x) in
+                                                                              let con_0'0 = CID1[x,acc] in
+                                                                              let k [i] app_89'11 =
+                                                                                let lit_89'48 = 10 in
+                                                                                let prim_0'0 = PRIM_DivInt(i,lit_89'48) in
+                                                                                app_89'11 prim_0'0 k in
+                                                                              loop con_0'0 k in
+                                                                          k lam_87'19) in
+                                                                        let lit_91'9 = 0 in
+                                                                        let prim_0'0 = PRIM_EqInt(n,lit_91'9) in
+                                                                        let k [block,explode,put_chars] case_91'2 =
+                                                                          let k [block,explode,put_chars] _ =
+                                                                            let lam_98'33 = fun [explode,put_chars] s k ->
+                                                                              let k [put_chars] app_98'57 = put_chars app_98'57 k in
+                                                                              explode s k in
+                                                                            let k [] app_98'28 =
+                                                                              let lit_191'13 = " chars)" in
+                                                                              let k [] _ =
+                                                                                let lit_102'26 = '\n' in
+                                                                                let prim_0'0 = PRIM_PutChar(lit_102'26) in
+                                                                                k prim_0'0 in
+                                                                              app_98'28 lit_191'13 k in
+                                                                            block lam_98'33 k in
+                                                                          put_chars case_91'2 k in
+                                                                        match prim_0'0 with
+                                                                        | true1 ->
+                                                                          let lit_91'21 = '0' in
+                                                                          let con_91'25 = CID0 in
+                                                                          let con_0'0 = CID1[lit_91'21,con_91'25] in
+                                                                          k con_0'0
+                                                                        | false0 ->
+                                                                          let con_91'38 = CID0 in
+                                                                          let k [n] app_91'38 = app_91'38 n k in
+                                                                          loop con_91'38 k in
+                                                                      app_98'28 lit_189'13 k in
+                                                                    block lam_98'33 k in
+                                                                  put_chars app_188'46 k in
+                                                                app_188'20 app_188'60 k in
+                                                              star_the_ohs xs k in
+                                                            append app_188'29 k in
+                                                          explode lit_188'29 k in
+                                                        length xs k in
+                                                      map lam_186'30 k in
+                                                  app_60'41 ys k in
+                                                app_60'33 command k in
+                                              eq_list lam_0'0 k in
+                                            explode lit_212'42 k in
+                                        app_60'41 ys k in
+                                      app_60'33 command k in
+                                    eq_list lam_0'0 k in
+                                  explode lit_211'40 k in
+                              app_60'41 ys k in
+                            app_60'33 command k in
+                          eq_list lam_0'0 k in
+                        explode lit_210'38 k in
+                    app_203'15 xs k in
+                  app_203'12 con_203'15 k in
+                splitloop con_203'12 k in
+            app_60'41 con_0'0 k in
+          app_60'33 xs k in
+        eq_list lam_0'0 k in
+      readloop con_121'28 k in
+    put_chars con_216'13 k) in
+  let lam_98'33 = fun [explode,put_chars] s k ->
+    let k [put_chars] app_98'57 = put_chars app_98'57 k in
+    explode s k in
+  let k [mainloop] app_98'28 =
+    let lit_222'13 = "This is a shell prototype. Try: fib, fact, rev\n" in
+    let k [mainloop] _ =
+      let con_223'11 = CID0 in
+      mainloop con_223'11 k in
+    app_98'28 lit_222'13 k in
+  block lam_98'33 k in
+block lam_0'0 k

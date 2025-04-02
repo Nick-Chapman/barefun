@@ -5,26 +5,26 @@
   [HALT]
 
   $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -0
-  [stage0]
-  @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
-  [HALT:#apps=158, #prim=85]
-
-  $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -1u
-  [stage1; un-normalized]
+  [Stage0 (AST)]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#apps=158, #prim=85]
 
   $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -1
-  [stage1; normalization: 106 -> 86]
+  [Stage1 (Exp)]
+  @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
+  [HALT:#apps=158, #prim=85]
+
+  $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -2
+  [Stage2 (NbE); normalization: 106 -> 86]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#prim=29]
 
-  $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -2
-  [stage2; normalization: 106 -> 86]
+  $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -3
+  [Stage3 (ANF); normalization: 106 -> 86]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#return=1, #prim=29]
 
-  $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -3
-  [stage3; normalization: 106 -> 86]
+  $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -4
+  [Stage4 (CCF); normalization: 106 -> 86]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#return=1, #prim=29]

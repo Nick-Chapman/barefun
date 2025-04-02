@@ -1,5 +1,5 @@
--- | Simplifed language: Just expressions. Constructor names replaced by tags.
-module Stage1
+-- | Simplifed expression language. Constructor names replaced by tags.
+module Stage1_EXP
   ( Exp(..),Arm(..),Ctag(..),Id(..), Name(..), provenanceExp, sizeExp
   , execute
   , compile
@@ -11,12 +11,12 @@ import Data.Map (Map)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Cid,Bid(..))
+import Stage0_AST (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(Prim,App))
-import qualified Stage0 as SRC
+import qualified Stage0_AST as SRC
 
 type Transformed = Exp
 

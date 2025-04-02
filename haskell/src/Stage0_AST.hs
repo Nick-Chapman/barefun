@@ -1,5 +1,5 @@
--- | Primary AST for the .fun language. As constructed by Parser
-module Stage0
+-- | Primary AST constructed by the ".fun" parser.
+module Stage0_AST
   ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Bid(..)
   , cUnit,cFalse,cTrue,cNil,cCons,mkUserId
   , execute,evalLit,apply

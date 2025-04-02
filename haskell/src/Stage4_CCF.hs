@@ -1,5 +1,5 @@
 -- | Locate identifier references at runtime; lift globals
-module Stage3
+module Stage4_CCF
   ( execute
   , compile
   ) where
@@ -12,13 +12,13 @@ import Data.Set (notMember)
 import Interaction (Interaction(..))
 import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
-import Stage0 (evalLit,apply,Literal)
-import Stage1 (Id(..),Ctag(..))
+import Stage0_AST (evalLit,apply,Literal)
+import Stage1_EXP (Id(..),Ctag(..))
 import Text.Printf (printf)
 import Value (Value(..),deUnit)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(..))
-import qualified Stage2 as SRC (Code(..),Atomic(..),Arm(..), fvs)
+import qualified Stage3_ANF as SRC (Code(..),Atomic(..),Arm(..), fvs)
 
 type Transformed = Loadable
 
@@ -153,7 +153,7 @@ evalLoadable env = \case
 look :: Env -> Ref -> Value
 look Env{venv} (Ref x loc) = do
   maybe err id $ Map.lookup loc venv
-  where err = error (show ("Stage3.look",x,loc,venv))
+  where err = error (show ("Stage4.look",x,loc,venv))
 
 evalT :: Env -> Top -> Value
 evalT genv = \case
@@ -338,7 +338,7 @@ frame cenv fvs = do
 
 locate :: Cenv -> Id -> Ref
 locate cenv x = maybe err id $ Map.lookup x cenv
-  where err = error (show ("Stage3.locate",x))
+  where err = error (show ("Stage4.locate",x))
 
 isGlobal :: Ref -> Bool
 isGlobal = \case Ref _ (Global _) -> True; _ -> False

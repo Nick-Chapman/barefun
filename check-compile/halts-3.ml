@@ -1,15 +1,15 @@
-(*stage3*)
+(*Stage3 (ANF)*)
 let k () = ()
-let g1 = 'X' in
-let g2 = CID0 in
-let g3 = 'Y' in
-let g4 = CID0 in
-let g5 = 'Z' in
-let t1 = PRIM_PutChar(g1) in
-let t2 = PRIM_GetChar(g2) in
-let t3 = PRIM_PutChar(t2) in
-let t4 = PRIM_PutChar(g3) in
-let t5 = PRIM_GetChar(g4) in
-let t6 = PRIM_PutChar(t5) in
-let t7 = PRIM_PutChar(g5) in
-k t7
+let lit_3'11 = 'X' in
+let _ = PRIM_PutChar(lit_3'11) in
+let con_4'21 = CID0 in
+let x = PRIM_GetChar(con_4'21) in
+let _ = PRIM_PutChar(x) in
+let lit_5'11 = 'Y' in
+let _ = PRIM_PutChar(lit_5'11) in
+let con_6'21 = CID0 in
+let x = PRIM_GetChar(con_6'21) in
+let _ = PRIM_PutChar(x) in
+let lit_7'11 = 'Z' in
+let prim_0'0 = PRIM_PutChar(lit_7'11) in
+k prim_0'0

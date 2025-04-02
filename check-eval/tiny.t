@@ -12,15 +12,7 @@ Ocaml REPL
 Haskell REPL
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -0
-  [stage0]
-  HHeelllloo,,
-  
-  WWoorrlldd!!
-  
-  [EOF:#apps=58, #prim=43]
-
-  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -1u
-  [stage1; un-normalized]
+  [Stage0 (AST)]
   HHeelllloo,,
   
   WWoorrlldd!!
@@ -28,23 +20,31 @@ Haskell REPL
   [EOF:#apps=58, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -1
-  [stage1; normalization: 92 -> 16]
+  [Stage1 (Exp)]
+  HHeelllloo,,
+  
+  WWoorrlldd!!
+  
+  [EOF:#apps=58, #prim=43]
+
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -2
+  [Stage2 (NbE); normalization: 92 -> 16]
   HHeelllloo,,
   
   WWoorrlldd!!
   
   [EOF:#apps=15, #prim=43]
 
-  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -2
-  [stage2; normalization: 92 -> 16]
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3
+  [Stage3 (ANF); normalization: 92 -> 16]
   HHeelllloo,,
   
   WWoorrlldd!!
   
   [EOF:#enter=15, #prim=43]
 
-  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3
-  [stage3; normalization: 92 -> 16]
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -4
+  [Stage4 (CCF); normalization: 92 -> 16]
   HHeelllloo,,
   
   WWoorrlldd!!

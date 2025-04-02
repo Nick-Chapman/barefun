@@ -1,67 +1,69 @@
-(*stage3*)
+(*Stage3 (ANF)*)
 let k () = ()
-let g2 = 0 in
-let g3 = 10 in
-let g4 = 48 in
-let g5 = 10 in
-let g1 = fun arg k ->
-  let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqInt(arg,g2) in
-    match t1 with
-    | true1 -> k f1
+let loop = fix (fun [] loop acc k ->
+  let lam_5'19 = fun [acc,loop] i k ->
+    let lit_6'11 = 0 in
+    let prim_0'0 = PRIM_EqInt(i,lit_6'11) in
+    match prim_0'0 with
+    | true1 -> k acc
     | false0 ->
-      let t2 = PRIM_ModInt(arg,g3) in
-      let t3 = PRIM_AddInt(g4,t2) in
-      let t4 = PRIM_CharChr(t3) in
-      let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g5) in
-        arg t1 k in
-      g1 t5 k in
-  k t1 in
-let g7 = CID0 in
-let g6 = fun arg k ->
-  match arg with
-  | Nil0 -> k g7
-  | Cons1(t1,t2) ->
-    let t3 = PRIM_PutChar(t1) in
-    g6 t2 k in
-let g8 = fun arg k ->
-  match arg with
-  | Num0(t1) -> k t1
-  | Add1(t1,t2) ->
-    let k = [t2], fun [f1] arg ->
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_AddInt(f1,arg) in
-        k t1 in
-      g8 f1 k in
-    g8 t1 k
-  | Sub2(t1,t2) ->
-    let k = [t2], fun [f1] arg ->
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_SubInt(f1,arg) in
-        k t1 in
-      g8 f1 k in
-    g8 t1 k in
-let g9 = 1000 in
-let g10 = CID0[g9] in
-let g11 = 42 in
-let g12 = CID0[g11] in
-let g13 = 3 in
-let g14 = CID0[g13] in
-let g15 = CID1[g12,g14] in
-let g16 = CID2[g10,g15] in
-let g17 = 0 in
-let g18 = '0' in
-let g19 = CID0 in
-let g20 = CID1[g18,g19] in
-let g21 = CID0 in
-let k = [], fun [] arg ->
-  let t1 = PRIM_EqInt(arg,g17) in
-  let k = [], fun [] arg -> g6 arg k in
-  match t1 with
-  | true1 -> k g20
+      let lit_7'29 = 10 in
+      let c = PRIM_ModInt(i,lit_7'29) in
+      let lit_0'0 = 48 in
+      let x = PRIM_AddInt(lit_0'0,c) in
+      let x = PRIM_CharChr(x) in
+      let con_0'0 = CID1[x,acc] in
+      let k [i] app_7'11 =
+        let lit_7'44 = 10 in
+        let prim_0'0 = PRIM_DivInt(i,lit_7'44) in
+        app_7'11 prim_0'0 k in
+      loop con_0'0 k in
+  k lam_5'19) in
+let put_chars = fix (fun [] put_chars xs k ->
+  match xs with
+  | Nil0 ->
+    let con_13'10 = CID0 in
+    k con_13'10
+  | Cons1(x,xs) ->
+    let _ = PRIM_PutChar(x) in
+    put_chars xs k) in
+let eval = fix (fun [] eval e k ->
+  match e with
+  | Num0(n) -> k n
+  | Add1(e1,e2) ->
+    let k [eval,e2] x =
+      let k [x] y =
+        let prim_0'0 = PRIM_AddInt(x,y) in
+        k prim_0'0 in
+      eval e2 k in
+    eval e1 k
+  | Sub2(e1,e2) ->
+    let k [eval,e2] x =
+      let k [x] y =
+        let prim_0'0 = PRIM_SubInt(x,y) in
+        k prim_0'0 in
+      eval e2 k in
+    eval e1 k) in
+let lit_34'24 = 1000 in
+let con_32'12 = CID0[lit_34'24] in
+let lit_34'39 = 42 in
+let con_32'12 = CID0[lit_34'39] in
+let lit_34'47 = 3 in
+let con_32'12 = CID0[lit_34'47] in
+let con_34'30 = CID1[con_32'12,con_32'12] in
+let con_34'15 = CID2[con_32'12,con_34'30] in
+let k [loop,put_chars] i =
+  let lit_9'18 = 0 in
+  let prim_0'0 = PRIM_EqInt(i,lit_9'18) in
+  let k [put_chars] case_9'11 = put_chars case_9'11 k in
+  match prim_0'0 with
+  | true1 ->
+    let lit_9'26 = '0' in
+    let con_9'29 = CID0 in
+    let con_9'26 = CID1[lit_9'26,con_9'29] in
+    k con_9'26
   | false0 ->
-    let k = [arg], fun [f1] arg -> arg f1 k in
-    g1 g21 k in
-g8 g16 k
+    let con_9'41 = CID0 in
+    let k [i] app_9'41 = app_9'41 i k in
+    loop con_9'41 k in
+eval con_34'15 k

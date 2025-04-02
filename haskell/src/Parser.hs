@@ -1,12 +1,12 @@
 module Parser (parseProg) where
 
 import Data.Word (Word16)
-import Stage0 (Prog,Exp,Id,Arm,Cid,Bid(..))
-import Stage0 (cUnit,cFalse,cTrue,cNil,cCons,mkUserId)
+import Stage0_AST (Prog,Exp,Id,Arm,Cid,Bid(..))
+import Stage0_AST (cUnit,cFalse,cTrue,cNil,cCons,mkUserId)
 import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
-import qualified Stage0 as AST
+import qualified Stage0_AST as AST
 import qualified Par4
 
 parseProg :: String -> Prog
