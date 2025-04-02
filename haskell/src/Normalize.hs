@@ -145,7 +145,7 @@ reflect env = \case
     scrut <- reflect env scrut
     case (enabled,scrut) of
       -- (4) Normalize: Constant Branch Selection
-      (True,Constructed _ tag args) -> undefined $ caseSelect tag args env arms -- TODO: no exammple provokes yet
+      (True,Constructed _ tag args) -> caseSelect tag args env arms
       (True,Constant pos (VCons tag vs)) -> caseSelect tag (map (Constant pos) vs) env arms
       (_,Constant{}) -> error "reflect: case-scrut a non-constucted constant"
       (_,Macro{}) -> error "reflect: case-scrut a function"
