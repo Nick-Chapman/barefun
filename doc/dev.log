@@ -42,6 +42,6 @@ Fri 28 Mar 2025 : instrument haskell eval; improve ANF
 
 Mon 31 Mar 2025 : instrument norm; improve globalization, cleanup
 Tue 01 Apr 2025 : thrice example; constant folding (needs Wrap/Reset)
-Wed 02 Apr 2025 : dune automation; evenodd example
+Wed 02 Apr 2025 : dune automation; evenodd/tree examples
 Thu 03 Apr 2025 :
 Fri 04 Apr 2025 :
