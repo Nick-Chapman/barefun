@@ -9,6 +9,7 @@ import qualified Stage1_EXP as Stage1 (compile,execute,sizeExp)
 import qualified Stage2_NBE as Stage2 (compile,execute)
 import qualified Stage3_ANF as Stage3 (compile,execute)
 import qualified Stage4_CCF as Stage4 (compile,execute)
+import qualified Stage5_ASM as Stage5 (compile,execute)
 import Text.Printf (printf)
 
 main :: IO ()
@@ -23,6 +24,7 @@ main = do
   let e2 = Stage2.compile e1
   let e3 = Stage3.compile e2
   let e4 = Stage4.compile e3
+  let e5 = Stage5.compile e4
 
   let
     tag = case stage of
@@ -30,7 +32,8 @@ main = do
       Stage1 -> "Stage1 (Exp)"
       Stage2 -> "Stage2 (NbE)"
       Stage3 -> "Stage3 (ANF)"
-      Stage4 -> "Stage4 (CCF)" --Closure converted form; Globals lifted; free-vars located)
+      Stage4 -> "Stage4 (CCF)"
+      Stage5 -> "Stage4 (ASM)"
 
   let reachedNormStage = (stage >= Stage2)
   let
@@ -44,12 +47,14 @@ main = do
     (Stage2,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e2)
     (Stage3,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e3)
     (Stage4,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e4)
+    (Stage5,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e5)
 
     (Stage0,Eval) -> do printf "[%s]\n" tag; runTerm (Stage0.execute e0)
     (Stage1,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage1.execute e1)
     (Stage2,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage2.execute e2)
     (Stage3,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage3.execute e3)
     (Stage4,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage4.execute e4)
+    (Stage5,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage5.execute e5)
 
 data Config = Config { paths :: [String], mode :: Mode, stage :: Stage }
 
@@ -61,6 +66,7 @@ data Stage
   | Stage2 -- NBE: Result of "Normalization by Evaluation".
   | Stage3 -- AST: A-Normal Form; free-vars identified.
   | Stage4 -- CCF: Closure-converted form; Runtime locations chosen (Global,Frame,Arg,Temp)
+  | Stage5 -- ASM: Asm image (WIP)
   deriving (Eq,Ord)
 
 parseCommandLine :: [String] -> Config
@@ -78,5 +84,6 @@ parseCommandLine = loop config0
       "-2":xs           -> loop config { stage = Stage2 } xs
       "-3":xs           -> loop config { stage = Stage3 } xs
       "-4":xs           -> loop config { stage = Stage4 } xs
+      "-5":xs           -> loop config { stage = Stage5 } xs
       ('-':flag):_      -> error (show ("unknown flag",flag))
       x:xs              -> loop config { paths = paths config ++ [x] } xs

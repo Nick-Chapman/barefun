@@ -1,6 +1,7 @@
 -- | Locate identifier references at runtime; lift globals
 module Stage4_CCF
-  ( execute
+  ( Loadable(..), Top(..), Code(..), Atomic(..), Arm(..), Ref(..), Location(..)
+  , execute
   , compile
   ) where
 
