@@ -1,74 +1,14 @@
-(library
- (name example_lib)
- (flags (:standard -nostdlib -nopervasives)) ; ensure we are explicit about all primitives
- (libraries prim_lib))
+
+(subdir gen
+ (dynamic_include ../dune.inc)
+ (library
+  (name example_lib)
+  (flags (:standard -nostdlib -nopervasives)) ; ensure we are explicit about all primitives
+  (libraries prim_lib)))
 
 (rule
-  (with-stdout-to halts.ml
-    (progn
-      (echo "module F() : sig val main : unit -> unit end = struct\n")
-      (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"halts.fun\"\n")
-      (cat ../../examples/halts.fun)
-      (echo "end\n")
-      )))
+ (target dune.inc)
+ (deps (glob_files ../../examples/*.fun))
+ (action (with-stdout-to dune.inc (run generate/main.exe))))
 
-(rule
-  (with-stdout-to fib.ml
-    (progn
-      (echo "module F() : sig val main : unit -> unit end = struct\n")
-      (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"fib.fun\"\n")
-      (cat ../../examples/fib.fun)
-      (echo "end\n")
-      )))
-
-(rule
-  (with-stdout-to tiny.ml
-    (progn
-      (echo "module F() : sig val main : unit -> unit end = struct\n")
-      (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"tiny.fun\"\n")
-      (cat ../../examples/tiny.fun)
-      (echo "end\n")
-      )))
-
-(rule
-  (with-stdout-to small.ml
-    (progn
-      (echo "module F() : sig val main : unit -> unit end = struct\n")
-      (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"small.fun\"\n")
-      (cat ../../examples/small.fun)
-      (echo "end\n")
-      )))
-
-(rule
-  (with-stdout-to shell.ml
-    (progn
-      (echo "module F() : sig val main : unit -> unit end = struct\n")
-      (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"shell.fun\"\n")
-      (cat ../../examples/shell.fun)
-      (echo "end\n")
-      )))
-
-(rule
-  (with-stdout-to thrice.ml
-    (progn
-      (echo "module F() : sig val main : unit -> unit end = struct\n")
-      (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"thrice.fun\"\n")
-      (cat ../../examples/thrice.fun)
-      (echo "end\n")
-      )))
-
-(rule
-  (with-stdout-to hello.ml
-    (progn
-      (echo "module F() : sig val main : unit -> unit end = struct\n")
-      (echo "open Prim_lib.Prim\n")
-      (echo "#1 \"hello.fun\"\n")
-      (cat ../../examples/hello.fun)
-      (echo "end\n")
-      )))
+(subdir generate (executable (name main)))

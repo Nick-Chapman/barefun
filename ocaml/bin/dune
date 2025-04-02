@@ -1,3 +1,11 @@
+
 (executables
  (names main)
  (libraries example_lib))
+
+(rule
+ (target select.ml)
+ (deps (glob_files ../../examples/*.fun))
+ (action (with-stdout-to select.ml (run generate/main.exe))))
+
+(subdir generate (executable (name main)))
