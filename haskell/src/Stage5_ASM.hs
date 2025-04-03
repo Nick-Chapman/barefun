@@ -9,33 +9,122 @@ import Interaction (Interaction)
 import Data.Map (Map)
 import Control.Monad (ap,liftM)
 import Builtin (Builtin)
+import qualified Builtin as SRC (Builtin(..))
 import Stage0_AST (Literal(..))
+import qualified Data.Map as Map
+import Stage1_EXP (Ctag(..))
 
 ----------------------------------------------------------------------
+
+globalOffset :: Int -> MemAddr
+globalOffset n = MemAddr (globalStart + n)
+  where
+    globalStart = 100
+
+tempOffset :: Int -> MemAddr
+tempOffset n = MemAddr (tempStart + n)
+  where
+    tempStart = 200
+
 compile :: SRC.Loadable -> Transformed
-compile l = runAsm (compileL l)
---  VMemAddr MemAddr
---  VCodeLabel CodeLabel
---  DataLabel
+compile x = runAsm (compileLoadable x >>= CutCode)
 
-compileL :: SRC.Loadable -> Asm ()
-compileL = \case
-  SRC.Run code -> undefined code compileC
-  SRC.LetTop (SRC.Ref _ x) rhs body -> do
-    reg <- compileT rhs
-    setLocation x reg
-    compileL body
+compileLoadable :: SRC.Loadable -> Asm Code
+compileLoadable = \case
+  SRC.Run code -> compileC code
+  SRC.LetTop (SRC.Ref _ loc) rhs body -> do
+    (ops1,reg) <- compileTopDef rhs
+    let ops2 = setLocation loc reg
+    doOps (ops1++ops2) <$> compileLoadable body
 
-
-setLocation :: SRC.Location -> Reg -> Asm ()
-setLocation = undefined
-
-compileT :: SRC.Top -> Asm Reg
-compileT = \case
+compileTopDef ::SRC.Top -> Asm ([Op],Reg) -- TODO: prefer static allocation
+compileTopDef = \case
   SRC.TopLit x -> undefined (compileLit x)
   SRC.TopPrim b xs -> undefined b xs
-  SRC.TopLam x body -> undefined x body
-  SRC.TopConApp tag xs -> undefined tag xs -- HERE -- do some (static) allocation
+  SRC.TopLam _x body -> do
+    c :: CodeLabel <- compileC body >>= CutCode
+    let v :: Val = VCodeLabel c
+    let op :: Op = OpPush (SLit v)
+    pure ([op],Sp)
+
+  SRC.TopConApp tag xs -> do
+    let vTag = SLit $ compileCtag tag
+    let vs = map compileRef xs
+    ops <- pure $ map OpPush (reverse (vTag : vs))
+    pure (ops,Sp)
+
+compileC :: SRC.Code -> Asm Code
+compileC = \case
+  SRC.Return _ x -> undefined x
+
+  SRC.Tail x1 _pos x2 -> do
+    let v1 = compileRef x1
+    let v2 = compileRef x2
+    pure $ compileTailCall v1 v2
+
+  SRC.LetAlias x y body -> undefined x y body
+
+  SRC.LetAtomic (SRC.Ref _ loc) rhs body -> do
+
+    -- fairly blindly copied from LetTop
+    (ops1,reg) <- compileA rhs
+    let ops2 = setLocation loc reg
+    doOps (ops1++ops2) <$> compileC body
+
+  SRC.PushContinuation pre post (x,later) first -> undefined pre post x later first
+  SRC.Case scrut arms -> undefined scrut arms compileArm
+
+compileA :: SRC.Atomic -> Asm ([Op],Reg)
+compileA = \case
+  SRC.Prim b xs -> do
+    pure (compileBuiltin b xs, Ax)
+
+  SRC.ConApp tag xs -> undefined tag xs compileAllocate
+  SRC.Lam pre post x body -> undefined pre post x body
+  SRC.RecLam pre post f x body -> undefined pre post f x body
+
+compileBuiltin :: Builtin -> [SRC.Ref] -> [Op]
+compileBuiltin b xs = case (b,xs) of
+  (SRC.GetChar,[_]) ->
+    [ OpCall BiosGetCharInAx
+    ]
+  (SRC.PutChar,[src]) ->
+    [ OpMove Ax (compileRef src)
+    , OpCall BiosPutCharInAx
+    ]
+  b ->
+    error (show (b,xs))
+
+compileTailCall :: Source -> Source -> Code
+compileTailCall fun arg = do
+  let frameReg :: Reg = Bp -- TODO: gloablly picked?
+  let argReg :: Reg = Ax -- TODO: global calling convention
+  let codeReg :: Reg = Bx -- TODO: global calling convention
+  doOps
+    [ OpMove frameReg fun -- TODO: do, first need to indirect to get code * set frame
+    , OpMove argReg arg
+    , OpMove codeReg (SMemIndirect frameReg)
+    ] (Done (JumpIndirect codeReg))
+
+setLocation :: SRC.Location -> Reg -> [Op]
+setLocation loc reg = case loc of
+  SRC.Global n -> [OpStore (globalOffset n) reg]
+  SRC.InFrame n -> undefined n
+  SRC.Temp n -> [OpStore (tempOffset n) reg]
+  SRC.TheArg -> undefined
+  SRC.TheFrame -> undefined
+
+compileRef :: SRC.Ref -> Source
+compileRef (SRC.Ref _ loc) = do
+  case loc of
+    SRC.Global n -> SMem (globalOffset n)
+    SRC.InFrame n -> undefined n
+    SRC.Temp n -> SMem (tempOffset n)
+    SRC.TheArg -> undefined
+    SRC.TheFrame -> undefined
+
+compileCtag :: Ctag -> Val
+compileCtag (Ctag _ tag) = VNum tag
 
 compileLit :: Literal -> Asm ()
 compileLit = \case
@@ -43,33 +132,17 @@ compileLit = \case
     LitN n -> undefined VNum n
     LitS s -> undefined s
 
-compileC :: SRC.Code -> Asm ()
-compileC = \case
-  SRC.Return _ x -> undefined x
-  SRC.Tail x1 _pos x2 -> undefined x1 x2
-  SRC.LetAlias x y body -> undefined x y body
-  SRC.LetAtomic x rhs body -> undefined x rhs body compileA
-  SRC.PushContinuation pre post (x,later) first -> undefined pre post x later first
-  SRC.Case scrut arms -> undefined scrut arms compileArm
-
-compileA :: SRC.Atomic -> Asm ()
-compileA = \case
-  SRC.Prim b xs -> undefined b xs compileBuiltin
-  SRC.ConApp tag xs -> undefined tag xs compileAllocate
-  SRC.Lam pre post x body -> undefined pre post x body
-  SRC.RecLam pre post f x body -> undefined pre post f x body
-
 compileAllocate :: Asm ()
 compileAllocate = undefined Sp
-
-compileBuiltin :: Builtin -> Asm ()
-compileBuiltin = undefined Ax
 
 compileArm :: SRC.Arm -> Asm ()
 compileArm (SRC.ArmTag c xs rhs) = undefined c xs rhs
 
+doOps :: [Op] -> Code -> Code
+doOps ops c = foldr Do c ops
 
--- TODO: compilation monad -- Asm a
+----------------------------------------------------------------------
+-- compilation monad
 
 instance Functor Asm where fmap = liftM
 instance Applicative Asm where pure = AsmRet; (<*>) = ap
@@ -79,42 +152,45 @@ data Asm a where -- execution monad
   -- handles state for regs/memory & code access from image
   AsmRet :: a -> Asm a
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
+  CutCode :: Code -> Asm CodeLabel
 
-runAsm :: Asm () -> Image
-runAsm m = loop image0 m k0
+runAsm :: Asm CodeLabel  -> Image
+runAsm m = loop state0 m k0
   where
-    k0 i () = i
-    loop :: Image -> Asm a -> (Image -> a -> Image) -> Image
-    loop i = \case
-      AsmRet x -> \k -> undefined k x i
-      AsmBind m f -> \k -> loop i m $ \i a -> loop i (f a) k
+    k0 _s start = Image { cmap = Map.empty, dmap = Map.empty, start }
+    state0 = State { u = 1 }
+    loop :: State -> Asm a -> (State -> a -> Image) -> Image
+    loop s = \case
+      AsmRet x -> \k -> k s x
+      AsmBind m f -> \k -> loop s m $ \s a -> loop s (f a) k
+      CutCode code -> \k -> do
+        let State{u} = s
+        let lab = CodeLabel u
+        let image@Image{cmap} = k s { u = u+1 } lab
+        image { cmap = Map.insert lab code cmap }
 
-
-image0 :: Image
-image0 = undefined
+data State = State { u :: Int }
 
 ----------------------------------------------------------------------
 type Transformed = Image
 
 data Image = Image
-  { code :: Map CodeLabel Code
-  , vals :: Map DataLabel [Val]
+  { cmap :: Map CodeLabel Code
+  , dmap :: Map DataLabel [Val]
   , start :: CodeLabel
   }
-  deriving Show
 
-data Reg = Ax | Sp -- | Bx | Sp | Bp -- | ... -- longer names so it is clear these are regs
-  deriving Show
+-- maybe longer names so it is clear these are regs
+-- or maybe move generic/abstract names, which can be mapped to concrete x86 registers later
+data Reg = Ax | Bx | Sp | Bp
 
 data Code
   = Do Op Code
   | Done Jump
-  deriving Show
 
 data Jump
   = JumpDirect CodeLabel
   | JumpIndirect Reg -- must contain a CodeLabel
-  deriving Show
 
 -- Val: what's in a regsiter or a memory location.
 -- we use a variant type here to help catch any compiler bugs during dev
@@ -128,39 +204,92 @@ data Val
   | VNum Int -- at some point gonna have to decide on 16b or 32b numbers (or 15/31 if we tag)
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
-  deriving Show
 
 data Op -- target; source
-  = OpMove Reg Reg
-  | OpLoadLit Reg Val
-  | OpLoadMemDirect Reg MemAddr
-  | OpLoadMemIndirect Reg Reg -- target-reg must contain a MemAddr
-  | OpStore MemAddr Reg
-  | OpStoreIndirectOffset Reg Int Reg -- target-reg must contain MemAddr
+  = OpMove Reg Source
+  | OpStore MemAddr Reg -- TODO: generalise MemAddr to Target
   | OpCall MyBiosRoutine
+  | OpPush Source
 --   | OpBranch
 --   | OpAddIn | OpSubIn
-  deriving Show
+
+data Source
+  = SReg Reg
+  | SLit Val
+  | SMem MemAddr
+  | SMemIndirect Reg
+  | SMemIndirectOffset Reg Int
+
+-- data Target -- TODO
 
 data MemAddr = MemAddr Int -- needs to be a numbers, so we can do offseting
-  deriving Show
-data CodeLabel = CodeLabel Id
-  deriving Show
+
+data CodeLabel = CodeLabel Int -- unique lables is enough; TODO: add providence
+  deriving (Eq,Ord)
+
 data DataLabel = DataLabel Id
-  deriving Show
 
 type Id = String -- temp hack. me can use whatever providence we have from the SRC
 
 data MyBiosRoutine
   = BiosPutCharInAx
   | BiosGetCharInAx
---   | initiate GC from here
-  deriving Show
-
+--   | initiate GC from here?
 
 ----------------------------------------------------------------------
--- TODO pretty print ASM Image
--- for now we half-arse it with deriving Show
+
+instance Show Image where
+  show Image{cmap,dmap=_,start} =
+    "start=" ++ show start ++ "\n" ++
+    unlines [ show lab ++ ":\n" ++ show code | (lab,code) <- Map.toList cmap ]
+
+instance Show Code where
+  show = \case
+    Do op code -> "  " ++ show op ++ "\n" ++ show code
+    Done jump -> "  " ++ show jump ++ "\n"
+
+instance Show Op where
+  show = \case
+    OpMove r src -> "mov " ++ show r ++ ", " ++ show src
+    OpStore a r -> "mov [" ++ show a ++ "], " ++ show r
+    OpCall mybios -> "call " ++ show mybios
+    OpPush src -> "push " ++ show src
+
+instance Show Jump where
+  show = \case
+    JumpDirect c -> "jmp "  ++ show c
+    JumpIndirect r -> "jmp ["  ++ show r ++ "]"
+
+instance Show Source where
+  show = \case
+    SReg r -> show r
+    SLit v -> "#" ++ show v
+    SMem a -> show a
+    SMemIndirect r -> "["++show r++"]"
+    SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
+
+instance Show Val where
+  show = \case
+    VChar c -> show c
+    VNum n -> show n
+    VMemAddr a -> show a
+    VCodeLabel c -> show c
+
+instance Show Reg where
+  show = \case
+    Ax -> "ax"
+    Bx -> "bx"
+    Sp -> "sp"
+    Bp -> "bp"
+
+instance Show DataLabel where show (DataLabel id) = "D" ++ show id
+instance Show CodeLabel where show (CodeLabel n) = "L" ++ show n
+instance Show MemAddr where show (MemAddr n) = show n -- TODO: use hex?
+
+instance Show MyBiosRoutine where
+  show = \case
+    BiosGetCharInAx -> "bios_get_char"
+    BiosPutCharInAx -> "bios_put_char"
 
 ----------------------------------------------------------------------
 
@@ -169,7 +298,7 @@ execute = undefined runM execImage
 
 execImage :: Image -> M ()
 execImage Image{} =
-  undefined code vals start execCode
+  undefined start execCode
 
 execCode :: Code -> M ()
 execCode = \case
@@ -178,13 +307,10 @@ execCode = \case
 
 execOp :: Op -> M ()
 execOp = \case
-  OpMove{} -> undefined SetReg GetReg
-  OpLoadLit{} -> undefined
-  OpLoadMemDirect{} -> undefined GetMem
-  OpLoadMemIndirect{} -> undefined
+  OpMove{} -> undefined -- SetReg GetReg
   OpStore{} -> undefined SetMem
-  OpStoreIndirectOffset{} -> undefined
   OpCall{} -> undefined execBios
+  OpPush{} -> undefined
 
 execBios :: MyBiosRoutine -> M ()
 execBios = \case
@@ -195,7 +321,6 @@ execJump :: Jump -> M ()
 execJump = \case
   JumpDirect{} -> undefined GetCode
   JumpIndirect{} -> undefined
-
 
 ----------------------------------------------------------------------
 
@@ -219,7 +344,7 @@ runM :: Image -> M a -> a
 runM = undefined loop
   -- TODO: init mem from vals portion of image
   where
-    loop :: M a -> State -> (State -> a -> Interaction) -> Interaction
+    loop :: M a -> XState -> (XState -> a -> Interaction) -> Interaction
     loop m s k = case m of
       Ret x -> undefined x k
       Bind m f -> undefined m f
@@ -231,4 +356,4 @@ runM = undefined loop
       GetChar -> undefined
       GetCode lab -> undefined lab
 
-data State -- TODO: reg state and mem state
+data XState -- TODO: reg state and mem state
