@@ -69,7 +69,8 @@ data Val
 
 -- maybe longer names so it is clear these are regs
 -- or maybe move generic/abstract names, which can be mapped to concrete x86 registers later
-data Reg = Ax | Bx | Sp | Bp | RegWhat
+-- using Ax and Bx as temps everywhere
+data Reg = Ax | Bx | Cx | Sp | Bp | RegWhat
   deriving (Eq,Ord)
 
 -- TODO: maybe no point in a new type for MemAddr, just alias a numeric type
@@ -88,6 +89,14 @@ data MyBiosRoutine
   | BiosMakeBoolFromFlagZ
   | BiosMatchFailure
 --   | initiate GC from here?
+
+
+-- calling conventions
+-- TODO: temps should be named/listed here
+
+argReg,frameReg :: Reg
+(argReg,frameReg) = (Cx,Bp)
+
 
 ----------------------------------------------------------------------
 
@@ -139,6 +148,7 @@ instance Show Reg where
   show = \case
     Ax -> "ax"
     Bx -> "bx"
+    Cx -> "cx"
     Sp -> "sp"
     Bp -> "bp"
     RegWhat -> "r?"
@@ -273,7 +283,14 @@ compileA = \case
 
   SRC.ConApp tag xs -> undefined tag xs compileAllocate
   SRC.Lam pre post x body -> undefined pre post x body
-  SRC.RecLam pre post f x body -> undefined pre post f x body
+
+  SRC.RecLam pre _post _f _x body -> do
+    lab <- compileCode body >>= CutCode
+    pure (
+      map OpPush (reverse (map compileRef pre)) ++
+      [ OpPush (SLit (VCodeLabel lab))
+      , OpMove Ax (SReg Sp)
+      ], Ax)
 
 compileBuiltin :: Builtin -> [SRC.Ref] -> [Op] -- --> Ax
 compileBuiltin b xs = case (b,xs) of
@@ -294,13 +311,12 @@ compileBuiltin b xs = case (b,xs) of
 
 compileTailCall :: Source -> Source -> Code
 compileTailCall fun arg = do
-  -- global calling convention...
-  let frameReg = Bp
-  let argReg = Ax
-  let codeReg = Bx
+  let codeReg = Bx -- this is just a temp; not part of calling convention
   doOps
+    -- can we combine these two steps...
     [ OpMove frameReg fun
     , OpMove frameReg (SMemIndirect frameReg) -- ???
+
     , OpMove argReg arg
     , OpMove argReg (SMemIndirect argReg) -- ???
     , OpMove codeReg (SMemIndirect frameReg)
@@ -318,10 +334,10 @@ compileRef :: SRC.Ref -> Source
 compileRef (SRC.Ref _ loc) = do
   case loc of
     SRC.Global n -> SMem (globalOffset n)
-    SRC.InFrame n -> undefined n
+    SRC.InFrame n -> SMemIndirectOffset frameReg n
     SRC.Temp n -> SMem (tempOffset n)
-    SRC.TheArg -> undefined
-    SRC.TheFrame -> undefined
+    SRC.TheArg -> SReg argReg
+    SRC.TheFrame -> SReg frameReg
 
 compileCtag :: Ctag -> Val
 compileCtag (Ctag _ tag) = VNum tag

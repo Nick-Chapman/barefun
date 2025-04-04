@@ -4,6 +4,7 @@ let select_versions_for_example = function
   | "small" -> [0;1;2;3;4]
   | "tiny" -> [0;1;2;3;4;5]
   | "promptA" -> [4;5]
+  | "promptB" -> [4;5]
   | _ -> [4]
 
 let suffix_of_version v =
