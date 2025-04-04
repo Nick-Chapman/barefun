@@ -1,8 +1,9 @@
 
 
 let select_versions_for_example = function
+  | "small" -> [0;1;2;3;4]
   | "tiny" -> [0;1;2;3;4;5]
-  | _ -> [0;1;2;3;4]
+  | _ -> [4]
 
 let suffix_of_version v =
   if v >= 0 && v <= 4 then "ml" else
