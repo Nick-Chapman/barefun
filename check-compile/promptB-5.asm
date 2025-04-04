@@ -1,18 +1,14 @@
 (*Stage5 (ASM)*)
 start=L5
 L1:
-  mov bp, 101
-  mov bp, [bp]
   mov cx, [bp+1]
-  mov cx, [cx]
+  mov bp, 101
   mov bx, [bp]
   jmp [bx]
 
 L2:
-  mov bp, bp
-  mov bp, [bp]
   mov cx, 105
-  mov cx, [cx]
+  mov bp, bp
   mov bx, [bp]
   jmp [bx]
 
@@ -47,10 +43,8 @@ L4:
   push #L3
   mov ax, sp
   mov 203, ax
-  mov bp, 203
-  mov bp, [bp]
   mov cx, 106
-  mov cx, [cx]
+  mov bp, 203
   mov bx, [bp]
   jmp [bx]
 
@@ -67,14 +61,11 @@ L5:
   push #0
   mov 106, sp
   push #L4
-  push sp
   mov 101, sp
   mov ax, #'%'
   mov 107, ax
-  mov bp, 101
-  mov bp, [bp]
   mov cx, 107
-  mov cx, [cx]
+  mov bp, 101
   mov bx, [bp]
   jmp [bx]
 

@@ -16,6 +16,9 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 import Value (tTrue,tFalse)
 
+enableDebug :: Bool
+enableDebug = False
+
 ----------------------------------------------------------------------
 type Transformed = Image
 
@@ -207,7 +210,7 @@ compileTopDef = \case
     lab <- compileCode body >>= CutCode
     pure (
       [ OpPush (SLit (VCodeLabel lab))
-      , OpPush (SReg Sp)
+      -- , OpPush (SReg Sp)
       ], Sp)
 
   SRC.TopConApp tag xs -> do
@@ -313,12 +316,8 @@ compileTailCall :: Source -> Source -> Code
 compileTailCall fun arg = do
   let codeReg = Bx -- this is just a temp; not part of calling convention
   doOps
-    -- can we combine these two steps...
-    [ OpMove frameReg fun
-    , OpMove frameReg (SMemIndirect frameReg) -- ???
-
-    , OpMove argReg arg
-    , OpMove argReg (SMemIndirect argReg) -- ???
+    [ OpMove argReg arg -- set arg before frame, because it might rely on the old value of frame
+    , OpMove frameReg fun
     , OpMove codeReg (SMemIndirect frameReg)
     ] (Done (JumpIndirect codeReg))
 
@@ -389,9 +388,10 @@ execImage Image{start} = GetCode start >>= execCode
 execCode :: Code -> M ()
 execCode = \case
   Do op code -> do
-    --TraceOp op  -- TODO: control trace on flag?
+    TraceOp op
     execOp op (execCode code)
-  Done jump ->
+  Done jump -> do
+    TraceJump jump
     execJump jump
 
 execOp :: Op -> M () -> M ()
@@ -431,7 +431,9 @@ evalSource = \case
   SMemIndirect r -> do
     a <- deMemAddr <$> GetReg r
     GetMem a
-  SMemIndirectOffset r i -> undefined r i
+  SMemIndirectOffset r i -> do
+    a <- deMemAddr <$> GetReg r
+    GetMem (addAddr i a)
 
 
 execBios :: MyBiosRoutine -> M ()
@@ -491,6 +493,7 @@ data M a where -- execution monad. name X maybe
   Bind :: M a -> (a -> M b) -> M b
   Debug :: Show a => a -> M ()
   TraceOp :: Op -> M ()
+  TraceJump :: Jump -> M ()
   GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Val -> M ()
   GetReg :: Reg -> M Val
@@ -501,10 +504,13 @@ data M a where -- execution monad. name X maybe
   PutChar :: Char -> M ()
   GetChar :: M Char
 
+idebug :: String -> Interaction -> Interaction
+idebug s i = if enableDebug then IDebug s i else i
+
 xdebug :: Show a => a -> Interaction -> Interaction
 xdebug _ i = i
 debug :: Show a => a -> Interaction -> Interaction
-debug a i = IDebug (show a) i
+debug a i = idebug (show a) i
 
 runM :: Image -> M () -> Interaction
 runM Image{cmap} m = loop s0 m k0
@@ -519,7 +525,11 @@ runM Image{cmap} m = loop s0 m k0
       Bind m f -> loop s m $ \s a -> loop s (f a) k
 
       TraceOp op -> do
-        IDebug (printf "%d: %s" countOps (show op)) $
+        idebug (printf "%d: %s" countOps (show op)) $
+          k s { countOps = 1 + countOps } ()
+
+      TraceJump jump -> do
+        idebug (printf "%d: %s" countOps (show jump)) $
           k s { countOps = 1 + countOps } ()
 
       Debug thing -> do
@@ -529,17 +539,22 @@ runM Image{cmap} m = loop s0 m k0
         k s (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
 
-      SetReg r v -> xdebug ("SetReg",r,v) $ do
+      SetReg r v -> debug ("SetReg",r,v) $ do
         k s { rmap = Map.insert r v rmap } ()
 
-      GetReg r -> xdebug ("GetReg",r) $ do
-        k s (maybe (VNotInitialized (show r)) id $ Map.lookup r rmap)
+      GetReg r -> do
+        --debug ("GetReg",r) $ do
+          let v = maybe (VNotInitialized (show r)) id $ Map.lookup r rmap
+          debug ("GetReg",r, "->",v) $ do
+            k s v
 
-      SetMem a v -> xdebug ("SetMem",a,v) $ do
+      SetMem a v -> debug ("SetMem",a,v) $ do
         k s { mem = Map.insert a v mem } ()
 
-      GetMem a -> xdebug ("GetMem",a) $ do
-        k s (maybe (VNotInitialized (show a)) id $ Map.lookup a mem)
+      GetMem a -> do
+        let v = maybe (VNotInitialized (show a)) id $ Map.lookup a mem
+        debug ("GetMem",a,"->",v) $ do
+          k s v
 
       SetFlagZ b -> xdebug ("SetFlagZ",b) $ do
         k s { flagZ = b } ()
