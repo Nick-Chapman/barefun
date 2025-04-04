@@ -24,18 +24,33 @@ data Image = Image
   , start :: CodeLabel
   }
 
--- maybe longer names so it is clear these are regs
--- or maybe move generic/abstract names, which can be mapped to concrete x86 registers later
-data Reg = Ax | Bx | Sp | Bp
-  deriving (Eq,Ord)
-
 data Code
   = Do Op Code
   | Done Jump
 
+data Op -- target; source
+  = OpMove Reg Source
+  | OpStore MemAddr Reg -- TODO: generalise MemAddr to Target
+  | OpCall MyBiosRoutine
+  | OpPush Source
+  | OpCmp Reg Source
+--   | OpBranch
+--   | OpAddIn | OpSubIn
+  | OpBranchAxZero CodeLabel
+
 data Jump
   = JumpDirect CodeLabel
   | JumpIndirect Reg -- must contain a CodeLabel
+  | Crash
+
+data Source
+  = SReg Reg
+  | SLit Val
+  | SMem MemAddr
+  | SMemIndirect Reg
+  | SMemIndirectOffset Reg Int
+
+-- data Target -- TODO
 
 -- Val: what's in a regsiter or a memory location.
 -- we use a variant type here to help catch any compiler bugs during dev
@@ -51,22 +66,10 @@ data Val
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
 
-data Op -- target; source
-  = OpMove Reg Source
-  | OpStore MemAddr Reg -- TODO: generalise MemAddr to Target
-  | OpCall MyBiosRoutine
-  | OpPush Source
---   | OpBranch
---   | OpAddIn | OpSubIn
-
-data Source
-  = SReg Reg
-  | SLit Val
-  | SMem MemAddr
-  | SMemIndirect Reg
-  | SMemIndirectOffset Reg Int
-
--- data Target -- TODO
+-- maybe longer names so it is clear these are regs
+-- or maybe move generic/abstract names, which can be mapped to concrete x86 registers later
+data Reg = Ax | Bx | Sp | Bp
+  deriving (Eq,Ord)
 
 -- TODO: maybe no point in a new type for MemAddr, just alias a numeric type
 -- and rename Addr
@@ -81,6 +84,8 @@ data DataLabel = DataLabel String -- TODO: provenance
 data MyBiosRoutine
   = BiosPutCharInAx
   | BiosGetCharInAx
+  | BiosMakeBoolFromAx
+  | BiosMatchFailure
 --   | initiate GC from here?
 
 ----------------------------------------------------------------------
@@ -101,11 +106,14 @@ instance Show Op where
     OpStore a r -> "mov [" ++ show a ++ "], " ++ show r
     OpCall mybios -> "call " ++ show mybios
     OpPush src -> "push " ++ show src
+    OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
+    OpBranchAxZero lab ->  "brz " ++ show lab
 
 instance Show Jump where
   show = \case
     JumpDirect c -> "jmp "  ++ show c
     JumpIndirect r -> "jmp ["  ++ show r ++ "]"
+    Crash -> "crash"
 
 instance Show Source where
   show = \case
@@ -133,14 +141,16 @@ instance Show Reg where
     Sp -> "sp"
     Bp -> "bp"
 
-instance Show DataLabel where show (DataLabel id) = "D" ++ show id
-instance Show CodeLabel where show (CodeLabel n) = "L" ++ show n
 instance Show MemAddr where show (MemAddr n) = show n
+instance Show CodeLabel where show (CodeLabel n) = "L" ++ show n
+instance Show DataLabel where show (DataLabel id) = "D" ++ show id
 
 instance Show MyBiosRoutine where
   show = \case
     BiosGetCharInAx -> "bios_get_char"
     BiosPutCharInAx -> "bios_put_char"
+    BiosMakeBoolFromAx -> "bios_make_bool"
+    BiosMatchFailure -> "bios_match_failure"
 
 ----------------------------------------------------------------------
 
@@ -164,7 +174,7 @@ compileInit x = do
 
 compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
-  SRC.Run code -> compileC code
+  SRC.Run code -> compileCode code
   SRC.LetTop (SRC.Ref _ loc) rhs body -> do
     ops1 <- compileTopDef rhs
     let ops2 = setLocation loc Sp
@@ -172,10 +182,15 @@ compileLoadable = \case
 
 compileTopDef ::SRC.Top -> Asm [Op]
 compileTopDef = \case
-  SRC.TopLit x -> undefined (compileLit x)
+  SRC.TopLit x -> do
+    v <- compileLit x
+    pure
+      [ OpPush (SLit v)
+      , OpPush (SReg Sp)
+      ]
   SRC.TopPrim b xs -> undefined b xs
   SRC.TopLam _x body -> do
-    lab <- compileC body >>= CutCode
+    lab <- compileCode body >>= CutCode
     pure
       [ OpPush (SLit (VCodeLabel lab))
       , OpPush (SReg Sp)
@@ -187,8 +202,8 @@ compileTopDef = \case
     ops <- pure $ map OpPush (reverse (vTag : vs))
     pure ops
 
-compileC :: SRC.Code -> Asm Code
-compileC = \case
+compileCode :: SRC.Code -> Asm Code
+compileCode = \case
   SRC.Return _ x -> undefined x
 
   SRC.Tail x1 _pos x2 -> do
@@ -203,10 +218,43 @@ compileC = \case
     -- fairly blindly copied from LetTop
     (ops1,reg) <- compileA rhs
     let ops2 = setLocation loc reg
-    doOps (ops1++ops2) <$> compileC body
+    doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre post (x,later) first -> undefined pre post x later first
-  SRC.Case scrut arms -> undefined scrut arms compileArm
+  SRC.Case scrut arms -> do
+    case arms of
+      [] -> undefined scrut compileArm
+      [arm1] -> undefined arm1
+      [arm1,arm2] -> do
+        let s :: Source = compileRef scrut
+        -- TODO: share unpacking of the tag (into Bx)
+        lab1 <- compileArm s arm1 >>= CutCode
+        ops1 <- compileArmBranch s arm1 lab1
+        lab2 <- compileArm s arm2 >>= CutCode
+        ops2 <- compileArmBranch s arm2 lab2
+        pure $ doOps (ops1 ++ ops2) (Done Crash)
+      _ ->
+        undefined
+
+compileArmBranch :: Source -> SRC.Arm -> CodeLabel -> Asm [Op]
+compileArmBranch s (SRC.ArmTag (Ctag _ n) _ _) lab = do
+  pure [ OpMove Ax s
+       , OpMove Ax (SMemIndirect Ax)
+       , OpCmp Ax (SLit (VNum n))
+       , OpBranchAxZero lab
+       ]
+
+compileArm :: Source -> SRC.Arm -> Asm Code
+compileArm s (SRC.ArmTag _c__CHECK_ME xs rhs) = do
+  ops <- sequence [ undefined $ compileArmUnpack x i s | (i,x) <- zip [1..] xs ]
+  doOps (concat ops) <$> compileCode rhs
+
+compileArmUnpack :: SRC.Ref -> Int -> Source -> Asm [Op]
+compileArmUnpack (SRC.Ref _ loc) i s = do -- TODO not hit yet
+  let reg = Bx
+  pure $ [ OpMove reg s
+         , OpMove reg (SMemIndirectOffset reg i) -- todo: not tried yet
+         ] ++ setLocation loc reg
 
 compileA :: SRC.Atomic -> Asm ([Op],Reg)
 compileA = \case
@@ -217,7 +265,7 @@ compileA = \case
   SRC.Lam pre post x body -> undefined pre post x body
   SRC.RecLam pre post f x body -> undefined pre post f x body
 
-compileBuiltin :: Builtin -> [SRC.Ref] -> [Op]
+compileBuiltin :: Builtin -> [SRC.Ref] -> [Op] -- --> Ax
 compileBuiltin b xs = case (b,xs) of
   (SRC.GetChar,[_]) ->
     [ OpCall BiosGetCharInAx
@@ -225,6 +273,11 @@ compileBuiltin b xs = case (b,xs) of
   (SRC.PutChar,[src]) ->
     [ OpMove Ax (compileRef src)
     , OpCall BiosPutCharInAx
+    ]
+  (SRC.EqChar, [s1,s2]) ->
+    [ OpMove Ax (compileRef s1)
+    , OpCmp Ax (compileRef s2)
+    , OpCall BiosMakeBoolFromAx
     ]
   b ->
     error (show (b,xs))
@@ -263,17 +316,14 @@ compileRef (SRC.Ref _ loc) = do
 compileCtag :: Ctag -> Val
 compileCtag (Ctag _ tag) = VNum tag
 
-compileLit :: Literal -> Asm ()
+compileLit :: Literal -> Asm Val
 compileLit = \case
-    LitC c -> undefined VChar  c
+    LitC c -> pure (VChar c)
     LitN n -> undefined VNum n
     LitS s -> undefined s
 
 compileAllocate :: Asm ()
 compileAllocate = undefined Sp
-
-compileArm :: SRC.Arm -> Asm ()
-compileArm (SRC.ArmTag c xs rhs) = undefined c xs rhs
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
@@ -332,6 +382,10 @@ execOp = \case
     let a' = prevAddr a
     SetMem a' v
     SetReg Sp (VMemAddr a')
+  OpCmp r s ->
+    undefined r s
+  OpBranchAxZero lab ->
+    undefined lab
 
 evalSource :: Source -> M Val
 evalSource = \case
@@ -347,7 +401,9 @@ evalSource = \case
 execBios :: MyBiosRoutine -> M ()
 execBios = \case
   BiosGetCharInAx -> do c <- GetChar; SetReg Ax (VChar c)
-  BiosPutCharInAx{} -> do c <- deChar <$> GetReg Ax; PutChar c
+  BiosPutCharInAx -> do c <- deChar <$> GetReg Ax; PutChar c
+  BiosMakeBoolFromAx -> undefined
+  BiosMatchFailure -> undefined
 
 execJump :: Jump -> M ()
 execJump = \case
@@ -357,6 +413,7 @@ execJump = \case
     let lab = deCodeLabel v
     code <- GetCode lab
     execCode code
+  Crash -> undefined
 
 
 deMemAddr :: Val -> MemAddr
