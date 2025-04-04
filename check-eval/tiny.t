@@ -50,3 +50,14 @@ Haskell REPL
   WWoorrlldd!!
   
   [EOF:#enter=15, #prim=43]
+
+
+Hey, the tiny example now works in stage 5...
+
+  $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -5
+  [Stage5 (ASM); normalization: 92 -> 16]
+  HHeelllloo,,
+  
+  WWoorrlldd!!
+  
+  [EOF:]

@@ -33,7 +33,7 @@ main = do
       Stage2 -> "Stage2 (NbE)"
       Stage3 -> "Stage3 (ANF)"
       Stage4 -> "Stage4 (CCF)"
-      Stage5 -> "Stage4 (ASM)"
+      Stage5 -> "Stage5 (ASM)"
 
   let reachedNormStage = (stage >= Stage2)
   let
