@@ -1,7 +1,7 @@
 
 Testing two different versions (A,B)...
 
-Ocaml REPL
+Ocaml (A and B)
 
   $ cat prompt.input | ../ocaml/bin/main.exe PromptA
   [ocaml]
@@ -16,3 +16,21 @@ Ocaml REPL
   % Another
   % And one more!
   % [EOF]
+
+Haskell (A)
+
+  $ cat prompt.input | ../haskell/main.exe ../examples/promptA.fun -4
+  [Stage4 (CCF); normalization: 113 -> 31]
+  % This is line one.
+  % Another
+  % And one more!
+  % [EOF:#enter=45, #prim=129]
+
+  $ cat prompt.input | ../haskell/main.exe ../examples/promptA.fun -5
+  [Stage5 (ASM); normalization: 113 -> 31]
+  % This is line one.
+  % Another
+  % And one more!
+  % [EOF:]
+
+Haskell (B) TODO

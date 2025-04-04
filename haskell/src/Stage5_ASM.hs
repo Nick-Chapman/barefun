@@ -14,6 +14,7 @@ import Text.Printf (printf)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
+import Value (tTrue,tFalse)
 
 ----------------------------------------------------------------------
 type Transformed = Image
@@ -34,9 +35,8 @@ data Op -- target; source
   | OpCall MyBiosRoutine
   | OpPush Source
   | OpCmp Reg Source
---   | OpBranch
 --   | OpAddIn | OpSubIn
-  | OpBranchAxZero CodeLabel
+  | OpBranchFlagZ CodeLabel
 
 data Jump
   = JumpDirect CodeLabel
@@ -65,10 +65,11 @@ data Val
   | VNum Int -- at some point gonna have to decide on 16b or 32b numbers (or 15/31 if we tag)
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
+  deriving Eq
 
 -- maybe longer names so it is clear these are regs
 -- or maybe move generic/abstract names, which can be mapped to concrete x86 registers later
-data Reg = Ax | Bx | Sp | Bp
+data Reg = Ax | Bx | Sp | Bp | RegWhat
   deriving (Eq,Ord)
 
 -- TODO: maybe no point in a new type for MemAddr, just alias a numeric type
@@ -84,7 +85,7 @@ data DataLabel = DataLabel String -- TODO: provenance
 data MyBiosRoutine
   = BiosPutCharInAx
   | BiosGetCharInAx
-  | BiosMakeBoolFromAx
+  | BiosMakeBoolFromFlagZ
   | BiosMatchFailure
 --   | initiate GC from here?
 
@@ -103,11 +104,11 @@ instance Show Code where
 instance Show Op where
   show = \case
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
-    OpStore a r -> "mov [" ++ show a ++ "], " ++ show r
+    OpStore a r -> "mov " ++ show a ++ ", " ++ show r
     OpCall mybios -> "call " ++ show mybios
     OpPush src -> "push " ++ show src
     OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
-    OpBranchAxZero lab ->  "brz " ++ show lab
+    OpBranchFlagZ lab ->  "bz " ++ show lab
 
 instance Show Jump where
   show = \case
@@ -140,6 +141,7 @@ instance Show Reg where
     Bx -> "bx"
     Sp -> "sp"
     Bp -> "bp"
+    RegWhat -> "r?"
 
 instance Show MemAddr where show (MemAddr n) = show n
 instance Show CodeLabel where show (CodeLabel n) = "L" ++ show n
@@ -149,10 +151,13 @@ instance Show MyBiosRoutine where
   show = \case
     BiosGetCharInAx -> "bios_get_char"
     BiosPutCharInAx -> "bios_put_char"
-    BiosMakeBoolFromAx -> "bios_make_bool"
+    BiosMakeBoolFromFlagZ -> "bios_make_bool"
     BiosMatchFailure -> "bios_match_failure"
 
 ----------------------------------------------------------------------
+
+aFalse,aTrue :: MemAddr
+(aFalse,aTrue) = (MemAddr 10, MemAddr 11) -- specific mem address. perhaps 0,1 is more sensible
 
 globalOffset :: Int -> MemAddr
 globalOffset n = MemAddr (globalStart + n)
@@ -176,31 +181,36 @@ compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (SRC.Ref _ loc) rhs body -> do
-    ops1 <- compileTopDef rhs
-    let ops2 = setLocation loc Sp
+    (ops1,reg) <- compileTopDef rhs
+    let ops2 = setLocation loc reg
     doOps (ops1++ops2) <$> compileLoadable body
 
-compileTopDef ::SRC.Top -> Asm [Op]
+compileTopDef ::SRC.Top -> Asm ([Op],Reg)
 compileTopDef = \case
   SRC.TopLit x -> do
     v <- compileLit x
     pure
-      [ OpPush (SLit v)
-      , OpPush (SReg Sp)
-      ]
+      ([ OpMove Ax (SLit v)
+      ],Ax)
   SRC.TopPrim b xs -> undefined b xs
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode
-    pure
+    pure (
       [ OpPush (SLit (VCodeLabel lab))
       , OpPush (SReg Sp)
-      ]
+      ], Sp)
 
   SRC.TopConApp tag xs -> do
     let vTag = SLit $ compileCtag tag
     let vs = map compileRef xs
     ops <- pure $ map OpPush (reverse (vTag : vs))
-    pure ops
+    pure (ops,Sp)
+
+compileLit :: Literal -> Asm Val
+compileLit = \case
+    LitC c -> pure (VChar c)
+    LitN n -> undefined VNum n
+    LitS s -> undefined s
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -241,7 +251,7 @@ compileArmBranch s (SRC.ArmTag (Ctag _ n) _ _) lab = do
   pure [ OpMove Ax s
        , OpMove Ax (SMemIndirect Ax)
        , OpCmp Ax (SLit (VNum n))
-       , OpBranchAxZero lab
+       , OpBranchFlagZ lab
        ]
 
 compileArm :: Source -> SRC.Arm -> Asm Code
@@ -253,7 +263,7 @@ compileArmUnpack :: SRC.Ref -> Int -> Source -> Asm [Op]
 compileArmUnpack (SRC.Ref _ loc) i s = do -- TODO not hit yet
   let reg = Bx
   pure $ [ OpMove reg s
-         , OpMove reg (SMemIndirectOffset reg i) -- todo: not tried yet
+         , OpMove reg (SMemIndirectOffset reg i) -- TODO: so this not tried yet
          ] ++ setLocation loc reg
 
 compileA :: SRC.Atomic -> Asm ([Op],Reg)
@@ -277,7 +287,7 @@ compileBuiltin b xs = case (b,xs) of
   (SRC.EqChar, [s1,s2]) ->
     [ OpMove Ax (compileRef s1)
     , OpCmp Ax (compileRef s2)
-    , OpCall BiosMakeBoolFromAx
+    , OpCall BiosMakeBoolFromFlagZ
     ]
   b ->
     error (show (b,xs))
@@ -315,12 +325,6 @@ compileRef (SRC.Ref _ loc) = do
 
 compileCtag :: Ctag -> Val
 compileCtag (Ctag _ tag) = VNum tag
-
-compileLit :: Literal -> Asm Val
-compileLit = \case
-    LitC c -> pure (VChar c)
-    LitN n -> undefined VNum n
-    LitS s -> undefined s
 
 compileAllocate :: Asm ()
 compileAllocate = undefined Sp
@@ -368,24 +372,40 @@ execImage Image{start} = GetCode start >>= execCode
 
 execCode :: Code -> M ()
 execCode = \case
-  Do op code -> do execOp op; execCode code
-  Done jump -> execJump jump
+  Do op code -> do
+    --TraceOp op  -- TODO: control trace on flag?
+    execOp op (execCode code)
+  Done jump ->
+    execJump jump
 
-execOp :: Op -> M ()
+execOp :: Op -> M () -> M ()
 execOp = \case
-  OpMove r s -> do v <- evalSource s; SetReg r v
-  OpStore a r -> do v <- GetReg r; SetMem a v
-  OpCall bios -> execBios bios
-  OpPush s -> do
+  OpMove r s -> \cont -> do v <- evalSource s; SetReg r v; cont
+  OpStore a r -> \cont -> do v <- GetReg r; SetMem a v; cont
+  OpCall bios -> \cont -> do execBios bios; cont
+  OpPush s -> \cont -> do
     v <- evalSource s
     a <- deMemAddr <$> GetReg Sp
     let a' = prevAddr a
     SetMem a' v
     SetReg Sp (VMemAddr a')
-  OpCmp r s ->
-    undefined r s
-  OpBranchAxZero lab ->
-    undefined lab
+    cont
+  OpCmp r s -> \cont -> do
+    v1 <- GetReg r
+    v2 <- evalSource s
+    --Debug ("OpCmp",v1,v2,"...")
+    let b = equalV (v1,v2)
+    --Debug ("OpCmp",v1,v2,"...",b)
+    SetFlagZ b
+    cont
+  OpBranchFlagZ lab -> \cont -> do
+    b <- GetFlagZ
+    case b of
+      False -> cont
+      True -> do
+        -- ignore the continuation
+        code <- GetCode lab
+        execCode code
 
 evalSource :: Source -> M Val
 evalSource = \case
@@ -402,8 +422,11 @@ execBios :: MyBiosRoutine -> M ()
 execBios = \case
   BiosGetCharInAx -> do c <- GetChar; SetReg Ax (VChar c)
   BiosPutCharInAx -> do c <- deChar <$> GetReg Ax; PutChar c
-  BiosMakeBoolFromAx -> undefined
-  BiosMatchFailure -> undefined
+  BiosMakeBoolFromFlagZ -> do
+    b <- GetFlagZ
+    SetReg Ax (VMemAddr (if b then aTrue else aFalse))
+  BiosMatchFailure ->
+    undefined
 
 execJump :: Jump -> M ()
 execJump = \case
@@ -413,8 +436,17 @@ execJump = \case
     let lab = deCodeLabel v
     code <- GetCode lab
     execCode code
-  Crash -> undefined
+  Crash -> do
+    error "Crash"
 
+
+equalV :: (Val,Val) -> Bool
+equalV (v1,v2) =
+  case (v1,v2) of
+    (VNum{},VNum{}) -> (v1==v2)
+    (VChar{},VChar{}) -> (v1==v2)
+    -- don think we should be comparing any other values
+    _ -> error (show ("equalV/unexpected-types",v1,v2))
 
 deMemAddr :: Val -> MemAddr
 deMemAddr = \case VMemAddr x -> x; v -> error (show("deMemAddr",v))
@@ -439,13 +471,17 @@ instance Monad M where (>>=) = Bind
 
 data M a where -- execution monad. name X maybe
   -- handles state for regs/memory & code access from image
-  GetCode :: CodeLabel -> M Code
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
+  Debug :: Show a => a -> M ()
+  TraceOp :: Op -> M ()
+  GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Val -> M ()
   GetReg :: Reg -> M Val
   SetMem :: MemAddr -> Val -> M ()
   GetMem :: MemAddr -> M Val
+  SetFlagZ :: Bool -> M ()
+  GetFlagZ :: M Bool
   PutChar :: Char -> M ()
   GetChar :: M Char
 
@@ -458,12 +494,20 @@ runM :: Image -> M () -> Interaction
 runM Image{cmap} m = loop s0 m k0
   -- TODO: init mem from vals portion of image
   where
+    mem = Map.fromList [ (aFalse, VNum tFalse), (aTrue, VNum tTrue) ]
     k0 _s () = debug "k0-ended" IDone
-    s0 = State { mem = Map.empty, rmap = Map.empty }
+    s0 = State { mem, rmap = Map.empty, flagZ = error "flagZ/undefined", countOps = 0 }
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
-    loop s@State{rmap,mem} m k = case m of
+    loop s@State{rmap,mem,flagZ,countOps} m k = case m of
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
+
+      TraceOp op -> do
+        IDebug (printf "%d: %s" countOps (show op)) $
+          k s { countOps = 1 + countOps } ()
+
+      Debug thing -> do
+        IDebug (show thing) $ k s ()
 
       GetCode lab -> xdebug ("GetCode",lab) $ do
         k s (maybe err id $ Map.lookup lab cmap)
@@ -481,6 +525,12 @@ runM Image{cmap} m = loop s0 m k0
       GetMem a -> xdebug ("GetMem",a) $ do
         k s (maybe (VNotInitialized (show a)) id $ Map.lookup a mem)
 
+      SetFlagZ b -> xdebug ("SetFlagZ",b) $ do
+        k s { flagZ = b } ()
+
+      GetFlagZ -> xdebug "GetFlagZ" $ do
+        k s flagZ
+
       PutChar c -> IPut c (k s ())
 
       GetChar -> do --IDebug "GetChar.." $ do
@@ -490,4 +540,6 @@ runM Image{cmap} m = loop s0 m k0
 data State = State
   { rmap :: Map Reg Val
   , mem :: Map MemAddr Val
+  , flagZ :: Bool
+  , countOps :: Int
   }

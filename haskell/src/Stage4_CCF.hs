@@ -141,15 +141,17 @@ execute :: Transformed -> Interaction
 execute = evalLoadable0
 
 evalLoadable0 :: Loadable -> Interaction
-evalLoadable0 exp =
-  evalLoadable env0 exp $ \v -> case deUnit v of () -> IDone
+evalLoadable0 exp = do
+  -- All global defs may mutually recurse; we tie the knot for gev here.
+  let (code,genv) = evalLoadable genv env0 exp
+  evalCode genv genv code $ \v -> case deUnit v of () -> IDone
 
-evalLoadable :: Env -> Loadable -> (Value -> Interaction) -> Interaction
-evalLoadable env = \case
-  Run code -> evalCode env env code
-  LetTop x top body -> \k -> do
-    let env' = insert x (evalT env' top) env
-    evalLoadable env' body k
+evalLoadable :: Env -> Env -> Loadable -> (Code,Env)
+evalLoadable genv env = \case
+  Run code -> (code,env)
+  LetTop x top body -> do
+    let env' = insert x (evalT genv top) env
+    evalLoadable genv env' body
 
 look :: Env -> Ref -> Value
 look Env{venv} (Ref x loc) = do
