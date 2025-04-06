@@ -9,7 +9,7 @@ L1:
   mov ax, 201
   call bios_put_char
   mov 203, ax
-  mov cx, 103
+  mov dx, 103
   mov bp, 101
   mov bx, [bp]
   jmp [bx]
@@ -24,7 +24,7 @@ L2:
   mov 101, sp
   push #0
   mov 104, sp
-  mov cx, 104
+  mov dx, 104
   mov bp, 101
   mov bx, [bp]
   jmp [bx]

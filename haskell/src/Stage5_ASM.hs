@@ -73,7 +73,7 @@ data Val
 -- maybe longer names so it is clear these are regs
 -- or maybe move generic/abstract names, which can be mapped to concrete x86 registers later
 -- using Ax and Bx as temps everywhere
-data Reg = Ax | Bx | Cx | Sp | Bp | RegWhat
+data Reg = Ax | Bx | Cx | Dx | Sp | Bp | RegWhat
   deriving (Eq,Ord)
 
 -- TODO: maybe no point in a new type for MemAddr, just alias a numeric type
@@ -95,11 +95,13 @@ data MyBiosRoutine
 
 
 -- calling conventions
--- TODO: temps should be named/listed here
+-- TODO: temps should be named/listed here -- Ax is the general scratch register
 
 argReg,frameReg :: Reg
-(argReg,frameReg) = (Cx,Bp)
 
+frameReg = Bp
+argReg = Dx
+-- contReg = Cx
 
 ----------------------------------------------------------------------
 
@@ -152,6 +154,7 @@ instance Show Reg where
     Ax -> "ax"
     Bx -> "bx"
     Cx -> "cx"
+    Dx -> "dx"
     Sp -> "sp"
     Bp -> "bp"
     RegWhat -> "r?"
