@@ -16,10 +16,10 @@ let g3 = fun arg k ->
   | true1 -> k arg
   | false0 ->
     let t2 = PRIM_SubInt(arg,g5) in
-    let k = [arg], fun [f1] arg ->
-      let t1 = PRIM_SubInt(f1,g6) in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_AddInt(f1,arg) in
+    let k = [arg], fun [f2] arg ->
+      let t1 = PRIM_SubInt(f2,g6) in
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_AddInt(f2,arg) in
         k t1 in
       g3 t1 k in
     g3 t2 k in
@@ -47,8 +47,8 @@ let g17 = fun arg k ->
       let t3 = PRIM_AddInt(g20,t2) in
       let t4 = PRIM_CharChr(t3) in
       let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g21) in
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_DivInt(f2,g21) in
         arg t1 k in
       g17 t5 k in
   k t1 in
@@ -79,8 +79,8 @@ let g35 = fun arg k ->
       let t3 = PRIM_AddInt(g38,t2) in
       let t4 = PRIM_CharChr(t3) in
       let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g39) in
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_DivInt(f2,g39) in
         arg t1 k in
       g35 t5 k in
   k t1 in
@@ -91,12 +91,12 @@ let g43 = CID1[g41,g42] in
 let g44 = CID0 in
 let g45 = '\n' in
 let k = [], fun [] arg ->
-  let k = [arg], fun [f1] arg ->
-    let k = [f1], fun [f1] arg ->
-      let k = [f1], fun [f1] arg ->
-        let k = [f1], fun [f1] arg ->
-          let k = [f1], fun [f1] arg ->
-            let t1 = PRIM_EqInt(f1,g40) in
+  let k = [arg], fun [f2] arg ->
+    let k = [f2], fun [f2] arg ->
+      let k = [f2], fun [f2] arg ->
+        let k = [f2], fun [f2] arg ->
+          let k = [f2], fun [f2] arg ->
+            let t1 = PRIM_EqInt(f2,g40) in
             let k = [], fun [] arg ->
               let k = [], fun [] arg ->
                 let t1 = PRIM_PutChar(g45) in
@@ -105,7 +105,7 @@ let k = [], fun [] arg ->
             match t1 with
             | true1 -> k g43
             | false0 ->
-              let k = [f1], fun [f1] arg -> arg f1 k in
+              let k = [f2], fun [f2] arg -> arg f2 k in
               g35 g44 k in
           g1 g34 k in
         g1 arg k in

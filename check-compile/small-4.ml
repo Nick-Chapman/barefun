@@ -32,7 +32,7 @@ let g24 = fun arg k ->
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
       let t3 = CID1[t1,f1] in
-      let k = [t2], fun [f1] arg -> arg f1 k in
+      let k = [t2], fun [f2] arg -> arg f2 k in
       g24 t3 k in
   k t1 in
 let g25 = CID0 in
@@ -42,7 +42,7 @@ let g20 = fun arg k ->
   match t2 with
   | true1 ->
     let t3 = PRIM_PutChar(g23) in
-    let k = [arg], fun [f1] arg -> arg f1 k in
+    let k = [arg], fun [f2] arg -> arg f2 k in
     g24 g25 k
   | false0 ->
     let t3 = PRIM_PutChar(t1) in

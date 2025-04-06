@@ -52,8 +52,9 @@ data Atomic
 data Location = Global Int | InFrame Int | Temp Int | TheFrame | TheArg deriving (Eq,Ord)
 data Ref = Ref Id Location
 
-firstFrameIndex,firstTempIndex,firstGlobalIndex :: Int
-firstFrameIndex = 1
+firstFrameIndexForLambdas,firstFrameIndexForContinuations,firstTempIndex,firstGlobalIndex :: Int
+firstFrameIndexForLambdas = 1
+firstFrameIndexForContinuations = 2
 firstTempIndex = 1
 firstGlobalIndex = 1
 
@@ -177,7 +178,7 @@ evalCode genv env = \case
       evalCode genv (insert x v1 env) c2 k
   PushContinuation pre _ (x,later) first -> \k -> ITick I.PushContinuation $ do
     evalCode genv env first $ \v1 -> do
-      let env' = mkFrameEnv genv env pre
+      let env' = mkFrameEnv firstFrameIndexForContinuations genv env pre
       evalCode genv (insert x v1 env') later k
   Case scrut arms0 -> \k -> do
     case (look env scrut) of
@@ -201,11 +202,11 @@ evalCode genv env = \case
       ConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map (look env) xs))
 
       Lam pre _ x body -> \k -> do
-        let env' = mkFrameEnv genv env pre
+        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         k (VFunc (\arg k -> evalCode genv (insert x arg env') body k))
 
       RecLam pre _ f x body -> \k -> do
-        let env' = mkFrameEnv genv env pre
+        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         let me = VFunc (\arg k -> do evalCode genv (insert x arg (insert f me env')) body k)
         k me
 
@@ -214,8 +215,8 @@ data Env = Env { venv :: Map Location Value }
 env0 :: Env
 env0 = Env { venv = Map.empty }
 
-mkFrameEnv :: Env -> Env -> [Ref] -> Env
-mkFrameEnv genv env fvs =
+mkFrameEnv :: Int -> Env -> Env -> [Ref] -> Env
+mkFrameEnv firstFrameIndex genv env fvs =
   foldr (uncurry insert) genv [ (Ref undefined (InFrame n), look env ref) | (n,ref) <- zip [firstFrameIndex..] fvs ]
 
 insert :: Ref -> Value -> Env -> Env
@@ -261,7 +262,7 @@ compileCtop = compileC firstTempIndex
       SRC.PushContinuation fvs (x,later) first -> do
         let xRef = Ref x TheArg
         first <- compileC nextTemp cenv first
-        (cenv,pre,post) <- pure $ frame cenv fvs
+        (cenv,pre,post) <- pure $ frame firstFrameIndexForContinuations cenv fvs
         later <- compileCtop (Map.insert x xRef cenv) later
         pure $ PushContinuation pre post (xRef,later) first
 
@@ -303,7 +304,7 @@ compileA x cenv = \case
 
   SRC.Lam _ fvs x body -> do
     let xRef = Ref x TheArg
-    (cenv,pre,post) <- pure $ frame cenv fvs
+    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
     body <- compileCtop (Map.insert x xRef cenv) body
     case (pre,post) of
       ([],[]) -> do
@@ -313,7 +314,7 @@ compileA x cenv = \case
         pure $ Left (Lam pre post xRef body)
 
   SRC.RecLam _ fvs f x body -> do
-    (cenv,pre,post) <- pure $ frame cenv fvs
+    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
     let xRef = Ref x TheArg
     case (pre,post) of
       ([],[]) -> do
@@ -327,8 +328,8 @@ compileA x cenv = \case
         pure $ Left (RecLam pre post fRef xRef body)
 
 
-frame :: Cenv -> [Id] -> (Cenv,[Ref],[Ref])
-frame cenv fvs = do
+frame :: Int -> Cenv -> [Id] -> (Cenv,[Ref],[Ref])
+frame firstFrameIndex cenv fvs = do
   -- partition fvs in global/truely-free
   let globXs = [ x | x <- fvs, isGlobal (locate cenv x) ]
   let freeXs = [ x | x <- fvs, not (isGlobal (locate cenv x)) ]

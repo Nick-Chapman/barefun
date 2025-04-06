@@ -14,8 +14,8 @@ let g1 = fun arg k ->
       let t3 = PRIM_AddInt(g4,t2) in
       let t4 = PRIM_CharChr(t3) in
       let t5 = CID1[t4,f1] in
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_DivInt(f1,g5) in
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_DivInt(f2,g5) in
         arg t1 k in
       g1 t5 k in
   k t1 in
@@ -30,18 +30,18 @@ let g8 = fun arg k ->
   match arg with
   | Num0(t1) -> k t1
   | Add1(t1,t2) ->
-    let k = [t2], fun [f1] arg ->
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_AddInt(f1,arg) in
+    let k = [t2], fun [f2] arg ->
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_AddInt(f2,arg) in
         k t1 in
-      g8 f1 k in
+      g8 f2 k in
     g8 t1 k
   | Sub2(t1,t2) ->
-    let k = [t2], fun [f1] arg ->
-      let k = [arg], fun [f1] arg ->
-        let t1 = PRIM_SubInt(f1,arg) in
+    let k = [t2], fun [f2] arg ->
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_SubInt(f2,arg) in
         k t1 in
-      g8 f1 k in
+      g8 f2 k in
     g8 t1 k in
 let g9 = 1000 in
 let g10 = CID0[g9] in
@@ -62,6 +62,6 @@ let k = [], fun [] arg ->
   match t1 with
   | true1 -> k g20
   | false0 ->
-    let k = [arg], fun [f1] arg -> arg f1 k in
+    let k = [arg], fun [f2] arg -> arg f2 k in
     g1 g21 k in
 g8 g16 k
