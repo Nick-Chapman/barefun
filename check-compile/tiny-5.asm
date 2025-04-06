@@ -11,8 +11,8 @@ L1:
   mov 203, ax
   mov dx, 103
   mov bp, 101
-  mov bx, [bp]
-  jmp [bx]
+  mov ax, [bp]
+  jmp [ax]
 
 L2:
   mov sp, #0
@@ -26,7 +26,7 @@ L2:
   mov 104, sp
   mov dx, 104
   mov bp, 101
-  mov bx, [bp]
-  jmp [bx]
+  mov ax, [bp]
+  jmp [ax]
 
 

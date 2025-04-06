@@ -233,9 +233,15 @@ compileCode = \case
   SRC.Return _ x -> undefined x
 
   SRC.Tail x1 _pos x2 -> do
-    let v1 = compileRef x1
-    let v2 = compileRef x2
-    pure $ compileTailCall v1 v2
+    let fun = compileRef x1
+    let arg = compileRef x2
+    pure $ doOps
+      -- set arg before frame, because arg might rely on the old value of frame
+      [ OpMove argReg arg
+      , OpMove frameReg fun
+      -- access code, and jump to it
+      , OpMove Ax (SMemIndirect frameReg)
+      ] (Done (JumpIndirect Ax))
 
   SRC.LetAlias x y body -> undefined x y body
 
@@ -253,7 +259,7 @@ compileCode = \case
       [arm1] -> undefined arm1
       [arm1,arm2] -> do
         let s :: Source = compileRef scrut
-        -- TODO: share unpacking of the tag (into Bx)
+        -- TODO: share unpacking of the tag
         lab1 <- compileArm s arm1 >>= CutCode
         ops1 <- compileArmBranch s arm1 lab1
         lab2 <- compileArm s arm2 >>= CutCode
@@ -277,7 +283,7 @@ compileArm s (SRC.ArmTag _c__CHECK_ME xs rhs) = do
 
 compileArmUnpack :: SRC.Ref -> Int -> Source -> Asm [Op]
 compileArmUnpack (SRC.Ref _ loc) i s = do -- TODO not hit yet
-  let reg = Bx
+  let reg = Ax
   pure $ [ OpMove reg s
          , OpMove reg (SMemIndirectOffset reg i) -- TODO: so this not tried yet
          ] ++ setLocation loc reg
@@ -314,15 +320,6 @@ compileBuiltin b xs = case (b,xs) of
     ]
   b ->
     error (show (b,xs))
-
-compileTailCall :: Source -> Source -> Code
-compileTailCall fun arg = do
-  let codeReg = Bx -- this is just a temp; not part of calling convention
-  doOps
-    [ OpMove argReg arg -- set arg before frame, because it might rely on the old value of frame
-    , OpMove frameReg fun
-    , OpMove codeReg (SMemIndirect frameReg)
-    ] (Done (JumpIndirect codeReg))
 
 setLocation :: SRC.Location -> Reg -> [Op]
 setLocation loc reg = case loc of

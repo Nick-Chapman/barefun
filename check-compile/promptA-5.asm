@@ -3,14 +3,14 @@ start=L5
 L1:
   mov dx, 107
   mov bp, 101
-  mov bx, [bp]
-  jmp [bx]
+  mov ax, [bp]
+  jmp [ax]
 
 L2:
   mov dx, 108
   mov bp, 104
-  mov bx, [bp]
-  jmp [bx]
+  mov ax, [bp]
+  jmp [ax]
 
 L3:
   call bios_get_char
@@ -41,8 +41,8 @@ L4:
   mov 202, ax
   mov dx, 109
   mov bp, 104
-  mov bx, [bp]
-  jmp [bx]
+  mov ax, [bp]
+  jmp [ax]
 
 L5:
   mov sp, #0
@@ -68,7 +68,7 @@ L5:
   mov 110, sp
   mov dx, 110
   mov bp, 101
-  mov bx, [bp]
-  jmp [bx]
+  mov ax, [bp]
+  jmp [ax]
 
 
