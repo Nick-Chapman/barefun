@@ -313,6 +313,8 @@ data State = State
   , mem :: Map MemAddr Val
   , flagZ :: Bool
   , countOps :: Int
+  , lastCodeLabel :: CodeLabel
+  , offsetFromLastLabel :: Int
   }
 
 runM :: TraceFlag  -> Image -> M () -> Interaction
@@ -331,7 +333,14 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
     finalCodeLabel = CodeLabel 0
 
     state0 :: State
-    state0 = State { mem , rmap , flagZ = error "flagZ/uninitialized" , countOps = 0 }
+    state0 = State
+      { mem
+      , rmap
+      , flagZ = error "flagZ/uninitialized"
+      , countOps = 0
+      , lastCodeLabel = error "lastCodeLabel"
+      , offsetFromLastLabel = error "offsetFromLastLabel"
+      }
       where
         initialStackPointer = MemAddr 0 -- stack address will be negative. TODO: what should it be?
         aFinalCont = MemAddr 12 -- TODO: where? matters not but we need a consistent mem layout
@@ -347,22 +356,30 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
     k0 _s () = IDone
 
+    traceOpOJump thing s k = do
+        let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
+        trace (printf "#%03d: %s.%d : %s"
+               countOps
+               (show lastCodeLabel)
+               offsetFromLastLabel
+               thing
+              ) $
+          k s { countOps = 1 + countOps
+              , offsetFromLastLabel = 1 + offsetFromLastLabel
+              } ()
+
+
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
-    loop s@State{rmap,mem,flagZ,countOps} m k = case m of
+    loop s@State{rmap,mem,flagZ} m k = case m of
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       XHalt -> IDone
 
-      TraceOp op -> do
-        trace (printf "%d: %s" countOps (show op)) $
-          k s { countOps = 1 + countOps } ()
-
-      TraceJump jump -> do
-        trace (printf "%d: %s" countOps (show jump)) $
-          k s { countOps = 1 + countOps } ()
+      TraceOp op -> traceOpOJump (show op) s k
+      TraceJump jump -> traceOpOJump (show jump) s k
 
       GetCode lab -> debug ("GetCode",lab) $ do
-        k s (maybe err id $ Map.lookup lab cmap)
+        k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
 
       SetReg r v -> debug ("SetReg",r,v) $ do
