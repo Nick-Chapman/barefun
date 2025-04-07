@@ -1,13 +1,13 @@
 (*Stage5 (ASM)*)
-start=L6
-L1:
+start=L6_Top
+L1_Arm1:
   mov dx, 102
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L2:
+L2_Arm2:
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -22,25 +22,25 @@ L2:
   mov ax, [bp]
   jmp [ax]
 
-L3:
+L3_TopLam:
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L1
+  bz L1_Arm1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L2
+  bz L2_Arm2
   crash
 
-L4:
+L4_TopLam:
   mov dx, dx
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L5:
+L5_Continuation:
   mov ax, dx
   call bios_explode
   mov 201, ax
@@ -49,12 +49,12 @@ L5:
   mov ax, [bp]
   jmp [ax]
 
-L6:
+L6_Top:
   push #0
   mov 102, sp
-  push #L3
+  push #L3_TopLam
   mov 101, sp
-  push #L4
+  push #L4_TopLam
   mov 103, sp
   push #0
   push sp
@@ -102,7 +102,7 @@ L6:
   mov ax, sp
   mov 104, ax
   push cx
-  push #L5
+  push #L5_Continuation
   mov cx, sp
   mov dx, 104
   mov bp, 103

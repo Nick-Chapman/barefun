@@ -1,20 +1,20 @@
 (*Stage5 (ASM)*)
-start=L14
-L1:
+start=L14_Top
+L1_Arm1:
   mov dx, 103
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L2:
+L2_Arm1:
   mov dx, 106
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L3:
+L3_Arm2:
   mov ax, 202
   sub ax, 107
   mov 204, ax
@@ -23,7 +23,7 @@ L3:
   mov ax, [bp]
   jmp [ax]
 
-L4:
+L4_Arm2:
   mov ax, dx
   sub ax, 104
   mov 202, ax
@@ -34,14 +34,14 @@ L4:
   mov ax, 203
   mov ax, [ax]
   cmp ax, #1
-  bz L2
+  bz L2_Arm1
   mov ax, 203
   mov ax, [ax]
   cmp ax, #0
-  bz L3
+  bz L3_Arm2
   crash
 
-L5:
+L5_TopLam:
   mov ax, dx
   cmp ax, 102
   call bios_make_bool_from_z
@@ -49,14 +49,14 @@ L5:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L1
+  bz L1_Arm1
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L4
+  bz L4_Arm2
   crash
 
-L6:
+L6_Continuation:
   mov ax, dx
   call bios_put_char
   mov 201, ax
@@ -66,75 +66,75 @@ L6:
   mov ax, [bp]
   jmp [ax]
 
-L7:
+L7_Arm1:
   mov dx, 112
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L8:
+L8_Arm2:
   mov dx, 113
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L9:
+L9_Continuation:
   push cx
-  push #L6
+  push #L6_Continuation
   mov cx, sp
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L7
+  bz L7_Arm1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L8
+  bz L8_Arm2
   crash
 
-L10:
+L10_Continuation:
   mov ax, dx
   call bios_put_char
   mov 201, ax
   push cx
-  push #L9
+  push #L9_Continuation
   mov cx, sp
   mov dx, 111
   mov bp, 101
   mov ax, [bp]
   jmp [ax]
 
-L11:
+L11_Arm1:
   mov dx, 109
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L12:
+L12_Arm2:
   mov dx, 110
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L13:
+L13_Continuation:
   push cx
-  push #L10
+  push #L10_Continuation
   mov cx, sp
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L11
+  bz L11_Arm1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L12
+  bz L12_Arm2
   crash
 
-L14:
+L14_Top:
   mov ax, #0
   mov 102, ax
   push #1
@@ -147,7 +147,7 @@ L14:
   mov 106, sp
   mov ax, #1
   mov 107, ax
-  push #L5
+  push #L5_TopLam
   mov 101, sp
   mov ax, #42
   mov 108, ax
@@ -162,7 +162,7 @@ L14:
   mov ax, #'O'
   mov 113, ax
   push cx
-  push #L13
+  push #L13_Continuation
   mov cx, sp
   mov dx, 108
   mov bp, 101

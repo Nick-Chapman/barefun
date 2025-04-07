@@ -1,13 +1,13 @@
 (*Stage5 (ASM)*)
-start=L11
-L1:
+start=L11_Top
+L1_Arm1:
   mov dx, 102
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L2:
+L2_Arm2:
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -22,25 +22,25 @@ L2:
   mov ax, [bp]
   jmp [ax]
 
-L3:
+L3_TopLam:
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L1
+  bz L1_Arm1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L2
+  bz L2_Arm2
   crash
 
-L4:
+L4_Arm1:
   mov dx, [bp+1]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L5:
+L5_Continuation:
   mov ax, [bp+2]
   div ax, 107
   mov 201, ax
@@ -49,7 +49,7 @@ L5:
   mov ax, [bp]
   jmp [ax]
 
-L6:
+L6_Arm2:
   mov ax, dx
   mod ax, 105
   mov 202, ax
@@ -64,14 +64,14 @@ L6:
   mov 205, ax
   push dx
   push cx
-  push #L5
+  push #L5_Continuation
   mov cx, sp
   mov dx, 205
   mov bp, 103
   mov ax, [bp]
   jmp [ax]
 
-L7:
+L7_Function:
   mov ax, dx
   cmp ax, 104
   call bios_make_bool_from_z
@@ -79,16 +79,16 @@ L7:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L4
+  bz L4_Arm1
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L6
+  bz L6_Arm2
   crash
 
-L8:
+L8_TopLam:
   push dx
-  push #L7
+  push #L7_Function
   mov ax, sp
   mov 201, ax
   mov dx, 201
@@ -97,25 +97,25 @@ L8:
   mov ax, [bp]
   jmp [ax]
 
-L9:
+L9_Continuation:
   mov dx, dx
   mov bp, 101
   mov ax, [bp]
   jmp [ax]
 
-L10:
+L10_Continuation:
   push cx
-  push #L9
+  push #L9_Continuation
   mov cx, sp
   mov bp, dx
   mov dx, 109
   mov ax, [bp]
   jmp [ax]
 
-L11:
+L11_Top:
   push #0
   mov 102, sp
-  push #L3
+  push #L3_TopLam
   mov 101, sp
   mov ax, #0
   mov 104, ax
@@ -125,14 +125,14 @@ L11:
   mov 106, ax
   mov ax, #10
   mov 107, ax
-  push #L8
+  push #L8_TopLam
   mov 103, sp
   push #0
   mov 108, sp
   mov ax, #42
   mov 109, ax
   push cx
-  push #L10
+  push #L10_Continuation
   mov cx, sp
   mov dx, 108
   mov bp, 103

@@ -78,7 +78,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | RegWhat
 data MemAddr = MemAddr Int -- needs to be a numbers, so we can do offseting
   deriving (Eq,Ord)
 
-data CodeLabel = CodeLabel Int -- unique labels is enough; TODO: add provenance
+data CodeLabel = CodeLabel Int String -- unique labels is enough; TODO: add provenance
   deriving (Eq,Ord)
 
 data DataLabel = DataLabel String -- TODO: provenance TODO: use!
@@ -156,7 +156,7 @@ instance Show Reg where
     RegWhat -> "r?"
 
 instance Show MemAddr where show (MemAddr n) = show n
-instance Show CodeLabel where show (CodeLabel n) = "L" ++ show n
+instance Show CodeLabel where show (CodeLabel n s) = "L" ++ show n ++ "_" ++ s
 instance Show DataLabel where show (DataLabel id) = "D" ++ show id
 
 instance Show BareBios where
@@ -385,7 +385,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
     cmap = Map.insert finalCodeLabel finalCode cmapUser
       where finalCode = Do (OpCall BiosHalt) (Done Crash)
 
-    finalCodeLabel = CodeLabel 0
+    finalCodeLabel = CodeLabel 0 "FINAL"
 
     state0 :: State
     state0 = State
@@ -413,7 +413,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
     k0 _s () = IDone
 
-    traceOpOJump thing s k = trace (show s) $ do
+    traceOpOJump thing s k = do --trace (show s ++ "\n") $ do
         let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
         trace (printf "#%03d: %s.%d : %s\n"
                countOps
@@ -469,7 +469,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 -- Compile
 
 compile :: SRC.Loadable -> Transformed
-compile x = runAsm (compileLoadable x >>= CutCode)
+compile x = runAsm (compileLoadable x >>= CutCode "Top")
 
 -- Calling conventions:
 frameReg,argReg,contReg :: Reg
@@ -497,7 +497,7 @@ compileTopDef = \case
       ],Ax)
   SRC.TopPrim b xs -> undefined b xs
   SRC.TopLam _x body -> do
-    lab <- compileCode body >>= CutCode
+    lab <- compileCode body >>= CutCode "TopLam"
     pure (
       [ OpPush (SLit (VCodeLabel lab))
       ], Sp)
@@ -555,7 +555,7 @@ compileCode = \case
     doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
-    lab <- compileCode later >>= CutCode
+    lab <- compileCode later >>= CutCode "Continuation"
     let
       ops =
         map OpPush (reverse (map compileRef pre)) ++
@@ -572,9 +572,9 @@ compileCode = \case
       [arm1,arm2] -> do
         let s :: Source = compileRef scrut
         -- TODO: share unpacking of the tag
-        lab1 <- compileArm s arm1 >>= CutCode
+        lab1 <- compileArm s arm1 >>= CutCode "Arm1"
         ops1 <- compileArmBranch s arm1 lab1
-        lab2 <- compileArm s arm2 >>= CutCode
+        lab2 <- compileArm s arm2 >>= CutCode "Arm2"
         ops2 <- compileArmBranch s arm2 lab2
         pure $ doOps (ops1 ++ ops2) (Done Crash)
       _ ->
@@ -638,7 +638,7 @@ construct tag xs = map OpPush (reverse (SLit (VNum tag) : xs))
 
 compileFunction :: [SRC.Ref] -> SRC.Code -> Asm [Op]
 compileFunction freeVars body = do
-  lab <- compileCode body >>= CutCode
+  lab <- compileCode body >>= CutCode "Function"
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (VCodeLabel lab))
@@ -737,7 +737,7 @@ instance Monad Asm where (>>=) = AsmBind
 data Asm a where
   AsmRet :: a -> Asm a
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
-  CutCode :: Code -> Asm CodeLabel
+  CutCode :: String -> Code -> Asm CodeLabel
 
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
@@ -749,9 +749,9 @@ runAsm m = loop state0 m k0
     loop s = \case
       AsmRet x -> \k -> k s x
       AsmBind m f -> \k -> loop s m $ \s a -> loop s (f a) k
-      CutCode code -> \k -> do
+      CutCode prov code -> \k -> do
         let AsmState{u} = s
-        let lab = CodeLabel u
+        let lab = CodeLabel u prov
         let image@Image{cmap} = k s { u = u+1 } lab
         image { cmap = Map.insert lab code cmap }
 
