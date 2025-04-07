@@ -97,11 +97,11 @@ data MyBiosRoutine
 -- calling conventions
 -- TODO: temps should be named/listed here -- Ax is the general scratch register
 
-argReg,frameReg :: Reg
+frameReg,argReg,contReg :: Reg
 
 frameReg = Bp
 argReg = Dx
--- contReg = Cx
+contReg = Cx
 
 ----------------------------------------------------------------------
 
@@ -230,7 +230,16 @@ compileLit = \case
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
-  SRC.Return _ x -> undefined x
+  SRC.Return _ x -> do
+    let res = compileRef x
+    pure $ doOps
+      [ OpMove argReg res
+      -- frame = cont; cont = frame[1]
+      , OpMove frameReg (SMemIndirect contReg)
+      , OpMove contReg (SMemIndirectOffset frameReg 1)
+      -- code = frame[0]; jmp [code]
+      , OpMove Ax (SMemIndirect frameReg)
+      ] (Done (JumpIndirect Ax))
 
   SRC.Tail x1 _pos x2 -> do
     let fun = compileRef x1
