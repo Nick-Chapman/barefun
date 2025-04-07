@@ -10,7 +10,7 @@ import qualified Data.Map as Map
 data Interaction
   = IDone
   | ITick Tickable Interaction
-  | IDebug String Interaction
+  | ITrace String Interaction
   | IPut Char Interaction
   | IGet (Char -> Interaction)
 
@@ -26,8 +26,8 @@ runTerm i = do
         loop (tick t counts) i
       IDone -> do
         printf "[HALT:%s]\n" (show counts)
-      IDebug mes i -> do
-        printf "[debug] %s\n" mes
+      ITrace mes i -> do
+        printf "[trace] %s\n" mes
         loop counts i
       IPut c i -> do
         let n = ord c

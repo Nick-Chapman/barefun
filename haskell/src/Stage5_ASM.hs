@@ -1,6 +1,6 @@
 -- | Locate identifier references at runtime; lift globals
 module Stage5_ASM
-  ( execute
+  ( execute, TraceFlag(..)
   , compile
   ) where
 
@@ -16,9 +16,6 @@ import Value (tTrue,tFalse)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
-
-enableDebug :: Bool
-enableDebug = False -- TODO: want this on command line flag
 
 type Transformed = Image
 
@@ -161,8 +158,10 @@ instance Show BareBios where
 ----------------------------------------------------------------------
 -- Execute
 
-execute :: Transformed -> Interaction
-execute i = runM i (execImage i)
+data TraceFlag = TraceOn | TraceOff
+
+execute :: Transformed -> TraceFlag -> Interaction
+execute i trace = runM trace i (execImage i)
 
 execImage :: Image -> M ()
 execImage Image{start} = GetCode start >>= execCode
@@ -287,7 +286,6 @@ data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
   XHalt :: M ()
-  Debug :: Show a => a -> M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
   GetCode :: CodeLabel -> M Code
@@ -300,13 +298,9 @@ data M a where
   PutChar :: Char -> M ()
   GetChar :: M Char
 
-idebug :: String -> Interaction -> Interaction
-idebug s i = if enableDebug then IDebug s i else i
 
-xdebug :: Show a => a -> Interaction -> Interaction
-xdebug _ i = i
 debug :: Show a => a -> Interaction -> Interaction
-debug a i = idebug (show a) i
+debug _ i = i -- disabled
 
 data State = State
   { rmap :: Map Reg Val
@@ -315,10 +309,15 @@ data State = State
   , countOps :: Int
   }
 
-runM :: Image -> M () -> Interaction
-runM Image{cmap=cmapUser} m = loop state0 m k0
+runM :: TraceFlag  -> Image -> M () -> Interaction
+runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
   -- TODO: init mem from vals portion of image -- and compile top/loadable to use it
   where
+
+    trace :: String -> Interaction -> Interaction
+    trace = case traceFlag of
+      TraceOn -> ITrace
+      TraceOff -> \_s i -> i
 
     cmap = Map.insert finalCodeLabel finalCode cmapUser
       where finalCode = Do (OpCall BiosHalt) (Done Crash)
@@ -340,7 +339,7 @@ runM Image{cmap=cmapUser} m = loop state0 m k0
           , (aFinalCont, VCodeLabel finalCodeLabel)
           ]
 
-    k0 _s () = debug "k0-ended" IDone
+    k0 _s () = IDone
 
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
     loop s@State{rmap,mem,flagZ,countOps} m k = case m of
@@ -349,49 +348,45 @@ runM Image{cmap=cmapUser} m = loop state0 m k0
       XHalt -> IDone
 
       TraceOp op -> do
-        idebug (printf "%d: %s" countOps (show op)) $
+        trace (printf "%d: %s" countOps (show op)) $
           k s { countOps = 1 + countOps } ()
 
       TraceJump jump -> do
-        idebug (printf "%d: %s" countOps (show jump)) $
+        trace (printf "%d: %s" countOps (show jump)) $
           k s { countOps = 1 + countOps } ()
 
-      Debug thing -> do
-        IDebug (show thing) $ k s ()
-
-      GetCode lab -> xdebug ("GetCode",lab) $ do
+      GetCode lab -> debug ("GetCode",lab) $ do
         k s (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
 
-      SetReg r v -> xdebug ("SetReg",r,v) $ do
+      SetReg r v -> debug ("SetReg",r,v) $ do
         k s { rmap = Map.insert r v rmap } ()
 
       GetReg r -> do
-        --debug ("GetReg",r) $ do
-          let v = maybe err id $ Map.lookup r rmap
-                where err = error (show ("GetReg/uninitialized",r))
-          xdebug ("GetReg",r, "->",v) $ do
-            k s v
+        let v = maybe err id $ Map.lookup r rmap
+              where err = error (show ("GetReg/uninitialized",r))
+        debug ("GetReg",r, "->",v) $ do
+          k s v
 
-      SetMem a v -> xdebug ("SetMem",a,v) $ do
+      SetMem a v -> debug ("SetMem",a,v) $ do
         k s { mem = Map.insert a v mem } ()
 
       GetMem a -> do
         let v = maybe err id $ Map.lookup a mem
               where err = error (show ("GetMem/uninitialized",a))
-        xdebug ("GetMem",a,"->",v) $ do
+        debug ("GetMem",a,"->",v) $ do
           k s v
 
-      SetFlagZ b -> xdebug ("SetFlagZ",b) $ do
+      SetFlagZ b -> debug ("SetFlagZ",b) $ do
         k s { flagZ = b } ()
 
-      GetFlagZ -> xdebug "GetFlagZ" $ do
+      GetFlagZ -> debug "GetFlagZ" $ do
         k s flagZ
 
       PutChar c -> IPut c (k s ())
 
-      GetChar -> do --IDebug "GetChar.." $ do
-        IGet $ \c -> do --IDebug (printf "GetChar..got:%s" (show c)) $ do
+      GetChar -> do
+        IGet $ \c -> do
           k s c
 
 ----------------------------------------------------------------------
