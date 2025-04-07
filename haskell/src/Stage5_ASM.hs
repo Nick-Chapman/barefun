@@ -7,14 +7,15 @@ module Stage5_ASM
 import Builtin (Builtin)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
+import Data.Word (Word16)
 import Interaction (Interaction(..))
 import Stage0_AST (Literal(..))
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
+import Value (tTrue,tFalse)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
-import Value (tTrue,tFalse)
 
 enableDebug :: Bool
 enableDebug = False
@@ -62,7 +63,7 @@ data Source
 -- Possible solutions to this. (1) Tagging. (2) Descriptor Word
 data Val
   = VChar Char
-  | VNum Int -- at some point gonna have to decide on 16b or 32b numbers (or 15/31 if we tag)
+  | VNum Word16 -- TODO: at some point gonna have to decide on 16b or 32b numbers (or 15/31 if we tag)
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
   deriving Eq
@@ -202,7 +203,7 @@ compileTopDef = \case
 compileLit :: Literal -> Asm Val
 compileLit = \case
     LitC c -> pure (VChar c)
-    LitN n -> undefined VNum n
+    LitN n -> pure (VNum n)
     LitS s -> undefined s
 
 compileCode :: SRC.Code -> Asm Code

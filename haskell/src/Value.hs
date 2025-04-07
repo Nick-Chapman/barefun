@@ -9,7 +9,7 @@ import Interaction (Interaction)
 import Text.Printf (printf)
 
 data Value
-  = VCons Int [Value] -- TODO: should define and use Ctag here
+  = VCons Word16 [Value] -- TODO: should define and use Ctag here
   | VString String
   | VChar Char
   | VNum Word16
@@ -24,7 +24,7 @@ instance Show Value where
     VFunc{} -> "[function]"
 
 -- These tag values only need to be unique within their type
-tUnit,tFalse,tTrue,tNil,tCons :: Int
+tUnit,tFalse,tTrue,tNil,tCons :: Word16
 tUnit = 0
 tFalse = 0
 tTrue = 1

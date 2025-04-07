@@ -113,7 +113,7 @@ executeProg (Prog defs) = loop env0 defs
         eval env rhs $ \value -> do
           loop (insert x value env) defs
       TypeDef cids : defs -> do
-        let pairs = zip cids [0::Int .. ]
+        let pairs = zip cids [0::Word16 .. ]
         let f (name,tag) cenv = Map.insert name tag cenv
         let cenv' = foldr f cenv pairs
         let env' = env { cenv = cenv' }
@@ -194,12 +194,12 @@ evalLit = \case
   LitN n -> VNum n
   LitS s -> VString s
 
-data Env = Env { venv :: Map Id Value, cenv :: Map Cid Int }
+data Env = Env { venv :: Map Id Value, cenv :: Map Cid Word16 }
 
 env0 :: Env
 env0 = Env { venv = Map.empty, cenv = initCenv}
 
-initCenv :: Map Cid Int
+initCenv :: Map Cid Word16
 initCenv = Map.fromList
   [ (cUnit, tUnit)
   , (cFalse, tFalse)
