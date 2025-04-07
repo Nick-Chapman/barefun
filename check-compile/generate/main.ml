@@ -7,6 +7,8 @@ let select_versions_for_example = function
   | "promptB" -> [4;5]
   | "halts" -> [4;5]
   | "evenodd" -> [4;5]
+  | "hello" -> [4;5]
+  (* TODO: have [4,5] be the default for all examples *)
   | _ -> [4]
 
 let suffix_of_version v =

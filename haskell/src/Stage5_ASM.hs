@@ -12,7 +12,7 @@ import Interaction (Interaction(..))
 import Stage0_AST (Literal(..))
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
-import Value (tTrue,tFalse)
+import Value (tTrue,tFalse,tNil,tCons)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
@@ -84,6 +84,7 @@ data BareBios
   = BiosPutCharInAx
   | BiosGetCharInAx
   | BiosMakeBoolFromFlagZ
+  | BiosExplode -- TODO: dont want this in Bios
   | BiosHalt
 --  | BiosCheckHeapSpace -- maybe initiate GC; compile at head of each code section
 
@@ -153,6 +154,7 @@ instance Show BareBios where
     BiosGetCharInAx -> "bios_get_char"
     BiosPutCharInAx -> "bios_put_char"
     BiosMakeBoolFromFlagZ -> "bios_make_bool"
+    BiosExplode -> "bios_explode"
     BiosHalt -> "bios_halt"
 
 ----------------------------------------------------------------------
@@ -227,6 +229,10 @@ execBios = \case
     b <- GetFlagZ
     SetReg Ax (VMemAddr (if b then aTrue else aFalse))
   BiosHalt -> XHalt
+  BiosExplode -> do
+    -- null execution effect because
+    -- string rep == char list rep
+    pure ()
 
 -- Shouldn't matter what these specifc address are.
 -- TODO: prefer these not o be top level
@@ -411,12 +417,13 @@ compileLoadable = \case
     let ops2 = setLocation loc reg
     doOps (ops1++ops2) <$> compileLoadable body
 
+-- TODO: TopDefs should really really not generate Push instructions. But instead should generate static data structures.
 compileTopDef ::SRC.Top -> Asm ([Op],Reg)
 compileTopDef = \case
   SRC.TopLit x -> do
-    v <- compileLit x
+    let (ops,source) = compileLit x
     pure
-      ([ OpMove Ax (SLit v)
+      (ops ++ [ OpMove Ax source
       ],Ax)
   SRC.TopPrim b xs -> undefined b xs
   SRC.TopLam _x body -> do
@@ -425,17 +432,29 @@ compileTopDef = \case
       [ OpPush (SLit (VCodeLabel lab))
       ], Sp)
 
-  SRC.TopConApp tag xs -> do
-    let vTag = SLit $ compileCtag tag
+  SRC.TopConApp (Ctag _ tag) xs -> do
     let vs = map compileRef xs
-    ops <- pure $ map OpPush (reverse (vTag : vs))
-    pure (ops,Sp)
+    pure (compileConApp tag vs, Sp)
 
-compileLit :: Literal -> Asm Val
+compileLit :: Literal -> ([Op],Source)
 compileLit = \case
-    LitC c -> pure (VChar c)
-    LitN n -> pure (VNum n)
-    LitS s -> undefined s
+    LitC c -> ([],SLit (VChar c))
+    LitN n -> ([],SLit (VNum n))
+    LitS string -> do
+      -- string rep is currently the same as a list of chars
+      -- TODO: we need a terminating Nil !
+      (compileConApp tNil [] ++
+        [ op
+        | c <- reverse string
+        , op <- compileConApp tCons [SLit (VChar c), SReg Sp]
+        ],
+       SReg Sp)
+
+compileConApp :: Word16 -> [Source] -> [Op]
+compileConApp tag ss = do
+    let sTag = SLit $ (VNum tag)
+    map OpPush (reverse (sTag : ss))
+
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -508,7 +527,7 @@ compileArmBranch s (SRC.ArmTag (Ctag _ n) _ _) lab = do
 
 compileArm :: Source -> SRC.Arm -> Asm Code
 compileArm s (SRC.ArmTag _c__CHECK_ME xs rhs) = do
-  ops <- sequence [ undefined $ compileArmUnpack x i s | (i,x) <- zip [1..] xs ]
+  ops <- sequence [ compileArmUnpack x i s | (i,x) <- zip [1..] xs ]
   doOps (concat ops) <$> compileCode rhs
 
 compileArmUnpack :: SRC.Ref -> Int -> Source -> Asm [Op]
@@ -557,6 +576,10 @@ compileBuiltin b xs = case (b,xs) of
     , OpCmp Ax (compileRef s2)
     , OpCall BiosMakeBoolFromFlagZ
     ]
+  (SRC.Explode, [s1]) ->
+    [ OpMove Ax (compileRef s1)
+    , OpCall BiosExplode
+    ]
   b ->
     error (show (b,xs))
 
@@ -577,9 +600,6 @@ compileRef (SRC.Ref _ loc) = do
     SRC.Temp n -> SMem (tempOffset n)
     SRC.TheArg -> SReg argReg
     SRC.TheFrame -> SReg frameReg
-
-compileCtag :: Ctag -> Val
-compileCtag (Ctag _ tag) = VNum tag
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
