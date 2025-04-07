@@ -31,7 +31,7 @@ L1:
   call bios_put_char
   mov 207, ax
   mov dx, 207
-  mov bp, [cx]
+  mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]

@@ -6,6 +6,7 @@ let select_versions_for_example = function
   | "promptA" -> [4;5]
   | "promptB" -> [4;5]
   | "halts" -> [4;5]
+  | "evenodd" -> [4;5]
   | _ -> [4]
 
 let suffix_of_version v =

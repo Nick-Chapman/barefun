@@ -18,7 +18,7 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 
 enableDebug :: Bool
-enableDebug = False
+enableDebug = False -- TODO: want this on command line flag
 
 ----------------------------------------------------------------------
 type Transformed = Image
@@ -39,7 +39,7 @@ data Op -- target; source
   | OpCall BareBios
   | OpPush Source
   | OpCmp Reg Source
---   | OpAddIn | OpSubIn
+  | OpSubInto Reg Source
   | OpBranchFlagZ CodeLabel
 
 data Jump
@@ -119,6 +119,7 @@ instance Show Op where
     OpCall mybios -> "call " ++ show mybios
     OpPush src -> "push " ++ show src
     OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
+    OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "bz " ++ show lab
 
 instance Show Jump where
@@ -212,11 +213,13 @@ compileCode = \case
     let res = compileRef x
     pure $ doOps
       [ OpMove argReg res
-      -- frame = cont; cont = frame[1]
-      , OpMove frameReg (SMemIndirect contReg)
+      -- frame = cont
+      , OpMove frameReg (SReg contReg)
+      -- cont = frame[1]
       , OpMove contReg (SMemIndirectOffset frameReg 1)
-      -- code = frame[0]; jmp [code]
+      -- code = frame[0]
       , OpMove Ax (SMemIndirect frameReg)
+      -- jmp [code]
       ] (Done (JumpIndirect Ax))
 
   SRC.Tail x1 _pos x2 -> do
@@ -239,7 +242,17 @@ compileCode = \case
     let ops2 = setLocation loc reg
     doOps (ops1++ops2) <$> compileCode body
 
-  SRC.PushContinuation pre post (x,later) first -> undefined pre post x later first
+  SRC.PushContinuation pre _post (_x,later) first -> do
+    lab <- compileCode later >>= CutCode
+    let
+      ops =
+        map OpPush (reverse (map compileRef pre)) ++
+        [ OpPush (SReg contReg)
+        , OpPush (SLit (VCodeLabel lab))
+        , OpMove contReg (SReg Sp)
+        ]
+    doOps ops <$> compileCode first
+
   SRC.Case scrut arms -> do
     case arms of
       [] -> undefined scrut compileArm
@@ -301,6 +314,15 @@ compileBuiltin b xs = case (b,xs) of
     , OpCall BiosPutCharInAx
     ]
   (SRC.EqChar, [s1,s2]) ->
+    [ OpMove Ax (compileRef s1)
+    , OpCmp Ax (compileRef s2)
+    , OpCall BiosMakeBoolFromFlagZ
+    ]
+  (SRC.SubInt, [s1,s2]) ->
+    [ OpMove Ax (compileRef s1)
+    , OpSubInto Ax (compileRef s2)
+    ]
+  (SRC.EqInt, [s1,s2]) ->
     [ OpMove Ax (compileRef s1)
     , OpCmp Ax (compileRef s2)
     , OpCall BiosMakeBoolFromFlagZ
@@ -404,9 +426,14 @@ execOp = \case
     v1 <- GetReg r
     v2 <- evalSource s
     --Debug ("OpCmp",v1,v2,"...")
-    let b = equalV (v1,v2)
+    let b = equalV v1 v2
     --Debug ("OpCmp",v1,v2,"...",b)
     SetFlagZ b
+    cont
+  OpSubInto r s -> \cont -> do
+    v1 <- GetReg r
+    v2 <- evalSource s
+    SetReg r (subV v1 v2)
     cont
   OpBranchFlagZ lab -> \cont -> do
     b <- GetFlagZ
@@ -456,9 +483,14 @@ execJump = \case
   Crash -> do
     error "Crash"
 
+subV :: Val -> Val -> Val
+subV v1 v2 =
+  case (v1,v2) of
+    (VNum n1,VNum n2) -> VNum (n1 - n2)
+    _ -> error (show ("subV/unexpected-types",v1,v2))
 
-equalV :: (Val,Val) -> Bool
-equalV (v1,v2) =
+equalV :: Val -> Val -> Bool
+equalV v1 v2 =
   case (v1,v2) of
     (VNum{},VNum{}) -> (v1==v2)
     (VChar{},VChar{}) -> (v1==v2)
@@ -542,9 +574,7 @@ runM Image{cmap=cmapUser} m = loop state0 m k0
         mem = Map.fromList
           [ (aFalse, VNum tFalse)
           , (aTrue, VNum tTrue)
-          , (aFinalCont, VMemAddr (addAddr 1 aFinalCont))
-          , (addAddr 1 aFinalCont, VCodeLabel finalCodeLabel)
-          , (addAddr 2 aFinalCont, VMemAddr aFinalCont) -- loop if we don't crash
+          , (aFinalCont, VCodeLabel finalCodeLabel)
           ]
 
     k0 _s () = debug "k0-ended" IDone
@@ -570,23 +600,23 @@ runM Image{cmap=cmapUser} m = loop state0 m k0
         k s (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
 
-      SetReg r v -> debug ("SetReg",r,v) $ do
+      SetReg r v -> xdebug ("SetReg",r,v) $ do
         k s { rmap = Map.insert r v rmap } ()
 
       GetReg r -> do
         --debug ("GetReg",r) $ do
           let v = maybe err id $ Map.lookup r rmap
                 where err = error (show ("GetReg/uninitialized",r))
-          debug ("GetReg",r, "->",v) $ do
+          xdebug ("GetReg",r, "->",v) $ do
             k s v
 
-      SetMem a v -> debug ("SetMem",a,v) $ do
+      SetMem a v -> xdebug ("SetMem",a,v) $ do
         k s { mem = Map.insert a v mem } ()
 
       GetMem a -> do
         let v = maybe err id $ Map.lookup a mem
               where err = error (show ("GetMem/uninitialized",a))
-        debug ("GetMem",a,"->",v) $ do
+        xdebug ("GetMem",a,"->",v) $ do
           k s v
 
       SetFlagZ b -> xdebug ("SetFlagZ",b) $ do
