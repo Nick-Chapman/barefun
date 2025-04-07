@@ -35,7 +35,10 @@ data Op -- target; source
   | OpCall BareBios
   | OpPush Source
   | OpCmp Reg Source
+  | OpAddInto Reg Source
   | OpSubInto Reg Source
+  | OpDivInto Reg Source -- TODO: check we have an op like this in x86. maybe requires specific regs
+  | OpModInto Reg Source -- TODO: check we have an op like this in x86. maybe requires specific regs
   | OpBranchFlagZ CodeLabel
 
 data Jump
@@ -83,7 +86,8 @@ data DataLabel = DataLabel String -- TODO: provenance TODO: use!
 data BareBios
   = BiosPutCharInAx
   | BiosGetCharInAx
-  | BiosMakeBoolFromFlagZ
+  | BiosMakeBoolFromFlagZ -- TODO: dedup code for Flag Z/N (if we get a 3rd flag!)
+  | BiosMakeBoolFromFlagN
   | BiosExplode -- TODO: dont want this in Bios
   | BiosHalt
 --  | BiosCheckHeapSpace -- maybe initiate GC; compile at head of each code section
@@ -108,7 +112,10 @@ instance Show Op where
     OpCall mybios -> "call " ++ show mybios
     OpPush src -> "push " ++ show src
     OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
+    OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
+    OpDivInto r src -> "div " ++ show r ++ ", " ++ show src -- TODO: check how written in x86
+    OpModInto r src -> "mod " ++ show r ++ ", " ++ show src -- TODO: check how written in x86
     OpBranchFlagZ lab ->  "bz " ++ show lab
 
 instance Show Jump where
@@ -131,9 +138,12 @@ instance Show Val where
     -- TODO: number and address look the same. fix? perhaps diff bases
     -- hmm, will make numbers look different.
     -- because simplest impl will be to tag numbers to distinguish from addresses
+    --VNum n -> printf "N:%03d" n
+    --VMemAddr (MemAddr n) -> printf "A:%03d" n
+    --VCodeLabel (CodeLabel n) -> printf "L:%03d" n
     VNum n -> show n
     VMemAddr a -> show a
-    VCodeLabel c -> show c
+    VCodeLabel lab -> show lab
 
 instance Show Reg where
   show = \case
@@ -153,7 +163,8 @@ instance Show BareBios where
   show = \case
     BiosGetCharInAx -> "bios_get_char"
     BiosPutCharInAx -> "bios_put_char"
-    BiosMakeBoolFromFlagZ -> "bios_make_bool"
+    BiosMakeBoolFromFlagZ -> "bios_make_bool_from_z"
+    BiosMakeBoolFromFlagN -> "bios_make_bool_from_n"
     BiosExplode -> "bios_explode"
     BiosHalt -> "bios_halt"
 
@@ -179,26 +190,41 @@ execCode = \case
 
 execOp :: Op -> M () -> M ()
 execOp = \case
-  OpMove r s -> \cont -> do v <- evalSource s; SetReg r v; cont
+  OpMove r s -> \cont -> do v <- evalSource "OpMove" s; SetReg r v; cont
   OpStore a r -> \cont -> do v <- GetReg r; SetMem a v; cont
   OpCall bios -> \cont -> do execBios bios; cont
   OpPush s -> \cont -> do
-    v <- evalSource s
-    a <- deMemAddr <$> GetReg Sp
+    v <- evalSource "OpPush" s
+    a <- deMemAddr "push" <$> GetReg Sp
     let a' = prevAddr a
     SetMem a' v
     SetReg Sp (VMemAddr a')
     cont
   OpCmp r s -> \cont -> do
     v1 <- GetReg r
-    v2 <- evalSource s
-    let b = equalV v1 v2
-    SetFlagZ b
+    v2 <- evalSource "OpCmp" s
+    SetFlagZ (equalV v1 v2)
+    SetFlagN (lessV v1 v2) -- i.e. a subtraction would go negative
+    cont
+  OpAddInto r s -> \cont -> do -- TODO: dedup binary op execution
+    v1 <- GetReg r
+    v2 <- evalSource "OpAddInto" s
+    SetReg r (addV v1 v2)
     cont
   OpSubInto r s -> \cont -> do
     v1 <- GetReg r
-    v2 <- evalSource s
+    v2 <- evalSource "OpSubInto" s
     SetReg r (subV v1 v2)
+    cont
+  OpDivInto r s -> \cont -> do
+    v1 <- GetReg r
+    v2 <- evalSource "OpDivInto" s
+    SetReg r (divV v1 v2)
+    cont
+  OpModInto r s -> \cont -> do
+    v1 <- GetReg r
+    v2 <- evalSource "OpModInto" s
+    SetReg r (modV v1 v2)
     cont
   OpBranchFlagZ lab -> \cont -> do
     b <- GetFlagZ
@@ -209,16 +235,29 @@ execOp = \case
         code <- GetCode lab
         execCode code
 
-evalSource :: Source -> M Val
-evalSource = \case
+
+addV :: Val -> Val -> Val
+addV = binV (+)
+
+subV :: Val -> Val -> Val -- TODO: inline all these
+subV = binV (-)
+
+divV :: Val -> Val -> Val
+divV = binV div
+
+modV :: Val -> Val -> Val
+modV = binV mod
+
+evalSource :: String -> Source -> M Val
+evalSource who = \case
   SReg r -> GetReg r
   SLit v -> pure v
   SMem a -> GetMem a
   SMemIndirect r -> do
-    a <- deMemAddr <$> GetReg r
+    a <- deMemAddr (show (who,"source-indirect")) <$> GetReg r
     GetMem a
   SMemIndirectOffset r i -> do
-    a <- deMemAddr <$> GetReg r
+    a <- deMemAddr (show (who,"source-indirect-offset")) <$> GetReg r
     GetMem (addAddr i a)
 
 execBios :: BareBios -> M ()
@@ -227,6 +266,9 @@ execBios = \case
   BiosPutCharInAx -> do c <- deChar <$> GetReg Ax; PutChar c
   BiosMakeBoolFromFlagZ -> do
     b <- GetFlagZ
+    SetReg Ax (VMemAddr (if b then aTrue else aFalse))
+  BiosMakeBoolFromFlagN -> do
+    b <- GetFlagN
     SetReg Ax (VMemAddr (if b then aTrue else aFalse))
   BiosHalt -> XHalt
   BiosExplode -> do
@@ -251,10 +293,10 @@ execJump = \case
   Crash -> do
     error "Crash"
 
-subV :: Val -> Val -> Val
-subV v1 v2 =
+binV :: (Word16 -> Word16 -> Word16) -> Val -> Val -> Val
+binV f v1 v2 =
   case (v1,v2) of
-    (VNum n1,VNum n2) -> VNum (n1 - n2)
+    (VNum n1,VNum n2) -> VNum (f n1 n2)
     _ -> error (show ("subV/unexpected-types",v1,v2))
 
 equalV :: Val -> Val -> Bool
@@ -265,8 +307,14 @@ equalV v1 v2 =
     -- We shouldn't be comparing any other values
     _ -> error (show ("equalV/unexpected-types",v1,v2))
 
-deMemAddr :: Val -> MemAddr
-deMemAddr = \case VMemAddr x -> x; v -> error (show("deMemAddr",v))
+lessV :: Val -> Val -> Bool
+lessV v1 v2 =
+  case (v1,v2) of
+    (VNum n1,VNum n2) -> (n1 < n2)
+    _ -> error (show ("lessV/unexpected-types",v1,v2))
+
+deMemAddr :: String -> Val -> MemAddr
+deMemAddr who = \case VMemAddr x -> x; v -> error (show("deMemAddr",who,v))
 
 deCodeLabel :: Val -> CodeLabel
 deCodeLabel = \case VCodeLabel x -> x; v -> error (show ("deCodeLabel", v))
@@ -301,9 +349,10 @@ data M a where
   GetMem :: MemAddr -> M Val
   SetFlagZ :: Bool -> M ()
   GetFlagZ :: M Bool
+  SetFlagN :: Bool -> M ()
+  GetFlagN :: M Bool
   PutChar :: Char -> M ()
   GetChar :: M Char
-
 
 debug :: Show a => a -> Interaction -> Interaction
 debug _ i = i -- disabled
@@ -312,10 +361,16 @@ data State = State
   { rmap :: Map Reg Val
   , mem :: Map MemAddr Val
   , flagZ :: Bool
+  , flagN :: Bool
   , countOps :: Int
   , lastCodeLabel :: CodeLabel
   , offsetFromLastLabel :: Int
   }
+
+instance Show State where
+  show State{rmap} =
+    printf "%s -- " (show (Map.toList rmap))
+
 
 runM :: TraceFlag  -> Image -> M () -> Interaction
 runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
@@ -337,6 +392,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
       { mem
       , rmap
       , flagZ = error "flagZ/uninitialized"
+      , flagN = error "flagN/uninitialized"
       , countOps = 0
       , lastCodeLabel = error "lastCodeLabel"
       , offsetFromLastLabel = error "offsetFromLastLabel"
@@ -352,13 +408,14 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
           [ (aFalse, VNum tFalse)
           , (aTrue, VNum tTrue)
           , (aFinalCont, VCodeLabel finalCodeLabel)
+          , (addAddr 1 aFinalCont, VChar 'X') -- dummy next cont
           ]
 
     k0 _s () = IDone
 
-    traceOpOJump thing s k = do
+    traceOpOJump thing s k = trace (show s) $ do
         let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
-        trace (printf "#%03d: %s.%d : %s"
+        trace (printf "#%03d: %s.%d : %s\n"
                countOps
                (show lastCodeLabel)
                offsetFromLastLabel
@@ -368,9 +425,8 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
               , offsetFromLastLabel = 1 + offsetFromLastLabel
               } ()
 
-
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
-    loop s@State{rmap,mem,flagZ} m k = case m of
+    loop s@State{rmap,mem,flagZ,flagN} m k = case m of
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       XHalt -> IDone
@@ -400,17 +456,14 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
         debug ("GetMem",a,"->",v) $ do
           k s v
 
-      SetFlagZ b -> debug ("SetFlagZ",b) $ do
-        k s { flagZ = b } ()
+      SetFlagZ b -> k s { flagZ = b } ()
+      GetFlagZ -> k s flagZ
 
-      GetFlagZ -> debug "GetFlagZ" $ do
-        k s flagZ
+      SetFlagN b -> k s { flagN = b } ()
+      GetFlagN -> k s flagN
 
       PutChar c -> IPut c (k s ())
-
-      GetChar -> do
-        IGet $ \c -> do
-          k s c
+      GetChar -> IGet $ \c -> k s c
 
 ----------------------------------------------------------------------
 -- Compile
@@ -450,28 +503,20 @@ compileTopDef = \case
       ], Sp)
 
   SRC.TopConApp (Ctag _ tag) xs -> do
-    let vs = map compileRef xs
-    pure (compileConApp tag vs, Sp)
+    pure (compileConApp tag xs, Sp)
 
 compileLit :: Literal -> ([Op],Source)
 compileLit = \case
     LitC c -> ([],SLit (VChar c))
     LitN n -> ([],SLit (VNum n))
     LitS string -> do
-      -- string rep is currently the same as a list of chars
-      -- TODO: we need a terminating Nil !
-      (compileConApp tNil [] ++
+      -- string rep is currently the same as a list of chars. TODO: do better!
+      ([OpPush (SLit (VNum tNil))] ++
         [ op
         | c <- reverse string
-        , op <- compileConApp tCons [SLit (VChar c), SReg Sp]
+        , op <- construct tCons [SLit (VChar c), SReg Sp]
         ],
        SReg Sp)
-
-compileConApp :: Word16 -> [Source] -> [Op]
-compileConApp tag ss = do
-    let sTag = SLit $ (VNum tag)
-    map OpPush (reverse (sTag : ss))
-
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -492,19 +537,20 @@ compileCode = \case
     let fun = compileRef x1
     let arg = compileRef x2
     pure $ doOps
-      -- set arg before frame, because arg might rely on the old value of frame
-      [ OpMove argReg arg
-      , OpMove frameReg fun
-      -- access code, and jump to it
-      , OpMove Ax (SMemIndirect frameReg)
-      ] (Done (JumpIndirect Ax))
+      -- (arg,frame) = ...
+      (moveTwoRegsPar (argReg,arg) (frameReg,fun) ++
+      -- code = frame[0]
+      [ OpMove Ax (SMemIndirect frameReg)
+      -- jmp [code]
+      ]) (Done (JumpIndirect Ax))
 
   SRC.LetAlias x y body -> undefined x y body
 
   SRC.LetAtomic (SRC.Ref _ loc) rhs body -> do
 
     -- fairly blindly copied from LetTop
-    (ops1,reg) <- compileA rhs
+    ops1 <- compileAtomic rhs
+    let reg = Ax
     let ops2 = setLocation loc reg
     doOps (ops1++ops2) <$> compileCode body
 
@@ -534,6 +580,27 @@ compileCode = \case
       _ ->
         undefined
 
+-- assign two regs in parallel, using a temp id required
+moveTwoRegsPar :: (Reg,Source) -> (Reg,Source) -> [Op]
+moveTwoRegsPar (r1,s1) (r2,s2) = do
+  let op1 = OpMove r1 s1
+  let op2 = OpMove r2 s2
+  let oneTwo = needs r2 s1
+  let twoOne = needs r1 s2
+  case (oneTwo,twoOne) of
+    (False,False) -> [op1,op2] -- either order will do
+    (True,True) -> undefined -- TODO: need a temp here. wait for example to provoke -- needed for fib
+    (True,_) -> [op1,op2]
+    (_,True) -> [op2,op1]
+
+needs :: Reg -> Source -> Bool
+needs r2 = \case
+  SReg r -> (r==r2)
+  SLit{} -> False
+  SMem{} -> False
+  SMemIndirect r -> (r==r2)
+  SMemIndirectOffset r _ -> (r==r2)
+
 compileArmBranch :: Source -> SRC.Arm -> CodeLabel -> Asm [Op]
 compileArmBranch s (SRC.ArmTag (Ctag _ n) _ _) lab = do
   pure [ OpMove Ax s
@@ -554,48 +621,78 @@ compileArmUnpack (SRC.Ref _ loc) i s = do -- TODO not hit yet
          , OpMove reg (SMemIndirectOffset reg i) -- TODO: so this not tried yet
          ] ++ setLocation loc reg
 
-compileA :: SRC.Atomic -> Asm ([Op],Reg)
-compileA = \case
-  SRC.Prim b xs -> do
-    pure (compileBuiltin b xs, Ax)
+compileAtomic :: SRC.Atomic -> Asm [Op]
+compileAtomic = \case
+  SRC.Prim b xs -> pure (compileBuiltin b (map compileRef xs))
+  SRC.ConApp (Ctag _ tag) xs -> pure (compileConApp tag xs)
+  SRC.Lam pre _post _x body -> compileFunction pre body
+  SRC.RecLam pre _post _f _x body -> compileFunction pre body
 
-  SRC.ConApp tag xs -> undefined tag xs
-  SRC.Lam pre post x body -> undefined pre post x body
 
-  SRC.RecLam pre _post _f _x body -> do
-    lab <- compileCode body >>= CutCode
-    pure (
-      map OpPush (reverse (map compileRef pre)) ++
-      [ OpPush (SLit (VCodeLabel lab))
-      , OpMove Ax (SReg Sp)
-      ], Ax)
+compileConApp :: Word16 -> [SRC.Ref] -> [Op]
+compileConApp tag xs = construct tag (map compileRef xs)
 
-compileBuiltin :: Builtin -> [SRC.Ref] -> [Op] -- --> Ax
+construct :: Word16 -> [Source] -> [Op]
+construct tag xs = map OpPush (reverse (SLit (VNum tag) : xs))
+
+
+compileFunction :: [SRC.Ref] -> SRC.Code -> Asm [Op]
+compileFunction freeVars body = do
+  lab <- compileCode body >>= CutCode
+  pure (
+    map OpPush (reverse (map compileRef freeVars)) ++
+    [ OpPush (SLit (VCodeLabel lab))
+    , OpMove Ax (SReg Sp)
+    ])
+
+-- TODO: target reg should be passed down
+compileBuiltin :: Builtin -> [Source] -> [Op] -- --> Ax
 compileBuiltin b xs = case (b,xs) of
   (SRC.GetChar,[_]) ->
     [ OpCall BiosGetCharInAx
     ]
-  (SRC.PutChar,[src]) ->
-    [ OpMove Ax (compileRef src)
+  (SRC.PutChar,[s1]) ->
+    [ OpMove Ax s1
     , OpCall BiosPutCharInAx
     ]
   (SRC.EqChar, [s1,s2]) ->
-    [ OpMove Ax (compileRef s1)
-    , OpCmp Ax (compileRef s2)
+    [ OpMove Ax s1
+    , OpCmp Ax s2
     , OpCall BiosMakeBoolFromFlagZ
+    ]
+  (SRC.AddInt, [s1,s2]) ->
+    [ OpMove Ax s1
+    , OpAddInto Ax s2
     ]
   (SRC.SubInt, [s1,s2]) ->
-    [ OpMove Ax (compileRef s1)
-    , OpSubInto Ax (compileRef s2)
+    [ OpMove Ax s1
+    , OpSubInto Ax s2
+    ]
+  (SRC.DivInt, [s1,s2]) ->
+    [ OpMove Ax s1
+    , OpDivInto Ax s2
+    ]
+  (SRC.ModInt, [s1,s2]) ->
+    [ OpMove Ax s1
+    , OpModInto Ax s2
     ]
   (SRC.EqInt, [s1,s2]) ->
-    [ OpMove Ax (compileRef s1)
-    , OpCmp Ax (compileRef s2)
+    [ OpMove Ax s1
+    , OpCmp Ax s2
     , OpCall BiosMakeBoolFromFlagZ
     ]
+  (SRC.LessInt, [s1,s2]) ->
+    [ OpMove Ax s1
+    , OpCmp Ax s2
+    , OpCall BiosMakeBoolFromFlagN
+    ]
   (SRC.Explode, [s1]) ->
-    [ OpMove Ax (compileRef s1)
+    [ OpMove Ax s1
     , OpCall BiosExplode
+    ]
+  (SRC.CharChr, [s1]) ->
+    [ OpMove Ax s1
+    -- null implementation because char/num have same rep
     ]
   b ->
     error (show (b,xs))
@@ -608,6 +705,7 @@ setLocation loc reg = case loc of
   SRC.InFrame n -> undefined n
   SRC.TheArg -> undefined
   SRC.TheFrame -> undefined
+
 
 compileRef :: SRC.Ref -> Source
 compileRef (SRC.Ref _ loc) = do

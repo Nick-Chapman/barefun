@@ -20,7 +20,7 @@ L3:
   mov 202, ax
   mov ax, 201
   cmp ax, 106
-  call bios_make_bool
+  call bios_make_bool_from_z
   mov 203, ax
   mov ax, 203
   mov ax, [ax]

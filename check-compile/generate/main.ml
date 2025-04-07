@@ -8,6 +8,7 @@ let select_versions_for_example = function
   | "halts" -> [4;5]
   | "evenodd" -> [4;5]
   | "hello" -> [4;5]
+  | "fib" -> [4]
   (* TODO: have [4,5] be the default for all examples *)
   | _ -> [4]
 

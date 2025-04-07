@@ -29,7 +29,7 @@ L4:
   mov 202, ax
   mov ax, 202
   cmp ax, 105
-  call bios_make_bool
+  call bios_make_bool_from_z
   mov 203, ax
   mov ax, 203
   mov ax, [ax]
@@ -44,7 +44,7 @@ L4:
 L5:
   mov ax, dx
   cmp ax, 102
-  call bios_make_bool
+  call bios_make_bool_from_z
   mov 201, ax
   mov ax, 201
   mov ax, [ax]
