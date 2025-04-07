@@ -16,6 +16,7 @@ import Value (tTrue,tFalse,tNil,tCons)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
+import qualified Data.Char as Char (chr)
 
 type Transformed = Image
 
@@ -89,6 +90,7 @@ data BareBios
   | BiosMakeBoolFromFlagZ -- TODO: dedup code for Flag Z/N (if we get a 3rd flag!)
   | BiosMakeBoolFromFlagN
   | BiosExplode -- TODO: dont want this in Bios
+  | BiosNumToChar
   | BiosHalt
 --  | BiosCheckHeapSpace -- maybe initiate GC; compile at head of each code section
 
@@ -167,6 +169,7 @@ instance Show BareBios where
     BiosMakeBoolFromFlagN -> "bios_make_bool_from_n"
     BiosExplode -> "bios_explode"
     BiosHalt -> "bios_halt"
+    BiosNumToChar -> "bios_num_to_char"
 
 ----------------------------------------------------------------------
 -- Execute
@@ -275,6 +278,12 @@ execBios = \case
     -- null execution effect because
     -- string rep == char list rep
     pure ()
+  BiosNumToChar -> do
+    -- null implementation because char/num have same rep
+    -- except not completely null for haskell execution
+    -- because we are tracking the type the Val corresponds to
+    n <- deNum <$> GetReg Ax
+    SetReg Ax (VChar (Char.chr (fromIntegral n)))
 
 -- Shouldn't matter what these specifc address are.
 -- TODO: prefer these not o be top level
@@ -321,6 +330,9 @@ deCodeLabel = \case VCodeLabel x -> x; v -> error (show ("deCodeLabel", v))
 
 deChar :: Val -> Char
 deChar = \case VChar x -> x; v -> error (show("deChar",v))
+
+deNum :: Val -> Word16
+deNum = \case VNum x -> x; v -> error (show("deNum",v))
 
 prevAddr :: MemAddr -> MemAddr
 prevAddr = addAddr (-1)
@@ -369,7 +381,7 @@ data State = State
 
 instance Show State where
   show State{rmap} =
-    printf "%s -- " (show (Map.toList rmap))
+    show (Map.toList rmap)
 
 
 runM :: TraceFlag  -> Image -> M () -> Interaction
@@ -413,7 +425,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
     k0 _s () = IDone
 
-    traceOpOJump thing s k = do --trace (show s ++ "\n") $ do
+    traceOpOJump thing s k = do -- trace (show s ++ " -- ") $ do
         let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
         trace (printf "#%03d: %s.%d : %s\n"
                countOps
@@ -692,7 +704,7 @@ compileBuiltin b xs = case (b,xs) of
     ]
   (SRC.CharChr, [s1]) ->
     [ OpMove Ax s1
-    -- null implementation because char/num have same rep
+    , OpCall BiosNumToChar
     ]
   b ->
     error (show (b,xs))

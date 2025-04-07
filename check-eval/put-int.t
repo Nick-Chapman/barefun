@@ -16,7 +16,7 @@ TODO: Stage 5 execution fails for put_int
 
   $ ../haskell/main.exe ../examples/put_int.fun -5
   [Stage5 (ASM); normalization: 141 -> 46]
-  main.exe: ("deMemAddr","(\"OpMove\",\"source-indirect\")",52)
+  main.exe: ("deMemAddr","(\"OpMove\",\"source-indirect\")",'4')
   CallStack (from HasCallStack):
-    error, called at src/Stage5_ASM.hs:317:45 in barefun-0.1.0.0-6XcQLzyaMgy6j7vUcK2FKm:Stage5_ASM
+    error, called at src/Stage5_ASM.hs:326:45 in barefun-0.1.0.0-6XcQLzyaMgy6j7vUcK2FKm:Stage5_ASM
   [1]

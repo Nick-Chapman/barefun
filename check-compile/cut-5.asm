@@ -15,6 +15,7 @@ L2_Continuation:
 
 L3_Arm2:
   mov ax, dx
+  call bios_num_to_char
   mov 202, ax
   push cx
   push #L2_Continuation

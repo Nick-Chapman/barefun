@@ -57,6 +57,7 @@ L6_Arm2:
   add ax, 202
   mov 203, ax
   mov ax, 203
+  call bios_num_to_char
   mov 204, ax
   push [bp+1]
   push 204
