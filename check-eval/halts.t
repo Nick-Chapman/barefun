@@ -26,3 +26,7 @@ Haskell REPL
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -4
   [Stage4 (CCF); normalization: 94 -> 20]
   XhYeZ[HALT:#return=1, #prim=7]
+
+  $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -5
+  [Stage5 (ASM); normalization: 94 -> 20]
+  XhYeZ[HALT:]

@@ -1,5 +1,9 @@
 (*Stage5 (ASM)*)
 start=L2
+L0:
+  call bios_halt
+  crash
+
 L1:
   call bios_get_char
   mov 201, ax
@@ -16,6 +20,7 @@ L1:
 
 L2:
   mov sp, #0
+  mov cx, #12
   push #0
   mov 102, sp
   push #0
