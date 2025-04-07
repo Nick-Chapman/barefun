@@ -23,6 +23,8 @@ import qualified Stage3_ANF as SRC (Code(..),Atomic(..),Arm(..), fvs)
 
 type Transformed = Loadable
 
+-- TODO: Better names for Loadable/Top
+
 data Loadable -- restriction of Code
   = Run Code
   | LetTop Ref Top Loadable

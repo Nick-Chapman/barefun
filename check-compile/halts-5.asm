@@ -1,12 +1,6 @@
 (*Stage5 (ASM)*)
 start=L1
-L0:
-  call bios_halt
-  crash
-
 L1:
-  mov sp, #0
-  mov cx, #12
   mov ax, #'X'
   mov 101, ax
   push #0

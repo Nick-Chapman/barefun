@@ -166,40 +166,10 @@ instance Show BareBios where
     BiosHalt -> "bios_halt"
 
 ----------------------------------------------------------------------
--- memory choices, made at compile time -- hmm, actually some only relevant for exec time
-
-aFalse,aTrue,aFinalCont :: MemAddr
--- Should matter what these specifc address are.
-aFalse = MemAddr 10
-aTrue = MemAddr 11
-aFinalCont = MemAddr 12
-
-globalOffset :: Int -> MemAddr
-globalOffset n = MemAddr (globalStart + n)
-  where globalStart = 100
-
-tempOffset :: Int -> MemAddr
-tempOffset n = MemAddr (tempStart + n)
-  where tempStart = 200
-
-initialStackPointer :: MemAddr -- stack address will be negative. TODO: what should it be?
-initialStackPointer = MemAddr 0
-
-finalCodeLabel :: CodeLabel
-finalCodeLabel = CodeLabel 0
-
-----------------------------------------------------------------------
+-- TODO: reorder code to match other stages: execute before compile
 
 compile :: SRC.Loadable -> Transformed
-compile x = runAsm (compileInit x >>= CutCode)
-
-compileInit :: SRC.Loadable -> Asm Code
-compileInit x = do
-  -- TODO: does it make sense to compile code for this initialization? or just leave it to the exec engine
-  doOps
-    [ OpMove Sp (SLit (VMemAddr initialStackPointer))
-    , OpMove Cx (SLit (VMemAddr aFinalCont))
-    ] <$> compileLoadable x
+compile x = runAsm (compileLoadable x >>= CutCode)
 
 compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
@@ -361,6 +331,15 @@ compileCtag (Ctag _ tag) = VNum tag
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
 
+
+globalOffset :: Int -> MemAddr
+globalOffset n = MemAddr (globalStart + n)
+  where globalStart = 100
+
+tempOffset :: Int -> MemAddr
+tempOffset n = MemAddr (tempStart + n)
+  where tempStart = 200
+
 ----------------------------------------------------------------------
 -- compilation monad
 
@@ -376,9 +355,8 @@ data Asm a where -- compilation monad
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
   where
-    cmap0 = Map.fromList [ (finalCodeLabel, finalCode) ]
     state0 = AsmState { u = 1 }
-    k0 _s start = Image { cmap = cmap0, dmap = Map.empty, start }
+    k0 _s start = Image { cmap = Map.empty, dmap = Map.empty, start }
 
     loop :: AsmState -> Asm a -> (AsmState -> a -> Image) -> Image
     loop s = \case
@@ -389,8 +367,6 @@ runAsm m = loop state0 m k0
         let lab = CodeLabel u
         let image@Image{cmap} = k s { u = u+1 } lab
         image { cmap = Map.insert lab code cmap }
-
-    finalCode = Do (OpCall BiosHalt) (Done Crash)
 
 data AsmState = AsmState { u :: Int }
 
@@ -462,6 +438,12 @@ execBios = \case
     SetReg Ax (VMemAddr (if b then aTrue else aFalse))
   BiosHalt -> XHalt
 
+-- Shouldn't matter what these specifc address are.
+-- TODO: prefer these not o be top level
+aFalse,aTrue :: MemAddr
+aFalse = MemAddr 10
+aTrue = MemAddr 11
+
 execJump :: Jump -> M ()
 execJump = \case
   JumpDirect{} -> undefined GetCode
@@ -529,10 +511,40 @@ xdebug _ i = i
 debug :: Show a => a -> Interaction -> Interaction
 debug a i = idebug (show a) i
 
+
+data State = State
+  { rmap :: Map Reg Val
+  , mem :: Map MemAddr Val
+  , flagZ :: Bool
+  , countOps :: Int
+  }
+
 runM :: Image -> M () -> Interaction
-runM Image{cmap} m = loop state0 m k0
+runM Image{cmap=cmapUser} m = loop state0 m k0
   -- TODO: init mem from vals portion of image -- and compile top/loadable to use it
   where
+
+    cmap = Map.insert finalCodeLabel finalCode cmapUser
+      where finalCode = Do (OpCall BiosHalt) (Done Crash)
+
+    finalCodeLabel = CodeLabel 0
+
+    state0 :: State
+    state0 = State { mem , rmap , flagZ = error "flagZ/uninitialized" , countOps = 0 }
+      where
+        initialStackPointer = MemAddr 0 -- stack address will be negative. TODO: what should it be?
+        aFinalCont = MemAddr 12 -- TODO: where? matters not but we need a consistent mem layout
+        rmap = Map.fromList
+          [ (Sp, VMemAddr initialStackPointer)
+          , (Cx, VMemAddr aFinalCont)
+          ]
+        mem = Map.fromList
+          [ (aFalse, VNum tFalse)
+          , (aTrue, VNum tTrue)
+          , (aFinalCont, VMemAddr (addAddr 1 aFinalCont))
+          , (addAddr 1 aFinalCont, VCodeLabel finalCodeLabel)
+          , (addAddr 2 aFinalCont, VMemAddr aFinalCont) -- loop if we don't crash
+          ]
 
     k0 _s () = debug "k0-ended" IDone
 
@@ -588,28 +600,3 @@ runM Image{cmap} m = loop state0 m k0
         IGet $ \c -> do --IDebug (printf "GetChar..got:%s" (show c)) $ do
           k s c
 
-
-data State = State
-  { rmap :: Map Reg Val
-  , mem :: Map MemAddr Val
-  , flagZ :: Bool
-  , countOps :: Int
-  }
-
-state0 :: State
-state0 = State
-  { mem = mem0
-  , rmap = Map.empty
-  , flagZ = error "flagZ/uninitialized"
-  , countOps = 0
-  }
-
-mem0 :: Map MemAddr Val
-mem0 = Map.fromList
-  [ (aFalse, VNum tFalse)
-  , (aTrue, VNum tTrue)
-
-  , (aFinalCont, VMemAddr (addAddr 1 aFinalCont))
-  , (addAddr 1 aFinalCont, VCodeLabel finalCodeLabel)
-  , (addAddr 2 aFinalCont, VMemAddr aFinalCont) -- loop if we don't crash
-  ]
