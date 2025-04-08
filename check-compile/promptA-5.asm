@@ -12,7 +12,7 @@ L2_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L3_TopLam:
+L3_TopLam_g4:
   call bios_get_char
   mov 201, ax
   mov ax, 201
@@ -32,7 +32,7 @@ L3_TopLam:
   bz L2_Arm2
   crash
 
-L4_TopLam:
+L4_TopLam_g1:
   mov ax, 102
   call bios_put_char
   mov 201, ax
@@ -57,11 +57,11 @@ L5_Top:
   mov 107, sp
   push #0
   mov 108, sp
-  push #L3_TopLam
+  push #L3_TopLam_g4
   mov 104, sp
   push #0
   mov 109, sp
-  push #L4_TopLam
+  push #L4_TopLam_g1
   mov 101, sp
   push #0
   mov 110, sp

@@ -27,7 +27,8 @@ runTerm i = do
       IDone -> do
         printf "[HALT:%s]\n" (show counts)
       ITrace mes i -> do
-        printf "[trace] %s" mes
+        --printf "[trace] %s" mes
+        printf "%s" mes
         loop counts i
       IPut c i -> do
         let n = ord c

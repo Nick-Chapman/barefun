@@ -6,6 +6,7 @@ module Stage5_ASM
 
 import Builtin (Builtin)
 import Control.Monad (ap,liftM)
+import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Word (Word16)
 import Interaction (Interaction(..))
@@ -14,9 +15,9 @@ import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
 import Value (tTrue,tFalse,tNil,tCons)
 import qualified Builtin as SRC (Builtin(..))
+import qualified Data.Char as Char (chr)
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
-import qualified Data.Char as Char (chr)
 
 type Transformed = Image
 
@@ -381,8 +382,7 @@ data State = State
 
 instance Show State where
   show State{rmap} =
-    show (Map.toList rmap)
-
+    intercalate " " [ show k ++ "=" ++ show v | (k,v) <- Map.toList rmap ]
 
 runM :: TraceFlag  -> Image -> M () -> Interaction
 runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
@@ -425,7 +425,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
     k0 _s () = IDone
 
-    traceOpOJump thing s k = do -- trace (show s ++ " -- ") $ do
+    traceOpOJump thing s k = trace (show s ++ " -- ") $ do
         let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
         trace (printf "#%03d: %s.%d : %s\n"
                countOps
@@ -495,13 +495,13 @@ compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (SRC.Ref _ loc) rhs body -> do
-    (ops1,reg) <- compileTopDef rhs
+    (ops1,reg) <- compileTopDef (show loc) rhs
     let ops2 = setLocation loc reg
     doOps (ops1++ops2) <$> compileLoadable body
 
 -- TODO: TopDefs should really really not generate Push instructions. But instead should generate static data structures.
-compileTopDef ::SRC.Top -> Asm ([Op],Reg)
-compileTopDef = \case
+compileTopDef ::String -> SRC.Top -> Asm ([Op],Reg)
+compileTopDef who = \case
   SRC.TopLit x -> do
     let (ops,source) = compileLit x
     pure
@@ -509,7 +509,7 @@ compileTopDef = \case
       ],Ax)
   SRC.TopPrim b xs -> undefined b xs
   SRC.TopLam _x body -> do
-    lab <- compileCode body >>= CutCode "TopLam"
+    lab <- compileCode body >>= CutCode ("TopLam_"++who)
     pure (
       [ OpPush (SLit (VCodeLabel lab))
       ], Sp)
@@ -561,13 +561,12 @@ compileCode = \case
   SRC.LetAtomic (SRC.Ref _ loc) rhs body -> do
 
     -- fairly blindly copied from LetTop
-    ops1 <- compileAtomic rhs
-    let reg = Ax
+    (ops1,reg) <- compileAtomic (show loc) rhs
     let ops2 = setLocation loc reg
     doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
-    lab <- compileCode later >>= CutCode "Continuation"
+    lab <- compileCode later >>= CutCode "Cont"
     let
       ops =
         map OpPush (reverse (map compileRef pre)) ++
@@ -633,12 +632,12 @@ compileArmUnpack (SRC.Ref _ loc) i s = do -- TODO not hit yet
          , OpMove reg (SMemIndirectOffset reg i) -- TODO: so this not tried yet
          ] ++ setLocation loc reg
 
-compileAtomic :: SRC.Atomic -> Asm [Op]
-compileAtomic = \case
-  SRC.Prim b xs -> pure (compileBuiltin b (map compileRef xs))
-  SRC.ConApp (Ctag _ tag) xs -> pure (compileConApp tag xs)
-  SRC.Lam pre _post _x body -> compileFunction pre body
-  SRC.RecLam pre _post _f _x body -> compileFunction pre body
+compileAtomic :: String -> SRC.Atomic -> Asm ([Op],Reg)
+compileAtomic who = \case
+  SRC.Prim b xs -> pure (compileBuiltin b (map compileRef xs), Ax)
+  SRC.ConApp (Ctag _ tag) xs -> pure (compileConApp tag xs, Sp)
+  SRC.Lam pre _post _x body -> compileFunction who pre body
+  SRC.RecLam pre _post _f _x body -> compileFunction who pre body
 
 
 compileConApp :: Word16 -> [SRC.Ref] -> [Op]
@@ -648,14 +647,14 @@ construct :: Word16 -> [Source] -> [Op]
 construct tag xs = map OpPush (reverse (SLit (VNum tag) : xs))
 
 
-compileFunction :: [SRC.Ref] -> SRC.Code -> Asm [Op]
-compileFunction freeVars body = do
-  lab <- compileCode body >>= CutCode "Function"
+compileFunction :: String -> [SRC.Ref] -> SRC.Code -> Asm ([Op],Reg) -- --> Ax
+compileFunction who freeVars body = do
+  lab <- compileCode body >>= CutCode ("Func_" ++ who)
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (VCodeLabel lab))
-    , OpMove Ax (SReg Sp)
-    ])
+    , OpMove Ax (SReg Sp) -- TODO: can be avoided
+    ],Ax)
 
 -- TODO: target reg should be passed down
 compileBuiltin :: Builtin -> [Source] -> [Op] -- --> Ax

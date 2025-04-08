@@ -7,7 +7,7 @@ L1_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L2_Continuation:
+L2_Cont:
   mov bp, dx
   mov dx, 103
   mov ax, [bp]
@@ -18,14 +18,14 @@ L3_Arm2:
   call bios_num_to_char
   mov 202, ax
   push cx
-  push #L2_Continuation
+  push #L2_Cont
   mov cx, sp
   mov dx, 202
   mov bp, 101
   mov ax, [bp]
   jmp [ax]
 
-L4_Function:
+L4_Func_t1:
   mov ax, dx
   cmp ax, 102
   call bios_make_bool_from_z
@@ -40,9 +40,9 @@ L4_Function:
   bz L3_Arm2
   crash
 
-L5_TopLam:
+L5_TopLam_g1:
   push dx
-  push #L4_Function
+  push #L4_Func_t1
   mov ax, sp
   mov 201, ax
   mov dx, 201
@@ -51,7 +51,7 @@ L5_TopLam:
   mov ax, [bp]
   jmp [ax]
 
-L6_Continuation:
+L6_Cont:
   mov ax, dx
   call bios_put_char
   mov 201, ax
@@ -61,9 +61,9 @@ L6_Continuation:
   mov ax, [bp]
   jmp [ax]
 
-L7_Continuation:
+L7_Cont:
   push cx
-  push #L6_Continuation
+  push #L6_Cont
   mov cx, sp
   mov bp, dx
   mov dx, 105
@@ -75,14 +75,14 @@ L8_Top:
   mov 102, ax
   mov ax, #0
   mov 103, ax
-  push #L5_TopLam
+  push #L5_TopLam_g1
   mov 101, sp
   mov ax, #'X'
   mov 104, ax
   mov ax, #52
   mov 105, ax
   push cx
-  push #L7_Continuation
+  push #L7_Cont
   mov cx, sp
   mov dx, 104
   mov bp, 101

@@ -22,7 +22,7 @@ L2_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L3_TopLam:
+L3_TopLam_g1:
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
@@ -33,14 +33,14 @@ L3_TopLam:
   bz L2_Arm2
   crash
 
-L4_TopLam:
+L4_TopLam_g3:
   mov dx, dx
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L5_Continuation:
+L5_Cont:
   mov ax, dx
   call bios_explode
   mov 201, ax
@@ -52,9 +52,9 @@ L5_Continuation:
 L6_Top:
   push #0
   mov 102, sp
-  push #L3_TopLam
+  push #L3_TopLam_g1
   mov 101, sp
-  push #L4_TopLam
+  push #L4_TopLam_g3
   mov 103, sp
   push #0
   push sp
@@ -102,7 +102,7 @@ L6_Top:
   mov ax, sp
   mov 104, ax
   push cx
-  push #L5_Continuation
+  push #L5_Cont
   mov cx, sp
   mov dx, 104
   mov bp, 103
