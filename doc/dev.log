@@ -42,6 +42,26 @@ Fri 28 Mar 2025 : instrument haskell eval; improve ANF
 
 Mon 31 Mar 2025 : instrument norm; improve globalization, cleanup
 Tue 01 Apr 2025 : thrice example; constant folding (needs Wrap/Reset)
-Wed 02 Apr 2025 : dune automation; evenodd/tree examples; stages 0(AST),1(EXP),2(NBE),3(ANF),4(CCF)... 5(ASM)...WIP
-Thu 03 Apr 2025 :
-Fri 04 Apr 2025 :
+Wed 02 Apr 2025 : dune automation; evenodd/tree; stages 0(AST),1(EXP),2(NBE),3(ANF),4(CCF)... begin stage 5(ASM)
+Thu 03 Apr 2025 : stage5: compilation
+Fri 04 Apr 2025 : stage5: execution - first example works: tiny
+
+Mon 07 Apr 2025 : stage5: more examples. towards fib.. debugging hell: put_int
+Tue 08 Apr 2025 : stage5: fixed put_int
+Wed 09 Apr 2025 :
+Thu 10 Apr 2025 :
+Fri 11 Apr 2025 :
+
+Mon 14 Apr 2025 :
+Tue 15 Apr 2025 :
+Wed 16 Apr 2025 :
+Thu 17 Apr 2025 : **Romania
+Fri 18 Apr 2025 : **Romania
+
+Mon 21 Apr 2025 : **Romania
+Tue 22 Apr 2025 :
+Wed 23 Apr 2025 :
+Thu 24 Apr 2025 :
+Fri 25 Apr 2025 :
+
+Mon 28 Apr 2025 :
