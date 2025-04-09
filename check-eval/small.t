@@ -62,3 +62,13 @@ Haskell REPL
   > Good bye.
   Good bye.
   > [EOF:#push-continuation=35, #enter=120, #return=33, #prim=112]
+
+  $ cat small.input | ../haskell/main.exe ../examples/small.fun -5
+  [Stage5 (ASM); normalization: 176 -> 113]
+  LOAD
+  RUN
+  > Hello, World!
+  Hello, World!
+  > Good bye.
+  Good bye.
+  > [EOF:#op=2562]

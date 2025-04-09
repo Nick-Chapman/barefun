@@ -28,3 +28,8 @@
   [Stage4 (CCF); normalization: 106 -> 86]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT:#return=1, #prim=29]
+
+  $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -5
+  [Stage5 (ASM); normalization: 106 -> 86]
+  @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
+  [HALT:#op=151]

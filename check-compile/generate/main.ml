@@ -1,18 +1,11 @@
 
 
 let select_versions_for_example = function
-  | "small" -> [0;1;2;3;4]
   | "tiny" -> [0;1;2;3;4;5]
-  | "promptA" -> [4;5]
-  | "promptB" -> [4;5]
-  | "halts" -> [4;5]
-  | "evenodd" -> [4;5]
-  | "hello" -> [4;5]
-  | "put_int" -> [4;5]
-  | "cut" -> [4;5]
-  | "fib" -> [4;5]
-  (* TODO: have [4,5] be the default for all examples *)
-  | _ -> [4]
+  | "small" -> [1;2;3;4;5]
+  | "tree" -> [4] (* TODO: make it compile *)
+  | "shell" -> [4] (* TODO: make it compile *)
+  | _ -> [4;5]
 
 let suffix_of_version v =
   if v >= 0 && v <= 4 then "ml" else
