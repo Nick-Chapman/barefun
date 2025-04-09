@@ -2,7 +2,6 @@
 
 let select_versions_for_example = function
   | "tiny" -> [0;1;2;3;4;5]
-  | "shell" -> [4] (* TODO: make it compile *)
   | _ -> [4;5]
 
 let suffix_of_version v =

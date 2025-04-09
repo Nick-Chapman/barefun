@@ -15,7 +15,7 @@ import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
 import Value (tTrue,tFalse,tNil,tCons)
 import qualified Builtin as SRC (Builtin(..))
-import qualified Data.Char as Char (chr)
+import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(..))
 import qualified Stage4_CCF as SRC
@@ -41,6 +41,7 @@ data Op -- target; source
   | OpCmp Reg Source
   | OpAddInto Reg Source
   | OpSubInto Reg Source
+  | OpMulInto Reg Source
   | OpDivInto Reg Source -- TODO: check we have an op like this in x86. maybe requires specific regs
   | OpModInto Reg Source -- TODO: check we have an op like this in x86. maybe requires specific regs
   | OpBranchFlagZ CodeLabel
@@ -94,6 +95,7 @@ data BareBios
   | BiosMakeBoolFromFlagN
   | BiosExplode -- TODO: dont want this in Bios
   | BiosNumToChar
+  | BiosCharToNum
   | BiosHalt
 --  | BiosCheckHeapSpace -- maybe initiate GC; compile at head of each code section
 
@@ -120,6 +122,7 @@ instance Show Op where
     OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
+    OpMulInto r src -> "mul " ++ show r ++ ", " ++ show src
     OpDivInto r src -> "div " ++ show r ++ ", " ++ show src -- TODO: check how written in x86
     OpModInto r src -> "mod " ++ show r ++ ", " ++ show src -- TODO: check how written in x86
     OpBranchFlagZ lab ->  "bz " ++ show lab
@@ -174,6 +177,7 @@ instance Show BareBios where
     BiosExplode -> "bios_explode"
     BiosHalt -> "bios_halt"
     BiosNumToChar -> "bios_num_to_char"
+    BiosCharToNum -> "bios_char_to_num"
 
 ----------------------------------------------------------------------
 -- Execute
@@ -225,6 +229,11 @@ execOp = \case
     v2 <- evalSource "OpSubInto" s
     SetReg r (subV v1 v2)
     cont
+  OpMulInto r s -> \cont -> do
+    v1 <- GetReg r
+    v2 <- evalSource "OpMulInto" s
+    SetReg r (mulV v1 v2)
+    cont
   OpDivInto r s -> \cont -> do
     v1 <- GetReg r
     v2 <- evalSource "OpDivInto" s
@@ -251,6 +260,9 @@ addV = binV (+)
 subV :: Val -> Val -> Val -- TODO: inline all these
 subV = binV (-)
 
+mulV :: Val -> Val -> Val
+mulV = binV (*)
+
 divV :: Val -> Val -> Val
 divV = binV div
 
@@ -258,7 +270,7 @@ modV :: Val -> Val -> Val
 modV = binV mod
 
 evalSource :: String -> Source -> M Val
-evalSource who = \case
+evalSource who = \case -- TODO: loose who
   SReg r -> GetReg r
   SLit v -> pure v
   SMem a -> GetMem a
@@ -284,12 +296,15 @@ execBios = \case
     -- null execution effect because
     -- string rep == char list rep
     pure ()
+  -- On real hardware Num/Char will have overlapping representations
+  -- such that ord/chr have null implementations
   BiosNumToChar -> do
-    -- null implementation because char/num have same rep
-    -- except not completely null for haskell execution
-    -- because we are tracking the type the Val corresponds to
     n <- deNum <$> GetReg Ax
     SetReg Ax (VChar (Char.chr (fromIntegral n)))
+  BiosCharToNum -> do
+    c <- deChar <$> GetReg Ax
+    SetReg Ax (VNum (fromIntegral $ Char.ord c))
+
 
 -- Shouldn't matter what these specifc address are.
 -- TODO: prefer these not o be top level
@@ -704,6 +719,10 @@ compileBuiltin b xs = case (b,xs) of
     [ OpMove Ax s1
     , OpSubInto Ax s2
     ]
+  (SRC.MulInt, [s1,s2]) ->
+    [ OpMove Ax s1
+    , OpMulInto Ax s2
+    ]
   (SRC.DivInt, [s1,s2]) ->
     [ OpMove Ax s1
     , OpDivInto Ax s2
@@ -729,6 +748,10 @@ compileBuiltin b xs = case (b,xs) of
   (SRC.CharChr, [s1]) ->
     [ OpMove Ax s1
     , OpCall BiosNumToChar
+    ]
+  (SRC.CharOrd, [s1]) ->
+    [ OpMove Ax s1
+    , OpCall BiosCharToNum
     ]
   b ->
     error (show (b,xs))
