@@ -60,93 +60,93 @@ L1: ; Start
   mov 129, ax
   mov ax, 101
   call bios_put_char
-  mov 201, ax
+  mov 1, ax
   mov ax, 102
   call bios_put_char
-  mov 202, ax
+  mov 2, ax
   mov ax, 103
   call bios_put_char
-  mov 203, ax
+  mov 3, ax
   mov ax, 104
   call bios_put_char
-  mov 204, ax
+  mov 4, ax
   mov ax, 105
   call bios_put_char
-  mov 205, ax
+  mov 5, ax
   mov ax, 106
   call bios_put_char
-  mov 206, ax
+  mov 6, ax
   mov ax, 107
   call bios_put_char
-  mov 207, ax
+  mov 7, ax
   mov ax, 108
   call bios_put_char
-  mov 208, ax
+  mov 8, ax
   mov ax, 109
   call bios_put_char
-  mov 209, ax
+  mov 9, ax
   mov ax, 110
   call bios_put_char
-  mov 210, ax
+  mov 10, ax
   mov ax, 111
   call bios_put_char
-  mov 211, ax
+  mov 11, ax
   mov ax, 112
   call bios_put_char
-  mov 212, ax
+  mov 12, ax
   mov ax, 113
   call bios_put_char
-  mov 213, ax
+  mov 13, ax
   mov ax, 114
   call bios_put_char
-  mov 214, ax
+  mov 14, ax
   mov ax, 115
   call bios_put_char
-  mov 215, ax
+  mov 15, ax
   mov ax, 116
   call bios_put_char
-  mov 216, ax
+  mov 16, ax
   mov ax, 117
   call bios_put_char
-  mov 217, ax
+  mov 17, ax
   mov ax, 118
   call bios_put_char
-  mov 218, ax
+  mov 18, ax
   mov ax, 119
   call bios_put_char
-  mov 219, ax
+  mov 19, ax
   mov ax, 120
   call bios_put_char
-  mov 220, ax
+  mov 20, ax
   mov ax, 121
   call bios_put_char
-  mov 221, ax
+  mov 21, ax
   mov ax, 122
   call bios_put_char
-  mov 222, ax
+  mov 22, ax
   mov ax, 123
   call bios_put_char
-  mov 223, ax
+  mov 23, ax
   mov ax, 124
   call bios_put_char
-  mov 224, ax
+  mov 24, ax
   mov ax, 125
   call bios_put_char
-  mov 225, ax
+  mov 25, ax
   mov ax, 126
   call bios_put_char
-  mov 226, ax
+  mov 26, ax
   mov ax, 127
   call bios_put_char
-  mov 227, ax
+  mov 27, ax
   mov ax, 128
   call bios_put_char
-  mov 228, ax
+  mov 28, ax
   mov ax, 129
   call bios_put_char
-  mov 229, ax
+  mov 29, ax
   ;; (0'0) Return: prim_0'0 (t29)
-  mov dx, 229
+  mov dx, 29
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]

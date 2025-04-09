@@ -12,15 +12,15 @@ L2: ; Function: g1
   cmp [bx], #0
   bz L1
   mov ax, [bx+1]
-  mov 201, ax
+  mov 1, ax
   mov ax, [bx+2]
-  mov 202, ax
-  mov ax, 201
+  mov 2, ax
+  mov ax, 1
   call bios_put_char
-  mov 203, ax
+  mov 3, ax
   ;; (5'39) Tail: put_chars (g1) @ xsMore (t2)
   mov bp, 101
-  mov dx, 202
+  mov dx, 2
   mov ax, [bp]
   jmp [ax]
 
@@ -35,10 +35,10 @@ L3: ; Function: g3
 L4: ; Continuation
   mov ax, dx
   call bios_explode
-  mov 201, ax
+  mov 1, ax
   ;; (9'29) Tail: put_chars (g1) @ prim_0'0 (t1)
   mov bp, 101
-  mov dx, 201
+  mov dx, 1
   mov ax, [bp]
   jmp [ax]
 

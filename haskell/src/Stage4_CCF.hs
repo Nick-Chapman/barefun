@@ -60,6 +60,10 @@ firstFrameIndexForContinuations = 2
 firstTempIndex = 1
 firstGlobalIndex = 1
 
+-- need 29 temps for the thrice example; no reason to not have more; but want to known when required
+maxTempIndex :: Int
+maxTempIndex = 30
+
 ----------------------------------------------------------------------
 -- Show
 
@@ -251,7 +255,8 @@ compileCtop = compileC firstTempIndex
       SRC.LetAtomic x rhs body -> do
         compileA x cenv rhs >>= \case
           Left rhs -> do -- not gloablized
-            let xRef = Ref x (Temp nextTemp)
+            let xRef = Ref x (Temp (if nextTemp > maxTempIndex then err else nextTemp))
+                  where err = error (show ("too many temps",nextTemp))
             cenv <- pure $ Map.insert x xRef cenv
             body <- compileC (nextTemp+1) cenv body
             pure $ LetAtomic xRef rhs body

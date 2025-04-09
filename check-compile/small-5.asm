@@ -12,15 +12,15 @@ L2: ; Function: g1
   cmp [bx], #0
   bz L1
   mov ax, [bx+1]
-  mov 201, ax
+  mov 1, ax
   mov ax, [bx+2]
-  mov 202, ax
-  mov ax, 201
+  mov 2, ax
+  mov ax, 1
   call bios_put_char
-  mov 203, ax
+  mov 3, ax
   ;; (5'39) Tail: put_chars (g1) @ xsMore (t2)
   mov bp, 101
-  mov dx, 202
+  mov dx, 2
   mov ax, [bp]
   jmp [ax]
 
@@ -46,29 +46,29 @@ L5: ; Function: t1
   cmp [bx], #0
   bz L3
   mov ax, [bx+1]
-  mov 201, ax
+  mov 1, ax
   mov ax, [bx+2]
-  mov 202, ax
+  mov 2, ax
   push [bp+1]
-  push 201
+  push 1
   push #1
-  mov 203, sp
-  push 202
+  mov 3, sp
+  push 2
   push cx
   push #L4
   mov cx, sp
   ;; (13'27) Tail: revloop (g24) @ con_0'0 (t3)
   mov bp, 124
-  mov dx, 203
+  mov dx, 3
   mov ax, [bp]
   jmp [ax]
 
 L6: ; Function: g24
   push dx
   push #L5
-  mov 201, sp
+  mov 1, sp
   ;; (0'0) Return: lam_10'22 (t1)
-  mov dx, 201
+  mov dx, 1
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -86,7 +86,7 @@ L7: ; Continuation
 L8: ; Arm: 23'27
   mov ax, 123
   call bios_put_char
-  mov 203, ax
+  mov 3, ax
   push dx
   push cx
   push #L7
@@ -99,31 +99,31 @@ L8: ; Arm: 23'27
 
 L9: ; Function: g20
   call bios_get_char
-  mov 201, ax
-  mov ax, 201
+  mov 1, ax
+  mov ax, 1
   cmp ax, 122
   call bios_make_bool_from_z
-  mov 202, ax
-  mov bx, 202
+  mov 2, ax
+  mov bx, 2
   cmp [bx], #1
   bz L8
-  mov ax, 201
+  mov ax, 1
   call bios_put_char
-  mov 203, ax
+  mov 3, ax
   push dx
-  push 201
+  push 1
   push #1
-  mov 204, sp
+  mov 4, sp
   ;; (24'33) Tail: readloop (g20) @ con_0'0 (t4)
   mov bp, 120
-  mov dx, 204
+  mov dx, 4
   mov ax, [bp]
   jmp [ax]
 
 L10: ; Continuation
   mov ax, 127
   call bios_put_char
-  mov 201, ax
+  mov 1, ax
   ;; (34'10) Tail: mainloop (g14) @ con_34'10 (g28)
   mov bp, 114
   mov dx, 128

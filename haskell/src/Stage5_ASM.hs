@@ -307,12 +307,6 @@ execBios = \case
     SetReg Ax (VNum (fromIntegral $ Char.ord c))
 
 
--- Shouldn't matter what these specifc address are.
--- TODO: prefer these not o be top level
-aFalse,aTrue :: MemAddr
-aFalse = MemAddr 10
-aTrue = MemAddr 11
-
 execJump :: Jump -> M ()
 execJump = \case
   JumpDirect{} -> undefined GetCode
@@ -432,7 +426,6 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
       }
       where
         initialStackPointer = MemAddr 0 -- stack address will be negative
-        aFinalCont = MemAddr 12 -- TODO: where? matters not but we need a consistent mem layout
         rmap = Map.fromList
           [ (Sp, VMemAddr initialStackPointer)
           , (Cx, VMemAddr aFinalCont)
@@ -497,6 +490,21 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
       PutChar c -> IPut c (k s ())
       GetChar -> IGet $ \c -> k s c
+
+
+-- Address for User Temps: 1..30
+-- Address for runtime system constants: 90,91,92
+-- Address for User Globals: 101..
+tempOffset :: Int -> MemAddr
+tempOffset n = MemAddr n
+
+aFalse,aTrue,aFinalCont :: MemAddr
+aFalse = MemAddr 90
+aTrue = MemAddr 91
+aFinalCont = MemAddr 92
+
+globalOffset :: Int -> MemAddr
+globalOffset n = MemAddr (n + 100)
 
 ----------------------------------------------------------------------
 -- Compile
@@ -761,20 +769,6 @@ compileRef (SRC.Ref _ loc) = do
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
-
--- TODO: too many globals will crash into the temps! -- happens for shell example
--- make a quick hack so globals go 101.199, 301.. (leaving a gap for 100 temps)
--- this is just so I dont change the numbers for most example's asm output
--- while I am still checking the evaluation for shell works
--- will have a think and make a proper fix in a mo
-globalOffset :: Int -> MemAddr
-globalOffset n = MemAddr (globalStart + n + tempHole)
-  where globalStart = 100
-        tempHole = if n >= 100 then 100 else 0
-
-tempOffset :: Int -> MemAddr
-tempOffset n = MemAddr (tempStart + n)
-  where tempStart = 200
 
 ppRef :: SRC.Ref -> String
 ppRef (SRC.Ref id loc) =

@@ -2,12 +2,12 @@
 L1: ; Function: g1
   mov bx, dx
   mov ax, [bx+1]
-  mov 201, ax
-  mov ax, 201
+  mov 1, ax
+  mov ax, 1
   call bios_put_char
-  mov 202, ax
+  mov 2, ax
   ;; (0'0) Return: prim_0'0 (t2)
-  mov dx, 202
+  mov dx, 2
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]

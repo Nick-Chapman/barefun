@@ -1,13 +1,13 @@
 (*Stage5 (ASM)*)
 L1: ; Function: g1
   call bios_get_char
-  mov 201, ax
-  mov ax, 201
+  mov 1, ax
+  mov ax, 1
   call bios_put_char
-  mov 202, ax
-  mov ax, 201
+  mov 2, ax
+  mov ax, 1
   call bios_put_char
-  mov 203, ax
+  mov 3, ax
   ;; (7'13) Tail: mainloop (g1) @ con_7'13 (g3)
   mov bp, 101
   mov dx, 103

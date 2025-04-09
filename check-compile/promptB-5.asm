@@ -8,15 +8,15 @@ L1: ; Arm: 9'27
 
 L2: ; Function: t3
   call bios_get_char
-  mov 201, ax
-  mov ax, 201
+  mov 1, ax
+  mov ax, 1
   call bios_put_char
-  mov 202, ax
-  mov ax, 201
+  mov 2, ax
+  mov ax, 1
   cmp ax, 104
   call bios_make_bool_from_z
-  mov 203, ax
-  mov bx, 203
+  mov 3, ax
+  mov bx, 3
   cmp [bx], #1
   bz L1
   ;; (9'51) Tail: inner (me) @ con_9'51 (g5)
@@ -28,15 +28,15 @@ L2: ; Function: t3
 L3: ; Function: g1
   mov ax, dx
   call bios_put_char
-  mov 201, ax
+  mov 1, ax
   mov ax, 102
   call bios_put_char
-  mov 202, ax
+  mov 2, ax
   push dx
   push #L2
-  mov 203, sp
+  mov 3, sp
   ;; (11'7) Tail: inner (t3) @ con_11'7 (g6)
-  mov bp, 203
+  mov bp, 3
   mov dx, 106
   mov ax, [bp]
   jmp [ax]

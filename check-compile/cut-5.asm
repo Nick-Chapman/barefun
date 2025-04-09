@@ -18,28 +18,28 @@ L3: ; Function: t1
   mov ax, dx
   cmp ax, 102
   call bios_make_bool_from_z
-  mov 201, ax
-  mov bx, 201
+  mov 1, ax
+  mov bx, 1
   cmp [bx], #1
   bz L1
   mov ax, dx
   call bios_num_to_char
-  mov 202, ax
+  mov 2, ax
   push cx
   push #L2
   mov cx, sp
   ;; (4'9) Tail: loop (g1) @ prim_0'0 (t2)
   mov bp, 101
-  mov dx, 202
+  mov dx, 2
   mov ax, [bp]
   jmp [ax]
 
 L4: ; Function: g1
   push dx
   push #L3
-  mov 201, sp
+  mov 1, sp
   ;; (0'0) Return: lam_2'17 (t1)
-  mov dx, 201
+  mov dx, 1
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -48,9 +48,9 @@ L4: ; Function: g1
 L5: ; Continuation
   mov ax, dx
   call bios_put_char
-  mov 201, ax
+  mov 1, ax
   ;; (0'0) Return: prim_0'0 (t1)
-  mov dx, 201
+  mov dx, 1
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
