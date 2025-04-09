@@ -596,26 +596,32 @@ compileCode = \case
     doOps ops <$> compileCode first
 
   SRC.Case scrut arms -> do
-    case arms of
+    case reverse arms of
       [] -> error "match expression with no arms: should not be allowed by syntax"
-      arms -> do
+      lastArm:armsR -> do
         let scrutReg = Bx -- indexable in cmp op
         let ops1 = [ OpMove scrutReg (compileRef scrut) ]
-        ops2 <- concat <$> mapM (compileArm scrutReg) arms
-        pure $ doOps (ops1 ++ ops2) (Done Crash)
+        ops2 <- concat <$> mapM (compileArm scrutReg) (reverse armsR)
+        doOps (ops1 ++ ops2) <$> compileArmTaken scrutReg lastArm
 
 compileArm :: Reg -> SRC.Arm -> Asm [Op]
 compileArm scrutReg arm =  do
-  let (SRC.ArmTag pos (Ctag _ n) xs rhs) = arm
-  let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg i)
-                     , setLocation loc Ax ]
-                   | (i,SRC.Ref _ loc) <- zip [1..] xs
-                   ]
-  code <- doOps ops <$> compileCode rhs
+  let (SRC.ArmTag pos (Ctag _ n) _xs _rhs) = arm
+  code <- compileArmTaken scrutReg arm
   lab <- CutCode ("Arm: " ++ show pos) code
   pure [ OpCmp (SMemIndirect scrutReg) (SLit (VNum n))
        , OpBranchFlagZ lab
        ]
+
+compileArmTaken :: Reg -> SRC.Arm -> Asm Code
+compileArmTaken scrutReg arm =  do
+  let (SRC.ArmTag _pos _tag xs rhs) = arm
+  let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg i)
+                     , setLocation loc Ax ]
+                   | (i,SRC.Ref _ loc) <- zip [1..] xs
+                   ]
+  doOps ops <$> compileCode rhs
+
 
 -- assign two regs in parallel, using a temp id required
 moveTwoRegsPar :: (Reg,Source) -> (Reg,Source) -> [Op]

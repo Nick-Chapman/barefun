@@ -94,4 +94,4 @@ repoduce: nic@Mosh:~/code/barefun$ echo 'fib xx' | dune exec haskell/main.exe ex
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#op=1522089]
+  > [EOF:#op=1459811]

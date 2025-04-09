@@ -6,14 +6,7 @@ L1: ; Arm: 10'29
   mov ax, [bp]
   jmp [ax]
 
-L2: ; Arm: 10'43
-  ;; (10'54) Tail: inner (g4) @ con_10'54 (g8)
-  mov bp, 104
-  mov dx, 108
-  mov ax, [bp]
-  jmp [ax]
-
-L3: ; Function: g4
+L2: ; Function: g4
   call bios_get_char
   mov 201, ax
   mov ax, 201
@@ -26,11 +19,13 @@ L3: ; Function: g4
   mov bx, 203
   cmp [bx], #1
   bz L1
-  cmp [bx], #0
-  bz L2
-  crash
+  ;; (10'54) Tail: inner (g4) @ con_10'54 (g8)
+  mov bp, 104
+  mov dx, 108
+  mov ax, [bp]
+  jmp [ax]
 
-L4: ; Function: g1
+L3: ; Function: g1
   mov ax, 102
   call bios_put_char
   mov 201, ax
@@ -43,7 +38,7 @@ L4: ; Function: g1
   mov ax, [bp]
   jmp [ax]
 
-L5: ; Start
+L4: ; Start
   mov ax, #'%'
   mov 102, ax
   mov ax, #' '
@@ -56,11 +51,11 @@ L5: ; Start
   mov 107, sp
   push #0
   mov 108, sp
-  push #L3
+  push #L2
   mov 104, sp
   push #0
   mov 109, sp
-  push #L4
+  push #L3
   mov 101, sp
   push #0
   mov 110, sp

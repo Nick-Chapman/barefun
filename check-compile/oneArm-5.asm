@@ -1,5 +1,6 @@
 (*Stage5 (ASM)*)
-L1: ; Arm: 10'14
+L1: ; Function: g1
+  mov bx, dx
   mov ax, [bx+1]
   mov 201, ax
   mov ax, 201
@@ -12,14 +13,8 @@ L1: ; Arm: 10'14
   mov ax, [bp]
   jmp [ax]
 
-L2: ; Function: g1
-  mov bx, dx
-  cmp [bx], #0
-  bz L1
-  crash
-
-L3: ; Start
-  push #L2
+L2: ; Start
+  push #L1
   mov 101, sp
   mov ax, #'x'
   mov 102, ax

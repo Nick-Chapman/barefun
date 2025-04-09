@@ -31,7 +31,7 @@ Haskell (A)
   % This is line one.
   % Another
   % And one more!
-  % [EOF:#op=779]
+  % [EOF:#op=705]
 
 Haskell (B)
 
@@ -48,4 +48,4 @@ TODO: promptB/-5
   % This is line one.
   % Another
   % And one more!
-  % [EOF:#op=785]
+  % [EOF:#op=711]
