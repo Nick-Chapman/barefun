@@ -21,4 +21,4 @@ Haskell REPL
   $ ../haskell/main.exe ../examples/hello.fun -5
   [Stage5 (ASM); normalization: 108 -> 24]
   Hello, world!
-  [HALT:#op=374]
+  [HALT:#op=303]

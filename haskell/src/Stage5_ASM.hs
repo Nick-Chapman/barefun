@@ -83,7 +83,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | RegWhat
 data MemAddr = MemAddr Int -- needs to be a numbers, so we can do offseting
   deriving (Eq,Ord)
 
-data CodeLabel = CodeLabel Int String -- unique labels is enough; TODO: add provenance
+data CodeLabel = CodeLabel Int String -- unique label and provenance
   deriving (Eq,Ord)
 
 data DataLabel = DataLabel String -- TODO: provenance TODO: use!
@@ -431,7 +431,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
       , offsetFromLastLabel = error "offsetFromLastLabel"
       }
       where
-        initialStackPointer = MemAddr 0 -- stack address will be negative. TODO: what should it be?
+        initialStackPointer = MemAddr 0 -- stack address will be negative
         aFinalCont = MemAddr 12 -- TODO: where? matters not but we need a consistent mem layout
         rmap = Map.fromList
           [ (Sp, VMemAddr initialStackPointer)
@@ -517,7 +517,7 @@ compileLoadable = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (SRC.Ref _ loc) rhs body -> do
     (ops1,reg) <- compileTopDef (show loc) rhs
-    let ops2 = setLocation loc reg
+    let ops2 = [setLocation loc reg]
     doOps (ops1++ops2) <$> compileLoadable body
 
 -- TODO: TopDefs should really really not generate Push instructions. But instead should generate static data structures.
@@ -581,7 +581,7 @@ compileCode = \case
 
     -- fairly blindly copied from LetTop
     (ops1,reg) <- compileAtomic (show loc) rhs
-    let ops2 = setLocation loc reg
+    let ops2 = [setLocation loc reg]
     doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
@@ -599,22 +599,21 @@ compileCode = \case
     case arms of
       [] -> error "match expression with no arms: should not be allowed by syntax"
       arms -> do
-        ops <- concat <$> mapM (compileArm (compileRef scrut)) arms
-        pure $ doOps ops (Done Crash)
+        let scrutReg = Bx -- indexable in cmp op
+        let ops1 = [ OpMove scrutReg (compileRef scrut) ]
+        ops2 <- concat <$> mapM (compileArm scrutReg) arms
+        pure $ doOps (ops1 ++ ops2) (Done Crash)
 
-compileArm :: Source -> SRC.Arm -> Asm [Op]
-compileArm scrut arm =  do
+compileArm :: Reg -> SRC.Arm -> Asm [Op]
+compileArm scrutReg arm =  do
   let (SRC.ArmTag pos (Ctag _ n) xs rhs) = arm
-  let ops = concat [ [ OpMove Ax scrut
-                     , OpMove Ax (SMemIndirectOffset Ax i)
-                     ] ++ setLocation loc Ax
+  let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg i)
+                     , setLocation loc Ax ]
                    | (i,SRC.Ref _ loc) <- zip [1..] xs
                    ]
   code <- doOps ops <$> compileCode rhs
   lab <- CutCode ("Arm: " ++ show pos) code
-  pure [ OpMove Ax scrut
-       , OpMove Ax (SMemIndirect Ax)
-       , OpCmp (SReg Ax) (SLit (VNum n))
+  pure [ OpCmp (SMemIndirect scrutReg) (SLit (VNum n))
        , OpBranchFlagZ lab
        ]
 
@@ -735,10 +734,10 @@ compileBuiltin b xs = case (b,xs) of
   b ->
     error (show (b,xs))
 
-setLocation :: SRC.Location -> Reg -> [Op]
+setLocation :: SRC.Location -> Reg -> Op
 setLocation loc reg = case loc of
-  SRC.Global n -> [OpStore (globalOffset n) reg]
-  SRC.Temp n -> [OpStore (tempOffset n) reg]
+  SRC.Global n -> OpStore (globalOffset n) reg
+  SRC.Temp n -> OpStore (tempOffset n) reg
   -- TODO: dont think any of these will be possible. perhaps rejig types in Stage4 to make that clear
   SRC.InFrame n -> undefined n
   SRC.TheArg -> undefined

@@ -16,4 +16,4 @@ TODO: Stage 5 execution fails for put_int
 
   $ ../haskell/main.exe ../examples/cut.fun -5
   [Stage5 (ASM); normalization: 96 -> 20]
-  4[HALT:#op=88]
+  4[HALT:#op=84]

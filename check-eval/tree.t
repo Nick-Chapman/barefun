@@ -13,4 +13,4 @@ Haskell REPL
 
   $ ../haskell/main.exe ../examples/tree.fun -5
   [Stage5 (ASM); normalization: 178 -> 95]
-  955[HALT:#op=444]
+  955[HALT:#op=397]

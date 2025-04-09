@@ -1,7 +1,6 @@
 (*Stage5 (ASM)*)
 L1: ; Arm: 10'14
-  mov ax, dx
-  mov ax, [ax+1]
+  mov ax, [bx+1]
   mov 201, ax
   mov ax, 201
   call bios_put_char
@@ -14,9 +13,8 @@ L1: ; Arm: 10'14
   jmp [ax]
 
 L2: ; Function: g1
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #0
+  mov bx, dx
+  cmp [bx], #0
   bz L1
   crash
 

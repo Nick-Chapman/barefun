@@ -8,11 +8,9 @@ L1: ; Arm: 4'7
   jmp [ax]
 
 L2: ; Arm: 5'14
-  mov ax, dx
-  mov ax, [ax+1]
+  mov ax, [bx+1]
   mov 201, ax
-  mov ax, dx
-  mov ax, [ax+2]
+  mov ax, [bx+2]
   mov 202, ax
   mov ax, 201
   call bios_put_char
@@ -24,13 +22,10 @@ L2: ; Arm: 5'14
   jmp [ax]
 
 L3: ; Function: g1
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #0
+  mov bx, dx
+  cmp [bx], #0
   bz L1
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #1
+  cmp [bx], #1
   bz L2
   crash
 
@@ -52,11 +47,9 @@ L5: ; Continuation
   jmp [ax]
 
 L6: ; Arm: 13'16
-  mov ax, dx
-  mov ax, [ax+1]
+  mov ax, [bx+1]
   mov 201, ax
-  mov ax, dx
-  mov ax, [ax+2]
+  mov ax, [bx+2]
   mov 202, ax
   push [bp+1]
   push 201
@@ -73,13 +66,10 @@ L6: ; Arm: 13'16
   jmp [ax]
 
 L7: ; Function: t1
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #0
+  mov bx, dx
+  cmp [bx], #0
   bz L4
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #1
+  cmp [bx], #1
   bz L6
   crash
 
@@ -138,13 +128,10 @@ L12: ; Function: g20
   cmp ax, 122
   call bios_make_bool_from_z
   mov 202, ax
-  mov ax, 202
-  mov ax, [ax]
-  cmp ax, #1
+  mov bx, 202
+  cmp [bx], #1
   bz L10
-  mov ax, 202
-  mov ax, [ax]
-  cmp ax, #0
+  cmp [bx], #0
   bz L11
   crash
 

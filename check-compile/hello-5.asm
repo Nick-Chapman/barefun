@@ -8,11 +8,9 @@ L1: ; Arm: 4'7
   jmp [ax]
 
 L2: ; Arm: 5'14
-  mov ax, dx
-  mov ax, [ax+1]
+  mov ax, [bx+1]
   mov 201, ax
-  mov ax, dx
-  mov ax, [ax+2]
+  mov ax, [bx+2]
   mov 202, ax
   mov ax, 201
   call bios_put_char
@@ -24,13 +22,10 @@ L2: ; Arm: 5'14
   jmp [ax]
 
 L3: ; Function: g1
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #0
+  mov bx, dx
+  cmp [bx], #0
   bz L1
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #1
+  cmp [bx], #1
   bz L2
   crash
 

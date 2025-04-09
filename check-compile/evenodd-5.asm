@@ -33,13 +33,10 @@ L4: ; Arm: 4'37
   cmp ax, 105
   call bios_make_bool_from_z
   mov 203, ax
-  mov ax, 203
-  mov ax, [ax]
-  cmp ax, #1
+  mov bx, 203
+  cmp [bx], #1
   bz L2
-  mov ax, 203
-  mov ax, [ax]
-  cmp ax, #0
+  cmp [bx], #0
   bz L3
   crash
 
@@ -48,13 +45,10 @@ L5: ; Function: g1
   cmp ax, 102
   call bios_make_bool_from_z
   mov 201, ax
-  mov ax, 201
-  mov ax, [ax]
-  cmp ax, #1
+  mov bx, 201
+  cmp [bx], #1
   bz L1
-  mov ax, 201
-  mov ax, [ax]
-  cmp ax, #0
+  cmp [bx], #0
   bz L4
   crash
 
@@ -89,13 +83,10 @@ L9: ; Continuation
   push cx
   push #L6
   mov cx, sp
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #1
+  mov bx, dx
+  cmp [bx], #1
   bz L7
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #0
+  cmp [bx], #0
   bz L8
   crash
 
@@ -132,13 +123,10 @@ L13: ; Continuation
   push cx
   push #L10
   mov cx, sp
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #1
+  mov bx, dx
+  cmp [bx], #1
   bz L11
-  mov ax, dx
-  mov ax, [ax]
-  cmp ax, #0
+  cmp [bx], #0
   bz L12
   crash
 

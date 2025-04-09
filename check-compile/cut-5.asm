@@ -32,13 +32,10 @@ L4: ; Function: t1
   cmp ax, 102
   call bios_make_bool_from_z
   mov 201, ax
-  mov ax, 201
-  mov ax, [ax]
-  cmp ax, #1
+  mov bx, 201
+  cmp [bx], #1
   bz L1
-  mov ax, 201
-  mov ax, [ax]
-  cmp ax, #0
+  cmp [bx], #0
   bz L3
   crash
 

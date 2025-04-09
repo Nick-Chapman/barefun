@@ -23,13 +23,10 @@ L3: ; Function: t3
   cmp ax, 104
   call bios_make_bool_from_z
   mov 203, ax
-  mov ax, 203
-  mov ax, [ax]
-  cmp ax, #1
+  mov bx, 203
+  cmp [bx], #1
   bz L1
-  mov ax, 203
-  mov ax, [ax]
-  cmp ax, #0
+  cmp [bx], #0
   bz L2
   crash
 
