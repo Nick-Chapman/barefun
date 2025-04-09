@@ -17,6 +17,7 @@ import Value (tTrue,tFalse,tNil,tCons)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Char as Char (chr)
 import qualified Data.Map as Map
+import qualified Interaction as I (Tickable(..))
 import qualified Stage4_CCF as SRC
 
 type Transformed = Image
@@ -187,6 +188,7 @@ execImage Image{start} = GetCode start >>= execCode
 
 execCode :: Code -> M ()
 execCode = \case
+  Do (OpComment{}) code -> execCode code
   Do op code -> do
     TraceOp op -- TODO: move to compile time to allow debug on qemu/real-hardware
     execOp op (execCode code)
@@ -196,7 +198,7 @@ execCode = \case
 
 execOp :: Op -> M () -> M ()
 execOp = \case
-  OpComment _ -> \cont -> cont
+  OpComment{} -> error "execOp/OpComment"
   OpMove r s -> \cont -> do v <- evalSource "OpMove" s; SetReg r v; cont
   OpStore a r -> \cont -> do v <- GetReg r; SetMem a v; cont
   OpCall bios -> \cont -> do execBios bios; cont
@@ -428,17 +430,17 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
     k0 _s () = IDone
 
-    traceOpOJump thing s k = trace (show s ++ " -- ") $ do
-        let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
-        trace (printf "#%03d: %s.%d : %s\n"
-               countOps
-               (show lastCodeLabel)
-               offsetFromLastLabel
-               thing
-              ) $
-          k s { countOps = 1 + countOps
-              , offsetFromLastLabel = 1 + offsetFromLastLabel
-              } ()
+    traceOpOJump thing s k = trace (show s ++ " -- ") $ ITick I.Op $ do
+      let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
+      trace (printf "#%03d: %s.%d : %s\n"
+             countOps
+             (show lastCodeLabel)
+             offsetFromLastLabel
+             thing
+            ) $
+        k s { countOps = 1 + countOps
+            , offsetFromLastLabel = 1 + offsetFromLastLabel
+            } ()
 
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
     loop s@State{rmap,mem,flagZ,flagN} m k = case m of

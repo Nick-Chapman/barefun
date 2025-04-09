@@ -48,7 +48,7 @@ instance Show Counts where
   show Counts{m} =
     intercalate ", " [ printf "#%s=%d" (show t) v | t <- all, Just v <- [Map.lookup t m] ]
     where
-      all = [App,PushContinuation,Enter,Return,Prim]
+      all = [App,PushContinuation,Enter,Return,Prim,Op] -- TODO: automate
 
 counts0 :: Counts
 counts0 = Counts { m = Map.empty }
@@ -62,6 +62,7 @@ data Tickable
   = App
   | PushContinuation | Enter | Return
   | Prim
+  | Op
   deriving (Eq,Ord)
 
 instance Show Tickable where
@@ -71,3 +72,4 @@ instance Show Tickable where
     Enter -> "enter"
     Return -> "return"
     Prim -> "prim"
+    Op -> "op"

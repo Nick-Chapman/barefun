@@ -13,4 +13,4 @@ Haskell REPL
 
   $ ../haskell/main.exe ../examples/evenodd.fun -5
   [Stage5 (ASM); normalization: 121 -> 42]
-  EO[HALT:]
+  EO[HALT:#op=1039]

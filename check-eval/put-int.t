@@ -13,4 +13,4 @@ Haskell REPL
 
   $ ../haskell/main.exe ../examples/put_int.fun -5
   [Stage5 (ASM); normalization: 141 -> 46]
-  42[HALT:]
+  42[HALT:#op=205]

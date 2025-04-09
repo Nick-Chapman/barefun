@@ -60,4 +60,4 @@ Hey, the tiny example now works in stage 5...
   
   WWoorrlldd!!
   
-  [EOF:]
+  [EOF:#op=181]
