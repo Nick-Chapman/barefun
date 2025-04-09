@@ -445,7 +445,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
     k0 _s () = IDone
 
-    traceOpOJump thing s k = trace (show s ++ " -- ") $ ITick I.Op $ do
+    traceOpOJump thing s k = trace (show s ++ " ") $ ITick I.Op $ do
       let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
       trace (printf "#%03d: %s.%d : %s\n"
              countOps
@@ -778,9 +778,15 @@ compileRef (SRC.Ref _ loc) = do
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
 
+-- TODO: too many globals will crash into the temps! -- happens for shell example
+-- make a quick hack so globals go 101.199, 301.. (leaving a gap for 100 temps)
+-- this is just so I dont change the numbers for most example's asm output
+-- while I am still checking the evaluation for shell works
+-- will have a think and make a proper fix in a mo
 globalOffset :: Int -> MemAddr
-globalOffset n = MemAddr (globalStart + n)
+globalOffset n = MemAddr (globalStart + n + tempHole)
   where globalStart = 100
+        tempHole = if n >= 100 then 100 else 0
 
 tempOffset :: Int -> MemAddr
 tempOffset n = MemAddr (tempStart + n)
