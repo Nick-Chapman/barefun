@@ -38,7 +38,7 @@ data Op -- target; source
   | OpStore MemAddr Reg -- TODO: generalise MemAddr to Target -- or maybe I dont need.
   | OpCall BareBios
   | OpPush Source
-  | OpCmp Reg Source
+  | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
   | OpAddInto Reg Source
   | OpSubInto Reg Source
   | OpMulInto Reg Source
@@ -214,9 +214,9 @@ execOp = \case
     SetMem a' v
     SetReg Sp (VMemAddr a')
     cont
-  OpCmp r s -> \cont -> do
-    v1 <- GetReg r
-    v2 <- evalSource "OpCmp" s
+  OpCmp s1 s2 -> \cont -> do
+    v1 <- evalSource "OpCmp/1" s1
+    v2 <- evalSource "OpCmp/2" s2
     SetFlagZ (equalV v1 v2)
     SetFlagN (lessV v1 v2) -- i.e. a subtraction would go negative
     cont
@@ -599,27 +599,24 @@ compileCode = \case
     case arms of
       [] -> error "match expression with no arms: should not be allowed by syntax"
       arms -> do
-        let s :: Source = compileRef scrut
-        ops <- concat <$> sequence
-          [do lab <- compileArm s arm >>= CutCode ("Arm: " ++ show pos)
-              compileArmBranch s arm lab
-          | (_i,arm@(SRC.ArmTag pos _ _ _)) <- zip [1::Int ..] arms
-          ]
+        ops <- concat <$> mapM (compileArm (compileRef scrut)) arms
         pure $ doOps ops (Done Crash)
 
-
-compileArmBranch :: Source -> SRC.Arm -> CodeLabel -> Asm [Op]
-compileArmBranch s (SRC.ArmTag _pos (Ctag _ n) _ _) lab = do
-  pure [ OpMove Ax s
+compileArm :: Source -> SRC.Arm -> Asm [Op]
+compileArm scrut arm =  do
+  let (SRC.ArmTag pos (Ctag _ n) xs rhs) = arm
+  let ops = concat [ [ OpMove Ax scrut
+                     , OpMove Ax (SMemIndirectOffset Ax i)
+                     ] ++ setLocation loc Ax
+                   | (i,SRC.Ref _ loc) <- zip [1..] xs
+                   ]
+  code <- doOps ops <$> compileCode rhs
+  lab <- CutCode ("Arm: " ++ show pos) code
+  pure [ OpMove Ax scrut
        , OpMove Ax (SMemIndirect Ax)
-       , OpCmp Ax (SLit (VNum n))
+       , OpCmp (SReg Ax) (SLit (VNum n))
        , OpBranchFlagZ lab
        ]
-
-compileArm :: Source -> SRC.Arm -> Asm Code
-compileArm s (SRC.ArmTag _pos _cid xs rhs) = do
-  ops <- sequence [ compileArmUnpack x i s | (i,x) <- zip [1..] xs ]
-  doOps (concat ops) <$> compileCode rhs
 
 -- assign two regs in parallel, using a temp id required
 moveTwoRegsPar :: (Reg,Source) -> (Reg,Source) -> [Op]
@@ -654,13 +651,6 @@ changeRegInSource r1 r2 = \case
   s@SMem{} -> s
   SMemIndirect r -> SMemIndirect (if r==r1 then r2 else r1)
   SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
-
-compileArmUnpack :: SRC.Ref -> Int -> Source -> Asm [Op]
-compileArmUnpack (SRC.Ref _ loc) i s = do -- TODO not hit yet
-  let reg = Ax
-  pure $ [ OpMove reg s
-         , OpMove reg (SMemIndirectOffset reg i) -- TODO: so this not tried yet
-         ] ++ setLocation loc reg
 
 compileAtomic :: String -> SRC.Atomic -> Asm ([Op],Reg)
 compileAtomic who = \case
@@ -697,7 +687,7 @@ compileBuiltin b xs = case (b,xs) of
     ]
   (SRC.EqChar, [s1,s2]) ->
     [ OpMove Ax s1
-    , OpCmp Ax s2
+    , OpCmp (SReg Ax) s2
     , OpCall BiosMakeBoolFromFlagZ
     ]
   (SRC.AddInt, [s1,s2]) ->
@@ -722,12 +712,12 @@ compileBuiltin b xs = case (b,xs) of
     ]
   (SRC.EqInt, [s1,s2]) ->
     [ OpMove Ax s1
-    , OpCmp Ax s2
+    , OpCmp (SReg Ax) s2
     , OpCall BiosMakeBoolFromFlagZ
     ]
   (SRC.LessInt, [s1,s2]) ->
     [ OpMove Ax s1
-    , OpCmp Ax s2
+    , OpCmp (SReg Ax) s2
     , OpCall BiosMakeBoolFromFlagN
     ]
   (SRC.Explode, [s1]) ->
