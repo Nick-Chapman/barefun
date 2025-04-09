@@ -29,7 +29,7 @@ data Exp
   | RecLam Position Bid Bid Exp
   | App Exp Position Exp
   | Let Position Bid Exp Exp
-  | Case Position Exp [Arm]
+  | Case Position Exp [Arm] -- TODO: rename Match to match ocaml-style syntax
 
 data Arm = Arm Cid [Bid] Exp
 data Cid = Cid String deriving (Eq,Ord)

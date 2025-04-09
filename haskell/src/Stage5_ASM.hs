@@ -596,8 +596,7 @@ compileCode = \case
 
   SRC.Case scrut arms -> do
     case arms of
-      [] -> undefined -- not allowed by syntax/ocaml-checker
-      [arm1] -> undefined arm1 -- TODO: need example for this
+      [] -> error "match expression with no arms: should not be allowed by syntax"
       arms -> do
         let s :: Source = compileRef scrut
         ops <- concat <$> sequence
