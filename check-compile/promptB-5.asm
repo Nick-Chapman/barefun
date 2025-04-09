@@ -1,7 +1,7 @@
 (*Stage5 (ASM)*)
 start=L5_Top
 L1_Arm1:
-  ;; (9'38) Tail: c (g1) @ c (f1)
+  ;; (9'38) Tail: outer (g1) @ c (f1)
   mov dx, [bp+1]
   mov bp, 101
   mov ax, [bp]
@@ -66,7 +66,7 @@ L5_Top:
   mov 101, sp
   mov ax, #'%'
   mov 107, ax
-  ;; (14'8) Tail: c (g1) @ lit_14'8 (g7)
+  ;; (14'8) Tail: outer (g1) @ lit_14'8 (g7)
   mov dx, 107
   mov bp, 101
   mov ax, [bp]

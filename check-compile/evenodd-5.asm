@@ -20,7 +20,7 @@ L3_Arm2:
   mov ax, 202
   sub ax, 107
   mov 204, ax
-  ;; (3'50) Tail: n (g1) @ prim_0'0 (t4)
+  ;; (3'50) Tail: is_even (g1) @ prim_0'0 (t4)
   mov dx, 204
   mov bp, 101
   mov ax, [bp]
@@ -107,7 +107,7 @@ L10_Cont:
   push cx
   push #L9_Cont
   mov cx, sp
-  ;; (8'23) Tail: n (g1) @ lit_12'8 (g11)
+  ;; (8'23) Tail: is_even (g1) @ lit_12'8 (g11)
   mov dx, 111
   mov bp, 101
   mov ax, [bp]
@@ -173,7 +173,7 @@ L14_Top:
   push cx
   push #L13_Cont
   mov cx, sp
-  ;; (8'23) Tail: n (g1) @ lit_11'8 (g8)
+  ;; (8'23) Tail: is_even (g1) @ lit_11'8 (g8)
   mov dx, 108
   mov bp, 101
   mov ax, [bp]

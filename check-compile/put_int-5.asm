@@ -18,7 +18,7 @@ L2_Arm2:
   mov ax, 201
   call bios_put_char
   mov 203, ax
-  ;; (14'35) Tail: xs (g1) @ xs (t2)
+  ;; (14'35) Tail: put_chars (g1) @ xs (t2)
   mov dx, 202
   mov bp, 101
   mov ax, [bp]
@@ -71,7 +71,7 @@ L6_Arm2:
   push cx
   push #L5_Cont
   mov cx, sp
-  ;; (7'11) Tail: acc (g3) @ con_0'0 (t5)
+  ;; (7'11) Tail: loop (g3) @ con_0'0 (t5)
   mov dx, 205
   mov bp, 103
   mov ax, [bp]
@@ -105,7 +105,7 @@ L8_TopLam_g3:
   jmp [ax]
 
 L9_Cont:
-  ;; (16'26) Tail: xs (g1) @ app_9'35 (arg)
+  ;; (16'26) Tail: put_chars (g1) @ app_9'35 (arg)
   mov dx, dx
   mov bp, 101
   mov ax, [bp]
@@ -143,7 +143,7 @@ L11_Top:
   push cx
   push #L10_Cont
   mov cx, sp
-  ;; (9'32) Tail: acc (g3) @ con_9'32 (g8)
+  ;; (9'32) Tail: loop (g3) @ con_9'32 (g8)
   mov dx, 108
   mov bp, 103
   mov ax, [bp]

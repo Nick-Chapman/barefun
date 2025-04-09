@@ -10,7 +10,6 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Word (Word16)
 import Interaction (Interaction(..))
-import Par4 (Position(..))
 import Stage0_AST (Literal(..))
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
@@ -538,7 +537,7 @@ compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return pos res -> do -- TODO: investigate misisng positions in check-compile output
     pure $ doOps
-      [ OpComment $ printf "(%s) Return: %s" (ppPos pos) (ppRef res)
+      [ OpComment $ printf "(%s) Return: %s" (show pos) (ppRef res)
       -- arg = ...
       -- frame = cont
       -- cont = frame[1]
@@ -551,7 +550,7 @@ compileCode = \case
 
   SRC.Tail fun pos arg -> do
     pure $ doOps (
-      [ OpComment $ printf "(%s) Tail: %s @ %s" (ppPos pos) (ppRef fun) (ppRef arg) ] ++
+      [ OpComment $ printf "(%s) Tail: %s @ %s" (show pos) (ppRef fun) (ppRef arg) ] ++
       -- (arg,frame) = ...
        moveTwoRegsPar (argReg,compileRef arg) (frameReg,compileRef fun) ++
       -- code = frame[0]; jmp [code]
@@ -741,13 +740,8 @@ tempOffset n = MemAddr (tempStart + n)
   where tempStart = 200
 
 ppRef :: SRC.Ref -> String
-ppRef (SRC.Ref id loc) = -- TODO: fix incorrect id seen in put_int example
+ppRef (SRC.Ref id loc) =
   show id ++ " (" ++ show loc ++ ")"
-
-ppPos :: Position -> String
-ppPos pos@(Position _r _c) =
-  --"line " ++ show _r ++ ", column " ++ show _c
-  show pos
 
 ----------------------------------------------------------------------
 -- Asm: compilation monad

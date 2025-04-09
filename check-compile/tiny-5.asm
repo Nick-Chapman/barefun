@@ -9,7 +9,7 @@ L1_TopLam_g1:
   mov ax, 201
   call bios_put_char
   mov 203, ax
-  ;; (7'13) Tail: _ (g1) @ con_7'13 (g3)
+  ;; (7'13) Tail: mainloop (g1) @ con_7'13 (g3)
   mov dx, 103
   mov bp, 101
   mov ax, [bp]
@@ -24,7 +24,7 @@ L2_Top:
   mov 101, sp
   push #0
   mov 104, sp
-  ;; (0'0) Tail: _ (g1) @ con_0'0 (g4)
+  ;; (0'0) Tail: mainloop (g1) @ con_0'0 (g4)
   mov dx, 104
   mov bp, 101
   mov ax, [bp]

@@ -281,16 +281,16 @@ compileCtop = compileC firstTempIndex
           pure $ ArmTag tag refs body
 
 compileA ::Id -> Cenv -> SRC.Atomic -> M (Either Atomic (Ref,Top))
-compileA x cenv = \case
+compileA name cenv = \case
   SRC.Lit _ literal -> do
-    g <- GlobalRef x
+    g <- GlobalRef name
     pure $ Right (g, TopLit literal)
 
   SRC.Prim _ b xs -> do
     let xs' = map (locate cenv) xs
     if isPure b && all isGlobal xs' then
       do
-        g <- GlobalRef x
+        g <- GlobalRef name
         pure $ Right (g, TopPrim b xs')
       else do
         pure $ Left $ Prim b xs'
@@ -299,7 +299,7 @@ compileA x cenv = \case
     let xs' = map (locate cenv) xs
     if all isGlobal xs' then
       do
-        g <- GlobalRef x
+        g <- GlobalRef name
         pure $ Right (g, TopConApp c xs')
       else do
         pure $ Left (ConApp c xs')
@@ -310,7 +310,7 @@ compileA x cenv = \case
     body <- compileCtop (Map.insert x xRef cenv) body
     case (pre,post) of
       ([],[]) -> do
-        g <- GlobalRef x
+        g <- GlobalRef name
         pure $ Right (g, TopLam xRef body)
       _ ->
         pure $ Left (Lam pre post xRef body)
@@ -320,7 +320,7 @@ compileA x cenv = \case
     let xRef = Ref x TheArg
     case (pre,post) of
       ([],[]) -> do
-        g <- GlobalRef x
+        g <- GlobalRef name
         let fRef = g
         body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body
         pure $ Right (g, TopLam xRef body)
