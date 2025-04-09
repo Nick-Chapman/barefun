@@ -1,6 +1,7 @@
 (*Stage5 (ASM)*)
 start=L11_Top
 L1_Arm1:
+  ;; (0'0) Return: con_13'10 (g2)
   mov dx, 102
   mov bp, cx
   mov cx, [bp+1]
@@ -17,6 +18,7 @@ L2_Arm2:
   mov ax, 201
   call bios_put_char
   mov 203, ax
+  ;; (14'35) Tail: xs (g1) @ xs (t2)
   mov dx, 202
   mov bp, 101
   mov ax, [bp]
@@ -34,6 +36,7 @@ L3_TopLam_g1:
   crash
 
 L4_Arm1:
+  ;; (5'15) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
   mov cx, [bp+1]
@@ -44,6 +47,7 @@ L5_Cont:
   mov ax, [bp+2]
   div ax, 107
   mov 201, ax
+  ;; (7'41) Tail: app_7'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
   mov dx, 201
   mov ax, [bp]
@@ -67,6 +71,7 @@ L6_Arm2:
   push cx
   push #L5_Cont
   mov cx, sp
+  ;; (7'11) Tail: acc (g3) @ con_0'0 (t5)
   mov dx, 205
   mov bp, 103
   mov ax, [bp]
@@ -92,6 +97,7 @@ L8_TopLam_g3:
   push #L7_Func_t1
   mov ax, sp
   mov 201, ax
+  ;; (0'0) Return: lam_5'19 (t1)
   mov dx, 201
   mov bp, cx
   mov cx, [bp+1]
@@ -99,6 +105,7 @@ L8_TopLam_g3:
   jmp [ax]
 
 L9_Cont:
+  ;; (16'26) Tail: xs (g1) @ app_9'35 (arg)
   mov dx, dx
   mov bp, 101
   mov ax, [bp]
@@ -108,6 +115,7 @@ L10_Cont:
   push cx
   push #L9_Cont
   mov cx, sp
+  ;; (9'35) Tail: app_9'32 (arg) @ lit_18'22 (g9)
   mov bp, dx
   mov dx, 109
   mov ax, [bp]
@@ -135,6 +143,7 @@ L11_Top:
   push cx
   push #L10_Cont
   mov cx, sp
+  ;; (9'32) Tail: acc (g3) @ con_9'32 (g8)
   mov dx, 108
   mov bp, 103
   mov ax, [bp]

@@ -10,6 +10,7 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Word (Word16)
 import Interaction (Interaction(..))
+import Par4 (Position(..))
 import Stage0_AST (Literal(..))
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
@@ -32,7 +33,8 @@ data Code
   | Done Jump
 
 data Op -- target; source
-  = OpMove Reg Source
+  = OpComment String
+  | OpMove Reg Source
   | OpStore MemAddr Reg -- TODO: generalise MemAddr to Target -- or maybe I dont need.
   | OpCall BareBios
   | OpPush Source
@@ -110,6 +112,7 @@ instance Show Code where
 
 instance Show Op where
   show = \case
+    OpComment message ->  ";; " ++ message
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
     OpStore a r -> "mov " ++ show a ++ ", " ++ show r
     OpCall mybios -> "call " ++ show mybios
@@ -194,6 +197,7 @@ execCode = \case
 
 execOp :: Op -> M () -> M ()
 execOp = \case
+  OpComment _ -> \cont -> cont
   OpMove r s -> \cont -> do v <- evalSource "OpMove" s; SetReg r v; cont
   OpStore a r -> \cont -> do v <- GetReg r; SetMem a v; cont
   OpCall bios -> \cont -> do execBios bios; cont
@@ -532,28 +536,26 @@ compileLit = \case
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
-  SRC.Return _ x -> do
-    let res = compileRef x
+  SRC.Return pos res -> do -- TODO: investigate misisng positions in check-compile output
     pure $ doOps
-      [ OpMove argReg res
+      [ OpComment $ printf "(%s) Return: %s" (ppPos pos) (ppRef res)
+      -- arg = ...
       -- frame = cont
-      , OpMove frameReg (SReg contReg)
       -- cont = frame[1]
+      , OpMove argReg (compileRef res)
+      , OpMove frameReg (SReg contReg)
       , OpMove contReg (SMemIndirectOffset frameReg 1)
-      -- code = frame[0]
+      -- code = frame[0]; jmp [code]
       , OpMove Ax (SMemIndirect frameReg)
-      -- jmp [code]
       ] (Done (JumpIndirect Ax))
 
-  SRC.Tail x1 _pos x2 -> do
-    let fun = compileRef x1
-    let arg = compileRef x2
-    pure $ doOps
+  SRC.Tail fun pos arg -> do
+    pure $ doOps (
+      [ OpComment $ printf "(%s) Tail: %s @ %s" (ppPos pos) (ppRef fun) (ppRef arg) ] ++
       -- (arg,frame) = ...
-      (moveTwoRegsPar (argReg,arg) (frameReg,fun) ++
-      -- code = frame[0]
+       moveTwoRegsPar (argReg,compileRef arg) (frameReg,compileRef fun) ++
+      -- code = frame[0]; jmp [code]
       [ OpMove Ax (SMemIndirect frameReg)
-      -- jmp [code]
       ]) (Done (JumpIndirect Ax))
 
   SRC.LetAlias x y body -> undefined x y body
@@ -737,6 +739,15 @@ globalOffset n = MemAddr (globalStart + n)
 tempOffset :: Int -> MemAddr
 tempOffset n = MemAddr (tempStart + n)
   where tempStart = 200
+
+ppRef :: SRC.Ref -> String
+ppRef (SRC.Ref id loc) = -- TODO: fix incorrect id seen in put_int example
+  show id ++ " (" ++ show loc ++ ")"
+
+ppPos :: Position -> String
+ppPos pos@(Position _r _c) =
+  --"line " ++ show _r ++ ", column " ++ show _c
+  show pos
 
 ----------------------------------------------------------------------
 -- Asm: compilation monad

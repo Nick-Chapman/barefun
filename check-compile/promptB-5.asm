@@ -1,12 +1,14 @@
 (*Stage5 (ASM)*)
 start=L5_Top
 L1_Arm1:
+  ;; (9'38) Tail: c (g1) @ c (f1)
   mov dx, [bp+1]
   mov bp, 101
   mov ax, [bp]
   jmp [ax]
 
 L2_Arm2:
+  ;; (9'51) Tail: inner (me) @ con_9'51 (g5)
   mov dx, 105
   mov bp, bp
   mov ax, [bp]
@@ -43,6 +45,7 @@ L4_TopLam_g1:
   push #L3_Func_t3
   mov ax, sp
   mov 203, ax
+  ;; (11'7) Tail: inner (t3) @ con_11'7 (g6)
   mov dx, 106
   mov bp, 203
   mov ax, [bp]
@@ -63,6 +66,7 @@ L5_Top:
   mov 101, sp
   mov ax, #'%'
   mov 107, ax
+  ;; (14'8) Tail: c (g1) @ lit_14'8 (g7)
   mov dx, 107
   mov bp, 101
   mov ax, [bp]

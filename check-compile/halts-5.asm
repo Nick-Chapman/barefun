@@ -30,6 +30,7 @@ L1_Top:
   mov ax, 105
   call bios_put_char
   mov 207, ax
+  ;; (0'0) Return: prim_0'0 (t7)
   mov dx, 207
   mov bp, cx
   mov cx, [bp+1]
