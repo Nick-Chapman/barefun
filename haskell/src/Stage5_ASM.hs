@@ -600,10 +600,15 @@ moveTwoRegsPar (r1,s1) (r2,s2) = do
   let oneTwo = needs r2 s1
   let twoOne = needs r1 s2
   case (oneTwo,twoOne) of
-    (False,False) -> [op1,op2] -- either order will do
-    (True,True) -> undefined -- TODO: need a temp here. wait for example to provoke -- needed for fib
+    (True,True) ->
+      [ OpComment "use temp ax while setting up bp/dx"
+      , OpMove Ax (SReg r1)
+      , OpMove r1 s1
+      , OpMove r2 (changeRegInSource r1 Ax s2)
+      ]
     (True,_) -> [op1,op2]
     (_,True) -> [op2,op1]
+    (False,False) -> [op1,op2] -- either order will do
 
 needs :: Reg -> Source -> Bool
 needs r2 = \case
@@ -612,6 +617,14 @@ needs r2 = \case
   SMem{} -> False
   SMemIndirect r -> (r==r2)
   SMemIndirectOffset r _ -> (r==r2)
+
+changeRegInSource :: Reg -> Reg -> Source -> Source
+changeRegInSource r1 r2 = \case
+  SReg r -> SReg (if r==r1 then r2 else r1)
+  s@SLit{} -> s
+  s@SMem{} -> s
+  SMemIndirect r -> SMemIndirect (if r==r1 then r2 else r1)
+  SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
 
 compileArmBranch :: Source -> SRC.Arm -> CodeLabel -> Asm [Op]
 compileArmBranch s (SRC.ArmTag (Ctag _ n) _ _) lab = do

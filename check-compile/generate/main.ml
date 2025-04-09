@@ -10,7 +10,7 @@ let select_versions_for_example = function
   | "hello" -> [4;5]
   | "put_int" -> [4;5]
   | "cut" -> [4;5]
-  | "fib" -> [4]
+  | "fib" -> [4;5]
   (* TODO: have [4,5] be the default for all examples *)
   | _ -> [4]
 

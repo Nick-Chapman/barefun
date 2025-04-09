@@ -32,3 +32,8 @@ Haskell REPL
   [Stage4 (CCF); normalization: 187 -> 139]
   fib 20 --> 6765
   [HALT:#push-continuation=21905, #enter=21926, #return=21906, #prim=54775]
+
+  $ ../haskell/main.exe ../examples/fib.fun -5
+  [Stage5 (ASM); normalization: 187 -> 139]
+  fib 20 --> 6765
+  [HALT:]
