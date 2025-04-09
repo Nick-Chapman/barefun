@@ -170,17 +170,17 @@ caseSelect :: Word16 -> [SemValue] -> Env -> [Arm] -> M SemValue
 caseSelect tag vs env arms = do
   let
     (xs,body) :: ([Id],Exp) =
-      case [ (xs,body) | ArmTag (Ctag _ cArm) xs body <- arms, cArm == tag ] of
+      case [ (xs,body) | ArmTag _pos (Ctag _ cArm) xs body <- arms, cArm == tag ] of
         [] -> error "reflect: case match failure"
         x:_ -> x
   reflect (foldr (uncurry Map.insert) env (zip xs vs)) body
 
 normArm :: Env -> Arm -> M Arm
-normArm env (ArmTag c xs body) = do
+normArm env (ArmTag pos c xs body) = do
   xys <- sequence [ do y <- fresh x; pure (x,y) | x <- xs ]
   let env' = foldr (uncurry Map.insert) env [ (x,syn y) | (x,y) <- xys ]
   body <- Reset (norm env' body)
-  pure $ ArmTag c (map snd xys) body
+  pure $ ArmTag pos c (map snd xys) body
 
 type Env = Map Id SemValue
 

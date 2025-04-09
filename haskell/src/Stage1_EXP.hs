@@ -32,7 +32,7 @@ data Exp
   | Let Position Id Exp Exp
   | Case Position Exp [Arm]
 
-data Arm = ArmTag Ctag [Id] Exp
+data Arm = ArmTag Position Ctag [Id] Exp
 data Ctag = Ctag Cid Word16
 
 data Id = Id
@@ -56,7 +56,7 @@ sizeExp = \case
   RecLam _ _ _ body -> 2 + sizeExp body
   App e1 _ e2 -> sizeExp e1 + sizeExp e2
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
-  Case _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _ xs rhs <- arms ]
+  Case _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
 
 ----------------------------------------------------------------------
 -- provenance
@@ -100,7 +100,7 @@ pretty = \case
   Case _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
-prettyArm (ArmTag c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
+prettyArm (ArmTag _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
 
 prettyPat :: Ctag -> [Id] -> String
 prettyPat c = \case
@@ -183,9 +183,9 @@ eval env@Env{venv} = \case
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
             [] -> error "case match failure"
-            ArmTag (Ctag _ tag) xs body : arms -> do
+            ArmTag pos (Ctag _ tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
-                if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
+                if length xs /= length vArgs then error (show ("case arm mismatch",pos,xs,vArgs)) else do
                   let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
                   eval env' body k
         dispatch arms0
@@ -246,9 +246,9 @@ trans cenv = \case
   SRC.Case p scrut arms -> Case p (trans cenv scrut) (map transArm arms)
     where
       transArm :: SRC.Arm -> Arm
-      transArm (SRC.Arm cid xs e) = do
+      transArm (SRC.Arm pos cid xs e) = do
         let (xs',cenv1) = posPropList xs cenv
-        ArmTag (transCid cenv cid) xs' (trans cenv1 e)
+        ArmTag pos (transCid cenv cid) xs' (trans cenv1 e)
 
 transId :: Cenv -> SRC.Id -> Id
 transId Cenv{xmap} x = maybe err id $ Map.lookup x xmap

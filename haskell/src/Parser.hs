@@ -293,11 +293,13 @@ gram6 = program where
     pos <- position
     key "if"
     i <- exp
+    posThen <- position
     key "then"
     t <- exp
+    posElse <- position
     key "else"
     e <- exp
-    pure (AST.Case pos i [AST.Arm cTrue [] t, AST.Arm cFalse [] e ])
+    pure (AST.Case pos i [AST.Arm posThen cTrue [] t, AST.Arm posElse cFalse [] e ])
 
   abstraction = do
     key "fun"
@@ -309,9 +311,10 @@ gram6 = program where
   arm :: Par Arm = do
     key "|"
     (c,xs) <- pat
+    pos <- position
     key "->"
     e <- exp
-    pure (AST.Arm c xs e)
+    pure (AST.Arm pos c xs e)
 
   match_ = do
     pos <- position

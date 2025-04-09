@@ -103,9 +103,10 @@ data BareBios
 -- Show
 
 instance Show Image where
-  show Image{cmap,dmap=_,start} =
-    "start=" ++ show start ++ "\n" ++
-    unlines [ show lab ++ ":\n" ++ show code | (lab,code) <- Map.toList cmap ]
+  show Image{cmap,dmap=_,start=_} =
+    -- "start=" ++ show start ++ "\n" ++
+    unlines [ printf "%s: ; %s\n%s" (show lab) provenance (show code)
+            | (lab@(CodeLabel _ provenance),code) <- Map.toList cmap ]
 
 instance Show Code where
   show = \case
@@ -165,7 +166,7 @@ instance Show Reg where
     RegWhat -> "r?"
 
 instance Show MemAddr where show (MemAddr n) = show n
-instance Show CodeLabel where show (CodeLabel n s) = "L" ++ show n ++ "_" ++ s
+instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
 instance Show DataLabel where show (DataLabel id) = "D" ++ show id
 
 instance Show BareBios where
@@ -501,7 +502,7 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 -- Compile
 
 compile :: SRC.Loadable -> Transformed
-compile x = runAsm (compileLoadable x >>= CutCode "Top")
+compile x = runAsm (compileLoadable x >>= CutCode "Start")
 
 -- Calling conventions:
 frameReg,argReg,contReg :: Reg
@@ -520,7 +521,7 @@ compileLoadable = \case
     doOps (ops1++ops2) <$> compileLoadable body
 
 -- TODO: TopDefs should really really not generate Push instructions. But instead should generate static data structures.
-compileTopDef ::String -> SRC.Top -> Asm ([Op],Reg)
+compileTopDef :: String -> SRC.Top -> Asm ([Op],Reg)
 compileTopDef who = \case
   SRC.TopLit x -> do
     let (ops,source) = compileLit x
@@ -529,7 +530,7 @@ compileTopDef who = \case
       ],Ax)
   SRC.TopPrim b xs -> undefined b xs
   SRC.TopLam _x body -> do
-    lab <- compileCode body >>= CutCode ("TopLam_"++who)
+    lab <- compileCode body >>= CutCode ("Function: " ++ who)
     pure (
       [ OpPush (SLit (VCodeLabel lab))
       ], Sp)
@@ -584,7 +585,7 @@ compileCode = \case
     doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
-    lab <- compileCode later >>= CutCode "Cont"
+    lab <- compileCode later >>= CutCode "Continuation"
     let
       ops =
         map OpPush (reverse (map compileRef pre)) ++
@@ -600,15 +601,15 @@ compileCode = \case
       arms -> do
         let s :: Source = compileRef scrut
         ops <- concat <$> sequence
-          [do lab <- compileArm s arm >>= CutCode ("Arm"++show i) -- TODO: thread position from "->" syntax
+          [do lab <- compileArm s arm >>= CutCode ("Arm: " ++ show pos)
               compileArmBranch s arm lab
-          | (i,arm) <- zip [1::Int ..] arms
+          | (_i,arm@(SRC.ArmTag pos _ _ _)) <- zip [1::Int ..] arms
           ]
         pure $ doOps ops (Done Crash)
 
 
 compileArmBranch :: Source -> SRC.Arm -> CodeLabel -> Asm [Op]
-compileArmBranch s (SRC.ArmTag (Ctag _ n) _ _) lab = do
+compileArmBranch s (SRC.ArmTag _pos (Ctag _ n) _ _) lab = do
   pure [ OpMove Ax s
        , OpMove Ax (SMemIndirect Ax)
        , OpCmp Ax (SLit (VNum n))
@@ -616,7 +617,7 @@ compileArmBranch s (SRC.ArmTag (Ctag _ n) _ _) lab = do
        ]
 
 compileArm :: Source -> SRC.Arm -> Asm Code
-compileArm s (SRC.ArmTag _c__CHECK_ME xs rhs) = do
+compileArm s (SRC.ArmTag _pos _cid xs rhs) = do
   ops <- sequence [ compileArmUnpack x i s | (i,x) <- zip [1..] xs ]
   doOps (concat ops) <$> compileCode rhs
 
@@ -678,7 +679,7 @@ construct tag xs = map OpPush (reverse (SLit (VNum tag) : xs))
 
 compileFunction :: String -> [SRC.Ref] -> SRC.Code -> Asm ([Op],Reg) -- --> Ax
 compileFunction who freeVars body = do
-  lab <- compileCode body >>= CutCode ("Func_" ++ who)
+  lab <- compileCode body >>= CutCode ("Function: " ++ who)
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (VCodeLabel lab))

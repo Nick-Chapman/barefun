@@ -1,6 +1,5 @@
 (*Stage5 (ASM)*)
-start=L22_Top
-L1_Arm1:
+L1: ; Arm: 6'13
   ;; (5'15) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -8,7 +7,7 @@ L1_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L2_Cont:
+L2: ; Continuation
   mov ax, [bp+2]
   div ax, 105
   mov 201, ax
@@ -18,7 +17,7 @@ L2_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L3_Arm2:
+L3: ; Arm: 6'22
   mov ax, dx
   mod ax, 103
   mov 202, ax
@@ -34,7 +33,7 @@ L3_Arm2:
   mov 205, sp
   push dx
   push cx
-  push #L2_Cont
+  push #L2
   mov cx, sp
   ;; (7'11) Tail: loop (g1) @ con_0'0 (t5)
   mov bp, 101
@@ -42,7 +41,7 @@ L3_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L4_Func_t1:
+L4: ; Function: t1
   mov ax, dx
   cmp ax, 102
   call bios_make_bool_from_z
@@ -50,16 +49,16 @@ L4_Func_t1:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L1_Arm1
+  bz L1
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L3_Arm2
+  bz L3
   crash
 
-L5_TopLam_g1:
+L5: ; Function: g1
   push dx
-  push #L4_Func_t1
+  push #L4
   mov 201, sp
   ;; (0'0) Return: lam_5'19 (t1)
   mov dx, 201
@@ -68,7 +67,7 @@ L5_TopLam_g1:
   mov ax, [bp]
   jmp [ax]
 
-L6_Arm1:
+L6: ; Arm: 13'7
   ;; (0'0) Return: con_13'10 (g7)
   mov dx, 107
   mov bp, cx
@@ -76,7 +75,7 @@ L6_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L7_Arm2:
+L7: ; Arm: 14'10
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -92,18 +91,18 @@ L7_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L8_TopLam_g6:
+L8: ; Function: g6
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L6_Arm1
+  bz L6
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L7_Arm2
+  bz L7
   crash
 
-L9_Arm1:
+L9: ; Arm: 27'10
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -114,7 +113,7 @@ L9_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L10_Cont:
+L10: ; Continuation
   mov ax, [bp+2]
   add ax, dx
   mov 201, ax
@@ -125,10 +124,10 @@ L10_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L11_Cont:
+L11: ; Continuation
   push dx
   push cx
-  push #L10_Cont
+  push #L10
   mov cx, sp
   ;; (28'33) Tail: eval (g8) @ e2 (f2)
   mov dx, [bp+2]
@@ -136,7 +135,7 @@ L11_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L12_Arm2:
+L12: ; Arm: 28'15
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -145,7 +144,7 @@ L12_Arm2:
   mov 202, ax
   push 202
   push cx
-  push #L11_Cont
+  push #L11
   mov cx, sp
   ;; (28'23) Tail: eval (g8) @ e1 (t1)
   mov bp, 108
@@ -153,7 +152,7 @@ L12_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L13_Cont:
+L13: ; Continuation
   mov ax, [bp+2]
   sub ax, dx
   mov 201, ax
@@ -164,10 +163,10 @@ L13_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L14_Cont:
+L14: ; Continuation
   push dx
   push cx
-  push #L13_Cont
+  push #L13
   mov cx, sp
   ;; (29'33) Tail: eval (g8) @ e2 (f2)
   mov dx, [bp+2]
@@ -175,7 +174,7 @@ L14_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L15_Arm3:
+L15: ; Arm: 29'15
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -184,7 +183,7 @@ L15_Arm3:
   mov 202, ax
   push 202
   push cx
-  push #L14_Cont
+  push #L14
   mov cx, sp
   ;; (29'23) Tail: eval (g8) @ e1 (t1)
   mov bp, 108
@@ -192,29 +191,29 @@ L15_Arm3:
   mov ax, [bp]
   jmp [ax]
 
-L16_TopLam_g8:
+L16: ; Function: g8
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L9_Arm1
+  bz L9
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L12_Arm2
+  bz L12
   mov ax, dx
   mov ax, [ax]
   cmp ax, #2
-  bz L15_Arm3
+  bz L15
   crash
 
-L17_Cont:
+L17: ; Continuation
   ;; (16'26) Tail: put_chars (g6) @ case_9'11 (arg)
   mov bp, 106
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L18_Arm1:
+L18: ; Arm: 9'20
   ;; (0'0) Return: con_9'26 (g20)
   mov dx, 120
   mov bp, cx
@@ -222,7 +221,7 @@ L18_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L19_Cont:
+L19: ; Continuation
   ;; (9'44) Tail: app_9'41 (arg) @ i (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -231,10 +230,10 @@ L19_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L20_Arm2:
+L20: ; Arm: 9'31
   push dx
   push cx
-  push #L19_Cont
+  push #L19
   mov cx, sp
   ;; (9'41) Tail: loop (g1) @ con_9'41 (g21)
   mov bp, 101
@@ -242,25 +241,25 @@ L20_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L21_Cont:
+L21: ; Continuation
   mov ax, dx
   cmp ax, 117
   call bios_make_bool_from_z
   mov 201, ax
   push cx
-  push #L17_Cont
+  push #L17
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L18_Arm1
+  bz L18
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L20_Arm2
+  bz L20
   crash
 
-L22_Top:
+L22: ; Start
   mov ax, #0
   mov 102, ax
   mov ax, #10
@@ -269,13 +268,13 @@ L22_Top:
   mov 104, ax
   mov ax, #10
   mov 105, ax
-  push #L5_TopLam_g1
+  push #L5
   mov 101, sp
   push #0
   mov 107, sp
-  push #L8_TopLam_g6
+  push #L8
   mov 106, sp
-  push #L16_TopLam_g8
+  push #L16
   mov 108, sp
   mov ax, #1000
   mov 109, ax
@@ -313,7 +312,7 @@ L22_Top:
   push #0
   mov 121, sp
   push cx
-  push #L21_Cont
+  push #L21
   mov cx, sp
   ;; (37'16) Tail: eval (g8) @ con_34'15 (g16)
   mov bp, 108

@@ -1,6 +1,5 @@
 (*Stage5 (ASM)*)
-start=L2_Top
-L1_TopLam_g1:
+L1: ; Function: g1
   call bios_get_char
   mov 201, ax
   mov ax, 201
@@ -15,12 +14,12 @@ L1_TopLam_g1:
   mov ax, [bp]
   jmp [ax]
 
-L2_Top:
+L2: ; Start
   push #0
   mov 102, sp
   push #0
   mov 103, sp
-  push #L1_TopLam_g1
+  push #L1
   mov 101, sp
   push #0
   mov 104, sp

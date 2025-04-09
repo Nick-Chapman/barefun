@@ -1,6 +1,5 @@
 (*Stage5 (ASM)*)
-start=L3_Top
-L1_Arm1:
+L1: ; Arm: 10'14
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -14,15 +13,15 @@ L1_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L2_TopLam_g1:
+L2: ; Function: g1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L1_Arm1
+  bz L1
   crash
 
-L3_Top:
-  push #L2_TopLam_g1
+L3: ; Start
+  push #L2
   mov 101, sp
   mov ax, #'x'
   mov 102, ax

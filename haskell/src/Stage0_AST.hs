@@ -31,7 +31,7 @@ data Exp
   | Let Position Bid Exp Exp
   | Case Position Exp [Arm] -- TODO: rename Match to match ocaml-style syntax
 
-data Arm = Arm Cid [Bid] Exp
+data Arm = Arm Position Cid [Bid] Exp
 data Cid = Cid String deriving (Eq,Ord)
 data Literal = LitC Char | LitN Word16 | LitS String
 
@@ -89,7 +89,7 @@ pretty = \case
   Case _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
-prettyArm (Arm c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
+prettyArm (Arm _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
 
 prettyPat :: Cid -> [Bid] -> String
 prettyPat c = \case
@@ -168,11 +168,11 @@ eval env@Env{venv,cenv} = \case
           dispatch arms = case arms of
             [] ->
               error "case match failure"
-            Arm cid xs body : arms -> do
+            Arm pos cid xs body : arms -> do
               let tag = maybe err id $ Map.lookup cid cenv
                     where err = error (show ("cenv-lookup",cid))
               if tag /= tagActual then dispatch arms else do
-                if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
+                if length xs /= length vArgs then error (show ("case arm mismatch",pos,xs,vArgs)) else do
                   let env' = foldr (uncurry insert) env (zip xs vArgs)
                   eval env' body k
         dispatch arms0

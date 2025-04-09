@@ -1,6 +1,5 @@
 (*Stage5 (ASM)*)
-start=L6_Top
-L1_Arm1:
+L1: ; Arm: 4'7
   ;; (0'0) Return: con_4'10 (g2)
   mov dx, 102
   mov bp, cx
@@ -8,7 +7,7 @@ L1_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L2_Arm2:
+L2: ; Arm: 5'14
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -24,18 +23,18 @@ L2_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L3_TopLam_g1:
+L3: ; Function: g1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L1_Arm1
+  bz L1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L2_Arm2
+  bz L2
   crash
 
-L4_TopLam_g3:
+L4: ; Function: g3
   ;; (7'26) Return: x (arg)
   mov dx, dx
   mov bp, cx
@@ -43,7 +42,7 @@ L4_TopLam_g3:
   mov ax, [bp]
   jmp [ax]
 
-L5_Cont:
+L5: ; Continuation
   mov ax, dx
   call bios_explode
   mov 201, ax
@@ -53,12 +52,12 @@ L5_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L6_Top:
+L6: ; Start
   push #0
   mov 102, sp
-  push #L3_TopLam_g1
+  push #L3
   mov 101, sp
-  push #L4_TopLam_g3
+  push #L4
   mov 103, sp
   push #0
   push sp
@@ -106,7 +105,7 @@ L6_Top:
   mov ax, sp
   mov 104, ax
   push cx
-  push #L5_Cont
+  push #L5
   mov cx, sp
   ;; (9'45) Tail: block (g3) @ lit_12'13 (g4)
   mov bp, 103

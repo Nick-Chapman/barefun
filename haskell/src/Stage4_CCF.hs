@@ -43,7 +43,7 @@ data Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Case Ref [Arm]
 
-data Arm = ArmTag Ctag [Ref] Code
+data Arm = ArmTag Position Ctag [Ref] Code
 
 data Atomic
   = Prim Builtin [Ref]
@@ -114,7 +114,7 @@ prettyA = \case
 
 prettyArm :: Arm -> Lines
 prettyArm = \case
-  ArmTag c xs rhs ->
+  ArmTag _pos c xs rhs ->
     ("| " ++ prettyPat c xs ++ " ->")
     >>> prettyC rhs
 
@@ -189,9 +189,9 @@ evalCode genv env = \case
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
             [] -> error "case match failure"
-            ArmTag (Ctag _ tag) xs body : arms -> do
+            ArmTag pos (Ctag _ tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
-                if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
+                if length xs /= length vArgs then error (show ("case arm mismatch",pos,xs,vArgs)) else do
                   let env' = foldr (uncurry insert) env (zip xs vArgs)
                   evalCode genv env' body k
         dispatch arms0
@@ -274,11 +274,11 @@ compileCtop = compileC firstTempIndex
 
       where
         compileArm :: SRC.Arm -> M Arm
-        compileArm (SRC.ArmTag tag xs body) = do
+        compileArm (SRC.ArmTag pos tag xs body) = do
           let refs = [ Ref x (Temp n) | (x,n) <- zip xs [nextTemp..] ]
           cenv <- pure $ foldr (uncurry Map.insert) cenv (zip xs refs)
           body <- compileC (nextTemp + length xs) cenv body
-          pure $ ArmTag tag refs body
+          pure $ ArmTag pos tag refs body
 
 compileA ::Id -> Cenv -> SRC.Atomic -> M (Either Atomic (Ref,Top))
 compileA name cenv = \case

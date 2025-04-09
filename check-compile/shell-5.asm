@@ -1,15 +1,14 @@
 (*Stage5 (ASM)*)
-start=L369_Top
-L1_Func_t1:
+L1: ; Function: t1
   ;; (2'54) Tail: f (f1) @ a (arg)
   mov bp, [bp+1]
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L2_TopLam_g1:
+L2: ; Function: g1
   push dx
-  push #L1_Func_t1
+  push #L1
   mov 201, sp
   ;; (0'0) Return: lam_2'31 (t1)
   mov dx, 201
@@ -18,7 +17,7 @@ L2_TopLam_g1:
   mov ax, [bp]
   jmp [ax]
 
-L3_TopLam_g2:
+L3: ; Function: g2
   mov ax, dx
   call bios_explode
   mov 201, ax
@@ -29,7 +28,7 @@ L3_TopLam_g2:
   mov ax, [bp]
   jmp [ax]
 
-L4_Arm1:
+L4: ; Arm: 53'30
   ;; (0'0) Return: con_53'33 (g4)
   mov dx, 104
   mov bp, cx
@@ -37,7 +36,7 @@ L4_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L5_Arm2:
+L5: ; Arm: 53'45
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -51,18 +50,18 @@ L5_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L6_Arm1:
+L6: ; Arm: 53'7
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L4_Arm1
+  bz L4
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L5_Arm2
+  bz L5
   crash
 
-L7_Arm1:
+L7: ; Arm: 56'10
   ;; (0'0) Return: con_56'13 (g6)
   mov dx, 106
   mov bp, cx
@@ -70,7 +69,7 @@ L7_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L8_Cont:
+L8: ; Continuation
   ;; (58'37) Tail: app_58'34 (arg) @ ys (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -79,10 +78,10 @@ L8_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L9_Cont:
+L9: ; Continuation
   push [bp+3]
   push cx
-  push #L8_Cont
+  push #L8
   mov cx, sp
   ;; (58'34) Tail: app_58'31 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
@@ -92,11 +91,11 @@ L9_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L10_Arm1:
+L10: ; Arm: 58'18
   push [bp+4]
   push [bp+3]
   push cx
-  push #L9_Cont
+  push #L9
   mov cx, sp
   ;; (58'31) Tail: eq_list (g3) @ eq (f2)
   mov dx, [bp+2]
@@ -104,7 +103,7 @@ L10_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L11_Arm2:
+L11: ; Arm: 58'40
   ;; (0'0) Return: con_58'45 (g7)
   mov dx, 107
   mov bp, cx
@@ -112,23 +111,23 @@ L11_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L12_Cont:
+L12: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L10_Arm1
+  bz L10
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L11_Arm2
+  bz L11
   crash
 
-L13_Cont:
+L13: ; Continuation
   push [bp+5]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L12_Cont
+  push #L12
   mov cx, sp
   ;; (58'16) Tail: app_58'14 (arg) @ y (f4)
   ;; use temp ax while setting up bp/dx
@@ -138,7 +137,7 @@ L13_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L14_Arm2:
+L14: ; Arm: 57'13
   mov ax, dx
   mov ax, [ax+1]
   mov 203, ax
@@ -150,7 +149,7 @@ L14_Arm2:
   push 202
   push [bp+1]
   push cx
-  push #L13_Cont
+  push #L13
   mov cx, sp
   ;; (58'14) Tail: eq (f1) @ x (t1)
   mov bp, [bp+1]
@@ -158,7 +157,7 @@ L14_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L15_Arm2:
+L15: ; Arm: 54'10
   mov ax, [bp+2]
   mov ax, [ax+1]
   mov 201, ax
@@ -168,28 +167,28 @@ L15_Arm2:
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L7_Arm1
+  bz L7
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L14_Arm2
+  bz L14
   crash
 
-L16_Func_t1:
+L16: ; Function: t1
   mov ax, [bp+2]
   mov ax, [ax]
   cmp ax, #0
-  bz L6_Arm1
+  bz L6
   mov ax, [bp+2]
   mov ax, [ax]
   cmp ax, #1
-  bz L15_Arm2
+  bz L15
   crash
 
-L17_Func_t1:
+L17: ; Function: t1
   push dx
   push [bp+1]
-  push #L16_Func_t1
+  push #L16
   mov 201, sp
   ;; (0'0) Return: lam_51'22 (t1)
   mov dx, 201
@@ -198,9 +197,9 @@ L17_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L18_TopLam_g3:
+L18: ; Function: g3
   push dx
-  push #L17_Func_t1
+  push #L17
   mov 201, sp
   ;; (0'0) Return: lam_51'19 (t1)
   mov dx, 201
@@ -209,7 +208,7 @@ L18_TopLam_g3:
   mov ax, [bp]
   jmp [ax]
 
-L19_Arm1:
+L19: ; Arm: 64'7
   ;; (62'18) Return: ys (arg)
   mov dx, dx
   mov bp, cx
@@ -217,7 +216,7 @@ L19_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L20_Cont:
+L20: ; Continuation
   push dx
   push [bp+2]
   push #1
@@ -229,10 +228,10 @@ L20_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L21_Cont:
+L21: ; Continuation
   push [bp+3]
   push cx
-  push #L20_Cont
+  push #L20
   mov cx, sp
   ;; (65'31) Tail: app_65'28 (arg) @ ys (f2)
   ;; use temp ax while setting up bp/dx
@@ -242,7 +241,7 @@ L21_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L22_Arm2:
+L22: ; Arm: 65'10
   mov ax, [bp+1]
   mov ax, [ax+1]
   mov 201, ax
@@ -252,7 +251,7 @@ L22_Arm2:
   push 201
   push dx
   push cx
-  push #L21_Cont
+  push #L21
   mov cx, sp
   ;; (65'28) Tail: append (g8) @ xs (t2)
   mov bp, 108
@@ -260,20 +259,20 @@ L22_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L23_Func_t1:
+L23: ; Function: t1
   mov ax, [bp+1]
   mov ax, [ax]
   cmp ax, #0
-  bz L19_Arm1
+  bz L19
   mov ax, [bp+1]
   mov ax, [ax]
   cmp ax, #1
-  bz L22_Arm2
+  bz L22
   crash
 
-L24_TopLam_g8:
+L24: ; Function: g8
   push dx
-  push #L23_Func_t1
+  push #L23
   mov 201, sp
   ;; (0'0) Return: lam_62'18 (t1)
   mov dx, 201
@@ -282,7 +281,7 @@ L24_TopLam_g8:
   mov ax, [bp]
   jmp [ax]
 
-L25_Arm1:
+L25: ; Arm: 69'7
   ;; (67'16) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -290,7 +289,7 @@ L25_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L26_Cont:
+L26: ; Continuation
   ;; (70'34) Tail: app_70'21 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -299,7 +298,7 @@ L26_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L27_Arm2:
+L27: ; Arm: 70'10
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -312,7 +311,7 @@ L27_Arm2:
   mov 203, sp
   push 202
   push cx
-  push #L26_Cont
+  push #L26
   mov cx, sp
   ;; (70'21) Tail: revloop (g9) @ con_0'0 (t3)
   mov bp, 109
@@ -320,20 +319,20 @@ L27_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L28_Func_t1:
+L28: ; Function: t1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L25_Arm1
+  bz L25
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L27_Arm2
+  bz L27
   crash
 
-L29_TopLam_g9:
+L29: ; Function: g9
   push dx
-  push #L28_Func_t1
+  push #L28
   mov 201, sp
   ;; (0'0) Return: lam_67'20 (t1)
   mov dx, 201
@@ -342,7 +341,7 @@ L29_TopLam_g9:
   mov ax, [bp]
   jmp [ax]
 
-L30_Arm1:
+L30: ; Arm: 76'7
   ;; (0'0) Return: con_76'10 (g11)
   mov dx, 111
   mov bp, cx
@@ -350,7 +349,7 @@ L30_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L31_Cont:
+L31: ; Continuation
   push dx
   push [bp+2]
   push #1
@@ -362,10 +361,10 @@ L31_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L32_Cont:
+L32: ; Continuation
   push [bp+3]
   push cx
-  push #L31_Cont
+  push #L31
   mov cx, sp
   ;; (77'26) Tail: app_77'24 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
@@ -375,11 +374,11 @@ L32_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L33_Cont:
+L33: ; Continuation
   push dx
   push [bp+3]
   push cx
-  push #L32_Cont
+  push #L32
   mov cx, sp
   ;; (77'24) Tail: map (g10) @ f (f2)
   mov dx, [bp+2]
@@ -387,7 +386,7 @@ L33_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L34_Arm2:
+L34: ; Arm: 77'10
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -397,7 +396,7 @@ L34_Arm2:
   push 202
   push [bp+1]
   push cx
-  push #L33_Cont
+  push #L33
   mov cx, sp
   ;; (77'15) Tail: f (f1) @ x (t1)
   mov bp, [bp+1]
@@ -405,20 +404,20 @@ L34_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L35_Func_t1:
+L35: ; Function: t1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L30_Arm1
+  bz L30
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L34_Arm2
+  bz L34
   crash
 
-L36_TopLam_g10:
+L36: ; Function: g10
   push dx
-  push #L35_Func_t1
+  push #L35
   mov 201, sp
   ;; (0'0) Return: lam_74'14 (t1)
   mov dx, 201
@@ -427,7 +426,7 @@ L36_TopLam_g10:
   mov ax, [bp]
   jmp [ax]
 
-L37_Arm1:
+L37: ; Arm: 81'7
   ;; (0'0) Return: lit_81'10 (g13)
   mov dx, 113
   mov bp, cx
@@ -435,7 +434,7 @@ L37_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L38_Cont:
+L38: ; Continuation
   mov ax, 114
   add ax, dx
   mov 201, ax
@@ -446,7 +445,7 @@ L38_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L39_Arm2:
+L39: ; Arm: 82'10
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -454,7 +453,7 @@ L39_Arm2:
   mov ax, [ax+2]
   mov 202, ax
   push cx
-  push #L38_Cont
+  push #L38
   mov cx, sp
   ;; (82'27) Tail: length (g12) @ xs (t2)
   mov bp, 112
@@ -462,18 +461,18 @@ L39_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L40_TopLam_g12:
+L40: ; Function: g12
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L37_Arm1
+  bz L37
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L39_Arm2
+  bz L39
   crash
 
-L41_Arm1:
+L41: ; Arm: 95'7
   ;; (0'0) Return: con_95'10 (g16)
   mov dx, 116
   mov bp, cx
@@ -481,14 +480,14 @@ L41_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L42_Cont:
+L42: ; Continuation
   ;; (96'35) Tail: put_chars (g15) @ xs (f2)
   mov dx, [bp+2]
   mov bp, 115
   mov ax, [bp]
   jmp [ax]
 
-L43_Arm1:
+L43: ; Arm: 19'19
   mov ax, 201
   call bios_put_char
   mov 205, ax
@@ -499,7 +498,7 @@ L43_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L44_Arm1:
+L44: ; Arm: 20'22
   mov ax, 201
   call bios_put_char
   mov 206, ax
@@ -510,7 +509,7 @@ L44_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L45_Arm1:
+L45: ; Arm: 21'16
   mov ax, 201
   call bios_put_char
   mov 207, ax
@@ -521,7 +520,7 @@ L45_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L46_Arm2:
+L46: ; Arm: 21'32
   mov ax, 120
   call bios_put_char
   mov 207, ax
@@ -544,7 +543,7 @@ L46_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L47_Arm2:
+L47: ; Arm: 20'38
   mov ax, 119
   cmp ax, 203
   call bios_make_bool_from_n
@@ -552,14 +551,14 @@ L47_Arm2:
   mov ax, 206
   mov ax, [ax]
   cmp ax, #1
-  bz L45_Arm1
+  bz L45
   mov ax, 206
   mov ax, [ax]
   cmp ax, #0
-  bz L46_Arm2
+  bz L46
   crash
 
-L48_Arm2:
+L48: ; Arm: 19'35
   mov ax, 201
   cmp ax, 118
   call bios_make_bool_from_z
@@ -567,14 +566,14 @@ L48_Arm2:
   mov ax, 205
   mov ax, [ax]
   cmp ax, #1
-  bz L44_Arm1
+  bz L44
   mov ax, 205
   mov ax, [ax]
   cmp ax, #0
-  bz L47_Arm2
+  bz L47
   crash
 
-L49_Arm2:
+L49: ; Arm: 96'10
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -590,30 +589,30 @@ L49_Arm2:
   mov 204, ax
   push 202
   push cx
-  push #L42_Cont
+  push #L42
   mov cx, sp
   mov ax, 204
   mov ax, [ax]
   cmp ax, #1
-  bz L43_Arm1
+  bz L43
   mov ax, 204
   mov ax, [ax]
   cmp ax, #0
-  bz L48_Arm2
+  bz L48
   crash
 
-L50_TopLam_g15:
+L50: ; Function: g15
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L41_Arm1
+  bz L41
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L49_Arm2
+  bz L49
   crash
 
-L51_Cont:
+L51: ; Continuation
   ;; (72'28) Tail: app_72'25 (arg) @ acc (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -622,13 +621,13 @@ L51_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L52_Arm1:
+L52: ; Arm: 108'20
   mov ax, 126
   call bios_put_char
   mov 204, ax
   push dx
   push cx
-  push #L51_Cont
+  push #L51
   mov cx, sp
   ;; (72'25) Tail: revloop (g9) @ con_72'25 (g27)
   mov bp, 109
@@ -636,7 +635,7 @@ L52_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L53_Cont:
+L53: ; Continuation
   push [bp+2]
   push 137
   push #1
@@ -647,13 +646,13 @@ L53_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L54_Cont:
+L54: ; Continuation
   mov ax, 135
   call bios_put_char
   mov 201, ax
   push [bp+2]
   push cx
-  push #L53_Cont
+  push #L53
   mov cx, sp
   ;; (72'25) Tail: revloop (g9) @ con_72'25 (g36)
   mov bp, 109
@@ -661,7 +660,7 @@ L54_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L55_Arm1:
+L55: ; Arm: 19'19
   mov ax, 201
   call bios_put_char
   mov 207, ax
@@ -672,7 +671,7 @@ L55_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L56_Arm1:
+L56: ; Arm: 20'22
   mov ax, 201
   call bios_put_char
   mov 208, ax
@@ -683,7 +682,7 @@ L56_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L57_Arm1:
+L57: ; Arm: 21'16
   mov ax, 201
   call bios_put_char
   mov 209, ax
@@ -694,7 +693,7 @@ L57_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L58_Arm2:
+L58: ; Arm: 21'32
   mov ax, 132
   call bios_put_char
   mov 209, ax
@@ -717,7 +716,7 @@ L58_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L59_Arm2:
+L59: ; Arm: 20'38
   mov ax, 131
   cmp ax, 205
   call bios_make_bool_from_n
@@ -725,14 +724,14 @@ L59_Arm2:
   mov ax, 208
   mov ax, [ax]
   cmp ax, #1
-  bz L57_Arm1
+  bz L57
   mov ax, 208
   mov ax, [ax]
   cmp ax, #0
-  bz L58_Arm2
+  bz L58
   crash
 
-L60_Arm2:
+L60: ; Arm: 19'35
   mov ax, 201
   cmp ax, 130
   call bios_make_bool_from_z
@@ -740,14 +739,14 @@ L60_Arm2:
   mov ax, 207
   mov ax, [ax]
   cmp ax, #1
-  bz L56_Arm1
+  bz L56
   mov ax, 207
   mov ax, [ax]
   cmp ax, #0
-  bz L59_Arm2
+  bz L59
   crash
 
-L61_Arm1:
+L61: ; Arm: 109'26
   mov ax, 201
   call bios_char_to_num
   mov 205, ax
@@ -757,33 +756,33 @@ L61_Arm1:
   mov 206, ax
   push dx
   push cx
-  push #L54_Cont
+  push #L54
   mov cx, sp
   mov ax, 206
   mov ax, [ax]
   cmp ax, #1
-  bz L55_Arm1
+  bz L55
   mov ax, 206
   mov ax, [ax]
   cmp ax, #0
-  bz L60_Arm2
+  bz L60
   crash
 
-L62_Arm1:
+L62: ; Arm: 110'17
   ;; (110'31) Tail: readloop (g23) @ acc (arg)
   mov bp, 123
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L63_Arm1:
+L63: ; Arm: 113'15
   ;; (113'27) Tail: readloop (g23) @ acc (arg)
   mov bp, 123
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L64_Cont:
+L64: ; Continuation
   mov ax, 147
   call bios_put_char
   mov 201, ax
@@ -799,7 +798,7 @@ L64_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L65_Arm1:
+L65: ; Arm: 115'29
   mov ax, 143
   call bios_put_char
   mov 201, ax
@@ -816,7 +815,7 @@ L65_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L66_Arm2:
+L66: ; Arm: 115'48
   ;; (0'0) Return: con_115'53 (g46)
   mov dx, 146
   mov bp, cx
@@ -824,22 +823,22 @@ L66_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L67_Cont:
+L67: ; Continuation
   push [bp+2]
   push cx
-  push #L64_Cont
+  push #L64
   mov cx, sp
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L65_Arm1
+  bz L65
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L66_Arm2
+  bz L66
   crash
 
-L68_Arm1:
+L68: ; Arm: 8'9
   ;; (0'0) Return: con_8'12 (g41)
   mov dx, 141
   mov bp, cx
@@ -847,7 +846,7 @@ L68_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L69_Arm2:
+L69: ; Arm: 9'10
   ;; (0'0) Return: con_9'13 (g42)
   mov dx, 142
   mov bp, cx
@@ -855,7 +854,7 @@ L69_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L70_Arm2:
+L70: ; Arm: 114'20
   mov ax, dx
   mov ax, [ax+1]
   mov 207, ax
@@ -871,30 +870,30 @@ L70_Arm2:
   mov 210, ax
   push 208
   push cx
-  push #L67_Cont
+  push #L67
   mov cx, sp
   mov ax, 210
   mov ax, [ax]
   cmp ax, #1
-  bz L68_Arm1
+  bz L68
   mov ax, 210
   mov ax, [ax]
   cmp ax, #0
-  bz L69_Arm2
+  bz L69
   crash
 
-L71_Arm1:
+L71: ; Arm: 111'19
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L63_Arm1
+  bz L63
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L70_Arm2
+  bz L70
   crash
 
-L72_Cont:
+L72: ; Continuation
   push [bp+2]
   push [bp+3]
   push #1
@@ -905,7 +904,7 @@ L72_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L73_Arm1:
+L73: ; Arm: 19'19
   mov ax, 201
   call bios_put_char
   mov 209, ax
@@ -916,7 +915,7 @@ L73_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L74_Arm1:
+L74: ; Arm: 20'22
   mov ax, 201
   call bios_put_char
   mov 210, ax
@@ -927,7 +926,7 @@ L74_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L75_Arm1:
+L75: ; Arm: 21'16
   mov ax, 201
   call bios_put_char
   mov 211, ax
@@ -938,7 +937,7 @@ L75_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L76_Arm2:
+L76: ; Arm: 21'32
   mov ax, 153
   call bios_put_char
   mov 211, ax
@@ -961,7 +960,7 @@ L76_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L77_Arm2:
+L77: ; Arm: 20'38
   mov ax, 152
   cmp ax, 207
   call bios_make_bool_from_n
@@ -969,14 +968,14 @@ L77_Arm2:
   mov ax, 210
   mov ax, [ax]
   cmp ax, #1
-  bz L75_Arm1
+  bz L75
   mov ax, 210
   mov ax, [ax]
   cmp ax, #0
-  bz L76_Arm2
+  bz L76
   crash
 
-L78_Arm2:
+L78: ; Arm: 19'35
   mov ax, 201
   cmp ax, 151
   call bios_make_bool_from_z
@@ -984,14 +983,14 @@ L78_Arm2:
   mov ax, 209
   mov ax, [ax]
   cmp ax, #1
-  bz L74_Arm1
+  bz L74
   mov ax, 209
   mov ax, [ax]
   cmp ax, #0
-  bz L77_Arm2
+  bz L77
   crash
 
-L79_Arm2:
+L79: ; Arm: 118'8
   mov ax, 201
   call bios_char_to_num
   mov 207, ax
@@ -1002,19 +1001,19 @@ L79_Arm2:
   push 201
   push dx
   push cx
-  push #L72_Cont
+  push #L72
   mov cx, sp
   mov ax, 208
   mov ax, [ax]
   cmp ax, #1
-  bz L73_Arm1
+  bz L73
   mov ax, 208
   mov ax, [ax]
   cmp ax, #0
-  bz L78_Arm2
+  bz L78
   crash
 
-L80_Arm2:
+L80: ; Arm: 110'35
   mov ax, 202
   cmp ax, 139
   call bios_make_bool_from_z
@@ -1022,14 +1021,14 @@ L80_Arm2:
   mov ax, 206
   mov ax, [ax]
   cmp ax, #1
-  bz L71_Arm1
+  bz L71
   mov ax, 206
   mov ax, [ax]
   cmp ax, #0
-  bz L79_Arm2
+  bz L79
   crash
 
-L81_Arm2:
+L81: ; Arm: 109'82
   mov ax, 138
   cmp ax, 202
   call bios_make_bool_from_n
@@ -1037,14 +1036,14 @@ L81_Arm2:
   mov ax, 205
   mov ax, [ax]
   cmp ax, #1
-  bz L62_Arm1
+  bz L62
   mov ax, 205
   mov ax, [ax]
   cmp ax, #0
-  bz L80_Arm2
+  bz L80
   crash
 
-L82_Arm2:
+L82: ; Arm: 108'50
   mov ax, 201
   cmp ax, 128
   call bios_make_bool_from_z
@@ -1052,14 +1051,14 @@ L82_Arm2:
   mov ax, 204
   mov ax, [ax]
   cmp ax, #1
-  bz L61_Arm1
+  bz L61
   mov ax, 204
   mov ax, [ax]
   cmp ax, #0
-  bz L81_Arm2
+  bz L81
   crash
 
-L83_TopLam_g23:
+L83: ; Function: g23
   call bios_get_char
   mov 201, ax
   mov ax, 201
@@ -1072,14 +1071,14 @@ L83_TopLam_g23:
   mov ax, 203
   mov ax, [ax]
   cmp ax, #1
-  bz L52_Arm1
+  bz L52
   mov ax, 203
   mov ax, [ax]
   cmp ax, #0
-  bz L82_Arm2
+  bz L82
   crash
 
-L84_Arm1:
+L84: ; Arm: 125'11
   ;; (123'12) Return: n (arg)
   mov dx, dx
   mov bp, cx
@@ -1087,7 +1086,7 @@ L84_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L85_Cont:
+L85: ; Continuation
   mov ax, [bp+2]
   add ax, dx
   mov 201, ax
@@ -1098,13 +1097,13 @@ L85_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L86_Cont:
+L86: ; Continuation
   mov ax, [bp+2]
   sub ax, 159
   mov 201, ax
   push dx
   push cx
-  push #L85_Cont
+  push #L85
   mov cx, sp
   ;; (125'39) Tail: fib (g56) @ prim_0'0 (t1)
   mov bp, 156
@@ -1112,13 +1111,13 @@ L86_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L87_Arm2:
+L87: ; Arm: 125'18
   mov ax, dx
   sub ax, 158
   mov 202, ax
   push dx
   push cx
-  push #L86_Cont
+  push #L86
   mov cx, sp
   ;; (125'27) Tail: fib (g56) @ prim_0'0 (t2)
   mov bp, 156
@@ -1126,7 +1125,7 @@ L87_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L88_TopLam_g56:
+L88: ; Function: g56
   mov ax, dx
   cmp ax, 157
   call bios_make_bool_from_n
@@ -1134,14 +1133,14 @@ L88_TopLam_g56:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L84_Arm1
+  bz L84
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L87_Arm2
+  bz L87
   crash
 
-L89_Cont:
+L89: ; Continuation
   mov ax, dx
   mul ax, [bp+2]
   mov 201, ax
@@ -1152,13 +1151,13 @@ L89_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L90_Arm1:
+L90: ; Arm: 129'12
   mov ax, [bp+2]
   sub ax, 164
   mov 201, ax
   push [bp+2]
   push cx
-  push #L89_Cont
+  push #L89
   mov cx, sp
   ;; (129'22) Tail: fact (g60) @ prim_0'0 (t1)
   mov bp, 160
@@ -1166,7 +1165,7 @@ L90_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L91_Arm2:
+L91: ; Arm: 129'32
   ;; (0'0) Return: lit_129'37 (g65)
   mov dx, 165
   mov bp, cx
@@ -1174,18 +1173,18 @@ L91_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L92_Cont:
+L92: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L90_Arm1
+  bz L90
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L91_Arm2
+  bz L91
   crash
 
-L93_Arm1:
+L93: ; Arm: 8'9
   ;; (0'0) Return: con_8'12 (g62)
   mov dx, 162
   mov bp, cx
@@ -1193,7 +1192,7 @@ L93_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L94_Arm2:
+L94: ; Arm: 9'10
   ;; (0'0) Return: con_9'13 (g63)
   mov dx, 163
   mov bp, cx
@@ -1201,26 +1200,26 @@ L94_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L95_TopLam_g60:
+L95: ; Function: g60
   mov ax, dx
   cmp ax, 161
   call bios_make_bool_from_n
   mov 201, ax
   push dx
   push cx
-  push #L92_Cont
+  push #L92
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L93_Arm1
+  bz L93
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L94_Arm2
+  bz L94
   crash
 
-L96_Cont:
+L96: ; Continuation
   push [bp+2]
   push [bp+3]
   push #1
@@ -1231,11 +1230,11 @@ L96_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L97_Cont:
+L97: ; Continuation
   push dx
   push [bp+2]
   push cx
-  push #L96_Cont
+  push #L96
   mov cx, sp
   ;; (72'25) Tail: revloop (g9) @ con_72'25 (g68)
   mov bp, 109
@@ -1243,10 +1242,10 @@ L97_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L98_Cont:
+L98: ; Continuation
   push [bp+2]
   push cx
-  push #L97_Cont
+  push #L97
   mov cx, sp
   ;; (72'28) Tail: app_72'25 (arg) @ accCs (f3)
   ;; use temp ax while setting up bp/dx
@@ -1256,11 +1255,11 @@ L98_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L99_Arm1:
+L99: ; Arm: 196'7
   push [bp+2]
   push [bp+1]
   push cx
-  push #L98_Cont
+  push #L98
   mov cx, sp
   ;; (72'25) Tail: revloop (g9) @ con_72'25 (g67)
   mov bp, 109
@@ -1268,7 +1267,7 @@ L99_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L100_Cont:
+L100: ; Continuation
   ;; (199'65) Tail: app_199'62 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -1277,10 +1276,10 @@ L100_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L101_Cont:
+L101: ; Continuation
   push [bp+2]
   push cx
-  push #L100_Cont
+  push #L100
   mov cx, sp
   ;; (199'62) Tail: app_199'37 (arg) @ con_199'62 (g71)
   mov bp, dx
@@ -1288,14 +1287,14 @@ L101_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L102_Cont:
+L102: ; Continuation
   push [bp+2]
   push dx
   push #1
   mov 201, sp
   push [bp+3]
   push cx
-  push #L101_Cont
+  push #L101
   mov cx, sp
   ;; (199'37) Tail: splitloop (g66) @ con_0'0 (t1)
   mov bp, 166
@@ -1303,11 +1302,11 @@ L102_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L103_Cont:
+L103: ; Continuation
   push [bp+4]
   push [bp+2]
   push cx
-  push #L102_Cont
+  push #L102
   mov cx, sp
   ;; (72'28) Tail: app_72'25 (arg) @ accCs (f3)
   ;; use temp ax while setting up bp/dx
@@ -1317,12 +1316,12 @@ L103_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L104_Arm1:
+L104: ; Arm: 199'22
   push 202
   push [bp+2]
   push [bp+1]
   push cx
-  push #L103_Cont
+  push #L103
   mov cx, sp
   ;; (72'25) Tail: revloop (g9) @ con_72'25 (g70)
   mov bp, 109
@@ -1330,7 +1329,7 @@ L104_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L105_Cont:
+L105: ; Continuation
   ;; (200'37) Tail: app_200'26 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -1339,14 +1338,14 @@ L105_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L106_Cont:
+L106: ; Continuation
   push [bp+2]
   push [bp+3]
   push #1
   mov 201, sp
   push [bp+4]
   push cx
-  push #L105_Cont
+  push #L105
   mov cx, sp
   ;; (200'26) Tail: app_200'20 (arg) @ con_0'0 (t1)
   mov bp, dx
@@ -1354,12 +1353,12 @@ L106_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L107_Arm2:
+L107: ; Arm: 200'5
   push 202
   push 201
   push [bp+2]
   push cx
-  push #L106_Cont
+  push #L106
   mov cx, sp
   ;; (200'20) Tail: splitloop (g66) @ accWs (f1)
   mov dx, [bp+1]
@@ -1367,7 +1366,7 @@ L107_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L108_Arm2:
+L108: ; Arm: 198'10
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -1381,28 +1380,28 @@ L108_Arm2:
   mov ax, 203
   mov ax, [ax]
   cmp ax, #1
-  bz L104_Arm1
+  bz L104
   mov ax, 203
   mov ax, [ax]
   cmp ax, #0
-  bz L107_Arm2
+  bz L107
   crash
 
-L109_Func_t1:
+L109: ; Function: t1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L99_Arm1
+  bz L99
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L108_Arm2
+  bz L108
   crash
 
-L110_Func_t1:
+L110: ; Function: t1
   push dx
   push [bp+1]
-  push #L109_Func_t1
+  push #L109
   mov 201, sp
   ;; (0'0) Return: lam_194'30 (t1)
   mov dx, 201
@@ -1411,9 +1410,9 @@ L110_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L111_TopLam_g66:
+L111: ; Function: g66
   push dx
-  push #L110_Func_t1
+  push #L110
   mov 201, sp
   ;; (0'0) Return: lam_194'24 (t1)
   mov dx, 201
@@ -1422,7 +1421,7 @@ L111_TopLam_g66:
   mov ax, [bp]
   jmp [ax]
 
-L112_Func_t1:
+L112: ; Function: t1
   mov ax, [bp+1]
   cmp ax, dx
   call bios_make_bool_from_z
@@ -1434,9 +1433,9 @@ L112_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L113_TopLam_g78:
+L113: ; Function: g78
   push dx
-  push #L112_Func_t1
+  push #L112
   mov 201, sp
   ;; (0'0) Return: lam_0'0 (t1)
   mov dx, 201
@@ -1445,7 +1444,7 @@ L113_TopLam_g78:
   mov ax, [bp]
   jmp [ax]
 
-L114_Func_t1:
+L114: ; Function: t1
   mov ax, [bp+1]
   cmp ax, dx
   call bios_make_bool_from_z
@@ -1457,9 +1456,9 @@ L114_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L115_TopLam_g87:
+L115: ; Function: g87
   push dx
-  push #L114_Func_t1
+  push #L114
   mov 201, sp
   ;; (0'0) Return: lam_0'0 (t1)
   mov dx, 201
@@ -1468,7 +1467,7 @@ L115_TopLam_g87:
   mov ax, [bp]
   jmp [ax]
 
-L116_Arm1:
+L116: ; Arm: 41'9
   push [bp+1]
   push #0
   mov 201, sp
@@ -1479,7 +1478,7 @@ L116_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L117_Arm1:
+L117: ; Arm: 44'15
   ;; (0'0) Return: con_44'18 (g105)
   mov dx, 305
   mov bp, cx
@@ -1487,7 +1486,7 @@ L117_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L118_Cont:
+L118: ; Continuation
   ;; (45'40) Tail: app_45'25 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -1496,7 +1495,7 @@ L118_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L119_Arm2:
+L119: ; Arm: 45'17
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -1508,7 +1507,7 @@ L119_Arm2:
   mov 203, ax
   push [bp+3]
   push cx
-  push #L118_Cont
+  push #L118
   mov cx, sp
   ;; (45'25) Tail: loop (g95) @ prim_0'0 (t3)
   mov bp, 195
@@ -1516,18 +1515,18 @@ L119_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L120_Cont:
+L120: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L117_Arm1
+  bz L117
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L119_Arm2
+  bz L119
   crash
 
-L121_Arm1:
+L121: ; Arm: 36'27
   push [bp+2]
   push #0
   mov 201, sp
@@ -1538,7 +1537,7 @@ L121_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L122_Arm2:
+L122: ; Arm: 36'40
   ;; (0'0) Return: con_36'45 (g103)
   mov dx, 303
   mov bp, cx
@@ -1546,18 +1545,18 @@ L122_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L123_Cont:
+L123: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L121_Arm1
+  bz L121
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L122_Arm2
+  bz L122
   crash
 
-L124_Arm1:
+L124: ; Arm: 8'9
   ;; (0'0) Return: con_8'12 (g101)
   mov dx, 301
   mov bp, cx
@@ -1565,7 +1564,7 @@ L124_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L125_Arm2:
+L125: ; Arm: 9'10
   ;; (0'0) Return: con_9'13 (g102)
   mov dx, 302
   mov bp, cx
@@ -1573,26 +1572,26 @@ L125_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L126_Arm1:
+L126: ; Arm: 36'12
   mov ax, 300
   cmp ax, [bp+4]
   call bios_make_bool_from_n
   mov 201, ax
   push [bp+4]
   push cx
-  push #L123_Cont
+  push #L123
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L124_Arm1
+  bz L124
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L125_Arm2
+  bz L125
   crash
 
-L127_Arm2:
+L127: ; Arm: 36'50
   ;; (0'0) Return: con_36'55 (g104)
   mov dx, 304
   mov bp, cx
@@ -1600,23 +1599,23 @@ L127_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L128_Cont:
+L128: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L120_Cont
+  push #L120
   mov cx, sp
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L126_Arm1
+  bz L126
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L127_Arm2
+  bz L127
   crash
 
-L129_Arm1:
+L129: ; Arm: 8'9
   ;; (0'0) Return: con_8'12 (g98)
   mov dx, 198
   mov bp, cx
@@ -1624,7 +1623,7 @@ L129_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L130_Arm2:
+L130: ; Arm: 9'10
   ;; (0'0) Return: con_9'13 (g99)
   mov dx, 199
   mov bp, cx
@@ -1632,7 +1631,7 @@ L130_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L131_Arm2:
+L131: ; Arm: 42'12
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -1653,32 +1652,32 @@ L131_Arm2:
   push 202
   push [bp+1]
   push cx
-  push #L128_Cont
+  push #L128
   mov cx, sp
   mov ax, 205
   mov ax, [ax]
   cmp ax, #1
-  bz L129_Arm1
+  bz L129
   mov ax, 205
   mov ax, [ax]
   cmp ax, #0
-  bz L130_Arm2
+  bz L130
   crash
 
-L132_Func_t1:
+L132: ; Function: t1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L116_Arm1
+  bz L116
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L131_Arm2
+  bz L131
   crash
 
-L133_TopLam_g95:
+L133: ; Function: g95
   push dx
-  push #L132_Func_t1
+  push #L132
   mov 201, sp
   ;; (0'0) Return: lam_39'19 (t1)
   mov dx, 201
@@ -1687,7 +1686,7 @@ L133_TopLam_g95:
   mov ax, [bp]
   jmp [ax]
 
-L134_Arm1:
+L134: ; Arm: 88'13
   ;; (87'15) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -1695,7 +1694,7 @@ L134_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L135_Cont:
+L135: ; Continuation
   mov ax, [bp+2]
   div ax, 315
   mov 201, ax
@@ -1705,7 +1704,7 @@ L135_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L136_Arm2:
+L136: ; Arm: 88'22
   mov ax, dx
   mod ax, 313
   mov 202, ax
@@ -1721,7 +1720,7 @@ L136_Arm2:
   mov 205, sp
   push dx
   push cx
-  push #L135_Cont
+  push #L135
   mov cx, sp
   ;; (89'11) Tail: loop (g111) @ con_0'0 (t5)
   mov bp, 311
@@ -1729,7 +1728,7 @@ L136_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L137_Func_t1:
+L137: ; Function: t1
   mov ax, dx
   cmp ax, 312
   call bios_make_bool_from_z
@@ -1737,16 +1736,16 @@ L137_Func_t1:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L134_Arm1
+  bz L134
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L136_Arm2
+  bz L136
   crash
 
-L138_TopLam_g111:
+L138: ; Function: g111
   push dx
-  push #L137_Func_t1
+  push #L137
   mov 201, sp
   ;; (0'0) Return: lam_87'19 (t1)
   mov dx, 201
@@ -1755,7 +1754,7 @@ L138_TopLam_g111:
   mov ax, [bp]
   jmp [ax]
 
-L139_Arm1:
+L139: ; Arm: 88'13
   ;; (87'15) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -1763,7 +1762,7 @@ L139_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L140_Cont:
+L140: ; Continuation
   mov ax, [bp+2]
   div ax, 326
   mov 201, ax
@@ -1773,7 +1772,7 @@ L140_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L141_Arm2:
+L141: ; Arm: 88'22
   mov ax, dx
   mod ax, 324
   mov 202, ax
@@ -1789,7 +1788,7 @@ L141_Arm2:
   mov 205, sp
   push dx
   push cx
-  push #L140_Cont
+  push #L140
   mov cx, sp
   ;; (89'11) Tail: loop (g122) @ con_0'0 (t5)
   mov bp, 322
@@ -1797,7 +1796,7 @@ L141_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L142_Func_t1:
+L142: ; Function: t1
   mov ax, dx
   cmp ax, 323
   call bios_make_bool_from_z
@@ -1805,16 +1804,16 @@ L142_Func_t1:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L139_Arm1
+  bz L139
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L141_Arm2
+  bz L141
   crash
 
-L143_TopLam_g122:
+L143: ; Function: g122
   push dx
-  push #L142_Func_t1
+  push #L142
   mov 201, sp
   ;; (0'0) Return: lam_87'19 (t1)
   mov dx, 201
@@ -1823,7 +1822,7 @@ L143_TopLam_g122:
   mov ax, [bp]
   jmp [ax]
 
-L144_Func_t1:
+L144: ; Function: t1
   mov ax, [bp+1]
   cmp ax, dx
   call bios_make_bool_from_z
@@ -1835,9 +1834,9 @@ L144_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L145_TopLam_g134:
+L145: ; Function: g134
   push dx
-  push #L144_Func_t1
+  push #L144
   mov 201, sp
   ;; (0'0) Return: lam_0'0 (t1)
   mov dx, 201
@@ -1846,7 +1845,7 @@ L145_TopLam_g134:
   mov ax, [bp]
   jmp [ax]
 
-L146_Arm1:
+L146: ; Arm: 41'9
   push [bp+1]
   push #0
   mov 201, sp
@@ -1857,7 +1856,7 @@ L146_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L147_Arm1:
+L147: ; Arm: 44'15
   ;; (0'0) Return: con_44'18 (g152)
   mov dx, 352
   mov bp, cx
@@ -1865,7 +1864,7 @@ L147_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L148_Cont:
+L148: ; Continuation
   ;; (45'40) Tail: app_45'25 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -1874,7 +1873,7 @@ L148_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L149_Arm2:
+L149: ; Arm: 45'17
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -1886,7 +1885,7 @@ L149_Arm2:
   mov 203, ax
   push [bp+3]
   push cx
-  push #L148_Cont
+  push #L148
   mov cx, sp
   ;; (45'25) Tail: loop (g142) @ prim_0'0 (t3)
   mov bp, 342
@@ -1894,18 +1893,18 @@ L149_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L150_Cont:
+L150: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L147_Arm1
+  bz L147
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L149_Arm2
+  bz L149
   crash
 
-L151_Arm1:
+L151: ; Arm: 36'27
   push [bp+2]
   push #0
   mov 201, sp
@@ -1916,7 +1915,7 @@ L151_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L152_Arm2:
+L152: ; Arm: 36'40
   ;; (0'0) Return: con_36'45 (g150)
   mov dx, 350
   mov bp, cx
@@ -1924,18 +1923,18 @@ L152_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L153_Cont:
+L153: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L151_Arm1
+  bz L151
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L152_Arm2
+  bz L152
   crash
 
-L154_Arm1:
+L154: ; Arm: 8'9
   ;; (0'0) Return: con_8'12 (g148)
   mov dx, 348
   mov bp, cx
@@ -1943,7 +1942,7 @@ L154_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L155_Arm2:
+L155: ; Arm: 9'10
   ;; (0'0) Return: con_9'13 (g149)
   mov dx, 349
   mov bp, cx
@@ -1951,26 +1950,26 @@ L155_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L156_Arm1:
+L156: ; Arm: 36'12
   mov ax, 347
   cmp ax, [bp+4]
   call bios_make_bool_from_n
   mov 201, ax
   push [bp+4]
   push cx
-  push #L153_Cont
+  push #L153
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L154_Arm1
+  bz L154
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L155_Arm2
+  bz L155
   crash
 
-L157_Arm2:
+L157: ; Arm: 36'50
   ;; (0'0) Return: con_36'55 (g151)
   mov dx, 351
   mov bp, cx
@@ -1978,23 +1977,23 @@ L157_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L158_Cont:
+L158: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L150_Cont
+  push #L150
   mov cx, sp
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L156_Arm1
+  bz L156
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L157_Arm2
+  bz L157
   crash
 
-L159_Arm1:
+L159: ; Arm: 8'9
   ;; (0'0) Return: con_8'12 (g145)
   mov dx, 345
   mov bp, cx
@@ -2002,7 +2001,7 @@ L159_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L160_Arm2:
+L160: ; Arm: 9'10
   ;; (0'0) Return: con_9'13 (g146)
   mov dx, 346
   mov bp, cx
@@ -2010,7 +2009,7 @@ L160_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L161_Arm2:
+L161: ; Arm: 42'12
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -2031,32 +2030,32 @@ L161_Arm2:
   push 202
   push [bp+1]
   push cx
-  push #L158_Cont
+  push #L158
   mov cx, sp
   mov ax, 205
   mov ax, [ax]
   cmp ax, #1
-  bz L159_Arm1
+  bz L159
   mov ax, 205
   mov ax, [ax]
   cmp ax, #0
-  bz L160_Arm2
+  bz L160
   crash
 
-L162_Func_t1:
+L162: ; Function: t1
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L146_Arm1
+  bz L146
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L161_Arm2
+  bz L161
   crash
 
-L163_TopLam_g142:
+L163: ; Function: g142
   push dx
-  push #L162_Func_t1
+  push #L162
   mov 201, sp
   ;; (0'0) Return: lam_39'19 (t1)
   mov dx, 201
@@ -2065,7 +2064,7 @@ L163_TopLam_g142:
   mov ax, [bp]
   jmp [ax]
 
-L164_Arm1:
+L164: ; Arm: 88'13
   ;; (87'15) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -2073,7 +2072,7 @@ L164_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L165_Cont:
+L165: ; Continuation
   mov ax, [bp+2]
   div ax, 362
   mov 201, ax
@@ -2083,7 +2082,7 @@ L165_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L166_Arm2:
+L166: ; Arm: 88'22
   mov ax, dx
   mod ax, 360
   mov 202, ax
@@ -2099,7 +2098,7 @@ L166_Arm2:
   mov 205, sp
   push dx
   push cx
-  push #L165_Cont
+  push #L165
   mov cx, sp
   ;; (89'11) Tail: loop (g158) @ con_0'0 (t5)
   mov bp, 358
@@ -2107,7 +2106,7 @@ L166_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L167_Func_t1:
+L167: ; Function: t1
   mov ax, dx
   cmp ax, 359
   call bios_make_bool_from_z
@@ -2115,16 +2114,16 @@ L167_Func_t1:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L164_Arm1
+  bz L164
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L166_Arm2
+  bz L166
   crash
 
-L168_TopLam_g158:
+L168: ; Function: g158
   push dx
-  push #L167_Func_t1
+  push #L167
   mov 201, sp
   ;; (0'0) Return: lam_87'19 (t1)
   mov dx, 201
@@ -2133,7 +2132,7 @@ L168_TopLam_g158:
   mov ax, [bp]
   jmp [ax]
 
-L169_Arm1:
+L169: ; Arm: 88'13
   ;; (87'15) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -2141,7 +2140,7 @@ L169_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L170_Cont:
+L170: ; Continuation
   mov ax, [bp+2]
   div ax, 373
   mov 201, ax
@@ -2151,7 +2150,7 @@ L170_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L171_Arm2:
+L171: ; Arm: 88'22
   mov ax, dx
   mod ax, 371
   mov 202, ax
@@ -2167,7 +2166,7 @@ L171_Arm2:
   mov 205, sp
   push dx
   push cx
-  push #L170_Cont
+  push #L170
   mov cx, sp
   ;; (89'11) Tail: loop (g169) @ con_0'0 (t5)
   mov bp, 369
@@ -2175,7 +2174,7 @@ L171_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L172_Func_t1:
+L172: ; Function: t1
   mov ax, dx
   cmp ax, 370
   call bios_make_bool_from_z
@@ -2183,16 +2182,16 @@ L172_Func_t1:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L169_Arm1
+  bz L169
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L171_Arm2
+  bz L171
   crash
 
-L173_TopLam_g169:
+L173: ; Function: g169
   push dx
-  push #L172_Func_t1
+  push #L172
   mov 201, sp
   ;; (0'0) Return: lam_87'19 (t1)
   mov dx, 201
@@ -2201,7 +2200,7 @@ L173_TopLam_g169:
   mov ax, [bp]
   jmp [ax]
 
-L174_Func_t1:
+L174: ; Function: t1
   mov ax, [bp+1]
   cmp ax, dx
   call bios_make_bool_from_z
@@ -2213,9 +2212,9 @@ L174_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L175_TopLam_g181:
+L175: ; Function: g181
   push dx
-  push #L174_Func_t1
+  push #L174
   mov 201, sp
   ;; (0'0) Return: lam_0'0 (t1)
   mov dx, 201
@@ -2224,7 +2223,7 @@ L175_TopLam_g181:
   mov ax, [bp]
   jmp [ax]
 
-L176_Func_t1:
+L176: ; Function: t1
   mov ax, [bp+1]
   cmp ax, dx
   call bios_make_bool_from_z
@@ -2236,9 +2235,9 @@ L176_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L177_TopLam_g188:
+L177: ; Function: g188
   push dx
-  push #L176_Func_t1
+  push #L176
   mov 201, sp
   ;; (0'0) Return: lam_0'0 (t1)
   mov dx, 201
@@ -2247,7 +2246,7 @@ L177_TopLam_g188:
   mov ax, [bp]
   jmp [ax]
 
-L178_Arm1:
+L178: ; Arm: 173'39
   ;; (0'0) Return: con_173'44 (g192)
   mov dx, 392
   mov bp, cx
@@ -2255,7 +2254,7 @@ L178_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L179_Cont:
+L179: ; Continuation
   mov ax, 394
   call bios_put_char
   mov 201, ax
@@ -2265,9 +2264,9 @@ L179_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L180_Cont:
+L180: ; Continuation
   push cx
-  push #L179_Cont
+  push #L179
   mov cx, sp
   ;; (174'17) Tail: put_chars (g15) @ app_72'28 (arg)
   mov bp, 115
@@ -2275,9 +2274,9 @@ L180_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L181_Cont:
+L181: ; Continuation
   push cx
-  push #L180_Cont
+  push #L180
   mov cx, sp
   ;; (72'28) Tail: app_72'25 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
@@ -2287,10 +2286,10 @@ L181_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L182_Arm2:
+L182: ; Arm: 173'47
   push [bp+2]
   push cx
-  push #L181_Cont
+  push #L181
   mov cx, sp
   ;; (72'25) Tail: revloop (g9) @ con_72'25 (g193)
   mov bp, 109
@@ -2298,21 +2297,21 @@ L182_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L183_Cont:
+L183: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L178_Arm1
+  bz L178
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L182_Arm2
+  bz L182
   crash
 
-L184_Cont:
+L184: ; Continuation
   push [bp+2]
   push cx
-  push #L183_Cont
+  push #L183
   mov cx, sp
   ;; (60'44) Tail: app_60'41 (arg) @ con_0'0 (g191)
   mov bp, dx
@@ -2320,10 +2319,10 @@ L184_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L185_Cont:
+L185: ; Continuation
   push [bp+2]
   push cx
-  push #L184_Cont
+  push #L184
   mov cx, sp
   ;; (60'41) Tail: app_60'33 (arg) @ xs (f2)
   ;; use temp ax while setting up bp/dx
@@ -2333,10 +2332,10 @@ L185_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L186_Cont:
+L186: ; Continuation
   push dx
   push cx
-  push #L185_Cont
+  push #L185
   mov cx, sp
   ;; (60'33) Tail: eq_list (g3) @ lam_0'0 (g188)
   mov bp, 103
@@ -2344,9 +2343,9 @@ L186_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L187_TopLam_g186:
+L187: ; Function: g186
   push cx
-  push #L186_Cont
+  push #L186
   mov cx, sp
   ;; (121'28) Tail: readloop (g23) @ con_121'28 (g187)
   mov bp, 123
@@ -2354,7 +2353,7 @@ L187_TopLam_g186:
   mov ax, [bp]
   jmp [ax]
 
-L188_Arm1:
+L188: ; Arm: 186'52
   ;; (0'0) Return: lit_186'57 (g198)
   mov dx, 398
   mov bp, cx
@@ -2362,7 +2361,7 @@ L188_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L189_Arm2:
+L189: ; Arm: 186'61
   ;; (186'30) Return: c (arg)
   mov dx, dx
   mov bp, cx
@@ -2370,7 +2369,7 @@ L189_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L190_TopLam_g199:
+L190: ; Function: g199
   mov ax, dx
   cmp ax, 397
   call bios_make_bool_from_z
@@ -2378,14 +2377,14 @@ L190_TopLam_g199:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L188_Arm1
+  bz L188
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L189_Arm2
+  bz L189
   crash
 
-L191_Arm1:
+L191: ; Arm: 88'13
   ;; (87'15) Return: acc (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -2393,7 +2392,7 @@ L191_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L192_Cont:
+L192: ; Continuation
   mov ax, [bp+2]
   div ax, 406
   mov 201, ax
@@ -2403,7 +2402,7 @@ L192_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L193_Arm2:
+L193: ; Arm: 88'22
   mov ax, dx
   mod ax, 404
   mov 202, ax
@@ -2419,7 +2418,7 @@ L193_Arm2:
   mov 205, sp
   push dx
   push cx
-  push #L192_Cont
+  push #L192
   mov cx, sp
   ;; (89'11) Tail: loop (g202) @ con_0'0 (t5)
   mov bp, 402
@@ -2427,7 +2426,7 @@ L193_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L194_Func_t1:
+L194: ; Function: t1
   mov ax, dx
   cmp ax, 403
   call bios_make_bool_from_z
@@ -2435,16 +2434,16 @@ L194_Func_t1:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L191_Arm1
+  bz L191
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L193_Arm2
+  bz L193
   crash
 
-L195_TopLam_g202:
+L195: ; Function: g202
   push dx
-  push #L194_Func_t1
+  push #L194
   mov 201, sp
   ;; (0'0) Return: lam_87'19 (t1)
   mov dx, 201
@@ -2453,7 +2452,7 @@ L195_TopLam_g202:
   mov ax, [bp]
   jmp [ax]
 
-L196_Arm1:
+L196: ; Arm: 218'37
   ;; (0'0) Return: con_218'42 (g82)
   mov dx, 182
   mov bp, cx
@@ -2461,14 +2460,14 @@ L196_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L197_Cont:
+L197: ; Continuation
   ;; (219'26) Tail: mainloop (f2) @ con_219'26 (g214)
   mov bp, [bp+2]
   mov dx, 414
   mov ax, [bp]
   jmp [ax]
 
-L198_Arm1:
+L198: ; Arm: 208'7
   ;; (0'0) Return: con_208'10 (g85)
   mov dx, 185
   mov bp, cx
@@ -2476,16 +2475,16 @@ L198_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L199_Cont:
+L199: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L200_Func_t1:
+L200: ; Function: t1
   push cx
-  push #L199_Cont
+  push #L199
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2493,16 +2492,16 @@ L200_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L201_Cont:
+L201: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L202_Func_t1:
+L202: ; Function: t1
   push cx
-  push #L201_Cont
+  push #L201
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2510,16 +2509,16 @@ L202_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L203_Cont:
+L203: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L204_Func_t1:
+L204: ; Function: t1
   push cx
-  push #L203_Cont
+  push #L203
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2527,7 +2526,7 @@ L204_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L205_Cont:
+L205: ; Continuation
   mov ax, 191
   call bios_put_char
   mov 201, ax
@@ -2538,9 +2537,9 @@ L205_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L206_Cont:
+L206: ; Continuation
   push cx
-  push #L205_Cont
+  push #L205
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_136'16 (g90)
   mov bp, dx
@@ -2548,12 +2547,12 @@ L206_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L207_Cont:
+L207: ; Continuation
   push [bp+2]
-  push #L204_Func_t1
+  push #L204
   mov 201, sp
   push cx
-  push #L206_Cont
+  push #L206
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -2561,10 +2560,10 @@ L207_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L208_Cont:
+L208: ; Continuation
   push [bp+2]
   push cx
-  push #L207_Cont
+  push #L207
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_131'25 (g89)
   mov bp, dx
@@ -2572,13 +2571,13 @@ L208_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L209_Arm1:
+L209: ; Arm: 136'7
   push [bp+2]
-  push #L202_Func_t1
+  push #L202
   mov 201, sp
   push [bp+2]
   push cx
-  push #L208_Cont
+  push #L208
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -2586,16 +2585,16 @@ L209_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L210_Cont:
+L210: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L211_Func_t5:
+L211: ; Function: t5
   push cx
-  push #L210_Cont
+  push #L210
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2603,16 +2602,16 @@ L211_Func_t5:
   mov ax, [bp]
   jmp [ax]
 
-L212_Cont:
+L212: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L213_Func_t1:
+L213: ; Function: t1
   push cx
-  push #L212_Cont
+  push #L212
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2620,7 +2619,7 @@ L213_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L214_Cont:
+L214: ; Continuation
   mov ax, 194
   call bios_put_char
   mov 201, ax
@@ -2631,9 +2630,9 @@ L214_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L215_Cont:
+L215: ; Continuation
   push cx
-  push #L214_Cont
+  push #L214
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_139'21 (g93)
   mov bp, dx
@@ -2641,12 +2640,12 @@ L215_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L216_Cont:
+L216: ; Continuation
   push [bp+2]
-  push #L213_Func_t1
+  push #L213
   mov 201, sp
   push cx
-  push #L215_Cont
+  push #L215
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -2654,10 +2653,10 @@ L216_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L217_Cont:
+L217: ; Continuation
   push [bp+2]
   push cx
-  push #L216_Cont
+  push #L216
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_131'25 (g92)
   mov bp, dx
@@ -2665,7 +2664,7 @@ L217_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L218_Arm1:
+L218: ; Arm: 139'12
   mov ax, 202
   mov ax, [ax+1]
   mov 203, ax
@@ -2673,11 +2672,11 @@ L218_Arm1:
   mov ax, [ax+2]
   mov 204, ax
   push [bp+2]
-  push #L211_Func_t5
+  push #L211
   mov 205, sp
   push [bp+2]
   push cx
-  push #L217_Cont
+  push #L217
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t5)
   mov bp, 101
@@ -2685,16 +2684,16 @@ L218_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L219_Cont:
+L219: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L220_Func_t1:
+L220: ; Function: t1
   push cx
-  push #L219_Cont
+  push #L219
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2702,16 +2701,16 @@ L220_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L221_Cont:
+L221: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L222_Func_t1:
+L222: ; Function: t1
   push cx
-  push #L221_Cont
+  push #L221
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2719,7 +2718,7 @@ L222_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L223_Cont:
+L223: ; Continuation
   mov ax, 310
   call bios_put_char
   mov 201, ax
@@ -2730,9 +2729,9 @@ L223_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L224_Cont:
+L224: ; Continuation
   push cx
-  push #L223_Cont
+  push #L223
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_142'24 (g109)
   mov bp, dx
@@ -2740,12 +2739,12 @@ L224_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L225_Cont:
+L225: ; Continuation
   push [bp+2]
-  push #L222_Func_t1
+  push #L222
   mov 201, sp
   push cx
-  push #L224_Cont
+  push #L224
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -2753,10 +2752,10 @@ L225_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L226_Cont:
+L226: ; Continuation
   push [bp+2]
   push cx
-  push #L225_Cont
+  push #L225
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_131'25 (g108)
   mov bp, dx
@@ -2764,13 +2763,13 @@ L226_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L227_Arm1:
+L227: ; Arm: 142'15
   push [bp+2]
-  push #L220_Func_t1
+  push #L220
   mov 201, sp
   push [bp+2]
   push cx
-  push #L226_Cont
+  push #L226
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -2778,16 +2777,16 @@ L227_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L228_Cont:
+L228: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L229_Func_t1:
+L229: ; Function: t1
   push cx
-  push #L228_Cont
+  push #L228
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -2795,7 +2794,7 @@ L229_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L230_Cont:
+L230: ; Continuation
   mov ax, 332
   call bios_put_char
   mov 201, ax
@@ -2806,9 +2805,9 @@ L230_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L231_Cont:
+L231: ; Continuation
   push cx
-  push #L230_Cont
+  push #L230
   mov cx, sp
   ;; (100'26) Tail: put_chars (g15) @ case_91'2 (arg)
   mov bp, 115
@@ -2816,7 +2815,7 @@ L231_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L232_Arm1:
+L232: ; Arm: 91'11
   ;; (0'0) Return: con_0'0 (g130)
   mov dx, 330
   mov bp, cx
@@ -2824,7 +2823,7 @@ L232_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L233_Cont:
+L233: ; Continuation
   ;; (91'41) Tail: app_91'38 (arg) @ res (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -2833,10 +2832,10 @@ L233_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L234_Arm2:
+L234: ; Arm: 91'28
   push [bp+2]
   push cx
-  push #L233_Cont
+  push #L233
   mov cx, sp
   ;; (91'38) Tail: loop (g122) @ con_91'38 (g131)
   mov bp, 322
@@ -2844,28 +2843,28 @@ L234_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L235_Cont:
+L235: ; Continuation
   mov ax, [bp+2]
   cmp ax, 327
   call bios_make_bool_from_z
   mov 201, ax
   push cx
-  push #L231_Cont
+  push #L231
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L232_Arm1
+  bz L232
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L234_Arm2
+  bz L234
   crash
 
-L236_Cont:
+L236: ; Continuation
   push [bp+2]
   push cx
-  push #L235_Cont
+  push #L235
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_146'22 (g121)
   mov bp, dx
@@ -2873,13 +2872,13 @@ L236_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L237_Cont:
+L237: ; Continuation
   push [bp+2]
-  push #L229_Func_t1
+  push #L229
   mov 201, sp
   push [bp+3]
   push cx
-  push #L236_Cont
+  push #L236
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -2887,11 +2886,11 @@ L237_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L238_Cont:
+L238: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L237_Cont
+  push #L237
   mov cx, sp
   ;; (100'26) Tail: put_chars (g15) @ case_91'2 (arg)
   mov bp, 115
@@ -2899,7 +2898,7 @@ L238_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L239_Arm1:
+L239: ; Arm: 91'11
   ;; (0'0) Return: con_0'0 (g119)
   mov dx, 319
   mov bp, cx
@@ -2907,7 +2906,7 @@ L239_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L240_Cont:
+L240: ; Continuation
   ;; (91'41) Tail: app_91'38 (arg) @ n (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -2916,10 +2915,10 @@ L240_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L241_Arm2:
+L241: ; Arm: 91'28
   push [bp+3]
   push cx
-  push #L240_Cont
+  push #L240
   mov cx, sp
   ;; (91'38) Tail: loop (g111) @ con_91'38 (g120)
   mov bp, 311
@@ -2927,7 +2926,7 @@ L241_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L242_Cont:
+L242: ; Continuation
   mov ax, [bp+3]
   cmp ax, 316
   call bios_make_bool_from_z
@@ -2935,26 +2934,26 @@ L242_Cont:
   push dx
   push [bp+2]
   push cx
-  push #L238_Cont
+  push #L238
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L239_Arm1
+  bz L239
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L241_Arm2
+  bz L241
   crash
 
-L243_Arm2:
+L243: ; Arm: 143'17
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
   push 201
   push [bp+2]
   push cx
-  push #L242_Cont
+  push #L242
   mov cx, sp
   ;; (144'25) Tail: fib (g56) @ n (t1)
   mov bp, 156
@@ -2962,21 +2961,21 @@ L243_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L244_Cont:
+L244: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L227_Arm1
+  bz L227
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L243_Arm2
+  bz L243
   crash
 
-L245_Cont:
+L245: ; Continuation
   push [bp+2]
   push cx
-  push #L244_Cont
+  push #L244
   mov cx, sp
   ;; (47'9) Tail: app_47'7 (arg) @ arg1 (f3)
   ;; use temp ax while setting up bp/dx
@@ -2986,11 +2985,11 @@ L245_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L246_Arm2:
+L246: ; Arm: 140'10
   push 201
   push [bp+2]
   push cx
-  push #L245_Cont
+  push #L245
   mov cx, sp
   ;; (47'7) Tail: loop (g95) @ lit_47'7 (g107)
   mov bp, 195
@@ -2998,7 +2997,7 @@ L246_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L247_Arm2:
+L247: ; Arm: 137'15
   mov ax, [bp+3]
   mov ax, [ax+1]
   mov 201, ax
@@ -3008,29 +3007,29 @@ L247_Arm2:
   mov ax, 202
   mov ax, [ax]
   cmp ax, #1
-  bz L218_Arm1
+  bz L218
   mov ax, 202
   mov ax, [ax]
   cmp ax, #0
-  bz L246_Arm2
+  bz L246
   crash
 
-L248_Cont:
+L248: ; Continuation
   mov ax, [bp+3]
   mov ax, [ax]
   cmp ax, #0
-  bz L209_Arm1
+  bz L209
   mov ax, [bp+3]
   mov ax, [ax]
   cmp ax, #1
-  bz L247_Arm2
+  bz L247
   crash
 
-L249_Cont:
+L249: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L248_Cont
+  push #L248
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_134'13 (g88)
   mov bp, dx
@@ -3038,14 +3037,14 @@ L249_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L250_Arm1:
+L250: ; Arm: 210'45
   push [bp+2]
-  push #L200_Func_t1
+  push #L200
   mov 201, sp
   push [bp+5]
   push [bp+2]
   push cx
-  push #L249_Cont
+  push #L249
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3053,16 +3052,16 @@ L250_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L251_Cont:
+L251: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L252_Func_t1:
+L252: ; Function: t1
   push cx
-  push #L251_Cont
+  push #L251
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3070,16 +3069,16 @@ L252_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L253_Cont:
+L253: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L254_Func_t1:
+L254: ; Function: t1
   push cx
-  push #L253_Cont
+  push #L253
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3087,16 +3086,16 @@ L254_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L255_Cont:
+L255: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L256_Func_t1:
+L256: ; Function: t1
   push cx
-  push #L255_Cont
+  push #L255
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3104,7 +3103,7 @@ L256_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L257_Cont:
+L257: ; Continuation
   mov ax, 338
   call bios_put_char
   mov 201, ax
@@ -3115,9 +3114,9 @@ L257_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L258_Cont:
+L258: ; Continuation
   push cx
-  push #L257_Cont
+  push #L257
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_153'16 (g137)
   mov bp, dx
@@ -3125,12 +3124,12 @@ L258_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L259_Cont:
+L259: ; Continuation
   push [bp+2]
-  push #L256_Func_t1
+  push #L256
   mov 201, sp
   push cx
-  push #L258_Cont
+  push #L258
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3138,10 +3137,10 @@ L259_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L260_Cont:
+L260: ; Continuation
   push [bp+2]
   push cx
-  push #L259_Cont
+  push #L259
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_131'25 (g136)
   mov bp, dx
@@ -3149,13 +3148,13 @@ L260_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L261_Arm1:
+L261: ; Arm: 153'7
   push [bp+2]
-  push #L254_Func_t1
+  push #L254
   mov 201, sp
   push [bp+2]
   push cx
-  push #L260_Cont
+  push #L260
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3163,16 +3162,16 @@ L261_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L262_Cont:
+L262: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L263_Func_t5:
+L263: ; Function: t5
   push cx
-  push #L262_Cont
+  push #L262
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3180,16 +3179,16 @@ L263_Func_t5:
   mov ax, [bp]
   jmp [ax]
 
-L264_Cont:
+L264: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L265_Func_t1:
+L265: ; Function: t1
   push cx
-  push #L264_Cont
+  push #L264
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3197,7 +3196,7 @@ L265_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L266_Cont:
+L266: ; Continuation
   mov ax, 341
   call bios_put_char
   mov 201, ax
@@ -3208,9 +3207,9 @@ L266_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L267_Cont:
+L267: ; Continuation
   push cx
-  push #L266_Cont
+  push #L266
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_156'21 (g140)
   mov bp, dx
@@ -3218,12 +3217,12 @@ L267_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L268_Cont:
+L268: ; Continuation
   push [bp+2]
-  push #L265_Func_t1
+  push #L265
   mov 201, sp
   push cx
-  push #L267_Cont
+  push #L267
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3231,10 +3230,10 @@ L268_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L269_Cont:
+L269: ; Continuation
   push [bp+2]
   push cx
-  push #L268_Cont
+  push #L268
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_131'25 (g139)
   mov bp, dx
@@ -3242,7 +3241,7 @@ L269_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L270_Arm1:
+L270: ; Arm: 156'12
   mov ax, 202
   mov ax, [ax+1]
   mov 203, ax
@@ -3250,11 +3249,11 @@ L270_Arm1:
   mov ax, [ax+2]
   mov 204, ax
   push [bp+2]
-  push #L263_Func_t5
+  push #L263
   mov 205, sp
   push [bp+2]
   push cx
-  push #L269_Cont
+  push #L269
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t5)
   mov bp, 101
@@ -3262,16 +3261,16 @@ L270_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L271_Cont:
+L271: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L272_Func_t1:
+L272: ; Function: t1
   push cx
-  push #L271_Cont
+  push #L271
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3279,16 +3278,16 @@ L272_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L273_Cont:
+L273: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L274_Func_t1:
+L274: ; Function: t1
   push cx
-  push #L273_Cont
+  push #L273
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3296,7 +3295,7 @@ L274_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L275_Cont:
+L275: ; Continuation
   mov ax, 357
   call bios_put_char
   mov 201, ax
@@ -3307,9 +3306,9 @@ L275_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L276_Cont:
+L276: ; Continuation
   push cx
-  push #L275_Cont
+  push #L275
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_159'24 (g156)
   mov bp, dx
@@ -3317,12 +3316,12 @@ L276_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L277_Cont:
+L277: ; Continuation
   push [bp+2]
-  push #L274_Func_t1
+  push #L274
   mov 201, sp
   push cx
-  push #L276_Cont
+  push #L276
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3330,10 +3329,10 @@ L277_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L278_Cont:
+L278: ; Continuation
   push [bp+2]
   push cx
-  push #L277_Cont
+  push #L277
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_131'25 (g155)
   mov bp, dx
@@ -3341,13 +3340,13 @@ L278_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L279_Arm1:
+L279: ; Arm: 159'15
   push [bp+2]
-  push #L272_Func_t1
+  push #L272
   mov 201, sp
   push [bp+2]
   push cx
-  push #L278_Cont
+  push #L278
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3355,16 +3354,16 @@ L279_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L280_Cont:
+L280: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L281_Func_t1:
+L281: ; Function: t1
   push cx
-  push #L280_Cont
+  push #L280
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3372,7 +3371,7 @@ L281_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L282_Cont:
+L282: ; Continuation
   mov ax, 379
   call bios_put_char
   mov 201, ax
@@ -3383,9 +3382,9 @@ L282_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L283_Cont:
+L283: ; Continuation
   push cx
-  push #L282_Cont
+  push #L282
   mov cx, sp
   ;; (100'26) Tail: put_chars (g15) @ case_91'2 (arg)
   mov bp, 115
@@ -3393,7 +3392,7 @@ L283_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L284_Arm1:
+L284: ; Arm: 91'11
   ;; (0'0) Return: con_0'0 (g177)
   mov dx, 377
   mov bp, cx
@@ -3401,7 +3400,7 @@ L284_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L285_Cont:
+L285: ; Continuation
   ;; (91'41) Tail: app_91'38 (arg) @ res (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -3410,10 +3409,10 @@ L285_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L286_Arm2:
+L286: ; Arm: 91'28
   push [bp+2]
   push cx
-  push #L285_Cont
+  push #L285
   mov cx, sp
   ;; (91'38) Tail: loop (g169) @ con_91'38 (g178)
   mov bp, 369
@@ -3421,28 +3420,28 @@ L286_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L287_Cont:
+L287: ; Continuation
   mov ax, [bp+2]
   cmp ax, 374
   call bios_make_bool_from_z
   mov 201, ax
   push cx
-  push #L283_Cont
+  push #L283
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L284_Arm1
+  bz L284
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L286_Arm2
+  bz L286
   crash
 
-L288_Cont:
+L288: ; Continuation
   push [bp+2]
   push cx
-  push #L287_Cont
+  push #L287
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_163'22 (g168)
   mov bp, dx
@@ -3450,13 +3449,13 @@ L288_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L289_Cont:
+L289: ; Continuation
   push [bp+2]
-  push #L281_Func_t1
+  push #L281
   mov 201, sp
   push [bp+3]
   push cx
-  push #L288_Cont
+  push #L288
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3464,11 +3463,11 @@ L289_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L290_Cont:
+L290: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L289_Cont
+  push #L289
   mov cx, sp
   ;; (100'26) Tail: put_chars (g15) @ case_91'2 (arg)
   mov bp, 115
@@ -3476,7 +3475,7 @@ L290_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L291_Arm1:
+L291: ; Arm: 91'11
   ;; (0'0) Return: con_0'0 (g166)
   mov dx, 366
   mov bp, cx
@@ -3484,7 +3483,7 @@ L291_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L292_Cont:
+L292: ; Continuation
   ;; (91'41) Tail: app_91'38 (arg) @ n (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -3493,10 +3492,10 @@ L292_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L293_Arm2:
+L293: ; Arm: 91'28
   push [bp+3]
   push cx
-  push #L292_Cont
+  push #L292
   mov cx, sp
   ;; (91'38) Tail: loop (g158) @ con_91'38 (g167)
   mov bp, 358
@@ -3504,7 +3503,7 @@ L293_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L294_Cont:
+L294: ; Continuation
   mov ax, [bp+3]
   cmp ax, 363
   call bios_make_bool_from_z
@@ -3512,26 +3511,26 @@ L294_Cont:
   push dx
   push [bp+2]
   push cx
-  push #L290_Cont
+  push #L290
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L291_Arm1
+  bz L291
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L293_Arm2
+  bz L293
   crash
 
-L295_Arm2:
+L295: ; Arm: 160'17
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
   push 201
   push [bp+2]
   push cx
-  push #L294_Cont
+  push #L294
   mov cx, sp
   ;; (161'26) Tail: fact (g60) @ n (t1)
   mov bp, 160
@@ -3539,21 +3538,21 @@ L295_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L296_Cont:
+L296: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L279_Arm1
+  bz L279
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L295_Arm2
+  bz L295
   crash
 
-L297_Cont:
+L297: ; Continuation
   push [bp+2]
   push cx
-  push #L296_Cont
+  push #L296
   mov cx, sp
   ;; (47'9) Tail: app_47'7 (arg) @ arg1 (f3)
   ;; use temp ax while setting up bp/dx
@@ -3563,11 +3562,11 @@ L297_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L298_Arm2:
+L298: ; Arm: 157'10
   push 201
   push [bp+2]
   push cx
-  push #L297_Cont
+  push #L297
   mov cx, sp
   ;; (47'7) Tail: loop (g142) @ lit_47'7 (g154)
   mov bp, 342
@@ -3575,7 +3574,7 @@ L298_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L299_Arm2:
+L299: ; Arm: 154'15
   mov ax, [bp+3]
   mov ax, [ax+1]
   mov 201, ax
@@ -3585,29 +3584,29 @@ L299_Arm2:
   mov ax, 202
   mov ax, [ax]
   cmp ax, #1
-  bz L270_Arm1
+  bz L270
   mov ax, 202
   mov ax, [ax]
   cmp ax, #0
-  bz L298_Arm2
+  bz L298
   crash
 
-L300_Cont:
+L300: ; Continuation
   mov ax, [bp+3]
   mov ax, [ax]
   cmp ax, #0
-  bz L261_Arm1
+  bz L261
   mov ax, [bp+3]
   mov ax, [ax]
   cmp ax, #1
-  bz L299_Arm2
+  bz L299
   crash
 
-L301_Cont:
+L301: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L300_Cont
+  push #L300
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_151'13 (g135)
   mov bp, dx
@@ -3615,14 +3614,14 @@ L301_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L302_Arm1:
+L302: ; Arm: 211'48
   push [bp+2]
-  push #L252_Func_t1
+  push #L252
   mov 201, sp
   push [bp+5]
   push [bp+2]
   push cx
-  push #L301_Cont
+  push #L301
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3630,16 +3629,16 @@ L302_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L303_Cont:
+L303: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L304_Func_t3:
+L304: ; Function: t3
   push cx
-  push #L303_Cont
+  push #L303
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3647,16 +3646,16 @@ L304_Func_t3:
   mov ax, [bp]
   jmp [ax]
 
-L305_Cont:
+L305: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L306_Func_t1:
+L306: ; Function: t1
   push cx
-  push #L305_Cont
+  push #L305
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3664,7 +3663,7 @@ L306_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L307_Cont:
+L307: ; Continuation
   mov ax, 384
   call bios_put_char
   mov 201, ax
@@ -3675,9 +3674,9 @@ L307_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L308_Cont:
+L308: ; Continuation
   push cx
-  push #L307_Cont
+  push #L307
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_180'18 (g183)
   mov bp, dx
@@ -3685,12 +3684,12 @@ L308_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L309_Cont:
+L309: ; Continuation
   push [bp+2]
-  push #L306_Func_t1
+  push #L306
   mov 201, sp
   push cx
-  push #L308_Cont
+  push #L308
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3698,10 +3697,10 @@ L309_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L310_Cont:
+L310: ; Continuation
   push [bp+2]
   push cx
-  push #L309_Cont
+  push #L309
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_131'25 (g182)
   mov bp, dx
@@ -3709,7 +3708,7 @@ L310_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L311_Arm1:
+L311: ; Arm: 180'9
   mov ax, [bp+4]
   mov ax, [ax+1]
   mov 201, ax
@@ -3717,11 +3716,11 @@ L311_Arm1:
   mov ax, [ax+2]
   mov 202, ax
   push [bp+2]
-  push #L304_Func_t3
+  push #L304
   mov 203, sp
   push [bp+2]
   push cx
-  push #L310_Cont
+  push #L310
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t3)
   mov bp, 101
@@ -3729,16 +3728,16 @@ L311_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L312_Cont:
+L312: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L313_Func_t1:
+L313: ; Function: t1
   push cx
-  push #L312_Cont
+  push #L312
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3746,16 +3745,16 @@ L313_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L314_Cont:
+L314: ; Continuation
   ;; (176'6) Tail: loop (g186) @ con_176'6 (g196)
   mov bp, 386
   mov dx, 396
   mov ax, [bp]
   jmp [ax]
 
-L315_Cont:
+L315: ; Continuation
   push cx
-  push #L314_Cont
+  push #L314
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_182'16 (g185)
   mov bp, dx
@@ -3763,12 +3762,12 @@ L315_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L316_Arm2:
+L316: ; Arm: 181'7
   push [bp+2]
-  push #L313_Func_t1
+  push #L313
   mov 201, sp
   push cx
-  push #L315_Cont
+  push #L315
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3776,27 +3775,27 @@ L316_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L317_Arm1:
+L317: ; Arm: 212'49
   mov ax, [bp+4]
   mov ax, [ax]
   cmp ax, #1
-  bz L311_Arm1
+  bz L311
   mov ax, [bp+4]
   mov ax, [ax]
   cmp ax, #0
-  bz L316_Arm2
+  bz L316
   crash
 
-L318_Cont:
+L318: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L319_Func_t1:
+L319: ; Function: t1
   push cx
-  push #L318_Cont
+  push #L318
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3804,16 +3803,16 @@ L319_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L320_Cont:
+L320: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L321_Func_t1:
+L321: ; Function: t1
   push cx
-  push #L320_Cont
+  push #L320
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -3821,7 +3820,7 @@ L321_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L322_Cont:
+L322: ; Continuation
   mov ax, 413
   call bios_put_char
   mov 201, ax
@@ -3832,9 +3831,9 @@ L322_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L323_Cont:
+L323: ; Continuation
   push cx
-  push #L322_Cont
+  push #L322
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_191'13 (g212)
   mov bp, dx
@@ -3842,12 +3841,12 @@ L323_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L324_Cont:
+L324: ; Continuation
   push [bp+2]
-  push #L321_Func_t1
+  push #L321
   mov 201, sp
   push cx
-  push #L323_Cont
+  push #L323
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3855,10 +3854,10 @@ L324_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L325_Cont:
+L325: ; Continuation
   push [bp+2]
   push cx
-  push #L324_Cont
+  push #L324
   mov cx, sp
   ;; (100'26) Tail: put_chars (g15) @ case_91'2 (arg)
   mov bp, 115
@@ -3866,7 +3865,7 @@ L325_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L326_Arm1:
+L326: ; Arm: 91'11
   ;; (0'0) Return: con_0'0 (g210)
   mov dx, 410
   mov bp, cx
@@ -3874,7 +3873,7 @@ L326_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L327_Cont:
+L327: ; Continuation
   ;; (91'41) Tail: app_91'38 (arg) @ n (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
@@ -3883,10 +3882,10 @@ L327_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L328_Arm2:
+L328: ; Arm: 91'28
   push [bp+3]
   push cx
-  push #L327_Cont
+  push #L327
   mov cx, sp
   ;; (91'38) Tail: loop (g202) @ con_91'38 (g211)
   mov bp, 402
@@ -3894,30 +3893,30 @@ L328_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L329_Cont:
+L329: ; Continuation
   mov ax, [bp+3]
   cmp ax, 407
   call bios_make_bool_from_z
   mov 201, ax
   push [bp+2]
   push cx
-  push #L325_Cont
+  push #L325
   mov cx, sp
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L326_Arm1
+  bz L326
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L328_Arm2
+  bz L328
   crash
 
-L330_Cont:
+L330: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L329_Cont
+  push #L329
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_189'13 (g201)
   mov bp, dx
@@ -3925,14 +3924,14 @@ L330_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L331_Cont:
+L331: ; Continuation
   push [bp+2]
-  push #L319_Func_t1
+  push #L319
   mov 201, sp
   push [bp+3]
   push [bp+2]
   push cx
-  push #L330_Cont
+  push #L330
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t1)
   mov bp, 101
@@ -3940,11 +3939,11 @@ L331_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L332_Cont:
+L332: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L331_Cont
+  push #L331
   mov cx, sp
   ;; (188'12) Tail: put_chars (g15) @ app_188'46 (arg)
   mov bp, 115
@@ -3952,11 +3951,11 @@ L332_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L333_Cont:
+L333: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L332_Cont
+  push #L332
   mov cx, sp
   ;; (188'46) Tail: app_188'20 (f4) @ app_188'60 (arg)
   mov bp, [bp+4]
@@ -3964,12 +3963,12 @@ L333_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L334_Cont:
+L334: ; Continuation
   push dx
   push [bp+5]
   push [bp+2]
   push cx
-  push #L333_Cont
+  push #L333
   mov cx, sp
   ;; (188'60) Tail: star_the_ohs (f4) @ xs (f3)
   mov dx, [bp+3]
@@ -3977,13 +3976,13 @@ L334_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L335_Cont:
+L335: ; Continuation
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L334_Cont
+  push #L334
   mov cx, sp
   ;; (188'20) Tail: append (g8) @ app_188'29 (arg)
   mov bp, 108
@@ -3991,13 +3990,13 @@ L335_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L336_Cont:
+L336: ; Continuation
   push dx
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L335_Cont
+  push #L335
   mov cx, sp
   ;; (188'29) Tail: explode (f2) @ lit_188'29 (g200)
   mov bp, [bp+2]
@@ -4005,12 +4004,12 @@ L336_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L337_Cont:
+L337: ; Continuation
   push dx
   push [bp+3]
   push [bp+2]
   push cx
-  push #L336_Cont
+  push #L336
   mov cx, sp
   ;; (187'17) Tail: length (g12) @ xs (f3)
   mov dx, [bp+3]
@@ -4018,11 +4017,11 @@ L337_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L338_Arm2:
+L338: ; Arm: 212'66
   push [bp+3]
   push [bp+2]
   push cx
-  push #L337_Cont
+  push #L337
   mov cx, sp
   ;; (186'25) Tail: map (g10) @ lam_186'30 (g199)
   mov bp, 110
@@ -4030,23 +4029,23 @@ L338_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L339_Cont:
+L339: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L317_Arm1
+  bz L317
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L338_Arm2
+  bz L338
   crash
 
-L340_Cont:
+L340: ; Continuation
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L339_Cont
+  push #L339
   mov cx, sp
   ;; (60'44) Tail: app_60'41 (arg) @ ys (f5)
   ;; use temp ax while setting up bp/dx
@@ -4056,13 +4055,13 @@ L340_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L341_Cont:
+L341: ; Continuation
   push [bp+6]
   push [bp+5]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L340_Cont
+  push #L340
   mov cx, sp
   ;; (60'41) Tail: app_60'33 (arg) @ command (f4)
   ;; use temp ax while setting up bp/dx
@@ -4072,14 +4071,14 @@ L341_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L342_Cont:
+L342: ; Continuation
   push dx
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L341_Cont
+  push #L341
   mov cx, sp
   ;; (60'33) Tail: eq_list (g3) @ lam_0'0 (g181)
   mov bp, 103
@@ -4087,13 +4086,13 @@ L342_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L343_Arm2:
+L343: ; Arm: 211'66
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L342_Cont
+  push #L342
   mov cx, sp
   ;; (212'42) Tail: explode (f2) @ lit_212'42 (g180)
   mov bp, [bp+2]
@@ -4101,24 +4100,24 @@ L343_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L344_Cont:
+L344: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L302_Arm1
+  bz L302
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L343_Arm2
+  bz L343
   crash
 
-L345_Cont:
+L345: ; Continuation
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L344_Cont
+  push #L344
   mov cx, sp
   ;; (60'44) Tail: app_60'41 (arg) @ ys (f6)
   ;; use temp ax while setting up bp/dx
@@ -4128,14 +4127,14 @@ L345_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L346_Cont:
+L346: ; Continuation
   push [bp+6]
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L345_Cont
+  push #L345
   mov cx, sp
   ;; (60'41) Tail: app_60'33 (arg) @ command (f4)
   ;; use temp ax while setting up bp/dx
@@ -4145,14 +4144,14 @@ L346_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L347_Cont:
+L347: ; Continuation
   push dx
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L346_Cont
+  push #L346
   mov cx, sp
   ;; (60'33) Tail: eq_list (g3) @ lam_0'0 (g134)
   mov bp, 103
@@ -4160,13 +4159,13 @@ L347_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L348_Arm2:
+L348: ; Arm: 210'62
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L347_Cont
+  push #L347
   mov cx, sp
   ;; (211'40) Tail: explode (f2) @ lit_211'40 (g133)
   mov bp, [bp+2]
@@ -4174,24 +4173,24 @@ L348_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L349_Cont:
+L349: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L250_Arm1
+  bz L250
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L348_Arm2
+  bz L348
   crash
 
-L350_Cont:
+L350: ; Continuation
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L349_Cont
+  push #L349
   mov cx, sp
   ;; (60'44) Tail: app_60'41 (arg) @ ys (f6)
   ;; use temp ax while setting up bp/dx
@@ -4201,14 +4200,14 @@ L350_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L351_Cont:
+L351: ; Continuation
   push [bp+6]
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L350_Cont
+  push #L350
   mov cx, sp
   ;; (60'41) Tail: app_60'33 (arg) @ command (f4)
   ;; use temp ax while setting up bp/dx
@@ -4218,14 +4217,14 @@ L351_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L352_Cont:
+L352: ; Continuation
   push dx
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L351_Cont
+  push #L351
   mov cx, sp
   ;; (60'33) Tail: eq_list (g3) @ lam_0'0 (g87)
   mov bp, 103
@@ -4233,7 +4232,7 @@ L352_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L353_Arm2:
+L353: ; Arm: 209'18
   mov ax, dx
   mov ax, [ax+1]
   mov 201, ax
@@ -4245,7 +4244,7 @@ L353_Arm2:
   push [bp+4]
   push [bp+2]
   push cx
-  push #L352_Cont
+  push #L352
   mov cx, sp
   ;; (210'38) Tail: explode (f2) @ lit_210'38 (g86)
   mov bp, [bp+2]
@@ -4253,27 +4252,27 @@ L353_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L354_Cont:
+L354: ; Continuation
   push [bp+3]
   push cx
-  push #L197_Cont
+  push #L197
   mov cx, sp
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L198_Arm1
+  bz L198
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L353_Arm2
+  bz L353
   crash
 
-L355_Cont:
+L355: ; Continuation
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L354_Cont
+  push #L354
   mov cx, sp
   ;; (203'18) Tail: app_203'15 (arg) @ xs (f4)
   ;; use temp ax while setting up bp/dx
@@ -4283,12 +4282,12 @@ L355_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L356_Cont:
+L356: ; Continuation
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L355_Cont
+  push #L355
   mov cx, sp
   ;; (203'15) Tail: app_203'12 (arg) @ con_203'15 (g84)
   mov bp, dx
@@ -4296,12 +4295,12 @@ L356_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L357_Arm2:
+L357: ; Arm: 218'45
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L356_Cont
+  push #L356
   mov cx, sp
   ;; (203'12) Tail: splitloop (g66) @ con_203'12 (g83)
   mov bp, 166
@@ -4309,23 +4308,23 @@ L357_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L358_Cont:
+L358: ; Continuation
   mov ax, dx
   mov ax, [ax]
   cmp ax, #1
-  bz L196_Arm1
+  bz L196
   mov ax, dx
   mov ax, [ax]
   cmp ax, #0
-  bz L357_Arm2
+  bz L357
   crash
 
-L359_Cont:
+L359: ; Continuation
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L358_Cont
+  push #L358
   mov cx, sp
   ;; (60'44) Tail: app_60'41 (arg) @ con_0'0 (g81)
   mov bp, dx
@@ -4333,12 +4332,12 @@ L359_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L360_Cont:
+L360: ; Continuation
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L359_Cont
+  push #L359
   mov cx, sp
   ;; (60'41) Tail: app_60'33 (arg) @ xs (f4)
   ;; use temp ax while setting up bp/dx
@@ -4348,12 +4347,12 @@ L360_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L361_Cont:
+L361: ; Continuation
   push dx
   push [bp+3]
   push [bp+2]
   push cx
-  push #L360_Cont
+  push #L360
   mov cx, sp
   ;; (60'33) Tail: eq_list (g3) @ lam_0'0 (g78)
   mov bp, 103
@@ -4361,11 +4360,11 @@ L361_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L362_Cont:
+L362: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L361_Cont
+  push #L361
   mov cx, sp
   ;; (121'28) Tail: readloop (g23) @ con_121'28 (g77)
   mov bp, 123
@@ -4373,11 +4372,11 @@ L362_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L363_Func_t1:
+L363: ; Function: t1
   push bp
   push [bp+1]
   push cx
-  push #L362_Cont
+  push #L362
   mov cx, sp
   ;; (216'12) Tail: put_chars (g15) @ con_216'13 (g76)
   mov bp, 115
@@ -4385,16 +4384,16 @@ L363_Func_t1:
   mov ax, [bp]
   jmp [ax]
 
-L364_Cont:
+L364: ; Continuation
   ;; (98'48) Tail: put_chars (g15) @ app_98'57 (arg)
   mov bp, 115
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L365_Func_t2:
+L365: ; Function: t2
   push cx
-  push #L364_Cont
+  push #L364
   mov cx, sp
   ;; (98'57) Tail: explode (f1) @ s (arg)
   mov bp, [bp+1]
@@ -4402,17 +4401,17 @@ L365_Func_t2:
   mov ax, [bp]
   jmp [ax]
 
-L366_Cont:
+L366: ; Continuation
   ;; (223'11) Tail: mainloop (f2) @ con_223'11 (g216)
   mov bp, [bp+2]
   mov dx, 416
   mov ax, [bp]
   jmp [ax]
 
-L367_Cont:
+L367: ; Continuation
   push [bp+2]
   push cx
-  push #L366_Cont
+  push #L366
   mov cx, sp
   ;; (98'61) Tail: app_98'28 (arg) @ lit_222'13 (g215)
   mov bp, dx
@@ -4420,16 +4419,16 @@ L367_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L368_Cont:
+L368: ; Continuation
   push dx
-  push #L363_Func_t1
+  push #L363
   mov 201, sp
   push dx
-  push #L365_Func_t2
+  push #L365
   mov 202, sp
   push 201
   push cx
-  push #L367_Cont
+  push #L367
   mov cx, sp
   ;; (98'28) Tail: block (g1) @ lam_98'33 (t2)
   mov bp, 101
@@ -4437,10 +4436,10 @@ L368_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L369_Top:
-  push #L2_TopLam_g1
+L369: ; Start
+  push #L2
   mov 101, sp
-  push #L3_TopLam_g2
+  push #L3
   mov 102, sp
   push #1
   mov 104, sp
@@ -4450,21 +4449,21 @@ L369_Top:
   mov 106, sp
   push #0
   mov 107, sp
-  push #L18_TopLam_g3
+  push #L18
   mov 103, sp
-  push #L24_TopLam_g8
+  push #L24
   mov 108, sp
-  push #L29_TopLam_g9
+  push #L29
   mov 109, sp
   push #0
   mov 111, sp
-  push #L36_TopLam_g10
+  push #L36
   mov 110, sp
   mov ax, #0
   mov 113, ax
   mov ax, #1
   mov 114, ax
-  push #L40_TopLam_g12
+  push #L40
   mov 112, sp
   push #0
   mov 116, sp
@@ -4480,7 +4479,7 @@ L369_Top:
   mov 121, ax
   mov ax, #1
   mov 122, ax
-  push #L50_TopLam_g15
+  push #L50
   mov 115, sp
   push #0
   mov 124, sp
@@ -4546,7 +4545,7 @@ L369_Top:
   mov 154, ax
   mov ax, #1
   mov 155, ax
-  push #L83_TopLam_g23
+  push #L83
   mov 123, sp
   mov ax, #2
   mov 157, ax
@@ -4554,7 +4553,7 @@ L369_Top:
   mov 158, ax
   mov ax, #2
   mov 159, ax
-  push #L88_TopLam_g56
+  push #L88
   mov 156, sp
   mov ax, #2
   mov 161, ax
@@ -4566,7 +4565,7 @@ L369_Top:
   mov 164, ax
   mov ax, #1
   mov 165, ax
-  push #L95_TopLam_g60
+  push #L95
   mov 160, sp
   push #0
   mov 167, sp
@@ -4578,7 +4577,7 @@ L369_Top:
   mov 170, sp
   push #0
   mov 171, sp
-  push #L111_TopLam_g66
+  push #L111
   mov 166, sp
   mov ax, #'>'
   mov 172, ax
@@ -4596,7 +4595,7 @@ L369_Top:
   mov 176, sp
   push #0
   mov 177, sp
-  push #L113_TopLam_g78
+  push #L113
   mov 178, sp
   mov ax, #'\EOT'
   mov 179, ax
@@ -4626,7 +4625,7 @@ L369_Top:
   push #1
   mov ax, sp
   mov 186, ax
-  push #L115_TopLam_g87
+  push #L115
   mov 187, sp
   push #0
   push sp
@@ -4873,7 +4872,7 @@ L369_Top:
   mov 305, sp
   mov ax, #10
   mov 306, ax
-  push #L133_TopLam_g95
+  push #L133
   mov 195, sp
   mov ax, #0
   mov 307, ax
@@ -4995,7 +4994,7 @@ L369_Top:
   mov 314, ax
   mov ax, #10
   mov 315, ax
-  push #L138_TopLam_g111
+  push #L138
   mov 311, sp
   mov ax, #0
   mov 316, ax
@@ -5035,7 +5034,7 @@ L369_Top:
   mov 325, ax
   mov ax, #10
   mov 326, ax
-  push #L143_TopLam_g122
+  push #L143
   mov 322, sp
   mov ax, #0
   mov 327, ax
@@ -5066,7 +5065,7 @@ L369_Top:
   push #1
   mov ax, sp
   mov 333, ax
-  push #L145_TopLam_g134
+  push #L145
   mov 334, sp
   push #0
   push sp
@@ -5316,7 +5315,7 @@ L369_Top:
   mov 352, sp
   mov ax, #10
   mov 353, ax
-  push #L163_TopLam_g142
+  push #L163
   mov 342, sp
   mov ax, #0
   mov 354, ax
@@ -5438,7 +5437,7 @@ L369_Top:
   mov 361, ax
   mov ax, #10
   mov 362, ax
-  push #L168_TopLam_g158
+  push #L168
   mov 358, sp
   mov ax, #0
   mov 363, ax
@@ -5478,7 +5477,7 @@ L369_Top:
   mov 372, ax
   mov ax, #10
   mov 373, ax
-  push #L173_TopLam_g169
+  push #L173
   mov 369, sp
   mov ax, #0
   mov 374, ax
@@ -5506,7 +5505,7 @@ L369_Top:
   push #1
   mov ax, sp
   mov 380, ax
-  push #L175_TopLam_g181
+  push #L175
   mov 381, sp
   push #0
   push sp
@@ -5713,7 +5712,7 @@ L369_Top:
   mov 385, ax
   push #0
   mov 387, sp
-  push #L177_TopLam_g188
+  push #L177
   mov 388, sp
   mov ax, #'\EOT'
   mov 389, ax
@@ -5731,7 +5730,7 @@ L369_Top:
   mov 394, ax
   push #0
   mov 395, sp
-  push #L187_TopLam_g186
+  push #L187
   mov 386, sp
   push #0
   mov 396, sp
@@ -5739,7 +5738,7 @@ L369_Top:
   mov 397, ax
   mov ax, #'*'
   mov 398, ax
-  push #L190_TopLam_g199
+  push #L190
   mov 399, sp
   push #0
   push sp
@@ -5800,7 +5799,7 @@ L369_Top:
   mov 405, ax
   mov ax, #10
   mov 406, ax
-  push #L195_TopLam_g202
+  push #L195
   mov 402, sp
   mov ax, #0
   mov 407, ax
@@ -5989,7 +5988,7 @@ L369_Top:
   push #0
   mov 416, sp
   push cx
-  push #L368_Cont
+  push #L368
   mov cx, sp
   ;; (4'23) Tail: block (g1) @ lam_0'0 (g2)
   mov bp, 101

@@ -32,7 +32,7 @@ data Code
   | PushContinuation Fvs (Id,Code) Code
   | Case Id [Arm]
 
-data Arm = ArmTag Ctag [Id] Code
+data Arm = ArmTag Position Ctag [Id] Code
 
 -- Atomic expressions cause only bounded evaluation.
 data Atomic
@@ -80,7 +80,7 @@ prettyA = \case
 
 prettyArm :: Arm -> Lines
 prettyArm = \case
-  ArmTag c xs rhs -> do
+  ArmTag _pos c xs rhs -> do
     indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
 
 prettyPat :: Ctag -> [Id] -> String
@@ -118,9 +118,9 @@ evalCode env = \case
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
             [] -> error "case match failure"
-            ArmTag (Ctag _ tag) xs body : arms -> do
+            ArmTag pos (Ctag _ tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
-                if length xs /= length vArgs then error (show ("case arm mismatch",xs,vArgs)) else do
+                if length xs /= length vArgs then error (show ("case arm mismatch",pos,xs,vArgs)) else do
                   let env' = foldr (uncurry insert) env (zip xs vArgs)
                   evalCode env' body k
         dispatch arms0
@@ -210,9 +210,9 @@ compileExp = \case
       k $ Compound $ Case scrut arms
 
 compileArm :: SRC.Arm -> M Arm
-compileArm (SRC.ArmTag tag xs exp) = do
+compileArm (SRC.ArmTag pos tag xs exp) = do
   exp <- compileTop exp
-  pure $ ArmTag tag xs exp
+  pure $ ArmTag pos tag xs exp
 
 compileAsIds :: [SRC.Exp] -> ([Id] -> M AC) -> M AC
 compileAsIds es k = case es of
@@ -283,7 +283,7 @@ fvs = \case
   PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
   Case scrut arms -> singleton scrut `union` Set.unions (map fvsArm arms)
   where
-    fvsArm (ArmTag _ xs exp) = fvs exp \\ Set.fromList xs
+    fvsArm (ArmTag _pos _cid xs exp) = fvs exp \\ Set.fromList xs
 
 fvsA :: Atomic -> Set Id
 fvsA = \case

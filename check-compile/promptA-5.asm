@@ -1,20 +1,19 @@
 (*Stage5 (ASM)*)
-start=L5_Top
-L1_Arm1:
+L1: ; Arm: 10'29
   ;; (10'40) Tail: outer (g1) @ con_10'40 (g7)
   mov bp, 101
   mov dx, 107
   mov ax, [bp]
   jmp [ax]
 
-L2_Arm2:
+L2: ; Arm: 10'43
   ;; (10'54) Tail: inner (g4) @ con_10'54 (g8)
   mov bp, 104
   mov dx, 108
   mov ax, [bp]
   jmp [ax]
 
-L3_TopLam_g4:
+L3: ; Function: g4
   call bios_get_char
   mov 201, ax
   mov ax, 201
@@ -27,14 +26,14 @@ L3_TopLam_g4:
   mov ax, 203
   mov ax, [ax]
   cmp ax, #1
-  bz L1_Arm1
+  bz L1
   mov ax, 203
   mov ax, [ax]
   cmp ax, #0
-  bz L2_Arm2
+  bz L2
   crash
 
-L4_TopLam_g1:
+L4: ; Function: g1
   mov ax, 102
   call bios_put_char
   mov 201, ax
@@ -47,7 +46,7 @@ L4_TopLam_g1:
   mov ax, [bp]
   jmp [ax]
 
-L5_Top:
+L5: ; Start
   mov ax, #'%'
   mov 102, ax
   mov ax, #' '
@@ -60,11 +59,11 @@ L5_Top:
   mov 107, sp
   push #0
   mov 108, sp
-  push #L3_TopLam_g4
+  push #L3
   mov 104, sp
   push #0
   mov 109, sp
-  push #L4_TopLam_g1
+  push #L4
   mov 101, sp
   push #0
   mov 110, sp

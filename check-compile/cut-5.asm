@@ -1,6 +1,5 @@
 (*Stage5 (ASM)*)
-start=L8_Top
-L1_Arm1:
+L1: ; Arm: 3'11
   ;; (2'13) Return: def (f1)
   mov dx, [bp+1]
   mov bp, cx
@@ -8,19 +7,19 @@ L1_Arm1:
   mov ax, [bp]
   jmp [ax]
 
-L2_Cont:
+L2: ; Continuation
   ;; (4'17) Tail: app_4'9 (arg) @ lit_4'17 (g3)
   mov bp, dx
   mov dx, 103
   mov ax, [bp]
   jmp [ax]
 
-L3_Arm2:
+L3: ; Arm: 3'20
   mov ax, dx
   call bios_num_to_char
   mov 202, ax
   push cx
-  push #L2_Cont
+  push #L2
   mov cx, sp
   ;; (4'9) Tail: loop (g1) @ prim_0'0 (t2)
   mov bp, 101
@@ -28,7 +27,7 @@ L3_Arm2:
   mov ax, [bp]
   jmp [ax]
 
-L4_Func_t1:
+L4: ; Function: t1
   mov ax, dx
   cmp ax, 102
   call bios_make_bool_from_z
@@ -36,16 +35,16 @@ L4_Func_t1:
   mov ax, 201
   mov ax, [ax]
   cmp ax, #1
-  bz L1_Arm1
+  bz L1
   mov ax, 201
   mov ax, [ax]
   cmp ax, #0
-  bz L3_Arm2
+  bz L3
   crash
 
-L5_TopLam_g1:
+L5: ; Function: g1
   push dx
-  push #L4_Func_t1
+  push #L4
   mov 201, sp
   ;; (0'0) Return: lam_2'17 (t1)
   mov dx, 201
@@ -54,7 +53,7 @@ L5_TopLam_g1:
   mov ax, [bp]
   jmp [ax]
 
-L6_Cont:
+L6: ; Continuation
   mov ax, dx
   call bios_put_char
   mov 201, ax
@@ -65,9 +64,9 @@ L6_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L7_Cont:
+L7: ; Continuation
   push cx
-  push #L6_Cont
+  push #L6
   mov cx, sp
   ;; (6'33) Tail: app_6'29 (arg) @ lit_6'33 (g5)
   mov bp, dx
@@ -75,19 +74,19 @@ L7_Cont:
   mov ax, [bp]
   jmp [ax]
 
-L8_Top:
+L8: ; Start
   mov ax, #0
   mov 102, ax
   mov ax, #0
   mov 103, ax
-  push #L5_TopLam_g1
+  push #L5
   mov 101, sp
   mov ax, #'X'
   mov 104, ax
   mov ax, #52
   mov 105, ax
   push cx
-  push #L7_Cont
+  push #L7
   mov cx, sp
   ;; (6'29) Tail: loop (g1) @ lit_6'29 (g4)
   mov bp, 101

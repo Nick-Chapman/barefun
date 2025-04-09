@@ -1,6 +1,5 @@
 (*Stage5 (ASM)*)
-start=L1_Top
-L1_Top:
+L1: ; Start
   mov ax, #'@'
   mov 101, ax
   mov ax, #'A'
