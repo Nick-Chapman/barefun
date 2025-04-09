@@ -46,8 +46,7 @@ L4_Func_t1:
 L5_TopLam_g1:
   push dx
   push #L4_Func_t1
-  mov ax, sp
-  mov 201, ax
+  mov 201, sp
   ;; (0'0) Return: lam_2'17 (t1)
   mov dx, 201
   mov bp, cx

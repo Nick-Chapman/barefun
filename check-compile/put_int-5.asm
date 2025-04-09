@@ -95,8 +95,7 @@ L7_Func_t1:
 L8_TopLam_g3:
   push dx
   push #L7_Func_t1
-  mov ax, sp
-  mov 201, ax
+  mov 201, sp
   ;; (0'0) Return: lam_5'19 (t1)
   mov dx, 201
   mov bp, cx

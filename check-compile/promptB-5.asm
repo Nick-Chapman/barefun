@@ -43,8 +43,7 @@ L4_TopLam_g1:
   mov 202, ax
   push dx
   push #L3_Func_t3
-  mov ax, sp
-  mov 203, ax
+  mov 203, sp
   ;; (11'7) Tail: inner (t3) @ con_11'7 (g6)
   mov dx, 106
   mov bp, 203

@@ -654,8 +654,7 @@ compileFunction who freeVars body = do
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (VCodeLabel lab))
-    , OpMove Ax (SReg Sp) -- TODO: can be avoided
-    ],Ax)
+    ],Sp)
 
 -- TODO: target reg should be passed down
 compileBuiltin :: Builtin -> [Source] -> [Op] -- --> Ax
