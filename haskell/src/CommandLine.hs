@@ -73,7 +73,7 @@ parseCommandLine :: [String] -> Config
 parseCommandLine = loop config0
   where
     config0 = Config { paths = [], mode = Eval
-                     , stage = Stage4 -- TODO: change so Stage5 is default
+                     , stage = Stage5
                      , trace = Stage5.TraceOff }
 
     loop :: Config -> [String] -> Config
