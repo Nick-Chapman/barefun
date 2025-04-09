@@ -552,7 +552,7 @@ compileCode = \case
     pure $ doOps (
       [ OpComment $ printf "(%s) Tail: %s @ %s" (show pos) (ppRef fun) (ppRef arg) ] ++
       -- (arg,frame) = ...
-       moveTwoRegsPar (argReg,compileRef arg) (frameReg,compileRef fun) ++
+       moveTwoRegsPar (frameReg,compileRef fun) (argReg,compileRef arg) ++
       -- code = frame[0]; jmp [code]
       [ OpMove Ax (SMemIndirect frameReg)
       ]) (Done (JumpIndirect Ax))

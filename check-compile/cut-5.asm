@@ -23,8 +23,8 @@ L3_Arm2:
   push #L2_Cont
   mov cx, sp
   ;; (4'9) Tail: loop (g1) @ prim_0'0 (t2)
-  mov dx, 202
   mov bp, 101
+  mov dx, 202
   mov ax, [bp]
   jmp [ax]
 
@@ -90,8 +90,8 @@ L8_Top:
   push #L7_Cont
   mov cx, sp
   ;; (6'29) Tail: loop (g1) @ lit_6'29 (g4)
-  mov dx, 104
   mov bp, 101
+  mov dx, 104
   mov ax, [bp]
   jmp [ax]
 

@@ -9,8 +9,8 @@ L1_Arm1:
 
 L2_Arm2:
   ;; (9'51) Tail: inner (me) @ con_9'51 (g5)
-  mov dx, 105
   mov bp, bp
+  mov dx, 105
   mov ax, [bp]
   jmp [ax]
 
@@ -45,8 +45,8 @@ L4_TopLam_g1:
   push #L3_Func_t3
   mov 203, sp
   ;; (11'7) Tail: inner (t3) @ con_11'7 (g6)
-  mov dx, 106
   mov bp, 203
+  mov dx, 106
   mov ax, [bp]
   jmp [ax]
 
@@ -66,8 +66,8 @@ L5_Top:
   mov ax, #'%'
   mov 107, ax
   ;; (14'8) Tail: outer (g1) @ lit_14'8 (g7)
-  mov dx, 107
   mov bp, 101
+  mov dx, 107
   mov ax, [bp]
   jmp [ax]
 
