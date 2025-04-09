@@ -581,18 +581,28 @@ compileCode = \case
 
   SRC.Case scrut arms -> do
     case arms of
-      [] -> undefined scrut compileArm
-      [arm1] -> undefined arm1
+      [] -> undefined -- not allowed by syntax/ocaml-checker
+      [arm1] -> undefined arm1 -- TODO: need example for this
       [arm1,arm2] -> do
+        let s :: Source = compileRef scrut
+        -- TODO: share unpacking of the tag
+        lab1 <- compileArm s arm1 >>= CutCode "Arm1" -- TODO: thread position from "->" syntax
+        ops1 <- compileArmBranch s arm1 lab1
+        lab2 <- compileArm s arm2 >>= CutCode "Arm2"
+        ops2 <- compileArmBranch s arm2 lab2
+        pure $ doOps (ops1 ++ ops2) (Done Crash)
+      [arm1,arm2,arm3] -> do
         let s :: Source = compileRef scrut
         -- TODO: share unpacking of the tag
         lab1 <- compileArm s arm1 >>= CutCode "Arm1"
         ops1 <- compileArmBranch s arm1 lab1
         lab2 <- compileArm s arm2 >>= CutCode "Arm2"
         ops2 <- compileArmBranch s arm2 lab2
-        pure $ doOps (ops1 ++ ops2) (Done Crash)
+        lab3 <- compileArm s arm3 >>= CutCode "Arm3"
+        ops3 <- compileArmBranch s arm3 lab3
+        pure $ doOps (ops1 ++ ops2 ++ ops3) (Done Crash)  -- TODO: special case final arm to void test/jump
       _ ->
-        undefined
+        undefined -- TODO: generalize for any number of arms
 
 -- assign two regs in parallel, using a temp id required
 moveTwoRegsPar :: (Reg,Source) -> (Reg,Source) -> [Op]

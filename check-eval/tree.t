@@ -7,6 +7,10 @@ Ocaml REPL
 
 Haskell REPL
 
-  $ ../haskell/main.exe ../examples/tree.fun
+  $ ../haskell/main.exe ../examples/tree.fun -4
   [Stage4 (CCF); normalization: 178 -> 95]
   955[HALT:#push-continuation=10, #enter=17, #return=11, #prim=22]
+
+  $ ../haskell/main.exe ../examples/tree.fun -5
+  [Stage5 (ASM); normalization: 178 -> 95]
+  955[HALT:#op=444]
