@@ -8,7 +8,7 @@ data Builtin
   = PutChar | GetChar
   | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
   | EqChar | CharOrd | CharChr
-  | Explode
+  | Explode -- TODO: remove in favour of string-length/index
   deriving (Show)
 
 data Semantics

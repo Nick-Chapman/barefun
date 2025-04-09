@@ -1,4 +1,4 @@
--- | Locate identifier references at runtime; lift globals
+-- | Generate x86 assembly
 module Stage5_ASM
   ( execute, TraceFlag(..)
   , compile
@@ -29,7 +29,7 @@ data Image = Image
   }
 
 data Code
-  = Do Op Code -- TODO: comment/label/name every op code for debug
+  = Do Op Code
   | Done Jump
 
 data Op -- target; source
@@ -39,16 +39,17 @@ data Op -- target; source
   | OpCall BareBios
   | OpPush Source
   | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
+  | OpBranchFlagZ CodeLabel
   | OpAddInto Reg Source
   | OpSubInto Reg Source
   | OpMulInto Reg Source
-  | OpDivInto Reg Source -- TODO: check we have an op like this in x86. maybe requires specific regs
-  | OpModInto Reg Source -- TODO: check we have an op like this in x86. maybe requires specific regs
-  | OpBranchFlagZ CodeLabel
+  -- TODO: x86 div/mod are the same instruction, makeing uses of specific registers
+  | OpDivInto Reg Source
+  | OpModInto Reg Source
 
 data Jump
   = JumpDirect CodeLabel
-  | JumpIndirect Reg -- must contain a CodeLabel
+  | JumpIndirect Reg
   | Crash
 
 data Source
@@ -58,42 +59,35 @@ data Source
   | SMemIndirect Reg
   | SMemIndirectOffset Reg Int
 
--- Val: what's in a regsiter or a memory location.
--- we use a variant type here to help catch any compiler bugs during dev
--- but eventually these will share the same 16b or 32b word
--- and each reference will have to know exactly how to interpreter the value
--- mostly not a problem
--- except for GC which need to distinguish pointer from non-pointer
--- Possible solutions to this. (1) Tagging. (2) Descriptor Word
-data Val
+-- Val is a structure type for the contents of a register or memory location
+-- We use a variant type to help catch compiler bugs during dev.
+-- On a real system, the representations will overlap.
+-- Tagging will distinguish pointer from non-pointer.
+
+data Val -- TODO: rename Word?
   = VChar Char
-  | VNum Word16 -- TODO: at some point gonna have to decide on 16b or 32b numbers (or 15/31 if we tag)
+  | VNum Word16 -- TODO: single definition for the type of tag/numbers across the whole compiler
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
   deriving Eq
 
--- maybe longer names so it is clear these are regs
--- or maybe move generic/abstract names, which can be mapped to concrete x86 registers later
--- using Ax and Bx as temps everywhere
-data Reg = Ax | Bx | Cx | Dx | Sp | Bp | RegWhat
+data Reg = Ax | Bx | Cx | Dx | Sp | Bp -- TODO: Si | Di
   deriving (Eq,Ord)
 
--- TODO: maybe no point in a new type for MemAddr, just alias a numeric type
--- TODO: rename Addr
-data MemAddr = MemAddr Int -- needs to be a numbers, so we can do offseting
+data MemAddr = MemAddr Int -- TODO: rename Addr
   deriving (Eq,Ord)
 
 data CodeLabel = CodeLabel Int String -- unique label and provenance
   deriving (Eq,Ord)
 
-data DataLabel = DataLabel String -- TODO: provenance TODO: use!
+data DataLabel = DataLabel String -- TODO: use!
 
 data BareBios
   = BiosPutCharInAx
   | BiosGetCharInAx
-  | BiosMakeBoolFromFlagZ -- TODO: dedup code for Flag Z/N (if we get a 3rd flag!)
+  | BiosMakeBoolFromFlagZ -- TODO: dedup code for Flag Z/N
   | BiosMakeBoolFromFlagN
-  | BiosExplode -- TODO: dont want this in Bios
+  | BiosExplode -- TODO: remove when builtin explode is removed
   | BiosNumToChar
   | BiosCharToNum
   | BiosHalt
@@ -104,7 +98,6 @@ data BareBios
 
 instance Show Image where
   show Image{cmap,dmap=_,start=_} =
-    -- "start=" ++ show start ++ "\n" ++
     unlines [ printf "%s: ; %s\n%s" (show lab) provenance (show code)
             | (lab@(CodeLabel _ provenance),code) <- Map.toList cmap ]
 
@@ -121,12 +114,12 @@ instance Show Op where
     OpCall mybios -> "call " ++ show mybios
     OpPush src -> "push " ++ show src
     OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
+    OpBranchFlagZ lab ->  "bz " ++ show lab
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulInto r src -> "mul " ++ show r ++ ", " ++ show src
-    OpDivInto r src -> "div " ++ show r ++ ", " ++ show src -- TODO: check how written in x86
-    OpModInto r src -> "mod " ++ show r ++ ", " ++ show src -- TODO: check how written in x86
-    OpBranchFlagZ lab ->  "bz " ++ show lab
+    OpDivInto r src -> "div " ++ show r ++ ", " ++ show src
+    OpModInto r src -> "mod " ++ show r ++ ", " ++ show src
 
 instance Show Jump where
   show = \case
@@ -138,19 +131,13 @@ instance Show Source where
   show = \case
     SReg r -> show r
     SLit v -> "#" ++ show v
-    SMem a -> show a
+    SMem a -> show a -- TODO: need square brackets here too!
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
 
 instance Show Val where
   show = \case
     VChar c -> show c
-    -- TODO: number and address look the same. fix? perhaps diff bases
-    -- hmm, will make numbers look different.
-    -- because simplest impl will be to tag numbers to distinguish from addresses
-    --VNum n -> printf "N:%03d" n
-    --VMemAddr (MemAddr n) -> printf "A:%03d" n
-    --VCodeLabel (CodeLabel n) -> printf "L:%03d" n
     VNum n -> show n
     VMemAddr a -> show a
     VCodeLabel lab -> show lab
@@ -163,9 +150,8 @@ instance Show Reg where
     Dx -> "dx"
     Sp -> "sp"
     Bp -> "bp"
-    RegWhat -> "r?"
 
-instance Show MemAddr where show (MemAddr n) = show n
+instance Show MemAddr where show (MemAddr n) = show n -- TODO: show Addr in different base
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
 instance Show DataLabel where show (DataLabel id) = "D" ++ show id
 
@@ -204,82 +190,50 @@ execCode = \case
 execOp :: Op -> M () -> M ()
 execOp = \case
   OpComment{} -> error "execOp/OpComment"
-  OpMove r s -> \cont -> do v <- evalSource "OpMove" s; SetReg r v; cont
+  OpMove r s -> \cont -> do v <- evalSource s; SetReg r v; cont
   OpStore a r -> \cont -> do v <- GetReg r; SetMem a v; cont
   OpCall bios -> \cont -> do execBios bios; cont
   OpPush s -> \cont -> do
-    v <- evalSource "OpPush" s
-    a <- deMemAddr "push" <$> GetReg Sp
+    v <- evalSource s
+    a <- deMemAddr <$> GetReg Sp
     let a' = prevAddr a
     SetMem a' v
     SetReg Sp (VMemAddr a')
     cont
   OpCmp s1 s2 -> \cont -> do
-    v1 <- evalSource "OpCmp/1" s1
-    v2 <- evalSource "OpCmp/2" s2
+    v1 <- evalSource s1
+    v2 <- evalSource s2
     SetFlagZ (equalV v1 v2)
     SetFlagN (lessV v1 v2) -- i.e. a subtraction would go negative
-    cont
-  OpAddInto r s -> \cont -> do -- TODO: dedup binary op execution
-    v1 <- GetReg r
-    v2 <- evalSource "OpAddInto" s
-    SetReg r (addV v1 v2)
-    cont
-  OpSubInto r s -> \cont -> do
-    v1 <- GetReg r
-    v2 <- evalSource "OpSubInto" s
-    SetReg r (subV v1 v2)
-    cont
-  OpMulInto r s -> \cont -> do
-    v1 <- GetReg r
-    v2 <- evalSource "OpMulInto" s
-    SetReg r (mulV v1 v2)
-    cont
-  OpDivInto r s -> \cont -> do
-    v1 <- GetReg r
-    v2 <- evalSource "OpDivInto" s
-    SetReg r (divV v1 v2)
-    cont
-  OpModInto r s -> \cont -> do
-    v1 <- GetReg r
-    v2 <- evalSource "OpModInto" s
-    SetReg r (modV v1 v2)
     cont
   OpBranchFlagZ lab -> \cont -> do
     b <- GetFlagZ
     case b of
-      False -> cont
-      True -> do
-        -- ignore the continuation
-        code <- GetCode lab
-        execCode code
+      False -> cont -- branch not taken
+      True -> GetCode lab >>= execCode -- branch taken; ignore the continuation
+  OpAddInto r s -> execBinaryOp (+) r s
+  OpSubInto r s -> execBinaryOp (-) r s
+  OpMulInto r s -> execBinaryOp (*) r s
+  OpDivInto r s -> execBinaryOp div r s
+  OpModInto r s -> execBinaryOp mod r s
 
+execBinaryOp :: (Word16 -> Word16 -> Word16) -> Reg -> Source -> M () -> M ()
+execBinaryOp f r s = \cont -> do
+    v1 <- GetReg r
+    v2 <- evalSource s
+    SetReg r (binaryV f v1 v2)
+    cont
 
-addV :: Val -> Val -> Val
-addV = binV (+)
-
-subV :: Val -> Val -> Val -- TODO: inline all these
-subV = binV (-)
-
-mulV :: Val -> Val -> Val
-mulV = binV (*)
-
-divV :: Val -> Val -> Val
-divV = binV div
-
-modV :: Val -> Val -> Val
-modV = binV mod
-
-evalSource :: String -> Source -> M Val
-evalSource who = \case -- TODO: loose who
+evalSource :: Source -> M Val
+evalSource = \case
   SReg r -> GetReg r
   SLit v -> pure v
   SMem a -> GetMem a
   SMemIndirect r -> do
-    a <- deMemAddr (show (who,"source-indirect")) <$> GetReg r
+    a <- deMemAddr <$> GetReg r
     GetMem a
   SMemIndirectOffset r i -> do
-    a <- deMemAddr (show (who,"source-indirect-offset")) <$> GetReg r
+    a <- deMemAddr  <$> GetReg r
     GetMem (addAddr i a)
 
 execBios :: BareBios -> M ()
@@ -292,7 +246,7 @@ execBios = \case
   BiosMakeBoolFromFlagN -> do
     b <- GetFlagN
     SetReg Ax (VMemAddr (if b then aTrue else aFalse))
-  BiosHalt -> XHalt
+  BiosHalt -> Halt
   BiosExplode -> do
     -- null execution effect because
     -- string rep == char list rep
@@ -306,7 +260,6 @@ execBios = \case
     c <- deChar <$> GetReg Ax
     SetReg Ax (VNum (fromIntegral $ Char.ord c))
 
-
 execJump :: Jump -> M ()
 execJump = \case
   JumpDirect{} -> undefined GetCode
@@ -318,11 +271,11 @@ execJump = \case
   Crash -> do
     error "Crash"
 
-binV :: (Word16 -> Word16 -> Word16) -> Val -> Val -> Val
-binV f v1 v2 =
+binaryV :: (Word16 -> Word16 -> Word16) -> Val -> Val -> Val
+binaryV f v1 v2 =
   case (v1,v2) of
     (VNum n1,VNum n2) -> VNum (f n1 n2)
-    _ -> error (show ("subV/unexpected-types",v1,v2))
+    _ -> error (show ("binaryV/unexpected-types",v1,v2))
 
 equalV :: Val -> Val -> Bool
 equalV v1 v2 =
@@ -338,8 +291,8 @@ lessV v1 v2 =
     (VNum n1,VNum n2) -> (n1 < n2)
     _ -> error (show ("lessV/unexpected-types",v1,v2))
 
-deMemAddr :: String -> Val -> MemAddr
-deMemAddr who = \case VMemAddr x -> x; v -> error (show("deMemAddr",who,v))
+deMemAddr :: Val -> MemAddr
+deMemAddr = \case VMemAddr x -> x; v -> error (show("deMemAddr",v))
 
 deCodeLabel :: Val -> CodeLabel
 deCodeLabel = \case VCodeLabel x -> x; v -> error (show ("deCodeLabel", v))
@@ -356,18 +309,17 @@ prevAddr = addAddr (-1)
 addAddr :: Int -> MemAddr -> MemAddr
 addAddr i (MemAddr n) = MemAddr (n+i)
 
+----------------------------------------------------------------------
+-- Execution monad (emulation!)
+
 instance Functor M where fmap = liftM
 instance Applicative M where pure = Ret; (<*>) = ap
 instance Monad M where (>>=) = Bind
 
-----------------------------------------------------------------------
--- Execution monad (emulation!) name X maybe. or Emu. or M is ok!
--- handles state for regs/memory & access to code from the image
-
 data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
-  XHalt :: M ()
+  Halt :: M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
   GetCode :: CodeLabel -> M Code
@@ -382,62 +334,20 @@ data M a where
   PutChar :: Char -> M ()
   GetChar :: M Char
 
-debug :: Show a => a -> Interaction -> Interaction
-debug _ i = i -- disabled
-
-data State = State
-  { rmap :: Map Reg Val
-  , mem :: Map MemAddr Val
-  , flagZ :: Bool
-  , flagN :: Bool
-  , countOps :: Int
-  , lastCodeLabel :: CodeLabel
-  , offsetFromLastLabel :: Int
-  }
-
-instance Show State where
-  show State{rmap} =
-    intercalate " " [ show k ++ "=" ++ show v | (k,v) <- Map.toList rmap ]
-
 runM :: TraceFlag  -> Image -> M () -> Interaction
 runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
   -- TODO: init mem from vals portion of image -- and compile top/loadable to use it
   where
 
+    k0 _s () = IDone
+
+    cmap = Map.insert finalCodeLabel finalCode cmapUser
+    finalCode = Do (OpCall BiosHalt) (Done Crash)
+
     trace :: String -> Interaction -> Interaction
     trace = case traceFlag of
       TraceOn -> ITrace
       TraceOff -> \_s i -> i
-
-    cmap = Map.insert finalCodeLabel finalCode cmapUser
-      where finalCode = Do (OpCall BiosHalt) (Done Crash)
-
-    finalCodeLabel = CodeLabel 0 "FINAL"
-
-    state0 :: State
-    state0 = State
-      { mem
-      , rmap
-      , flagZ = error "flagZ/uninitialized"
-      , flagN = error "flagN/uninitialized"
-      , countOps = 0
-      , lastCodeLabel = error "lastCodeLabel"
-      , offsetFromLastLabel = error "offsetFromLastLabel"
-      }
-      where
-        initialStackPointer = MemAddr 0 -- stack address will be negative
-        rmap = Map.fromList
-          [ (Sp, VMemAddr initialStackPointer)
-          , (Cx, VMemAddr aFinalCont)
-          ]
-        mem = Map.fromList
-          [ (aFalse, VNum tFalse)
-          , (aTrue, VNum tTrue)
-          , (aFinalCont, VCodeLabel finalCodeLabel)
-          , (addAddr 1 aFinalCont, VChar 'X') -- dummy next cont
-          ]
-
-    k0 _s () = IDone
 
     traceOpOJump thing s k = trace (show s ++ " ") $ ITick I.Op $ do
       let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
@@ -453,34 +363,25 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
 
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
     loop s@State{rmap,mem,flagZ,flagN} m k = case m of
+
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
-      XHalt -> IDone
+      Halt -> IDone
 
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k
 
-      GetCode lab -> debug ("GetCode",lab) $ do
+      GetCode lab -> do
         k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
 
-      SetReg r v -> debug ("SetReg",r,v) $ do
-        k s { rmap = Map.insert r v rmap } ()
+      SetReg r v -> k s { rmap = Map.insert r v rmap } ()
+      GetReg r -> k s (maybe err id $ Map.lookup r rmap)
+        where err = error (show ("GetReg/uninitialized",r))
 
-      GetReg r -> do
-        let v = maybe err id $ Map.lookup r rmap
-              where err = error (show ("GetReg/uninitialized",r))
-        debug ("GetReg",r, "->",v) $ do
-          k s v
-
-      SetMem a v -> debug ("SetMem",a,v) $ do
-        k s { mem = Map.insert a v mem } ()
-
-      GetMem a -> do
-        let v = maybe err id $ Map.lookup a mem
-              where err = error (show ("GetMem/uninitialized",a))
-        debug ("GetMem",a,"->",v) $ do
-          k s v
+      SetMem a v -> k s { mem = Map.insert a v mem } ()
+      GetMem a -> k s (maybe err id $ Map.lookup a mem)
+        where err = error (show ("GetMem/uninitialized",a))
 
       SetFlagZ b -> k s { flagZ = b } ()
       GetFlagZ -> k s flagZ
@@ -491,6 +392,43 @@ runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
       PutChar c -> IPut c (k s ())
       GetChar -> IGet $ \c -> k s c
 
+
+data State = State
+  { rmap :: Map Reg Val
+  , mem :: Map MemAddr Val
+  , flagZ :: Bool
+  , flagN :: Bool
+  , countOps :: Int
+  , lastCodeLabel :: CodeLabel
+  , offsetFromLastLabel :: Int
+  }
+
+state0 :: State
+state0 = State
+  { mem
+  , rmap
+  , flagZ = error "flagZ/uninitialized"
+  , flagN = error "flagN/uninitialized"
+  , countOps = 0
+  , lastCodeLabel = error "lastCodeLabel"
+  , offsetFromLastLabel = error "offsetFromLastLabel"
+  }
+  where
+    initialStackPointer = MemAddr 0 -- stack address are negative in stage5 emulation
+    rmap = Map.fromList
+      [ (Sp, VMemAddr initialStackPointer)
+      , (Cx, VMemAddr aFinalCont)
+      ]
+    mem = Map.fromList
+      [ (aFalse, VNum tFalse)
+      , (aTrue, VNum tTrue)
+      , (aFinalCont, VCodeLabel finalCodeLabel)
+      , (addAddr 1 aFinalCont, VChar 'X') -- dummy next cont; without this we see error with -trace
+      ]
+
+instance Show State where
+  show State{rmap} =
+    intercalate " " [ show k ++ "=" ++ show v | (k,v) <- Map.toList rmap ]
 
 -- Address for User Temps: 1..30
 -- Address for runtime system constants: 90,91,92
@@ -505,6 +443,9 @@ aFinalCont = MemAddr 92
 
 globalOffset :: Int -> MemAddr
 globalOffset n = MemAddr (n + 100)
+
+finalCodeLabel :: CodeLabel
+finalCodeLabel = CodeLabel 0 "FINAL"
 
 ----------------------------------------------------------------------
 -- Compile
@@ -583,11 +524,9 @@ compileCode = \case
       [ OpMove Ax (SMemIndirect frameReg)
       ]) (Done (JumpIndirect Ax))
 
-  SRC.LetAlias x y body -> undefined x y body
+  SRC.LetAlias x y body -> undefined x y body -- TODO: need an example to provoke this
 
   SRC.LetAtomic (SRC.Ref _ loc) rhs body -> do
-
-    -- fairly blindly copied from LetTop
     (ops1,reg) <- compileAtomic (show loc) rhs
     let ops2 = [setLocation loc reg]
     doOps (ops1++ops2) <$> compileCode body
@@ -630,7 +569,6 @@ compileArmTaken scrutReg arm =  do
                    ]
   doOps ops <$> compileCode rhs
 
-
 -- assign two regs in parallel, using a temp id required
 moveTwoRegsPar :: (Reg,Source) -> (Reg,Source) -> [Op]
 moveTwoRegsPar (r1,s1) (r2,s2) = do
@@ -672,15 +610,13 @@ compileAtomic who = \case
   SRC.Lam pre _post _x body -> compileFunction who pre body
   SRC.RecLam pre _post _f _x body -> compileFunction who pre body
 
-
 compileConApp :: Word16 -> [SRC.Ref] -> [Op]
 compileConApp tag xs = construct tag (map compileRef xs)
 
 construct :: Word16 -> [Source] -> [Op]
 construct tag xs = map OpPush (reverse (SLit (VNum tag) : xs))
 
-
-compileFunction :: String -> [SRC.Ref] -> SRC.Code -> Asm ([Op],Reg) -- --> Ax
+compileFunction :: String -> [SRC.Ref] -> SRC.Code -> Asm ([Op],Reg)
 compileFunction who freeVars body = do
   lab <- compileCode body >>= CutCode ("Function: " ++ who)
   pure (
@@ -757,7 +693,6 @@ setLocation loc reg = case loc of
   SRC.TheArg -> undefined
   SRC.TheFrame -> undefined
 
-
 compileRef :: SRC.Ref -> Source
 compileRef (SRC.Ref _ loc) = do
   case loc of
@@ -789,7 +724,7 @@ data Asm a where
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
   where
-    state0 = AsmState { u = 1 }
+    state0 = AsmState { u = 1 } -- user code labels start at 1; 0 labels the code for the final continuation
     k0 _s start = Image { cmap = Map.empty, dmap = Map.empty, start }
 
     loop :: AsmState -> Asm a -> (AsmState -> a -> Image) -> Image
