@@ -5,27 +5,27 @@ let g1 = fun arg k ->
   k t1 in
 let g2 = 0 in
 let g3 = 1 in
-let g4 = 1 in
-let g5 = CID0 in
+let g4 = CID0 in
+let g5 = 1 in
 let g6 = fun arg k ->
   let t1 = [arg], fun [f1] me arg k ->
     let t1 = [f1,arg,me], fun [f1,f2,f3] arg k ->
-      let t1 = PRIM_EqInt(arg,g2) in
+      let t1 = PRIM_LessInt(arg,g2) in
       match t1 with
       | true1 -> k f2
       | false0 ->
-        let t2 = PRIM_SubInt(arg,g3) in
-        let t3 = PRIM_StringIndex(f1,t2) in
-        let t4 = CID1[t3,f2] in
+        let t2 = PRIM_StringIndex(f1,arg) in
+        let t3 = CID1[t2,f2] in
         let k = [arg], fun [f2] arg ->
-          let t1 = PRIM_SubInt(f2,g4) in
+          let t1 = PRIM_SubInt(f2,g3) in
           arg t1 k in
-        f3 t4 k in
+        f3 t3 k in
     k t1 in
-  let k = [arg], fun [f2] arg ->
-    let t1 = PRIM_StringLength(f2) in
+  let t2 = PRIM_StringLength(arg) in
+  let k = [t2], fun [f2] arg ->
+    let t1 = PRIM_SubInt(f2,g5) in
     arg t1 k in
-  t1 g5 k in
+  t1 g4 k in
 let g8 = CID1 in
 let g9 = CID0 in
 let g10 = CID0 in

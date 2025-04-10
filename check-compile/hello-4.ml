@@ -8,26 +8,24 @@ let g1 = fun arg k ->
     let t3 = PRIM_PutChar(t1) in
     g1 t2 k in
 let g4 = 0 in
-let g5 = 1 in
-let g6 = "Hello, world!\n" in
-let g7 = 1 in
+let g5 = "Hello, world!\n" in
+let g6 = 1 in
 let g3 = fun arg k ->
   let t1 = [arg], fun [f1] arg k ->
-    let t1 = PRIM_EqInt(arg,g4) in
+    let t1 = PRIM_LessInt(arg,g4) in
     match t1 with
     | true1 -> k f1
     | false0 ->
-      let t2 = PRIM_SubInt(arg,g5) in
-      let t3 = PRIM_StringIndex(g6,t2) in
-      let t4 = CID1[t3,f1] in
+      let t2 = PRIM_StringIndex(g5,arg) in
+      let t3 = CID1[t2,f1] in
       let k = [arg], fun [f2] arg ->
-        let t1 = PRIM_SubInt(f2,g7) in
+        let t1 = PRIM_SubInt(f2,g6) in
         arg t1 k in
-      g3 t4 k in
+      g3 t3 k in
   k t1 in
-let g8 = CID0 in
-let g9 = 14 in
+let g7 = CID0 in
+let g8 = 13 in
 let k = [], fun [] arg ->
   let k = [], fun [] arg -> g1 arg k in
-  arg g9 k in
-g3 g8 k
+  arg g8 k in
+g3 g7 k

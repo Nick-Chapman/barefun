@@ -61,7 +61,7 @@ Haskell REPL (stage4)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=59273, #enter=60084, #return=59272, #prim=148269]
+  > [EOF:#push-continuation=59273, #enter=60084, #return=59272, #prim=147977]
 
 Haskell REPL (stage5)
 
@@ -93,4 +93,4 @@ Haskell REPL (stage5)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#op=1475600]
+  > [EOF:#op=1474724]

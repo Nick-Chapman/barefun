@@ -4,12 +4,10 @@ module Value
   , mkBool,mkList,deUnit
   ) where
 
-import Data.Word (Word16)
 import Interaction (Interaction)
 import Text.Printf (printf)
 
--- TODO: prefer to be signed; when so, improve explode definition
-newtype Number = Number Word16 deriving (Eq,Ord,Num,Integral,Real,Enum)
+newtype Number = Number Int deriving (Eq,Ord,Num,Integral,Real,Enum)
 
 data Value
   = VCons Number [Value] -- TODO: should define and use Ctag here

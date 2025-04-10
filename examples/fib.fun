@@ -1,10 +1,10 @@
 
 let explode s =
-  let rec loop acc i =
-    if i = 0 then acc else
-      loop (string_index s (i-1) :: acc) (i-1)
+  let rec explode_loop acc i =
+    if i < 0 then acc else
+      explode_loop (string_index s i :: acc) (i-1)
   in
-  loop [] (string_length s)
+  explode_loop [] (string_length s - 1)
 
 let chars_of_int i =
   let ord0 = ord '0' in
