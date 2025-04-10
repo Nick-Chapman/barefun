@@ -87,7 +87,8 @@ data BareBios
   | BiosGetCharInAx
   | BiosMakeBoolFromFlagZ -- TODO: dedup code for Flag Z/N
   | BiosMakeBoolFromFlagN
-  | BiosExplode -- TODO: remove when builtin explode is removed
+  | BiosStringLength
+  | BiosStringIndex
   | BiosNumToChar
   | BiosCharToNum
   | BiosHalt
@@ -161,7 +162,8 @@ instance Show BareBios where
     BiosPutCharInAx -> "bios_put_char"
     BiosMakeBoolFromFlagZ -> "bios_make_bool_from_z"
     BiosMakeBoolFromFlagN -> "bios_make_bool_from_n"
-    BiosExplode -> "bios_explode"
+    BiosStringLength -> "bios_string_length"
+    BiosStringIndex -> "bios_string_index"
     BiosHalt -> "bios_halt"
     BiosNumToChar -> "bios_num_to_char"
     BiosCharToNum -> "bios_char_to_num"
@@ -247,10 +249,15 @@ execBios = \case
     b <- GetFlagN
     SetReg Ax (VMemAddr (if b then aTrue else aFalse))
   BiosHalt -> Halt
-  BiosExplode -> do
-    -- null execution effect because
-    -- string rep == char list rep
-    pure ()
+  BiosStringLength -> do
+    a <- deMemAddr <$> GetReg Ax
+    string <- readStringFromMemory a
+    SetReg Ax (VNum (fromIntegral $ length string))
+  BiosStringIndex -> do
+    a <- deMemAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    string <- readStringFromMemory a
+    SetReg Ax (VChar (string !! fromIntegral i))
   -- On real hardware Num/Char will have overlapping representations
   -- such that ord/chr have null implementations
   BiosNumToChar -> do
@@ -259,6 +266,18 @@ execBios = \case
   BiosCharToNum -> do
     c <- deChar <$> GetReg Ax
     SetReg Ax (VNum (fromIntegral $ Char.ord c))
+
+-- TODO: improve string rep to avoid this...
+readStringFromMemory :: MemAddr -> M String
+readStringFromMemory a = do
+  n <- deNum <$> GetMem a
+  case n of
+    0 -> pure []
+    1 -> do
+      c <- deChar <$> GetMem (addAddr 1 a)
+      a' <- deMemAddr <$> GetMem (addAddr 2 a)
+      (c:) <$> readStringFromMemory a'
+    _ -> error (show ("readStringFromMemory",n))
 
 execJump :: Jump -> M ()
 execJump = \case
@@ -669,9 +688,14 @@ compileBuiltin b xs = case (b,xs) of
     , OpCmp (SReg Ax) s2
     , OpCall BiosMakeBoolFromFlagN
     ]
-  (SRC.Explode, [s1]) ->
+  (SRC.StringLength, [s1]) ->
     [ OpMove Ax s1
-    , OpCall BiosExplode
+    , OpCall BiosStringLength
+    ]
+  (SRC.StringIndex, [s1,s2]) ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpCall BiosStringIndex
     ]
   (SRC.CharChr, [s1]) ->
     [ OpMove Ax s1

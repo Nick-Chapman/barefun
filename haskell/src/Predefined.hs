@@ -14,19 +14,20 @@ wrapPreDefs (Prog defs) =
     bindings :: [(String,Exp)]
     bindings =
       [ ("+"            , prim2 AddInt)
-      , ("-"            , prim2 SubInt)
-      , ("*"            , prim2 MulInt)
-      , ("/"            , prim2 DivInt)
       , ("%"            , prim2 ModInt)
+      , ("*"            , prim2 MulInt)
+      , ("-"            , prim2 SubInt)
+      , ("/"            , prim2 DivInt)
+      , ("::"           , construct2 cCons)
       , ("<"            , prim2 LessInt)
       , ("="            , prim2 EqInt)
-      , ("eq_char"      , prim2 EqChar)
-      , ("ord"          , prim1 CharOrd)
       , ("chr"          , prim1 CharChr)
-      , ("explode"      , prim1 Explode)
-      , ("put_char"     , prim1 PutChar)
+      , ("eq_char"      , prim2 EqChar)
       , ("get_char"     , prim1 GetChar)
-      , ("::"           , construct2 cCons)
+      , ("ord"          , prim1 CharOrd)
+      , ("put_char"     , prim1 PutChar)
+      , ("string_index" , prim2 StringIndex)
+      , ("string_length", prim1 StringLength)
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])

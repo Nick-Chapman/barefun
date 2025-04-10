@@ -34,7 +34,7 @@ Ocaml REPL
 Haskell REPL (stage4)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -4
-  [Stage4 (CCF); normalization: 791 -> 1089]
+  [Stage4 (CCF); normalization: 824 -> 1116]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
@@ -61,13 +61,13 @@ Haskell REPL (stage4)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#push-continuation=58895, #enter=59328, #return=58894, #prim=146886]
+  > [EOF:#push-continuation=59273, #enter=60084, #return=59272, #prim=148269]
 
 Haskell REPL (stage5) -- TODO: fix bug
 repoduce: nic@Mosh:~/code/barefun$ echo 'fib xx' | dune exec haskell/main.exe examples/shell.fun -- -5
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -5
-  [Stage5 (ASM); normalization: 791 -> 1089]
+  [Stage5 (ASM); normalization: 824 -> 1116]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
@@ -94,4 +94,4 @@ repoduce: nic@Mosh:~/code/barefun$ echo 'fib xx' | dune exec haskell/main.exe ex
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#op=1459811]
+  > [EOF:#op=1475600]

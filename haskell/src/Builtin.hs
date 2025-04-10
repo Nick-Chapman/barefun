@@ -1,14 +1,14 @@
 module Builtin ( Builtin(..), executeBuiltin, isPure, evaluatePureBuiltin ) where
 
 import Interaction (Interaction(..))
-import Value (Value(..),tUnit,mkBool,mkList,deUnit)
+import Value (Value(..),tUnit,mkBool,deUnit)
 import qualified Data.Char as Char (chr,ord)
 
 data Builtin
   = PutChar | GetChar
   | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
   | EqChar | CharOrd | CharChr
-  | Explode -- TODO: remove in favour of string-length/index
+  | StringLength | StringIndex
   deriving (Show)
 
 data Semantics
@@ -48,7 +48,8 @@ defineBuiltin b =
     EqChar -> Pure (\vs -> mkBool (uncurry (==) (twoArgs deChar deChar vs)))
     CharOrd -> Pure (\vs -> VNum ((fromIntegral . Char.ord) (deChar (oneArg vs))))
     CharChr -> Pure (\vs -> VChar ((Char.chr . fromIntegral) (deNum (oneArg vs))))
-    Explode -> Pure (\vs -> mkList [ VChar c | c <- deString (oneArg vs) ])
+    StringLength -> Pure (\vs -> VNum (fromIntegral $ length (deString (oneArg vs))))
+    StringIndex -> Pure (\vs -> VChar ((\(s,i) -> s!!(fromIntegral i)) $ (twoArgs deString deNum vs)))
 
   where
     unit = VCons tUnit []

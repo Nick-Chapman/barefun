@@ -252,11 +252,11 @@ trans cenv = \case
 
 transId :: Cenv -> SRC.Id -> Id
 transId Cenv{xmap} x = maybe err id $ Map.lookup x xmap
-  where err = error (show ("transId",x))
+  where err = error (printf "Stage1: unknown identifier: %s" (show x))
 
 transCid :: Cenv -> Cid -> Ctag
 transCid Cenv{cmap} cid = Ctag cid $ maybe err id $ Map.lookup cid cmap
-  where err = error (show ("transCid",cid))
+  where err = error (printf "Stage1: unknown constructor: %s" (show cid))
 
 data Cenv = Cenv { cmap :: Map Cid Word16, xmap :: Map SRC.Id Id }
 

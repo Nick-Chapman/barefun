@@ -12,7 +12,7 @@ data Value
   = VCons Word16 [Value] -- TODO: should define and use Ctag here
   | VString String
   | VChar Char
-  | VNum Word16
+  | VNum Word16 -- TODO: prefer to be signed; when so, improve explode definition
   | VFunc (Value -> (Value -> Interaction) -> Interaction)
 
 instance Show Value where

@@ -11,29 +11,29 @@ Haskell REPL
   $ ../haskell/main.exe ../examples/fib.fun -0
   [Stage0 (AST)]
   fib 20 --> 6765
-  [HALT:#apps=131487, #prim=54780]
+  [HALT:#apps=131605, #prim=54818]
 
   $ ../haskell/main.exe ../examples/fib.fun -1
   [Stage1 (Exp)]
   fib 20 --> 6765
-  [HALT:#apps=131487, #prim=54780]
+  [HALT:#apps=131605, #prim=54818]
 
   $ ../haskell/main.exe ../examples/fib.fun -2
-  [Stage2 (NbE); normalization: 187 -> 139]
+  [Stage2 (NbE); normalization: 220 -> 175]
   fib 20 --> 6765
-  [HALT:#apps=21926, #prim=54775]
+  [HALT:#apps=21948, #prim=54813]
 
   $ ../haskell/main.exe ../examples/fib.fun -3
-  [Stage3 (ANF); normalization: 187 -> 139]
+  [Stage3 (ANF); normalization: 220 -> 175]
   fib 20 --> 6765
-  [HALT:#push-continuation=21905, #enter=21926, #return=21906, #prim=54775]
+  [HALT:#push-continuation=21918, #enter=21948, #return=21919, #prim=54813]
 
   $ ../haskell/main.exe ../examples/fib.fun -4
-  [Stage4 (CCF); normalization: 187 -> 139]
+  [Stage4 (CCF); normalization: 220 -> 175]
   fib 20 --> 6765
-  [HALT:#push-continuation=21905, #enter=21926, #return=21906, #prim=54775]
+  [HALT:#push-continuation=21918, #enter=21948, #return=21919, #prim=54813]
 
   $ ../haskell/main.exe ../examples/fib.fun -5
-  [Stage5 (ASM); normalization: 187 -> 139]
+  [Stage5 (ASM); normalization: 220 -> 175]
   fib 20 --> 6765
-  [HALT:#op=537053]
+  [HALT:#op=537493]

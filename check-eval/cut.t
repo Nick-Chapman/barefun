@@ -8,12 +8,12 @@ Ocaml REPL
 Haskell REPL
 
   $ ../haskell/main.exe ../examples/cut.fun -4
-  [Stage4 (CCF); normalization: 96 -> 20]
+  [Stage4 (CCF); normalization: 102 -> 20]
   4[HALT:#push-continuation=3, #enter=4, #return=4, #prim=4]
 
 
 TODO: Stage 5 execution fails for put_int
 
   $ ../haskell/main.exe ../examples/cut.fun -5
-  [Stage5 (ASM); normalization: 96 -> 20]
+  [Stage5 (ASM); normalization: 102 -> 20]
   4[HALT:#op=82]

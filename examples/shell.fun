@@ -1,6 +1,13 @@
 
 let noinline = let rec block f a = let _ = block in f a in block (* TODO: have principled noinline construct *)
 
+let explode s =
+  let rec loop acc i =
+    if i = 0 then acc else
+      loop (string_index s (i-1) :: acc) (i-1)
+  in
+  loop [] (string_length s)
+
 let explode = noinline explode
 
 let not b =

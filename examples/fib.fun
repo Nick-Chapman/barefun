@@ -1,4 +1,11 @@
 
+let explode s =
+  let rec loop acc i =
+    if i = 0 then acc else
+      loop (string_index s (i-1) :: acc) (i-1)
+  in
+  loop [] (string_length s)
+
 let chars_of_int i =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in

@@ -10,10 +10,11 @@ module X : sig
 
   val chr : int -> char
   val eq_char : char -> char -> bool
-  val explode : string -> char list
   val get_char : unit -> char
   val ord : char -> int
   val put_char : char -> unit
+  val string_index : string -> int -> char
+  val string_length : string -> int
   val upto : int -> int -> int list
 
 end = struct
@@ -46,8 +47,8 @@ end = struct
     let rec loop acc i = if i > j then List.rev acc else loop (i::acc) (i+1) in
     loop [] i
 
-  let explode s =  (* TODO: define in example.fun, using lower level primitives *)
-    List.map (fun i -> s.[i]) (upto 0 (String.length s - 1))
+  let string_length = String.length
+  let string_index s i = s.[i]
 
 end
 include X

@@ -20,14 +20,14 @@ Ocaml (A and B)
 Haskell (A)
 
   $ cat prompt.input | ../haskell/main.exe ../examples/promptA.fun -4
-  [Stage4 (CCF); normalization: 113 -> 31]
+  [Stage4 (CCF); normalization: 119 -> 31]
   % This is line one.
   % Another
   % And one more!
   % [EOF:#enter=45, #prim=129]
 
   $ cat prompt.input | ../haskell/main.exe ../examples/promptA.fun -5
-  [Stage5 (ASM); normalization: 113 -> 31]
+  [Stage5 (ASM); normalization: 119 -> 31]
   % This is line one.
   % Another
   % And one more!
@@ -36,7 +36,7 @@ Haskell (A)
 Haskell (B)
 
   $ cat prompt.input | ../haskell/main.exe ../examples/promptB.fun -4
-  [Stage4 (CCF); normalization: 109 -> 31]
+  [Stage4 (CCF); normalization: 115 -> 31]
   % This is line one.
   % Another
   % And one more!
@@ -44,7 +44,7 @@ Haskell (B)
 
 TODO: promptB/-5
   $ cat prompt.input | ../haskell/main.exe ../examples/promptB.fun -5
-  [Stage5 (ASM); normalization: 109 -> 31]
+  [Stage5 (ASM); normalization: 115 -> 31]
   % This is line one.
   % Another
   % And one more!
