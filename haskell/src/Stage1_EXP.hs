@@ -8,13 +8,12 @@ module Stage1_EXP
 import Builtin (Builtin,executeBuiltin)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Data.Word (Word16)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Stage0_AST (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
-import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
+import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(Prim,App))
 import qualified Stage0_AST as SRC
@@ -33,7 +32,7 @@ data Exp
   | Case Position Exp [Arm]
 
 data Arm = ArmTag Position Ctag [Id] Exp
-data Ctag = Ctag Cid Word16
+data Ctag = Ctag Cid Number
 
 data Id = Id
   { optUnique :: Maybe Int
@@ -79,7 +78,7 @@ provenanceExp = \case
 
 instance Show Id where show = prettyId
 instance Show Exp where show = intercalate "\n" . pretty
-instance Show Ctag where show (Ctag cid n) = printf "%s%d" (show cid) n
+instance Show Ctag where show (Ctag cid n) = printf "%s%s" (show cid) (show n)
 
 instance Show Name where
   show = \case
@@ -222,7 +221,7 @@ transProg cenv0 (SRC.Prog defs) = walk cenv0 defs
         Let pos x1 (trans cenv rhs) (walk cenv1 defs)
 
       SRC.TypeDef cids : defs -> do
-        let pairs = zip cids [0::Word16 .. ]
+        let pairs = zip cids [0::Number .. ]
         let cenv' = foldr (uncurry insertCid) cenv pairs
         walk cenv' defs
 
@@ -258,9 +257,9 @@ transCid :: Cenv -> Cid -> Ctag
 transCid Cenv{cmap} cid = Ctag cid $ maybe err id $ Map.lookup cid cmap
   where err = error (printf "Stage1: unknown constructor: %s" (show cid))
 
-data Cenv = Cenv { cmap :: Map Cid Word16, xmap :: Map SRC.Id Id }
+data Cenv = Cenv { cmap :: Map Cid Number, xmap :: Map SRC.Id Id }
 
-insertCid :: Cid -> Word16 -> Cenv -> Cenv
+insertCid :: Cid -> Number -> Cenv -> Cenv
 insertCid c tag cenv@Cenv{cmap} = cenv { cmap = Map.insert c tag cmap }
 
 posPropList :: [Bid] -> Cenv -> ([Id],Cenv)

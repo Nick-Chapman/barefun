@@ -4,12 +4,11 @@ module Stage2_NBE (compile,execute) where
 import Builtin (Builtin,isPure,evaluatePureBuiltin)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
-import Data.Word (Word16)
 import Interaction (Interaction)
 import Par4 (Position(..))
 import Stage0_AST (Literal(..),evalLit,Cid(..))
 import Stage1_EXP (Exp(..),Arm(..),Id(..),Ctag(..))
-import Value (Value(..))
+import Value (Value(..),Number)
 import qualified Data.Map as Map
 import qualified Stage1_EXP as SRC
 
@@ -39,7 +38,7 @@ data SemValue
   = Syntax Exp
   | Macro Id (SemValue -> M SemValue)
   | Constant Position Value -- TODO: should only be base values here
-  | Constructed Position Word16 [SemValue]
+  | Constructed Position Number [SemValue]
 
 posOfId :: Id -> Position
 posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos -- TODO: mandatory pos in ident
@@ -166,7 +165,7 @@ reflect env = \case
         arms <- mapM (normArm env) arms
         pure $ Syntax $ Case pos scrut arms
 
-caseSelect :: Word16 -> [SemValue] -> Env -> [Arm] -> M SemValue
+caseSelect :: Number -> [SemValue] -> Env -> [Arm] -> M SemValue
 caseSelect tag vs env arms = do
   let
     (xs,body) :: ([Id],Exp) =

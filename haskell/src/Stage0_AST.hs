@@ -8,12 +8,11 @@ module Stage0_AST
 import Builtin (Builtin,executeBuiltin)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Data.Word (Word16)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Text.Printf (printf)
-import Value (Value(..),tUnit,tFalse,tTrue,tNil,tCons,deUnit)
+import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(Prim,App))
 
@@ -33,7 +32,7 @@ data Exp
 
 data Arm = Arm Position Cid [Bid] Exp
 data Cid = Cid String deriving (Eq,Ord)
-data Literal = LitC Char | LitN Word16 | LitS String
+data Literal = LitC Char | LitN Number | LitS String
 
 data Id = Id { name :: String } deriving (Eq,Ord)
 
@@ -113,7 +112,7 @@ executeProg (Prog defs) = loop env0 defs
         eval env rhs $ \value -> do
           loop (insert x value env) defs
       TypeDef cids : defs -> do
-        let pairs = zip cids [0::Word16 .. ]
+        let pairs = zip cids [0::Number .. ]
         let f (name,tag) cenv = Map.insert name tag cenv
         let cenv' = foldr f cenv pairs
         let env' = env { cenv = cenv' }
@@ -194,12 +193,12 @@ evalLit = \case
   LitN n -> VNum n
   LitS s -> VString s
 
-data Env = Env { venv :: Map Id Value, cenv :: Map Cid Word16 }
+data Env = Env { venv :: Map Id Value, cenv :: Map Cid Number }
 
 env0 :: Env
 env0 = Env { venv = Map.empty, cenv = initCenv}
 
-initCenv :: Map Cid Word16
+initCenv :: Map Cid Number
 initCenv = Map.fromList
   [ (cUnit, tUnit)
   , (cFalse, tFalse)

@@ -1,6 +1,6 @@
 module Value
   ( tUnit, tFalse, tTrue, tNil, tCons
-  , Value(..)
+  , Value(..), Number --(..)
   , mkBool,mkList,deUnit
   ) where
 
@@ -8,23 +8,28 @@ import Data.Word (Word16)
 import Interaction (Interaction)
 import Text.Printf (printf)
 
+-- TODO: prefer to be signed; when so, improve explode definition
+newtype Number = Number Word16 deriving (Eq,Ord,Num,Integral,Real,Enum)
+
 data Value
-  = VCons Word16 [Value] -- TODO: should define and use Ctag here
+  = VCons Number [Value] -- TODO: should define and use Ctag here
   | VString String
   | VChar Char
-  | VNum Word16 -- TODO: prefer to be signed; when so, improve explode definition
+  | VNum Number
   | VFunc (Value -> (Value -> Interaction) -> Interaction)
+
+instance Show Number where show (Number n) = show n
 
 instance Show Value where
   show = \case
-    VCons tag vs -> printf "[construct:%d:%s]" tag (show vs)
+    VCons tag vs -> printf "[construct:%s:%s]" (show tag) (show vs)
     VString s -> printf"[string:%s]" (show s)
     VChar c -> printf"[char:%s]" (show c)
     VNum n -> printf"[number:%s]" (show n)
     VFunc{} -> "[function]"
 
 -- These tag values only need to be unique within their type
-tUnit,tFalse,tTrue,tNil,tCons :: Word16
+tUnit,tFalse,tTrue,tNil,tCons :: Number
 tUnit = 0
 tFalse = 0
 tTrue = 1

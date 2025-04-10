@@ -8,12 +8,11 @@ import Builtin (Builtin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Data.Word (Word16)
 import Interaction (Interaction(..))
 import Stage0_AST (Literal(..))
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
-import Value (tTrue,tFalse,tNil,tCons)
+import Value (Number,tTrue,tFalse,tNil,tCons)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
@@ -66,7 +65,7 @@ data Source
 
 data Val -- TODO: rename Word?
   = VChar Char
-  | VNum Word16 -- TODO: single definition for the type of tag/numbers across the whole compiler
+  | VNum Number
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
   deriving Eq
@@ -219,7 +218,7 @@ execOp = \case
   OpDivInto r s -> execBinaryOp div r s
   OpModInto r s -> execBinaryOp mod r s
 
-execBinaryOp :: (Word16 -> Word16 -> Word16) -> Reg -> Source -> M () -> M ()
+execBinaryOp :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
 execBinaryOp f r s = \cont -> do
     v1 <- GetReg r
     v2 <- evalSource s
@@ -290,7 +289,7 @@ execJump = \case
   Crash -> do
     error "Crash"
 
-binaryV :: (Word16 -> Word16 -> Word16) -> Val -> Val -> Val
+binaryV :: (Number -> Number -> Number) -> Val -> Val -> Val
 binaryV f v1 v2 =
   case (v1,v2) of
     (VNum n1,VNum n2) -> VNum (f n1 n2)
@@ -319,7 +318,7 @@ deCodeLabel = \case VCodeLabel x -> x; v -> error (show ("deCodeLabel", v))
 deChar :: Val -> Char
 deChar = \case VChar x -> x; v -> error (show("deChar",v))
 
-deNum :: Val -> Word16
+deNum :: Val -> Number
 deNum = \case VNum x -> x; v -> error (show("deNum",v))
 
 prevAddr :: MemAddr -> MemAddr
@@ -629,10 +628,10 @@ compileAtomic who = \case
   SRC.Lam pre _post _x body -> compileFunction who pre body
   SRC.RecLam pre _post _f _x body -> compileFunction who pre body
 
-compileConApp :: Word16 -> [SRC.Ref] -> [Op]
+compileConApp :: Number -> [SRC.Ref] -> [Op]
 compileConApp tag xs = construct tag (map compileRef xs)
 
-construct :: Word16 -> [Source] -> [Op]
+construct :: Number -> [Source] -> [Op]
 construct tag xs = map OpPush (reverse (SLit (VNum tag) : xs))
 
 compileFunction :: String -> [SRC.Ref] -> SRC.Code -> Asm ([Op],Reg)

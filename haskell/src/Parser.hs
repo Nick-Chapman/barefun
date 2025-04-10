@@ -1,13 +1,13 @@
 module Parser (parseProg) where
 
-import Data.Word (Word16)
+import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Stage0_AST (Prog,Exp,Id,Arm,Cid,Bid(..))
 import Stage0_AST (cUnit,cFalse,cTrue,cNil,cCons,mkUserId)
-import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
 import Text.Printf (printf)
+import Value (Number)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
-import qualified Stage0_AST as AST
 import qualified Par4
+import qualified Stage0_AST as AST
 
 parseProg :: String -> Prog
 parseProg = Par4.parse gram6
@@ -102,7 +102,7 @@ gram6 = program where
     , do key "false"; pure cFalse
     ]
 
-  decNumber :: Par Word16 = foldl (\acc d -> 10*acc + d) 0 <$> some decDigit
+  decNumber :: Par Number = foldl (\acc d -> 10*acc + d) 0 <$> some decDigit
 
   number = nibble $ alts [decNumber]
 
