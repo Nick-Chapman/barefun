@@ -42,7 +42,6 @@ Haskell (B)
   % And one more!
   % [EOF:#enter=45, #prim=129]
 
-TODO: promptB/-5
   $ cat prompt.input | ../haskell/main.exe ../examples/promptB.fun -5
   [Stage5 (ASM); normalization: 115 -> 31]
   % This is line one.

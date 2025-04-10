@@ -63,8 +63,7 @@ Haskell REPL (stage4)
   You wrote: "G**dbye" (7 chars)
   > [EOF:#push-continuation=59273, #enter=60084, #return=59272, #prim=148269]
 
-Haskell REPL (stage5) -- TODO: fix bug
-repoduce: nic@Mosh:~/code/barefun$ echo 'fib xx' | dune exec haskell/main.exe examples/shell.fun -- -5
+Haskell REPL (stage5)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -5
   [Stage5 (ASM); normalization: 824 -> 1116]
