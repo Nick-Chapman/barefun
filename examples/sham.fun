@@ -39,20 +39,9 @@ let reverse =
   in
   fun xs -> revloop [] xs
 
-let rec eq_list eq xs ys =
-  match xs with
-  | [] -> (match ys with | [] -> true | _::_ -> false)
-  | x::xs ->
-     match ys with
-     | [] -> false
-     | y::ys ->
-        if eq x y then eq_list eq xs ys else false
-
-let eq_char_list xs ys = eq_list eq_char xs ys
-
 (* string ops *)
 
-let implode xs =
+let implode = noinline (fun xs -> (* TODO $ or @@ op would be nice *)
   let b = make_bytes (length xs) in
   let rec loop i xs =
     match xs with
@@ -60,22 +49,37 @@ let implode xs =
     | x::xs -> set_bytes b i x; loop (i+1) xs
   in
   loop 0 xs;
-  freeze_bytes b
+  freeze_bytes b)
 
-let implode = noinline implode
+let reverse_implode = noinline(fun xs ->
+  let n = length xs in
+  let b = make_bytes n in
+  let rec loop i xs =
+    match xs with
+    | [] -> ()
+    | x::xs -> set_bytes b i x; loop (i-1) xs
+  in
+  loop (n-1) xs;
+  freeze_bytes b)
 
-let explode s =
+let explode = noinline (fun s ->
   let rec explode_loop acc i =
     if i < 0 then acc else
       explode_loop (string_index s i :: acc) (i-1)
   in
-  explode_loop [] (string_length s - 1)
+  explode_loop [] (string_length s - 1))
 
-let explode = noinline explode
-
-let reverse_implode xs = implode (reverse xs) (* TODO: combine *)
-
-let eq_string s1 s2 = eq_char_list (explode s1) (explode s2) (* TODO: avoid explode *)
+let eq_string = noinline (fun s1 s2 ->
+  let n1 = string_length s1 in
+  let n2 = string_length s2 in
+  if not (n1 = n2) then false else
+    let rec loop i =
+      if i < 0 then true else
+        let c1 = string_index s1 i in
+        let c2 = string_index s2 i in
+        if not (eq_char c1 c2) then false else loop (i-1)
+    in
+    loop (n1-1))
 
 let string_append s1 s2 = implode (append (explode s1) (explode s2)) (* TODO: ^ *)
 

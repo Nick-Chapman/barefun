@@ -84,10 +84,10 @@ L6: ; Function: g6
   mov ax, [bp]
   jmp [ax]
 
-L7: ; Arm: 27'10
+L7: ; Arm: 22'10
   mov ax, [bx+1]
   mov 1, ax
-  ;; (27'8) Return: n (t1)
+  ;; (22'8) Return: n (t1)
   mov dx, 1
   mov bp, cx
   mov cx, [bp+1]
@@ -110,13 +110,13 @@ L9: ; Continuation
   push cx
   push #L8
   mov cx, sp
-  ;; (28'33) Tail: eval (g8) @ e2 (f2)
+  ;; (23'33) Tail: eval (g8) @ e2 (f2)
   mov dx, [bp+2]
   mov bp, 108
   mov ax, [bp]
   jmp [ax]
 
-L10: ; Arm: 28'15
+L10: ; Arm: 23'15
   mov ax, [bx+1]
   mov 1, ax
   mov ax, [bx+2]
@@ -125,7 +125,7 @@ L10: ; Arm: 28'15
   push cx
   push #L9
   mov cx, sp
-  ;; (28'23) Tail: eval (g8) @ e1 (t1)
+  ;; (23'23) Tail: eval (g8) @ e1 (t1)
   mov bp, 108
   mov dx, 1
   mov ax, [bp]
@@ -147,7 +147,7 @@ L12: ; Continuation
   push cx
   push #L11
   mov cx, sp
-  ;; (29'33) Tail: eval (g8) @ e2 (f2)
+  ;; (24'33) Tail: eval (g8) @ e2 (f2)
   mov dx, [bp+2]
   mov bp, 108
   mov ax, [bp]
@@ -167,7 +167,7 @@ L13: ; Function: g8
   push cx
   push #L12
   mov cx, sp
-  ;; (29'23) Tail: eval (g8) @ e1 (t1)
+  ;; (24'23) Tail: eval (g8) @ e1 (t1)
   mov bp, 108
   mov dx, 1
   mov ax, [bp]
@@ -273,7 +273,7 @@ L18: ; Start
   push cx
   push #L17
   mov cx, sp
-  ;; (37'16) Tail: eval (g8) @ con_34'15 (g16)
+  ;; (32'16) Tail: eval (g8) @ con_29'15 (g16)
   mov bp, 108
   mov dx, 116
   mov ax, [bp]

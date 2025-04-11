@@ -1,5 +1,5 @@
 
-let noinline = let rec block f a = let _ = block in f a in block (* TODO: have principled noinline construct *)
+let noinline = let rec block f a = let _ = block in f a in block
 
 let rec length xs =
   match xs with
@@ -34,7 +34,7 @@ let explode s =
 
 let explode = noinline explode
 
-let string_append s1 s2 = implode (append (explode s1) (explode s2)) (* TODO: ^ *)
+let string_append s1 s2 = implode (append (explode s1) (explode s2))
 
 let not b =
   match b with
@@ -219,7 +219,6 @@ let fallback line =
 let rec splitloop accWs accCs xs =
   match xs with
   | [] -> reverse (implode (reverse accCs) :: accWs)
-  (* TODO: handle multiple space seps *)
   | x::xs ->
      if eq_char x ' ' then splitloop (implode (reverse accCs) :: accWs) [] xs
      else splitloop accWs (x::accCs) xs

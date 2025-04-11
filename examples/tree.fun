@@ -15,12 +15,7 @@ let rec put_chars xs =
 
 let put_int i = put_chars (chars_of_int i)
 
-(* TODO: fix parser bug to allow base types like "int"... *)
-(* type exp = Num of int | Add of exp * exp | Sub of exp * exp*)
-
-(* For now,  we can work around by being polymorphic... *)
-type 'a exp = Num of 'a | Add of 'a exp * 'a exp | Sub of 'a exp * 'a exp
-
+type exp = Num of int | Add of exp * exp | Sub of exp * exp
 
 let rec eval e =
   match e with
