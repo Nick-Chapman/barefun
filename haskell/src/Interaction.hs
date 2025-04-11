@@ -1,4 +1,4 @@
-module Interaction ( Interaction(..), runTerm, Tickable(..) ) where
+module Interaction ( Interaction(..), runTerm, Tickable(..), Bytes ) where
 
 import Data.Char (showLitChar,ord)
 import Data.List (intercalate)
@@ -13,57 +13,81 @@ data Interaction
   | ITrace String Interaction
   | IPut Char Interaction
   | IGet (Char -> Interaction)
+  | IMakeBytes Int (Bytes -> Interaction)
+  | IFreezeBytes Bytes (String -> Interaction)
+  | ISetBytes Bytes Int Char Interaction
 
 runTerm :: Interaction -> IO ()
-runTerm i = do
+runTerm next = do
   hSetEcho stdin False
   hSetBuffering stdin NoBuffering
-  loop counts0 i
+  loop state0 next
   where
-    loop :: Counts -> Interaction -> IO ()
-    loop counts = \case
-      ITick t i -> do
-        loop (tick t counts) i
+    loop :: State -> Interaction -> IO ()
+    loop state= \case
+      ITick t next -> do
+        let State{tm} = state
+        loop state { tm = Map.insertWith (+) t 1 tm } next
       IDone -> do
-        printf "[HALT:%s]\n" (show counts)
-      ITrace mes i -> do
-        --printf "[trace] %s" mes
+        printf "[HALT:%s]\n" (show state)
+      ITrace mes next -> do
         printf "%s" mes
-        loop counts i
-      IPut c i -> do
+        loop state next
+      IPut c next -> do
         let n = ord c
         let dontEscape = (32 <= n && n <= 126) || n == 8 || c == '\n'
         putStr (if dontEscape then [c] else showLitChar c "")
         hFlush stdout
-        loop counts i
+        loop state next
       IGet f -> do
         b <- hIsEOF stdin
-        if b then printf "[EOF:%s]\n" (show counts) else do
+        if b then printf "[EOF:%s]\n" (show state) else do
           c <- getChar
-          loop counts (f c)
+          loop state (f c)
 
-data Counts = Counts { m :: Map Tickable Int }
+      IMakeBytes n f -> do
+        let State{bm,u} = state
+        let r = BytesRef u
+        loop state { u = 1 + u, bm = Map.insert r (n,Map.empty) bm } (f (BytesRef u))
 
-instance Show Counts where
-  show Counts{m} =
-    intercalate ", " [ printf "#%s=%d" (show t) v | t <- all, Just v <- [Map.lookup t m] ]
+      IFreezeBytes r f -> do
+        let State{bm} = state
+        let (n,m) = maybe err id $ Map.lookup r bm where err = error (show ("IFreezeBytes",r))
+        let string = [ maybe '\0' id $ Map.lookup i m | i <- [0..n-1] ]
+        loop state (f string)
+
+      ISetBytes r i c next -> do
+        if i < 0 then error "ISetBytes:i<0" else do
+          let State{bm} = state
+          let (n,m) = maybe err id $ Map.lookup r bm where err = error (show ("ISetBytes",r))
+          if i >= n then error "ISetBytes:i>=n" else do
+            let bm' = Map.insert r (n,Map.insert i c m) bm
+            loop state { bm = bm' } next
+
+
+data Bytes = BytesRef Int deriving (Eq,Ord,Show)
+
+data State = State
+  { tm :: Map Tickable Int
+  , bm :: Map Bytes (Int,Map Int Char)
+  , u :: Int
+  }
+
+state0 :: State
+state0 = State { tm = Map.empty, bm = Map.empty, u = 1 }
+
+instance Show State where
+  show State{tm} =
+    intercalate ", " [ printf "#%s=%d" (show t) v | t <- all, Just v <- [Map.lookup t tm] ]
     where
-      all = [App,PushContinuation,Enter,Return,Prim,Op] -- TODO: automate
-
-counts0 :: Counts
-counts0 = Counts { m = Map.empty }
-
-tick :: Tickable -> Counts -> Counts
-tick t c@Counts{m} = c { m = Map.insert t (v+1) m }
-  where v = maybe 0 id $ Map.lookup t m
-
+      all = [minBound ..maxBound]
 
 data Tickable
   = App
   | PushContinuation | Enter | Return
   | Prim
   | Op
-  deriving (Eq,Ord)
+  deriving (Eq,Ord,Enum,Bounded)
 
 instance Show Tickable where
   show = \case

@@ -4,13 +4,14 @@ module Value
   , mkBool,mkList,deUnit
   ) where
 
-import Interaction (Interaction)
+import Interaction (Interaction,Bytes)
 import Text.Printf (printf)
 
 newtype Number = Number Int deriving (Eq,Ord,Num,Integral,Real,Enum)
 
 data Value
   = VCons Number [Value] -- TODO: should define and use Ctag here
+  | VBytes Bytes
   | VString String
   | VChar Char
   | VNum Number
@@ -21,6 +22,7 @@ instance Show Number where show (Number n) = show n
 instance Show Value where
   show = \case
     VCons tag vs -> printf "[construct:%s:%s]" (show tag) (show vs)
+    VBytes b -> printf"[bytes:%s]" (show b)
     VString s -> printf"[string:%s]" (show s)
     VChar c -> printf"[char:%s]" (show c)
     VNum n -> printf"[number:%s]" (show n)

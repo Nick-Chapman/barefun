@@ -70,7 +70,7 @@ data Val -- TODO: rename Word?
   | VCodeLabel CodeLabel
   deriving Eq
 
-data Reg = Ax | Bx | Cx | Dx | Sp | Bp -- TODO: Si | Di
+data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si-- TODO: Si | Di
   deriving (Eq,Ord)
 
 data MemAddr = MemAddr Int -- TODO: rename Addr
@@ -82,15 +82,18 @@ data CodeLabel = CodeLabel Int String -- unique label and provenance
 data DataLabel = DataLabel String -- TODO: use!
 
 data BareBios
-  = BiosPutCharInAx
+  = BiosHalt
+  | BiosPutCharInAx
   | BiosGetCharInAx
   | BiosMakeBoolFromFlagZ -- TODO: dedup code for Flag Z/N
   | BiosMakeBoolFromFlagN
-  | BiosStringLength
-  | BiosStringIndex
   | BiosNumToChar
   | BiosCharToNum
-  | BiosHalt
+  | BiosStringLength
+  | BiosStringIndex
+  | BiosMakeBytes
+  | BiosFreezeBytes
+  | BiosSetBytes
 --  | BiosCheckHeapSpace -- maybe initiate GC; compile at head of each code section
 
 ----------------------------------------------------------------------
@@ -150,6 +153,7 @@ instance Show Reg where
     Dx -> "dx"
     Sp -> "sp"
     Bp -> "bp"
+    Si -> "si"
 
 instance Show MemAddr where show (MemAddr n) = show n -- TODO: show Addr in different base
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
@@ -157,15 +161,18 @@ instance Show DataLabel where show (DataLabel id) = "D" ++ show id
 
 instance Show BareBios where
   show = \case
+    BiosHalt -> "bios_halt"
     BiosGetCharInAx -> "bios_get_char"
     BiosPutCharInAx -> "bios_put_char"
     BiosMakeBoolFromFlagZ -> "bios_make_bool_from_z"
     BiosMakeBoolFromFlagN -> "bios_make_bool_from_n"
-    BiosStringLength -> "bios_string_length"
-    BiosStringIndex -> "bios_string_index"
-    BiosHalt -> "bios_halt"
     BiosNumToChar -> "bios_num_to_char"
     BiosCharToNum -> "bios_char_to_num"
+    BiosStringLength -> "bios_string_length"
+    BiosStringIndex -> "bios_string_index"
+    BiosMakeBytes -> "bios_make_bytes"
+    BiosFreezeBytes -> "bios_freeze_bytes"
+    BiosSetBytes -> "bios_set_bytes"
 
 ----------------------------------------------------------------------
 -- Execute
@@ -196,10 +203,7 @@ execOp = \case
   OpCall bios -> \cont -> do execBios bios; cont
   OpPush s -> \cont -> do
     v <- evalSource s
-    a <- deMemAddr <$> GetReg Sp
-    let a' = prevAddr a
-    SetMem a' v
-    SetReg Sp (VMemAddr a')
+    execPush v
     cont
   OpCmp s1 s2 -> \cont -> do
     v1 <- evalSource s1
@@ -217,6 +221,13 @@ execOp = \case
   OpMulInto r s -> execBinaryOp (*) r s
   OpDivInto r s -> execBinaryOp div r s
   OpModInto r s -> execBinaryOp mod r s
+
+execPush :: Val -> M ()
+execPush v = do
+  a <- deMemAddr <$> GetReg Sp
+  let a' = prevAddr a
+  SetMem a' v
+  SetReg Sp (VMemAddr a')
 
 execBinaryOp :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
 execBinaryOp f r s = \cont -> do
@@ -239,6 +250,7 @@ evalSource = \case
 
 execBios :: BareBios -> M ()
 execBios = \case
+  BiosHalt -> Halt
   BiosGetCharInAx -> do c <- GetChar; SetReg Ax (VChar c)
   BiosPutCharInAx -> do c <- deChar <$> GetReg Ax; PutChar c
   BiosMakeBoolFromFlagZ -> do
@@ -247,16 +259,7 @@ execBios = \case
   BiosMakeBoolFromFlagN -> do
     b <- GetFlagN
     SetReg Ax (VMemAddr (if b then aTrue else aFalse))
-  BiosHalt -> Halt
-  BiosStringLength -> do
-    a <- deMemAddr <$> GetReg Ax
-    string <- readStringFromMemory a
-    SetReg Ax (VNum (fromIntegral $ length string))
-  BiosStringIndex -> do
-    a <- deMemAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Bx
-    string <- readStringFromMemory a
-    SetReg Ax (VChar (string !! fromIntegral i))
+
   -- On real hardware Num/Char will have overlapping representations
   -- such that ord/chr have null implementations
   BiosNumToChar -> do
@@ -266,17 +269,60 @@ execBios = \case
     c <- deChar <$> GetReg Ax
     SetReg Ax (VNum (fromIntegral $ Char.ord c))
 
--- TODO: improve string rep to avoid this...
-readStringFromMemory :: MemAddr -> M String
-readStringFromMemory a = do
+  BiosStringLength -> do
+    a <- deMemAddr <$> GetReg Ax
+    n <- lengthOfListInMemory a
+    SetReg Ax (VNum n)
+  BiosStringIndex -> do
+    a <- deMemAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    e <- getBytesElement a i
+    c <- GetMem (addAddr 1 e)
+    SetReg Ax c
+  BiosMakeBytes -> do
+    n <- deNum <$> GetReg Ax
+    v <- createBytesInMemory n
+    SetReg Ax v
+  BiosFreezeBytes -> do
+    -- currently a null-imp, because we dont have a special rep for strings
+    pure ()
+  BiosSetBytes -> do
+    a <- deMemAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    c <- deChar <$> GetReg Si
+    e <- getBytesElement a i
+    SetMem (addAddr 1 e) (VChar c)
+    pure ()
+
+lengthOfListInMemory :: MemAddr -> M Number
+lengthOfListInMemory a = do
   n <- deNum <$> GetMem a
   case n of
-    0 -> pure []
+    0 -> pure 0
     1 -> do
-      c <- deChar <$> GetMem (addAddr 1 a)
       a' <- deMemAddr <$> GetMem (addAddr 2 a)
-      (c:) <$> readStringFromMemory a'
-    _ -> error (show ("readStringFromMemory",n))
+      (1+) <$> lengthOfListInMemory a'
+    _ -> error (show ("lengthOfListInMemory",n))
+
+-- A string is represented as a list of chars, so we must walk the list to get the nth element
+getBytesElement :: MemAddr -> Number -> M MemAddr
+getBytesElement a = \case
+  0 -> pure a
+  n -> do
+    a <- deMemAddr <$> GetMem (addAddr 2 a)
+    getBytesElement a (n-1)
+
+createBytesInMemory :: Number -> M Val
+createBytesInMemory = loop (VMemAddr aNil)
+  where
+    loop v = \case
+      0 -> pure v
+      n -> do
+        execPush v
+        execPush (VChar '\0')
+        execPush (VNum tCons)
+        v <- GetReg Sp
+        loop v (n-1)
 
 execJump :: Jump -> M ()
 execJump = \case
@@ -440,6 +486,7 @@ state0 = State
     mem = Map.fromList
       [ (aFalse, VNum tFalse)
       , (aTrue, VNum tTrue)
+      , (aNil, VNum tNil)
       , (aFinalCont, VCodeLabel finalCodeLabel)
       , (addAddr 1 aFinalCont, VChar 'X') -- dummy next cont; without this we see error with -trace
       ]
@@ -454,10 +501,11 @@ instance Show State where
 tempOffset :: Int -> MemAddr
 tempOffset n = MemAddr n
 
-aFalse,aTrue,aFinalCont :: MemAddr
+aFalse,aTrue,aNil,aFinalCont :: MemAddr
 aFalse = MemAddr 90
 aTrue = MemAddr 91
-aFinalCont = MemAddr 92
+aNil = MemAddr 92
+aFinalCont = MemAddr 93
 
 globalOffset :: Int -> MemAddr
 globalOffset n = MemAddr (n + 100)
@@ -704,8 +752,25 @@ compileBuiltin b xs = case (b,xs) of
     [ OpMove Ax s1
     , OpCall BiosCharToNum
     ]
-  b ->
-    error (show (b,xs))
+
+  (SRC.MakeBytes, [s1]) ->
+    [ OpMove Ax s1
+    , OpCall BiosMakeBytes
+    ]
+  (SRC.FreezeBytes, [s1]) ->
+    [ OpMove Ax s1
+    , OpCall BiosFreezeBytes
+    ]
+  (SRC.SetBytes, [s1,s2,s3]) ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpMove Si s3
+    , OpCall BiosSetBytes
+    ]
+
+  _ ->
+    -- TODO: avoid chance of missing Builtin by using oneArg/TwoArgs/.. combinators
+    error (printf "Stage5.compileBuiltin: %s %s" (show b) (show xs))
 
 setLocation :: SRC.Location -> Reg -> Op
 setLocation loc reg = case loc of

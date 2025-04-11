@@ -28,14 +28,21 @@ wrapPreDefs (Prog defs) =
       , ("put_char"     , prim1 PutChar)
       , ("string_index" , prim2 StringIndex)
       , ("string_length", prim1 StringLength)
+      , ("make_bytes"   , prim1 MakeBytes)
+      , ("freeze_bytes" , prim1 FreezeBytes)
+      , ("set_bytes"    , prim3 SetBytes)
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])
         prim2 p2 = Lam noPos x (Lam noPos y (Prim noPos p2 [ex,ey]))
+        prim3 p3 = Lam noPos x (Lam noPos y (Lam noPos z (Prim noPos p3 [ex,ey,ez])))
         construct2 c2 = Lam noPos x (Lam noPos y (Con noPos c2 [ex,ey]))
         ex = Var noPos x'
         ey = Var noPos y'
+        ez = Var noPos z'
         x = Bid noPos x'
         y = Bid noPos y'
+        z = Bid noPos z'
         x' = mkUserId "x"
         y' = mkUserId "y"
+        z' = mkUserId "z"

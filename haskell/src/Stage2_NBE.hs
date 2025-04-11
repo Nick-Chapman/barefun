@@ -56,6 +56,8 @@ reifyValue pos = \case
     let es = map (reifyValue pos) vs
     let cid = Cid "CID" -- TODO: need to solve this issue?
     ConTag pos (Ctag cid tag) es
+  v@VBytes{} ->
+    error (show ("refifyValue",pos,v))
   v@VFunc{} ->
     error (show ("refifyValue",pos,v))
 

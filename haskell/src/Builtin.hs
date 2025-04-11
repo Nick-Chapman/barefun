@@ -3,12 +3,14 @@ module Builtin ( Builtin(..), executeBuiltin, isPure, evaluatePureBuiltin ) wher
 import Interaction (Interaction(..))
 import Value (Value(..),tUnit,mkBool,deUnit)
 import qualified Data.Char as Char (chr,ord)
+import Text.Printf (printf)
 
 data Builtin
   = PutChar | GetChar
   | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
   | EqChar | CharOrd | CharChr
   | StringLength | StringIndex
+  | MakeBytes | FreezeBytes | SetBytes
   deriving (Show)
 
 data Semantics
@@ -50,13 +52,19 @@ defineBuiltin b =
     CharChr -> Pure (\vs -> VChar ((Char.chr . fromIntegral) (deNum (oneArg vs))))
     StringLength -> Pure (\vs -> VNum (fromIntegral $ length (deString (oneArg vs))))
     StringIndex -> Pure (\vs -> VChar ((\(s,i) -> s!!(fromIntegral i)) $ (twoArgs deString deNum vs)))
-
+    MakeBytes -> Impure $ \vs k -> IMakeBytes (fromIntegral $ deNum (oneArg vs)) (\b -> k (VBytes b))
+    FreezeBytes -> Impure $ \vs k -> IFreezeBytes (deBytes (oneArg vs)) (\s -> k (VString s))
+    SetBytes -> Impure $ \vs k -> do
+      let (b,n,c) = threeArgs deBytes deNum deChar vs
+      ISetBytes b (fromIntegral n) c (k unit)
   where
     unit = VCons tUnit []
     oneArg = \case [v] -> v; _ -> err
     twoArgs c1 c2 = \case [v1,v2] -> (c1 v1, c2 v2); _ -> err
+    threeArgs c1 c2 c3 = \case [v1,v2,v3] -> (c1 v1, c2 v2, c3 v3); _ -> err
     deNum = \case VNum n -> n; _ -> err
     deChar = \case VChar c -> c; _ -> err
+    deBytes = \case VBytes b -> b; _ -> err
     deString = \case VString s -> s; _ -> err
     err :: a
-    err = error (show b)
+    err = error (printf "Builtin.hs: error: %s" (show b))

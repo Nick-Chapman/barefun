@@ -14,6 +14,9 @@ let ord = (fun x -> PRIM_CharOrd(x)) in
 let put_char = (fun x -> PRIM_PutChar(x)) in
 let string_index = (fun x -> (fun y -> PRIM_StringIndex(x,y))) in
 let string_length = (fun x -> PRIM_StringLength(x)) in
+let make_bytes = (fun x -> PRIM_MakeBytes(x)) in
+let freeze_bytes = (fun x -> PRIM_FreezeBytes(x)) in
+let set_bytes = (fun x -> (fun y -> (fun z -> PRIM_SetBytes(x,y,z)))) in
 let main =
   let mainloop =
     fix (fun mainloop _ ->

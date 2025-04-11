@@ -17,6 +17,11 @@ module X : sig
   val string_length : string -> int
   val upto : int -> int -> int list
 
+  type bytes
+  val make_bytes : int -> bytes
+  val freeze_bytes : bytes  -> string
+  val set_bytes : bytes -> int -> char -> unit
+
 end = struct
 
   let (=) = (=)
@@ -49,6 +54,11 @@ end = struct
 
   let string_length = String.length
   let string_index s i = s.[i]
+
+  type bytes = Bytes.t
+  let make_bytes = Bytes.create
+  let freeze_bytes = Bytes.unsafe_to_string
+  let set_bytes = Bytes.set
 
 end
 include X
