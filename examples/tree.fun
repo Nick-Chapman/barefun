@@ -23,10 +23,7 @@ let rec eval e =
   | Add(e1,e2) -> eval e1 + eval e2
   | Sub(e1,e2) -> eval e1 - eval e2
 
-(* Need parens on Num or else get type-incorrect parsing becausse of parse bug. TODO: fix it! *)
-let num n = Num (n)
-
-let example1 = Sub (num 1000, Add (num 42, num 3))
+let example1 = Sub (Num 1000, Add (Num 42, Num 3))
 
 let main() =
   put_int (eval example1)

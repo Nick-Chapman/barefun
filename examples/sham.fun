@@ -162,7 +162,7 @@ let lookup = fun sought ->
     | e1::ps ->
        match e1 with
        | Pair (name,file) ->
-          if eq_string name sought then Some(file) else loop ps
+          if eq_string name sought then Some file else loop ps
   in
   fun fs -> loop (bindings fs)
 

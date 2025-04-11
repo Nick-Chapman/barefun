@@ -273,7 +273,7 @@ L18: ; Start
   push cx
   push #L17
   mov cx, sp
-  ;; (32'16) Tail: eval (g8) @ con_29'15 (g16)
+  ;; (29'16) Tail: eval (g8) @ con_26'15 (g16)
   mov bp, 108
   mov dx, 116
   mov ax, [bp]

@@ -12,4 +12,4 @@ let put_thing f =
   doit
 
 let main () =
-  put_thing put_char (Thing('x')) (* TODO: missing parens makes wrong example *)
+  put_thing put_char (Thing 'x')

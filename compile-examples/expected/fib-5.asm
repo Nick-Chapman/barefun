@@ -24,7 +24,7 @@ L2: ; Function: g1
   mov ax, [bp]
   jmp [ax]
 
-L3: ; Arm: 31'11
+L3: ; Arm: 30'11
   ;; (29'12) Return: n (arg)
   mov dx, dx
   mov bp, cx
@@ -51,7 +51,7 @@ L5: ; Continuation
   push cx
   push #L4
   mov cx, sp
-  ;; (31'39) Tail: fib (g3) @ prim_0'0 (t1)
+  ;; (30'39) Tail: fib (g3) @ prim_0'0 (t1)
   mov bp, 103
   mov dx, 1
   mov ax, [bp]
@@ -72,7 +72,7 @@ L6: ; Function: g3
   push cx
   push #L5
   mov cx, sp
-  ;; (31'27) Tail: fib (g3) @ prim_0'0 (t2)
+  ;; (30'27) Tail: fib (g3) @ prim_0'0 (t2)
   mov bp, 103
   mov dx, 2
   mov ax, [bp]
@@ -416,7 +416,7 @@ L32: ; Continuation
   push cx
   push #L31
   mov cx, sp
-  ;; (16'35) Tail: app_16'32 (arg) @ lit_41'21 (g20)
+  ;; (16'35) Tail: app_16'32 (arg) @ lit_40'21 (g20)
   mov bp, dx
   mov dx, 120
   mov ax, [bp]
@@ -575,7 +575,7 @@ L37: ; Start
   push cx
   push #L36
   mov cx, sp
-  ;; (34'16) Tail: fib (g3) @ lit_41'21 (g7)
+  ;; (33'16) Tail: fib (g3) @ lit_40'21 (g7)
   mov bp, 103
   mov dx, 107
   mov ax, [bp]

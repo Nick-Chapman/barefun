@@ -1325,7 +1325,7 @@ L100: ; Continuation
   mov bx, dx
   cmp [bx], #1
   bz L99
-  ;; (165'61) Tail: loop (f2) @ ps (f3)
+  ;; (165'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]
@@ -2005,7 +2005,7 @@ L147: ; Continuation
   mov bx, dx
   cmp [bx], #1
   bz L146
-  ;; (165'61) Tail: loop (f2) @ ps (f3)
+  ;; (165'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]
@@ -2075,7 +2075,7 @@ L152: ; Continuation
   mov bx, dx
   cmp [bx], #1
   bz L151
-  ;; (165'61) Tail: loop (f2) @ ps (f3)
+  ;; (165'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]
@@ -2525,7 +2525,7 @@ L184: ; Continuation
   mov bx, dx
   cmp [bx], #1
   bz L183
-  ;; (165'61) Tail: loop (f2) @ ps (f3)
+  ;; (165'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]
@@ -2595,7 +2595,7 @@ L189: ; Continuation
   mov bx, dx
   cmp [bx], #1
   bz L188
-  ;; (165'61) Tail: loop (f2) @ ps (f3)
+  ;; (165'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]

@@ -65,8 +65,7 @@ type 'a option = Some of 'a | None
 
 let parse_digit c =
   let n = ord c - ord '0' in
-  (* TODO missing parens for "Some(x)" cause haskell evaluation to go wrong. parse mistake? *)
-  if n >= 0 then if n <= 9 then Some(n) else None else None
+  if n >= 0 then if n <= 9 then Some n else None else None
 
 let parse_num s =
   let rec loop acc xs =

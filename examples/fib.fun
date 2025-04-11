@@ -27,7 +27,6 @@ let put_int i = put_chars (chars_of_int i)
 let newline () = put_char '\n'
 
 let rec fib n =
-  (*put_int n; newline ();*)
   if n < 2 then n else fib (n-1) + fib (n-2)
 
 let runfib n =

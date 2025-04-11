@@ -220,7 +220,7 @@ gram6 = program where
     c <- constructor
     alts
       [ do es <- tupleExp; pure (AST.Con pos c es)
---      , do e <- atom0; pure (AST.Con c [e]) -- TODO: How to make this work?
+      , do e <- atom; pure (AST.Con pos c [e])
       , pure (AST.Con pos c [])
       ]
 
