@@ -16,17 +16,17 @@ Haskell REPL
   XhYeZ[HALT:#apps=8, #prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -2
-  [Stage2 (NbE); normalization: 100 -> 20]
+  [Stage2 (NbE); post normalization size: 20]
   XhYeZ[HALT:#prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -3
-  [Stage3 (ANF); normalization: 100 -> 20]
+  [Stage3 (ANF); post normalization size: 20]
   XhYeZ[HALT:#return=1, #prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -4
-  [Stage4 (CCF); normalization: 100 -> 20]
+  [Stage4 (CCF); post normalization size: 20]
   XhYeZ[HALT:#return=1, #prim=7]
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -5
-  [Stage5 (ASM); normalization: 100 -> 20]
+  [Stage5 (ASM); post normalization size: 20]
   XhYeZ[HALT:#op=35]

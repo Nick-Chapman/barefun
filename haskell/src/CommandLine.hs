@@ -37,8 +37,9 @@ main = do
 
   let reachedNormStage = (stage >= Stage2)
   let
-    tagZ :: String = if reachedNormStage then printf "; normalization: %d -> %d" sizeU sizeN else ""
-      where sizeU = Stage1.sizeExp e1
+    -- pre-normalization size is unstable when new builtins are added.
+    tagZ :: String = if reachedNormStage then printf "; post normalization size: %d" sizeN else ""
+      where --sizeU = Stage1.sizeExp e1
             sizeN = Stage1.sizeExp e2
 
   case (stage,mode) of

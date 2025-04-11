@@ -28,7 +28,7 @@ Haskell REPL
   [EOF:#apps=58, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -2
-  [Stage2 (NbE); normalization: 98 -> 16]
+  [Stage2 (NbE); post normalization size: 16]
   HHeelllloo,,
   
   WWoorrlldd!!
@@ -36,7 +36,7 @@ Haskell REPL
   [EOF:#apps=15, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -3
-  [Stage3 (ANF); normalization: 98 -> 16]
+  [Stage3 (ANF); post normalization size: 16]
   HHeelllloo,,
   
   WWoorrlldd!!
@@ -44,7 +44,7 @@ Haskell REPL
   [EOF:#enter=15, #prim=43]
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -4
-  [Stage4 (CCF); normalization: 98 -> 16]
+  [Stage4 (CCF); post normalization size: 16]
   HHeelllloo,,
   
   WWoorrlldd!!
@@ -55,7 +55,7 @@ Haskell REPL
 Hey, the tiny example now works in stage 5...
 
   $ cat tiny.input | ../haskell/main.exe ../examples/tiny.fun -5
-  [Stage5 (ASM); normalization: 98 -> 16]
+  [Stage5 (ASM); post normalization size: 16]
   HHeelllloo,,
   
   WWoorrlldd!!

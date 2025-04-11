@@ -19,21 +19,21 @@ Haskell REPL
   [HALT:#apps=131591, #prim=54811]
 
   $ ../haskell/main.exe ../examples/fib.fun -2
-  [Stage2 (NbE); normalization: 220 -> 167]
+  [Stage2 (NbE); post normalization size: 167]
   fib 20 --> 6765
   [HALT:#apps=21948, #prim=54804]
 
   $ ../haskell/main.exe ../examples/fib.fun -3
-  [Stage3 (ANF); normalization: 220 -> 167]
+  [Stage3 (ANF); post normalization size: 167]
   fib 20 --> 6765
   [HALT:#push-continuation=21918, #enter=21948, #return=21919, #prim=54804]
 
   $ ../haskell/main.exe ../examples/fib.fun -4
-  [Stage4 (CCF); normalization: 220 -> 167]
+  [Stage4 (CCF); post normalization size: 167]
   fib 20 --> 6765
   [HALT:#push-continuation=21918, #enter=21948, #return=21919, #prim=54804]
 
   $ ../haskell/main.exe ../examples/fib.fun -5
-  [Stage5 (ASM); normalization: 220 -> 167]
+  [Stage5 (ASM); post normalization size: 167]
   fib 20 --> 6765
   [HALT:#op=537462]

@@ -34,7 +34,7 @@ Ocaml REPL
 Haskell REPL (stage4)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -4
-  [Stage4 (CCF); normalization: 824 -> 1116]
+  [Stage4 (CCF); post normalization size: 1116]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
@@ -66,7 +66,7 @@ Haskell REPL (stage4)
 Haskell REPL (stage5)
 
   $ cat shell.input | ../haskell/main.exe ../examples/shell.fun -5
-  [Stage5 (ASM); normalization: 824 -> 1116]
+  [Stage5 (ASM); post normalization size: 1116]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
   You wrote: "Hell*, W*rld!" (13 chars)
