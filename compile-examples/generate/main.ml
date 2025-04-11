@@ -13,7 +13,7 @@ let generate_rules x v =
   let suf = suffix_of_version v in
   let m = Printf.sprintf "%d" v in
   Printf.printf {|
-(rule (alias runtest) (action (diff ../%s-%s.%s %s-%s.gen)))
+(rule (alias runtest) (action (diff ../expected/%s-%s.%s %s-%s.gen)))
 (rule (deps ../../haskell/main.exe ../../examples/%s.fun) (action (with-stdout-to %s-%s.gen (run ../../haskell/main.exe ../../examples/%s.fun -compile -%s))))
  |} x m suf x m  x x m  x m
 
