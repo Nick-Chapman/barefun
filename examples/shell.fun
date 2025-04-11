@@ -1,4 +1,30 @@
 
+let noinline = let rec block f a = let _ = block in f a in block (* TODO: have principled noinline construct *)
+
+let rec length xs =
+  match xs with
+  | [] -> 0
+  | _::xs -> (+) 1 (length xs)
+
+let cons x xs = x :: xs
+
+let rec append xs ys = (* non tail-recursive version *)
+  match xs with
+  | [] -> ys
+  | x::xs -> cons x (append xs ys)
+
+let implode xs =
+  let b = make_bytes (length xs) in
+  let rec loop i xs =
+    match xs with
+    | [] -> ()
+    | x::xs -> set_bytes b i x; loop (i+1) xs
+  in
+  loop 0 xs;
+  freeze_bytes b
+
+let implode = noinline implode
+
 let explode s =
   let rec explode_loop acc i =
     if i < 0 then acc else
@@ -6,9 +32,9 @@ let explode s =
   in
   explode_loop [] (string_length s - 1)
 
-let noinline = let rec block f a = let _ = block in f a in block (* TODO: have principled noinline construct *)
-
 let explode = noinline explode
+
+let string_append s1 s2 = implode (append (explode s1) (explode s2)) (* TODO: ^ *)
 
 let not b =
   match b with
@@ -19,7 +45,7 @@ let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
-(* Make a prettier put_char for control chars; also align with backspacing *)
+(* A prettier put_char for control chars; also aligned with backspacing *)
 let put_char = (fun c -> (* TODO: inline_only_constant_argument *)
   let backspace = 8 in
   let n = ord c in
@@ -53,8 +79,6 @@ let parse_num s =
   in
   loop 0 s
 
-let cons x xs = x :: xs
-
 let rec eq_list eq xs ys =
   match xs with
   | [] -> (match ys with | [] -> true | _::_ -> false)
@@ -66,10 +90,7 @@ let rec eq_list eq xs ys =
 
 let eq_char_list xs ys = eq_list eq_char xs ys
 
-let rec append xs ys = (* non tail-recursive version *)
-  match xs with
-  | [] -> ys
-  | x::xs -> cons x (append xs ys)
+let eq_string s1 s2 = eq_char_list (explode s1) (explode s2)
 
 let rec revloop acc xs =
   match xs with
@@ -82,11 +103,6 @@ let rec map f xs =
   match xs with
   | [] -> []
   | x::xs -> f x :: map f xs
-
-let rec length xs =
-  match xs with
-  | [] -> 0
-  | _::xs -> (+) 1 (length xs)
 
 let chars_of_int i =
   let ord0 = ord '0' in
@@ -102,7 +118,7 @@ let rec put_chars xs =
   | [] -> ()
   | x::xs -> put_char x; put_chars xs
 
-let put_string s = noinline (fun s -> put_chars (explode s)) s
+let put_string s = put_chars (explode s) (* could avoid explode *)
 
 let put_int i = put_chars (chars_of_int i)
 
@@ -113,7 +129,7 @@ let rec readloop acc =
   let n = ord c in
   let controlD = chr 4 in
   if eq_char c '\n' then (newline(); reverse acc) else
-    if eq_char c controlD then (put_char c; newline(); reverse (controlD :: acc)) else (* TODO put_char controlD *)
+    if eq_char c controlD then (put_char controlD; newline(); reverse (controlD :: acc)) else
       if n > 127 then readloop acc else
         if n = 127 then
           match acc with
@@ -125,7 +141,7 @@ let rec readloop acc =
         else
           (put_char c; readloop (cons c acc))
 
-let read_line () = readloop []
+let read_line () = implode (readloop [])
 
 let rec fib n =
   (*put_int n; newline ();*)
@@ -145,7 +161,7 @@ let runfib args =
      match more with
      | _::_ -> error "expected exactly one argument"
      | [] ->
-        match parse_num arg1 with
+        match parse_num (explode arg1) with
         | None -> error "expected arg1 to be numeric"
         | Some n ->
            let res = fib n in
@@ -162,7 +178,7 @@ let runfact args =
      match more with
      | _::_ -> error "expected exactly one argument"
      | [] ->
-        match parse_num arg1 with
+        match parse_num (explode arg1) with
         | None -> error "expected arg1 to be numeric"
         | Some n ->
            let res = fact n in
@@ -172,13 +188,15 @@ let runfact args =
            newline ()
 
 
-let single_controlD = chr 4 :: []
+let single_controlD = implode (chr 4 :: [])
+
+let reverse_string s = implode (reverse (explode s))
 
 let rev() =
   let rec loop() =
-    let xs = read_line () in
-    if eq_char_list xs single_controlD then () else
-      (put_chars (reverse xs); newline(); loop())
+    let line = read_line () in
+    if eq_string line single_controlD then () else
+      (put_string (reverse_string line); newline(); loop())
   in
   loop()
 
@@ -191,8 +209,8 @@ let runrev args =
 
 let fallback line =
   let star_the_ohs = map (fun c -> if eq_char c 'o' then '*' else c) in
-  let n = length line in
-  put_chars (append (explode "You wrote: \"") (star_the_ohs line));
+  let n = string_length line in
+  put_string (string_append "You wrote: \"" (implode (star_the_ohs (explode line))));
   put_string "\" (";
   put_int n;
   put_string " chars)";
@@ -200,30 +218,30 @@ let fallback line =
 
 let rec splitloop accWs accCs xs =
   match xs with
-  | [] -> reverse (reverse accCs :: accWs)
+  | [] -> reverse (implode (reverse accCs) :: accWs)
   (* TODO: handle multiple space seps *)
   | x::xs ->
-     if eq_char x ' ' then splitloop (reverse accCs :: accWs) [] xs
+     if eq_char x ' ' then splitloop (implode (reverse accCs) :: accWs) [] xs
      else splitloop accWs (x::accCs) xs
 
 let split_words s = (* eta expand for efficiency; smaller continuation frames *)
   splitloop [] [] s
 
 let execute line =
-  let words = split_words line in
+  let words = split_words (explode line) in
   match words with
   | [] -> ()
   | command::args ->
-     if eq_char_list command (explode "fib") then runfib args else
-       if eq_char_list command (explode "fact") then runfact args else
-         if eq_char_list command (explode "rev") then runrev args else
+     if eq_string command "fib" then runfib args else
+       if eq_string command "fact" then runfact args else
+         if eq_string command "rev" then runrev args else
            fallback line
 
 let rec mainloop () =
   put_chars ['>';' '];
-  let xs = read_line () in
-  if eq_char_list xs single_controlD then () else
-    (execute xs; mainloop ())
+  let line = read_line () in
+  if eq_string line single_controlD then () else
+    (execute line; mainloop ())
 
 let main () =
   put_string "This is a shell prototype. Try: fib, fact, rev\n";

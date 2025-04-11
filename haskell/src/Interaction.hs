@@ -69,7 +69,7 @@ data Bytes = BytesRef Int deriving (Eq,Ord,Show)
 
 data State = State
   { tm :: Map Tickable Int
-  , bm :: Map Bytes (Int,Map Int Char)
+  , bm :: Map Bytes (Int,Map Int Char) -- TODO: implement in IO to avoid leak
   , u :: Int
   }
 
