@@ -12,7 +12,7 @@ Programming of the operating system & compiler are proceeding in tandem!
 
 Various examples of `.fun` code can be found [here](examples). Since `.fun` is a subset of ocaml, we can leverage the ocaml type checker for our examples: `dune build ocaml -w`
 
-We test evaluation of the examples [here](check-eval), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
+We test evaluation of the examples [here](test-evaluation), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
 
 We have haskell interpreters for each stage of the compilation pipeline:
 - [Stage0](haskell/src/Stage0_AST.hs): AST
