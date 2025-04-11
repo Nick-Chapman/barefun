@@ -351,24 +351,23 @@ gram6 = program where
   -- types and typedefs: mostly skipped
 
   type_constructor :: Par () = do
-    _ <- identifier
+    alts
+      [ do _ <- identifier; pure ()
+      ]
     pure ()
 
-  atomic_type = alts
-    [ do
-        _ <- tvar
-        _ <- opt type_constructor
-        pure ()
-    , do
-        _ <- constructor; pure ()
-    ]
+  atomic_type = do
+    _ <- opt (alts [ do _ <- tvar; pure ()
+                   , do _ <- bracketed (separated (key ",") type_); pure ()
+                   ])
+    _ <- many type_constructor
+    pure ()
 
-  type_ = do
-    separated (key "*") atomic_type
+  type_ = separated (alts [key "*", key "->"]) atomic_type
 
   maybe_tvar_seq =
     alts [ tvar
-         -- , bracketed (separated (key ",")) tvar -- TODO: when we have an example
+         , do _ <- bracketed (separated (key ",") tvar); pure ()
          , pure ()
          ]
 
