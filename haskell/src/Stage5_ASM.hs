@@ -34,7 +34,7 @@ data Code
 data Op -- target; source
   = OpComment String
   | OpMove Reg Source
-  | OpStore MemAddr Reg -- TODO: generalise MemAddr to Target -- or maybe I dont need.
+  | OpStore MemAddr Source -- TODO: generalise MemAddr to Target -- or maybe I dont need.
   | OpCall BareBios
   | OpPush Source
   | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
@@ -73,13 +73,16 @@ data Val -- TODO: rename Word?
 data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si-- TODO: Si | Di
   deriving (Eq,Ord)
 
-data MemAddr = MemAddr Int -- TODO: rename Addr
+data MemAddr  -- TODO: rename Addr
+  = Physical Int
+  | Symbolic DataLabel Int
   deriving (Eq,Ord)
 
 data CodeLabel = CodeLabel Int String -- unique label and provenance
   deriving (Eq,Ord)
 
-data DataLabel = DataLabel String -- TODO: use!
+data DataLabel = DataLabel SRC.Location -- TODO: just globals
+  deriving (Eq,Ord)
 
 data BareBios
   = BiosHalt
@@ -100,7 +103,10 @@ data BareBios
 -- Show
 
 instance Show Image where
-  show Image{cmap,dmap=_,start=_} =
+  show Image{cmap,dmap,start=_} =
+    unlines [ printf "%s:\n  dw %s\n" (show lab) (intercalate ", " (map show vals))
+            | (lab,vals) <- Map.toList dmap ]
+    ++
     unlines [ printf "%s: ; %s\n%s" (show lab) provenance (show code)
             | (lab@(CodeLabel _ provenance),code) <- Map.toList cmap ]
 
@@ -155,9 +161,14 @@ instance Show Reg where
     Bp -> "bp"
     Si -> "si"
 
-instance Show MemAddr where show (MemAddr n) = show n -- TODO: show Addr in different base
+instance Show MemAddr where
+  show = \case
+    Physical n -> show n
+    Symbolic d 0 -> printf "%s" (show d)
+    Symbolic d n -> printf "%s+%d" (show d) n
+
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
-instance Show DataLabel where show (DataLabel id) = "D" ++ show id
+instance Show DataLabel where show (DataLabel n) = "D_" ++ show n
 
 instance Show BareBios where
   show = \case
@@ -199,7 +210,7 @@ execOp :: Op -> M () -> M ()
 execOp = \case
   OpComment{} -> error "execOp/OpComment"
   OpMove r s -> \cont -> do v <- evalSource s; SetReg r v; cont
-  OpStore a r -> \cont -> do v <- GetReg r; SetMem a v; cont
+  OpStore a s -> \cont -> do v <- evalSource s; SetMem a v; cont
   OpCall bios -> \cont -> do execBios bios; cont
   OpPush s -> \cont -> do
     v <- evalSource s
@@ -371,7 +382,9 @@ prevAddr :: MemAddr -> MemAddr
 prevAddr = addAddr (-1)
 
 addAddr :: Int -> MemAddr -> MemAddr
-addAddr i (MemAddr n) = MemAddr (n+i)
+addAddr i = \case
+  Physical n -> Physical (n+i)
+  Symbolic lab n -> Symbolic lab (n+1)
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -399,9 +412,11 @@ data M a where
   GetChar :: M Char
 
 runM :: TraceFlag  -> Image -> M () -> Interaction
-runM traceFlag Image{cmap=cmapUser} m = loop state0 m k0
-  -- TODO: init mem from vals portion of image -- and compile top/loadable to use it
+runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
+
   where
+
+    stateLoaded = state0 dmap
 
     k0 _s () = IDone
 
@@ -467,8 +482,8 @@ data State = State
   , offsetFromLastLabel :: Int
   }
 
-state0 :: State
-state0 = State
+state0 :: Map DataLabel [Val] -> State
+state0 dmap = State
   { mem
   , rmap
   , flagZ = error "flagZ/uninitialized"
@@ -478,18 +493,23 @@ state0 = State
   , offsetFromLastLabel = error "offsetFromLastLabel"
   }
   where
-    initialStackPointer = MemAddr 0 -- stack address are negative in stage5 emulation
+    initialStackPointer = Physical 0 -- stack address are negative in stage5 emulation
     rmap = Map.fromList
       [ (Sp, VMemAddr initialStackPointer)
       , (Cx, VMemAddr aFinalCont)
       ]
-    mem = Map.fromList
+    mem = Map.fromList (internal ++ user)
+    internal =
       [ (aFalse, VNum tFalse)
       , (aTrue, VNum tTrue)
       , (aNil, VNum tNil)
       , (aFinalCont, VCodeLabel finalCodeLabel)
       , (addAddr 1 aFinalCont, VChar 'X') -- dummy next cont; without this we see error with -trace
       ]
+    user =
+      concat [ [(Symbolic lab i,v) | (i,v) <- zip [0..] vals ]
+             | (lab,vals) <- Map.toList dmap
+             ]
 
 instance Show State where
   show State{rmap} =
@@ -498,17 +518,20 @@ instance Show State where
 -- Address for User Temps: 1..30
 -- Address for runtime system constants: 90,91,92
 -- Address for User Globals: 101..
+
+-- TODO: Avoid using Physical addressses here. (when have Symbolic working!)
+
 tempOffset :: Int -> MemAddr
-tempOffset n = MemAddr n
+tempOffset n = Physical n
 
 aFalse,aTrue,aNil,aFinalCont :: MemAddr
-aFalse = MemAddr 90
-aTrue = MemAddr 91
-aNil = MemAddr 92
-aFinalCont = MemAddr 93
+aFalse = Physical 90
+aTrue = Physical 91
+aNil = Physical 92
+aFinalCont = Physical 93
 
 globalOffset :: Int -> MemAddr
-globalOffset n = MemAddr (n + 100)
+globalOffset n = Physical (n + 100)
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
@@ -531,40 +554,87 @@ compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (SRC.Ref _ loc) rhs body -> do
-    (ops1,reg) <- compileTopDef (show loc) rhs
-    let ops2 = [setLocation loc reg]
+    (ops1,source) <- compileTopDef loc rhs
+    --let ops2 = if preStatic then [setLocationT loc source] else []
+    let ops2 = [setLocationT loc source]
     doOps (ops1++ops2) <$> compileLoadable body
 
--- TODO: TopDefs should really really not generate Push instructions. But instead should generate static data structures.
-compileTopDef :: String -> SRC.Top -> Asm ([Op],Reg)
-compileTopDef who = \case
+
+preStatic :: Bool
+preStatic = True -- TODO: make it work for False
+
+-- TODO: TopDefs should really really not generate Push instructions. But instead should generate static data structures. -- WIP....
+compileTopDef :: SRC.Location -> SRC.Top -> Asm ([Op],Source)
+compileTopDef loc = \case
   SRC.TopLit x -> do
-    let (ops,source) = compileLit x
+    (ops,source) <- compileLit loc x
     pure
-      (ops ++ [ OpMove Ax source
-      ],Ax)
-  SRC.TopPrim b xs -> undefined b xs
+      (ops ++ [ OpMove Ax source -- TODO: remove this move
+      ],SReg Ax
+      )
+  SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
   SRC.TopLam _x body -> do
-    lab <- compileCode body >>= CutCode ("Function: " ++ who)
-    pure (
-      [ OpPush (SLit (VCodeLabel lab))
-      ], Sp)
+    lab <- compileCode body >>= CutCode ("Function: " ++ show loc)
+    let v1 = VCodeLabel lab
+    case preStatic of
+      True -> do
+        pure (
+          [ --OpComment "OLD-TopLam"
+           OpPush (SLit v1)
+          ], SReg Sp)
+      False -> do
+        a <- CutData loc [v1]
+        let source = SLit (VMemAddr a)
+        pure ([ OpComment "NEW-TopLam"], source)
 
   SRC.TopConApp (Ctag _ tag) xs -> do
-    pure (compileConApp tag xs, Sp)
+    case preStatic of
+      True -> do
+        let ops =
+              -- [OpComment "Old-TopConApp"] ++
+              construct tag (map compileRef xs)
+        pure (ops, SReg Sp)
+      False -> do
+        let vals = VNum tag : map compileRefG xs
+        a <- CutData loc vals
+        let source = SLit (VMemAddr a)
+        pure ([ OpComment "NEW-TopConApp"], source)
 
-compileLit :: Literal -> ([Op],Source)
-compileLit = \case
-    LitC c -> ([],SLit (VChar c))
-    LitN n -> ([],SLit (VNum n))
+compileRefG :: SRC.Ref -> Val -- only globals expectedd
+compileRefG (SRC.Ref _ loc) = do
+  case loc of
+    SRC.Global n -> VMemAddr (globalOffset n)
+    --SRC.Global{} -> VMemAddr (Symbolic (DataLabel loc) 0)
+    _ -> error (show ("compileRefG/not-Global",loc))
+
+compileLit :: SRC.Location -> Literal -> Asm ([Op],Source)
+compileLit loc = \case
+    LitC c -> pure ([],SLit (VChar c))
+    LitN n -> pure ([],SLit (VNum n))
+    -- string rep is currently the same as a list of chars. TODO: do better!
     LitS string -> do
-      -- string rep is currently the same as a list of chars. TODO: do better!
-      ([OpPush (SLit (VNum tNil))] ++
-        [ op
-        | c <- reverse string
-        , op <- construct tCons [SLit (VChar c), SReg Sp]
-        ],
-       SReg Sp)
+      case preStatic of
+        True -> pure $ do
+          ([ --OpComment "OLD-lit-string"
+            OpPush (SLit (VNum tNil))] ++
+           [ op
+           | c <- reverse string
+           , op <- construct tCons [SLit (VChar c), SReg Sp]
+           ],
+           SReg Sp)
+        False -> do
+          --a <- CutData loc [] -- TODO: hack
+          let lab = DataLabel loc
+          let
+            vals :: [Val] =
+              ([]
+                ++ concat [ [VNum tCons, VChar c, VMemAddr (Symbolic lab (3*i)) ]
+                       | (i,c) <- zip [1..] string --"xy" -- hack, mustuse string
+                       ]
+                ++ [ VNum tNil ])
+          a <- CutData loc vals
+          let source = SLit (VMemAddr a)
+          pure ([ OpComment "NEW-lit-string"], source)
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -594,7 +664,7 @@ compileCode = \case
 
   SRC.LetAtomic (SRC.Ref _ loc) rhs body -> do
     (ops1,reg) <- compileAtomic (show loc) rhs
-    let ops2 = [setLocation loc reg]
+    let ops2 = [setLocationT loc (SReg reg)]
     doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
@@ -630,7 +700,7 @@ compileArmTaken :: Reg -> SRC.Arm -> Asm Code
 compileArmTaken scrutReg arm =  do
   let (SRC.ArmTag _pos _tag xs rhs) = arm
   let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg i)
-                     , setLocation loc Ax ]
+                     , setLocationT loc (SReg Ax) ]
                    | (i,SRC.Ref _ loc) <- zip [1..] xs
                    ]
   doOps ops <$> compileCode rhs
@@ -772,10 +842,12 @@ compileBuiltin b xs = case (b,xs) of
     -- TODO: avoid chance of missing Builtin by using oneArg/TwoArgs/.. combinators
     error (printf "Stage5.compileBuiltin: %s %s" (show b) (show xs))
 
-setLocation :: SRC.Location -> Reg -> Op
-setLocation loc reg = case loc of
-  SRC.Global n -> OpStore (globalOffset n) reg
-  SRC.Temp n -> OpStore (tempOffset n) reg
+setLocationT :: SRC.Location -> Source -> Op -- just temps
+setLocationT loc source = case loc of
+  SRC.Global n ->
+    OpStore (globalOffset n) source
+    --if preStatic then OpStore (globalOffset n) source else undefined
+  SRC.Temp n -> OpStore (tempOffset n) source
   -- TODO: dont think any of these will be possible. perhaps rejig types in Stage4 to make that clear
   SRC.InFrame n -> undefined n
   SRC.TheArg -> undefined
@@ -784,7 +856,10 @@ setLocation loc reg = case loc of
 compileRef :: SRC.Ref -> Source
 compileRef (SRC.Ref _ loc) = do
   case loc of
-    SRC.Global n -> SMem (globalOffset n)
+    SRC.Global n ->
+      SMem (globalOffset n)
+      --if preStatic then SMem (globalOffset n) else SMem (Symbolic (DataLabel loc) 0)
+        --SLit (VMemAddr (Symbolic (DataLabel loc) 0))
     SRC.InFrame n -> SMemIndirectOffset frameReg n
     SRC.Temp n -> SMem (tempOffset n)
     SRC.TheArg -> SReg argReg
@@ -808,6 +883,7 @@ data Asm a where
   AsmRet :: a -> Asm a
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
   CutCode :: String -> Code -> Asm CodeLabel
+  CutData :: SRC.Location -> [Val] -> Asm MemAddr -- TODO: only cut dtata for gloabal
 
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
@@ -824,5 +900,9 @@ runAsm m = loop state0 m k0
         let lab = CodeLabel u prov
         let image@Image{cmap} = k s { u = u+1 } lab
         image { cmap = Map.insert lab code cmap }
+      CutData loc vals -> \k -> do
+        let lab = DataLabel loc
+        let image@Image{dmap} = k s (Symbolic lab 0)
+        image { dmap = Map.insert lab vals dmap }
 
 data AsmState = AsmState { u :: Int }
