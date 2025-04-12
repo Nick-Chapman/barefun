@@ -133,8 +133,8 @@ instance Show Jump where
 instance Show Source where
   show = \case
     SReg r -> show r
-    SLit v -> "#" ++ show v
-    SMem a -> show a -- TODO: need square brackets here too!
+    SLit v -> "#" ++ show v -- TODO: does x86 use this #-syntax?
+    SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
 

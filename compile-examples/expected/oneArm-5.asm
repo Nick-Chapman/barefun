@@ -3,11 +3,11 @@ L1: ; Function: g1
   mov bx, dx
   mov ax, [bx+1]
   mov 1, ax
-  mov ax, 1
+  mov ax, [1]
   call bios_put_char
   mov 2, ax
   ;; (0'0) Return: prim_0'0 (t2)
-  mov dx, 2
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -18,12 +18,12 @@ L2: ; Start
   mov 101, sp
   mov ax, #'x'
   mov 102, ax
-  push 102
+  push [102]
   push #0
   mov 103, sp
   ;; (15'21) Tail: doit (g1) @ con_15'22 (g3)
-  mov bp, 101
-  mov dx, 103
+  mov bp, [101]
+  mov dx, [103]
   mov ax, [bp]
   jmp [ax]
 
