@@ -553,20 +553,20 @@ contReg = Cx
 compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
   SRC.Run code -> compileCode code
-  SRC.LetTop (SRC.Ref _ loc) rhs body -> do
-    (ops1,source) <- compileTopDef loc rhs
-    let ops2 = [setLocationT loc source]
+  SRC.LetTop (_,g) rhs body -> do
+    (ops1,source) <- compileTopDef g rhs
+    let ops2 = [setGlobal g source]
     doOps (ops1++ops2) <$> compileLoadable body
 
 -- TODO: TopDefs should not generate Push instructions, but instead should generate static data structures.
-compileTopDef :: SRC.Location -> SRC.Top -> Asm ([Op],Source)
-compileTopDef loc = \case
+compileTopDef :: SRC.Global -> SRC.Top -> Asm ([Op],Source)
+compileTopDef g = \case
   SRC.TopLit x -> do
     (ops,source) <- compileLit x
     pure (ops ++ [ OpMove Ax source],SReg Ax)  -- TODO: remove this move
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
   SRC.TopLam _x body -> do
-    lab <- compileCode body >>= CutCode ("Function: " ++ show loc)
+    lab <- compileCode body >>= CutCode ("Function: " ++ show g)
     let v1 = VCodeLabel lab
     pure ([OpPush (SLit v1)], SReg Sp)
   SRC.TopConApp (Ctag _ tag) xs -> do
@@ -612,9 +612,9 @@ compileCode = \case
 
   SRC.LetAlias x y body -> undefined x y body -- TODO: need an example to provoke this
 
-  SRC.LetAtomic (SRC.Ref _ loc) rhs body -> do
-    (ops1,reg) <- compileAtomic (show loc) rhs
-    let ops2 = [setLocationT loc (SReg reg)]
+  SRC.LetAtomic (_,t) rhs body -> do
+    (ops1,reg) <- compileAtomic (show t) rhs
+    let ops2 = [setTemp t (SReg reg)]
     doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
@@ -650,8 +650,8 @@ compileArmTaken :: Reg -> SRC.Arm -> Asm Code
 compileArmTaken scrutReg arm =  do
   let (SRC.ArmTag _pos _tag xs rhs) = arm
   let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg i)
-                     , setLocationT loc (SReg Ax) ]
-                   | (i,SRC.Ref _ loc) <- zip [1..] xs
+                     , setTemp temp (SReg Ax) ]
+                   | (i,(_,temp)) <- zip [1..] xs
                    ]
   doOps ops <$> compileCode rhs
 
@@ -792,26 +792,18 @@ compileBuiltin b xs = case (b,xs) of
     -- TODO: avoid chance of missing Builtin by using oneArg/TwoArgs/.. combinators
     error (printf "Stage5.compileBuiltin: %s %s" (show b) (show xs))
 
-setLocationT :: SRC.Location -> Source -> Op -- just temps
-setLocationT loc source = case loc of
-  SRC.Global n ->
-    OpStore (globalOffset n) source
-    --if preStatic then OpStore (globalOffset n) source else undefined
-  SRC.Temp n -> OpStore (tempOffset n) source
-  -- TODO: dont think any of these will be possible. perhaps rejig types in Stage4 to make that clear
-  SRC.InFrame n -> undefined n
-  SRC.TheArg -> undefined
-  SRC.TheFrame -> undefined
+setGlobal :: SRC.Global -> Source -> Op
+setGlobal (SRC.Global n) source = OpStore (globalOffset n) source
+
+setTemp :: SRC.Temp -> Source -> Op
+setTemp (SRC.Temp n) source = OpStore (tempOffset n) source
 
 compileRef :: SRC.Ref -> Source
 compileRef (SRC.Ref _ loc) = do
   case loc of
-    SRC.Global n ->
-      SMem (globalOffset n)
-      --if preStatic then SMem (globalOffset n) else SMem (Symbolic (DataLabel loc) 0)
-        --SLit (VMemAddr (Symbolic (DataLabel loc) 0))
+    SRC.InGlobal (SRC.Global n) -> SMem (globalOffset n)
     SRC.InFrame n -> SMemIndirectOffset frameReg n
-    SRC.Temp n -> SMem (tempOffset n)
+    SRC.InTemp (SRC.Temp n) -> SMem (tempOffset n)
     SRC.TheArg -> SReg argReg
     SRC.TheFrame -> SReg frameReg
 

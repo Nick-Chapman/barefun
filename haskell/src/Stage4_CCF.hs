@@ -1,6 +1,6 @@
 -- | Locate identifier references at runtime; lift globals
 module Stage4_CCF
-  ( Loadable(..), Top(..), Code(..), Atomic(..), Arm(..), Ref(..), Location(..)
+  ( Loadable(..), Top(..), Code(..), Atomic(..), Arm(..), Ref(..), Location(..), Global(..), Temp(..)
   , execute
   , compile
   ) where
@@ -27,7 +27,7 @@ type Transformed = Loadable
 
 data Loadable -- restriction of Code
   = Run Code
-  | LetTop Ref Top Loadable
+  | LetTop (Id,Global) Top Loadable
 
 data Top -- restriction of Atomic
   = TopLit Literal
@@ -39,11 +39,11 @@ data Code
   = Return Position Ref
   | Tail Ref Position Ref
   | LetAlias Ref Ref Code
-  | LetAtomic Ref Atomic Code
+  | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Case Ref [Arm]
 
-data Arm = ArmTag Position Ctag [Ref] Code
+data Arm = ArmTag Position Ctag [(Id,Temp)] Code
 
 data Atomic
   = Prim Builtin [Ref]
@@ -51,8 +51,11 @@ data Atomic
   | Lam [Ref] [Ref] Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code
 
-data Location = Global Int | InFrame Int | Temp Int | TheFrame | TheArg deriving (Eq,Ord)
+data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg deriving (Eq,Ord)
 data Ref = Ref Id Location
+
+data Global = Global Int deriving (Eq,Ord)
+data Temp = Temp Int deriving (Eq,Ord)
 
 firstFrameIndexForLambdas,firstFrameIndexForContinuations,firstTempIndex,firstGlobalIndex :: Int
 firstFrameIndexForLambdas = 1
@@ -72,8 +75,8 @@ instance Show Loadable where show = intercalate "\n" . ("let k () = ()":) . pret
 prettyL :: Loadable -> Lines
 prettyL = \case
   Run code -> prettyC code
-  LetTop x rhs body ->
-    ("let " ++ show x ++ " = ") <++ prettyT rhs ++> " in"
+  LetTop (_,g) rhs body ->
+    ("let " ++ show g ++ " = ") <++ prettyT rhs ++> " in"
     ++ prettyL body
 
 prettyT :: Top -> Lines
@@ -93,8 +96,8 @@ prettyC = \case
   LetAlias x y body ->
     ["let " ++ show x ++ " = " ++ show y ++ " in"]
     ++ prettyC body
-  LetAtomic x rhs body ->
-    ("let " ++ show x ++ " = ") <++ prettyA rhs ++> " in"
+  LetAtomic (_,t) rhs body ->
+    ("let " ++ show t ++ " = ") <++ prettyA rhs ++> " in"
     ++ prettyC body
   PushContinuation pre post (x,later) first ->
     ("let k = " ++ show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " ->")
@@ -122,10 +125,10 @@ prettyArm = \case
     ("| " ++ prettyPat c xs ++ " ->")
     >>> prettyC rhs
 
-prettyPat :: Ctag -> [Ref] -> String
+prettyPat :: Ctag -> [(Id,Temp)] -> String
 prettyPat tag = \case
   [] -> show tag
-  xs -> printf "%s(%s)" (show tag) (intercalate "," (map show xs))
+  xs -> printf "%s(%s)" (show tag) (intercalate "," (map (\(_,t) -> show t) xs))
 
 instance Show Ref where
   show (Ref x loc) = do
@@ -135,11 +138,17 @@ instance Show Ref where
 
 instance Show Location where
   show = \case
-    Global n -> "g" ++ show n
+    InGlobal g -> show g
     InFrame n -> "f" ++ show n
-    Temp n -> "t" ++ show n
+    InTemp t -> show t
     TheArg -> "arg"
     TheFrame -> "me"
+
+instance Show Global where
+  show (Global n) = "g" ++ show n
+
+instance Show Temp where
+  show (Temp n) = "t" ++ show n
 
 ----------------------------------------------------------------------
 -- Execute
@@ -156,8 +165,8 @@ evalLoadable0 exp = do
 evalLoadable :: Env -> Env -> Loadable -> (Code,Env)
 evalLoadable genv env = \case
   Run code -> (code,env)
-  LetTop x top body -> do
-    let env' = insert x (evalT genv top) env
+  LetTop (x,g) top body -> do
+    let env' = insert (Ref x (InGlobal g)) (evalT genv top) env
     evalLoadable genv env' body
 
 look :: Env -> Ref -> Value
@@ -179,9 +188,9 @@ evalCode genv env = \case
   LetAlias x y body -> \k -> do
     let v = look env y
     evalCode genv (insert x v env) body k
-  LetAtomic x a1 c2 -> \k -> do
+  LetAtomic (x,t) a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
-      evalCode genv (insert x v1 env) c2 k
+      evalCode genv (insert (Ref x (InTemp t)) v1 env) c2 k
   PushContinuation pre _ (x,later) first -> \k -> ITick I.PushContinuation $ do
     evalCode genv env first $ \v1 -> do
       let env' = mkFrameEnv firstFrameIndexForContinuations genv env pre
@@ -196,7 +205,8 @@ evalCode genv env = \case
             ArmTag pos (Ctag _ tag) xs body : arms -> do
               if tag /= tagActual then dispatch arms else do
                 if length xs /= length vArgs then error (show ("case arm mismatch",pos,xs,vArgs)) else do
-                  let env' = foldr (uncurry insert) env (zip xs vArgs)
+                  let env' = foldr ins env (zip xs vArgs)
+                        where ins ((x,t),v) = insert (Ref x (InTemp t)) v
                   evalCode genv env' body k
         dispatch arms0
       v ->
@@ -253,18 +263,18 @@ compileCtop = compileC firstTempIndex
         pure $ LetAlias xRef yRef body
 
       SRC.LetAtomic x rhs body -> do
-        compileA x cenv rhs >>= \case
+        compileA cenv rhs >>= \case
           Left rhs -> do -- not gloablized
-            let xRef = Ref x (Temp (if nextTemp > maxTempIndex then err else nextTemp))
+            let temp = Temp (if nextTemp > maxTempIndex then err else nextTemp)
                   where err = error (show ("too many temps",nextTemp))
-            cenv <- pure $ Map.insert x xRef cenv
+            cenv <- pure $ Map.insert x (Ref x (InTemp temp)) cenv
             body <- compileC (nextTemp+1) cenv body
-            pure $ LetAtomic xRef rhs body
+            pure $ LetAtomic (x,temp) rhs body
           Right (xRefG, rhs) -> do -- globalized
             -- liftable things can have no effetcs, so if they are not even used we can just drop them
             if x `notMember` SRC.fvs body then compileC nextTemp cenv body else do
-              cenv <- pure $ Map.insert x xRefG cenv
-              Wrap (LetTop xRefG rhs) $ compileC nextTemp cenv body
+              cenv <- pure $ Map.insert x (Ref x (InGlobal xRefG)) cenv
+              Wrap (LetTop (x,xRefG) rhs) $ compileC nextTemp cenv body
 
       SRC.PushContinuation fvs (x,later) first -> do
         let xRef = Ref x TheArg
@@ -280,22 +290,23 @@ compileCtop = compileC firstTempIndex
       where
         compileArm :: SRC.Arm -> M Arm
         compileArm (SRC.ArmTag pos tag xs body) = do
-          let refs = [ Ref x (Temp n) | (x,n) <- zip xs [nextTemp..] ]
+          let temps = [ (x,Temp n) | (x,n) <- zip xs [nextTemp..] ]
+          let refs = [ Ref x (InTemp t) | (x,t) <- temps ]
           cenv <- pure $ foldr (uncurry Map.insert) cenv (zip xs refs)
           body <- compileC (nextTemp + length xs) cenv body
-          pure $ ArmTag pos tag refs body
+          pure $ ArmTag pos tag temps body
 
-compileA ::Id -> Cenv -> SRC.Atomic -> M (Either Atomic (Ref,Top))
-compileA name cenv = \case
+compileA ::Cenv -> SRC.Atomic -> M (Either Atomic (Global,Top))
+compileA cenv = \case
   SRC.Lit _ literal -> do
-    g <- GlobalRef name
+    g <- GlobalRef
     pure $ Right (g, TopLit literal)
 
   SRC.Prim _ b xs -> do
     let xs' = map (locate cenv) xs
     if isPure b && all isGlobal xs' then
       do
-        g <- GlobalRef name
+        g <- GlobalRef
         pure $ Right (g, TopPrim b xs')
       else do
         pure $ Left $ Prim b xs'
@@ -304,7 +315,7 @@ compileA name cenv = \case
     let xs' = map (locate cenv) xs
     if all isGlobal xs' then
       do
-        g <- GlobalRef name
+        g <- GlobalRef
         pure $ Right (g, TopConApp c xs')
       else do
         pure $ Left (ConApp c xs')
@@ -315,7 +326,7 @@ compileA name cenv = \case
     body <- compileCtop (Map.insert x xRef cenv) body
     case (pre,post) of
       ([],[]) -> do
-        g <- GlobalRef name
+        g <- GlobalRef
         pure $ Right (g, TopLam xRef body)
       _ ->
         pure $ Left (Lam pre post xRef body)
@@ -325,8 +336,8 @@ compileA name cenv = \case
     let xRef = Ref x TheArg
     case (pre,post) of
       ([],[]) -> do
-        g <- GlobalRef name
-        let fRef = g
+        g <- GlobalRef
+        let fRef = Ref f (InGlobal g)
         body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body
         pure $ Right (g, TopLam xRef body)
       _ -> do
@@ -352,7 +363,7 @@ locate cenv x = maybe err id $ Map.lookup x cenv
   where err = error (show ("Stage4.locate",x))
 
 isGlobal :: Ref -> Bool
-isGlobal = \case Ref _ (Global _) -> True; _ -> False
+isGlobal = \case Ref _ (InGlobal _) -> True; _ -> False
 
 instance Functor M where fmap = liftM
 instance Applicative M where pure = Ret; (<*>) = ap
@@ -362,7 +373,7 @@ data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
   Wrap :: (Loadable -> Loadable) -> M b -> M b
-  GlobalRef :: Id -> M Ref
+  GlobalRef :: M Global
 
 runM :: M Loadable -> Loadable
 runM m0 = loop firstGlobalIndex m0 $ \_ x -> x
@@ -372,4 +383,4 @@ runM m0 = loop firstGlobalIndex m0 $ \_ x -> x
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
       Wrap f m -> f (loop u m k)
-      GlobalRef x -> k (u+1) (Ref x (Global u))
+      GlobalRef -> k (u+1) (Global u)

@@ -234,7 +234,7 @@ compileAsId = \case
 
 mkBind :: Id -> AC -> Code -> Code
 mkBind x rhs body = case rhs of
-  Compound (Return _ y) -> LetAlias x y body
+  Compound (Return _ y) -> LetAlias x y body -- TODO: dont think can ever happen, because of NbE
   Compound rhs -> mkPushContinuation (x,body) rhs
   Atomic rhs -> LetAtomic x rhs body
 
