@@ -555,86 +555,36 @@ compileLoadable = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (SRC.Ref _ loc) rhs body -> do
     (ops1,source) <- compileTopDef loc rhs
-    --let ops2 = if preStatic then [setLocationT loc source] else []
     let ops2 = [setLocationT loc source]
     doOps (ops1++ops2) <$> compileLoadable body
 
-
-preStatic :: Bool
-preStatic = True -- TODO: make it work for False
-
--- TODO: TopDefs should really really not generate Push instructions. But instead should generate static data structures. -- WIP....
+-- TODO: TopDefs should not generate Push instructions, but instead should generate static data structures.
 compileTopDef :: SRC.Location -> SRC.Top -> Asm ([Op],Source)
 compileTopDef loc = \case
   SRC.TopLit x -> do
-    (ops,source) <- compileLit loc x
-    pure
-      (ops ++ [ OpMove Ax source -- TODO: remove this move
-      ],SReg Ax
-      )
+    (ops,source) <- compileLit x
+    pure (ops ++ [ OpMove Ax source],SReg Ax)  -- TODO: remove this move
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show loc)
     let v1 = VCodeLabel lab
-    case preStatic of
-      True -> do
-        pure (
-          [ --OpComment "OLD-TopLam"
-           OpPush (SLit v1)
-          ], SReg Sp)
-      False -> do
-        a <- CutData loc [v1]
-        let source = SLit (VMemAddr a)
-        pure ([ OpComment "NEW-TopLam"], source)
-
+    pure ([OpPush (SLit v1)], SReg Sp)
   SRC.TopConApp (Ctag _ tag) xs -> do
-    case preStatic of
-      True -> do
-        let ops =
-              -- [OpComment "Old-TopConApp"] ++
-              construct tag (map compileRef xs)
-        pure (ops, SReg Sp)
-      False -> do
-        let vals = VNum tag : map compileRefG xs
-        a <- CutData loc vals
-        let source = SLit (VMemAddr a)
-        pure ([ OpComment "NEW-TopConApp"], source)
+    let ops = construct tag (map compileRef xs)
+    pure (ops, SReg Sp)
 
-compileRefG :: SRC.Ref -> Val -- only globals expectedd
-compileRefG (SRC.Ref _ loc) = do
-  case loc of
-    SRC.Global n -> VMemAddr (globalOffset n)
-    --SRC.Global{} -> VMemAddr (Symbolic (DataLabel loc) 0)
-    _ -> error (show ("compileRefG/not-Global",loc))
-
-compileLit :: SRC.Location -> Literal -> Asm ([Op],Source)
-compileLit loc = \case
+compileLit :: Literal -> Asm ([Op],Source)
+compileLit = \case
     LitC c -> pure ([],SLit (VChar c))
     LitN n -> pure ([],SLit (VNum n))
     -- string rep is currently the same as a list of chars. TODO: do better!
     LitS string -> do
-      case preStatic of
-        True -> pure $ do
-          ([ --OpComment "OLD-lit-string"
-            OpPush (SLit (VNum tNil))] ++
-           [ op
-           | c <- reverse string
-           , op <- construct tCons [SLit (VChar c), SReg Sp]
-           ],
-           SReg Sp)
-        False -> do
-          --a <- CutData loc [] -- TODO: hack
-          let lab = DataLabel loc
-          let
-            vals :: [Val] =
-              ([]
-                ++ concat [ [VNum tCons, VChar c, VMemAddr (Symbolic lab (3*i)) ]
-                       | (i,c) <- zip [1..] string --"xy" -- hack, mustuse string
-                       ]
-                ++ [ VNum tNil ])
-          a <- CutData loc vals
-          let source = SLit (VMemAddr a)
-          pure ([ OpComment "NEW-lit-string"], source)
+      pure ([ OpPush (SLit (VNum tNil))] ++
+            [ op
+            | c <- reverse string
+            , op <- construct tCons [SLit (VChar c), SReg Sp]
+            ],
+            SReg Sp)
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -883,7 +833,7 @@ data Asm a where
   AsmRet :: a -> Asm a
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
   CutCode :: String -> Code -> Asm CodeLabel
-  CutData :: SRC.Location -> [Val] -> Asm MemAddr -- TODO: only cut dtata for gloabal
+  CutData :: SRC.Location -> [Val] -> Asm MemAddr -- TODO: only cut data for gloabal
 
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
