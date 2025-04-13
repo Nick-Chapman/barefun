@@ -9,7 +9,7 @@ L1: ; Arm: 6'13
 
 L2: ; Continuation
   mov ax, [bp+2]
-  div ax, [105]
+  div ax, #10
   mov 1, ax
   ;; (7'41) Tail: app_7'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -19,16 +19,16 @@ L2: ; Continuation
 
 L3: ; Function: t1
   mov ax, dx
-  cmp ax, [102]
+  cmp ax, #0
   call bios_make_bool_from_z
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L1
   mov ax, dx
-  mod ax, [103]
+  mod ax, #10
   mov 2, ax
-  mov ax, [104]
+  mov ax, #48
   add ax, [2]
   mov 3, ax
   mov ax, [3]
@@ -60,14 +60,14 @@ L4: ; Function: g1
   jmp [ax]
 
 L5: ; Arm: 13'7
-  ;; (0'0) Return: con_13'10 (g7)
-  mov dx, [107]
+  ;; (0'0) Return: con_13'10 (g3)
+  mov dx, [103]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L6: ; Function: g6
+L6: ; Function: g2
   mov bx, dx
   cmp [bx], #0
   bz L5
@@ -78,8 +78,8 @@ L6: ; Function: g6
   mov ax, [1]
   call bios_put_char
   mov 3, ax
-  ;; (14'35) Tail: put_chars (g6) @ xs (t2)
-  mov bp, [106]
+  ;; (14'35) Tail: put_chars (g2) @ xs (t2)
+  mov bp, [102]
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -110,9 +110,9 @@ L9: ; Continuation
   push cx
   push #L8
   mov cx, sp
-  ;; (23'33) Tail: eval (g8) @ e2 (f2)
+  ;; (23'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+2]
-  mov bp, [108]
+  mov bp, [104]
   mov ax, [bp]
   jmp [ax]
 
@@ -125,8 +125,8 @@ L10: ; Arm: 23'15
   push cx
   push #L9
   mov cx, sp
-  ;; (23'23) Tail: eval (g8) @ e1 (t1)
-  mov bp, [108]
+  ;; (23'23) Tail: eval (g4) @ e1 (t1)
+  mov bp, [104]
   mov dx, [1]
   mov ax, [bp]
   jmp [ax]
@@ -147,13 +147,13 @@ L12: ; Continuation
   push cx
   push #L11
   mov cx, sp
-  ;; (24'33) Tail: eval (g8) @ e2 (f2)
+  ;; (24'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+2]
-  mov bp, [108]
+  mov bp, [104]
   mov ax, [bp]
   jmp [ax]
 
-L13: ; Function: g8
+L13: ; Function: g4
   mov bx, dx
   cmp [bx], #0
   bz L7
@@ -167,22 +167,26 @@ L13: ; Function: g8
   push cx
   push #L12
   mov cx, sp
-  ;; (24'23) Tail: eval (g8) @ e1 (t1)
-  mov bp, [108]
+  ;; (24'23) Tail: eval (g4) @ e1 (t1)
+  mov bp, [104]
   mov dx, [1]
   mov ax, [bp]
   jmp [ax]
 
 L14: ; Continuation
-  ;; (16'26) Tail: put_chars (g6) @ case_9'11 (arg)
-  mov bp, [106]
+  ;; (16'26) Tail: put_chars (g2) @ case_9'11 (arg)
+  mov bp, [102]
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
 L15: ; Arm: 9'20
-  ;; (0'0) Return: con_9'26 (g20)
-  mov dx, [120]
+  push [105]
+  push #'0'
+  push #1
+  mov 2, sp
+  ;; (0'0) Return: con_9'26 (t2)
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -199,7 +203,7 @@ L16: ; Continuation
 
 L17: ; Continuation
   mov ax, dx
-  cmp ax, [117]
+  cmp ax, #0
   call bios_make_bool_from_z
   mov 1, ax
   push cx
@@ -212,70 +216,48 @@ L17: ; Continuation
   push cx
   push #L16
   mov cx, sp
-  ;; (9'41) Tail: loop (g1) @ con_9'41 (g21)
+  ;; (9'41) Tail: loop (g1) @ con_9'41 (g6)
   mov bp, [101]
-  mov dx, [121]
+  mov dx, [106]
   mov ax, [bp]
   jmp [ax]
 
 L18: ; Start
-  mov ax, #0
-  mov 102, ax
-  mov ax, #10
-  mov 103, ax
-  mov ax, #48
-  mov 104, ax
-  mov ax, #10
-  mov 105, ax
   push #L4
   mov 101, sp
   push #0
-  mov 107, sp
+  mov 103, sp
   push #L6
-  mov 106, sp
+  mov 102, sp
   push #L13
-  mov 108, sp
-  mov ax, #1000
-  mov 109, ax
-  push [109]
+  mov 104, sp
   push #0
-  mov 110, sp
-  mov ax, #42
-  mov 111, ax
-  push [111]
+  mov 105, sp
   push #0
-  mov 112, sp
-  mov ax, #3
-  mov 113, ax
-  push [113]
+  mov 106, sp
+  push #1000
   push #0
-  mov 114, sp
-  push [114]
-  push [112]
+  mov 1, sp
+  push #42
+  push #0
+  mov 2, sp
+  push #3
+  push #0
+  mov 3, sp
+  push [3]
+  push [2]
   push #1
-  mov 115, sp
-  push [115]
-  push [110]
+  mov 4, sp
+  push [4]
+  push [1]
   push #2
-  mov 116, sp
-  mov ax, #0
-  mov 117, ax
-  mov ax, #'0'
-  mov 118, ax
-  push #0
-  mov 119, sp
-  push [119]
-  push [118]
-  push #1
-  mov 120, sp
-  push #0
-  mov 121, sp
+  mov 5, sp
   push cx
   push #L17
   mov cx, sp
-  ;; (29'16) Tail: eval (g8) @ con_26'15 (g16)
-  mov bp, [108]
-  mov dx, [116]
+  ;; (29'16) Tail: eval (g4) @ con_26'15 (t5)
+  mov bp, [104]
+  mov dx, [5]
   mov ax, [bp]
   jmp [ax]
 

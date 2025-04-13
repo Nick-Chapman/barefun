@@ -9,7 +9,6 @@ import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Interaction (Interaction(..))
-import Stage0_AST (Literal(..))
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
 import Value (Number,tTrue,tFalse,tNil,tCons)
@@ -561,8 +560,8 @@ compileLoadable = \case
 -- TODO: TopDefs should not generate Push instructions, but instead should generate static data structures.
 compileTopDef :: SRC.Global -> SRC.Top -> Asm ([Op],Source)
 compileTopDef g = \case
-  SRC.TopLit x -> do
-    (ops,source) <- compileLit x
+  SRC.TopLitS string -> do
+    (ops,source) <- compileLitS string
     pure (ops ++ [ OpMove Ax source],SReg Ax)  -- TODO: remove this move
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
   SRC.TopLam _x body -> do
@@ -573,18 +572,15 @@ compileTopDef g = \case
     let ops = construct tag (map compileRef xs)
     pure (ops, SReg Sp)
 
-compileLit :: Literal -> Asm ([Op],Source)
-compileLit = \case
-    LitC c -> pure ([],SLit (VChar c))
-    LitN n -> pure ([],SLit (VNum n))
-    -- string rep is currently the same as a list of chars. TODO: do better!
-    LitS string -> do
-      pure ([ OpPush (SLit (VNum tNil))] ++
-            [ op
-            | c <- reverse string
-            , op <- construct tCons [SLit (VChar c), SReg Sp]
-            ],
-            SReg Sp)
+compileLitS :: String -> Asm ([Op],Source)
+compileLitS string = do
+  -- string rep is currently the same as a list of chars. TODO: do better!
+  pure ([ OpPush (SLit (VNum tNil))] ++
+        [ op
+        | c <- reverse string
+        , op <- construct tCons [SLit (VChar c), SReg Sp]
+        ],
+        SReg Sp)
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -797,20 +793,26 @@ setTemp :: SRC.Temp -> Source -> Op
 setTemp (SRC.Temp n) source = OpStore (tempOffset n) source
 
 compileRef :: SRC.Ref -> Source
-compileRef (SRC.Ref _ loc) = do
-  case loc of
-    SRC.InGlobal (SRC.Global n) -> SMem (globalOffset n)
-    SRC.InFrame n -> SMemIndirectOffset frameReg n
-    SRC.InTemp (SRC.Temp n) -> SMem (tempOffset n)
-    SRC.TheArg -> SReg argReg
-    SRC.TheFrame -> SReg frameReg
+compileRef = \case
+    SRC.RefLitC c -> SLit (VChar c)
+    SRC.RefLitN n -> SLit (VNum n)
+    SRC.Ref _ loc -> do
+    case loc of
+      SRC.InGlobal (SRC.Global n) -> SMem (globalOffset n)
+      SRC.InFrame n -> SMemIndirectOffset frameReg n
+      SRC.InTemp (SRC.Temp n) -> SMem (tempOffset n)
+      SRC.TheArg -> SReg argReg
+      SRC.TheFrame -> SReg frameReg
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
 
 ppRef :: SRC.Ref -> String
-ppRef (SRC.Ref id loc) =
-  show id ++ " (" ++ show loc ++ ")"
+ppRef = \case
+  SRC.RefLitC c -> show c
+  SRC.RefLitN n -> show n
+  SRC.Ref id loc ->
+    show id ++ " (" ++ show loc ++ ")"
 
 ----------------------------------------------------------------------
 -- Asm: compilation monad

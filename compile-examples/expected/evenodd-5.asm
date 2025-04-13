@@ -1,15 +1,15 @@
 (*Stage5 (ASM)*)
 L1: ; Arm: 4'27
-  ;; (0'0) Return: con_4'32 (g3)
-  mov dx, [103]
+  ;; (0'0) Return: con_4'32 (g2)
+  mov dx, [102]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
 L2: ; Arm: 3'26
-  ;; (0'0) Return: con_3'31 (g6)
-  mov dx, [106]
+  ;; (0'0) Return: con_3'31 (g3)
+  mov dx, [103]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -17,24 +17,24 @@ L2: ; Arm: 3'26
 
 L3: ; Function: g1
   mov ax, dx
-  cmp ax, [102]
+  cmp ax, #0
   call bios_make_bool_from_z
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L1
   mov ax, dx
-  sub ax, [104]
+  sub ax, #1
   mov 2, ax
   mov ax, [2]
-  cmp ax, [105]
+  cmp ax, #0
   call bios_make_bool_from_z
   mov 3, ax
   mov bx, [3]
   cmp [bx], #1
   bz L2
   mov ax, [2]
-  sub ax, [107]
+  sub ax, #1
   mov 4, ax
   ;; (3'50) Tail: is_even (g1) @ prim_0'0 (t4)
   mov bp, [101]
@@ -54,8 +54,8 @@ L4: ; Continuation
   jmp [ax]
 
 L5: ; Arm: 8'25
-  ;; (0'0) Return: lit_8'30 (g12)
-  mov dx, [112]
+  ;; (8'30) Return: 'E'
+  mov dx, #'E'
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -68,8 +68,8 @@ L6: ; Continuation
   mov bx, dx
   cmp [bx], #1
   bz L5
-  ;; (0'0) Return: lit_8'39 (g13)
-  mov dx, [113]
+  ;; (8'39) Return: 'O'
+  mov dx, #'O'
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -82,15 +82,15 @@ L7: ; Continuation
   push cx
   push #L6
   mov cx, sp
-  ;; (8'23) Tail: is_even (g1) @ lit_12'8 (g11)
+  ;; (8'23) Tail: is_even (g1) @ 13
   mov bp, [101]
-  mov dx, [111]
+  mov dx, #13
   mov ax, [bp]
   jmp [ax]
 
 L8: ; Arm: 8'25
-  ;; (0'0) Return: lit_8'30 (g9)
-  mov dx, [109]
+  ;; (8'30) Return: 'E'
+  mov dx, #'E'
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -103,46 +103,26 @@ L9: ; Continuation
   mov bx, dx
   cmp [bx], #1
   bz L8
-  ;; (0'0) Return: lit_8'39 (g10)
-  mov dx, [110]
+  ;; (8'39) Return: 'O'
+  mov dx, #'O'
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
 L10: ; Start
-  mov ax, #0
-  mov 102, ax
   push #1
-  mov 103, sp
-  mov ax, #1
-  mov 104, ax
-  mov ax, #0
-  mov 105, ax
+  mov 102, sp
   push #0
-  mov 106, sp
-  mov ax, #1
-  mov 107, ax
+  mov 103, sp
   push #L3
   mov 101, sp
-  mov ax, #42
-  mov 108, ax
-  mov ax, #'E'
-  mov 109, ax
-  mov ax, #'O'
-  mov 110, ax
-  mov ax, #13
-  mov 111, ax
-  mov ax, #'E'
-  mov 112, ax
-  mov ax, #'O'
-  mov 113, ax
   push cx
   push #L9
   mov cx, sp
-  ;; (8'23) Tail: is_even (g1) @ lit_11'8 (g8)
+  ;; (8'23) Tail: is_even (g1) @ 42
   mov bp, [101]
-  mov dx, [108]
+  mov dx, #42
   mov ax, [bp]
   jmp [ax]
 

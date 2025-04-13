@@ -31,7 +31,7 @@ Haskell (A)
   % This is line one.
   % Another
   % And one more!
-  % [EOF:#op=705]
+  % [EOF:#op=699]
 
 Haskell (B)
 
@@ -47,4 +47,4 @@ Haskell (B)
   % This is line one.
   % Another
   % And one more!
-  % [EOF:#op=711]
+  % [EOF:#op=705]

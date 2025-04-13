@@ -34,7 +34,7 @@ L3: ; Arm: 6'13
 
 L4: ; Continuation
   mov ax, [bp+2]
-  div ax, [107]
+  div ax, #10
   mov 1, ax
   ;; (7'41) Tail: app_7'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -44,16 +44,16 @@ L4: ; Continuation
 
 L5: ; Function: t1
   mov ax, dx
-  cmp ax, [104]
+  cmp ax, #0
   call bios_make_bool_from_z
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L3
   mov ax, dx
-  mod ax, [105]
+  mod ax, #10
   mov 2, ax
-  mov ax, [106]
+  mov ax, #48
   add ax, [2]
   mov 3, ax
   mov ax, [3]
@@ -95,9 +95,9 @@ L8: ; Continuation
   push cx
   push #L7
   mov cx, sp
-  ;; (9'35) Tail: app_9'32 (arg) @ lit_18'22 (g9)
+  ;; (9'35) Tail: app_9'32 (arg) @ 42
   mov bp, dx
-  mov dx, [109]
+  mov dx, #42
   mov ax, [bp]
   jmp [ax]
 
@@ -106,26 +106,16 @@ L9: ; Start
   mov 102, sp
   push #L2
   mov 101, sp
-  mov ax, #0
-  mov 104, ax
-  mov ax, #10
-  mov 105, ax
-  mov ax, #48
-  mov 106, ax
-  mov ax, #10
-  mov 107, ax
   push #L6
   mov 103, sp
   push #0
-  mov 108, sp
-  mov ax, #42
-  mov 109, ax
+  mov 104, sp
   push cx
   push #L8
   mov cx, sp
-  ;; (9'32) Tail: loop (g3) @ con_9'32 (g8)
+  ;; (9'32) Tail: loop (g3) @ con_9'32 (g4)
   mov bp, [103]
-  mov dx, [108]
+  mov dx, [104]
   mov ax, [bp]
   jmp [ax]
 

@@ -13,13 +13,13 @@ import Data.Set (notMember)
 import Interaction (Interaction(..))
 import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
-import Stage0_AST (evalLit,apply,Literal)
+import Stage0_AST (apply)
 import Stage1_EXP (Id(..),Ctag(..))
 import Text.Printf (printf)
-import Value (Value(..),deUnit)
+import Value (Value(..),deUnit,Number)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(..))
-import qualified Stage3_ANF as SRC (Code(..),Atomic(..),Arm(..), fvs)
+import qualified Stage3_ANF as SRC (Code(..),Atomic(..),Val(..),Arm(..), fvs)
 
 type Transformed = Loadable
 
@@ -30,7 +30,7 @@ data Loadable -- restriction of Code
   | LetTop (Id,Global) Top Loadable
 
 data Top -- restriction of Atomic
-  = TopLit Literal
+  = TopLitS String
   | TopPrim Builtin [Ref]
   | TopLam Ref Code -- always allowing recursion
   | TopConApp Ctag [Ref]
@@ -51,7 +51,11 @@ data Atomic
   | RecLam [Ref] [Ref] Ref Ref Code
 
 data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg deriving (Eq,Ord)
-data Ref = Ref Id Location
+
+data Ref
+  = Ref Id Location
+  | RefLitC Char
+  | RefLitN Number
 
 data Global = Global Int deriving (Eq,Ord)
 data Temp = Temp Int deriving (Eq,Ord)
@@ -80,7 +84,7 @@ prettyL = \case
 
 prettyT :: Top -> Lines
 prettyT = \case
-  TopLit x -> [show x]
+  TopLitS x -> [show x]
   TopPrim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   TopLam x body ->
     ("fun " ++ show x ++ " k ->")
@@ -127,10 +131,13 @@ prettyPat tag = \case
   xs -> printf "%s(%s)" (show tag) (intercalate "," (map (\(_,t) -> show t) xs))
 
 instance Show Ref where
-  show (Ref x loc) = do
-    let verbose = False
-    if not verbose then show loc else
-      show x ++ "_" ++ show loc
+  show = \case
+    RefLitC c -> show c
+    RefLitN n -> show n
+    Ref x loc -> do
+      let verbose = False
+      if not verbose then show loc else
+        show x ++ "_" ++ show loc
 
 instance Show Location where
   show = \case
@@ -166,13 +173,16 @@ evalLoadable genv env = \case
     evalLoadable genv env' body
 
 look :: Env -> Ref -> Value
-look Env{venv} (Ref x loc) = do
-  maybe err id $ Map.lookup loc venv
-  where err = error (show ("Stage4.look",x,loc,venv))
+look Env{venv} = \case
+  RefLitC c -> VChar c
+  RefLitN n -> VNum n
+  Ref x loc -> do
+    maybe err id $ Map.lookup loc venv
+      where err = error (show ("Stage4.look",x,loc,venv))
 
 evalT :: Env -> Top -> Value
 evalT genv = \case
-  TopLit literal -> evalLit literal
+  TopLitS string -> VString string
   TopPrim b xs -> evaluatePureBuiltin b (map (look genv) xs)
   TopLam x body -> VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
   TopConApp (Ctag _ tag) xs -> VCons tag (map (look genv) xs)
@@ -229,7 +239,11 @@ mkFrameEnv firstFrameIndex genv env fvs =
   foldr (uncurry insert) genv [ (Ref undefined (InFrame n), look env ref) | (n,ref) <- zip [firstFrameIndex..] fvs ]
 
 insert :: Ref -> Value -> Env -> Env
-insert (Ref _ loc) v Env{venv} = Env { venv = Map.insert loc v venv }
+insert ref v Env{venv} =
+  case ref of
+    RefLitC{} -> undefined -- TODO: rejig code so we know this can never happen
+    RefLitN{} -> undefined
+    Ref _ loc -> Env { venv = Map.insert loc v venv }
 
 ----------------------------------------------------------------------
 -- Compile
@@ -243,10 +257,11 @@ compileCtop :: Cenv -> SRC.Code -> M Code
 compileCtop = compileC firstTempIndex
 
   where
+
     compileC :: Int -> Cenv -> SRC.Code -> M Code
     compileC nextTemp cenv = \case
-      SRC.Return pos x -> pure $ Return pos (locate cenv x)
-      SRC.Tail x1 pos x2 -> pure $ Tail (locate cenv x1) pos (locate cenv x2)
+      SRC.Return pos v -> pure $ Return pos (compileV cenv v)
+      SRC.Tail x1 pos x2 -> pure $ Tail (compileV cenv x1) pos (compileV cenv x2)
 
       SRC.LetAtomic x rhs body -> do
         compileA cenv rhs >>= \case
@@ -271,7 +286,7 @@ compileCtop = compileC firstTempIndex
 
       SRC.Case scrut arms -> do
         arms <- mapM compileArm arms
-        pure $ Case (locate cenv scrut) arms
+        pure $ Case (compileV cenv scrut) arms
 
       where
         compileArm :: SRC.Arm -> M Arm
@@ -284,12 +299,12 @@ compileCtop = compileC firstTempIndex
 
 compileA ::Cenv -> SRC.Atomic -> M (Either Atomic (Global,Top))
 compileA cenv = \case
-  SRC.Lit _ literal -> do
+  SRC.LitS _ string -> do
     g <- GlobalRef
-    pure $ Right (g, TopLit literal)
+    pure $ Right (g, TopLitS string)
 
   SRC.Prim _ b xs -> do
-    let xs' = map (locate cenv) xs
+    let xs' = map (compileV cenv) xs
     if isPure b && all isGlobal xs' then
       do
         g <- GlobalRef
@@ -298,7 +313,7 @@ compileA cenv = \case
         pure $ Left $ Prim b xs'
 
   SRC.ConTag _ c xs -> do
-    let xs' = map (locate cenv) xs
+    let xs' = map (compileV cenv) xs
     if all isGlobal xs' then
       do
         g <- GlobalRef
@@ -331,6 +346,12 @@ compileA cenv = \case
         body <- compileCtop (Map.insert f fRef (Map.insert x xRef cenv)) body
         pure $ Left (RecLam pre post fRef xRef body)
 
+
+compileV :: Cenv -> SRC.Val -> Ref
+compileV cenv = \case
+  SRC.Named x -> locate cenv x
+  SRC.LitC c -> RefLitC c
+  SRC.LitN n -> RefLitN n
 
 frame :: Int -> Cenv -> [Id] -> (Cenv,[Ref],[Ref])
 frame firstFrameIndex cenv fvs = do

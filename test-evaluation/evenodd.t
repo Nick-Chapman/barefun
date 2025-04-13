@@ -13,4 +13,4 @@ Haskell REPL
 
   $ ../haskell/main.exe ../examples/evenodd.fun -5
   [Stage5 (ASM); post normalization size: 42]
-  EO[HALT:#op=756]
+  EO[HALT:#op=736]

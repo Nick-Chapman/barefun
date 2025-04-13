@@ -1,16 +1,10 @@
 (*Stage5 (ASM)*)
 L1: ; Start
-  mov ax, #'X'
-  mov 101, ax
+  push #0
+  mov 101, sp
   push #0
   mov 102, sp
-  mov ax, #'Y'
-  mov 103, ax
-  push #0
-  mov 104, sp
-  mov ax, #'Z'
-  mov 105, ax
-  mov ax, [101]
+  mov ax, #'X'
   call bios_put_char
   mov 1, ax
   call bios_get_char
@@ -18,7 +12,7 @@ L1: ; Start
   mov ax, [2]
   call bios_put_char
   mov 3, ax
-  mov ax, [103]
+  mov ax, #'Y'
   call bios_put_char
   mov 4, ax
   call bios_get_char
@@ -26,7 +20,7 @@ L1: ; Start
   mov ax, [5]
   call bios_put_char
   mov 6, ax
-  mov ax, [105]
+  mov ax, #'Z'
   call bios_put_char
   mov 7, ax
   ;; (0'0) Return: prim_0'0 (t7)

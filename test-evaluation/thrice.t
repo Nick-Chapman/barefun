@@ -32,4 +32,4 @@
   $ cat thrice.input | ../haskell/main.exe ../examples/thrice.fun -5
   [Stage5 (ASM); post normalization size: 86]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
-  [HALT:#op=151]
+  [HALT:#op=93]

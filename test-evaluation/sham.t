@@ -33,4 +33,4 @@ Haskell
   Can you find the hidden Easter Egg?
   % man man
   Show the manual page for a command.
-  % [EOF:#op=55530]
+  % [EOF:#op=55486]

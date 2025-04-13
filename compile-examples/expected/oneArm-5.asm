@@ -16,14 +16,12 @@ L1: ; Function: g1
 L2: ; Start
   push #L1
   mov 101, sp
-  mov ax, #'x'
-  mov 102, ax
-  push [102]
+  push #'x'
   push #0
-  mov 103, sp
-  ;; (15'21) Tail: doit (g1) @ con_15'22 (g3)
+  mov 1, sp
+  ;; (15'21) Tail: doit (g1) @ con_15'22 (t1)
   mov bp, [101]
-  mov dx, [103]
+  mov dx, [1]
   mov ax, [bp]
   jmp [ax]
 

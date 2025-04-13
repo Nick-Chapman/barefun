@@ -1,6 +1,6 @@
 -- | ANF style expressions. All sub-expressions named. Atomic/Compound expression forms distinguished.
 module Stage3_ANF
-  ( Code(..), Arm(..), Atomic(..), fvs
+  ( Code(..), Arm(..), Atomic(..), Val(..), fvs
   , execute
   , compile
   ) where
@@ -13,33 +13,40 @@ import Data.Set (Set,singleton,(\\),union)
 import Interaction (Interaction(..))
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
-import Stage0_AST (evalLit,apply,Literal)
+import Stage0_AST (apply)
 import Stage1_EXP (Id(..),Name(GeneratedName),Ctag(..),provenanceExp)
 import Text.Printf (printf)
-import Value (Value(..),deUnit)
+import Value (Value(..),deUnit,Number)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (toList,fromList,unions,empty)
 import qualified Interaction as I (Tickable(..))
 import qualified Stage1_EXP as SRC
+import qualified Stage0_AST as SRC (Literal(..))
 
 type Transformed = Code
 
 data Code
-  = Return Position Id
-  | Tail Id Position Id
+  = Return Position Val
+  | Tail Val Position Val
   | LetAtomic Id Atomic Code
   | PushContinuation Fvs (Id,Code) Code
-  | Case Id [Arm]
+  | Case Val [Arm]
 
 data Arm = ArmTag Position Ctag [Id] Code
 
 -- Atomic expressions cause only bounded evaluation.
 data Atomic
-  = Lit Position Literal
-  | Prim Position Builtin [Id]
-  | ConTag Position Ctag [Id]
+  = LitS Position String
+  | Prim Position Builtin [Val]
+  | ConTag Position Ctag [Val]
   | Lam Position Fvs Id Code
   | RecLam Position Fvs Id Id Code
+
+-- Val expressions cause no evaluation.
+data Val
+  = Named Id
+  | LitC Char
+  | LitN Number
 
 type Fvs = [Id]
 
@@ -48,7 +55,7 @@ type Fvs = [Id]
 
 provenanceAtomic :: Atomic -> (String,Maybe Position)
 provenanceAtomic = \case
-  Lit pos _ -> ("lit",Just pos)
+  LitS pos _ -> ("lit",Just pos)
   Prim pos _ _ -> ("prim",Just pos)
   ConTag pos _ _ -> ("con",Just pos)
   Lam pos _ _ _ -> ("lam",Just pos)
@@ -69,7 +76,7 @@ pretty = \case
 
 prettyA :: Atomic -> Lines
 prettyA = \case
-  Lit _ x -> [show x]
+  LitS _ x -> [show x]
   Prim _ b xs -> do [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
   ConTag _ tag [] -> [show tag]
   ConTag _ tag xs -> [printf "%s%s" (show tag) (show xs)]
@@ -86,6 +93,12 @@ prettyPat tag = \case
   [] -> show tag
   xs -> printf "%s(%s)" (show tag) (intercalate "," (map show xs))
 
+instance Show Val where
+  show = \case
+    Named x -> show x
+    LitC c -> show c
+    LitN n -> show n
+
 ----------------------------------------------------------------------
 -- Execute
 
@@ -98,8 +111,8 @@ evalCode0 exp =
 
 evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env = \case
-  Return _ x -> \k -> ITick I.Return $ k (look x)
-  Tail x1 pos x2 -> \k -> ITick I.Enter $ apply (look x1) pos (look x2) k
+  Return _ v -> \k -> ITick I.Return $ k (evalV v)
+  Tail fun pos arg -> \k -> ITick I.Enter $ apply (evalV fun) pos (evalV arg) k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode (insert x v1 env) c2 k
@@ -107,7 +120,7 @@ evalCode env = \case
     evalCode env first $ \v1 -> do
       evalCode (insert x v1 (limit fvs env)) later k
   Case scrut arms0 -> \k -> do
-    case (look scrut) of
+    case (evalV scrut) of
       VCons tagActual vArgs -> do
         let
           dispatch :: [Arm] -> Interaction
@@ -122,16 +135,23 @@ evalCode env = \case
       v ->
         error (printf "case/scrut not a constructed value: %s" (show v))
   where
+
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
-      Lit _ literal -> \k -> k (evalLit literal)
-      Prim _ b xs -> \k -> ITick I.Prim $ executeBuiltin b (map look xs) k
-      ConTag _ (Ctag _ tag) xs -> \k -> k (VCons tag (map look xs))
+      LitS _ s -> \k -> k (VString s)
+      Prim _ b vs -> \k -> ITick I.Prim $ executeBuiltin b (map evalV vs) k
+      ConTag _ (Ctag _ tag) vs -> \k -> k (VCons tag (map evalV vs))
       Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
       RecLam _ fvs f x body -> \k -> do
         let me = VFunc (\arg k -> evalCode (insert f me (insert x arg (limit fvs env))) body k)
         k me
+
+    evalV :: Val -> Value
+    evalV = \case
+      Named x -> look x
+      LitC c -> VChar c
+      LitN n -> VNum n
 
     look :: Id -> Value
     look x = do
@@ -169,16 +189,21 @@ nameAtomic = \case
   Compound code -> pure code
   Atomic a -> do
     let (what,optPos) = provenanceAtomic a
-    u <- Fresh optPos what
+    x <- Fresh optPos what
     let noPos = Position 0 0
-    pure $ LetAtomic u a (Return noPos u)
+    pure $ LetAtomic x a (Return noPos (Named x))
 
 compileExp :: SRC.Exp -> (AC -> M AC) -> M AC
 compileExp = \case
   SRC.Var pos x -> \k -> do
-    k $ Compound $ Return pos x
-  SRC.Lit pos x -> \k -> do
-    k $ Atomic $ Lit pos x
+    k $ Compound $ Return pos (Named x)
+
+  -- Numbers are Chars are small literals which cause no evaluation
+  -- Strings on the other hand are compound literals, which ultimately become global/static data.
+  SRC.Lit pos (SRC.LitC c) -> \k -> k $ Compound $ Return pos (LitC c)
+  SRC.Lit pos (SRC.LitN n) -> \k -> k $ Compound $ Return pos (LitN n)
+  SRC.Lit pos (SRC.LitS s) -> \k -> k $ Atomic $ LitS pos s
+
   SRC.ConTag pos tag es -> \k -> do
     compileAsIds es $ \xs ->
       k $ Atomic $ ConTag pos tag xs
@@ -209,7 +234,7 @@ compileArm (SRC.ArmTag pos tag xs exp) = do
   exp <- compileTop exp
   pure $ ArmTag pos tag xs exp
 
-compileAsIds :: [SRC.Exp] -> ([Id] -> M AC) -> M AC
+compileAsIds :: [SRC.Exp] -> ([Val] -> M AC) -> M AC
 compileAsIds es k = case es of
   [] -> k []
   e:es -> do
@@ -217,15 +242,17 @@ compileAsIds es k = case es of
       compileAsIds es $ \xs ->
         k (x:xs)
 
-compileAsId :: SRC.Exp -> (Id -> M AC) -> M AC
+compileAsId :: SRC.Exp -> (Val -> M AC) -> M AC
 compileAsId = \case
-  SRC.Var _pos x -> \k -> k x
+  SRC.Lit _pos (SRC.LitC c) -> \k -> k (LitC c)
+  SRC.Lit _pos (SRC.LitN n) -> \k -> k (LitN n)
+  SRC.Var _pos x -> \k -> k (Named x)
   e -> \k -> do
     let (what,optPos) = provenanceExp e
-    u <- Fresh optPos what
+    x <- Fresh optPos what
     compileExp e $ \code -> do
-      body <- (k u >>= nameAtomic)
-      pure $ Compound $ mkBind u code body
+      body <- (k (Named x) >>= nameAtomic)
+      pure $ Compound $ mkBind x code body
 
 mkBind :: Id -> AC -> Code -> Code
 mkBind x rhs body = case rhs of
@@ -234,7 +261,7 @@ mkBind x rhs body = case rhs of
   -- This is demonstrated by the undefined.
   -- And the LetAlias form is removed.
   -- If it turns out this case can occur, then the standard code for Compound will apply just fine.
-  Compound (Return _ _y) -> undefined -- $ LetAlias x _y body
+  Compound (Return _ (Named _y)) -> undefined -- $ LetAlias x _y body
   Compound rhs -> mkPushContinuation (x,body) rhs
   Atomic rhs -> LetAtomic x rhs body
 
@@ -276,18 +303,24 @@ mkPushContinuation (x,later) first =
 
 fvs :: Code -> Set Id
 fvs = \case
-  Return _ x -> singleton x
-  Tail x1 _ x2 -> Set.fromList [x1,x2]
+  Return _ x -> fvsV x
+  Tail x1 _ x2 -> Set.unions [fvsV x1,fvsV x2]
   LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
   PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
-  Case scrut arms -> singleton scrut `union` Set.unions (map fvsArm arms)
+  Case scrut arms -> fvsV scrut `union` Set.unions (map fvsArm arms)
   where
     fvsArm (ArmTag _pos _cid xs exp) = fvs exp \\ Set.fromList xs
 
+fvsV :: Val -> Set Id
+fvsV = \case
+  Named x -> singleton x
+  LitC{} -> Set.empty
+  LitN{} -> Set.empty
+
 fvsA :: Atomic -> Set Id
 fvsA = \case
-  Lit _ _ -> Set.empty
-  ConTag _ _ xs -> Set.fromList xs
-  Prim _ _ xs -> Set.fromList xs
+  LitS _ _ -> Set.empty
+  ConTag _ _ xs -> Set.unions (map fvsV xs)
+  Prim _ _ xs -> Set.unions (map fvsV xs)
   Lam _ fvs _ _ -> Set.fromList fvs
   RecLam _ fvs _ _ _ -> Set.fromList fvs
