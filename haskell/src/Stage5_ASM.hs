@@ -610,8 +610,6 @@ compileCode = \case
       [ OpMove Ax (SMemIndirect frameReg)
       ]) (Done (JumpIndirect Ax))
 
-  SRC.LetAlias x y body -> undefined x y body -- TODO: need an example to provoke this
-
   SRC.LetAtomic (_,t) rhs body -> do
     (ops1,reg) <- compileAtomic (show t) rhs
     let ops2 = [setTemp t (SReg reg)]

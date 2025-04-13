@@ -38,7 +38,6 @@ data Top -- restriction of Atomic
 data Code
   = Return Position Ref
   | Tail Ref Position Ref
-  | LetAlias Ref Ref Code
   | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Case Ref [Arm]
@@ -93,9 +92,6 @@ prettyC :: Code -> Lines
 prettyC = \case
   Return _ x -> ["k " ++ show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
-  LetAlias x y body ->
-    ["let " ++ show x ++ " = " ++ show y ++ " in"]
-    ++ prettyC body
   LetAtomic (_,t) rhs body ->
     ("let " ++ show t ++ " = ") <++ prettyA rhs ++> " in"
     ++ prettyC body
@@ -185,9 +181,6 @@ evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return _ x -> \k -> ITick I.Return $ k (look env x)
   Tail x1 pos x2 -> \k -> ITick I.Enter $ apply (look env x1) pos (look env x2) k
-  LetAlias x y body -> \k -> do
-    let v = look env y
-    evalCode genv (insert x v env) body k
   LetAtomic (x,t) a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode genv (insert (Ref x (InTemp t)) v1 env) c2 k
@@ -254,13 +247,6 @@ compileCtop = compileC firstTempIndex
     compileC nextTemp cenv = \case
       SRC.Return pos x -> pure $ Return pos (locate cenv x)
       SRC.Tail x1 pos x2 -> pure $ Tail (locate cenv x1) pos (locate cenv x2)
-
-      SRC.LetAlias x y body -> do
-        let yRef@(Ref _ yLoc) = locate cenv y
-        let xRef = Ref x yLoc
-        cenv <- pure $ Map.insert x xRef cenv
-        body <- compileC nextTemp cenv body
-        pure $ LetAlias xRef yRef body
 
       SRC.LetAtomic x rhs body -> do
         compileA cenv rhs >>= \case
