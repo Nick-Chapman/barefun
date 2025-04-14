@@ -3,3 +3,7 @@ ls
 readme
 cat readme
 man man
+cp ls xx
+rm ls
+ls
+xx

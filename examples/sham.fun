@@ -26,6 +26,11 @@ let rec iter f xs =
   | [] -> ()
   | x::xs -> f x; iter f xs
 
+let rec fold_left f b xs =
+  match xs with
+  | [] -> b
+  | x::xs -> fold_left f (f b x) xs
+
 let rec append xs ys = (* non tail-recursive version *)
   match xs with
   | [] -> ys
@@ -230,20 +235,74 @@ let man_behaviour fs args =
        | Executable (meta,_) -> put_string meta
   in
   match args with
-  | [] -> (put_string "man: takes at least one argument\n"; fs)
+  | [] -> (put_string "What manual page do you want?\n"; fs)
   | x::xs -> (man1 x; iter man1 xs; fs)
 
+let rm1 fs sought =
+  let rec loop ps =
+    match ps with
+    | [] ->
+       put_string (concat ["rm: cannot remove '";sought;"': No such file or directory\n"]); []
+    | e1::ps ->
+       match e1 with
+       | Pair (name,file) ->
+          if eq_string name sought then ps else Pair (name,file) :: loop ps
+  in
+  Bindings (loop (bindings fs))
+
+let rm_behaviour =
+  fun fs args ->
+  match args with
+  | [] -> (put_string "rm: missing operand\n"; fs)
+  | _::_ -> fold_left rm1 fs args
+
+let cp_behaviour fs args =
+  match args with
+  | [] -> (put_string "cp: missing file operand\n"; fs)
+  | source::args ->
+     match args with
+     | [] -> (put_string (concat ["cp: missing destination file operand after '";source;"'\n"]); fs)
+     | target::args ->
+     match args with
+     | _::_ -> (put_string "cp: unexpected extra operands\n"; fs)
+     | [] ->
+        match lookup source fs with
+        | None -> (put_string (concat ["cp: cannot stat '";source;"': No such file or directory\n"]);fs)
+        | Some file ->
+           Bindings (Pair (target,file) :: bindings fs)
+
+let mv_behaviour fs args =
+  match args with
+  | [] -> (put_string "mv: missing file operand\n"; fs)
+  | source::args ->
+     match args with
+     | [] -> (put_string (concat ["mv: missing destination file operand after '";source;"'\n"]); fs)
+     | target::args ->
+     match args with
+     | _::_ -> (put_string "mv: unexpected extra operands\n"; fs)
+     | [] ->
+        match lookup source fs with
+        | None -> (put_string (concat ["mv: cannot stat '";source;"': No such file or directory\n"]);fs)
+        | Some file ->
+           Bindings (Pair (target,file) :: bindings (rm1 fs source))
+
 let readme = "Welcome to sham; please try all the commands!\nCan you find the hidden Easter Egg?\n"
-let man_ls = "List all files on the file system.\n"
-let man_cat = "Show the content of data files.\n"
-let man_man = "Show the manual page for a command.\n"
+let man_ls = "ls - list directory contents\n"
+let man_cat = "cat - concatenate files and print on the standard output\n"
+let man_man = "man - an interface to the system reference manuals\n"
+let man_rm = "rm - remove files or directories (TODO: support directories)\n"
+let man_cp = "cp - copy files and directories\n"
+let man_mv = "mv - move (rename) files\n"
 
 let fs0 () = Bindings
   ([ Pair ("readme", Data (readme))
   ; Pair ("ls", Executable (man_ls, ls_behaviour))
   ; Pair ("cat", Executable (man_cat, cat_behaviour))
   ; Pair ("man", Executable (man_man, man_behaviour))
-  (* TODO: file, mv, cp, rm, create & Easter Egg *)
+  ; Pair ("rm", Executable (man_rm, rm_behaviour))
+  ; Pair ("cp", Executable (man_cp, cp_behaviour))
+  ; Pair ("mv", Executable (man_mv, mv_behaviour))
+  (* TODO: file, create & Easter Egg *)
   ])
 
 let main () =
