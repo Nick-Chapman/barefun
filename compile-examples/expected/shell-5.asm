@@ -4080,8 +4080,7 @@ L291: ; Start
   push sp
   push #'f'
   push #1
-  mov ax, sp
-  mov 141, ax
+  mov 141, sp
   push #L80
   mov 142, sp
   push #0
@@ -4100,8 +4099,7 @@ L291: ; Start
   push sp
   push #'f'
   push #1
-  mov ax, sp
-  mov 143, ax
+  mov 143, sp
   push #0
   push sp
   push #' '
@@ -4124,8 +4122,7 @@ L291: ; Start
   push sp
   push #'E'
   push #1
-  mov ax, sp
-  mov 144, ax
+  mov 144, sp
   push #0
   push sp
   push #'t'
@@ -4187,8 +4184,7 @@ L291: ; Start
   push sp
   push #'e'
   push #1
-  mov ax, sp
-  mov 145, ax
+  mov 145, sp
   push #0
   push sp
   push #' '
@@ -4211,8 +4207,7 @@ L291: ; Start
   push sp
   push #'E'
   push #1
-  mov ax, sp
-  mov 146, ax
+  mov 146, sp
   push #0
   push sp
   push #'t'
@@ -4301,8 +4296,7 @@ L291: ; Start
   push sp
   push #'e'
   push #1
-  mov ax, sp
-  mov 147, ax
+  mov 147, sp
   push #0
   mov 149, sp
   push #1
@@ -4341,8 +4335,7 @@ L291: ; Start
   push sp
   push #'E'
   push #1
-  mov ax, sp
-  mov 156, ax
+  mov 156, sp
   push #0
   push sp
   push #'c'
@@ -4425,8 +4418,7 @@ L291: ; Start
   push sp
   push #'e'
   push #1
-  mov ax, sp
-  mov 157, ax
+  mov 157, sp
   push #L96
   mov 158, sp
   push #0
@@ -4449,8 +4441,7 @@ L291: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 161, ax
+  mov 161, sp
   push #L100
   mov 162, sp
   push #0
@@ -4470,8 +4461,7 @@ L291: ; Start
   push sp
   push #'f'
   push #1
-  mov ax, sp
-  mov 165, ax
+  mov 165, sp
   push #L102
   mov 166, sp
   push #0
@@ -4493,8 +4483,7 @@ L291: ; Start
   push sp
   push #'f'
   push #1
-  mov ax, sp
-  mov 167, ax
+  mov 167, sp
   push #0
   push sp
   push #' '
@@ -4517,8 +4506,7 @@ L291: ; Start
   push sp
   push #'E'
   push #1
-  mov ax, sp
-  mov 168, ax
+  mov 168, sp
   push #0
   push sp
   push #'t'
@@ -4580,8 +4568,7 @@ L291: ; Start
   push sp
   push #'e'
   push #1
-  mov ax, sp
-  mov 169, ax
+  mov 169, sp
   push #0
   push sp
   push #' '
@@ -4604,8 +4591,7 @@ L291: ; Start
   push sp
   push #'E'
   push #1
-  mov ax, sp
-  mov 170, ax
+  mov 170, sp
   push #0
   push sp
   push #'t'
@@ -4694,8 +4680,7 @@ L291: ; Start
   push sp
   push #'e'
   push #1
-  mov ax, sp
-  mov 171, ax
+  mov 171, sp
   push #0
   mov 173, sp
   push #1
@@ -4734,8 +4719,7 @@ L291: ; Start
   push sp
   push #'E'
   push #1
-  mov ax, sp
-  mov 180, ax
+  mov 180, sp
   push #0
   push sp
   push #'c'
@@ -4818,8 +4802,7 @@ L291: ; Start
   push sp
   push #'e'
   push #1
-  mov ax, sp
-  mov 181, ax
+  mov 181, sp
   push #L118
   mov 182, sp
   push #0
@@ -4842,8 +4825,7 @@ L291: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 185, ax
+  mov 185, sp
   push #L122
   mov 186, sp
   push #0
@@ -4860,8 +4842,7 @@ L291: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 189, ax
+  mov 189, sp
   push #L124
   mov 190, sp
   push #0
@@ -4886,8 +4867,7 @@ L291: ; Start
   push sp
   push #'E'
   push #1
-  mov ax, sp
-  mov 191, ax
+  mov 191, sp
   push #0
   push sp
   push #'s'
@@ -4967,8 +4947,7 @@ L291: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 192, ax
+  mov 192, sp
   push #0
   push sp
   push #'\n'
@@ -5063,8 +5042,7 @@ L291: ; Start
   push sp
   push #'('
   push #1
-  mov ax, sp
-  mov 193, ax
+  mov 193, sp
   push #0
   mov 194, sp
   push #L126
@@ -5116,8 +5094,7 @@ L291: ; Start
   push sp
   push #'Y'
   push #1
-  mov ax, sp
-  mov 201, ax
+  mov 201, sp
   push #0
   push sp
   push #'('
@@ -5128,8 +5105,7 @@ L291: ; Start
   push sp
   push #'"'
   push #1
-  mov ax, sp
-  mov 202, ax
+  mov 202, sp
   push #L132
   mov 203, sp
   push #0
@@ -5158,8 +5134,7 @@ L291: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 206, ax
+  mov 206, sp
   push #0
   mov 207, sp
   push #0
@@ -5304,8 +5279,7 @@ L291: ; Start
   push sp
   push #'T'
   push #1
-  mov ax, sp
-  mov 208, ax
+  mov 208, sp
   push #0
   mov 209, sp
   push cx

@@ -20,4 +20,4 @@ Haskell REPL
   [Stage5 (ASM); post normalization size: 130]
   One
   \NUL\NUL\NUL\NUL\NULTwo
-  [HALT:#op=1319]
+  [HALT:#op=1318]

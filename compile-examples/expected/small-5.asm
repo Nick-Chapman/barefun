@@ -508,8 +508,7 @@ L41: ; Start
   push sp
   push #'L'
   push #1
-  mov ax, sp
-  mov 104, ax
+  mov 104, sp
   push #L6
   mov 103, sp
   push #0
@@ -521,8 +520,7 @@ L41: ; Start
   push sp
   push #'>'
   push #1
-  mov ax, sp
-  mov 108, ax
+  mov 108, sp
   push #L10
   mov 107, sp
   push #0
@@ -554,8 +552,7 @@ L41: ; Start
   push sp
   push #'R'
   push #1
-  mov ax, sp
-  mov 117, ax
+  mov 117, sp
   push #L27
   mov 116, sp
   push #0
@@ -581,8 +578,7 @@ L41: ; Start
   push sp
   push #'N'
   push #1
-  mov ax, sp
-  mov 121, ax
+  mov 121, sp
   push #L31
   mov 120, sp
   push #0

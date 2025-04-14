@@ -144,8 +144,7 @@ L9: ; Start
   push sp
   push #'H'
   push #1
-  mov ax, sp
-  mov 104, ax
+  mov 104, sp
   push #L6
   mov 103, sp
   push #0

@@ -21,4 +21,4 @@ Haskell REPL
   $ ../haskell/main.exe ../examples/hello.fun -5
   [Stage5 (ASM); post normalization size: 39]
   Hello, world!
-  [HALT:#op=828]
+  [HALT:#op=827]

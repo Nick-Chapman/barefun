@@ -410,8 +410,7 @@ L30: ; Start
   push sp
   push #'O'
   push #1
-  mov ax, sp
-  mov 109, ax
+  mov 109, sp
   push #0
   mov 110, sp
   push cx

@@ -490,8 +490,7 @@ L37: ; Start
   push sp
   push #'f'
   push #1
-  mov ax, sp
-  mov 105, ax
+  mov 105, sp
   push #L10
   mov 104, sp
   push #0
@@ -516,8 +515,7 @@ L37: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 110, ax
+  mov 110, sp
   push #L18
   mov 109, sp
   push #0

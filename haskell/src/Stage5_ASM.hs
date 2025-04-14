@@ -553,34 +553,27 @@ compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (_,g) rhs body -> do
-    (ops1,source) <- compileTopDef g rhs
-    let ops2 = [setGlobal g source]
+    ops1 <- compileTopDef g rhs
+    let ops2 = [setGlobal g (SReg Sp)]
     doOps (ops1++ops2) <$> compileLoadable body
 
 -- TODO: TopDefs should not generate Push instructions, but instead should generate static data structures.
-compileTopDef :: SRC.Global -> SRC.Top -> Asm ([Op],Source)
+compileTopDef :: SRC.Global -> SRC.Top -> Asm [Op]
 compileTopDef g = \case
-  SRC.TopLitS string -> do
-    (ops,source) <- compileLitS string
-    pure (ops ++ [ OpMove Ax source],SReg Ax)  -- TODO: remove this move
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
+  SRC.TopLitS string -> do
+    -- string rep is currently the same as a list of chars. TODO: do better!
+    pure ([ OpPush (SLit (VNum tNil))] ++
+          [ op
+          | c <- reverse string
+          , op <- construct tCons [SLit (VChar c), SReg Sp]
+          ])
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show g)
     let v1 = VCodeLabel lab
-    pure ([OpPush (SLit v1)], SReg Sp)
+    pure [OpPush (SLit v1)]
   SRC.TopConApp (Ctag _ tag) xs -> do
-    let ops = construct tag (map compileRef xs)
-    pure (ops, SReg Sp)
-
-compileLitS :: String -> Asm ([Op],Source)
-compileLitS string = do
-  -- string rep is currently the same as a list of chars. TODO: do better!
-  pure ([ OpPush (SLit (VNum tNil))] ++
-        [ op
-        | c <- reverse string
-        , op <- construct tCons [SLit (VChar c), SReg Sp]
-        ],
-        SReg Sp)
+    pure $ construct tag (map compileRef xs)
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case

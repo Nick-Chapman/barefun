@@ -4449,8 +4449,7 @@ L308: ; Start
   push #L65
   mov 123, sp
   push #0
-  mov ax, sp
-  mov 124, ax
+  mov 124, sp
   push #0
   mov 126, sp
   push #L67
@@ -4464,8 +4463,7 @@ L308: ; Start
   push sp
   push #'%'
   push #1
-  mov ax, sp
-  mov 128, ax
+  mov 128, sp
   push #0
   mov 129, sp
   push #0
@@ -4505,8 +4503,7 @@ L308: ; Start
   push sp
   push #'s'
   push #1
-  mov ax, sp
-  mov 139, ax
+  mov 139, sp
   push #0
   push sp
   push #' '
@@ -4514,8 +4511,7 @@ L308: ; Start
   push sp
   push #':'
   push #1
-  mov ax, sp
-  mov 140, ax
+  mov 140, sp
   push #0
   push sp
   push #'d'
@@ -4568,14 +4564,12 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 141, ax
+  mov 141, sp
   push #0
   push sp
   push #'\n'
   push #1
-  mov ax, sp
-  mov 142, ax
+  mov 142, sp
   push #0
   mov 143, sp
   push [143]
@@ -4609,8 +4603,7 @@ L308: ; Start
   push sp
   push #'s'
   push #1
-  mov ax, sp
-  mov 147, ax
+  mov 147, sp
   push #0
   push sp
   push #' '
@@ -4618,8 +4611,7 @@ L308: ; Start
   push sp
   push #':'
   push #1
-  mov ax, sp
-  mov 148, ax
+  mov 148, sp
   push #0
   push sp
   push #'d'
@@ -4672,14 +4664,12 @@ L308: ; Start
   push sp
   push #'P'
   push #1
-  mov ax, sp
-  mov 149, ax
+  mov 149, sp
   push #0
   push sp
   push #'\n'
   push #1
-  mov ax, sp
-  mov 150, ax
+  mov 150, sp
   push #0
   mov 151, sp
   push [151]
@@ -4848,8 +4838,7 @@ L308: ; Start
   push sp
   push #'S'
   push #1
-  mov ax, sp
-  mov 155, ax
+  mov 155, sp
   push #0
   push sp
   push #'e'
@@ -4869,8 +4858,7 @@ L308: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 156, ax
+  mov 156, sp
   push #0
   push sp
   push #'\n'
@@ -5118,8 +5106,7 @@ L308: ; Start
   push sp
   push #'W'
   push #1
-  mov ax, sp
-  mov 157, ax
+  mov 157, sp
   push [157]
   push #0
   mov 158, sp
@@ -5134,8 +5121,7 @@ L308: ; Start
   push sp
   push #'l'
   push #1
-  mov ax, sp
-  mov 160, ax
+  mov 160, sp
   push #0
   push sp
   push #'\n'
@@ -5224,8 +5210,7 @@ L308: ; Start
   push sp
   push #'l'
   push #1
-  mov ax, sp
-  mov 161, ax
+  mov 161, sp
   push #0
   push sp
   push #'\n'
@@ -5296,8 +5281,7 @@ L308: ; Start
   push sp
   push #'l'
   push #1
-  mov ax, sp
-  mov 162, ax
+  mov 162, sp
   push #L68
   mov 163, sp
   push #0
@@ -5314,8 +5298,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 166, ax
+  mov 166, sp
   push #0
   push sp
   push #'\n'
@@ -5488,8 +5471,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 167, ax
+  mov 167, sp
   push #0
   push sp
   push #'\n'
@@ -5590,8 +5572,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 168, ax
+  mov 168, sp
   push #0
   mov 169, sp
   push #0
@@ -5610,8 +5591,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 170, ax
+  mov 170, sp
   push #0
   push sp
   push #'\n'
@@ -5661,8 +5641,7 @@ L308: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 171, ax
+  mov 171, sp
   push #0
   mov 172, sp
   push [172]
@@ -5685,8 +5664,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 174, ax
+  mov 174, sp
   push #0
   push sp
   push #'\n'
@@ -5745,8 +5723,7 @@ L308: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 175, ax
+  mov 175, sp
   push #0
   mov 176, sp
   push [176]
@@ -5771,8 +5748,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 179, ax
+  mov 179, sp
   push #0
   push sp
   push #'\n'
@@ -5822,8 +5798,7 @@ L308: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 180, ax
+  mov 180, sp
   push #0
   mov 181, sp
   push [181]
@@ -5846,8 +5821,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 183, ax
+  mov 183, sp
   push #0
   push sp
   push #'\n'
@@ -5906,8 +5880,7 @@ L308: ; Start
   push sp
   push #' '
   push #1
-  mov ax, sp
-  mov 184, ax
+  mov 184, sp
   push #0
   mov 185, sp
   push [185]
@@ -5924,8 +5897,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 187, ax
+  mov 187, sp
   push #0
   push sp
   push #'\n'
@@ -6080,8 +6052,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 188, ax
+  mov 188, sp
   push #0
   push sp
   push #'\n'
@@ -6173,8 +6144,7 @@ L308: ; Start
   push sp
   push #'W'
   push #1
-  mov ax, sp
-  mov 189, ax
+  mov 189, sp
   push #0
   mov 190, sp
   push #0
@@ -6238,14 +6208,12 @@ L308: ; Start
   push sp
   push #'N'
   push #1
-  mov ax, sp
-  mov 191, ax
+  mov 191, sp
   push #0
   push sp
   push #'\n'
   push #1
-  mov ax, sp
-  mov 192, ax
+  mov 192, sp
   push #0
   mov 193, sp
   push [193]
@@ -6313,14 +6281,12 @@ L308: ; Start
   push sp
   push #'N'
   push #1
-  mov ax, sp
-  mov 195, ax
+  mov 195, sp
   push #0
   push sp
   push #'\n'
   push #1
-  mov ax, sp
-  mov 196, ax
+  mov 196, sp
   push #0
   mov 197, sp
   push [197]
@@ -6390,14 +6356,12 @@ L308: ; Start
   push sp
   push #'N'
   push #1
-  mov ax, sp
-  mov 200, ax
+  mov 200, sp
   push #0
   push sp
   push #'\n'
   push #1
-  mov ax, sp
-  mov 201, ax
+  mov 201, sp
   push #0
   mov 202, sp
   push [202]
@@ -6465,14 +6429,12 @@ L308: ; Start
   push sp
   push #'N'
   push #1
-  mov ax, sp
-  mov 204, ax
+  mov 204, sp
   push #0
   push sp
   push #'\n'
   push #1
-  mov ax, sp
-  mov 205, ax
+  mov 205, sp
   push #0
   mov 206, sp
   push [206]
@@ -6486,8 +6448,7 @@ L308: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 208, ax
+  mov 208, sp
   push #0
   push sp
   push #'\n'
@@ -6672,8 +6633,7 @@ L308: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 209, ax
+  mov 209, sp
   push #0
   push sp
   push #'\n'
@@ -6735,8 +6695,7 @@ L308: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 210, ax
+  mov 210, sp
   push #0
   push sp
   push #'\''
@@ -6795,8 +6754,7 @@ L308: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 211, ax
+  mov 211, sp
   push #0
   push sp
   push #'\n'
@@ -6885,8 +6843,7 @@ L308: ; Start
   push sp
   push #'\''
   push #1
-  mov ax, sp
-  mov 212, ax
+  mov 212, sp
   push #0
   mov 213, sp
   push [213]
@@ -6902,8 +6859,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 216, ax
+  mov 216, sp
   push #0
   push sp
   push #'\n'
@@ -7001,8 +6957,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 217, ax
+  mov 217, sp
   push #0
   push sp
   push #'\n'
@@ -7079,8 +7034,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 218, ax
+  mov 218, sp
   push #0
   push sp
   push #'\''
@@ -7214,8 +7168,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 219, ax
+  mov 219, sp
   push #0
   push sp
   push #'\n'
@@ -7223,8 +7176,7 @@ L308: ; Start
   push sp
   push #'\''
   push #1
-  mov ax, sp
-  mov 220, ax
+  mov 220, sp
   push #0
   mov 221, sp
   push [221]
@@ -7322,8 +7274,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 223, ax
+  mov 223, sp
   push #0
   mov 224, sp
   push #0
@@ -7378,8 +7329,7 @@ L308: ; Start
   push sp
   push #'c'
   push #1
-  mov ax, sp
-  mov 225, ax
+  mov 225, sp
   push #0
   push sp
   push #'\n'
@@ -7468,8 +7418,7 @@ L308: ; Start
   push sp
   push #'\''
   push #1
-  mov ax, sp
-  mov 226, ax
+  mov 226, sp
   push #0
   mov 227, sp
   push [227]
@@ -7483,8 +7432,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 229, ax
+  mov 229, sp
   push #0
   push sp
   push #'\n'
@@ -7561,8 +7509,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 230, ax
+  mov 230, sp
   push #0
   push sp
   push #'\n'
@@ -7639,8 +7586,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 231, ax
+  mov 231, sp
   push #0
   push sp
   push #'\''
@@ -7774,8 +7720,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 232, ax
+  mov 232, sp
   push #0
   push sp
   push #'\n'
@@ -7783,8 +7728,7 @@ L308: ; Start
   push sp
   push #'\''
   push #1
-  mov ax, sp
-  mov 233, ax
+  mov 233, sp
   push #0
   mov 234, sp
   push [234]
@@ -7882,8 +7826,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 236, ax
+  mov 236, sp
   push #0
   mov 237, sp
   push #0
@@ -7938,8 +7881,7 @@ L308: ; Start
   push sp
   push #'m'
   push #1
-  mov ax, sp
-  mov 238, ax
+  mov 238, sp
   push #0
   push sp
   push #'\n'
@@ -8028,8 +7970,7 @@ L308: ; Start
   push sp
   push #'\''
   push #1
-  mov ax, sp
-  mov 239, ax
+  mov 239, sp
   push #0
   mov 240, sp
   push [240]
@@ -8094,8 +8035,7 @@ L308: ; Start
   push sp
   push #'r'
   push #1
-  mov ax, sp
-  mov 242, ax
+  mov 242, sp
   push #0
   push sp
   push #'\n'
@@ -8184,8 +8124,7 @@ L308: ; Start
   push sp
   push #'\''
   push #1
-  mov ax, sp
-  mov 243, ax
+  mov 243, sp
   push #0
   mov 244, sp
   push [244]
