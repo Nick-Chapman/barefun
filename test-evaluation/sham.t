@@ -45,4 +45,4 @@ Haskell
   sham: ls: command not found
   % xx
   xx readme cat man rm cp mv
-  % [EOF:#op=85687]
+  % [EOF:#op=81954]

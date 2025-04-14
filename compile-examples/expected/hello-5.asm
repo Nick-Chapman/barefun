@@ -1,7 +1,7 @@
 (*Stage5 (ASM)*)
 L1: ; Arm: 11'7
   ;; (0'0) Return: con_11'10 (g2)
-  mov dx, [102]
+  mov dx, #g2
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -19,7 +19,7 @@ L2: ; Function: g1
   call bios_put_char
   mov 3, ax
   ;; (12'39) Tail: put_chars (g1) @ xsMore (t2)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -50,7 +50,7 @@ L5: ; Function: t1
   mov bx, [1]
   cmp [bx], #1
   bz L3
-  mov ax, [104]
+  mov ax, #g4
   mov bx, dx
   call bios_string_index
   mov 2, ax
@@ -63,7 +63,7 @@ L5: ; Function: t1
   push #L4
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g3) @ con_0'0 (t3)
-  mov bp, [103]
+  mov bp, #g3
   mov dx, [3]
   mov ax, [bp]
   jmp [ax]
@@ -81,7 +81,7 @@ L6: ; Function: g3
 
 L7: ; Continuation
   ;; (14'29) Tail: put_chars (g1) @ app_7'18 (arg)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -97,65 +97,18 @@ L8: ; Continuation
   jmp [ax]
 
 L9: ; Start
-  push #0
-  mov 102, sp
-  push #L2
-  mov 101, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'!'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'w'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #','
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'H'
-  push #1
-  mov 104, sp
-  push #L6
-  mov 103, sp
-  push #0
-  mov 105, sp
   push cx
   push #L8
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g3) @ con_7'15 (g5)
-  mov bp, [103]
-  mov dx, [105]
+  mov bp, #g3
+  mov dx, #g5
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L2
+g2: dw 0
+g3: dw L6
+g4: dw 1, 'H', g4+3, 1, 'e', g4+6, 1, 'l', g4+9, 1, 'l', g4+12, 1, 'o', g4+15, 1, ',', g4+18, 1, ' ', g4+21, 1, 'w', g4+24, 1, 'o', g4+27, 1, 'r', g4+30, 1, 'l', g4+33, 1, 'd', g4+36, 1, '!', g4+39, 1, '\n', g4+42, 0
+g5: dw 0
 

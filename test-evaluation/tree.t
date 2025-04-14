@@ -13,4 +13,4 @@ Haskell REPL
 
   $ ../haskell/main.exe ../examples/tree.fun -5
   [Stage5 (ASM); post normalization size: 95]
-  955[HALT:#op=359]
+  955[HALT:#op=347]

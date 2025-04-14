@@ -2,7 +2,7 @@
 L1: ; Arm: 9'27
   ;; (9'38) Tail: outer (g1) @ c (f1)
   mov dx, [bp+1]
-  mov bp, [101]
+  mov bp, #g1
   mov ax, [bp]
   jmp [ax]
 
@@ -21,7 +21,7 @@ L2: ; Function: t3
   bz L1
   ;; (9'51) Tail: inner (me) @ con_9'51 (g3)
   mov bp, bp
-  mov dx, [103]
+  mov dx, #g3
   mov ax, [bp]
   jmp [ax]
 
@@ -37,23 +37,19 @@ L3: ; Function: g1
   mov 3, sp
   ;; (11'7) Tail: inner (t3) @ con_11'7 (g4)
   mov bp, [3]
-  mov dx, [104]
+  mov dx, #g4
   mov ax, [bp]
   jmp [ax]
 
 L4: ; Start
-  push #0
-  mov 102, sp
-  push #0
-  mov 103, sp
-  push #0
-  mov 104, sp
-  push #L3
-  mov 101, sp
   ;; (14'8) Tail: outer (g1) @ '%'
-  mov bp, [101]
+  mov bp, #g1
   mov dx, #'%'
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L3
+g2: dw 0
+g3: dw 0
+g4: dw 0
 

@@ -36,4 +36,4 @@ Haskell REPL
   $ ../haskell/main.exe ../examples/fib.fun -5
   [Stage5 (ASM); post normalization size: 167]
   fib 20 --> 6765
-  [HALT:#op=537412]
+  [HALT:#op=537357]

@@ -29,7 +29,7 @@ L3: ; Function: t1
   push #L2
   mov cx, sp
   ;; (4'9) Tail: loop (g1) @ prim_0'0 (t2)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -67,15 +67,14 @@ L6: ; Continuation
   jmp [ax]
 
 L7: ; Start
-  push #L4
-  mov 101, sp
   push cx
   push #L6
   mov cx, sp
   ;; (6'29) Tail: loop (g1) @ 'X'
-  mov bp, [101]
+  mov bp, #g1
   mov dx, #'X'
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L4
 

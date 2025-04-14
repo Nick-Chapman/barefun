@@ -1,9 +1,5 @@
 (*Stage5 (ASM)*)
 L1: ; Start
-  push #0
-  mov 101, sp
-  push #0
-  mov 102, sp
   mov ax, #'X'
   call bios_put_char
   mov 1, ax
@@ -30,4 +26,6 @@ L1: ; Start
   mov ax, [bp]
   jmp [ax]
 
+g1: dw 0
+g2: dw 0
 

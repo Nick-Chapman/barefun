@@ -43,7 +43,7 @@ L3: ; Function: t1
   push #L2
   mov cx, sp
   ;; (7'11) Tail: loop (g1) @ con_0'0 (t5)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, [5]
   mov ax, [bp]
   jmp [ax]
@@ -61,7 +61,7 @@ L4: ; Function: g1
 
 L5: ; Arm: 13'7
   ;; (0'0) Return: con_13'10 (g3)
-  mov dx, [103]
+  mov dx, #g3
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -79,7 +79,7 @@ L6: ; Function: g2
   call bios_put_char
   mov 3, ax
   ;; (14'35) Tail: put_chars (g2) @ xs (t2)
-  mov bp, [102]
+  mov bp, #g2
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -112,7 +112,7 @@ L9: ; Continuation
   mov cx, sp
   ;; (23'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+2]
-  mov bp, [104]
+  mov bp, #g4
   mov ax, [bp]
   jmp [ax]
 
@@ -126,7 +126,7 @@ L10: ; Arm: 23'15
   push #L9
   mov cx, sp
   ;; (23'23) Tail: eval (g4) @ e1 (t1)
-  mov bp, [104]
+  mov bp, #g4
   mov dx, [1]
   mov ax, [bp]
   jmp [ax]
@@ -149,7 +149,7 @@ L12: ; Continuation
   mov cx, sp
   ;; (24'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+2]
-  mov bp, [104]
+  mov bp, #g4
   mov ax, [bp]
   jmp [ax]
 
@@ -168,20 +168,20 @@ L13: ; Function: g4
   push #L12
   mov cx, sp
   ;; (24'23) Tail: eval (g4) @ e1 (t1)
-  mov bp, [104]
+  mov bp, #g4
   mov dx, [1]
   mov ax, [bp]
   jmp [ax]
 
 L14: ; Continuation
   ;; (16'26) Tail: put_chars (g2) @ case_9'11 (arg)
-  mov bp, [102]
+  mov bp, #g2
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
 L15: ; Arm: 9'20
-  push [105]
+  push #g5
   push #'0'
   push #1
   mov 2, sp
@@ -217,24 +217,12 @@ L17: ; Continuation
   push #L16
   mov cx, sp
   ;; (9'41) Tail: loop (g1) @ con_9'41 (g6)
-  mov bp, [101]
-  mov dx, [106]
+  mov bp, #g1
+  mov dx, #g6
   mov ax, [bp]
   jmp [ax]
 
 L18: ; Start
-  push #L4
-  mov 101, sp
-  push #0
-  mov 103, sp
-  push #L6
-  mov 102, sp
-  push #L13
-  mov 104, sp
-  push #0
-  mov 105, sp
-  push #0
-  mov 106, sp
   push #1000
   push #0
   mov 1, sp
@@ -256,9 +244,15 @@ L18: ; Start
   push #L17
   mov cx, sp
   ;; (29'16) Tail: eval (g4) @ con_26'15 (t5)
-  mov bp, [104]
+  mov bp, #g4
   mov dx, [5]
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L4
+g2: dw L6
+g3: dw 0
+g4: dw L13
+g5: dw 0
+g6: dw 0
 

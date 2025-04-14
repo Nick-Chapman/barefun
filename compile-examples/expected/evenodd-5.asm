@@ -1,7 +1,7 @@
 (*Stage5 (ASM)*)
 L1: ; Arm: 4'27
   ;; (0'0) Return: con_4'32 (g2)
-  mov dx, [102]
+  mov dx, #g2
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -9,7 +9,7 @@ L1: ; Arm: 4'27
 
 L2: ; Arm: 3'26
   ;; (0'0) Return: con_3'31 (g3)
-  mov dx, [103]
+  mov dx, #g3
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -37,7 +37,7 @@ L3: ; Function: g1
   sub ax, #1
   mov 4, ax
   ;; (3'50) Tail: is_even (g1) @ prim_0'0 (t4)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, [4]
   mov ax, [bp]
   jmp [ax]
@@ -83,7 +83,7 @@ L7: ; Continuation
   push #L6
   mov cx, sp
   ;; (8'23) Tail: is_even (g1) @ 13
-  mov bp, [101]
+  mov bp, #g1
   mov dx, #13
   mov ax, [bp]
   jmp [ax]
@@ -111,19 +111,16 @@ L9: ; Continuation
   jmp [ax]
 
 L10: ; Start
-  push #1
-  mov 102, sp
-  push #0
-  mov 103, sp
-  push #L3
-  mov 101, sp
   push cx
   push #L9
   mov cx, sp
   ;; (8'23) Tail: is_even (g1) @ 42
-  mov bp, [101]
+  mov bp, #g1
   mov dx, #42
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L3
+g2: dw 1
+g3: dw 0
 

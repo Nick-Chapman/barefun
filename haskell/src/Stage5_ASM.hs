@@ -69,7 +69,7 @@ data Val -- TODO: rename Word?
   | VCodeLabel CodeLabel
   deriving Eq
 
-data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si-- TODO: Si | Di
+data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si -- TODO: Di
   deriving (Eq,Ord)
 
 data MemAddr  -- TODO: rename Addr
@@ -80,7 +80,7 @@ data MemAddr  -- TODO: rename Addr
 data CodeLabel = CodeLabel Int String -- unique label and provenance
   deriving (Eq,Ord)
 
-data DataLabel = DataLabel SRC.Location -- TODO: just globals
+data DataLabel = DataLabel SRC.Global
   deriving (Eq,Ord)
 
 data BareBios
@@ -103,11 +103,11 @@ data BareBios
 
 instance Show Image where
   show Image{cmap,dmap,start=_} =
-    unlines [ printf "%s:\n  dw %s\n" (show lab) (intercalate ", " (map show vals))
-            | (lab,vals) <- Map.toList dmap ]
-    ++
     unlines [ printf "%s: ; %s\n%s" (show lab) provenance (show code)
             | (lab@(CodeLabel _ provenance),code) <- Map.toList cmap ]
+    ++
+    unlines [ printf "%s: dw %s" (show lab) (intercalate ", " (map show vals))
+            | (lab,vals) <- Map.toList dmap ]
 
 instance Show Code where
   show = \case
@@ -167,7 +167,7 @@ instance Show MemAddr where
     Symbolic d n -> printf "%s+%d" (show d) n
 
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
-instance Show DataLabel where show (DataLabel n) = "D_" ++ show n
+instance Show DataLabel where show (DataLabel g) = show g
 
 instance Show BareBios where
   show = \case
@@ -383,7 +383,7 @@ prevAddr = addAddr (-1)
 addAddr :: Int -> MemAddr -> MemAddr
 addAddr i = \case
   Physical n -> Physical (n+i)
-  Symbolic lab n -> Symbolic lab (n+1)
+  Symbolic lab n -> Symbolic lab (n+i) -- I had a nasty bug here -- 1 instead of i
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -529,9 +529,6 @@ aTrue = Physical 91
 aNil = Physical 92
 aFinalCont = Physical 93
 
-globalOffset :: Int -> MemAddr
-globalOffset n = Physical (n + 100)
-
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
 
@@ -553,28 +550,35 @@ compileLoadable :: SRC.Loadable -> Asm Code
 compileLoadable = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (_,g) rhs body -> do
-    vals <- compileTopDef g rhs
-    let ops1 = map OpPush vals
-    let ops2 = [setGlobal g (SReg Sp)]
-    doOps (ops1++ops2) <$> compileLoadable body
+    let lab = DataLabel g
+    vals <- compileTopDef lab rhs
+    CutData lab vals
+    compileLoadable body
 
--- TODO: TopDefs should not generate Push instructions, but instead should generate static data structures.
-compileTopDef :: SRC.Global -> SRC.Top -> Asm [Source]
-compileTopDef g = \case
+compileTopDef :: DataLabel -> SRC.Top -> Asm [Val]
+compileTopDef lab = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
   SRC.TopLitS string -> do
     -- string rep is currently the same as a list of chars. TODO: do better!
-    pure ([ SLit (VNum tNil)] ++
-          [ op
-          | c <- reverse string
-          , op <- reverse [SLit (VNum tCons), SLit (VChar c), SReg Sp]
-          ])
+    pure ([ op
+          | (i,c) <- zip [1..] string
+          , op <- [VNum tCons, VChar c, VMemAddr (Symbolic lab (i*3))]
+          ] ++ [ VNum tNil ])
   SRC.TopLam _x body -> do
-    lab <- compileCode body >>= CutCode ("Function: " ++ show g)
+    lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
     let v1 = VCodeLabel lab
-    pure [SLit v1]
+    pure [v1]
   SRC.TopConApp (Ctag _ tag) xs -> do
-    pure $ reverse (SLit (VNum tag) : map compileRef xs)
+    pure (VNum tag : map compileTopRef xs)
+
+compileTopRef :: SRC.Ref -> Val
+compileTopRef = \case
+    SRC.RefLitC c -> VChar c
+    SRC.RefLitN n -> VNum n
+    SRC.Ref _ loc -> do
+    case loc of
+      SRC.InGlobal g -> VMemAddr (Symbolic (DataLabel g) 0)
+      _ -> error "compileTopRef"
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -780,9 +784,6 @@ compileBuiltin b xs = case (b,xs) of
     -- TODO: avoid chance of missing Builtin by using oneArg/TwoArgs/.. combinators
     error (printf "Stage5.compileBuiltin: %s %s" (show b) (show xs))
 
-setGlobal :: SRC.Global -> Source -> Op
-setGlobal (SRC.Global n) source = OpStore (globalOffset n) source
-
 setTemp :: SRC.Temp -> Source -> Op
 setTemp (SRC.Temp n) source = OpStore (tempOffset n) source
 
@@ -792,7 +793,7 @@ compileRef = \case
     SRC.RefLitN n -> SLit (VNum n)
     SRC.Ref _ loc -> do
     case loc of
-      SRC.InGlobal (SRC.Global n) -> SMem (globalOffset n)
+      SRC.InGlobal g -> SLit (VMemAddr (Symbolic (DataLabel g) 0))
       SRC.InFrame n -> SMemIndirectOffset frameReg n
       SRC.InTemp (SRC.Temp n) -> SMem (tempOffset n)
       SRC.TheArg -> SReg argReg
@@ -819,7 +820,7 @@ data Asm a where
   AsmRet :: a -> Asm a
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
   CutCode :: String -> Code -> Asm CodeLabel
-  CutData :: SRC.Location -> [Val] -> Asm MemAddr -- TODO: only cut data for gloabal
+  CutData :: DataLabel -> [Val] -> Asm ()
 
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
@@ -836,9 +837,8 @@ runAsm m = loop state0 m k0
         let lab = CodeLabel u prov
         let image@Image{cmap} = k s { u = u+1 } lab
         image { cmap = Map.insert lab code cmap }
-      CutData loc vals -> \k -> do
-        let lab = DataLabel loc
-        let image@Image{dmap} = k s (Symbolic lab 0)
+      CutData lab vals -> \k -> do
+        let image@Image{dmap} = k s ()
         image { dmap = Map.insert lab vals dmap }
 
 data AsmState = AsmState { u :: Int }

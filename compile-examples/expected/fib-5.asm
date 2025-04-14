@@ -1,7 +1,7 @@
 (*Stage5 (ASM)*)
 L1: ; Arm: 20'7
   ;; (0'0) Return: con_20'10 (g2)
-  mov dx, [102]
+  mov dx, #g2
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -19,7 +19,7 @@ L2: ; Function: g1
   call bios_put_char
   mov 3, ax
   ;; (21'35) Tail: put_chars (g1) @ xs (t2)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -52,7 +52,7 @@ L5: ; Continuation
   push #L4
   mov cx, sp
   ;; (30'39) Tail: fib (g3) @ prim_0'0 (t1)
-  mov bp, [103]
+  mov bp, #g3
   mov dx, [1]
   mov ax, [bp]
   jmp [ax]
@@ -73,7 +73,7 @@ L6: ; Function: g3
   push #L5
   mov cx, sp
   ;; (30'27) Tail: fib (g3) @ prim_0'0 (t2)
-  mov bp, [103]
+  mov bp, #g3
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -104,7 +104,7 @@ L9: ; Function: t1
   mov bx, [1]
   cmp [bx], #1
   bz L7
-  mov ax, [105]
+  mov ax, #g5
   mov bx, dx
   call bios_string_index
   mov 2, ax
@@ -117,7 +117,7 @@ L9: ; Function: t1
   push #L8
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g4) @ con_0'0 (t3)
-  mov bp, [104]
+  mov bp, #g4
   mov dx, [3]
   mov ax, [bp]
   jmp [ax]
@@ -177,7 +177,7 @@ L13: ; Function: t1
   push #L12
   mov cx, sp
   ;; (14'11) Tail: loop (g7) @ con_0'0 (t5)
-  mov bp, [107]
+  mov bp, #g7
   mov dx, [5]
   mov ax, [bp]
   jmp [ax]
@@ -219,7 +219,7 @@ L17: ; Function: t1
   mov bx, [1]
   cmp [bx], #1
   bz L15
-  mov ax, [110]
+  mov ax, #g10
   mov bx, dx
   call bios_string_index
   mov 2, ax
@@ -232,7 +232,7 @@ L17: ; Function: t1
   push #L16
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g9) @ con_0'0 (t3)
-  mov bp, [109]
+  mov bp, #g9
   mov dx, [3]
   mov ax, [bp]
   jmp [ax]
@@ -292,7 +292,7 @@ L21: ; Function: t1
   push #L20
   mov cx, sp
   ;; (14'11) Tail: loop (g12) @ con_0'0 (t5)
-  mov bp, [112]
+  mov bp, #g12
   mov dx, [5]
   mov ax, [bp]
   jmp [ax]
@@ -324,13 +324,13 @@ L24: ; Continuation
   push #L23
   mov cx, sp
   ;; (25'26) Tail: put_chars (g1) @ case_16'2 (arg)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
 L25: ; Arm: 16'11
-  push [113]
+  push #g13
   push #'0'
   push #1
   mov 2, sp
@@ -366,8 +366,8 @@ L27: ; Continuation
   push #L26
   mov cx, sp
   ;; (16'32) Tail: loop (g12) @ con_16'32 (g14)
-  mov bp, [112]
-  mov dx, [114]
+  mov bp, #g12
+  mov dx, #g14
   mov ax, [bp]
   jmp [ax]
 
@@ -377,7 +377,7 @@ L28: ; Continuation
   push #L27
   mov cx, sp
   ;; (23'29) Tail: put_chars (g1) @ app_7'18 (arg)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -399,8 +399,8 @@ L30: ; Continuation
   push #L29
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g9) @ con_7'15 (g11)
-  mov bp, [109]
-  mov dx, [111]
+  mov bp, #g9
+  mov dx, #g11
   mov ax, [bp]
   jmp [ax]
 
@@ -410,7 +410,7 @@ L31: ; Continuation
   push #L30
   mov cx, sp
   ;; (25'26) Tail: put_chars (g1) @ app_16'35 (arg)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -432,8 +432,8 @@ L33: ; Continuation
   push #L32
   mov cx, sp
   ;; (16'32) Tail: loop (g7) @ con_16'32 (g8)
-  mov bp, [107]
-  mov dx, [108]
+  mov bp, #g7
+  mov dx, #g8
   mov ax, [bp]
   jmp [ax]
 
@@ -443,7 +443,7 @@ L34: ; Continuation
   push #L33
   mov cx, sp
   ;; (23'29) Tail: put_chars (g1) @ app_7'18 (arg)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -465,74 +465,33 @@ L36: ; Continuation
   push #L35
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g4) @ con_7'15 (g6)
-  mov bp, [104]
-  mov dx, [106]
+  mov bp, #g4
+  mov dx, #g6
   mov ax, [bp]
   jmp [ax]
 
 L37: ; Start
-  push #0
-  mov 102, sp
-  push #L2
-  mov 101, sp
-  push #L6
-  mov 103, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'b'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  mov 105, sp
-  push #L10
-  mov 104, sp
-  push #0
-  mov 106, sp
-  push #L14
-  mov 107, sp
-  push #0
-  mov 108, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'>'
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #' '
-  push #1
-  mov 110, sp
-  push #L18
-  mov 109, sp
-  push #0
-  mov 111, sp
-  push #L22
-  mov 112, sp
-  push #0
-  mov 113, sp
-  push #0
-  mov 114, sp
   push cx
   push #L36
   mov cx, sp
   ;; (33'16) Tail: fib (g3) @ 20
-  mov bp, [103]
+  mov bp, #g3
   mov dx, #20
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L2
+g2: dw 0
+g3: dw L6
+g4: dw L10
+g5: dw 1, 'f', g5+3, 1, 'i', g5+6, 1, 'b', g5+9, 1, ' ', g5+12, 0
+g6: dw 0
+g7: dw L14
+g8: dw 0
+g9: dw L18
+g10: dw 1, ' ', g10+3, 1, '-', g10+6, 1, '-', g10+9, 1, '>', g10+12, 1, ' ', g10+15, 0
+g11: dw 0
+g12: dw L22
+g13: dw 0
+g14: dw 0
 

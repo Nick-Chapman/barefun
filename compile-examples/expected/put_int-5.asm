@@ -1,7 +1,7 @@
 (*Stage5 (ASM)*)
 L1: ; Arm: 13'7
   ;; (0'0) Return: con_13'10 (g2)
-  mov dx, [102]
+  mov dx, #g2
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -19,7 +19,7 @@ L2: ; Function: g1
   call bios_put_char
   mov 3, ax
   ;; (14'35) Tail: put_chars (g1) @ xs (t2)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -68,7 +68,7 @@ L5: ; Function: t1
   push #L4
   mov cx, sp
   ;; (7'11) Tail: loop (g3) @ con_0'0 (t5)
-  mov bp, [103]
+  mov bp, #g3
   mov dx, [5]
   mov ax, [bp]
   jmp [ax]
@@ -86,7 +86,7 @@ L6: ; Function: g3
 
 L7: ; Continuation
   ;; (16'26) Tail: put_chars (g1) @ app_9'35 (arg)
-  mov bp, [101]
+  mov bp, #g1
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -102,21 +102,17 @@ L8: ; Continuation
   jmp [ax]
 
 L9: ; Start
-  push #0
-  mov 102, sp
-  push #L2
-  mov 101, sp
-  push #L6
-  mov 103, sp
-  push #0
-  mov 104, sp
   push cx
   push #L8
   mov cx, sp
   ;; (9'32) Tail: loop (g3) @ con_9'32 (g4)
-  mov bp, [103]
-  mov dx, [104]
+  mov bp, #g3
+  mov dx, #g4
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L2
+g2: dw 0
+g3: dw L6
+g4: dw 0
 

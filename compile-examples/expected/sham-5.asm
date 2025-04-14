@@ -48,14 +48,14 @@ L5: ; Function: g2
   push #L4
   mov cx, sp
   ;; (17'27) Tail: length (g2) @ xs (t2)
-  mov bp, [102]
+  mov bp, #g2
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
 
 L6: ; Arm: 21'7
   ;; (0'0) Return: con_21'10 (g4)
-  mov dx, [104]
+  mov dx, #g4
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -94,7 +94,7 @@ L9: ; Continuation
   mov cx, sp
   ;; (22'24) Tail: map (g3) @ f (f2)
   mov dx, [bp+2]
-  mov bp, [103]
+  mov bp, #g3
   mov ax, [bp]
   jmp [ax]
 
@@ -130,7 +130,7 @@ L11: ; Function: g3
 
 L12: ; Arm: 26'7
   ;; (0'0) Return: con_26'10 (g6)
-  mov dx, [106]
+  mov dx, #g6
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -152,7 +152,7 @@ L14: ; Continuation
   mov cx, sp
   ;; (27'23) Tail: iter (g5) @ f (f2)
   mov dx, [bp+2]
-  mov bp, [105]
+  mov bp, #g5
   mov ax, [bp]
   jmp [ax]
 
@@ -258,7 +258,7 @@ L22: ; Function: t1
   mov cx, sp
   ;; (32'23) Tail: fold_left (g7) @ f (f1)
   mov dx, [bp+1]
-  mov bp, [107]
+  mov bp, #g7
   mov ax, [bp]
   jmp [ax]
 
@@ -332,7 +332,7 @@ L28: ; Function: t1
   push #L27
   mov cx, sp
   ;; (37'25) Tail: append (g8) @ xs (t2)
-  mov bp, [108]
+  mov bp, #g8
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -382,7 +382,7 @@ L32: ; Function: t1
   push #L31
   mov cx, sp
   ;; (43'23) Tail: revloop (g9) @ con_0'0 (t3)
-  mov bp, [109]
+  mov bp, #g9
   mov dx, [3]
   mov ax, [bp]
   jmp [ax]
@@ -400,7 +400,7 @@ L33: ; Function: g9
 
 L34: ; Arm: 53'9
   ;; (0'0) Return: con_53'12 (g10)
-  mov dx, [110]
+  mov dx, #g10
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -502,14 +502,14 @@ L41: ; Function: g11
   push #L40
   mov cx, sp
   ;; (50'29) Tail: length (g2) @ xs (arg)
-  mov bp, [102]
+  mov bp, #g2
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
 L42: ; Arm: 64'9
   ;; (0'0) Return: con_64'12 (g12)
-  mov dx, [112]
+  mov dx, #g12
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -614,7 +614,7 @@ L49: ; Function: g13
   push #L48
   mov cx, sp
   ;; (60'17) Tail: length (g2) @ xs (arg)
-  mov bp, [102]
+  mov bp, #g2
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -699,13 +699,13 @@ L55: ; Function: g15
   mov cx, sp
   ;; (75'15) Tail: explode_loop (t1) @ con_75'15 (g14)
   mov bp, [1]
-  mov dx, [114]
+  mov dx, #g14
   mov ax, [bp]
   jmp [ax]
 
 L56: ; Arm: 80'19
   ;; (0'0) Return: con_80'24 (g18)
-  mov dx, [118]
+  mov dx, #g18
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -713,7 +713,7 @@ L56: ; Arm: 80'19
 
 L57: ; Arm: 82'15
   ;; (0'0) Return: con_82'20 (g19)
-  mov dx, [119]
+  mov dx, #g19
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -721,7 +721,7 @@ L57: ; Arm: 82'15
 
 L58: ; Arm: 85'31
   ;; (0'0) Return: con_85'36 (g22)
-  mov dx, [122]
+  mov dx, #g22
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -742,7 +742,7 @@ L59: ; Continuation
 
 L60: ; Arm: 4'9
   ;; (0'0) Return: con_4'12 (g20)
-  mov dx, [120]
+  mov dx, #g20
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -777,7 +777,7 @@ L61: ; Function: t1
   cmp [bx], #1
   bz L60
   ;; (0'0) Return: con_5'13 (g21)
-  mov dx, [121]
+  mov dx, #g21
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -802,7 +802,7 @@ L62: ; Continuation
 
 L63: ; Arm: 4'9
   ;; (0'0) Return: con_4'12 (g16)
-  mov dx, [116]
+  mov dx, #g16
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -829,7 +829,7 @@ L64: ; Function: t1
   cmp [bx], #1
   bz L63
   ;; (0'0) Return: con_5'13 (g17)
-  mov dx, [117]
+  mov dx, #g17
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -848,7 +848,7 @@ L65: ; Function: g23
 
 L66: ; Arm: 100'7
   ;; (0'0) Return: con_100'10 (g26)
-  mov dx, [126]
+  mov dx, #g26
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -866,7 +866,7 @@ L67: ; Function: g25
   call bios_put_char
   mov 3, ax
   ;; (101'35) Tail: put_chars (g25) @ xs (t2)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
@@ -886,7 +886,7 @@ L68: ; Function: g63
 
 L69: ; Arm: 93'7
   ;; (0'0) Return: lit_93'10 (g24)
-  mov dx, [124]
+  mov dx, #g24
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -930,7 +930,7 @@ L73: ; Continuation
   push #L72
   mov cx, sp
   ;; (89'42) Tail: append (g8) @ app_89'51 (arg)
-  mov bp, [108]
+  mov bp, #g8
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -1146,7 +1146,7 @@ L89: ; Continuation
   jmp [ax]
 
 L90: ; Continuation
-  push [127]
+  push #g27
   push [bp+2]
   push #1
   mov 1, sp
@@ -1287,7 +1287,7 @@ L99: ; Continuation
   cmp [bx], #1
   bz L98
   ;; (0'0) Return: con_128'55 (g33)
-  mov dx, [133]
+  mov dx, #g33
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -1295,7 +1295,7 @@ L99: ; Continuation
 
 L100: ; Arm: 4'9
   ;; (0'0) Return: con_4'12 (g31)
-  mov dx, [131]
+  mov dx, #g31
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -1325,7 +1325,7 @@ L101: ; Arm: 124'21
   cmp [bx], #1
   bz L100
   ;; (0'0) Return: con_5'13 (g32)
-  mov dx, [132]
+  mov dx, #g32
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -1380,7 +1380,7 @@ L102: ; Function: t1
 
 L103: ; Arm: 202'36
   ;; (0'0) Return: con_202'41 (g35)
-  mov dx, [135]
+  mov dx, #g35
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -1403,7 +1403,7 @@ L105: ; Arm: 195'7
 
 L106: ; Arm: 166'9
   ;; (0'0) Return: con_166'12 (g38)
-  mov dx, [138]
+  mov dx, #g38
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -1485,7 +1485,7 @@ L112: ; Continuation
   push #L111
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -1502,12 +1502,12 @@ L113: ; Continuation
   jmp [ax]
 
 L114: ; Arm: 187'9
-  push [146]
+  push #g46
   push [bp+5]
   push #1
   mov 1, sp
   push [1]
-  push [139]
+  push #g39
   push #1
   mov 2, sp
   push [bp+4]
@@ -1535,7 +1535,7 @@ L116: ; Continuation
   push #L115
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -1554,12 +1554,12 @@ L117: ; Continuation
 L118: ; Arm: 190'14
   mov ax, [bx+1]
   mov 2, ax
-  push [154]
+  push #g54
   push [bp+5]
   push #1
   mov 3, sp
   push [3]
-  push [147]
+  push #g47
   push #1
   mov 4, sp
   push [bp+4]
@@ -1683,8 +1683,8 @@ L124: ; Continuation
   push #L123
   mov cx, sp
   ;; (45'20) Tail: revloop (g9) @ con_45'20 (g37)
-  mov bp, [109]
-  mov dx, [137]
+  mov bp, #g9
+  mov dx, #g37
   mov ax, [bp]
   jmp [ax]
 
@@ -1734,7 +1734,7 @@ L127: ; Continuation
   mov cx, sp
   ;; (153'34) Tail: at_word_start (f5) @ con_153'34 (g36)
   mov bp, [bp+5]
-  mov dx, [136]
+  mov dx, #g36
   mov ax, [bp]
   jmp [ax]
 
@@ -1791,12 +1791,12 @@ L130: ; Continuation
   mov cx, sp
   ;; (134'11) Tail: readloop (t1) @ con_134'11 (g34)
   mov bp, [1]
-  mov dx, [134]
+  mov dx, #g34
   mov ax, [bp]
   jmp [ax]
 
 L131: ; Continuation
-  push [129]
+  push #g29
   push #'\EOT'
   push #1
   mov 1, sp
@@ -1829,7 +1829,7 @@ L132: ; Continuation
   push #L131
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -1848,7 +1848,7 @@ L133: ; Function: t3
   mov cx, sp
   ;; (103'38) Tail: explode (f3) @ lit_199'13 (g28)
   mov bp, [bp+3]
-  mov dx, [128]
+  mov dx, #g28
   mov ax, [bp]
   jmp [ax]
 
@@ -1866,7 +1866,7 @@ L135: ; Continuation
   push #L134
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -1882,13 +1882,13 @@ L136: ; Arm: 208'9
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_208'23 (g62)
   mov bp, [bp+1]
-  mov dx, [162]
+  mov dx, #g62
   mov ax, [bp]
   jmp [ax]
 
 L137: ; Arm: 177'9
   ;; (0'0) Return: con_177'12 (g64)
-  mov dx, [164]
+  mov dx, #g64
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -1908,7 +1908,7 @@ L139: ; Continuation
   push #L138
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -1948,7 +1948,7 @@ L141: ; Continuation
 
 L142: ; Arm: 181'9
   ;; (0'0) Return: con_181'12 (g65)
-  mov dx, [165]
+  mov dx, #g65
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -1968,7 +1968,7 @@ L144: ; Continuation
   push #L143
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2038,8 +2038,8 @@ L148: ; Function: t1
   push #L147
   mov cx, sp
   ;; (212'33) Tail: map (g3) @ lam_211'19 (g63)
-  mov bp, [103]
-  mov dx, [163]
+  mov bp, #g3
+  mov dx, #g63
   mov ax, [bp]
   jmp [ax]
 
@@ -2069,7 +2069,7 @@ L151: ; Continuation
   push #L150
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2081,13 +2081,13 @@ L152: ; Arm: 224'7
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_224'22 (g68)
   mov bp, [bp+1]
-  mov dx, [168]
+  mov dx, #g68
   mov ax, [bp]
   jmp [ax]
 
 L153: ; Arm: 166'9
   ;; (0'0) Return: con_166'12 (g69)
-  mov dx, [169]
+  mov dx, #g69
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -2157,7 +2157,7 @@ L157: ; Function: t3
 
 L158: ; Arm: 166'9
   ;; (0'0) Return: con_166'12 (g78)
-  mov dx, [178]
+  mov dx, #g78
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -2227,7 +2227,7 @@ L162: ; Function: t1
 
 L163: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2243,12 +2243,12 @@ L164: ; Continuation
   jmp [ax]
 
 L165: ; Arm: 217'11
-  push [182]
+  push #g82
   push [bp+4]
   push #1
   mov 1, sp
   push [1]
-  push [179]
+  push #g79
   push #1
   mov 2, sp
   push [bp+2]
@@ -2263,7 +2263,7 @@ L165: ; Arm: 217'11
 
 L166: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2282,7 +2282,7 @@ L167: ; Arm: 220'16
 
 L168: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2310,12 +2310,12 @@ L170: ; Continuation
   mov 2, ax
   mov ax, [bx+2]
   mov 3, ax
-  push [186]
+  push #g86
   push [bp+4]
   push #1
   mov 4, sp
   push [4]
-  push [183]
+  push #g83
   push #1
   mov 5, sp
   push [bp+2]
@@ -2397,14 +2397,14 @@ L175: ; Continuation
   push #L174
   mov cx, sp
   ;; (225'27) Tail: iter (g5) @ lam_215'11 (t1)
-  mov bp, [105]
+  mov bp, #g5
   mov dx, [1]
   mov ax, [bp]
   jmp [ax]
 
 L176: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2420,12 +2420,12 @@ L177: ; Continuation
   jmp [ax]
 
 L178: ; Arm: 217'11
-  push [173]
+  push #g73
   push [bp+6]
   push #1
   mov 1, sp
   push [1]
-  push [170]
+  push #g70
   push #1
   mov 2, sp
   push [bp+2]
@@ -2440,7 +2440,7 @@ L178: ; Arm: 217'11
 
 L179: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2459,7 +2459,7 @@ L180: ; Arm: 220'16
 
 L181: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2495,12 +2495,12 @@ L183: ; Continuation
   mov 2, ax
   mov ax, [bx+2]
   mov 3, ax
-  push [177]
+  push #g77
   push [bp+6]
   push #1
   mov 4, sp
   push [4]
-  push [174]
+  push #g74
   push #1
   mov 5, sp
   push [bp+2]
@@ -2589,7 +2589,7 @@ L188: ; Continuation
   push #L187
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2601,13 +2601,13 @@ L189: ; Arm: 238'7
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_238'22 (g89)
   mov bp, [bp+1]
-  mov dx, [189]
+  mov dx, #g89
   mov ax, [bp]
   jmp [ax]
 
 L190: ; Arm: 166'9
   ;; (0'0) Return: con_166'12 (g90)
-  mov dx, [190]
+  mov dx, #g90
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -2677,7 +2677,7 @@ L194: ; Function: t3
 
 L195: ; Arm: 166'9
   ;; (0'0) Return: con_166'12 (g99)
-  mov dx, [199]
+  mov dx, #g99
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -2747,7 +2747,7 @@ L199: ; Function: t1
 
 L200: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2763,12 +2763,12 @@ L201: ; Continuation
   jmp [ax]
 
 L202: ; Arm: 231'11
-  push [203]
+  push #g103
   push [bp+4]
   push #1
   mov 1, sp
   push [1]
-  push [200]
+  push #g100
   push #1
   mov 2, sp
   push [bp+2]
@@ -2783,7 +2783,7 @@ L202: ; Arm: 231'11
 
 L203: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2801,12 +2801,12 @@ L204: ; Continuation
 L205: ; Arm: 234'16
   mov ax, [bx+1]
   mov 2, ax
-  push [207]
+  push #g107
   push [bp+4]
   push #1
   mov 3, sp
   push [3]
-  push [204]
+  push #g104
   push #1
   mov 4, sp
   push [bp+2]
@@ -2821,7 +2821,7 @@ L205: ; Arm: 234'16
 
 L206: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2917,14 +2917,14 @@ L212: ; Continuation
   push #L211
   mov cx, sp
   ;; (239'27) Tail: iter (g5) @ lam_228'11 (t1)
-  mov bp, [105]
+  mov bp, #g5
   mov dx, [1]
   mov ax, [bp]
   jmp [ax]
 
 L213: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2940,12 +2940,12 @@ L214: ; Continuation
   jmp [ax]
 
 L215: ; Arm: 231'11
-  push [194]
+  push #g94
   push [bp+6]
   push #1
   mov 1, sp
   push [1]
-  push [191]
+  push #g91
   push #1
   mov 2, sp
   push [bp+2]
@@ -2960,7 +2960,7 @@ L215: ; Arm: 231'11
 
 L216: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -2978,12 +2978,12 @@ L217: ; Continuation
 L218: ; Arm: 234'16
   mov ax, [bx+1]
   mov 2, ax
-  push [198]
+  push #g98
   push [bp+6]
   push #1
   mov 3, sp
   push [3]
-  push [195]
+  push #g95
   push #1
   mov 4, sp
   push [bp+2]
@@ -2998,7 +2998,7 @@ L218: ; Arm: 234'16
 
 L219: ; Continuation
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3109,7 +3109,7 @@ L225: ; Continuation
   push #L224
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3121,13 +3121,13 @@ L226: ; Arm: 256'7
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_256'22 (g110)
   mov bp, [bp+1]
-  mov dx, [210]
+  mov dx, #g110
   mov ax, [bp]
   jmp [ax]
 
 L227: ; Continuation
   ;; (0'0) Return: con_245'92 (g115)
-  mov dx, [215]
+  mov dx, #g115
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -3138,7 +3138,7 @@ L228: ; Continuation
   push #L227
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3154,12 +3154,12 @@ L229: ; Continuation
   jmp [ax]
 
 L230: ; Arm: 244'9
-  push [214]
+  push #g114
   push [bp+4]
   push #1
   mov 1, sp
   push [1]
-  push [211]
+  push #g111
   push #1
   mov 2, sp
   push [bp+1]
@@ -3351,7 +3351,7 @@ L242: ; Function: t1
   push #L241
   mov cx, sp
   ;; (257'22) Tail: fold_left (g7) @ lam_241'8 (t3)
-  mov bp, [107]
+  mov bp, #g7
   mov dx, [3]
   mov ax, [bp]
   jmp [ax]
@@ -3384,7 +3384,7 @@ L245: ; Continuation
   push #L244
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3396,7 +3396,7 @@ L246: ; Arm: 261'7
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_261'22 (g118)
   mov bp, [bp+1]
-  mov dx, [218]
+  mov dx, #g118
   mov ax, [bp]
   jmp [ax]
 
@@ -3414,7 +3414,7 @@ L248: ; Continuation
   push #L247
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3431,12 +3431,12 @@ L249: ; Continuation
   jmp [ax]
 
 L250: ; Arm: 264'10
-  push [222]
+  push #g122
   push [1]
   push #1
   mov 3, sp
   push [3]
-  push [219]
+  push #g119
   push #1
   mov 4, sp
   push [bp+4]
@@ -3464,7 +3464,7 @@ L252: ; Continuation
   push #L251
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3480,13 +3480,13 @@ L253: ; Arm: 267'12
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_267'27 (g123)
   mov bp, [bp+1]
-  mov dx, [223]
+  mov dx, #g123
   mov ax, [bp]
   jmp [ax]
 
 L254: ; Arm: 166'9
   ;; (0'0) Return: con_166'12 (g124)
-  mov dx, [224]
+  mov dx, #g124
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -3568,7 +3568,7 @@ L260: ; Continuation
   push #L259
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3585,12 +3585,12 @@ L261: ; Continuation
   jmp [ax]
 
 L262: ; Arm: 270'15
-  push [228]
+  push #g128
   push [bp+5]
   push #1
   mov 1, sp
   push [1]
-  push [225]
+  push #g125
   push #1
   mov 2, sp
   push [bp+4]
@@ -3728,7 +3728,7 @@ L269: ; Continuation
   push #L268
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3740,7 +3740,7 @@ L270: ; Arm: 276'7
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_276'22 (g131)
   mov bp, [bp+1]
-  mov dx, [231]
+  mov dx, #g131
   mov ax, [bp]
   jmp [ax]
 
@@ -3758,7 +3758,7 @@ L272: ; Continuation
   push #L271
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3775,12 +3775,12 @@ L273: ; Continuation
   jmp [ax]
 
 L274: ; Arm: 279'10
-  push [235]
+  push #g135
   push [1]
   push #1
   mov 3, sp
   push [3]
-  push [232]
+  push #g132
   push #1
   mov 4, sp
   push [bp+4]
@@ -3808,7 +3808,7 @@ L276: ; Continuation
   push #L275
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3824,13 +3824,13 @@ L277: ; Arm: 282'12
   mov cx, sp
   ;; (103'38) Tail: explode (f1) @ lit_282'27 (g136)
   mov bp, [bp+1]
-  mov dx, [236]
+  mov dx, #g136
   mov ax, [bp]
   jmp [ax]
 
 L278: ; Arm: 166'9
   ;; (0'0) Return: con_166'12 (g137)
-  mov dx, [237]
+  mov dx, #g137
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -3912,7 +3912,7 @@ L284: ; Continuation
   push #L283
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3929,12 +3929,12 @@ L285: ; Continuation
   jmp [ax]
 
 L286: ; Arm: 285'15
-  push [241]
+  push #g141
   push [bp+6]
   push #1
   mov 1, sp
   push [1]
-  push [238]
+  push #g138
   push #1
   mov 2, sp
   push [bp+5]
@@ -3950,7 +3950,7 @@ L286: ; Arm: 285'15
 
 L287: ; Continuation
   ;; (0'0) Return: con_245'92 (g146)
-  mov dx, [246]
+  mov dx, #g146
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -3961,7 +3961,7 @@ L288: ; Continuation
   push #L287
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -3977,12 +3977,12 @@ L289: ; Continuation
   jmp [ax]
 
 L290: ; Arm: 244'9
-  push [245]
+  push #g145
   push [bp+4]
   push #1
   mov 1, sp
   push [1]
-  push [242]
+  push #g142
   push #1
   mov 2, sp
   push [bp+1]
@@ -4213,11 +4213,11 @@ L302: ; Continuation
   push #L149
   mov 1, sp
   push [1]
-  push [161]
+  push #g61
   push #1
   mov 2, sp
   push [2]
-  push [160]
+  push #g60
   push #0
   mov 3, sp
   push [bp+4]
@@ -4226,11 +4226,11 @@ L302: ; Continuation
   push #L186
   mov 4, sp
   push [4]
-  push [167]
+  push #g67
   push #1
   mov 5, sp
   push [5]
-  push [166]
+  push #g66
   push #0
   mov 6, sp
   push [bp+4]
@@ -4239,11 +4239,11 @@ L302: ; Continuation
   push #L223
   mov 7, sp
   push [7]
-  push [188]
+  push #g88
   push #1
   mov 8, sp
   push [8]
-  push [187]
+  push #g87
   push #0
   mov 9, sp
   push [bp+4]
@@ -4252,11 +4252,11 @@ L302: ; Continuation
   push #L243
   mov 10, sp
   push [10]
-  push [209]
+  push #g109
   push #1
   mov 11, sp
   push [11]
-  push [208]
+  push #g108
   push #0
   mov 12, sp
   push [bp+4]
@@ -4265,11 +4265,11 @@ L302: ; Continuation
   push #L267
   mov 13, sp
   push [13]
-  push [217]
+  push #g117
   push #1
   mov 14, sp
   push [14]
-  push [216]
+  push #g116
   push #0
   mov 15, sp
   push [bp+4]
@@ -4278,14 +4278,14 @@ L302: ; Continuation
   push #L301
   mov 16, sp
   push [16]
-  push [230]
+  push #g130
   push #1
   mov 17, sp
   push [17]
-  push [229]
+  push #g129
   push #0
   mov 18, sp
-  push [247]
+  push #g147
   push [18]
   push #1
   mov 19, sp
@@ -4310,7 +4310,7 @@ L302: ; Continuation
   push #1
   mov 24, sp
   push [24]
-  push [159]
+  push #g59
   push #1
   mov 25, sp
   push [25]
@@ -4331,7 +4331,7 @@ L303: ; Continuation
   push #L302
   mov cx, sp
   ;; (103'29) Tail: put_chars (g25) @ app_103'38 (arg)
-  mov bp, [125]
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
@@ -4361,7 +4361,7 @@ L304: ; Continuation
   mov cx, sp
   ;; (103'38) Tail: explode (f4) @ lit_309'13 (g55)
   mov bp, [bp+4]
-  mov dx, [155]
+  mov dx, #g55
   mov ax, [bp]
   jmp [ax]
 
@@ -4373,8 +4373,8 @@ L305: ; Continuation
   push #L304
   mov cx, sp
   ;; (77'25) Tail: block (g1) @ lam_77'30 (g23)
-  mov bp, [101]
-  mov dx, [123]
+  mov bp, #g1
+  mov dx, #g23
   mov ax, [bp]
   jmp [ax]
 
@@ -4385,8 +4385,8 @@ L306: ; Continuation
   push #L305
   mov cx, sp
   ;; (70'23) Tail: block (g1) @ lam_70'28 (g15)
-  mov bp, [101]
-  mov dx, [115]
+  mov bp, #g1
+  mov dx, #g15
   mov ax, [bp]
   jmp [ax]
 
@@ -4396,3752 +4396,166 @@ L307: ; Continuation
   push #L306
   mov cx, sp
   ;; (59'30) Tail: block (g1) @ lam_59'35 (g13)
-  mov bp, [101]
-  mov dx, [113]
+  mov bp, #g1
+  mov dx, #g13
   mov ax, [bp]
   jmp [ax]
 
 L308: ; Start
-  push #L2
-  mov 101, sp
-  push #L5
-  mov 102, sp
-  push #0
-  mov 104, sp
-  push #L11
-  mov 103, sp
-  push #0
-  mov 106, sp
-  push #L16
-  mov 105, sp
-  push #L24
-  mov 107, sp
-  push #L29
-  mov 108, sp
-  push #L33
-  mov 109, sp
-  push #0
-  mov 110, sp
-  push #L41
-  mov 111, sp
-  push #0
-  mov 112, sp
-  push #L49
-  mov 113, sp
-  push #0
-  mov 114, sp
-  push #L55
-  mov 115, sp
-  push #0
-  mov 116, sp
-  push #1
-  mov 117, sp
-  push #0
-  mov 118, sp
-  push #1
-  mov 119, sp
-  push #0
-  mov 120, sp
-  push #1
-  mov 121, sp
-  push #0
-  mov 122, sp
-  push #L65
-  mov 123, sp
-  push #0
-  mov 124, sp
-  push #0
-  mov 126, sp
-  push #L67
-  mov 125, sp
-  push #0
-  mov 127, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'%'
-  push #1
-  mov 128, sp
-  push #0
-  mov 129, sp
-  push #0
-  mov 130, sp
-  push #0
-  mov 131, sp
-  push #1
-  mov 132, sp
-  push #0
-  mov 133, sp
-  push #0
-  mov 134, sp
-  push #0
-  mov 135, sp
-  push #0
-  mov 136, sp
-  push #0
-  mov 137, sp
-  push #0
-  mov 138, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  mov 139, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  mov 140, sp
-  push #0
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 141, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  mov 142, sp
-  push #0
-  mov 143, sp
-  push [143]
-  push [142]
-  push #1
-  mov 144, sp
-  push [144]
-  push [141]
-  push #1
-  mov 145, sp
-  push [145]
-  push [140]
-  push #1
-  mov 146, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  mov 147, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  mov 148, sp
-  push #0
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'P'
-  push #1
-  mov 149, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  mov 150, sp
-  push #0
-  mov 151, sp
-  push [151]
-  push [150]
-  push #1
-  mov 152, sp
-  push [152]
-  push [149]
-  push #1
-  mov 153, sp
-  push [153]
-  push [148]
-  push #1
-  mov 154, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'.'
-  push #1
-  push sp
-  push #'"'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'"'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'C'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'.'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'I'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'S'
-  push #1
-  mov 155, sp
-  push #0
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  mov 156, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'?'
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'E'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'E'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'C'
-  push #1
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'!'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #';'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'W'
-  push #1
-  mov 157, sp
-  push [157]
-  push #0
-  mov 158, sp
-  push [158]
-  push [156]
-  push #0
-  mov 159, sp
-  push #0
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  mov 160, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  mov 161, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'k'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  mov 162, sp
-  push #L68
-  mov 163, sp
-  push #0
-  mov 164, sp
-  push #0
-  mov 165, sp
-  push #0
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 166, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 167, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'k'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 168, sp
-  push #0
-  mov 169, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 170, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #' '
-  push #1
-  mov 171, sp
-  push #0
-  mov 172, sp
-  push [172]
-  push [171]
-  push #1
-  mov 173, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 174, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #' '
-  push #1
-  mov 175, sp
-  push #0
-  mov 176, sp
-  push [176]
-  push [175]
-  push #1
-  mov 177, sp
-  push #0
-  mov 178, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 179, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #' '
-  push #1
-  mov 180, sp
-  push #0
-  mov 181, sp
-  push [181]
-  push [180]
-  push #1
-  mov 182, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 183, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #' '
-  push #1
-  mov 184, sp
-  push #0
-  mov 185, sp
-  push [185]
-  push [184]
-  push #1
-  mov 186, sp
-  push #0
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 187, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 188, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'?'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'w'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'W'
-  push #1
-  mov 189, sp
-  push #0
-  mov 190, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  mov 191, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  mov 192, sp
-  push #0
-  mov 193, sp
-  push [193]
-  push [192]
-  push #1
-  mov 194, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  mov 195, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  mov 196, sp
-  push #0
-  mov 197, sp
-  push [197]
-  push [196]
-  push #1
-  mov 198, sp
-  push #0
-  mov 199, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  mov 200, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  mov 201, sp
-  push #0
-  mov 202, sp
-  push [202]
-  push [201]
-  push #1
-  mov 203, sp
-  push #0
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  mov 204, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  mov 205, sp
-  push #0
-  mov 206, sp
-  push [206]
-  push [205]
-  push #1
-  mov 207, sp
-  push #0
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  mov 208, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #')'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'O'
-  push #1
-  push sp
-  push #'D'
-  push #1
-  push sp
-  push #'O'
-  push #1
-  push sp
-  push #'T'
-  push #1
-  push sp
-  push #'('
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  mov 209, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  mov 210, sp
-  push #0
-  push sp
-  push #'\''
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  mov 211, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'\''
-  push #1
-  mov 212, sp
-  push #0
-  mov 213, sp
-  push [213]
-  push [212]
-  push #1
-  mov 214, sp
-  push #0
-  mov 215, sp
-  push #0
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 216, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 217, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 218, sp
-  push #0
-  push sp
-  push #'\''
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 219, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'\''
-  push #1
-  mov 220, sp
-  push #0
-  mov 221, sp
-  push [221]
-  push [220]
-  push #1
-  mov 222, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'x'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'x'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 223, sp
-  push #0
-  mov 224, sp
-  push #0
-  push sp
-  push #'\''
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  mov 225, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'\''
-  push #1
-  mov 226, sp
-  push #0
-  mov 227, sp
-  push [227]
-  push [226]
-  push #1
-  mov 228, sp
-  push #0
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 229, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #')'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'('
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'-'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 230, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 231, sp
-  push #0
-  push sp
-  push #'\''
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'g'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 232, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'\''
-  push #1
-  mov 233, sp
-  push #0
-  mov 234, sp
-  push [234]
-  push [233]
-  push #1
-  mov 235, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'x'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'p'
-  push #1
-  push sp
-  push #'x'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 236, sp
-  push #0
-  mov 237, sp
-  push #0
-  push sp
-  push #'\''
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  mov 238, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'\''
-  push #1
-  mov 239, sp
-  push #0
-  mov 240, sp
-  push [240]
-  push [239]
-  push #1
-  mov 241, sp
-  push #0
-  push sp
-  push #'\''
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'v'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'n'
-  push #1
-  push sp
-  push #'a'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'m'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  mov 242, sp
-  push #0
-  push sp
-  push #'\n'
-  push #1
-  push sp
-  push #'y'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'t'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'d'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'r'
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'e'
-  push #1
-  push sp
-  push #'l'
-  push #1
-  push sp
-  push #'i'
-  push #1
-  push sp
-  push #'f'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'h'
-  push #1
-  push sp
-  push #'c'
-  push #1
-  push sp
-  push #'u'
-  push #1
-  push sp
-  push #'s'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #'o'
-  push #1
-  push sp
-  push #'N'
-  push #1
-  push sp
-  push #' '
-  push #1
-  push sp
-  push #':'
-  push #1
-  push sp
-  push #'\''
-  push #1
-  mov 243, sp
-  push #0
-  mov 244, sp
-  push [244]
-  push [243]
-  push #1
-  mov 245, sp
-  push #0
-  mov 246, sp
-  push #0
-  mov 247, sp
   push cx
   push #L307
   mov cx, sp
   ;; (49'23) Tail: block (g1) @ lam_49'28 (g11)
-  mov bp, [101]
-  mov dx, [111]
+  mov bp, #g1
+  mov dx, #g11
   mov ax, [bp]
   jmp [ax]
 
+g1: dw L2
+g2: dw L5
+g3: dw L11
+g4: dw 0
+g5: dw L16
+g6: dw 0
+g7: dw L24
+g8: dw L29
+g9: dw L33
+g10: dw 0
+g11: dw L41
+g12: dw 0
+g13: dw L49
+g14: dw 0
+g15: dw L55
+g16: dw 0
+g17: dw 1
+g18: dw 0
+g19: dw 1
+g20: dw 0
+g21: dw 1
+g22: dw 0
+g23: dw L65
+g24: dw 0
+g25: dw L67
+g26: dw 0
+g27: dw 0
+g28: dw 1, '%', g28+3, 1, ' ', g28+6, 0
+g29: dw 0
+g30: dw 0
+g31: dw 0
+g32: dw 1
+g33: dw 0
+g34: dw 0
+g35: dw 0
+g36: dw 0
+g37: dw 0
+g38: dw 0
+g39: dw 1, 's', g39+3, 1, 'h', g39+6, 1, 'a', g39+9, 1, 'm', g39+12, 1, ':', g39+15, 1, ' ', g39+18, 0
+g40: dw 1, ':', g40+3, 1, ' ', g40+6, 0
+g41: dw 1, 'c', g41+3, 1, 'o', g41+6, 1, 'm', g41+9, 1, 'm', g41+12, 1, 'a', g41+15, 1, 'n', g41+18, 1, 'd', g41+21, 1, ' ', g41+24, 1, 'n', g41+27, 1, 'o', g41+30, 1, 't', g41+33, 1, ' ', g41+36, 1, 'f', g41+39, 1, 'o', g41+42, 1, 'u', g41+45, 1, 'n', g41+48, 1, 'd', g41+51, 0
+g42: dw 1, '\n', g42+3, 0
+g43: dw 0
+g44: dw 1, g42, g43
+g45: dw 1, g41, g44
+g46: dw 1, g40, g45
+g47: dw 1, 's', g47+3, 1, 'h', g47+6, 1, 'a', g47+9, 1, 'm', g47+12, 1, ':', g47+15, 1, ' ', g47+18, 0
+g48: dw 1, ':', g48+3, 1, ' ', g48+6, 0
+g49: dw 1, 'P', g49+3, 1, 'e', g49+6, 1, 'r', g49+9, 1, 'm', g49+12, 1, 'i', g49+15, 1, 's', g49+18, 1, 's', g49+21, 1, 'i', g49+24, 1, 'o', g49+27, 1, 'n', g49+30, 1, ' ', g49+33, 1, 'd', g49+36, 1, 'e', g49+39, 1, 'n', g49+42, 1, 'i', g49+45, 1, 'e', g49+48, 1, 'd', g49+51, 0
+g50: dw 1, '\n', g50+3, 0
+g51: dw 0
+g52: dw 1, g50, g51
+g53: dw 1, g49, g52
+g54: dw 1, g48, g53
+g55: dw 1, 'S', g55+3, 1, 'h', g55+6, 1, 'a', g55+9, 1, 'm', g55+12, 1, ':', g55+15, 1, ' ', g55+18, 1, 'I', g55+21, 1, 'n', g55+24, 1, '-', g55+27, 1, 'm', g55+30, 1, 'e', g55+33, 1, 'm', g55+36, 1, 'o', g55+39, 1, 'r', g55+42, 1, 'y', g55+45, 1, ' ', g55+48, 1, 'f', g55+51, 1, 'i', g55+54, 1, 'l', g55+57, 1, 'e', g55+60, 1, '-', g55+63, 1, 's', g55+66, 1, 'y', g55+69, 1, 's', g55+72, 1, 't', g55+75, 1, 'e', g55+78, 1, 'm', g55+81, 1, '.', g55+84, 1, ' ', g55+87, 1, 'C', g55+90, 1, 'o', g55+93, 1, 'n', g55+96, 1, 's', g55+99, 1, 'i', g55+102, 1, 'd', g55+105, 1, 'e', g55+108, 1, 'r', g55+111, 1, ' ', g55+114, 1, 't', g55+117, 1, 'y', g55+120, 1, 'p', g55+123, 1, 'i', g55+126, 1, 'n', g55+129, 1, 'g', g55+132, 1, ' ', g55+135, 1, '"', g55+138, 1, 'l', g55+141, 1, 's', g55+144, 1, '"', g55+147, 1, '.', g55+150, 1, '\n', g55+153, 0
+g56: dw 1, 'r', g56+3, 1, 'e', g56+6, 1, 'a', g56+9, 1, 'd', g56+12, 1, 'm', g56+15, 1, 'e', g56+18, 0
+g57: dw 1, 'W', g57+3, 1, 'e', g57+6, 1, 'l', g57+9, 1, 'c', g57+12, 1, 'o', g57+15, 1, 'm', g57+18, 1, 'e', g57+21, 1, ' ', g57+24, 1, 't', g57+27, 1, 'o', g57+30, 1, ' ', g57+33, 1, 's', g57+36, 1, 'h', g57+39, 1, 'a', g57+42, 1, 'm', g57+45, 1, ';', g57+48, 1, ' ', g57+51, 1, 'p', g57+54, 1, 'l', g57+57, 1, 'e', g57+60, 1, 'a', g57+63, 1, 's', g57+66, 1, 'e', g57+69, 1, ' ', g57+72, 1, 't', g57+75, 1, 'r', g57+78, 1, 'y', g57+81, 1, ' ', g57+84, 1, 'a', g57+87, 1, 'l', g57+90, 1, 'l', g57+93, 1, ' ', g57+96, 1, 't', g57+99, 1, 'h', g57+102, 1, 'e', g57+105, 1, ' ', g57+108, 1, 'c', g57+111, 1, 'o', g57+114, 1, 'm', g57+117, 1, 'm', g57+120, 1, 'a', g57+123, 1, 'n', g57+126, 1, 'd', g57+129, 1, 's', g57+132, 1, '!', g57+135, 1, '\n', g57+138, 1, 'C', g57+141, 1, 'a', g57+144, 1, 'n', g57+147, 1, ' ', g57+150, 1, 'y', g57+153, 1, 'o', g57+156, 1, 'u', g57+159, 1, ' ', g57+162, 1, 'f', g57+165, 1, 'i', g57+168, 1, 'n', g57+171, 1, 'd', g57+174, 1, ' ', g57+177, 1, 't', g57+180, 1, 'h', g57+183, 1, 'e', g57+186, 1, ' ', g57+189, 1, 'h', g57+192, 1, 'i', g57+195, 1, 'd', g57+198, 1, 'd', g57+201, 1, 'e', g57+204, 1, 'n', g57+207, 1, ' ', g57+210, 1, 'E', g57+213, 1, 'a', g57+216, 1, 's', g57+219, 1, 't', g57+222, 1, 'e', g57+225, 1, 'r', g57+228, 1, ' ', g57+231, 1, 'E', g57+234, 1, 'g', g57+237, 1, 'g', g57+240, 1, '?', g57+243, 1, '\n', g57+246, 0
+g58: dw 0, g57
+g59: dw 0, g56, g58
+g60: dw 1, 'l', g60+3, 1, 's', g60+6, 0
+g61: dw 1, 'l', g61+3, 1, 's', g61+6, 1, ' ', g61+9, 1, '-', g61+12, 1, ' ', g61+15, 1, 'l', g61+18, 1, 'i', g61+21, 1, 's', g61+24, 1, 't', g61+27, 1, ' ', g61+30, 1, 'd', g61+33, 1, 'i', g61+36, 1, 'r', g61+39, 1, 'e', g61+42, 1, 'c', g61+45, 1, 't', g61+48, 1, 'o', g61+51, 1, 'r', g61+54, 1, 'y', g61+57, 1, ' ', g61+60, 1, 'c', g61+63, 1, 'o', g61+66, 1, 'n', g61+69, 1, 't', g61+72, 1, 'e', g61+75, 1, 'n', g61+78, 1, 't', g61+81, 1, 's', g61+84, 1, '\n', g61+87, 0
+g62: dw 1, 'l', g62+3, 1, 's', g62+6, 1, ':', g62+9, 1, ' ', g62+12, 1, 't', g62+15, 1, 'a', g62+18, 1, 'k', g62+21, 1, 'e', g62+24, 1, 's', g62+27, 1, ' ', g62+30, 1, 'n', g62+33, 1, 'o', g62+36, 1, ' ', g62+39, 1, 'a', g62+42, 1, 'r', g62+45, 1, 'g', g62+48, 1, 'u', g62+51, 1, 'm', g62+54, 1, 'e', g62+57, 1, 'n', g62+60, 1, 't', g62+63, 1, 's', g62+66, 1, '\n', g62+69, 0
+g63: dw L68
+g64: dw 0
+g65: dw 0
+g66: dw 1, 'c', g66+3, 1, 'a', g66+6, 1, 't', g66+9, 0
+g67: dw 1, 'c', g67+3, 1, 'a', g67+6, 1, 't', g67+9, 1, ' ', g67+12, 1, '-', g67+15, 1, ' ', g67+18, 1, 'c', g67+21, 1, 'o', g67+24, 1, 'n', g67+27, 1, 'c', g67+30, 1, 'a', g67+33, 1, 't', g67+36, 1, 'e', g67+39, 1, 'n', g67+42, 1, 'a', g67+45, 1, 't', g67+48, 1, 'e', g67+51, 1, ' ', g67+54, 1, 'f', g67+57, 1, 'i', g67+60, 1, 'l', g67+63, 1, 'e', g67+66, 1, 's', g67+69, 1, ' ', g67+72, 1, 'a', g67+75, 1, 'n', g67+78, 1, 'd', g67+81, 1, ' ', g67+84, 1, 'p', g67+87, 1, 'r', g67+90, 1, 'i', g67+93, 1, 'n', g67+96, 1, 't', g67+99, 1, ' ', g67+102, 1, 'o', g67+105, 1, 'n', g67+108, 1, ' ', g67+111, 1, 't', g67+114, 1, 'h', g67+117, 1, 'e', g67+120, 1, ' ', g67+123, 1, 's', g67+126, 1, 't', g67+129, 1, 'a', g67+132, 1, 'n', g67+135, 1, 'd', g67+138, 1, 'a', g67+141, 1, 'r', g67+144, 1, 'd', g67+147, 1, ' ', g67+150, 1, 'o', g67+153, 1, 'u', g67+156, 1, 't', g67+159, 1, 'p', g67+162, 1, 'u', g67+165, 1, 't', g67+168, 1, '\n', g67+171, 0
+g68: dw 1, 'c', g68+3, 1, 'a', g68+6, 1, 't', g68+9, 1, ':', g68+12, 1, ' ', g68+15, 1, 't', g68+18, 1, 'a', g68+21, 1, 'k', g68+24, 1, 'e', g68+27, 1, 's', g68+30, 1, ' ', g68+33, 1, 'a', g68+36, 1, 't', g68+39, 1, ' ', g68+42, 1, 'l', g68+45, 1, 'e', g68+48, 1, 'a', g68+51, 1, 's', g68+54, 1, 't', g68+57, 1, ' ', g68+60, 1, 'o', g68+63, 1, 'n', g68+66, 1, 'e', g68+69, 1, ' ', g68+72, 1, 'a', g68+75, 1, 'r', g68+78, 1, 'g', g68+81, 1, 'u', g68+84, 1, 'm', g68+87, 1, 'e', g68+90, 1, 'n', g68+93, 1, 't', g68+96, 1, '\n', g68+99, 0
+g69: dw 0
+g70: dw 1, 'c', g70+3, 1, 'a', g70+6, 1, 't', g70+9, 1, ':', g70+12, 1, ' ', g70+15, 0
+g71: dw 1, ' ', g71+3, 1, ':', g71+6, 1, ' ', g71+9, 1, 'N', g71+12, 1, 'o', g71+15, 1, ' ', g71+18, 1, 's', g71+21, 1, 'u', g71+24, 1, 'c', g71+27, 1, 'h', g71+30, 1, ' ', g71+33, 1, 'f', g71+36, 1, 'i', g71+39, 1, 'l', g71+42, 1, 'e', g71+45, 1, '\n', g71+48, 0
+g72: dw 0
+g73: dw 1, g71, g72
+g74: dw 1, 'c', g74+3, 1, 'a', g74+6, 1, 't', g74+9, 1, ':', g74+12, 1, ' ', g74+15, 0
+g75: dw 1, ' ', g75+3, 1, ':', g75+6, 1, ' ', g75+9, 1, 'N', g75+12, 1, 'o', g75+15, 1, 't', g75+18, 1, ' ', g75+21, 1, 'a', g75+24, 1, ' ', g75+27, 1, 'd', g75+30, 1, 'a', g75+33, 1, 't', g75+36, 1, 'a', g75+39, 1, ' ', g75+42, 1, 'f', g75+45, 1, 'i', g75+48, 1, 'l', g75+51, 1, 'e', g75+54, 1, '\n', g75+57, 0
+g76: dw 0
+g77: dw 1, g75, g76
+g78: dw 0
+g79: dw 1, 'c', g79+3, 1, 'a', g79+6, 1, 't', g79+9, 1, ':', g79+12, 1, ' ', g79+15, 0
+g80: dw 1, ' ', g80+3, 1, ':', g80+6, 1, ' ', g80+9, 1, 'N', g80+12, 1, 'o', g80+15, 1, ' ', g80+18, 1, 's', g80+21, 1, 'u', g80+24, 1, 'c', g80+27, 1, 'h', g80+30, 1, ' ', g80+33, 1, 'f', g80+36, 1, 'i', g80+39, 1, 'l', g80+42, 1, 'e', g80+45, 1, '\n', g80+48, 0
+g81: dw 0
+g82: dw 1, g80, g81
+g83: dw 1, 'c', g83+3, 1, 'a', g83+6, 1, 't', g83+9, 1, ':', g83+12, 1, ' ', g83+15, 0
+g84: dw 1, ' ', g84+3, 1, ':', g84+6, 1, ' ', g84+9, 1, 'N', g84+12, 1, 'o', g84+15, 1, 't', g84+18, 1, ' ', g84+21, 1, 'a', g84+24, 1, ' ', g84+27, 1, 'd', g84+30, 1, 'a', g84+33, 1, 't', g84+36, 1, 'a', g84+39, 1, ' ', g84+42, 1, 'f', g84+45, 1, 'i', g84+48, 1, 'l', g84+51, 1, 'e', g84+54, 1, '\n', g84+57, 0
+g85: dw 0
+g86: dw 1, g84, g85
+g87: dw 1, 'm', g87+3, 1, 'a', g87+6, 1, 'n', g87+9, 0
+g88: dw 1, 'm', g88+3, 1, 'a', g88+6, 1, 'n', g88+9, 1, ' ', g88+12, 1, '-', g88+15, 1, ' ', g88+18, 1, 'a', g88+21, 1, 'n', g88+24, 1, ' ', g88+27, 1, 'i', g88+30, 1, 'n', g88+33, 1, 't', g88+36, 1, 'e', g88+39, 1, 'r', g88+42, 1, 'f', g88+45, 1, 'a', g88+48, 1, 'c', g88+51, 1, 'e', g88+54, 1, ' ', g88+57, 1, 't', g88+60, 1, 'o', g88+63, 1, ' ', g88+66, 1, 't', g88+69, 1, 'h', g88+72, 1, 'e', g88+75, 1, ' ', g88+78, 1, 's', g88+81, 1, 'y', g88+84, 1, 's', g88+87, 1, 't', g88+90, 1, 'e', g88+93, 1, 'm', g88+96, 1, ' ', g88+99, 1, 'r', g88+102, 1, 'e', g88+105, 1, 'f', g88+108, 1, 'e', g88+111, 1, 'r', g88+114, 1, 'e', g88+117, 1, 'n', g88+120, 1, 'c', g88+123, 1, 'e', g88+126, 1, ' ', g88+129, 1, 'm', g88+132, 1, 'a', g88+135, 1, 'n', g88+138, 1, 'u', g88+141, 1, 'a', g88+144, 1, 'l', g88+147, 1, 's', g88+150, 1, '\n', g88+153, 0
+g89: dw 1, 'W', g89+3, 1, 'h', g89+6, 1, 'a', g89+9, 1, 't', g89+12, 1, ' ', g89+15, 1, 'm', g89+18, 1, 'a', g89+21, 1, 'n', g89+24, 1, 'u', g89+27, 1, 'a', g89+30, 1, 'l', g89+33, 1, ' ', g89+36, 1, 'p', g89+39, 1, 'a', g89+42, 1, 'g', g89+45, 1, 'e', g89+48, 1, ' ', g89+51, 1, 'd', g89+54, 1, 'o', g89+57, 1, ' ', g89+60, 1, 'y', g89+63, 1, 'o', g89+66, 1, 'u', g89+69, 1, ' ', g89+72, 1, 'w', g89+75, 1, 'a', g89+78, 1, 'n', g89+81, 1, 't', g89+84, 1, '?', g89+87, 1, '\n', g89+90, 0
+g90: dw 0
+g91: dw 1, 'N', g91+3, 1, 'o', g91+6, 1, ' ', g91+9, 1, 'm', g91+12, 1, 'a', g91+15, 1, 'n', g91+18, 1, 'u', g91+21, 1, 'a', g91+24, 1, 'l', g91+27, 1, ' ', g91+30, 1, 'e', g91+33, 1, 'n', g91+36, 1, 't', g91+39, 1, 'r', g91+42, 1, 'y', g91+45, 1, ' ', g91+48, 1, 'f', g91+51, 1, 'o', g91+54, 1, 'r', g91+57, 1, ' ', g91+60, 0
+g92: dw 1, '\n', g92+3, 0
+g93: dw 0
+g94: dw 1, g92, g93
+g95: dw 1, 'N', g95+3, 1, 'o', g95+6, 1, ' ', g95+9, 1, 'm', g95+12, 1, 'a', g95+15, 1, 'n', g95+18, 1, 'u', g95+21, 1, 'a', g95+24, 1, 'l', g95+27, 1, ' ', g95+30, 1, 'e', g95+33, 1, 'n', g95+36, 1, 't', g95+39, 1, 'r', g95+42, 1, 'y', g95+45, 1, ' ', g95+48, 1, 'f', g95+51, 1, 'o', g95+54, 1, 'r', g95+57, 1, ' ', g95+60, 0
+g96: dw 1, '\n', g96+3, 0
+g97: dw 0
+g98: dw 1, g96, g97
+g99: dw 0
+g100: dw 1, 'N', g100+3, 1, 'o', g100+6, 1, ' ', g100+9, 1, 'm', g100+12, 1, 'a', g100+15, 1, 'n', g100+18, 1, 'u', g100+21, 1, 'a', g100+24, 1, 'l', g100+27, 1, ' ', g100+30, 1, 'e', g100+33, 1, 'n', g100+36, 1, 't', g100+39, 1, 'r', g100+42, 1, 'y', g100+45, 1, ' ', g100+48, 1, 'f', g100+51, 1, 'o', g100+54, 1, 'r', g100+57, 1, ' ', g100+60, 0
+g101: dw 1, '\n', g101+3, 0
+g102: dw 0
+g103: dw 1, g101, g102
+g104: dw 1, 'N', g104+3, 1, 'o', g104+6, 1, ' ', g104+9, 1, 'm', g104+12, 1, 'a', g104+15, 1, 'n', g104+18, 1, 'u', g104+21, 1, 'a', g104+24, 1, 'l', g104+27, 1, ' ', g104+30, 1, 'e', g104+33, 1, 'n', g104+36, 1, 't', g104+39, 1, 'r', g104+42, 1, 'y', g104+45, 1, ' ', g104+48, 1, 'f', g104+51, 1, 'o', g104+54, 1, 'r', g104+57, 1, ' ', g104+60, 0
+g105: dw 1, '\n', g105+3, 0
+g106: dw 0
+g107: dw 1, g105, g106
+g108: dw 1, 'r', g108+3, 1, 'm', g108+6, 0
+g109: dw 1, 'r', g109+3, 1, 'm', g109+6, 1, ' ', g109+9, 1, '-', g109+12, 1, ' ', g109+15, 1, 'r', g109+18, 1, 'e', g109+21, 1, 'm', g109+24, 1, 'o', g109+27, 1, 'v', g109+30, 1, 'e', g109+33, 1, ' ', g109+36, 1, 'f', g109+39, 1, 'i', g109+42, 1, 'l', g109+45, 1, 'e', g109+48, 1, 's', g109+51, 1, ' ', g109+54, 1, 'o', g109+57, 1, 'r', g109+60, 1, ' ', g109+63, 1, 'd', g109+66, 1, 'i', g109+69, 1, 'r', g109+72, 1, 'e', g109+75, 1, 'c', g109+78, 1, 't', g109+81, 1, 'o', g109+84, 1, 'r', g109+87, 1, 'i', g109+90, 1, 'e', g109+93, 1, 's', g109+96, 1, ' ', g109+99, 1, '(', g109+102, 1, 'T', g109+105, 1, 'O', g109+108, 1, 'D', g109+111, 1, 'O', g109+114, 1, ':', g109+117, 1, ' ', g109+120, 1, 's', g109+123, 1, 'u', g109+126, 1, 'p', g109+129, 1, 'p', g109+132, 1, 'o', g109+135, 1, 'r', g109+138, 1, 't', g109+141, 1, ' ', g109+144, 1, 'd', g109+147, 1, 'i', g109+150, 1, 'r', g109+153, 1, 'e', g109+156, 1, 'c', g109+159, 1, 't', g109+162, 1, 'o', g109+165, 1, 'r', g109+168, 1, 'i', g109+171, 1, 'e', g109+174, 1, 's', g109+177, 1, ')', g109+180, 1, '\n', g109+183, 0
+g110: dw 1, 'r', g110+3, 1, 'm', g110+6, 1, ':', g110+9, 1, ' ', g110+12, 1, 'm', g110+15, 1, 'i', g110+18, 1, 's', g110+21, 1, 's', g110+24, 1, 'i', g110+27, 1, 'n', g110+30, 1, 'g', g110+33, 1, ' ', g110+36, 1, 'o', g110+39, 1, 'p', g110+42, 1, 'e', g110+45, 1, 'r', g110+48, 1, 'a', g110+51, 1, 'n', g110+54, 1, 'd', g110+57, 1, '\n', g110+60, 0
+g111: dw 1, 'r', g111+3, 1, 'm', g111+6, 1, ':', g111+9, 1, ' ', g111+12, 1, 'c', g111+15, 1, 'a', g111+18, 1, 'n', g111+21, 1, 'n', g111+24, 1, 'o', g111+27, 1, 't', g111+30, 1, ' ', g111+33, 1, 'r', g111+36, 1, 'e', g111+39, 1, 'm', g111+42, 1, 'o', g111+45, 1, 'v', g111+48, 1, 'e', g111+51, 1, ' ', g111+54, 1, '\'', g111+57, 0
+g112: dw 1, '\'', g112+3, 1, ':', g112+6, 1, ' ', g112+9, 1, 'N', g112+12, 1, 'o', g112+15, 1, ' ', g112+18, 1, 's', g112+21, 1, 'u', g112+24, 1, 'c', g112+27, 1, 'h', g112+30, 1, ' ', g112+33, 1, 'f', g112+36, 1, 'i', g112+39, 1, 'l', g112+42, 1, 'e', g112+45, 1, ' ', g112+48, 1, 'o', g112+51, 1, 'r', g112+54, 1, ' ', g112+57, 1, 'd', g112+60, 1, 'i', g112+63, 1, 'r', g112+66, 1, 'e', g112+69, 1, 'c', g112+72, 1, 't', g112+75, 1, 'o', g112+78, 1, 'r', g112+81, 1, 'y', g112+84, 1, '\n', g112+87, 0
+g113: dw 0
+g114: dw 1, g112, g113
+g115: dw 0
+g116: dw 1, 'c', g116+3, 1, 'p', g116+6, 0
+g117: dw 1, 'c', g117+3, 1, 'p', g117+6, 1, ' ', g117+9, 1, '-', g117+12, 1, ' ', g117+15, 1, 'c', g117+18, 1, 'o', g117+21, 1, 'p', g117+24, 1, 'y', g117+27, 1, ' ', g117+30, 1, 'f', g117+33, 1, 'i', g117+36, 1, 'l', g117+39, 1, 'e', g117+42, 1, 's', g117+45, 1, ' ', g117+48, 1, 'a', g117+51, 1, 'n', g117+54, 1, 'd', g117+57, 1, ' ', g117+60, 1, 'd', g117+63, 1, 'i', g117+66, 1, 'r', g117+69, 1, 'e', g117+72, 1, 'c', g117+75, 1, 't', g117+78, 1, 'o', g117+81, 1, 'r', g117+84, 1, 'i', g117+87, 1, 'e', g117+90, 1, 's', g117+93, 1, '\n', g117+96, 0
+g118: dw 1, 'c', g118+3, 1, 'p', g118+6, 1, ':', g118+9, 1, ' ', g118+12, 1, 'm', g118+15, 1, 'i', g118+18, 1, 's', g118+21, 1, 's', g118+24, 1, 'i', g118+27, 1, 'n', g118+30, 1, 'g', g118+33, 1, ' ', g118+36, 1, 'f', g118+39, 1, 'i', g118+42, 1, 'l', g118+45, 1, 'e', g118+48, 1, ' ', g118+51, 1, 'o', g118+54, 1, 'p', g118+57, 1, 'e', g118+60, 1, 'r', g118+63, 1, 'a', g118+66, 1, 'n', g118+69, 1, 'd', g118+72, 1, '\n', g118+75, 0
+g119: dw 1, 'c', g119+3, 1, 'p', g119+6, 1, ':', g119+9, 1, ' ', g119+12, 1, 'm', g119+15, 1, 'i', g119+18, 1, 's', g119+21, 1, 's', g119+24, 1, 'i', g119+27, 1, 'n', g119+30, 1, 'g', g119+33, 1, ' ', g119+36, 1, 'd', g119+39, 1, 'e', g119+42, 1, 's', g119+45, 1, 't', g119+48, 1, 'i', g119+51, 1, 'n', g119+54, 1, 'a', g119+57, 1, 't', g119+60, 1, 'i', g119+63, 1, 'o', g119+66, 1, 'n', g119+69, 1, ' ', g119+72, 1, 'f', g119+75, 1, 'i', g119+78, 1, 'l', g119+81, 1, 'e', g119+84, 1, ' ', g119+87, 1, 'o', g119+90, 1, 'p', g119+93, 1, 'e', g119+96, 1, 'r', g119+99, 1, 'a', g119+102, 1, 'n', g119+105, 1, 'd', g119+108, 1, ' ', g119+111, 1, 'a', g119+114, 1, 'f', g119+117, 1, 't', g119+120, 1, 'e', g119+123, 1, 'r', g119+126, 1, ' ', g119+129, 1, '\'', g119+132, 0
+g120: dw 1, '\'', g120+3, 1, '\n', g120+6, 0
+g121: dw 0
+g122: dw 1, g120, g121
+g123: dw 1, 'c', g123+3, 1, 'p', g123+6, 1, ':', g123+9, 1, ' ', g123+12, 1, 'u', g123+15, 1, 'n', g123+18, 1, 'e', g123+21, 1, 'x', g123+24, 1, 'p', g123+27, 1, 'e', g123+30, 1, 'c', g123+33, 1, 't', g123+36, 1, 'e', g123+39, 1, 'd', g123+42, 1, ' ', g123+45, 1, 'e', g123+48, 1, 'x', g123+51, 1, 't', g123+54, 1, 'r', g123+57, 1, 'a', g123+60, 1, ' ', g123+63, 1, 'o', g123+66, 1, 'p', g123+69, 1, 'e', g123+72, 1, 'r', g123+75, 1, 'a', g123+78, 1, 'n', g123+81, 1, 'd', g123+84, 1, 's', g123+87, 1, '\n', g123+90, 0
+g124: dw 0
+g125: dw 1, 'c', g125+3, 1, 'p', g125+6, 1, ':', g125+9, 1, ' ', g125+12, 1, 'c', g125+15, 1, 'a', g125+18, 1, 'n', g125+21, 1, 'n', g125+24, 1, 'o', g125+27, 1, 't', g125+30, 1, ' ', g125+33, 1, 's', g125+36, 1, 't', g125+39, 1, 'a', g125+42, 1, 't', g125+45, 1, ' ', g125+48, 1, '\'', g125+51, 0
+g126: dw 1, '\'', g126+3, 1, ':', g126+6, 1, ' ', g126+9, 1, 'N', g126+12, 1, 'o', g126+15, 1, ' ', g126+18, 1, 's', g126+21, 1, 'u', g126+24, 1, 'c', g126+27, 1, 'h', g126+30, 1, ' ', g126+33, 1, 'f', g126+36, 1, 'i', g126+39, 1, 'l', g126+42, 1, 'e', g126+45, 1, ' ', g126+48, 1, 'o', g126+51, 1, 'r', g126+54, 1, ' ', g126+57, 1, 'd', g126+60, 1, 'i', g126+63, 1, 'r', g126+66, 1, 'e', g126+69, 1, 'c', g126+72, 1, 't', g126+75, 1, 'o', g126+78, 1, 'r', g126+81, 1, 'y', g126+84, 1, '\n', g126+87, 0
+g127: dw 0
+g128: dw 1, g126, g127
+g129: dw 1, 'm', g129+3, 1, 'v', g129+6, 0
+g130: dw 1, 'm', g130+3, 1, 'v', g130+6, 1, ' ', g130+9, 1, '-', g130+12, 1, ' ', g130+15, 1, 'm', g130+18, 1, 'o', g130+21, 1, 'v', g130+24, 1, 'e', g130+27, 1, ' ', g130+30, 1, '(', g130+33, 1, 'r', g130+36, 1, 'e', g130+39, 1, 'n', g130+42, 1, 'a', g130+45, 1, 'm', g130+48, 1, 'e', g130+51, 1, ')', g130+54, 1, ' ', g130+57, 1, 'f', g130+60, 1, 'i', g130+63, 1, 'l', g130+66, 1, 'e', g130+69, 1, 's', g130+72, 1, '\n', g130+75, 0
+g131: dw 1, 'm', g131+3, 1, 'v', g131+6, 1, ':', g131+9, 1, ' ', g131+12, 1, 'm', g131+15, 1, 'i', g131+18, 1, 's', g131+21, 1, 's', g131+24, 1, 'i', g131+27, 1, 'n', g131+30, 1, 'g', g131+33, 1, ' ', g131+36, 1, 'f', g131+39, 1, 'i', g131+42, 1, 'l', g131+45, 1, 'e', g131+48, 1, ' ', g131+51, 1, 'o', g131+54, 1, 'p', g131+57, 1, 'e', g131+60, 1, 'r', g131+63, 1, 'a', g131+66, 1, 'n', g131+69, 1, 'd', g131+72, 1, '\n', g131+75, 0
+g132: dw 1, 'm', g132+3, 1, 'v', g132+6, 1, ':', g132+9, 1, ' ', g132+12, 1, 'm', g132+15, 1, 'i', g132+18, 1, 's', g132+21, 1, 's', g132+24, 1, 'i', g132+27, 1, 'n', g132+30, 1, 'g', g132+33, 1, ' ', g132+36, 1, 'd', g132+39, 1, 'e', g132+42, 1, 's', g132+45, 1, 't', g132+48, 1, 'i', g132+51, 1, 'n', g132+54, 1, 'a', g132+57, 1, 't', g132+60, 1, 'i', g132+63, 1, 'o', g132+66, 1, 'n', g132+69, 1, ' ', g132+72, 1, 'f', g132+75, 1, 'i', g132+78, 1, 'l', g132+81, 1, 'e', g132+84, 1, ' ', g132+87, 1, 'o', g132+90, 1, 'p', g132+93, 1, 'e', g132+96, 1, 'r', g132+99, 1, 'a', g132+102, 1, 'n', g132+105, 1, 'd', g132+108, 1, ' ', g132+111, 1, 'a', g132+114, 1, 'f', g132+117, 1, 't', g132+120, 1, 'e', g132+123, 1, 'r', g132+126, 1, ' ', g132+129, 1, '\'', g132+132, 0
+g133: dw 1, '\'', g133+3, 1, '\n', g133+6, 0
+g134: dw 0
+g135: dw 1, g133, g134
+g136: dw 1, 'm', g136+3, 1, 'v', g136+6, 1, ':', g136+9, 1, ' ', g136+12, 1, 'u', g136+15, 1, 'n', g136+18, 1, 'e', g136+21, 1, 'x', g136+24, 1, 'p', g136+27, 1, 'e', g136+30, 1, 'c', g136+33, 1, 't', g136+36, 1, 'e', g136+39, 1, 'd', g136+42, 1, ' ', g136+45, 1, 'e', g136+48, 1, 'x', g136+51, 1, 't', g136+54, 1, 'r', g136+57, 1, 'a', g136+60, 1, ' ', g136+63, 1, 'o', g136+66, 1, 'p', g136+69, 1, 'e', g136+72, 1, 'r', g136+75, 1, 'a', g136+78, 1, 'n', g136+81, 1, 'd', g136+84, 1, 's', g136+87, 1, '\n', g136+90, 0
+g137: dw 0
+g138: dw 1, 'm', g138+3, 1, 'v', g138+6, 1, ':', g138+9, 1, ' ', g138+12, 1, 'c', g138+15, 1, 'a', g138+18, 1, 'n', g138+21, 1, 'n', g138+24, 1, 'o', g138+27, 1, 't', g138+30, 1, ' ', g138+33, 1, 's', g138+36, 1, 't', g138+39, 1, 'a', g138+42, 1, 't', g138+45, 1, ' ', g138+48, 1, '\'', g138+51, 0
+g139: dw 1, '\'', g139+3, 1, ':', g139+6, 1, ' ', g139+9, 1, 'N', g139+12, 1, 'o', g139+15, 1, ' ', g139+18, 1, 's', g139+21, 1, 'u', g139+24, 1, 'c', g139+27, 1, 'h', g139+30, 1, ' ', g139+33, 1, 'f', g139+36, 1, 'i', g139+39, 1, 'l', g139+42, 1, 'e', g139+45, 1, ' ', g139+48, 1, 'o', g139+51, 1, 'r', g139+54, 1, ' ', g139+57, 1, 'd', g139+60, 1, 'i', g139+63, 1, 'r', g139+66, 1, 'e', g139+69, 1, 'c', g139+72, 1, 't', g139+75, 1, 'o', g139+78, 1, 'r', g139+81, 1, 'y', g139+84, 1, '\n', g139+87, 0
+g140: dw 0
+g141: dw 1, g139, g140
+g142: dw 1, 'r', g142+3, 1, 'm', g142+6, 1, ':', g142+9, 1, ' ', g142+12, 1, 'c', g142+15, 1, 'a', g142+18, 1, 'n', g142+21, 1, 'n', g142+24, 1, 'o', g142+27, 1, 't', g142+30, 1, ' ', g142+33, 1, 'r', g142+36, 1, 'e', g142+39, 1, 'm', g142+42, 1, 'o', g142+45, 1, 'v', g142+48, 1, 'e', g142+51, 1, ' ', g142+54, 1, '\'', g142+57, 0
+g143: dw 1, '\'', g143+3, 1, ':', g143+6, 1, ' ', g143+9, 1, 'N', g143+12, 1, 'o', g143+15, 1, ' ', g143+18, 1, 's', g143+21, 1, 'u', g143+24, 1, 'c', g143+27, 1, 'h', g143+30, 1, ' ', g143+33, 1, 'f', g143+36, 1, 'i', g143+39, 1, 'l', g143+42, 1, 'e', g143+45, 1, ' ', g143+48, 1, 'o', g143+51, 1, 'r', g143+54, 1, ' ', g143+57, 1, 'd', g143+60, 1, 'i', g143+63, 1, 'r', g143+66, 1, 'e', g143+69, 1, 'c', g143+72, 1, 't', g143+75, 1, 'o', g143+78, 1, 'r', g143+81, 1, 'y', g143+84, 1, '\n', g143+87, 0
+g144: dw 0
+g145: dw 1, g143, g144
+g146: dw 0
+g147: dw 0
 

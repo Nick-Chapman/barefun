@@ -29,4 +29,4 @@ Haskell REPL
 
   $ cat halts.input | ../haskell/main.exe ../examples/halts.fun -5
   [Stage5 (ASM); post normalization size: 20]
-  XhYeZ[HALT:#op=29]
+  XhYeZ[HALT:#op=25]
