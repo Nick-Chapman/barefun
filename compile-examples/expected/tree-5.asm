@@ -33,13 +33,13 @@ L3: ; Function: t1
   mov ax, [6]
   call Bare_num_to_char
   mov [8], ax
-  push [bp+2]
-  push [8]
-  push 1
+  push word [bp+2]
+  push word [8]
+  push word 1
   mov [10], sp
-  push dx
-  push cx
-  push L2
+  push word dx
+  push word cx
+  push word L2
   mov cx, sp
   ;; (7'11) Tail: loop (g1) @ con_0'0 (t5)
   mov bp, g1
@@ -48,8 +48,8 @@ L3: ; Function: t1
   jmp ax
 
 L4: ; Function: g1
-  push dx
-  push L3
+  push word dx
+  push word L3
   mov [2], sp
   ;; (0'0) Return: lam_5'19 (t1)
   mov dx, [2]
@@ -105,9 +105,9 @@ L8: ; Continuation
   jmp ax
 
 L9: ; Continuation
-  push dx
-  push cx
-  push L8
+  push word dx
+  push word cx
+  push word L8
   mov cx, sp
   ;; (23'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+4]
@@ -120,9 +120,9 @@ L10: ; Arm: 23'15
   mov [2], ax
   mov ax, [bx+4]
   mov [4], ax
-  push [4]
-  push cx
-  push L9
+  push word [4]
+  push word cx
+  push word L9
   mov cx, sp
   ;; (23'23) Tail: eval (g4) @ e1 (t1)
   mov bp, g4
@@ -142,9 +142,9 @@ L11: ; Continuation
   jmp ax
 
 L12: ; Continuation
-  push dx
-  push cx
-  push L11
+  push word dx
+  push word cx
+  push word L11
   mov cx, sp
   ;; (24'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+4]
@@ -162,9 +162,9 @@ L13: ; Function: g4
   mov [2], ax
   mov ax, [bx+4]
   mov [4], ax
-  push [4]
-  push cx
-  push L12
+  push word [4]
+  push word cx
+  push word L12
   mov cx, sp
   ;; (24'23) Tail: eval (g4) @ e1 (t1)
   mov bp, g4
@@ -180,9 +180,9 @@ L14: ; Continuation
   jmp ax
 
 L15: ; Arm: 9'20
-  push g5
-  push '0'
-  push 1
+  push word g5
+  push word '0'
+  push word 1
   mov [4], sp
   ;; (0'0) Return: con_9'26 (t2)
   mov dx, [4]
@@ -205,15 +205,15 @@ L17: ; Continuation
   cmp word ax, 0
   call Bare_make_bool_from_z
   mov [2], ax
-  push cx
-  push L14
+  push word cx
+  push word L14
   mov cx, sp
   mov bx, [2]
   cmp word [bx], 1
   jz L15
-  push dx
-  push cx
-  push L16
+  push word dx
+  push word cx
+  push word L16
   mov cx, sp
   ;; (9'41) Tail: loop (g1) @ con_9'41 (g6)
   mov bp, g1
@@ -222,25 +222,25 @@ L17: ; Continuation
   jmp ax
 
 L18: ; Start
-  push 1000
-  push 0
+  push word 1000
+  push word 0
   mov [2], sp
-  push 42
-  push 0
+  push word 42
+  push word 0
   mov [4], sp
-  push 3
-  push 0
+  push word 3
+  push word 0
   mov [6], sp
-  push [6]
-  push [4]
-  push 1
+  push word [6]
+  push word [4]
+  push word 1
   mov [8], sp
-  push [8]
-  push [2]
-  push 2
+  push word [8]
+  push word [2]
+  push word 2
   mov [10], sp
-  push cx
-  push L17
+  push word cx
+  push word L17
   mov cx, sp
   ;; (29'16) Tail: eval (g4) @ con_26'15 (t5)
   mov bp, g4

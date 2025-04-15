@@ -24,8 +24,8 @@ L3: ; Function: t1
   mov ax, dx
   call Bare_num_to_char
   mov [4], ax
-  push cx
-  push L2
+  push word cx
+  push word L2
   mov cx, sp
   ;; (4'9) Tail: loop (g1) @ prim_0'0 (t2)
   mov bp, g1
@@ -34,8 +34,8 @@ L3: ; Function: t1
   jmp ax
 
 L4: ; Function: g1
-  push dx
-  push L3
+  push word dx
+  push word L3
   mov [2], sp
   ;; (0'0) Return: lam_2'17 (t1)
   mov dx, [2]
@@ -56,8 +56,8 @@ L5: ; Continuation
   jmp ax
 
 L6: ; Continuation
-  push cx
-  push L5
+  push word cx
+  push word L5
   mov cx, sp
   ;; (6'33) Tail: app_6'29 (arg) @ 52
   mov bp, dx
@@ -66,8 +66,8 @@ L6: ; Continuation
   jmp ax
 
 L7: ; Start
-  push cx
-  push L6
+  push word cx
+  push word L6
   mov cx, sp
   ;; (6'29) Tail: loop (g1) @ 'X'
   mov bp, g1

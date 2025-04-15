@@ -53,13 +53,13 @@ L5: ; Function: t1
   mov bx, dx
   call Bare_string_index
   mov [4], ax
-  push [bp+2]
-  push [4]
-  push 1
+  push word [bp+2]
+  push word [4]
+  push word 1
   mov [6], sp
-  push dx
-  push cx
-  push L4
+  push word dx
+  push word cx
+  push word L4
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g3) @ con_0'0 (t3)
   mov bp, g3
@@ -68,8 +68,8 @@ L5: ; Function: t1
   jmp ax
 
 L6: ; Function: g3
-  push dx
-  push L5
+  push word dx
+  push word L5
   mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
   mov dx, [2]
@@ -108,13 +108,13 @@ L9: ; Function: t1
   mov bx, dx
   call Bare_string_index
   mov [4], ax
-  push [bp+2]
-  push [4]
-  push 1
+  push word [bp+2]
+  push word [4]
+  push word 1
   mov [6], sp
-  push dx
-  push cx
-  push L8
+  push word dx
+  push word cx
+  push word L8
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g7) @ con_0'0 (t3)
   mov bp, g7
@@ -123,8 +123,8 @@ L9: ; Function: t1
   jmp ax
 
 L10: ; Function: g7
-  push dx
-  push L9
+  push word dx
+  push word L9
   mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
   mov dx, [2]
@@ -158,13 +158,13 @@ L13: ; Function: t1
   mov [2], ax
   mov ax, [bx+4]
   mov [4], ax
-  push [bp+2]
-  push [2]
-  push 1
+  push word [bp+2]
+  push word [2]
+  push word 1
   mov [6], sp
-  push [4]
-  push cx
-  push L12
+  push word [4]
+  push word cx
+  push word L12
   mov cx, sp
   ;; (19'27) Tail: revloop (g12) @ con_0'0 (t3)
   mov bp, g12
@@ -173,8 +173,8 @@ L13: ; Function: t1
   jmp ax
 
 L14: ; Function: g12
-  push dx
-  push L13
+  push word dx
+  push word L13
   mov [2], sp
   ;; (0'0) Return: lam_16'22 (t1)
   mov dx, [2]
@@ -196,9 +196,9 @@ L16: ; Arm: 29'27
   mov ax, `\n`
   call Bare_put_char
   mov [6], ax
-  push dx
-  push cx
-  push L15
+  push word dx
+  push word cx
+  push word L15
   mov cx, sp
   ;; (21'10) Tail: revloop (g12) @ con_21'10 (g13)
   mov bp, g12
@@ -219,9 +219,9 @@ L17: ; Function: g10
   mov ax, [2]
   call Bare_put_char
   mov [6], ax
-  push dx
-  push [2]
-  push 1
+  push word dx
+  push word [2]
+  push word 1
   mov [8], sp
   ;; (30'33) Tail: readloop (g10) @ con_0'0 (t4)
   mov bp, g10
@@ -240,8 +240,8 @@ L18: ; Continuation
   jmp ax
 
 L19: ; Continuation
-  push cx
-  push L18
+  push word cx
+  push word L18
   mov cx, sp
   ;; (38'12) Tail: put_chars (g1) @ app_32'11 (arg)
   mov bp, g1
@@ -250,8 +250,8 @@ L19: ; Continuation
   jmp ax
 
 L20: ; Continuation
-  push cx
-  push L19
+  push word cx
+  push word L19
   mov cx, sp
   ;; (32'11) Tail: readloop (g10) @ con_32'11 (g14)
   mov bp, g10
@@ -260,8 +260,8 @@ L20: ; Continuation
   jmp ax
 
 L21: ; Continuation
-  push cx
-  push L20
+  push word cx
+  push word L20
   mov cx, sp
   ;; (13'29) Tail: put_chars (g1) @ app_7'18 (arg)
   mov bp, g1
@@ -270,8 +270,8 @@ L21: ; Continuation
   jmp ax
 
 L22: ; Continuation
-  push cx
-  push L21
+  push word cx
+  push word L21
   mov cx, sp
   ;; (7'18) Tail: app_7'15 (arg) @ 1
   mov bp, dx
@@ -280,8 +280,8 @@ L22: ; Continuation
   jmp ax
 
 L23: ; Function: g6
-  push cx
-  push L22
+  push word cx
+  push word L22
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g7) @ con_7'15 (g9)
   mov bp, g7
@@ -319,13 +319,13 @@ L26: ; Function: t1
   mov bx, dx
   call Bare_string_index
   mov [4], ax
-  push [bp+2]
-  push [4]
-  push 1
+  push word [bp+2]
+  push word [4]
+  push word 1
   mov [6], sp
-  push dx
-  push cx
-  push L25
+  push word dx
+  push word cx
+  push word L25
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g16) @ con_0'0 (t3)
   mov bp, g16
@@ -334,8 +334,8 @@ L26: ; Function: t1
   jmp ax
 
 L27: ; Function: g16
-  push dx
-  push L26
+  push word dx
+  push word L26
   mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
   mov dx, [2]
@@ -374,13 +374,13 @@ L30: ; Function: t1
   mov bx, dx
   call Bare_string_index
   mov [4], ax
-  push [bp+2]
-  push [4]
-  push 1
+  push word [bp+2]
+  push word [4]
+  push word 1
   mov [6], sp
-  push dx
-  push cx
-  push L29
+  push word dx
+  push word cx
+  push word L29
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g20) @ con_0'0 (t3)
   mov bp, g20
@@ -389,8 +389,8 @@ L30: ; Function: t1
   jmp ax
 
 L31: ; Function: g20
-  push dx
-  push L30
+  push word dx
+  push word L30
   mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
   mov dx, [2]
@@ -407,8 +407,8 @@ L32: ; Continuation
   jmp ax
 
 L33: ; Continuation
-  push cx
-  push L32
+  push word cx
+  push word L32
   mov cx, sp
   ;; (7'18) Tail: app_7'15 (arg) @ 5
   mov bp, dx
@@ -417,8 +417,8 @@ L33: ; Continuation
   jmp ax
 
 L34: ; Continuation
-  push cx
-  push L33
+  push word cx
+  push word L33
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g20) @ con_7'15 (g22)
   mov bp, g20
@@ -427,8 +427,8 @@ L34: ; Continuation
   jmp ax
 
 L35: ; Continuation
-  push cx
-  push L34
+  push word cx
+  push word L34
   mov cx, sp
   ;; (44'20) Tail: mainloop (g6) @ con_44'20 (g19)
   mov bp, g6
@@ -437,8 +437,8 @@ L35: ; Continuation
   jmp ax
 
 L36: ; Continuation
-  push cx
-  push L35
+  push word cx
+  push word L35
   mov cx, sp
   ;; (13'29) Tail: put_chars (g1) @ app_7'18 (arg)
   mov bp, g1
@@ -447,8 +447,8 @@ L36: ; Continuation
   jmp ax
 
 L37: ; Continuation
-  push cx
-  push L36
+  push word cx
+  push word L36
   mov cx, sp
   ;; (7'18) Tail: app_7'15 (arg) @ 3
   mov bp, dx
@@ -457,8 +457,8 @@ L37: ; Continuation
   jmp ax
 
 L38: ; Continuation
-  push cx
-  push L37
+  push word cx
+  push word L37
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g16) @ con_7'15 (g18)
   mov bp, g16
@@ -467,8 +467,8 @@ L38: ; Continuation
   jmp ax
 
 L39: ; Continuation
-  push cx
-  push L38
+  push word cx
+  push word L38
   mov cx, sp
   ;; (13'29) Tail: put_chars (g1) @ app_7'18 (arg)
   mov bp, g1
@@ -477,8 +477,8 @@ L39: ; Continuation
   jmp ax
 
 L40: ; Continuation
-  push cx
-  push L39
+  push word cx
+  push word L39
   mov cx, sp
   ;; (7'18) Tail: app_7'15 (arg) @ 4
   mov bp, dx
@@ -487,8 +487,8 @@ L40: ; Continuation
   jmp ax
 
 L41: ; Start
-  push cx
-  push L40
+  push word cx
+  push word L40
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g3) @ con_7'15 (g5)
   mov bp, g3

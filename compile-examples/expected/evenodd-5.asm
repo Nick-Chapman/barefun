@@ -61,8 +61,8 @@ L5: ; Arm: 8'25
   jmp ax
 
 L6: ; Continuation
-  push cx
-  push L4
+  push word cx
+  push word L4
   mov cx, sp
   mov bx, dx
   cmp word [bx], 1
@@ -78,8 +78,8 @@ L7: ; Continuation
   mov ax, dx
   call Bare_put_char
   mov [2], ax
-  push cx
-  push L6
+  push word cx
+  push word L6
   mov cx, sp
   ;; (8'23) Tail: is_even (g1) @ 13
   mov bp, g1
@@ -96,8 +96,8 @@ L8: ; Arm: 8'25
   jmp ax
 
 L9: ; Continuation
-  push cx
-  push L7
+  push word cx
+  push word L7
   mov cx, sp
   mov bx, dx
   cmp word [bx], 1
@@ -110,8 +110,8 @@ L9: ; Continuation
   jmp ax
 
 L10: ; Start
-  push cx
-  push L9
+  push word cx
+  push word L9
   mov cx, sp
   ;; (8'23) Tail: is_even (g1) @ 42
   mov bp, g1

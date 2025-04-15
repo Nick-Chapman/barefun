@@ -53,13 +53,13 @@ L5: ; Function: t1
   mov bx, dx
   call Bare_string_index
   mov [4], ax
-  push [bp+2]
-  push [4]
-  push 1
+  push word [bp+2]
+  push word [4]
+  push word 1
   mov [6], sp
-  push dx
-  push cx
-  push L4
+  push word dx
+  push word cx
+  push word L4
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g3) @ con_0'0 (t3)
   mov bp, g3
@@ -68,8 +68,8 @@ L5: ; Function: t1
   jmp ax
 
 L6: ; Function: g3
-  push dx
-  push L5
+  push word dx
+  push word L5
   mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
   mov dx, [2]
@@ -86,8 +86,8 @@ L7: ; Continuation
   jmp ax
 
 L8: ; Continuation
-  push cx
-  push L7
+  push word cx
+  push word L7
   mov cx, sp
   ;; (7'18) Tail: app_7'15 (arg) @ 13
   mov bp, dx
@@ -96,8 +96,8 @@ L8: ; Continuation
   jmp ax
 
 L9: ; Start
-  push cx
-  push L8
+  push word cx
+  push word L8
   mov cx, sp
   ;; (7'15) Tail: explode_loop (g3) @ con_7'15 (g5)
   mov bp, g3

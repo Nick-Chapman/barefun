@@ -31,8 +31,8 @@ L3: ; Function: g1
   mov ax, ' '
   call Bare_put_char
   mov [4], ax
-  push dx
-  push L2
+  push word dx
+  push word L2
   mov [6], sp
   ;; (11'7) Tail: inner (t3) @ con_11'7 (g4)
   mov bp, [6]

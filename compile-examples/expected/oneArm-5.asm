@@ -13,8 +13,8 @@ L1: ; Function: g1
   jmp ax
 
 L2: ; Start
-  push 'x'
-  push 0
+  push word 'x'
+  push word 0
   mov [2], sp
   ;; (15'21) Tail: doit (g1) @ con_15'22 (t1)
   mov bp, g1

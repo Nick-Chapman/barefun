@@ -131,7 +131,7 @@ instance Show Op where
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
     OpStore a r -> "mov [" ++ show a ++ "], " ++ show r
     OpCall bare -> "call " ++ show bare
-    OpPush src -> "push " ++ show src
+    OpPush src -> "push word " ++ show src
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "jz " ++ show lab
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
