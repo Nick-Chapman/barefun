@@ -7,14 +7,14 @@ L1: ; Arm: 9'27
   jmp [ax]
 
 L2: ; Function: t3
-  call bios_get_char
+  call Bare_get_char
   mov 1, ax
   mov ax, [1]
-  call bios_put_char
+  call Bare_put_char
   mov 2, ax
   mov ax, [1]
   cmp ax, #'\n'
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 3, ax
   mov bx, [3]
   cmp [bx], #1
@@ -27,10 +27,10 @@ L2: ; Function: t3
 
 L3: ; Function: g1
   mov ax, dx
-  call bios_put_char
+  call Bare_put_char
   mov 1, ax
   mov ax, #' '
-  call bios_put_char
+  call Bare_put_char
   mov 2, ax
   push dx
   push #L2

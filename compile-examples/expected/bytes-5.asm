@@ -81,7 +81,7 @@ L8: ; Function: t1
   mov ax, [bp+1]
   mov bx, [bp+2]
   mov si, [1]
-  call bios_set_bytes
+  call Bare_set_bytes
   mov 3, ax
   mov ax, [bp+2]
   add ax, #1
@@ -111,7 +111,7 @@ L9: ; Function: t2
 
 L10: ; Continuation
   mov ax, [bp+2]
-  call bios_freeze_bytes
+  call Bare_freeze_bytes
   mov 1, ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [1]
@@ -135,7 +135,7 @@ L11: ; Continuation
 
 L12: ; Continuation
   mov ax, dx
-  call bios_make_bytes
+  call Bare_make_bytes
   mov 1, ax
   push [1]
   push #L9
@@ -183,14 +183,14 @@ L15: ; Continuation
 L16: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L14
   mov ax, [bp+1]
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+2]
   push [2]
@@ -234,7 +234,7 @@ L19: ; Function: g6
   push #L17
   mov 1, sp
   mov ax, dx
-  call bios_string_length
+  call Bare_string_length
   mov 2, ax
   push [2]
   push cx
@@ -263,7 +263,7 @@ L21: ; Function: g7
   mov ax, [bx+2]
   mov 2, ax
   mov ax, [1]
-  call bios_put_char
+  call Bare_put_char
   mov 3, ax
   ;; (35'39) Tail: put_chars (g7) @ xsMore (t2)
   mov bp, #g7
@@ -329,10 +329,10 @@ L25: ; Continuation
 
 L26: ; Continuation
   mov ax, #5
-  call bios_make_bytes
+  call Bare_make_bytes
   mov 1, ax
   mov ax, [1]
-  call bios_freeze_bytes
+  call Bare_freeze_bytes
   mov 2, ax
   push [bp+3]
   push [bp+2]

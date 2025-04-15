@@ -4,7 +4,7 @@ L1: ; Function: g1
   mov ax, [bx+1]
   mov 1, ax
   mov ax, [1]
-  call bios_put_char
+  call Bare_put_char
   mov 2, ax
   ;; (0'0) Return: prim_0'0 (t2)
   mov dx, [2]

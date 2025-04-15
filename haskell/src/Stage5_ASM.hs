@@ -87,35 +87,22 @@ data CodeLabel = CodeLabel Int String -- unique label and provenance
 data DataLabel = DataLabel SRC.Global
   deriving (Eq,Ord)
 
-data BareBios -- TODO: rename constructors to avoid the hand coded Show function
-  = BiosHalt
-  | BiosPutCharInAx
-  | BiosGetCharInAx
-  | BiosMakeBoolFromFlagZ -- TODO: dedup code for Flag Z/N
-  | BiosMakeBoolFromFlagN
-  | BiosNumToChar
-  | BiosCharToNum
-  | BiosStringLength
-  | BiosStringIndex
-  | BiosMakeBytes
-  | BiosFreezeBytes
-  | BiosSetBytes
---  | BiosCheckHeapSpace -- maybe initiate GC; compile at head of each code section
-
-instance Show BareBios where
-  show = \case
-    BiosHalt -> "bios_halt"
-    BiosGetCharInAx -> "bios_get_char"
-    BiosPutCharInAx -> "bios_put_char"
-    BiosMakeBoolFromFlagZ -> "bios_make_bool_from_z"
-    BiosMakeBoolFromFlagN -> "bios_make_bool_from_n"
-    BiosNumToChar -> "bios_num_to_char"
-    BiosCharToNum -> "bios_char_to_num"
-    BiosStringLength -> "bios_string_length"
-    BiosStringIndex -> "bios_string_index"
-    BiosMakeBytes -> "bios_make_bytes"
-    BiosFreezeBytes -> "bios_freeze_bytes"
-    BiosSetBytes -> "bios_set_bytes"
+-- BareBios; primitive routines available to the compiled code
+data BareBios
+  = Bare_halt
+  | Bare_put_char
+  | Bare_get_char
+  | Bare_make_bool_from_z
+  | Bare_make_bool_from_n
+  | Bare_num_to_char
+  | Bare_char_to_num
+  | Bare_string_length
+  | Bare_string_index
+  | Bare_make_bytes
+  | Bare_freeze_bytes
+  | Bare_set_bytes
+  -- Bare_check_heap_space
+  deriving Show
 
 ----------------------------------------------------------------------
 -- Show
@@ -138,7 +125,7 @@ instance Show Op where
     OpComment message ->  ";; " ++ message
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
     OpStore a r -> "mov " ++ show a ++ ", " ++ show r
-    OpCall mybios -> "call " ++ show mybios
+    OpCall bare -> "call " ++ show bare
     OpPush src -> "push " ++ show src
     OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "bz " ++ show lab
@@ -214,7 +201,7 @@ execOp = \case
   OpComment{} -> error "execOp/OpComment"
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
   OpStore a s -> \cont -> do w <- evalSource s; SetMem a w; cont
-  OpCall bios -> \cont -> do execBios bios; cont
+  OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
     execPush w
@@ -262,45 +249,45 @@ evalSource = \case
     a <- deAddr  <$> GetReg r
     GetMem (addAddr i a)
 
-execBios :: BareBios -> M ()
-execBios = \case
-  BiosHalt -> Halt
-  BiosGetCharInAx -> do c <- GetChar; SetReg Ax (WChar c)
-  BiosPutCharInAx -> do c <- deChar <$> GetReg Ax; PutChar c
-  BiosMakeBoolFromFlagZ -> do
+execBare :: BareBios -> M ()
+execBare = \case
+  Bare_halt -> Halt
+  Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
+  Bare_put_char -> do c <- deChar <$> GetReg Ax; PutChar c
+  Bare_make_bool_from_z -> do
     b <- GetFlagZ
     SetReg Ax (WAddr (if b then aTrue else aFalse))
-  BiosMakeBoolFromFlagN -> do
+  Bare_make_bool_from_n -> do
     b <- GetFlagN
     SetReg Ax (WAddr (if b then aTrue else aFalse))
 
   -- On real hardware Num/Char will have overlapping representations
   -- such that ord/chr have null implementations
-  BiosNumToChar -> do
+  Bare_num_to_char -> do
     n <- deNum <$> GetReg Ax
     SetReg Ax (WChar (Char.chr (fromIntegral n)))
-  BiosCharToNum -> do
+  Bare_char_to_num -> do
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
-  BiosStringLength -> do
+  Bare_string_length -> do
     a <- deAddr <$> GetReg Ax
     n <- lengthOfListInMemory a
     SetReg Ax (WNum n)
-  BiosStringIndex -> do
+  Bare_string_index -> do
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
     e <- getBytesElement a i
     c <- GetMem (addAddr 1 e)
     SetReg Ax c
-  BiosMakeBytes -> do
+  Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
     w <- createBytesInMemory n
     SetReg Ax w
-  BiosFreezeBytes -> do
+  Bare_freeze_bytes -> do
     -- currently a null-imp, because we dont have a special rep for strings
     pure ()
-  BiosSetBytes -> do
+  Bare_set_bytes -> do
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
     c <- deChar <$> GetReg Si
@@ -424,7 +411,7 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
     k0 _s () = IDone
 
     cmap = Map.insert finalCodeLabel finalCode cmapUser
-    finalCode = Do (OpCall BiosHalt) (Done Crash)
+    finalCode = Do (OpCall Bare_halt) (Done Crash)
 
     trace :: String -> Interaction -> Interaction
     trace = case traceFlag of
@@ -710,16 +697,16 @@ compileFunction who freeVars body = do
 compileBuiltin :: Builtin -> [Source] -> [Op] -- --> Ax
 compileBuiltin b xs = case (b,xs) of
   (SRC.GetChar,[_]) ->
-    [ OpCall BiosGetCharInAx
+    [ OpCall Bare_get_char
     ]
   (SRC.PutChar,[s1]) ->
     [ OpMove Ax s1
-    , OpCall BiosPutCharInAx
+    , OpCall Bare_put_char
     ]
   (SRC.EqChar, [s1,s2]) ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
-    , OpCall BiosMakeBoolFromFlagZ
+    , OpCall Bare_make_bool_from_z
     ]
   (SRC.AddInt, [s1,s2]) ->
     [ OpMove Ax s1
@@ -744,44 +731,44 @@ compileBuiltin b xs = case (b,xs) of
   (SRC.EqInt, [s1,s2]) ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
-    , OpCall BiosMakeBoolFromFlagZ
+    , OpCall Bare_make_bool_from_z
     ]
   (SRC.LessInt, [s1,s2]) ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
-    , OpCall BiosMakeBoolFromFlagN
+    , OpCall Bare_make_bool_from_n
     ]
   (SRC.StringLength, [s1]) ->
     [ OpMove Ax s1
-    , OpCall BiosStringLength
+    , OpCall Bare_string_length
     ]
   (SRC.StringIndex, [s1,s2]) ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpCall BiosStringIndex
+    , OpCall Bare_string_index
     ]
   (SRC.CharChr, [s1]) ->
     [ OpMove Ax s1
-    , OpCall BiosNumToChar
+    , OpCall Bare_num_to_char
     ]
   (SRC.CharOrd, [s1]) ->
     [ OpMove Ax s1
-    , OpCall BiosCharToNum
+    , OpCall Bare_char_to_num
     ]
 
   (SRC.MakeBytes, [s1]) ->
     [ OpMove Ax s1
-    , OpCall BiosMakeBytes
+    , OpCall Bare_make_bytes
     ]
   (SRC.FreezeBytes, [s1]) ->
     [ OpMove Ax s1
-    , OpCall BiosFreezeBytes
+    , OpCall Bare_freeze_bytes
     ]
   (SRC.SetBytes, [s1,s2,s3]) ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpMove Si s3
-    , OpCall BiosSetBytes
+    , OpCall Bare_set_bytes
     ]
 
   _ ->

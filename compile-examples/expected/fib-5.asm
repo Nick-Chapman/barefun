@@ -16,7 +16,7 @@ L2: ; Function: g1
   mov ax, [bx+2]
   mov 2, ax
   mov ax, [1]
-  call bios_put_char
+  call Bare_put_char
   mov 3, ax
   ;; (21'35) Tail: put_chars (g1) @ xs (t2)
   mov bp, #g1
@@ -60,7 +60,7 @@ L5: ; Continuation
 L6: ; Function: g3
   mov ax, dx
   cmp ax, #2
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
@@ -99,14 +99,14 @@ L8: ; Continuation
 L9: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L7
   mov ax, #g5
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+1]
   push [2]
@@ -154,7 +154,7 @@ L12: ; Continuation
 L13: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
@@ -166,7 +166,7 @@ L13: ; Function: t1
   add ax, [2]
   mov 3, ax
   mov ax, [3]
-  call bios_num_to_char
+  call Bare_num_to_char
   mov 4, ax
   push [bp+1]
   push [4]
@@ -214,14 +214,14 @@ L16: ; Continuation
 L17: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L15
   mov ax, #g10
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+1]
   push [2]
@@ -269,7 +269,7 @@ L20: ; Continuation
 L21: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
@@ -281,7 +281,7 @@ L21: ; Function: t1
   add ax, [2]
   mov 3, ax
   mov ax, [3]
-  call bios_num_to_char
+  call Bare_num_to_char
   mov 4, ax
   push [bp+1]
   push [4]
@@ -310,7 +310,7 @@ L22: ; Function: g12
 
 L23: ; Continuation
   mov ax, #'\n'
-  call bios_put_char
+  call Bare_put_char
   mov 1, ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [1]
@@ -353,7 +353,7 @@ L26: ; Continuation
 L27: ; Continuation
   mov ax, [bp+2]
   cmp ax, #0
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 1, ax
   push cx
   push #L24

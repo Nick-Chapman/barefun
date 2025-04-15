@@ -17,13 +17,13 @@ L2: ; Continuation
 L3: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L1
   mov ax, dx
-  call bios_num_to_char
+  call Bare_num_to_char
   mov 2, ax
   push cx
   push #L2
@@ -47,7 +47,7 @@ L4: ; Function: g1
 
 L5: ; Continuation
   mov ax, dx
-  call bios_put_char
+  call Bare_put_char
   mov 1, ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [1]

@@ -18,7 +18,7 @@ L2: ; Arm: 3'26
 L3: ; Function: g1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
@@ -28,7 +28,7 @@ L3: ; Function: g1
   mov 2, ax
   mov ax, [2]
   cmp ax, #0
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 3, ax
   mov bx, [3]
   cmp [bx], #1
@@ -44,7 +44,7 @@ L3: ; Function: g1
 
 L4: ; Continuation
   mov ax, dx
-  call bios_put_char
+  call Bare_put_char
   mov 1, ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [1]
@@ -77,7 +77,7 @@ L6: ; Continuation
 
 L7: ; Continuation
   mov ax, dx
-  call bios_put_char
+  call Bare_put_char
   mov 1, ax
   push cx
   push #L6

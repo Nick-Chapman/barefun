@@ -16,7 +16,7 @@ L2: ; Function: g1
   mov ax, [bx+2]
   mov 2, ax
   mov ax, [1]
-  call bios_put_char
+  call Bare_put_char
   mov 3, ax
   ;; (12'39) Tail: put_chars (g1) @ xsMore (t2)
   mov bp, #g1
@@ -45,14 +45,14 @@ L4: ; Continuation
 L5: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L3
   mov ax, #g4
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+1]
   push [2]

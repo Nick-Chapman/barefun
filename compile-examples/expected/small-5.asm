@@ -16,7 +16,7 @@ L2: ; Function: g1
   mov ax, [bx+2]
   mov 2, ax
   mov ax, [1]
-  call bios_put_char
+  call Bare_put_char
   mov 3, ax
   ;; (11'39) Tail: put_chars (g1) @ xsMore (t2)
   mov bp, #g1
@@ -45,14 +45,14 @@ L4: ; Continuation
 L5: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L3
   mov ax, #g4
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+1]
   push [2]
@@ -100,14 +100,14 @@ L8: ; Continuation
 L9: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L7
   mov ax, #g8
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+1]
   push [2]
@@ -195,7 +195,7 @@ L15: ; Continuation
 
 L16: ; Arm: 29'27
   mov ax, #'\n'
-  call bios_put_char
+  call Bare_put_char
   mov 3, ax
   push dx
   push cx
@@ -208,17 +208,17 @@ L16: ; Arm: 29'27
   jmp [ax]
 
 L17: ; Function: g10
-  call bios_get_char
+  call Bare_get_char
   mov 1, ax
   mov ax, [1]
   cmp ax, #'\n'
-  call bios_make_bool_from_z
+  call Bare_make_bool_from_z
   mov 2, ax
   mov bx, [2]
   cmp [bx], #1
   bz L16
   mov ax, [1]
-  call bios_put_char
+  call Bare_put_char
   mov 3, ax
   push dx
   push [1]
@@ -232,7 +232,7 @@ L17: ; Function: g10
 
 L18: ; Continuation
   mov ax, #'\n'
-  call bios_put_char
+  call Bare_put_char
   mov 1, ax
   ;; (40'10) Tail: mainloop (g6) @ con_40'10 (g15)
   mov bp, #g6
@@ -311,14 +311,14 @@ L25: ; Continuation
 L26: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L24
   mov ax, #g17
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+1]
   push [2]
@@ -366,14 +366,14 @@ L29: ; Continuation
 L30: ; Function: t1
   mov ax, dx
   cmp ax, #0
-  call bios_make_bool_from_n
+  call Bare_make_bool_from_n
   mov 1, ax
   mov bx, [1]
   cmp [bx], #1
   bz L28
   mov ax, #g21
   mov bx, dx
-  call bios_string_index
+  call Bare_string_index
   mov 2, ax
   push [bp+1]
   push [2]
