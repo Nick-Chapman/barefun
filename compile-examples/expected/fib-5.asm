@@ -342,10 +342,10 @@ L25: ; Arm: 16'11
 
 L26: ; Continuation
   ;; (16'35) Tail: app_16'32 (arg) @ res (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 

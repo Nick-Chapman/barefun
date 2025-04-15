@@ -657,10 +657,10 @@ moveTwoRegsPar (r1,s1) (r2,s2) = do
   let twoOne = needs r1 s2
   case (oneTwo,twoOne) of
     (True,True) ->
-      [ OpComment "use temp ax while setting up bp/dx"
-      , OpMove Ax (SReg r1)
+      [ OpComment "use temp di while setting up bp/dx"
+      , OpMove Di (SReg r1)
       , OpMove r1 s1
-      , OpMove r2 (changeRegInSource r1 Ax s2)
+      , OpMove r2 (changeRegInSource r1 Di s2)
       ]
     (True,_) -> [op1,op2]
     (_,True) -> [op2,op1]

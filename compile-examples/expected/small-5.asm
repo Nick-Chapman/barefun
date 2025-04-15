@@ -143,10 +143,10 @@ L11: ; Arm: 18'9
 
 L12: ; Continuation
   ;; (19'38) Tail: app_19'27 (arg) @ ysMore (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -185,10 +185,10 @@ L14: ; Function: g12
 
 L15: ; Continuation
   ;; (21'13) Tail: app_21'10 (arg) @ sofar (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 

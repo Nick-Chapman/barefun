@@ -62,10 +62,10 @@ L6: ; Arm: 15'9
 
 L7: ; Continuation
   ;; (16'43) Tail: app_16'37 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -125,10 +125,10 @@ L11: ; Continuation
   push L10
   mov cx, sp
   ;; (18'9) Tail: app_18'7 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 

@@ -78,10 +78,10 @@ L8: ; Continuation
   push L7
   mov cx, sp
   ;; (16'31) Tail: app_16'28 (arg) @ ys (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -125,10 +125,10 @@ L11: ; Arm: 22'9
 
 L12: ; Continuation
   ;; (23'43) Tail: app_23'37 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -188,10 +188,10 @@ L16: ; Continuation
   push L15
   mov cx, sp
   ;; (25'9) Tail: app_25'7 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -341,10 +341,10 @@ L27: ; Arm: 89'10
 
 L28: ; Continuation
   ;; (91'37) Tail: app_91'34 (arg) @ ys (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -354,10 +354,10 @@ L29: ; Continuation
   push L28
   mov cx, sp
   ;; (91'34) Tail: app_91'31 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -392,10 +392,10 @@ L32: ; Continuation
   push L31
   mov cx, sp
   ;; (91'16) Tail: app_91'14 (arg) @ y (f4)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+8]
+  mov dx, [di+8]
   mov ax, [bp]
   jmp ax
 
@@ -460,10 +460,10 @@ L36: ; Arm: 99'7
 
 L37: ; Continuation
   ;; (100'34) Tail: app_100'21 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -526,10 +526,10 @@ L42: ; Continuation
   push L41
   mov cx, sp
   ;; (107'26) Tail: app_107'24 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -683,10 +683,10 @@ L51: ; Function: g16
 
 L52: ; Continuation
   ;; (102'28) Tail: app_102'25 (arg) @ acc (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -1147,10 +1147,10 @@ L82: ; Arm: 79'15
 
 L83: ; Continuation
   ;; (80'40) Tail: app_80'25 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -1458,10 +1458,10 @@ L104: ; Arm: 79'15
 
 L105: ; Continuation
   ;; (80'40) Tail: app_80'25 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -1895,10 +1895,10 @@ L136: ; Continuation
   push L135
   mov cx, sp
   ;; (102'28) Tail: app_102'25 (arg) @ accCs (f4)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+8]
+  mov dx, [di+8]
   mov ax, [bp]
   jmp ax
 
@@ -1917,10 +1917,10 @@ L137: ; Arm: 221'7
 
 L138: ; Continuation
   ;; (223'75) Tail: app_223'72 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -1972,10 +1972,10 @@ L142: ; Continuation
   push L141
   mov cx, sp
   ;; (102'28) Tail: app_102'25 (arg) @ accCs (f5)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+10]
+  mov dx, [di+10]
   mov ax, [bp]
   jmp ax
 
@@ -1996,10 +1996,10 @@ L143: ; Arm: 223'22
 
 L144: ; Continuation
   ;; (224'37) Tail: app_224'26 (arg) @ xs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -2293,10 +2293,10 @@ L169: ; Arm: 116'11
 
 L170: ; Continuation
   ;; (116'41) Tail: app_116'38 (arg) @ res (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -2369,10 +2369,10 @@ L175: ; Arm: 116'11
 
 L176: ; Continuation
   ;; (116'41) Tail: app_116'38 (arg) @ n (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -2422,10 +2422,10 @@ L179: ; Continuation
   push L178
   mov cx, sp
   ;; (82'9) Tail: app_82'7 (arg) @ s (f3)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+6]
+  mov dx, [di+6]
   mov ax, [bp]
   jmp ax
 
@@ -2684,10 +2684,10 @@ L201: ; Arm: 116'11
 
 L202: ; Continuation
   ;; (116'41) Tail: app_116'38 (arg) @ res (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -2760,10 +2760,10 @@ L207: ; Arm: 116'11
 
 L208: ; Continuation
   ;; (116'41) Tail: app_116'38 (arg) @ n (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -2813,10 +2813,10 @@ L211: ; Continuation
   push L210
   mov cx, sp
   ;; (82'9) Tail: app_82'7 (arg) @ s (f3)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+6]
+  mov dx, [di+6]
   mov ax, [bp]
   jmp ax
 
@@ -2994,10 +2994,10 @@ L226: ; Continuation
   push L225
   mov cx, sp
   ;; (102'28) Tail: app_102'25 (arg) @ xs (f5)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+10]
+  mov dx, [di+10]
   mov ax, [bp]
   jmp ax
 
@@ -3040,10 +3040,10 @@ L229: ; Continuation
   push L228
   mov cx, sp
   ;; (93'44) Tail: app_93'41 (arg) @ ys (f6)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+12]
+  mov dx, [di+12]
   mov ax, [bp]
   jmp ax
 
@@ -3057,10 +3057,10 @@ L230: ; Continuation
   push L229
   mov cx, sp
   ;; (93'41) Tail: app_93'33 (arg) @ xs (f6)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+12]
+  mov dx, [di+12]
   mov ax, [bp]
   jmp ax
 
@@ -3235,10 +3235,10 @@ L243: ; Arm: 116'11
 
 L244: ; Continuation
   ;; (116'41) Tail: app_116'38 (arg) @ n (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+4]
+  mov dx, [di+4]
   mov ax, [bp]
   jmp ax
 
@@ -3448,10 +3448,10 @@ L259: ; Continuation
   push L258
   mov cx, sp
   ;; (93'44) Tail: app_93'41 (arg) @ ys (f7)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+14]
+  mov dx, [di+14]
   mov ax, [bp]
   jmp ax
 
@@ -3466,10 +3466,10 @@ L260: ; Continuation
   push L259
   mov cx, sp
   ;; (93'41) Tail: app_93'33 (arg) @ xs (f7)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+14]
+  mov dx, [di+14]
   mov ax, [bp]
   jmp ax
 
@@ -3535,10 +3535,10 @@ L264: ; Continuation
   push L263
   mov cx, sp
   ;; (93'44) Tail: app_93'41 (arg) @ ys (f8)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+16]
+  mov dx, [di+16]
   mov ax, [bp]
   jmp ax
 
@@ -3554,10 +3554,10 @@ L265: ; Continuation
   push L264
   mov cx, sp
   ;; (93'41) Tail: app_93'33 (arg) @ xs (f8)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+16]
+  mov dx, [di+16]
   mov ax, [bp]
   jmp ax
 
@@ -3626,10 +3626,10 @@ L269: ; Continuation
   push L268
   mov cx, sp
   ;; (93'44) Tail: app_93'41 (arg) @ ys (f8)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+16]
+  mov dx, [di+16]
   mov ax, [bp]
   jmp ax
 
@@ -3645,10 +3645,10 @@ L270: ; Continuation
   push L269
   mov cx, sp
   ;; (93'41) Tail: app_93'33 (arg) @ xs (f8)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+16]
+  mov dx, [di+16]
   mov ax, [bp]
   jmp ax
 
@@ -3724,10 +3724,10 @@ L274: ; Continuation
   push L273
   mov cx, sp
   ;; (227'18) Tail: app_227'15 (arg) @ s (f7)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+14]
+  mov dx, [di+14]
   mov ax, [bp]
   jmp ax
 
@@ -3793,10 +3793,10 @@ L278: ; Continuation
   push L277
   mov cx, sp
   ;; (93'44) Tail: app_93'41 (arg) @ ys (f8)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+16]
+  mov dx, [di+16]
   mov ax, [bp]
   jmp ax
 
@@ -3812,10 +3812,10 @@ L279: ; Continuation
   push L278
   mov cx, sp
   ;; (93'41) Tail: app_93'33 (arg) @ xs (f8)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
+  ;; use temp di while setting up bp/dx
+  mov di, bp
   mov bp, dx
-  mov dx, [ax+16]
+  mov dx, [di+16]
   mov ax, [bp]
   jmp ax
 
