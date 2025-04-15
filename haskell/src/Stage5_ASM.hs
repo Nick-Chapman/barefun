@@ -625,7 +625,7 @@ compileCode = \case
         ]
     doOps ops <$> compileCode first
 
-  SRC.Case scrut arms -> do
+  SRC.Match scrut arms -> do
     case reverse arms of
       [] -> error "match expression with no arms: should not be allowed by syntax"
       lastArm:armsR -> do

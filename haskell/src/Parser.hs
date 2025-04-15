@@ -298,7 +298,7 @@ gram6 = program where
     posElse <- position
     key "else"
     e <- exp
-    pure (AST.Case pos i [AST.Arm posThen cTrue [] t, AST.Arm posElse cFalse [] e ])
+    pure (AST.Match pos i [AST.Arm posThen cTrue [] t, AST.Arm posElse cFalse [] e ])
 
   abstraction = do
     key "fun"
@@ -321,7 +321,7 @@ gram6 = program where
     e <- exp
     key "with"
     as <- many arm
-    pure (AST.Case pos e as)
+    pure (AST.Match pos e as)
 
   expITE = alts
     [ infixWeakestPrecendence

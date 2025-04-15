@@ -40,7 +40,7 @@ data Code
   | Tail Ref Position Ref
   | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
-  | Case Ref [Arm]
+  | Match Ref [Arm]
 
 data Arm = ArmTag Position Ctag [(Id,Temp)] Code
 
@@ -103,7 +103,7 @@ prettyC = \case
     ("let k = " ++ show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " ->")
     >>> prettyC later ++> " in"
     ++ prettyC first
-  Case scrut arms ->
+  Match scrut arms ->
     "match " <++ [show scrut] ++> " with"
     ++ concat (map prettyArm arms)
 
@@ -198,7 +198,7 @@ evalCode genv env = \case
     evalCode genv env first $ \v1 -> do
       let env' = mkFrameEnv firstFrameIndexForContinuations genv env pre
       evalCode genv (insert x v1 env') later k
-  Case scrut arms0 -> \k -> do
+  Match scrut arms0 -> \k -> do
     case (look env scrut) of
       VCons (Ctag _ tagActual) vArgs -> do
         let
@@ -284,9 +284,9 @@ compileCtop = compileC firstTempIndex
         later <- compileCtop (Map.insert x xRef cenv) later
         pure $ PushContinuation pre post (xRef,later) first
 
-      SRC.Case scrut arms -> do
+      SRC.Match scrut arms -> do
         arms <- mapM compileArm arms
-        pure $ Case (compileV cenv scrut) arms
+        pure $ Match (compileV cenv scrut) arms
 
       where
         compileArm :: SRC.Arm -> M Arm

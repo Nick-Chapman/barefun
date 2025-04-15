@@ -29,7 +29,7 @@ data Exp
   | RecLam Position Bid Bid Exp
   | App Exp Position Exp
   | Let Position Bid Exp Exp
-  | Case Position Exp [Arm] -- TODO: rename Match to match ocaml-style syntax
+  | Match Position Exp [Arm]
 
 data Arm = Arm Position Cid [Bid] Exp
 data Literal = LitC Char | LitN Number | LitS String
@@ -77,7 +77,7 @@ pretty = \case
   RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
   Let _ x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
-  Case _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
+  Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
 prettyArm (Arm _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
@@ -151,7 +151,7 @@ eval env@Env{venv,cenv} = \case
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval (insert x v1 env) e2 k
-  Case _ e arms0 -> \k -> do
+  Match _ e arms0 -> \k -> do
     eval env e $ \case
       VCons tagActual vArgs -> do
         let

@@ -30,7 +30,7 @@ data Exp
   | RecLam Position Id Id Exp
   | App Exp Position Exp
   | Let Position Id Exp Exp
-  | Case Position Exp [Arm]
+  | Match Position Exp [Arm]
 
 data Arm = ArmTag Position Ctag [Id] Exp
 
@@ -55,7 +55,7 @@ sizeExp = \case
   RecLam _ _ _ body -> 2 + sizeExp body
   App e1 _ e2 -> sizeExp e1 + sizeExp e2
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
-  Case _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
+  Match _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
 
 ----------------------------------------------------------------------
 -- provenance
@@ -71,7 +71,7 @@ provenanceExp = \case
   Let pos _ _ _ -> ("uLET", Just pos)
   Prim pos _ _ -> ("prim", Just pos)
   RecLam pos _ _ _ -> ("reclam",Just pos)
-  Case pos _ _ -> ("case",Just pos)
+  Match pos _ _ -> ("case",Just pos)
 
 ----------------------------------------------------------------------
 -- Show
@@ -95,7 +95,7 @@ pretty = \case
   RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
   Let _ x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
-  Case _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
+  Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
 prettyArm :: Arm -> Lines
 prettyArm (ArmTag _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
@@ -174,7 +174,7 @@ eval env@Env{venv} = \case
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k
-  Case _ e arms0 -> \k -> do
+  Match _ e arms0 -> \k -> do
     eval env e $ \case
       VCons (Ctag _ tagActual) vArgs -> do
         let
@@ -241,7 +241,7 @@ trans cenv = \case
   SRC.Let pos x rhs body -> do
     let (x',cenv1) = posProp x cenv
     Let pos x' (trans cenv rhs) (trans cenv1 body)
-  SRC.Case p scrut arms -> Case p (trans cenv scrut) (map transArm arms)
+  SRC.Match p scrut arms -> Match p (trans cenv scrut) (map transArm arms)
     where
       transArm :: SRC.Arm -> Arm
       transArm (SRC.Arm pos cid xs e) = do

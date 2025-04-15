@@ -30,7 +30,7 @@ data Code
   | Tail Val Position Val
   | LetAtomic Id Atomic Code
   | PushContinuation Fvs (Id,Code) Code
-  | Case Val [Arm]
+  | Match Val [Arm]
 
 data Arm = ArmTag Position Ctag [Id] Code
 
@@ -72,7 +72,7 @@ pretty = \case
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
   LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ pretty body
   PushContinuation fvs (x,later) first -> indented ("let k " ++ show fvs ++ " " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
-  Case scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
+  Match scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
 
 prettyA :: Atomic -> Lines
 prettyA = \case
@@ -119,7 +119,7 @@ evalCode env = \case
   PushContinuation fvs (x,later) first -> \k -> ITick I.PushContinuation $ do
     evalCode env first $ \v1 -> do
       evalCode (insert x v1 (limit fvs env)) later k
-  Case scrut arms0 -> \k -> do
+  Match scrut arms0 -> \k -> do
     case (evalV scrut) of
       VCons (Ctag _ tagActual) vArgs -> do
         let
@@ -224,10 +224,10 @@ compileExp = \case
     compileExp rhs $ \rhs -> do
       body <- compileExp body k >>= nameAtomic
       pure $ Compound $ mkBind x rhs body
-  SRC.Case _pos scrut arms -> \k -> do
+  SRC.Match _pos scrut arms -> \k -> do
     compileAsId scrut $ \scrut -> do
       arms <- mapM compileArm arms
-      k $ Compound $ Case scrut arms
+      k $ Compound $ Match scrut arms
 
 compileArm :: SRC.Arm -> M Arm
 compileArm (SRC.ArmTag pos tag xs exp) = do
@@ -307,7 +307,7 @@ fvs = \case
   Tail x1 _ x2 -> Set.unions [fvsV x1,fvsV x2]
   LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
   PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
-  Case scrut arms -> fvsV scrut `union` Set.unions (map fvsArm arms)
+  Match scrut arms -> fvsV scrut `union` Set.unions (map fvsArm arms)
   where
     fvsArm (ArmTag _pos _cid xs exp) = fvs exp \\ Set.fromList xs
 

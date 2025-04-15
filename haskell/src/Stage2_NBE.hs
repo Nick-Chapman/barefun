@@ -155,7 +155,7 @@ reflect env = \case
         body <- norm (Map.insert x (syn x') env) body
         pure $ Syntax $ Let p x' rhs body
 
-  Case pos scrut arms -> do
+  Match pos scrut arms -> do
     scrut <- reflect env scrut
     case (enabled,scrut) of
       -- (4) Normalize: Constant Branch Selection
@@ -166,7 +166,7 @@ reflect env = \case
       _ -> do
         scrut <- reify scrut
         arms <- mapM (normArm env) arms
-        pure $ Syntax $ Case pos scrut arms
+        pure $ Syntax $ Match pos scrut arms
 
 caseSelect :: Ctag -> [SemValue] -> Env -> [Arm] -> M SemValue
 caseSelect tag vs env arms = do
