@@ -540,8 +540,8 @@ finalCodeLabel = CodeLabel 0 "FINAL"
 ----------------------------------------------------------------------
 -- Compile
 
-compile :: SRC.Loadable -> Transformed
-compile x = runAsm (compileLoadable x >>= CutCode "Start")
+compile :: SRC.Image -> Transformed
+compile x = runAsm (compileImage x >>= CutCode "Start")
 
 -- Calling conventions:
 frameReg,argReg,contReg :: Reg
@@ -551,14 +551,14 @@ argReg = Dx
 contReg = Cx
 -- TODO: idea: use remaining regs for temps 1,2... etc
 
-compileLoadable :: SRC.Loadable -> Asm Code
-compileLoadable = \case
+compileImage :: SRC.Image -> Asm Code
+compileImage = \case
   SRC.Run code -> compileCode code
   SRC.LetTop (_,g) rhs body -> do
     let lab = DataLabel g
     vals <- compileTopDef lab rhs
     CutData lab vals
-    compileLoadable body
+    compileImage body
 
 compileTopDef :: DataLabel -> SRC.Top -> Asm [Val]
 compileTopDef lab = \case

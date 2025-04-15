@@ -1,6 +1,6 @@
 -- | Locate identifier references at runtime; lift globals
 module Stage4_CCF
-  ( Loadable(..), Top(..), Code(..), Atomic(..), Arm(..), Ref(..), Location(..), Global(..), Temp(..)
+  ( Image(..), Top(..), Code(..), Atomic(..), Arm(..), Ref(..), Location(..), Global(..), Temp(..)
   , execute
   , compile
   ) where
@@ -21,18 +21,17 @@ import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(..))
 import qualified Stage3_ANF as SRC (Code(..),Atomic(..),Val(..),Arm(..), fvs)
 
-type Transformed = Loadable
+type Transformed = Image
 
--- TODO: Think of better names for Loadable/Top
-
-data Loadable -- like Code, but executed at loadtime
+data Image
   = Run Code
-  | LetTop (Id,Global) Top Loadable
+  | LetTop (Id,Global) Top Image
 
-data Top -- like Atomic, but executed at loadtime
+-- A top level expression corresponds to global/static data
+data Top
   = TopLitS String
   | TopPrim Builtin [Ref]
-  | TopLam Ref Code -- all top function defs allow recursion. we dont even have an unrecursive form
+  | TopLam Ref Code -- All top function defs allow recursion. We dont even have an unrecursive form.
   | TopConApp Ctag [Ref]
 
 data Code
@@ -47,7 +46,7 @@ data Arm = ArmTag Position Ctag [(Id,Temp)] Code
 data Atomic
   = Prim Builtin [Ref]
   | ConApp Ctag [Ref]
-  | Lam [Ref] [Ref] Ref Code -- TODO: why do we have an unrecursive form here?
+  | Lam [Ref] [Ref] Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code
 
 data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg deriving (Eq,Ord)
@@ -74,9 +73,9 @@ maxTempIndex = 35
 ----------------------------------------------------------------------
 -- Show
 
-instance Show Loadable where show = intercalate "\n" . ("let k () = ()":) . prettyL
+instance Show Image where show = intercalate "\n" . ("let k () = ()":) . prettyL
 
-prettyL :: Loadable -> Lines
+prettyL :: Image -> Lines
 prettyL = \case
   Run code -> prettyC code
   LetTop (_,g) rhs body ->
@@ -158,20 +157,20 @@ instance Show Temp where
 -- Execute
 
 execute :: Transformed -> Interaction
-execute = evalLoadable0
+execute = evalImage0
 
-evalLoadable0 :: Loadable -> Interaction
-evalLoadable0 exp = do
+evalImage0 :: Image -> Interaction
+evalImage0 exp = do
   -- All global defs may mutually recurse; we tie the knot for gev here.
-  let (code,genv) = evalLoadable genv env0 exp
+  let (code,genv) = evalImage genv env0 exp
   evalCode genv genv code $ \v -> case deUnit v of () -> IDone
 
-evalLoadable :: Env -> Env -> Loadable -> (Code,Env)
-evalLoadable genv env = \case
+evalImage :: Env -> Env -> Image -> (Code,Env)
+evalImage genv env = \case
   Run code -> (code,env)
   LetTop (x,g) top body -> do
     let env' = insert (Ref x (InGlobal g)) (evalT genv top) env
-    evalLoadable genv env' body
+    evalImage genv env' body
 
 look :: Env -> Ref -> Value
 look Env{venv} = \case
@@ -380,13 +379,13 @@ instance Monad M where (>>=) = Bind
 data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
-  Wrap :: (Loadable -> Loadable) -> M b -> M b
+  Wrap :: (Image -> Image) -> M b -> M b
   GlobalRef :: M Global
 
-runM :: M Loadable -> Loadable
+runM :: M Image -> Image
 runM m0 = loop firstGlobalIndex m0 $ \_ x -> x
   where
-    loop :: Int -> M a -> (Int -> a -> Loadable) -> Loadable
+    loop :: Int -> M a -> (Int -> a -> Image) -> Image
     loop u m k = case m of
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
