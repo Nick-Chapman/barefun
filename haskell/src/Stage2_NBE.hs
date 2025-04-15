@@ -6,9 +6,9 @@ import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Interaction (Interaction)
 import Par4 (Position(..))
-import Stage0_AST (Literal(..),evalLit)
+import Stage0_AST (Literal(..))
 import Stage1_EXP (Exp(..),Arm(..),Id(..),Ctag(..))
-import Value (Value(..))
+import Value (Value(..),Number)
 import qualified Data.Map as Map
 import qualified Stage1_EXP as SRC
 
@@ -37,11 +37,30 @@ norm env e =
 data SemValue
   = Syntax Exp
   | Macro Id (SemValue -> M SemValue)
-  | Constant Position Value -- only base values here
+  | Constant Position BaseValue
   | Constructed Position Ctag [SemValue]
 
--- TODO: Have locally defined type for BaseValue.
--- This wont allow values for which a constant is not possible to construct.i.e. VFunc and VBytes
+data BaseValue -- should BaseValue contain the Position infi?
+  = BVString String
+  | BVChar Char
+  | BVNum Number
+  | BVCons Ctag [BaseValue]
+
+ofBV :: BaseValue -> Value
+ofBV = \case
+  BVString s -> VString s
+  BVNum n -> VNum n
+  BVChar n -> VChar n
+  BVCons tag bvs -> VCons tag (map ofBV bvs)
+
+toBV :: Value -> BaseValue
+toBV = \case
+  VString s -> BVString s
+  VNum n -> BVNum n
+  VChar n -> BVChar n
+  VCons tag vs -> BVCons tag (map toBV vs)
+  -- A Pure builtin should never return a non base value
+  v -> error (show ("toBV",v))
 
 posOfId :: Id -> Position
 posOfId = \case Id{pos} -> pos
@@ -49,25 +68,19 @@ posOfId = \case Id{pos} -> pos
 syn :: Id -> SemValue
 syn x = Syntax (Var (posOfId x) x)
 
-reifyValue :: Position -> Value -> Exp
-reifyValue pos = \case
-  VNum n -> Lit pos (LitN n)
-  VChar c -> Lit pos (LitC c)
-  VString s -> Lit pos (LitS s)
-  VCons tag vs -> undefined $ do -- TODO provoke or remove
-    let es = map (reifyValue pos) vs
-    ConTag pos tag es
-  v@VBytes{} ->
-    error (show ("refifyValue",pos,v))
-  v@VFunc{} ->
-    error (show ("refifyValue",pos,v))
+reifyBaseValue :: Position -> BaseValue -> Exp
+reifyBaseValue pos = \case
+  BVNum n -> Lit pos (LitN n)
+  BVChar c -> Lit pos (LitC c)
+  BVString s -> Lit pos (LitS s)
+  BVCons tag bvs -> ConTag pos tag (map (reifyBaseValue pos) bvs)
 
 reify :: SemValue -> M Exp
 reify = \case
   Constructed pos tag args -> do
     es <- mapM reify args
     pure $ ConTag pos tag es
-  Constant pos v -> pure (reifyValue pos v)
+  Constant pos bv -> pure (reifyBaseValue pos bv)
   Syntax e -> pure e
   Macro x f -> do
     x <- fresh x
@@ -102,7 +115,7 @@ apply fun p arg = do
       arg <- reify arg
       pure $ Syntax (App fun p arg)
 
-maybeAllConstant :: [SemValue] -> Maybe [Value]
+maybeAllConstant :: [SemValue] -> Maybe [BaseValue]
 maybeAllConstant svs = do
   let vs = [ v | Constant _ v <- svs ]
   if length vs == length svs then Just vs else Nothing
@@ -111,18 +124,24 @@ reflectBuiltin :: Position -> Builtin -> [SemValue] -> M SemValue
 reflectBuiltin pos b es = do
   case (enabled && isPure b, maybeAllConstant es) of
     -- (2) Normalize: Constant Propogation
-    (True, Just vs) -> do
-      pure $ Constant pos (evaluatePureBuiltin b vs)
+    (True, Just bvs) -> do
+      pure $ Constant pos (toBV (evaluatePureBuiltin b (map ofBV bvs)))
     _ -> do
       es <- mapM reify es
       pure $ Syntax $ Prim pos b es
+
+reflectLit :: Literal -> BaseValue
+reflectLit = \case
+  LitC c -> BVChar c
+  LitN n -> BVNum n
+  LitS s -> BVString s
 
 reflect :: Env -> Exp -> M SemValue
 reflect env = \case
   Var _pos x -> do
     pure (look env x)
   Lit pos x -> do
-    pure $ Constant pos (evalLit x)
+    pure $ Constant pos (reflectLit x)
   ConTag pos tag args -> do
     args <- mapM (reflect env) args
     pure $ Constructed pos tag args
@@ -159,7 +178,7 @@ reflect env = \case
     case (enabled,scrut) of
       -- (4) Normalize: Constant Branch Selection
       (True,Constructed _ tag args) -> caseSelect tag args env arms
-      (True,Constant pos (VCons tag vs)) -> caseSelect tag (map (Constant pos) vs) env arms
+      (True,Constant pos (BVCons tag vs)) -> caseSelect tag (map (Constant pos) vs) env arms
       (_,Constant{}) -> error "reflect: case-scrut a non-constucted constant"
       (_,Macro{}) -> error "reflect: case-scrut a function"
       _ -> do
