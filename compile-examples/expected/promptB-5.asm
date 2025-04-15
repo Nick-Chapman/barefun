@@ -7,17 +7,17 @@ L1: ; Arm: 9'27
 
 L2: ; Function: t3
   call Bare_get_char
-  mov [1], ax
-  mov ax, [1]
-  call Bare_put_char
   mov [2], ax
-  mov ax, [1]
-  cmp ax, '\n'
+  mov ax, [2]
+  call Bare_put_char
+  mov [4], ax
+  mov ax, [2]
+  cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [3], ax
-  mov bx, [3]
-  cmp [bx], 1
-  bz L1
+  mov [6], ax
+  mov bx, [6]
+  cmp word [bx], 1
+  jz L1
   ;; (9'51) Tail: inner (me) @ con_9'51 (g3)
   mov bp, bp
   mov dx, g3
@@ -27,15 +27,15 @@ L2: ; Function: t3
 L3: ; Function: g1
   mov ax, dx
   call Bare_put_char
-  mov [1], ax
+  mov [2], ax
   mov ax, ' '
   call Bare_put_char
-  mov [2], ax
+  mov [4], ax
   push dx
   push L2
-  mov [3], sp
+  mov [6], sp
   ;; (11'7) Tail: inner (t3) @ con_11'7 (g4)
-  mov bp, [3]
+  mov bp, [6]
   mov dx, g4
   mov ax, [bp]
   jmp ax

@@ -8,9 +8,9 @@ L1: ; Function: t1
 L2: ; Function: g1
   push dx
   push L1
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_4'31 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -27,9 +27,9 @@ L3: ; Arm: 8'7
 L4: ; Continuation
   mov ax, 1
   add ax, dx
-  mov [1], ax
+  mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -37,18 +37,18 @@ L4: ; Continuation
 
 L5: ; Function: g2
   mov bx, dx
-  cmp [bx], 0
-  bz L3
+  cmp word [bx], 0
+  jz L3
   mov ax, [bx+1]
-  mov [1], ax
-  mov ax, [bx+2]
   mov [2], ax
+  mov ax, [bx+2]
+  mov [4], ax
   push cx
   push L4
   mov cx, sp
   ;; (9'27) Tail: length (g2) @ xs (t2)
   mov bp, g2
-  mov dx, [2]
+  mov dx, [4]
   mov ax, [bp]
   jmp ax
 
@@ -71,27 +71,27 @@ L7: ; Continuation
 
 L8: ; Function: t1
   mov bx, dx
-  cmp [bx], 0
-  bz L6
+  cmp word [bx], 0
+  jz L6
   mov ax, [bx+1]
-  mov [1], ax
-  mov ax, [bx+2]
   mov [2], ax
+  mov ax, [bx+2]
+  mov [4], ax
   mov ax, [bp+1]
   mov bx, [bp+2]
-  mov si, [1]
+  mov si, [2]
   call Bare_set_bytes
-  mov [3], ax
+  mov [6], ax
   mov ax, [bp+2]
   add ax, 1
-  mov [4], ax
-  push [2]
+  mov [8], ax
+  push [4]
   push cx
   push L7
   mov cx, sp
   ;; (16'37) Tail: loop (f3) @ prim_0'0 (t4)
   mov bp, [bp+3]
-  mov dx, [4]
+  mov dx, [8]
   mov ax, [bp]
   jmp ax
 
@@ -100,9 +100,9 @@ L9: ; Function: t2
   push dx
   push [bp+1]
   push L8
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_13'17 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -111,9 +111,9 @@ L9: ; Function: t2
 L10: ; Continuation
   mov ax, [bp+2]
   call Bare_freeze_bytes
-  mov [1], ax
+  mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -135,17 +135,17 @@ L11: ; Continuation
 L12: ; Continuation
   mov ax, dx
   call Bare_make_bytes
-  mov [1], ax
-  push [1]
+  mov [2], ax
+  push [2]
   push L9
-  mov [2], sp
-  push [1]
+  mov [4], sp
+  push [2]
   push [bp+2]
   push cx
   push L11
   mov cx, sp
   ;; (18'7) Tail: loop (t2) @ 0
-  mov bp, [2]
+  mov bp, [4]
   mov dx, 0
   mov ax, [bp]
   jmp ax
@@ -172,36 +172,36 @@ L14: ; Arm: 25'13
 L15: ; Continuation
   mov ax, [bp+2]
   sub ax, 1
-  mov [1], ax
+  mov [2], ax
   ;; (26'45) Tail: app_26'19 (arg) @ prim_0'0 (t1)
   mov bp, dx
-  mov dx, [1]
+  mov dx, [2]
   mov ax, [bp]
   jmp ax
 
 L16: ; Function: t1
   mov ax, dx
-  cmp ax, 0
+  cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [1], ax
-  mov bx, [1]
-  cmp [bx], 1
-  bz L14
+  mov [2], ax
+  mov bx, [2]
+  cmp word [bx], 1
+  jz L14
   mov ax, [bp+1]
   mov bx, dx
   call Bare_string_index
-  mov [2], ax
+  mov [4], ax
   push [bp+2]
-  push [2]
+  push [4]
   push 1
-  mov [3], sp
+  mov [6], sp
   push dx
   push cx
   push L15
   mov cx, sp
   ;; (26'19) Tail: explode_loop (f3) @ con_0'0 (t3)
   mov bp, [bp+3]
-  mov dx, [3]
+  mov dx, [6]
   mov ax, [bp]
   jmp ax
 
@@ -210,9 +210,9 @@ L17: ; Function: t1
   push dx
   push [bp+1]
   push L16
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_24'27 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -221,26 +221,26 @@ L17: ; Function: t1
 L18: ; Continuation
   mov ax, [bp+2]
   sub ax, 1
-  mov [1], ax
+  mov [2], ax
   ;; (28'18) Tail: app_28'15 (arg) @ prim_0'0 (t1)
   mov bp, dx
-  mov dx, [1]
+  mov dx, [2]
   mov ax, [bp]
   jmp ax
 
 L19: ; Function: g6
   push dx
   push L17
-  mov [1], sp
+  mov [2], sp
   mov ax, dx
   call Bare_string_length
-  mov [2], ax
-  push [2]
+  mov [4], ax
+  push [4]
   push cx
   push L18
   mov cx, sp
   ;; (28'15) Tail: explode_loop (t1) @ con_28'15 (g5)
-  mov bp, [1]
+  mov bp, [2]
   mov dx, g5
   mov ax, [bp]
   jmp ax
@@ -255,18 +255,18 @@ L20: ; Arm: 34'7
 
 L21: ; Function: g7
   mov bx, dx
-  cmp [bx], 0
-  bz L20
+  cmp word [bx], 0
+  jz L20
   mov ax, [bx+1]
-  mov [1], ax
-  mov ax, [bx+2]
   mov [2], ax
-  mov ax, [1]
+  mov ax, [bx+2]
+  mov [4], ax
+  mov ax, [2]
   call Bare_put_char
-  mov [3], ax
+  mov [6], ax
   ;; (35'39) Tail: put_chars (g7) @ xsMore (t2)
   mov bp, g7
-  mov dx, [2]
+  mov dx, [4]
   mov ax, [bp]
   jmp ax
 
@@ -289,28 +289,28 @@ L23: ; Continuation
 
 L24: ; Continuation
   push g10
-  push '\n'
-  push 1
-  mov [1], sp
-  push [1]
-  push 'o'
+  push `\n`
   push 1
   mov [2], sp
   push [2]
-  push 'w'
-  push 1
-  mov [3], sp
-  push [3]
-  push 'T'
+  push 'o'
   push 1
   mov [4], sp
+  push [4]
+  push 'w'
+  push 1
+  mov [6], sp
+  push [6]
+  push 'T'
+  push 1
+  mov [8], sp
   push [bp+3]
   push cx
   push L23
   mov cx, sp
   ;; (42'22) Tail: implode (f2) @ con_42'23 (t4)
   mov bp, [bp+2]
-  mov dx, [4]
+  mov dx, [8]
   mov ax, [bp]
   jmp ax
 
@@ -329,10 +329,10 @@ L25: ; Continuation
 L26: ; Continuation
   mov ax, 5
   call Bare_make_bytes
-  mov [1], ax
-  mov ax, [1]
-  call Bare_freeze_bytes
   mov [2], ax
+  mov ax, [2]
+  call Bare_freeze_bytes
+  mov [4], ax
   push [bp+3]
   push [bp+2]
   push cx
@@ -340,7 +340,7 @@ L26: ; Continuation
   mov cx, sp
   ;; (37'38) Tail: explode (f3) @ s (t2)
   mov bp, [bp+3]
-  mov dx, [2]
+  mov dx, [4]
   mov ax, [bp]
   jmp ax
 
@@ -397,7 +397,7 @@ g5: dw 0
 g6: dw L19
 g7: dw L21
 g8: dw 0
-g9: dw 1, 'O', g9+3, 1, 'n', g9+6, 1, 'e', g9+9, 1, '\n', g9+12, 0
+g9: dw 1, 'O', g9+3, 1, 'n', g9+6, 1, 'e', g9+9, 1, `\n`, g9+12, 0
 g10: dw 0
 
 bare_start: jmp L30

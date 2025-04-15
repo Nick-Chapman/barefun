@@ -1,12 +1,12 @@
 L1: ; Function: g1
   call Bare_get_char
-  mov [1], ax
-  mov ax, [1]
-  call Bare_put_char
   mov [2], ax
-  mov ax, [1]
+  mov ax, [2]
   call Bare_put_char
-  mov [3], ax
+  mov [4], ax
+  mov ax, [2]
+  call Bare_put_char
+  mov [6], ax
   ;; (7'13) Tail: mainloop (g1) @ con_7'13 (g3)
   mov bp, g1
   mov dx, g3

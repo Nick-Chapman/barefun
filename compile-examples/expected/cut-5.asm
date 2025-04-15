@@ -15,30 +15,30 @@ L2: ; Continuation
 
 L3: ; Function: t1
   mov ax, dx
-  cmp ax, 0
+  cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [1], ax
-  mov bx, [1]
-  cmp [bx], 1
-  bz L1
+  mov [2], ax
+  mov bx, [2]
+  cmp word [bx], 1
+  jz L1
   mov ax, dx
   call Bare_num_to_char
-  mov [2], ax
+  mov [4], ax
   push cx
   push L2
   mov cx, sp
   ;; (4'9) Tail: loop (g1) @ prim_0'0 (t2)
   mov bp, g1
-  mov dx, [2]
+  mov dx, [4]
   mov ax, [bp]
   jmp ax
 
 L4: ; Function: g1
   push dx
   push L3
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_2'17 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -47,9 +47,9 @@ L4: ; Function: g1
 L5: ; Continuation
   mov ax, dx
   call Bare_put_char
-  mov [1], ax
+  mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]

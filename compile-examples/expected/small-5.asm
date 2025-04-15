@@ -8,18 +8,18 @@ L1: ; Arm: 10'7
 
 L2: ; Function: g1
   mov bx, dx
-  cmp [bx], 0
-  bz L1
+  cmp word [bx], 0
+  jz L1
   mov ax, [bx+1]
-  mov [1], ax
-  mov ax, [bx+2]
   mov [2], ax
-  mov ax, [1]
+  mov ax, [bx+2]
+  mov [4], ax
+  mov ax, [2]
   call Bare_put_char
-  mov [3], ax
+  mov [6], ax
   ;; (11'39) Tail: put_chars (g1) @ xsMore (t2)
   mov bp, g1
-  mov dx, [2]
+  mov dx, [4]
   mov ax, [bp]
   jmp ax
 
@@ -34,45 +34,45 @@ L3: ; Arm: 4'13
 L4: ; Continuation
   mov ax, [bp+2]
   sub ax, 1
-  mov [1], ax
+  mov [2], ax
   ;; (5'45) Tail: app_5'19 (arg) @ prim_0'0 (t1)
   mov bp, dx
-  mov dx, [1]
+  mov dx, [2]
   mov ax, [bp]
   jmp ax
 
 L5: ; Function: t1
   mov ax, dx
-  cmp ax, 0
+  cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [1], ax
-  mov bx, [1]
-  cmp [bx], 1
-  bz L3
+  mov [2], ax
+  mov bx, [2]
+  cmp word [bx], 1
+  jz L3
   mov ax, g4
   mov bx, dx
   call Bare_string_index
-  mov [2], ax
+  mov [4], ax
   push [bp+1]
-  push [2]
+  push [4]
   push 1
-  mov [3], sp
+  mov [6], sp
   push dx
   push cx
   push L4
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g3) @ con_0'0 (t3)
   mov bp, g3
-  mov dx, [3]
+  mov dx, [6]
   mov ax, [bp]
   jmp ax
 
 L6: ; Function: g3
   push dx
   push L5
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -89,45 +89,45 @@ L7: ; Arm: 4'13
 L8: ; Continuation
   mov ax, [bp+2]
   sub ax, 1
-  mov [1], ax
+  mov [2], ax
   ;; (5'45) Tail: app_5'19 (arg) @ prim_0'0 (t1)
   mov bp, dx
-  mov dx, [1]
+  mov dx, [2]
   mov ax, [bp]
   jmp ax
 
 L9: ; Function: t1
   mov ax, dx
-  cmp ax, 0
+  cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [1], ax
-  mov bx, [1]
-  cmp [bx], 1
-  bz L7
+  mov [2], ax
+  mov bx, [2]
+  cmp word [bx], 1
+  jz L7
   mov ax, g8
   mov bx, dx
   call Bare_string_index
-  mov [2], ax
+  mov [4], ax
   push [bp+1]
-  push [2]
+  push [4]
   push 1
-  mov [3], sp
+  mov [6], sp
   push dx
   push cx
   push L8
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g7) @ con_0'0 (t3)
   mov bp, g7
-  mov dx, [3]
+  mov dx, [6]
   mov ax, [bp]
   jmp ax
 
 L10: ; Function: g7
   push dx
   push L9
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -152,32 +152,32 @@ L12: ; Continuation
 
 L13: ; Function: t1
   mov bx, dx
-  cmp [bx], 0
-  bz L11
+  cmp word [bx], 0
+  jz L11
   mov ax, [bx+1]
-  mov [1], ax
-  mov ax, [bx+2]
   mov [2], ax
+  mov ax, [bx+2]
+  mov [4], ax
   push [bp+1]
-  push [1]
-  push 1
-  mov [3], sp
   push [2]
+  push 1
+  mov [6], sp
+  push [4]
   push cx
   push L12
   mov cx, sp
   ;; (19'27) Tail: revloop (g12) @ con_0'0 (t3)
   mov bp, g12
-  mov dx, [3]
+  mov dx, [6]
   mov ax, [bp]
   jmp ax
 
 L14: ; Function: g12
   push dx
   push L13
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_16'22 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -193,9 +193,9 @@ L15: ; Continuation
   jmp ax
 
 L16: ; Arm: 29'27
-  mov ax, '\n'
+  mov ax, `\n`
   call Bare_put_char
-  mov [3], ax
+  mov [6], ax
   push dx
   push cx
   push L15
@@ -208,31 +208,31 @@ L16: ; Arm: 29'27
 
 L17: ; Function: g10
   call Bare_get_char
-  mov [1], ax
-  mov ax, [1]
-  cmp ax, '\n'
-  call Bare_make_bool_from_z
   mov [2], ax
-  mov bx, [2]
-  cmp [bx], 1
-  bz L16
-  mov ax, [1]
+  mov ax, [2]
+  cmp word ax, `\n`
+  call Bare_make_bool_from_z
+  mov [4], ax
+  mov bx, [4]
+  cmp word [bx], 1
+  jz L16
+  mov ax, [2]
   call Bare_put_char
-  mov [3], ax
+  mov [6], ax
   push dx
-  push [1]
+  push [2]
   push 1
-  mov [4], sp
+  mov [8], sp
   ;; (30'33) Tail: readloop (g10) @ con_0'0 (t4)
   mov bp, g10
-  mov dx, [4]
+  mov dx, [8]
   mov ax, [bp]
   jmp ax
 
 L18: ; Continuation
-  mov ax, '\n'
+  mov ax, `\n`
   call Bare_put_char
-  mov [1], ax
+  mov [2], ax
   ;; (40'10) Tail: mainloop (g6) @ con_40'10 (g15)
   mov bp, g6
   mov dx, g15
@@ -300,45 +300,45 @@ L24: ; Arm: 4'13
 L25: ; Continuation
   mov ax, [bp+2]
   sub ax, 1
-  mov [1], ax
+  mov [2], ax
   ;; (5'45) Tail: app_5'19 (arg) @ prim_0'0 (t1)
   mov bp, dx
-  mov dx, [1]
+  mov dx, [2]
   mov ax, [bp]
   jmp ax
 
 L26: ; Function: t1
   mov ax, dx
-  cmp ax, 0
+  cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [1], ax
-  mov bx, [1]
-  cmp [bx], 1
-  bz L24
+  mov [2], ax
+  mov bx, [2]
+  cmp word [bx], 1
+  jz L24
   mov ax, g17
   mov bx, dx
   call Bare_string_index
-  mov [2], ax
+  mov [4], ax
   push [bp+1]
-  push [2]
+  push [4]
   push 1
-  mov [3], sp
+  mov [6], sp
   push dx
   push cx
   push L25
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g16) @ con_0'0 (t3)
   mov bp, g16
-  mov dx, [3]
+  mov dx, [6]
   mov ax, [bp]
   jmp ax
 
 L27: ; Function: g16
   push dx
   push L26
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -355,45 +355,45 @@ L28: ; Arm: 4'13
 L29: ; Continuation
   mov ax, [bp+2]
   sub ax, 1
-  mov [1], ax
+  mov [2], ax
   ;; (5'45) Tail: app_5'19 (arg) @ prim_0'0 (t1)
   mov bp, dx
-  mov dx, [1]
+  mov dx, [2]
   mov ax, [bp]
   jmp ax
 
 L30: ; Function: t1
   mov ax, dx
-  cmp ax, 0
+  cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [1], ax
-  mov bx, [1]
-  cmp [bx], 1
-  bz L28
+  mov [2], ax
+  mov bx, [2]
+  cmp word [bx], 1
+  jz L28
   mov ax, g21
   mov bx, dx
   call Bare_string_index
-  mov [2], ax
+  mov [4], ax
   push [bp+1]
-  push [2]
+  push [4]
   push 1
-  mov [3], sp
+  mov [6], sp
   push dx
   push cx
   push L29
   mov cx, sp
   ;; (5'19) Tail: explode_loop (g20) @ con_0'0 (t3)
   mov bp, g20
-  mov dx, [3]
+  mov dx, [6]
   mov ax, [bp]
   jmp ax
 
 L31: ; Function: g20
   push dx
   push L30
-  mov [1], sp
+  mov [2], sp
   ;; (0'0) Return: lam_3'27 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -499,7 +499,7 @@ L41: ; Start
 g1: dw L2
 g2: dw 0
 g3: dw L6
-g4: dw 1, 'L', g4+3, 1, 'O', g4+6, 1, 'A', g4+9, 1, 'D', g4+12, 1, '\n', g4+15, 0
+g4: dw 1, 'L', g4+3, 1, 'O', g4+6, 1, 'A', g4+9, 1, 'D', g4+12, 1, `\n`, g4+15, 0
 g5: dw 0
 g6: dw L23
 g7: dw L10
@@ -512,11 +512,11 @@ g13: dw 0
 g14: dw 0
 g15: dw 0
 g16: dw L27
-g17: dw 1, 'R', g17+3, 1, 'U', g17+6, 1, 'N', g17+9, 1, '\n', g17+12, 0
+g17: dw 1, 'R', g17+3, 1, 'U', g17+6, 1, 'N', g17+9, 1, `\n`, g17+12, 0
 g18: dw 0
 g19: dw 0
 g20: dw L31
-g21: dw 1, 'N', g21+3, 1, 'E', g21+6, 1, 'V', g21+9, 1, 'E', g21+12, 1, 'R', g21+15, 1, '\n', g21+18, 0
+g21: dw 1, 'N', g21+3, 1, 'E', g21+6, 1, 'V', g21+9, 1, 'E', g21+12, 1, 'R', g21+15, 1, `\n`, g21+18, 0
 g22: dw 0
 
 bare_start: jmp L41

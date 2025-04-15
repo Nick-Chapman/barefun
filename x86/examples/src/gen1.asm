@@ -92,57 +92,122 @@ top_of_memory equ 0
 
 begin:
     mov sp, top_of_memory
-    call Base_clear_screen
+    mov cx, final_continuation
+    call Bare_clear_screen
     jmp bare_start
 
 
-;; These could be macros...
-Base_clear_screen:
+final_continuation:
+    dw final_code
+
+final_code:
+    ;; TODO: print halt here. better still. quit the emulator
+    mov ax, 'F'
+    call Bare_put_char
+spin:
+    jmp spin
+
+;;; These could be macros...
+Bare_clear_screen:
     mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
     int 0x10
     ret
 
+CR equ 13
+LF equ 10
+
+;;; Read a key press (Converting CR to LF)
+Bare_get_char: ; -> ax
+    mov ah, 0
+    int 0x16
+    mov ah, 0
+    cmp ax, CR
+    jz .cr
+    ret
+.cr:
+    mov ax, LF
+    ret
+
+;;; Print to the screen (Converting LF to CR/LF)
+
 Bare_put_char: ; al->
+    cmp ax, LF
+    jnz .normal
+    mov al, CR
+    call .normal
+    mov al, LF
+.normal:
     mov ah, 0x0e ; Function: Teletype output
     mov bh, 0
     int 0x10
     mov ax, 0x77 ; splat so we can be sure we saved
     ret
 
-Bare_get_char: ; -> ax
-    mov ah, 0
-    int 0x16
-    mov ah, 0
+Bare_make_bool_from_z:
+    jz .yes
+.no:
+    mov ax, False
+    ret
+.yes:
+    mov ax, True
     ret
 
+False: dw 0
+True: dw 1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;(insert-file "~/code/barefun/compile-examples/expected/tiny-5.asm")
-
-L1: ; Function: g1
-  call Bare_get_char
-  mov [1], ax
-  mov ax, [1]
-  call Bare_put_char
-  mov [2], ax
-  mov ax, [1]
-  call Bare_put_char
-  mov [3], ax
-  ;; (7'13) Tail: mainloop (g1) @ con_7'13 (g3)
-  mov bp, g1
-  mov dx, g3
-  mov ax, [bp]
-  jmp ax
-
-L2: ; Start
-  ;; (0'0) Tail: mainloop (g1) @ con_0'0 (g4)
+L1: ; Arm: 10'29
+  ;; (10'40) Tail: outer (g1) @ con_10'40 (g4)
   mov bp, g1
   mov dx, g4
   mov ax, [bp]
   jmp ax
 
-g1: dw L1
-g2: dw 0
+L2: ; Function: g2
+  call Bare_get_char
+  mov [2], ax
+  mov ax, [2]
+  call Bare_put_char
+  mov [4], ax
+  mov ax, [2]
+  cmp word ax, `\n`
+  call Bare_make_bool_from_z
+  mov [6], ax
+  mov bx, [6]
+  cmp word [bx], 1
+  jz L1
+  ;; (10'54) Tail: inner (g2) @ con_10'54 (g5)
+  mov bp, g2
+  mov dx, g5
+  mov ax, [bp]
+  jmp ax
+
+L3: ; Function: g1
+  mov ax, '%'
+  call Bare_put_char
+  mov [2], ax
+  mov ax, ' '
+  call Bare_put_char
+  mov [4], ax
+  ;; (12'9) Tail: inner (g2) @ con_12'9 (g6)
+  mov bp, g2
+  mov dx, g6
+  mov ax, [bp]
+  jmp ax
+
+L4: ; Start
+  ;; (13'11) Tail: outer (g1) @ con_13'11 (g7)
+  mov bp, g1
+  mov dx, g7
+  mov ax, [bp]
+  jmp ax
+
+g1: dw L3
+g2: dw L2
 g3: dw 0
 g4: dw 0
+g5: dw 0
+g6: dw 0
+g7: dw 0
 
-bare_start: jmp L2
+bare_start: jmp L4

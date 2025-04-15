@@ -129,8 +129,8 @@ instance Show Op where
     OpStore a r -> "mov [" ++ show a ++ "], " ++ show r
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push " ++ show src
-    OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
-    OpBranchFlagZ lab ->  "bz " ++ show lab
+    OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
+    OpBranchFlagZ lab ->  "jz " ++ show lab
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulInto r src -> "mul " ++ show r ++ ", " ++ show src
@@ -154,7 +154,8 @@ instance Show Source where
 
 instance Show Word where
   show = \case
-    WChar c -> show c
+    -- nasm requires backticks around escape sequences
+    WChar c -> if c == '\n' then "`\\n`" else show c
     WNum n -> show n
     WAddr a -> show a
     WCodeLabel lab -> show lab
@@ -171,7 +172,7 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical n -> show n
+    Physical n -> show (2*n) -- TODO super hacky place to fix the 2bytes/word
     Symbolic d 0 -> printf "%s" (show d)
     Symbolic d n -> printf "%s+%d" (show d) n
 
@@ -512,6 +513,8 @@ instance Show State where
 -- Address for User Temps: 1..30
 -- Address for runtime system constants: 90,91,92
 
+-- TODO: we need to multiple by the #bytes/word for physical address
+-- ie. temps should be at 0,2,4.. etc on a 16 bitarch
 tempOffset :: Int -> Addr
 tempOffset n = Physical n
 

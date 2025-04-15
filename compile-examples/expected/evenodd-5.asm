@@ -16,37 +16,37 @@ L2: ; Arm: 3'26
 
 L3: ; Function: g1
   mov ax, dx
-  cmp ax, 0
+  cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [1], ax
-  mov bx, [1]
-  cmp [bx], 1
-  bz L1
+  mov [2], ax
+  mov bx, [2]
+  cmp word [bx], 1
+  jz L1
   mov ax, dx
   sub ax, 1
-  mov [2], ax
-  mov ax, [2]
-  cmp ax, 0
-  call Bare_make_bool_from_z
-  mov [3], ax
-  mov bx, [3]
-  cmp [bx], 1
-  bz L2
-  mov ax, [2]
-  sub ax, 1
   mov [4], ax
+  mov ax, [4]
+  cmp word ax, 0
+  call Bare_make_bool_from_z
+  mov [6], ax
+  mov bx, [6]
+  cmp word [bx], 1
+  jz L2
+  mov ax, [4]
+  sub ax, 1
+  mov [8], ax
   ;; (3'50) Tail: is_even (g1) @ prim_0'0 (t4)
   mov bp, g1
-  mov dx, [4]
+  mov dx, [8]
   mov ax, [bp]
   jmp ax
 
 L4: ; Continuation
   mov ax, dx
   call Bare_put_char
-  mov [1], ax
+  mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
-  mov dx, [1]
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -65,8 +65,8 @@ L6: ; Continuation
   push L4
   mov cx, sp
   mov bx, dx
-  cmp [bx], 1
-  bz L5
+  cmp word [bx], 1
+  jz L5
   ;; (8'39) Return: 'O'
   mov dx, 'O'
   mov bp, cx
@@ -77,7 +77,7 @@ L6: ; Continuation
 L7: ; Continuation
   mov ax, dx
   call Bare_put_char
-  mov [1], ax
+  mov [2], ax
   push cx
   push L6
   mov cx, sp
@@ -100,8 +100,8 @@ L9: ; Continuation
   push L7
   mov cx, sp
   mov bx, dx
-  cmp [bx], 1
-  bz L8
+  cmp word [bx], 1
+  jz L8
   ;; (8'39) Return: 'O'
   mov dx, 'O'
   mov bp, cx
