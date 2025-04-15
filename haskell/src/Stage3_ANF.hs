@@ -20,8 +20,8 @@ import Value (Value(..),deUnit,Number)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (toList,fromList,unions,empty)
 import qualified Interaction as I (Tickable(..))
-import qualified Stage1_EXP as SRC
 import qualified Stage0_AST as SRC (Literal(..))
+import qualified Stage1_EXP as SRC
 
 type Transformed = Code
 
@@ -121,7 +121,7 @@ evalCode env = \case
       evalCode (insert x v1 (limit fvs env)) later k
   Case scrut arms0 -> \k -> do
     case (evalV scrut) of
-      VCons tagActual vArgs -> do
+      VCons (Ctag _ tagActual) vArgs -> do
         let
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
@@ -140,7 +140,7 @@ evalCode env = \case
     evalA = \case
       LitS _ s -> \k -> k (VString s)
       Prim _ b vs -> \k -> ITick I.Prim $ executeBuiltin b (map evalV vs) k
-      ConTag _ (Ctag _ tag) vs -> \k -> k (VCons tag (map evalV vs))
+      ConTag _ tag vs -> \k -> k (VCons tag (map evalV vs))
       Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
       RecLam _ fvs f x body -> \k -> do

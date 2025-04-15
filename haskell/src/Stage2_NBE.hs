@@ -8,7 +8,7 @@ import Interaction (Interaction)
 import Par4 (Position(..))
 import Stage0_AST (Literal(..),evalLit,Cid(..))
 import Stage1_EXP (Exp(..),Arm(..),Id(..),Ctag(..))
-import Value (Value(..),Number)
+import Value (Value(..))
 import qualified Data.Map as Map
 import qualified Stage1_EXP as SRC
 
@@ -38,7 +38,7 @@ data SemValue
   = Syntax Exp
   | Macro Id (SemValue -> M SemValue)
   | Constant Position Value -- only base values here
-  | Constructed Position Number [SemValue]
+  | Constructed Position Ctag [SemValue]
 
 -- TODO: Have locally defined type for BaseValue.
 -- This wont allow values for which a constant is not possible to construct.i.e. VFunc and VBytes
@@ -57,8 +57,9 @@ reifyValue pos = \case
   VString s -> Lit pos (LitS s)
   VCons tag vs -> do
     let es = map (reifyValue pos) vs
-    let cid = Cid "CID" -- TODO: Can the original user name be recovered?
-    ConTag pos (Ctag cid tag) es
+    -- TODO: preserve original user name
+    let tag' = Ctag (Cid "CID") n where Ctag _ n = tag
+    ConTag pos tag' es
   v@VBytes{} ->
     error (show ("refifyValue",pos,v))
   v@VFunc{} ->
@@ -67,9 +68,10 @@ reifyValue pos = \case
 reify :: SemValue -> M Exp
 reify = \case
   Constructed pos tag args -> do
+    -- TODO: preserve original user name
+    let tag' = Ctag (Cid "CID") n where Ctag _ n = tag
     es <- mapM reify args
-    let cid = Cid "CID"
-    pure $ ConTag pos (Ctag cid tag) es
+    pure $ ConTag pos tag' es
   Constant pos v -> pure (reifyValue pos v)
   Syntax e -> pure e
   Macro x f -> do
@@ -126,7 +128,7 @@ reflect env = \case
     pure (look env x)
   Lit pos x -> do
     pure $ Constant pos (evalLit x)
-  ConTag pos (Ctag _ tag) args -> do
+  ConTag pos tag args -> do
     args <- mapM (reflect env) args
     pure $ Constructed pos tag args
   Prim p b es -> do
@@ -170,11 +172,11 @@ reflect env = \case
         arms <- mapM (normArm env) arms
         pure $ Syntax $ Case pos scrut arms
 
-caseSelect :: Number -> [SemValue] -> Env -> [Arm] -> M SemValue
+caseSelect :: Ctag -> [SemValue] -> Env -> [Arm] -> M SemValue
 caseSelect tag vs env arms = do
   let
     (xs,body) :: ([Id],Exp) =
-      case [ (xs,body) | ArmTag _pos (Ctag _ cArm) xs body <- arms, cArm == tag ] of
+      case [ (xs,body) | ArmTag _pos tagArm xs body <- arms, tagArm == tag ] of
         [] -> error "reflect: case match failure"
         x:_ -> x
   reflect (foldr (uncurry Map.insert) env (zip xs vs)) body

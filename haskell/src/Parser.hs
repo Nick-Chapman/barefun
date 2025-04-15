@@ -1,10 +1,9 @@
 module Parser (parseProg) where
 
 import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
-import Stage0_AST (Prog,Exp,Id,Arm,Cid,Bid(..))
-import Stage0_AST (cUnit,cFalse,cTrue,cNil,cCons,mkUserId)
+import Stage0_AST (Prog,Exp,Id,Arm,Cid,Bid(..),mkUserId)
 import Text.Printf (printf)
-import Value (Number)
+import Value (Number,cUnit,cFalse,cTrue,cNil,cCons)
 import qualified Data.Char as Char (isAlpha,isNumber,isLower,isUpper)
 import qualified Par4
 import qualified Stage0_AST as AST

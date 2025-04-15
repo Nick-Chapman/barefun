@@ -1,7 +1,7 @@
 -- | Primary AST constructed by the ".fun" parser.
 module Stage0_AST
   ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Bid(..)
-  , cUnit,cFalse,cTrue,cNil,cCons,mkUserId
+  , mkUserId
   , execute,evalLit,apply
   ) where
 
@@ -12,7 +12,8 @@ import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Text.Printf (printf)
-import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit)
+import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..),Cid(..))
+import Value (cUnit,cFalse,cTrue,cNil,cCons)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(Prim,App))
 
@@ -31,17 +32,9 @@ data Exp
   | Case Position Exp [Arm] -- TODO: rename Match to match ocaml-style syntax
 
 data Arm = Arm Position Cid [Bid] Exp
-data Cid = Cid String deriving (Eq,Ord)
 data Literal = LitC Char | LitN Number | LitS String
 
 data Id = Id { name :: String } deriving (Eq,Ord)
-
-cUnit,cFalse,cTrue,cNil,cCons :: Cid
-cUnit = Cid "Unit"
-cTrue = Cid "true"
-cFalse = Cid "false"
-cNil = Cid "Nil"
-cCons = Cid "Cons"
 
 mkUserId :: String -> Id
 mkUserId name = Id { name }
@@ -62,7 +55,6 @@ instance Show Id where
       maybeBracket s = if needBracket s then printf "( %s )" s else s
       needBracket = \case "*" -> True; _ -> False
 
-instance Show Cid where show (Cid s) = s
 instance Show Literal where
   show = \case
     LitC c -> show c
@@ -113,7 +105,7 @@ executeProg (Prog defs) = loop env0 defs
           loop (insert x value env) defs
       TypeDef cids : defs -> do
         let pairs = zip cids [0::Number .. ]
-        let f (name,tag) cenv = Map.insert name tag cenv
+        let f (name,tag) cenv = Map.insert name (Ctag name tag) cenv
         let cenv' = foldr f cenv pairs
         let env' = env { cenv = cenv' }
         loop env' defs
@@ -193,12 +185,12 @@ evalLit = \case
   LitN n -> VNum n
   LitS s -> VString s
 
-data Env = Env { venv :: Map Id Value, cenv :: Map Cid Number }
+data Env = Env { venv :: Map Id Value, cenv :: Map Cid Ctag }
 
 env0 :: Env
-env0 = Env { venv = Map.empty, cenv = initCenv}
+env0 = Env { venv = Map.empty, cenv = initCenv }
 
-initCenv :: Map Cid Number
+initCenv :: Map Cid Ctag
 initCenv = Map.fromList
   [ (cUnit, tUnit)
   , (cFalse, tFalse)

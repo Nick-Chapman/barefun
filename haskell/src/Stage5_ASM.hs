@@ -66,9 +66,13 @@ data Source
 data Val
   = VChar Char
   | VNum Number
+  -- TODO: VTag CTag -- allow carrying more provenence info
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
   deriving Eq
+
+vTag :: Ctag -> Val
+vTag (Ctag _ n) = VNum n
 
 data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si -- Di when needed
   deriving (Eq,Ord)
@@ -331,7 +335,7 @@ createBytesInMemory = loop (VMemAddr aNil)
       n -> do
         execPush v
         execPush (VChar '\0')
-        execPush (VNum tCons)
+        execPush (vTag tCons)
         v <- GetReg Sp
         loop v (n-1)
 
@@ -503,9 +507,9 @@ state0 dmap = State
     -- TODO: Use Symbolic addressses for internal constructed objected
     -- TODO: Why do we even need an address for true/false?
     internal =
-      [ (aFalse, VNum tFalse)
-      , (aTrue, VNum tTrue)
-      , (aNil, VNum tNil)
+      [ (aFalse, vTag tFalse)
+      , (aTrue, vTag tTrue)
+      , (aNil, vTag tNil)
       , (aFinalCont, VCodeLabel finalCodeLabel)
       , (addAddr 1 aFinalCont, VChar 'X') -- dummy next cont; without this we see error with -trace
       ]
@@ -563,8 +567,8 @@ compileTopDef lab = \case
     -- string rep is currently the same as a list of chars. TODO: do better!
     pure ([ op
           | (i,c) <- zip [1..] string
-          , op <- [VNum tCons, VChar c, VMemAddr (Symbolic lab (i*3))]
-          ] ++ [ VNum tNil ])
+          , op <- [vTag tCons, VChar c, VMemAddr (Symbolic lab (i*3))]
+          ] ++ [ vTag tNil ])
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
     let v1 = VCodeLabel lab

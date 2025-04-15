@@ -185,7 +185,7 @@ evalT genv = \case
   TopLitS string -> VString string
   TopPrim b xs -> evaluatePureBuiltin b (map (look genv) xs)
   TopLam x body -> VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
-  TopConApp (Ctag _ tag) xs -> VCons tag (map (look genv) xs)
+  TopConApp tag xs -> VCons tag (map (look genv) xs)
 
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
@@ -200,7 +200,7 @@ evalCode genv env = \case
       evalCode genv (insert x v1 env') later k
   Case scrut arms0 -> \k -> do
     case (look env scrut) of
-      VCons tagActual vArgs -> do
+      VCons (Ctag _ tagActual) vArgs -> do
         let
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
@@ -218,7 +218,7 @@ evalCode genv env = \case
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
       Prim b xs -> \k -> ITick I.Prim $ executeBuiltin b (map (look env) xs) k
-      ConApp (Ctag _ tag) xs -> \k -> k (VCons tag (map (look env) xs))
+      ConApp tag xs -> \k -> k (VCons tag (map (look env) xs))
 
       Lam pre _ x body -> \k -> do
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre

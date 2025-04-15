@@ -1,6 +1,6 @@
 module Value
-  ( tUnit, tFalse, tTrue, tNil, tCons
-  , Value(..), Number --(..)
+  ( tUnit, tFalse, tTrue, tNil, tCons, cUnit, cFalse, cTrue, cNil, cCons
+  , Value(..), Number, Ctag(..), Cid(..)
   , mkBool,mkList,deUnit
   ) where
 
@@ -10,12 +10,15 @@ import Text.Printf (printf)
 newtype Number = Number Int deriving (Eq,Ord,Num,Integral,Real,Enum)
 
 data Value
-  = VCons Number [Value] -- TODO: should define and use Ctag here
+  = VCons Ctag [Value]
   | VBytes Bytes
   | VString String
   | VChar Char
   | VNum Number
   | VFunc (Value -> (Value -> Interaction) -> Interaction)
+
+data Ctag = Ctag Cid Number deriving (Eq)
+data Cid = Cid String deriving (Eq,Ord)
 
 instance Show Number where show (Number n) = show n
 
@@ -28,13 +31,22 @@ instance Show Value where
     VNum n -> printf"[number:%s]" (show n)
     VFunc{} -> "[function]"
 
--- These tag values only need to be unique within their type
-tUnit,tFalse,tTrue,tNil,tCons :: Number
-tUnit = 0
-tFalse = 0
-tTrue = 1
-tNil = 0
-tCons = 1
+instance Show Ctag where show (Ctag cid n) = printf "%s%s" (show cid) (show n)
+instance Show Cid where show (Cid s) = s
+
+cUnit,cFalse,cTrue,cNil,cCons :: Cid
+cUnit = Cid "Unit"
+cTrue = Cid "true"
+cFalse = Cid "false"
+cNil = Cid "Nil"
+cCons = Cid "Cons"
+
+tUnit,tFalse,tTrue,tNil,tCons :: Ctag
+tUnit = Ctag cUnit 0
+tFalse = Ctag cFalse 0
+tTrue = Ctag cTrue 1
+tNil = Ctag cNil 0
+tCons = Ctag cCons 1
 
 mkBool :: Bool -> Value
 mkBool = \case
@@ -53,4 +65,6 @@ mkList = \case
   v:vs -> VCons tCons [v, mkList vs]
 
 deUnit :: Value -> ()
-deUnit = \case VCons tag [] | tag == tUnit -> (); _ -> error "deUnit"
+deUnit =
+  \case VCons (Ctag _ tag) [] | tag == n -> (); _ -> error "deUnit"
+  where Ctag _ n = tUnit

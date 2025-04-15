@@ -11,9 +11,10 @@ import Data.Map (Map)
 import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0_AST (cUnit,cFalse,cTrue,cNil,cCons,evalLit,apply,Literal,Cid,Bid(..))
+import Stage0_AST (evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
-import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit)
+import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..))
+import Value (cUnit,cFalse,cTrue,cNil,cCons)
 import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(Prim,App))
 import qualified Stage0_AST as SRC
@@ -32,7 +33,6 @@ data Exp
   | Case Position Exp [Arm]
 
 data Arm = ArmTag Position Ctag [Id] Exp
-data Ctag = Ctag Cid Number
 
 data Id = Id
   { optUnique :: Maybe Int
@@ -78,7 +78,6 @@ provenanceExp = \case
 
 instance Show Id where show = prettyId
 instance Show Exp where show = intercalate "\n" . pretty
-instance Show Ctag where show (Ctag cid n) = printf "%s%s" (show cid) (show n)
 
 instance Show Name where
   show = \case
@@ -157,7 +156,7 @@ eval env@Env{venv} = \case
       where err = error (show ("var-lookup",x,pos))
   Lit _ literal -> \k -> do
     k (evalLit literal)
-  ConTag _ (Ctag _ tag) es -> \k -> do
+  ConTag _ tag es -> \k -> do
     evals env es $ \vs -> do
       k (VCons tag vs)
   Prim _ b es -> \k -> do
@@ -177,7 +176,7 @@ eval env@Env{venv} = \case
       eval env { venv = Map.insert x v1 venv } e2 k
   Case _ e arms0 -> \k -> do
     eval env e $ \case
-      VCons tagActual vArgs -> do
+      VCons (Ctag _ tagActual) vArgs -> do
         let
           dispatch :: [Arm] -> Interaction
           dispatch arms = case arms of
@@ -214,7 +213,7 @@ transProg cenv0 (SRC.Prog defs) = walk cenv0 defs
         let mainId = transId cenv (SRC.mkUserId "main")
         let noPos = Position 0 0
         let main = Var noPos mainId
-        App main noPos (ConTag noPos (Ctag cUnit tUnit) [])
+        App main noPos (ConTag noPos tUnit [])
 
       SRC.ValDef x@(Bid pos _) rhs : defs -> do
         let (x1,cenv1) = posProp x cenv
@@ -254,13 +253,13 @@ transId Cenv{xmap} x = maybe err id $ Map.lookup x xmap
   where err = error (printf "Stage1: unknown identifier: %s" (show x))
 
 transCid :: Cenv -> Cid -> Ctag
-transCid Cenv{cmap} cid = Ctag cid $ maybe err id $ Map.lookup cid cmap
+transCid Cenv{cmap} cid = maybe err id $ Map.lookup cid cmap
   where err = error (printf "Stage1: unknown constructor: %s" (show cid))
 
-data Cenv = Cenv { cmap :: Map Cid Number, xmap :: Map SRC.Id Id }
+data Cenv = Cenv { cmap :: Map Cid Ctag, xmap :: Map SRC.Id Id }
 
 insertCid :: Cid -> Number -> Cenv -> Cenv
-insertCid c tag cenv@Cenv{cmap} = cenv { cmap = Map.insert c tag cmap }
+insertCid c tag cenv@Cenv{cmap} = cenv { cmap = Map.insert c (Ctag c tag) cmap }
 
 posPropList :: [Bid] -> Cenv -> ([Id],Cenv)
 posPropList = \case
