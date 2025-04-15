@@ -85,12 +85,13 @@ let eq_string = noinline (fun s1 s2 ->
     in
     loop (n1-1))
 
-let string_append s1 s2 = implode (append (explode s1) (explode s2)) (* TODO: ^ *)
+let (^) s1 s2 =
+  implode (append (explode s1) (explode s2))
 
 let rec concat xs =
   match xs with
   | [] -> ""
-  | x::xs -> string_append x (concat xs)
+  | x::xs -> x ^ concat xs
 
 (* io *)
 
@@ -190,7 +191,7 @@ let put_space_sep_strings xs =
     | x::xs -> put_string x; loop xs
 
 let dispatch fs command args =
-  let err m = put_string (concat ["sham: ";command;": ";m;"\n"]) in
+  let err m = put_string ("sham: "^command^": "^m^"\n") in
   match lookup command fs with
   | None -> err "command not found"; fs
   | Some file ->

@@ -256,7 +256,7 @@ gram6 = program where
   -- higest..lowest
   infixGroup1 = ["*","%","/"]
   infixGroup2 = ["+","-"]
-  infixGroup3 = ["::"]
+  infixGroup3 = ["::","^"]
   infixGroup4 = ["=","<=","<",">=",">"]
 
   infix0 = application
