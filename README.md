@@ -20,8 +20,9 @@ We have haskell interpreters for each stage of the compilation pipeline:
 - [Stage2](haskell/src/Stage2_NBE.hs): Normalization by Evaluation. (Inlining & Constant Folding).
 - [Stage3](haskell/src/Stage3_ANF.hs): A-normal form.
 - [Stage4](haskell/src/Stage4_CCF.hs): Closure converted form.
+- [Stage5](haskell/src/Stage5_ASM.hs): x86 ASM.
 
-The expected output from each compiler stage is [here](check-compile),
+The expected output from each compiler stage is [here](compile-examples/expected/),
 
 To run all tests, type `dune test`. (No output is good).
 
