@@ -240,8 +240,20 @@ gram6 = program where
                loop (mkApps (AST.Var p1 (mkUserId name)) [(p1,acc),(p2,x)])
            ]
 
+  infixOpR names sub = do
+    x <- sub
+    alts [ pure x
+         , do
+             p1 <- position
+             name <- alts [ do key x; pure x | x <- names ]
+             p2 <- position
+             y <- infixOpR names sub
+             pure (mkApps (AST.Var p1 (mkUserId name)) [(p1,x),(p2,y)])
+         ]
+
   infixNames = infixGroup1 ++ infixGroup2 ++ infixGroup3 ++ infixGroup4
 
+  -- higest..lowest
   infixGroup1 = ["*","%","/"]
   infixGroup2 = ["+","-"]
   infixGroup3 = ["::"]
@@ -250,7 +262,7 @@ gram6 = program where
   infix0 = application
   infix1 = infixOp infixGroup1 infix0
   infix2 = infixOp infixGroup2 infix1
-  infix3 = infixOp infixGroup3 infix2
+  infix3 = infixOpR infixGroup3 infix2
   infix4 = infixOp infixGroup4 infix3
 
   infixWeakestPrecendence = infix4
