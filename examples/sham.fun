@@ -225,7 +225,7 @@ let ls_behaviour fs args =
 let cat_behaviour fs args =
   let cat1 x =
     match lookup x fs with
-    | None -> put_string (concat ["cat: ";x;" : No such file\n"])
+    | None -> put_string (concat ["cat: ";x;" : No such file or directory\n"])
     | Some(file) ->
        match file with
        | Data s -> put_string s
@@ -297,6 +297,19 @@ let mv_behaviour fs args =
         | Some file ->
            Bindings (Pair (target,file) :: bindings (rm1 fs source))
 
+let file_behaviour fs args =
+  let file1 x =
+    match lookup x fs with
+    | None -> put_string (concat [x;" : No such file or directory\n"])
+    | Some(file) ->
+       match file with
+       | Data _ -> put_string (concat [x;": ASCII text\n"])
+       | Executable (_,_) -> put_string (concat [x;": executable\n"])
+  in
+  match args with
+  | [] -> (put_string "file: takes at least one argument\n"; fs)
+  | _::_ -> (iter file1 args; fs)
+
 let readme = "Welcome to sham; please try all the commands!\nCan you find the hidden Easter Egg?\n"
 let man_ls = "ls - list directory contents\n"
 let man_cat = "cat - concatenate files and print on the standard output\n"
@@ -304,6 +317,7 @@ let man_man = "man - an interface to the system reference manuals\n"
 let man_rm = "rm - remove files or directories (directories not supported yet!)\n"
 let man_cp = "cp - copy files and directories\n"
 let man_mv = "mv - move (rename) files\n"
+let man_file = "file — determine file type\n"
 
 let fs0 () = Bindings
   ([ Pair ("readme", Data (readme))
@@ -313,6 +327,7 @@ let fs0 () = Bindings
   ; Pair ("rm", Executable (man_rm, rm_behaviour))
   ; Pair ("cp", Executable (man_cp, cp_behaviour))
   ; Pair ("mv", Executable (man_mv, mv_behaviour))
+  ; Pair ("file", Executable (man_file, file_behaviour))
   (* TODO: file, create & Easter Egg *)
   ])
 
