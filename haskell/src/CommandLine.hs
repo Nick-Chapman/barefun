@@ -48,7 +48,7 @@ main = do
     (Stage2,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e2)
     (Stage3,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e3)
     (Stage4,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e4)
-    (Stage5,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e5)
+    (Stage5,Compile) -> do putStrLn (show e5)
 
     (Stage0,Eval) -> do printf "[%s]\n" tag; runTerm (Stage0.execute e0)
     (Stage1,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage1.execute e1)

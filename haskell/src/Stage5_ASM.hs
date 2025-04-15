@@ -48,7 +48,8 @@ data Op -- target; source
 
 data Jump
   = JumpDirect CodeLabel
-  | JumpIndirect Reg
+  | JumpReg Reg
+  -- | JumpIndirect Reg
   | Crash
 
 data Source
@@ -108,12 +109,13 @@ data BareBios
 -- Show
 
 instance Show Image where
-  show Image{cmap,dmap,start=_} =
+  show Image{cmap,dmap,start} =
     unlines [ printf "%s: ; %s\n%s" (show lab) provenance (show code)
             | (lab@(CodeLabel _ provenance),code) <- Map.toList cmap ]
     ++
     unlines [ printf "%s: dw %s" (show lab) (intercalate ", " (map show vals))
             | (lab,vals) <- Map.toList dmap ]
+    ++ printf "\nbare_start: jmp %s" (show start)
 
 instance Show Code where
   show = \case
@@ -124,7 +126,7 @@ instance Show Op where
   show = \case
     OpComment message ->  ";; " ++ message
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
-    OpStore a r -> "mov " ++ show a ++ ", " ++ show r
+    OpStore a r -> "mov [" ++ show a ++ "], " ++ show r
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push " ++ show src
     OpCmp r src -> "cmp " ++ show r ++ ", " ++ show src
@@ -138,13 +140,14 @@ instance Show Op where
 instance Show Jump where
   show = \case
     JumpDirect c -> "jmp "  ++ show c
-    JumpIndirect r -> "jmp ["  ++ show r ++ "]"
+    JumpReg r -> "jmp "  ++ show r
+    --JumpIndirect r -> "jmp ["  ++ show r ++ "]"
     Crash -> "crash"
 
 instance Show Source where
   show = \case
     SReg r -> show r
-    SLit w -> "#" ++ show w -- dont think x86 use this #-syntax
+    SLit w -> show w
     SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
@@ -328,7 +331,7 @@ createBytesInMemory = loop (WAddr aNil)
 execJump :: Jump -> M ()
 execJump = \case
   JumpDirect{} -> undefined GetCode
-  JumpIndirect r -> do
+  JumpReg r -> do
     w <- GetReg r
     let lab = deCodeLabel w
     code <- GetCode lab
@@ -581,8 +584,10 @@ compileCode = \case
       , OpMove frameReg (SReg contReg)
       , OpMove contReg (SMemIndirectOffset frameReg 1)
       -- code = frame[0]; jmp [code]
+
+      -- TODO: JumpIndirect (SMemIndirect frameReg)
       , OpMove Ax (SMemIndirect frameReg)
-      ] (Done (JumpIndirect Ax))
+      ] (Done (JumpReg Ax))
 
   SRC.Tail fun pos arg -> do
     pure $ doOps (
@@ -591,7 +596,7 @@ compileCode = \case
        moveTwoRegsPar (frameReg,compileRef fun) (argReg,compileRef arg) ++
       -- code = frame[0]; jmp [code]
       [ OpMove Ax (SMemIndirect frameReg)
-      ]) (Done (JumpIndirect Ax))
+      ]) (Done (JumpReg Ax))
 
   SRC.LetAtomic (_,t) rhs body -> do
     (ops1,reg) <- compileAtomic (show t) rhs

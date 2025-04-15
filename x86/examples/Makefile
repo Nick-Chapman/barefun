@@ -1,5 +1,5 @@
 
-default = cursor
+default = gen1
 
 top: run
 
