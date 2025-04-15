@@ -1,4 +1,6 @@
 
+(* sham: early example motivation shell like behaviour *)
+
 let noinline = let rec block f a = let _ = block in f a in block
 
 let rec length xs =
@@ -8,7 +10,7 @@ let rec length xs =
 
 let cons x xs = x :: xs
 
-let rec append xs ys = (* non tail-recursive version *)
+let rec append xs ys =
   match xs with
   | [] -> ys
   | x::xs -> cons x (append xs ys)
@@ -45,14 +47,15 @@ let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
+(* This would be a good reason for an inline_only_constant_argument primitive *)
 (* A prettier put_char for control chars; also aligned with backspacing *)
-let put_char = (fun c -> (* TODO: inline_only_constant_argument *)
+let put_char c =
   let backspace = 8 in
   let n = ord c in
   if n = backspace then put_char c else
     if eq_char c '\n' then put_char c else
       if n > 26 then put_char c else
-        (put_char '^'; put_char (chr (ord 'A' + n - 1 ))))
+        (put_char '^'; put_char (chr (ord 'A' + n - 1 )))
 
 let erase_char () =
   let backspace = chr 8 in
@@ -117,7 +120,7 @@ let rec put_chars xs =
   | [] -> ()
   | x::xs -> put_char x; put_chars xs
 
-let put_string s = put_chars (explode s) (* could avoid explode *)
+let put_string s = put_chars (explode s)
 
 let put_int i = put_chars (chars_of_int i)
 
@@ -143,11 +146,9 @@ let rec readloop acc =
 let read_line () = implode (readloop [])
 
 let rec fib n =
-  (*put_int n; newline ();*)
   if n < 2 then n else fib (n-1) + fib (n-2)
 
 let rec fact n =
-  (*put_int n; newline ();*)
   if n >= 2 then fact (n-1) * n else 1
 
 let error s = put_string "ERROR: "; put_string s; newline ()
@@ -222,7 +223,7 @@ let rec splitloop accWs accCs xs =
      if eq_char x ' ' then splitloop (implode (reverse accCs) :: accWs) [] xs
      else splitloop accWs (x::accCs) xs
 
-let split_words s = (* eta expand for efficiency; smaller continuation frames *)
+let split_words s =
   splitloop [] [] s
 
 let execute line =

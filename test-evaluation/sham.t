@@ -26,7 +26,7 @@ Ocaml REPL
 Haskell
 
   $ cat sham.input | ../haskell/main.exe ../examples/sham.fun -5
-  [Stage5 (ASM); post normalization size: 1252]
+  [Stage5 (ASM); post normalization size: 1331]
   Sham: In-memory file-system. Consider typing "ls".
   % xxx
   sham: xxx: command not found
@@ -45,4 +45,4 @@ Haskell
   sham: ls: command not found
   % xx
   xx readme cat man rm cp mv
-  % [EOF:#op=81954]
+  % [EOF:#op=94469]

@@ -1,7 +1,7 @@
 
-let noinline = let rec block f a = let _ = block in f a in block (* TODO: have principled noinline construct *)
+(* example: build strings using the builtin "bytes" ops *)
 
-(* try building strings using the builtin "bytes" ops *)
+let noinline = let rec block f a = let _ = block in f a in block
 
 let rec length xs =
   match xs with

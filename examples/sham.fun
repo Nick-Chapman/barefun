@@ -1,4 +1,6 @@
 
+(* sham: example of a shell with an in-memory file-systems *)
+
 let not b =
   match b with
   | true -> false
@@ -7,6 +9,7 @@ let not b =
 let (>) a b = b < a
 let (<=) a b = not (b < a)
 
+(* TODO: have a noinline pimitive *)
 let noinline = let rec block f a = let _ = block in f a in block
 
 (* list ops *)
@@ -31,7 +34,7 @@ let rec fold_left f b xs =
   | [] -> b
   | x::xs -> fold_left f (f b x) xs
 
-let rec append xs ys = (* non tail-recursive version *)
+let rec append xs ys = (* TODO: code tail-recursive version *)
   match xs with
   | [] -> ys
   | x::xs -> x :: append xs ys
@@ -94,6 +97,15 @@ let rec concat xs =
   | x::xs -> string_append x (concat xs)
 
 (* io *)
+
+(* A prettier put_char for control chars; also aligned with backspacing *)
+let put_char c =
+  let backspace = 8 in
+  let n = ord c in
+  if n = backspace then put_char c else
+    if eq_char c '\n' then put_char c else
+      if n > 26 then put_char c else
+        (put_char '^'; put_char (chr (ord 'A' + n - 1 )))
 
 let rec put_chars xs =
   match xs with
@@ -290,7 +302,7 @@ let readme = "Welcome to sham; please try all the commands!\nCan you find the hi
 let man_ls = "ls - list directory contents\n"
 let man_cat = "cat - concatenate files and print on the standard output\n"
 let man_man = "man - an interface to the system reference manuals\n"
-let man_rm = "rm - remove files or directories (TODO: support directories)\n"
+let man_rm = "rm - remove files or directories (directories not supported yet!)\n"
 let man_cp = "cp - copy files and directories\n"
 let man_mv = "mv - move (rename) files\n"
 

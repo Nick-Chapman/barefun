@@ -1,6 +1,6 @@
 (*Stage5 (ASM)*)
 L1: ; Function: t1
-  ;; (2'54) Tail: f (f1) @ a (arg)
+  ;; (4'54) Tail: f (f1) @ a (arg)
   mov bp, [bp+1]
   mov dx, dx
   mov ax, [bp]
@@ -10,7 +10,7 @@ L2: ; Function: g1
   push dx
   push #L1
   mov 1, sp
-  ;; (0'0) Return: lam_2'31 (t1)
+  ;; (0'0) Return: lam_4'31 (t1)
   mov dx, [1]
   mov bp, cx
   mov cx, [bp+1]

@@ -182,8 +182,32 @@ let g25 = fun arg k ->
   match arg with
   | Nil0 -> k g26
   | Cons1(t1,t2) ->
-    let t3 = PRIM_PutChar(t1) in
-    g25 t2 k in
+    let t3 = PRIM_CharOrd(t1) in
+    let t4 = PRIM_EqInt(t3,8) in
+    let k = [t2], fun [f2] arg -> g25 f2 k in
+    match t4 with
+    | true1 ->
+      let t5 = PRIM_PutChar(t1) in
+      k t5
+    | false0 ->
+      let t5 = PRIM_EqChar(t1,'\n') in
+      match t5 with
+      | true1 ->
+        let t6 = PRIM_PutChar(t1) in
+        k t6
+      | false0 ->
+        let t6 = PRIM_LessInt(26,t3) in
+        match t6 with
+        | true1 ->
+          let t7 = PRIM_PutChar(t1) in
+          k t7
+        | false0 ->
+          let t7 = PRIM_PutChar('^') in
+          let t8 = PRIM_AddInt(65,t3) in
+          let t9 = PRIM_SubInt(t8,1) in
+          let t10 = PRIM_CharChr(t9) in
+          let t11 = PRIM_PutChar(t10) in
+          k t11 in
 let g27 = CID0 in
 let g28 = "% " in
 let g29 = CID0 in
@@ -268,7 +292,7 @@ let g105 = "\n" in
 let g106 = CID0 in
 let g107 = CID1[g105,g106] in
 let g108 = "rm" in
-let g109 = "rm - remove files or directories (TODO: support directories)\n" in
+let g109 = "rm - remove files or directories (directories not supported yet!)\n" in
 let g110 = "rm: missing operand\n" in
 let g111 = "rm: cannot remove '" in
 let g112 = "': No such file or directory\n" in
@@ -385,10 +409,11 @@ let k = [], fun [] arg ->
                     let t4 = PRIM_EqChar(t1,'\EOT') in
                     match t4 with
                     | true1 ->
-                      let t5 = PRIM_PutChar('\EOT') in
-                      let t6 = PRIM_PutChar('\n') in
-                      let t7 = CID1['\EOT',arg] in
-                      f1 t7 k
+                      let t5 = PRIM_PutChar('^') in
+                      let t6 = PRIM_PutChar('D') in
+                      let t7 = PRIM_PutChar('\n') in
+                      let t8 = CID1['\EOT',arg] in
+                      f1 t8 k
                     | false0 ->
                       let t5 = PRIM_LessInt(127,t2) in
                       match t5 with
@@ -419,9 +444,34 @@ let k = [], fun [] arg ->
                             | true1 -> k g31
                             | false0 -> k g32
                         | false0 ->
-                          let t7 = PRIM_PutChar(t1) in
-                          let t8 = CID1[t1,arg] in
-                          me t8 k in
+                          let t7 = PRIM_CharOrd(t1) in
+                          let t8 = PRIM_EqInt(t7,8) in
+                          let k = [arg,me,t1], fun [f2,f3,f4] arg ->
+                            let t1 = CID1[f4,f2] in
+                            f3 t1 k in
+                          match t8 with
+                          | true1 ->
+                            let t9 = PRIM_PutChar(t1) in
+                            k t9
+                          | false0 ->
+                            let t9 = PRIM_EqChar(t1,'\n') in
+                            match t9 with
+                            | true1 ->
+                              let t10 = PRIM_PutChar(t1) in
+                              k t10
+                            | false0 ->
+                              let t10 = PRIM_LessInt(26,t7) in
+                              match t10 with
+                              | true1 ->
+                                let t11 = PRIM_PutChar(t1) in
+                                k t11
+                              | false0 ->
+                                let t11 = PRIM_PutChar('^') in
+                                let t12 = PRIM_AddInt(65,t7) in
+                                let t13 = PRIM_SubInt(t12,1) in
+                                let t14 = PRIM_CharChr(t13) in
+                                let t15 = PRIM_PutChar(t14) in
+                                k t15 in
                 let k = [f3,f4,f5,f6,f7,f8,arg], fun [f2,f3,f4,f5,f6,f7,f8] arg ->
                   let k = [f2,f3,f4,f5,f6,f7,f8,arg], fun [f2,f3,f4,f5,f6,f7,f8,f9] arg ->
                     let k = [f2,f3,f4,f5,f6,f7,f9], fun [f2,f3,f4,f5,f6,f7,f8] arg ->
