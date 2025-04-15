@@ -1,7 +1,7 @@
 (*Stage4 (CCF)*)
 let k () = ()
-let g2 = CID1 in
-let g3 = CID0 in
+let g2 = true1 in
+let g3 = false0 in
 let g1 = fun arg k ->
   let t1 = PRIM_EqInt(arg,0) in
   match t1 with

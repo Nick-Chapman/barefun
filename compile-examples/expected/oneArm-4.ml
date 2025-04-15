@@ -5,5 +5,5 @@ let g1 = fun arg k ->
   | Thing0(t1) ->
     let t2 = PRIM_PutChar(t1) in
     k t2 in
-let t1 = CID0['x'] in
+let t1 = Thing0['x'] in
 g1 t1 k

@@ -1,8 +1,8 @@
 (*Stage4 (CCF)*)
 let k () = ()
-let g2 = CID0 in
-let g3 = CID0 in
-let g4 = CID0 in
+let g2 = Unit0 in
+let g3 = Unit0 in
+let g4 = Unit0 in
 let g1 = fun arg k ->
   let t1 = PRIM_PutChar(arg) in
   let t2 = PRIM_PutChar(' ') in

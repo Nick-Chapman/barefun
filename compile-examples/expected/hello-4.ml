@@ -1,6 +1,6 @@
 (*Stage4 (CCF)*)
 let k () = ()
-let g2 = CID0 in
+let g2 = Unit0 in
 let g1 = fun arg k ->
   match arg with
   | Nil0 -> k g2
@@ -15,13 +15,13 @@ let g3 = fun arg k ->
     | true1 -> k f1
     | false0 ->
       let t2 = PRIM_StringIndex(g4,arg) in
-      let t3 = CID1[t2,f1] in
+      let t3 = Cons1[t2,f1] in
       let k = [arg], fun [f2] arg ->
         let t1 = PRIM_SubInt(f2,1) in
         arg t1 k in
       g3 t3 k in
   k t1 in
-let g5 = CID0 in
+let g5 = Nil0 in
 let k = [], fun [] arg ->
   let k = [], fun [] arg -> g1 arg k in
   arg 13 k in

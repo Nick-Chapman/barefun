@@ -6,7 +6,7 @@ import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Interaction (Interaction)
 import Par4 (Position(..))
-import Stage0_AST (Literal(..),evalLit,Cid(..))
+import Stage0_AST (Literal(..),evalLit)
 import Stage1_EXP (Exp(..),Arm(..),Id(..),Ctag(..))
 import Value (Value(..))
 import qualified Data.Map as Map
@@ -55,11 +55,9 @@ reifyValue pos = \case
   VNum n -> Lit pos (LitN n)
   VChar c -> Lit pos (LitC c)
   VString s -> Lit pos (LitS s)
-  VCons tag vs -> do
+  VCons tag vs -> undefined $ do -- TODO provoke or remove
     let es = map (reifyValue pos) vs
-    -- TODO: preserve original user name
-    let tag' = Ctag (Cid "CID") n where Ctag _ n = tag
-    ConTag pos tag' es
+    ConTag pos tag es
   v@VBytes{} ->
     error (show ("refifyValue",pos,v))
   v@VFunc{} ->
@@ -68,10 +66,8 @@ reifyValue pos = \case
 reify :: SemValue -> M Exp
 reify = \case
   Constructed pos tag args -> do
-    -- TODO: preserve original user name
-    let tag' = Ctag (Cid "CID") n where Ctag _ n = tag
     es <- mapM reify args
-    pure $ ConTag pos tag' es
+    pure $ ConTag pos tag es
   Constant pos v -> pure (reifyValue pos v)
   Syntax e -> pure e
   Macro x f -> do

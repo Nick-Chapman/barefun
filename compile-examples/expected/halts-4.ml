@@ -1,7 +1,7 @@
 (*Stage4 (CCF)*)
 let k () = ()
-let g1 = CID0 in
-let g2 = CID0 in
+let g1 = Unit0 in
+let g2 = Unit0 in
 let t1 = PRIM_PutChar('X') in
 let t2 = PRIM_GetChar(g1) in
 let t3 = PRIM_PutChar(t2) in

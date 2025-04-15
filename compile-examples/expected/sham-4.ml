@@ -11,7 +11,7 @@ let g2 = fun arg k ->
       let t1 = PRIM_AddInt(1,arg) in
       k t1 in
     g2 t2 k in
-let g4 = CID0 in
+let g4 = Nil0 in
 let g3 = fun arg k ->
   let t1 = [arg], fun [f1] arg k ->
     match arg with
@@ -20,13 +20,13 @@ let g3 = fun arg k ->
       let k = [f1,t2], fun [f2,f3] arg ->
         let k = [f3,arg], fun [f2,f3] arg ->
           let k = [f3], fun [f2] arg ->
-            let t1 = CID1[f2,arg] in
+            let t1 = Cons1[f2,arg] in
             k t1 in
           arg f2 k in
         g3 f2 k in
       f1 t1 k in
   k t1 in
-let g6 = CID0 in
+let g6 = Unit0 in
 let g5 = fun arg k ->
   let t1 = [arg], fun [f1] arg k ->
     match arg with
@@ -60,7 +60,7 @@ let g8 = fun arg k ->
     | Cons1(t1,t2) ->
       let k = [arg,t1], fun [f2,f3] arg ->
         let k = [f3], fun [f2] arg ->
-          let t1 = CID1[f2,arg] in
+          let t1 = Cons1[f2,arg] in
           k t1 in
         arg f2 k in
       g8 t2 k in
@@ -70,11 +70,11 @@ let g9 = fun arg k ->
     match arg with
     | Nil0 -> k f1
     | Cons1(t1,t2) ->
-      let t3 = CID1[t1,f1] in
+      let t3 = Cons1[t1,f1] in
       let k = [t2], fun [f2] arg -> arg f2 k in
       g9 t3 k in
   k t1 in
-let g10 = CID0 in
+let g10 = Unit0 in
 let g11 = fun arg k ->
   let k = [arg], fun [f2] arg ->
     let t1 = PRIM_MakeBytes(arg) in
@@ -95,7 +95,7 @@ let g11 = fun arg k ->
       arg f2 k in
     t2 0 k in
   g2 arg k in
-let g12 = CID0 in
+let g12 = Unit0 in
 let g13 = fun arg k ->
   let k = [arg], fun [f2] arg ->
     let t1 = PRIM_MakeBytes(arg) in
@@ -117,7 +117,7 @@ let g13 = fun arg k ->
       arg f2 k in
     t2 t3 k in
   g2 arg k in
-let g14 = CID0 in
+let g14 = Nil0 in
 let g15 = fun arg k ->
   let t1 = [arg], fun [f1] me arg k ->
     let t1 = [f1,arg,me], fun [f1,f2,f3] arg k ->
@@ -126,7 +126,7 @@ let g15 = fun arg k ->
       | true1 -> k f2
       | false0 ->
         let t2 = PRIM_StringIndex(f1,arg) in
-        let t3 = CID1[t2,f2] in
+        let t3 = Cons1[t2,f2] in
         let k = [arg], fun [f2] arg ->
           let t1 = PRIM_SubInt(f2,1) in
           arg t1 k in
@@ -137,13 +137,13 @@ let g15 = fun arg k ->
     let t1 = PRIM_SubInt(f2,1) in
     arg t1 k in
   t1 g14 k in
-let g16 = CID0 in
-let g17 = CID1 in
-let g18 = CID0 in
-let g19 = CID1 in
-let g20 = CID0 in
-let g21 = CID1 in
-let g22 = CID0 in
+let g16 = false0 in
+let g17 = true1 in
+let g18 = false0 in
+let g19 = true1 in
+let g20 = false0 in
+let g21 = true1 in
+let g22 = false0 in
 let g23 = fun arg k ->
   let t1 = [arg], fun [f1] arg k ->
     let t1 = PRIM_StringLength(f1) in
@@ -177,7 +177,7 @@ let g23 = fun arg k ->
     | false0 -> k g17 in
   k t1 in
 let g24 = "" in
-let g26 = CID0 in
+let g26 = Unit0 in
 let g25 = fun arg k ->
   match arg with
   | Nil0 -> k g26
@@ -208,129 +208,129 @@ let g25 = fun arg k ->
           let t10 = PRIM_CharChr(t9) in
           let t11 = PRIM_PutChar(t10) in
           k t11 in
-let g27 = CID0 in
+let g27 = Nil0 in
 let g28 = "% " in
-let g29 = CID0 in
-let g30 = CID0 in
-let g31 = CID0 in
-let g32 = CID1 in
-let g33 = CID0 in
-let g34 = CID0 in
-let g35 = CID0 in
-let g36 = CID0 in
-let g37 = CID0 in
-let g38 = CID0 in
+let g29 = Nil0 in
+let g30 = Unit0 in
+let g31 = false0 in
+let g32 = true1 in
+let g33 = Unit0 in
+let g34 = Nil0 in
+let g35 = Unit0 in
+let g36 = Nil0 in
+let g37 = Nil0 in
+let g38 = None0 in
 let g39 = "sham: " in
 let g40 = ": " in
 let g41 = "command not found" in
 let g42 = "\n" in
-let g43 = CID0 in
-let g44 = CID1[g42,g43] in
-let g45 = CID1[g41,g44] in
-let g46 = CID1[g40,g45] in
+let g43 = Nil0 in
+let g44 = Cons1[g42,g43] in
+let g45 = Cons1[g41,g44] in
+let g46 = Cons1[g40,g45] in
 let g47 = "sham: " in
 let g48 = ": " in
 let g49 = "Permission denied" in
 let g50 = "\n" in
-let g51 = CID0 in
-let g52 = CID1[g50,g51] in
-let g53 = CID1[g49,g52] in
-let g54 = CID1[g48,g53] in
+let g51 = Nil0 in
+let g52 = Cons1[g50,g51] in
+let g53 = Cons1[g49,g52] in
+let g54 = Cons1[g48,g53] in
 let g55 = "Sham: In-memory file-system. Consider typing \"ls\".\n" in
 let g56 = "readme" in
 let g57 = "Welcome to sham; please try all the commands!\nCan you find the hidden Easter Egg?\n" in
-let g58 = CID0[g57] in
-let g59 = CID0[g56,g58] in
+let g58 = Data0[g57] in
+let g59 = Pair0[g56,g58] in
 let g60 = "ls" in
 let g61 = "ls - list directory contents\n" in
 let g62 = "ls: takes no arguments\n" in
 let g63 = fun arg k ->
   match arg with
   | Pair0(t1,t2) -> k t1 in
-let g64 = CID0 in
-let g65 = CID0 in
+let g64 = Unit0 in
+let g65 = Unit0 in
 let g66 = "cat" in
 let g67 = "cat - concatenate files and print on the standard output\n" in
 let g68 = "cat: takes at least one argument\n" in
-let g69 = CID0 in
+let g69 = None0 in
 let g70 = "cat: " in
 let g71 = " : No such file\n" in
-let g72 = CID0 in
-let g73 = CID1[g71,g72] in
+let g72 = Nil0 in
+let g73 = Cons1[g71,g72] in
 let g74 = "cat: " in
 let g75 = " : Not a data file\n" in
-let g76 = CID0 in
-let g77 = CID1[g75,g76] in
-let g78 = CID0 in
+let g76 = Nil0 in
+let g77 = Cons1[g75,g76] in
+let g78 = None0 in
 let g79 = "cat: " in
 let g80 = " : No such file\n" in
-let g81 = CID0 in
-let g82 = CID1[g80,g81] in
+let g81 = Nil0 in
+let g82 = Cons1[g80,g81] in
 let g83 = "cat: " in
 let g84 = " : Not a data file\n" in
-let g85 = CID0 in
-let g86 = CID1[g84,g85] in
+let g85 = Nil0 in
+let g86 = Cons1[g84,g85] in
 let g87 = "man" in
 let g88 = "man - an interface to the system reference manuals\n" in
 let g89 = "What manual page do you want?\n" in
-let g90 = CID0 in
+let g90 = None0 in
 let g91 = "No manual entry for " in
 let g92 = "\n" in
-let g93 = CID0 in
-let g94 = CID1[g92,g93] in
+let g93 = Nil0 in
+let g94 = Cons1[g92,g93] in
 let g95 = "No manual entry for " in
 let g96 = "\n" in
-let g97 = CID0 in
-let g98 = CID1[g96,g97] in
-let g99 = CID0 in
+let g97 = Nil0 in
+let g98 = Cons1[g96,g97] in
+let g99 = None0 in
 let g100 = "No manual entry for " in
 let g101 = "\n" in
-let g102 = CID0 in
-let g103 = CID1[g101,g102] in
+let g102 = Nil0 in
+let g103 = Cons1[g101,g102] in
 let g104 = "No manual entry for " in
 let g105 = "\n" in
-let g106 = CID0 in
-let g107 = CID1[g105,g106] in
+let g106 = Nil0 in
+let g107 = Cons1[g105,g106] in
 let g108 = "rm" in
 let g109 = "rm - remove files or directories (directories not supported yet!)\n" in
 let g110 = "rm: missing operand\n" in
 let g111 = "rm: cannot remove '" in
 let g112 = "': No such file or directory\n" in
-let g113 = CID0 in
-let g114 = CID1[g112,g113] in
-let g115 = CID0 in
+let g113 = Nil0 in
+let g114 = Cons1[g112,g113] in
+let g115 = Nil0 in
 let g116 = "cp" in
 let g117 = "cp - copy files and directories\n" in
 let g118 = "cp: missing file operand\n" in
 let g119 = "cp: missing destination file operand after '" in
 let g120 = "'\n" in
-let g121 = CID0 in
-let g122 = CID1[g120,g121] in
+let g121 = Nil0 in
+let g122 = Cons1[g120,g121] in
 let g123 = "cp: unexpected extra operands\n" in
-let g124 = CID0 in
+let g124 = None0 in
 let g125 = "cp: cannot stat '" in
 let g126 = "': No such file or directory\n" in
-let g127 = CID0 in
-let g128 = CID1[g126,g127] in
+let g127 = Nil0 in
+let g128 = Cons1[g126,g127] in
 let g129 = "mv" in
 let g130 = "mv - move (rename) files\n" in
 let g131 = "mv: missing file operand\n" in
 let g132 = "mv: missing destination file operand after '" in
 let g133 = "'\n" in
-let g134 = CID0 in
-let g135 = CID1[g133,g134] in
+let g134 = Nil0 in
+let g135 = Cons1[g133,g134] in
 let g136 = "mv: unexpected extra operands\n" in
-let g137 = CID0 in
+let g137 = None0 in
 let g138 = "mv: cannot stat '" in
 let g139 = "': No such file or directory\n" in
-let g140 = CID0 in
-let g141 = CID1[g139,g140] in
+let g140 = Nil0 in
+let g141 = Cons1[g139,g140] in
 let g142 = "rm: cannot remove '" in
 let g143 = "': No such file or directory\n" in
-let g144 = CID0 in
-let g145 = CID1[g143,g144] in
-let g146 = CID0 in
-let g147 = CID0 in
+let g144 = Nil0 in
+let g145 = Cons1[g143,g144] in
+let g146 = Nil0 in
+let g147 = Nil0 in
 let k = [], fun [] arg ->
   let k = [arg], fun [f2] arg ->
     let k = [f2,arg], fun [f2,f3] arg ->
@@ -356,7 +356,7 @@ let k = [], fun [] arg ->
                 match arg with
                 | Nil0 ->
                   let k = [f3], fun [f2] arg ->
-                    let t1 = CID1[arg,f2] in
+                    let t1 = Cons1[arg,f2] in
                     k t1 in
                   f1 f5 k
                 | Cons1(t1,t2) ->
@@ -364,13 +364,13 @@ let k = [], fun [] arg ->
                   match t3 with
                   | true1 ->
                     let k = [f2,f3,t2], fun [f2,f3,f4] arg ->
-                      let t1 = CID1[arg,f3] in
+                      let t1 = Cons1[arg,f3] in
                       let k = [f4], fun [f2] arg -> arg f2 k in
                       f2 t1 k in
                     f1 f5 k
                   | false0 ->
                     let k = [f5,t1,t2], fun [f2,f3,f4] arg ->
-                      let t1 = CID1[f3,f2] in
+                      let t1 = Cons1[f3,f2] in
                       let k = [f4], fun [f2] arg -> arg f2 k in
                       arg t1 k in
                     f4 f3 k in
@@ -387,7 +387,7 @@ let k = [], fun [] arg ->
                 f2 f1 k
               | false0 ->
                 let k = [t1,t2], fun [f2,f3] arg ->
-                  let t1 = CID1[f2,g27] in
+                  let t1 = Cons1[f2,g27] in
                   let k = [f3], fun [f2] arg -> arg f2 k in
                   arg t1 k in
                 f3 f1 k in
@@ -395,7 +395,7 @@ let k = [], fun [] arg ->
         let t3 = [f2,f3,f4,arg,t1,t2], fun [f1,f2,f3,f4,f5,f6] me arg k ->
           let k = [f1,f2,f3,f4,f5,f6,arg,me], fun [f2,f3,f4,f5,f6,f7,f8,f9] arg ->
             let k = [f2,f3,f4,f5,f6,f7,f8,f9], fun [f2,f3,f4,f5,f6,f7,f8,f9] arg ->
-              let t1 = CID1['\EOT',g29] in
+              let t1 = Cons1['\EOT',g29] in
               let k = [f3,f4,f5,f6,f7,f8,f9], fun [f2,f3,f4,f5,f6,f7,f8] arg ->
                 let t1 = [f2], fun [f1] me arg k ->
                   let t1 = PRIM_GetChar(g30) in
@@ -412,7 +412,7 @@ let k = [], fun [] arg ->
                       let t5 = PRIM_PutChar('^') in
                       let t6 = PRIM_PutChar('D') in
                       let t7 = PRIM_PutChar('\n') in
-                      let t8 = CID1['\EOT',arg] in
+                      let t8 = Cons1['\EOT',arg] in
                       f1 t8 k
                     | false0 ->
                       let t5 = PRIM_LessInt(127,t2) in
@@ -447,7 +447,7 @@ let k = [], fun [] arg ->
                           let t7 = PRIM_CharOrd(t1) in
                           let t8 = PRIM_EqInt(t7,8) in
                           let k = [arg,me,t1], fun [f2,f3,f4] arg ->
-                            let t1 = CID1[f4,f2] in
+                            let t1 = Cons1[f4,f2] in
                             f3 t1 k in
                           match t8 with
                           | true1 ->
@@ -497,7 +497,7 @@ let k = [], fun [] arg ->
                                             let k = [f3,f4,f5], fun [f2,f3,f4] arg ->
                                               match arg with
                                               | true1 ->
-                                                let t1 = CID1[f4] in
+                                                let t1 = Some1[f4] in
                                                 k t1
                                               | false0 -> f2 f3 k in
                                             arg f2 k in
@@ -506,8 +506,8 @@ let k = [], fun [] arg ->
                                       let k = [f2,f3,f4,f5,f6], fun [f2,f3,f4,f5,f6] arg ->
                                         match arg with
                                         | None0 ->
-                                          let t1 = CID1[f5,g46] in
-                                          let t2 = CID1[g39,t1] in
+                                          let t1 = Cons1[f5,g46] in
+                                          let t2 = Cons1[g39,t1] in
                                           let k = [f2,f4], fun [f2,f3] arg ->
                                             let k = [f3], fun [f2] arg ->
                                               let k = [f2], fun [f2] arg -> k f2 in
@@ -517,8 +517,8 @@ let k = [], fun [] arg ->
                                         | Some1(t1) ->
                                           match t1 with
                                           | Data0(t2) ->
-                                            let t3 = CID1[f5,g54] in
-                                            let t4 = CID1[g47,t3] in
+                                            let t3 = Cons1[f5,g54] in
+                                            let t4 = Cons1[g47,t3] in
                                             let k = [f2,f4], fun [f2,f3] arg ->
                                               let k = [f3], fun [f2] arg ->
                                                 let k = [f2], fun [f2] arg -> k f2 in
@@ -580,8 +580,8 @@ let k = [], fun [] arg ->
                     | Bindings0(t1) -> k t1 in
                   g3 g63 k in
               k t1 in
-            let t2 = CID1[g61,t1] in
-            let t3 = CID0[g60,t2] in
+            let t2 = Executable1[g61,t1] in
+            let t3 = Pair0[g60,t2] in
             let t4 = [f2,f3,f4], fun [f1,f2,f3] arg k ->
               let t1 = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg k ->
                 match arg with
@@ -601,7 +601,7 @@ let k = [], fun [] arg ->
                           let k = [f3,f4,f5], fun [f2,f3,f4] arg ->
                             match arg with
                             | true1 ->
-                              let t1 = CID1[f4] in
+                              let t1 = Some1[f4] in
                               k t1
                             | false0 -> f2 f3 k in
                           arg f2 k in
@@ -620,7 +620,7 @@ let k = [], fun [] arg ->
                                   let k = [f3,f4,f5], fun [f2,f3,f4] arg ->
                                     match arg with
                                     | true1 ->
-                                      let t1 = CID1[f4] in
+                                      let t1 = Some1[f4] in
                                       k t1
                                     | false0 -> f2 f3 k in
                                   arg f2 k in
@@ -629,8 +629,8 @@ let k = [], fun [] arg ->
                             let k = [f2,f3,f4], fun [f2,f3,f4] arg ->
                               match arg with
                               | None0 ->
-                                let t1 = CID1[f4,g82] in
-                                let t2 = CID1[g79,t1] in
+                                let t1 = Cons1[f4,g82] in
+                                let t2 = Cons1[g79,t1] in
                                 let k = [f2], fun [f2] arg ->
                                   let k = [], fun [] arg -> g25 arg k in
                                   f2 arg k in
@@ -641,8 +641,8 @@ let k = [], fun [] arg ->
                                   let k = [], fun [] arg -> g25 arg k in
                                   f2 t2 k
                                 | Executable1(t2,t3) ->
-                                  let t4 = CID1[f4,g86] in
-                                  let t5 = CID1[g83,t4] in
+                                  let t4 = Cons1[f4,g86] in
+                                  let t5 = Cons1[g83,t4] in
                                   let k = [f2], fun [f2] arg ->
                                     let k = [], fun [] arg -> g25 arg k in
                                     f2 arg k in
@@ -656,8 +656,8 @@ let k = [], fun [] arg ->
                         g5 t1 k in
                       match arg with
                       | None0 ->
-                        let t1 = CID1[f6,g73] in
-                        let t2 = CID1[g70,t1] in
+                        let t1 = Cons1[f6,g73] in
+                        let t2 = Cons1[g70,t1] in
                         let k = [f2], fun [f2] arg ->
                           let k = [], fun [] arg -> g25 arg k in
                           f2 arg k in
@@ -668,8 +668,8 @@ let k = [], fun [] arg ->
                           let k = [], fun [] arg -> g25 arg k in
                           f2 t2 k
                         | Executable1(t2,t3) ->
-                          let t4 = CID1[f6,g77] in
-                          let t5 = CID1[g74,t4] in
+                          let t4 = Cons1[f6,g77] in
+                          let t5 = Cons1[g74,t4] in
                           let k = [f2], fun [f2] arg ->
                             let k = [], fun [] arg -> g25 arg k in
                             f2 arg k in
@@ -678,8 +678,8 @@ let k = [], fun [] arg ->
                   match f4 with
                   | Bindings0(t4) -> k t4 in
               k t1 in
-            let t5 = CID1[g67,t4] in
-            let t6 = CID0[g66,t5] in
+            let t5 = Executable1[g67,t4] in
+            let t6 = Pair0[g66,t5] in
             let t7 = [f2,f3,f4], fun [f1,f2,f3] arg k ->
               let t1 = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg k ->
                 match arg with
@@ -699,7 +699,7 @@ let k = [], fun [] arg ->
                           let k = [f3,f4,f5], fun [f2,f3,f4] arg ->
                             match arg with
                             | true1 ->
-                              let t1 = CID1[f4] in
+                              let t1 = Some1[f4] in
                               k t1
                             | false0 -> f2 f3 k in
                           arg f2 k in
@@ -718,7 +718,7 @@ let k = [], fun [] arg ->
                                   let k = [f3,f4,f5], fun [f2,f3,f4] arg ->
                                     match arg with
                                     | true1 ->
-                                      let t1 = CID1[f4] in
+                                      let t1 = Some1[f4] in
                                       k t1
                                     | false0 -> f2 f3 k in
                                   arg f2 k in
@@ -727,8 +727,8 @@ let k = [], fun [] arg ->
                             let k = [f2,f3,f4], fun [f2,f3,f4] arg ->
                               match arg with
                               | None0 ->
-                                let t1 = CID1[f4,g103] in
-                                let t2 = CID1[g100,t1] in
+                                let t1 = Cons1[f4,g103] in
+                                let t2 = Cons1[g100,t1] in
                                 let k = [f2], fun [f2] arg ->
                                   let k = [], fun [] arg -> g25 arg k in
                                   f2 arg k in
@@ -736,8 +736,8 @@ let k = [], fun [] arg ->
                               | Some1(t1) ->
                                 match t1 with
                                 | Data0(t2) ->
-                                  let t3 = CID1[f4,g107] in
-                                  let t4 = CID1[g104,t3] in
+                                  let t3 = Cons1[f4,g107] in
+                                  let t4 = Cons1[g104,t3] in
                                   let k = [f2], fun [f2] arg ->
                                     let k = [], fun [] arg -> g25 arg k in
                                     f2 arg k in
@@ -754,8 +754,8 @@ let k = [], fun [] arg ->
                         g5 t1 k in
                       match arg with
                       | None0 ->
-                        let t1 = CID1[f6,g94] in
-                        let t2 = CID1[g91,t1] in
+                        let t1 = Cons1[f6,g94] in
+                        let t2 = Cons1[g91,t1] in
                         let k = [f2], fun [f2] arg ->
                           let k = [], fun [] arg -> g25 arg k in
                           f2 arg k in
@@ -763,8 +763,8 @@ let k = [], fun [] arg ->
                       | Some1(t1) ->
                         match t1 with
                         | Data0(t2) ->
-                          let t3 = CID1[f6,g98] in
-                          let t4 = CID1[g95,t3] in
+                          let t3 = Cons1[f6,g98] in
+                          let t4 = Cons1[g95,t3] in
                           let k = [f2], fun [f2] arg ->
                             let k = [], fun [] arg -> g25 arg k in
                             f2 arg k in
@@ -776,8 +776,8 @@ let k = [], fun [] arg ->
                   match f4 with
                   | Bindings0(t4) -> k t4 in
               k t1 in
-            let t8 = CID1[g88,t7] in
-            let t9 = CID0[g87,t8] in
+            let t8 = Executable1[g88,t7] in
+            let t9 = Pair0[g87,t8] in
             let t10 = [f2,f3,f4], fun [f1,f2,f3] arg k ->
               let t1 = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg k ->
                 match arg with
@@ -792,8 +792,8 @@ let k = [], fun [] arg ->
                       let t1 = [f1,f2,f3,arg], fun [f1,f2,f3,f4] me arg k ->
                         match arg with
                         | Nil0 ->
-                          let t1 = CID1[f4,g114] in
-                          let t2 = CID1[g111,t1] in
+                          let t1 = Cons1[f4,g114] in
+                          let t2 = Cons1[g111,t1] in
                           let k = [f1], fun [f2] arg ->
                             let k = [], fun [] arg ->
                               let k = [], fun [] arg -> k g115 in
@@ -809,15 +809,15 @@ let k = [], fun [] arg ->
                                 | true1 -> k f3
                                 | false0 ->
                                   let k = [f4,f5], fun [f2,f3] arg ->
-                                    let t1 = CID0[f2,f3] in
-                                    let t2 = CID1[t1,arg] in
+                                    let t1 = Pair0[f2,f3] in
+                                    let t2 = Cons1[t1,arg] in
                                     k t2 in
                                   f2 f3 k in
                               arg f2 k in
                             f2 t3 k in
                       let k = [t1], fun [f2] arg ->
                         let k = [], fun [] arg ->
-                          let t1 = CID0[arg] in
+                          let t1 = Bindings0[arg] in
                           k t1 in
                         f2 arg k in
                       match f4 with
@@ -828,8 +828,8 @@ let k = [], fun [] arg ->
                     arg f2 k in
                   g7 t3 k in
               k t1 in
-            let t11 = CID1[g109,t10] in
-            let t12 = CID0[g108,t11] in
+            let t11 = Executable1[g109,t10] in
+            let t12 = Pair0[g108,t11] in
             let t13 = [f2,f3,f4], fun [f1,f2,f3] arg k ->
               let t1 = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg k ->
                 match arg with
@@ -841,8 +841,8 @@ let k = [], fun [] arg ->
                 | Cons1(t1,t2) ->
                   match t2 with
                   | Nil0 ->
-                    let t3 = CID1[t1,g122] in
-                    let t4 = CID1[g119,t3] in
+                    let t3 = Cons1[t1,g122] in
+                    let t4 = Cons1[g119,t3] in
                     let k = [f1,f4], fun [f2,f3] arg ->
                       let k = [f3], fun [f2] arg ->
                         let k = [f2], fun [f2] arg -> k f2 in
@@ -867,7 +867,7 @@ let k = [], fun [] arg ->
                               let k = [f3,f4,f5], fun [f2,f3,f4] arg ->
                                 match arg with
                                 | true1 ->
-                                  let t1 = CID1[f4] in
+                                  let t1 = Some1[f4] in
                                   k t1
                                 | false0 -> f2 f3 k in
                               arg f2 k in
@@ -876,8 +876,8 @@ let k = [], fun [] arg ->
                         let k = [f2,f3,f4,f5,f6], fun [f2,f3,f4,f5,f6] arg ->
                           match arg with
                           | None0 ->
-                            let t1 = CID1[f5,g128] in
-                            let t2 = CID1[g125,t1] in
+                            let t1 = Cons1[f5,g128] in
+                            let t2 = Cons1[g125,t1] in
                             let k = [f2,f4], fun [f2,f3] arg ->
                               let k = [f3], fun [f2] arg ->
                                 let k = [f2], fun [f2] arg -> k f2 in
@@ -886,9 +886,9 @@ let k = [], fun [] arg ->
                             f3 t2 k
                           | Some1(t1) ->
                             let k = [f6,t1], fun [f2,f3] arg ->
-                              let t1 = CID0[f2,f3] in
-                              let t2 = CID1[t1,arg] in
-                              let t3 = CID0[t2] in
+                              let t1 = Pair0[f2,f3] in
+                              let t2 = Cons1[t1,arg] in
+                              let t3 = Bindings0[t2] in
                               k t3 in
                             match f4 with
                             | Bindings0(t2) -> k t2 in
@@ -896,8 +896,8 @@ let k = [], fun [] arg ->
                       match f4 with
                       | Bindings0(t6) -> k t6 in
               k t1 in
-            let t14 = CID1[g117,t13] in
-            let t15 = CID0[g116,t14] in
+            let t14 = Executable1[g117,t13] in
+            let t15 = Pair0[g116,t14] in
             let t16 = [f2,f3,f4], fun [f1,f2,f3] arg k ->
               let t1 = [f1,f2,f3,arg], fun [f1,f2,f3,f4] arg k ->
                 match arg with
@@ -909,8 +909,8 @@ let k = [], fun [] arg ->
                 | Cons1(t1,t2) ->
                   match t2 with
                   | Nil0 ->
-                    let t3 = CID1[t1,g135] in
-                    let t4 = CID1[g132,t3] in
+                    let t3 = Cons1[t1,g135] in
+                    let t4 = Cons1[g132,t3] in
                     let k = [f1,f4], fun [f2,f3] arg ->
                       let k = [f3], fun [f2] arg ->
                         let k = [f2], fun [f2] arg -> k f2 in
@@ -935,7 +935,7 @@ let k = [], fun [] arg ->
                               let k = [f3,f4,f5], fun [f2,f3,f4] arg ->
                                 match arg with
                                 | true1 ->
-                                  let t1 = CID1[f4] in
+                                  let t1 = Some1[f4] in
                                   k t1
                                 | false0 -> f2 f3 k in
                               arg f2 k in
@@ -944,8 +944,8 @@ let k = [], fun [] arg ->
                         let k = [f2,f3,f4,f5,f6,f7], fun [f2,f3,f4,f5,f6,f7] arg ->
                           match arg with
                           | None0 ->
-                            let t1 = CID1[f6,g141] in
-                            let t2 = CID1[g138,t1] in
+                            let t1 = Cons1[f6,g141] in
+                            let t2 = Cons1[g138,t1] in
                             let k = [f2,f5], fun [f2,f3] arg ->
                               let k = [f3], fun [f2] arg ->
                                 let k = [f2], fun [f2] arg -> k f2 in
@@ -956,8 +956,8 @@ let k = [], fun [] arg ->
                             let t2 = [f2,f3,f4,f6], fun [f1,f2,f3,f4] me arg k ->
                               match arg with
                               | Nil0 ->
-                                let t1 = CID1[f4,g145] in
-                                let t2 = CID1[g142,t1] in
+                                let t1 = Cons1[f4,g145] in
+                                let t2 = Cons1[g142,t1] in
                                 let k = [f1], fun [f2] arg ->
                                   let k = [], fun [] arg ->
                                     let k = [], fun [] arg -> k g146 in
@@ -973,17 +973,17 @@ let k = [], fun [] arg ->
                                       | true1 -> k f3
                                       | false0 ->
                                         let k = [f4,f5], fun [f2,f3] arg ->
-                                          let t1 = CID0[f2,f3] in
-                                          let t2 = CID1[t1,arg] in
+                                          let t1 = Pair0[f2,f3] in
+                                          let t2 = Cons1[t1,arg] in
                                           k t2 in
                                         f2 f3 k in
                                     arg f2 k in
                                   f2 t3 k in
                             let k = [f7,t1,t2], fun [f2,f3,f4] arg ->
                               let k = [f2,f3], fun [f2,f3] arg ->
-                                let t1 = CID0[f2,f3] in
-                                let t2 = CID1[t1,arg] in
-                                let t3 = CID0[t2] in
+                                let t1 = Pair0[f2,f3] in
+                                let t2 = Cons1[t1,arg] in
+                                let t3 = Bindings0[t2] in
                                 k t3 in
                               f4 arg k in
                             match f5 with
@@ -992,16 +992,16 @@ let k = [], fun [] arg ->
                       match f4 with
                       | Bindings0(t6) -> k t6 in
               k t1 in
-            let t17 = CID1[g130,t16] in
-            let t18 = CID0[g129,t17] in
-            let t19 = CID1[t18,g147] in
-            let t20 = CID1[t15,t19] in
-            let t21 = CID1[t12,t20] in
-            let t22 = CID1[t9,t21] in
-            let t23 = CID1[t6,t22] in
-            let t24 = CID1[t3,t23] in
-            let t25 = CID1[g59,t24] in
-            let t26 = CID0[t25] in
+            let t17 = Executable1[g130,t16] in
+            let t18 = Pair0[g129,t17] in
+            let t19 = Cons1[t18,g147] in
+            let t20 = Cons1[t15,t19] in
+            let t21 = Cons1[t12,t20] in
+            let t22 = Cons1[t9,t21] in
+            let t23 = Cons1[t6,t22] in
+            let t24 = Cons1[t3,t23] in
+            let t25 = Cons1[g59,t24] in
+            let t26 = Bindings0[t25] in
             f5 t26 k in
           g25 arg k in
         f4 g55 k in
