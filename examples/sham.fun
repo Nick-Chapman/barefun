@@ -34,18 +34,14 @@ let rec fold_left f b xs =
   | [] -> b
   | x::xs -> fold_left f (f b x) xs
 
-let rec append xs ys = (* TODO: code tail-recursive version *)
+let rec rev_onto acc xs =
   match xs with
-  | [] -> ys
-  | x::xs -> x :: append xs ys
+  | [] -> acc
+  | x::xs -> rev_onto (x :: acc) xs
 
-let reverse =
-  let rec revloop acc xs =
-    match xs with
-    | [] -> acc
-    | x::xs -> revloop (x :: acc) xs
-  in
-  fun xs -> revloop [] xs
+let rev xs = rev_onto [] xs
+
+let append xs ys = rev_onto ys (rev xs)
 
 (* string ops *)
 
@@ -59,7 +55,7 @@ let implode = noinline (fun xs -> (* TODO $ or @@ op would be nice *)
   loop 0 xs;
   freeze_bytes b)
 
-let reverse_implode = noinline(fun xs ->
+let rev_implode = noinline(fun xs ->
   let n = length xs in
   let b = make_bytes n in
   let rec loop i xs =
@@ -130,8 +126,8 @@ let read_line () =
     let c = get_char () in
     let n = ord c in
     let controlD = chr 4 in
-    if eq_char c '\n' then (newline(); reverse_implode acc) else
-      if eq_char c controlD then (put_char controlD; newline(); reverse_implode (controlD :: acc)) else
+    if eq_char c '\n' then (newline(); rev_implode acc) else
+      if eq_char c controlD then (put_char controlD; newline(); rev_implode (controlD :: acc)) else
         if n > 127 then readloop acc else
           if n = 127 then
             match acc with
@@ -149,9 +145,9 @@ let split_words =
   let rec at_word_start accWs =
     let rec have_letter accWs accCs xs =
       match xs with
-      | [] -> reverse_implode accCs :: accWs
+      | [] -> rev_implode accCs :: accWs
       | x::xs ->
-         if eq_char x ' ' then at_word_start (reverse_implode accCs :: accWs) xs
+         if eq_char x ' ' then at_word_start (rev_implode accCs :: accWs) xs
          else have_letter accWs (x::accCs) xs
     in
     fun xs ->
@@ -162,12 +158,12 @@ let split_words =
          have_letter accWs [x] xs
 
   in
-  fun s -> reverse (at_word_start [] (explode s))
+  fun s -> rev (at_word_start [] (explode s))
 
 type 'a option = None | Some of 'a
 
 type ('a,'b) pair = Pair of 'a * 'b
-type 'file fs = Bindings of (string, 'file) pair list (* TODO: remove Bindins when fun can parse type aliases *)
+type 'file fs = Bindings of (string, 'file) pair list (* TODO: remove Bindings when parser can handle/ignore type aliases *)
 type file = Data of string | Executable of string * (file fs -> string list -> file fs)
 
 let bindings fs = match fs with | Bindings(ps) -> ps
