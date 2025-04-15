@@ -490,8 +490,6 @@ state0 dmap = State
       ]
     mem = Map.fromList (internal ++ user)
 
-    -- TODO: Use Symbolic addressses for internal constructed objected
-    -- TODO: Why do we even need an address for true/false?
     internal =
       [ (aFalse, vTag tFalse)
       , (aTrue, vTag tTrue)
