@@ -1,6 +1,6 @@
 L1: ; Function: g1
   mov bx, dx
-  mov ax, [bx+1]
+  mov ax, [bx+2]
   mov [2], ax
   mov ax, [2]
   call Bare_put_char
@@ -8,7 +8,7 @@ L1: ; Function: g1
   ;; (0'0) Return: prim_0'0 (t2)
   mov dx, [4]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 

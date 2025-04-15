@@ -2,7 +2,7 @@ L1: ; Arm: 4'27
   ;; (0'0) Return: con_4'32 (g2)
   mov dx, g2
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -10,7 +10,7 @@ L2: ; Arm: 3'26
   ;; (0'0) Return: con_3'31 (g3)
   mov dx, g3
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -48,7 +48,7 @@ L4: ; Continuation
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -56,7 +56,7 @@ L5: ; Arm: 8'25
   ;; (8'30) Return: 'E'
   mov dx, 'E'
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -70,7 +70,7 @@ L6: ; Continuation
   ;; (8'39) Return: 'O'
   mov dx, 'O'
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -91,7 +91,7 @@ L8: ; Arm: 8'25
   ;; (8'30) Return: 'E'
   mov dx, 'E'
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -105,7 +105,7 @@ L9: ; Continuation
   ;; (8'39) Return: 'O'
   mov dx, 'O'
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 

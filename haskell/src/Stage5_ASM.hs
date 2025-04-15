@@ -19,6 +19,9 @@ import qualified Data.Map as Map
 import qualified Interaction as I (Tickable(..))
 import qualified Stage4_CCF as SRC
 
+bytesPerWord :: Int
+bytesPerWord = 2 -- TODO: think about the correct way to do this!
+
 type Transformed = Image
 
 data Image = Image
@@ -74,7 +77,7 @@ data Word
 vTag :: Ctag -> Word
 vTag (Ctag _ n) = WNum n
 
-data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si -- Di when needed
+data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di -- when needed
   deriving (Eq,Ord)
 
 data Addr -- memory address
@@ -150,7 +153,7 @@ instance Show Source where
     SLit w -> show w
     SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
-    SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
+    SMemIndirectOffset r n -> "["++show r++"+"++show (bytesPerWord*n)++"]" -- hack to fix frame refs
 
 instance Show Word where
   show = \case
@@ -169,10 +172,11 @@ instance Show Reg where
     Sp -> "sp"
     Bp -> "bp"
     Si -> "si"
+    Di -> "di"
 
 instance Show Addr where
   show = \case
-    Physical n -> show (2*n) -- TODO super hacky place to fix the 2bytes/word
+    Physical n -> show (bytesPerWord*n) -- hack to fix temp refs
     Symbolic d 0 -> printf "%s" (show d)
     Symbolic d n -> printf "%s+%d" (show d) n
 

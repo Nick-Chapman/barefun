@@ -101,7 +101,7 @@ final_continuation:
     dw final_code
 
 final_code:
-    ;; TODO: print halt here. better still. quit the emulator
+    ;; print halt here. better still. quit the emulator
     mov ax, 'F'
     call Bare_put_char
 spin:

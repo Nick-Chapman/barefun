@@ -89,7 +89,7 @@ L1: ; Start
   ;; (0'0) Return: prim_0'0 (t29)
   mov dx, [58]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 

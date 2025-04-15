@@ -2,7 +2,7 @@ L1: ; Arm: 20'7
   ;; (0'0) Return: con_20'10 (g2)
   mov dx, g2
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -10,9 +10,9 @@ L2: ; Function: g1
   mov bx, dx
   cmp word [bx], 0
   jz L1
-  mov ax, [bx+1]
-  mov [2], ax
   mov ax, [bx+2]
+  mov [2], ax
+  mov ax, [bx+4]
   mov [4], ax
   mov ax, [2]
   call Bare_put_char
@@ -27,23 +27,23 @@ L3: ; Arm: 30'11
   ;; (29'12) Return: n (arg)
   mov dx, dx
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L4: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   add ax, dx
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L5: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   sub ax, 2
   mov [2], ax
   push dx
@@ -79,14 +79,14 @@ L6: ; Function: g3
 
 L7: ; Arm: 4'13
   ;; (3'23) Return: acc (f1)
-  mov dx, [bp+1]
+  mov dx, [bp+2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L8: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   sub ax, 1
   mov [2], ax
   ;; (5'45) Tail: app_5'19 (arg) @ prim_0'0 (t1)
@@ -107,7 +107,7 @@ L9: ; Function: t1
   mov bx, dx
   call Bare_string_index
   mov [4], ax
-  push [bp+1]
+  push [bp+2]
   push [4]
   push 1
   mov [6], sp
@@ -128,20 +128,20 @@ L10: ; Function: g4
   ;; (0'0) Return: lam_3'27 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L11: ; Arm: 13'13
   ;; (12'15) Return: acc (f1)
-  mov dx, [bp+1]
+  mov dx, [bp+2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L12: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   div ax, 10
   mov [2], ax
   ;; (14'41) Tail: app_14'11 (arg) @ prim_0'0 (t1)
@@ -167,7 +167,7 @@ L13: ; Function: t1
   mov ax, [6]
   call Bare_num_to_char
   mov [8], ax
-  push [bp+1]
+  push [bp+2]
   push [8]
   push 1
   mov [10], sp
@@ -188,20 +188,20 @@ L14: ; Function: g7
   ;; (0'0) Return: lam_12'19 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L15: ; Arm: 4'13
   ;; (3'23) Return: acc (f1)
-  mov dx, [bp+1]
+  mov dx, [bp+2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L16: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   sub ax, 1
   mov [2], ax
   ;; (5'45) Tail: app_5'19 (arg) @ prim_0'0 (t1)
@@ -222,7 +222,7 @@ L17: ; Function: t1
   mov bx, dx
   call Bare_string_index
   mov [4], ax
-  push [bp+1]
+  push [bp+2]
   push [4]
   push 1
   mov [6], sp
@@ -243,20 +243,20 @@ L18: ; Function: g9
   ;; (0'0) Return: lam_3'27 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L19: ; Arm: 13'13
   ;; (12'15) Return: acc (f1)
-  mov dx, [bp+1]
+  mov dx, [bp+2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L20: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   div ax, 10
   mov [2], ax
   ;; (14'41) Tail: app_14'11 (arg) @ prim_0'0 (t1)
@@ -282,7 +282,7 @@ L21: ; Function: t1
   mov ax, [6]
   call Bare_num_to_char
   mov [8], ax
-  push [bp+1]
+  push [bp+2]
   push [8]
   push 1
   mov [10], sp
@@ -303,7 +303,7 @@ L22: ; Function: g12
   ;; (0'0) Return: lam_12'19 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -314,7 +314,7 @@ L23: ; Continuation
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -336,7 +336,7 @@ L25: ; Arm: 16'11
   ;; (0'0) Return: con_16'17 (t2)
   mov dx, [4]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -345,12 +345,12 @@ L26: ; Continuation
   ;; use temp ax while setting up bp/dx
   mov ax, bp
   mov bp, dx
-  mov dx, [ax+2]
+  mov dx, [ax+4]
   mov ax, [bp]
   jmp ax
 
 L27: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   cmp word ax, 0
   call Bare_make_bool_from_z
   mov [2], ax
@@ -360,7 +360,7 @@ L27: ; Continuation
   mov bx, [2]
   cmp word [bx], 1
   jz L25
-  push [bp+2]
+  push [bp+4]
   push cx
   push L26
   mov cx, sp
@@ -371,7 +371,7 @@ L27: ; Continuation
   jmp ax
 
 L28: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L27
   mov cx, sp
@@ -382,7 +382,7 @@ L28: ; Continuation
   jmp ax
 
 L29: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L28
   mov cx, sp
@@ -393,7 +393,7 @@ L29: ; Continuation
   jmp ax
 
 L30: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L29
   mov cx, sp
@@ -404,7 +404,7 @@ L30: ; Continuation
   jmp ax
 
 L31: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L30
   mov cx, sp
@@ -415,7 +415,7 @@ L31: ; Continuation
   jmp ax
 
 L32: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L31
   mov cx, sp
@@ -426,7 +426,7 @@ L32: ; Continuation
   jmp ax
 
 L33: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L32
   mov cx, sp
@@ -437,7 +437,7 @@ L33: ; Continuation
   jmp ax
 
 L34: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L33
   mov cx, sp
@@ -448,7 +448,7 @@ L34: ; Continuation
   jmp ax
 
 L35: ; Continuation
-  push [bp+2]
+  push [bp+4]
   push cx
   push L34
   mov cx, sp

@@ -1,13 +1,13 @@
 L1: ; Arm: 6'13
   ;; (5'15) Return: acc (f1)
-  mov dx, [bp+1]
+  mov dx, [bp+2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L2: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   div ax, 10
   mov [2], ax
   ;; (7'41) Tail: app_7'11 (arg) @ prim_0'0 (t1)
@@ -33,7 +33,7 @@ L3: ; Function: t1
   mov ax, [6]
   call Bare_num_to_char
   mov [8], ax
-  push [bp+1]
+  push [bp+2]
   push [8]
   push 1
   mov [10], sp
@@ -54,7 +54,7 @@ L4: ; Function: g1
   ;; (0'0) Return: lam_5'19 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -62,7 +62,7 @@ L5: ; Arm: 13'7
   ;; (0'0) Return: con_13'10 (g3)
   mov dx, g3
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -70,9 +70,9 @@ L6: ; Function: g2
   mov bx, dx
   cmp word [bx], 0
   jz L5
-  mov ax, [bx+1]
-  mov [2], ax
   mov ax, [bx+2]
+  mov [2], ax
+  mov ax, [bx+4]
   mov [4], ax
   mov ax, [2]
   call Bare_put_char
@@ -84,23 +84,23 @@ L6: ; Function: g2
   jmp ax
 
 L7: ; Arm: 22'10
-  mov ax, [bx+1]
+  mov ax, [bx+2]
   mov [2], ax
   ;; (22'8) Return: n (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
 L8: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   add ax, dx
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -110,15 +110,15 @@ L9: ; Continuation
   push L8
   mov cx, sp
   ;; (23'33) Tail: eval (g4) @ e2 (f2)
-  mov dx, [bp+2]
+  mov dx, [bp+4]
   mov bp, g4
   mov ax, [bp]
   jmp ax
 
 L10: ; Arm: 23'15
-  mov ax, [bx+1]
-  mov [2], ax
   mov ax, [bx+2]
+  mov [2], ax
+  mov ax, [bx+4]
   mov [4], ax
   push [4]
   push cx
@@ -131,13 +131,13 @@ L10: ; Arm: 23'15
   jmp ax
 
 L11: ; Continuation
-  mov ax, [bp+2]
+  mov ax, [bp+4]
   sub ax, dx
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -147,7 +147,7 @@ L12: ; Continuation
   push L11
   mov cx, sp
   ;; (24'33) Tail: eval (g4) @ e2 (f2)
-  mov dx, [bp+2]
+  mov dx, [bp+4]
   mov bp, g4
   mov ax, [bp]
   jmp ax
@@ -158,9 +158,9 @@ L13: ; Function: g4
   jz L7
   cmp word [bx], 1
   jz L10
-  mov ax, [bx+1]
-  mov [2], ax
   mov ax, [bx+2]
+  mov [2], ax
+  mov ax, [bx+4]
   mov [4], ax
   push [4]
   push cx
@@ -187,7 +187,7 @@ L15: ; Arm: 9'20
   ;; (0'0) Return: con_9'26 (t2)
   mov dx, [4]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -196,7 +196,7 @@ L16: ; Continuation
   ;; use temp ax while setting up bp/dx
   mov ax, bp
   mov bp, dx
-  mov dx, [ax+2]
+  mov dx, [ax+4]
   mov ax, [bp]
   jmp ax
 

@@ -1,8 +1,8 @@
 L1: ; Arm: 3'11
   ;; (2'13) Return: def (f1)
-  mov dx, [bp+1]
+  mov dx, [bp+2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -40,7 +40,7 @@ L4: ; Function: g1
   ;; (0'0) Return: lam_2'17 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
@@ -51,7 +51,7 @@ L5: ; Continuation
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 

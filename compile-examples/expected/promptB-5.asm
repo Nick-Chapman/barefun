@@ -1,6 +1,6 @@
 L1: ; Arm: 9'27
   ;; (9'38) Tail: outer (g1) @ c (f1)
-  mov dx, [bp+1]
+  mov dx, [bp+2]
   mov bp, g1
   mov ax, [bp]
   jmp ax

@@ -21,7 +21,7 @@ L1: ; Start
   ;; (0'0) Return: prim_0'0 (t7)
   mov dx, [14]
   mov bp, cx
-  mov cx, [bp+1]
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
