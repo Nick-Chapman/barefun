@@ -37,11 +37,14 @@ norm env e =
 data SemValue
   = Syntax Exp
   | Macro Id (SemValue -> M SemValue)
-  | Constant Position Value -- TODO: should only be base values here
+  | Constant Position Value -- only base values here
   | Constructed Position Number [SemValue]
 
+-- TODO: Have locally defined type for BaseValue.
+-- This wont allow values for which a constant is not possible to construct.i.e. VFunc and VBytes
+
 posOfId :: Id -> Position
-posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos -- TODO: mandatory pos in ident
+posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos
   where noPos = Position 0 0
 
 syn :: Id -> SemValue
@@ -54,7 +57,7 @@ reifyValue pos = \case
   VString s -> Lit pos (LitS s)
   VCons tag vs -> do
     let es = map (reifyValue pos) vs
-    let cid = Cid "CID" -- TODO: need to solve this issue?
+    let cid = Cid "CID" -- TODO: Can the original user name be recovered?
     ConTag pos (Ctag cid tag) es
   v@VBytes{} ->
     error (show ("refifyValue",pos,v))
@@ -65,7 +68,7 @@ reify :: SemValue -> M Exp
 reify = \case
   Constructed pos tag args -> do
     es <- mapM reify args
-    let cid = Cid "CID" -- TODO: need to solve this issue?
+    let cid = Cid "CID"
     pure $ ConTag pos (Ctag cid tag) es
   Constant pos v -> pure (reifyValue pos v)
   Syntax e -> pure e

@@ -105,7 +105,8 @@ parse parStart chars0  = do
     run i chars par k@K4{eps,succ,fail,err} = case par of
 
       Pos -> do
-        -- TODO: compute line/col incrementally
+        -- It would be more efficient to track line/col directly in the state of the parser
+        -- instead of mkPosition recounting newlines passed so far each time a position is required.
         let position = mkPosition i
         eps position
 

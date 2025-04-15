@@ -64,12 +64,15 @@ runTerm next = do
             let bm' = Map.insert r (n,Map.insert i c m) bm
             loop state { bm = bm' } next
 
-
+-- An Interaction supports primitives for manipualting mutable "bytes"
+-- We implement functionally, with bytes being a reference into a Map of created bytes.
+-- Without GC, this will leak over time!
+-- This would be solved by switching to an IOArray based implementation
 data Bytes = BytesRef Int deriving (Eq,Ord,Show)
 
 data State = State
   { tm :: Map Tickable Int
-  , bm :: Map Bytes (Int,Map Int Char) -- TODO: implement in IO to avoid leak
+  , bm :: Map Bytes (Int,Map Int Char)
   , u :: Int
   }
 

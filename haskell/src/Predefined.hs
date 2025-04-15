@@ -10,7 +10,7 @@ wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =
   Prog ([ ValDef (Bid noPos (mkUserId x)) exp | (x,exp) <- bindings ] ++ defs)
   where
-    noPos = Position 0 0 -- TODO: can we do better than noPos?
+    noPos = Position 0 0
     bindings :: [(String,Exp)]
     bindings =
       [ ("+"            , prim2 AddInt)

@@ -23,16 +23,16 @@ import qualified Stage3_ANF as SRC (Code(..),Atomic(..),Val(..),Arm(..), fvs)
 
 type Transformed = Loadable
 
--- TODO: Better names for Loadable/Top
+-- TODO: Think of better names for Loadable/Top
 
-data Loadable -- restriction of Code
+data Loadable -- like Code, but executed at loadtime
   = Run Code
   | LetTop (Id,Global) Top Loadable
 
-data Top -- restriction of Atomic
+data Top -- like Atomic, but executed at loadtime
   = TopLitS String
   | TopPrim Builtin [Ref]
-  | TopLam Ref Code -- always allowing recursion
+  | TopLam Ref Code -- all top function defs allow recursion. we dont even have an unrecursive form
   | TopConApp Ctag [Ref]
 
 data Code
@@ -47,7 +47,7 @@ data Arm = ArmTag Position Ctag [(Id,Temp)] Code
 data Atomic
   = Prim Builtin [Ref]
   | ConApp Ctag [Ref]
-  | Lam [Ref] [Ref] Ref Code
+  | Lam [Ref] [Ref] Ref Code -- TODO: why do we have an unrecursive form here?
   | RecLam [Ref] [Ref] Ref Ref Code
 
 data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg deriving (Eq,Ord)

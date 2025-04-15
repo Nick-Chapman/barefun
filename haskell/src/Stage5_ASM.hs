@@ -33,7 +33,7 @@ data Code
 data Op -- target; source
   = OpComment String
   | OpMove Reg Source
-  | OpStore MemAddr Source -- TODO: generalise MemAddr to Target -- or maybe I dont need.
+  | OpStore MemAddr Source
   | OpCall BareBios
   | OpPush Source
   | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
@@ -41,7 +41,7 @@ data Op -- target; source
   | OpAddInto Reg Source
   | OpSubInto Reg Source
   | OpMulInto Reg Source
-  -- TODO: x86 div/mod are the same instruction, makeing uses of specific registers
+  -- TODO: x86 div/mod are the same instruction, making uses of specific registers
   | OpDivInto Reg Source
   | OpModInto Reg Source
 
@@ -57,19 +57,20 @@ data Source
   | SMemIndirect Reg
   | SMemIndirectOffset Reg Int
 
--- Val is a structure type for the contents of a register or memory location
+-- TODO: rename Val --> Word
+-- Val is a structured type for the contents of a register or memory location
 -- We use a variant type to help catch compiler bugs during dev.
 -- On a real system, the representations will overlap.
 -- Tagging will distinguish pointer from non-pointer.
 
-data Val -- TODO: rename Word?
+data Val
   = VChar Char
   | VNum Number
   | VMemAddr MemAddr
   | VCodeLabel CodeLabel
   deriving Eq
 
-data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si -- TODO: Di
+data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si -- Di when needed
   deriving (Eq,Ord)
 
 data MemAddr  -- TODO: rename Addr
@@ -83,7 +84,7 @@ data CodeLabel = CodeLabel Int String -- unique label and provenance
 data DataLabel = DataLabel SRC.Global
   deriving (Eq,Ord)
 
-data BareBios
+data BareBios -- TODO: rename constructors to avoid the hand coded Show function
   = BiosHalt
   | BiosPutCharInAx
   | BiosGetCharInAx
@@ -97,6 +98,21 @@ data BareBios
   | BiosFreezeBytes
   | BiosSetBytes
 --  | BiosCheckHeapSpace -- maybe initiate GC; compile at head of each code section
+
+instance Show BareBios where
+  show = \case
+    BiosHalt -> "bios_halt"
+    BiosGetCharInAx -> "bios_get_char"
+    BiosPutCharInAx -> "bios_put_char"
+    BiosMakeBoolFromFlagZ -> "bios_make_bool_from_z"
+    BiosMakeBoolFromFlagN -> "bios_make_bool_from_n"
+    BiosNumToChar -> "bios_num_to_char"
+    BiosCharToNum -> "bios_char_to_num"
+    BiosStringLength -> "bios_string_length"
+    BiosStringIndex -> "bios_string_index"
+    BiosMakeBytes -> "bios_make_bytes"
+    BiosFreezeBytes -> "bios_freeze_bytes"
+    BiosSetBytes -> "bios_set_bytes"
 
 ----------------------------------------------------------------------
 -- Show
@@ -138,7 +154,7 @@ instance Show Jump where
 instance Show Source where
   show = \case
     SReg r -> show r
-    SLit v -> "#" ++ show v -- TODO: does x86 use this #-syntax?
+    SLit v -> "#" ++ show v -- dont think x86 use this #-syntax
     SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
@@ -168,21 +184,6 @@ instance Show MemAddr where
 
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
 instance Show DataLabel where show (DataLabel g) = show g
-
-instance Show BareBios where
-  show = \case
-    BiosHalt -> "bios_halt"
-    BiosGetCharInAx -> "bios_get_char"
-    BiosPutCharInAx -> "bios_put_char"
-    BiosMakeBoolFromFlagZ -> "bios_make_bool_from_z"
-    BiosMakeBoolFromFlagN -> "bios_make_bool_from_n"
-    BiosNumToChar -> "bios_num_to_char"
-    BiosCharToNum -> "bios_char_to_num"
-    BiosStringLength -> "bios_string_length"
-    BiosStringIndex -> "bios_string_index"
-    BiosMakeBytes -> "bios_make_bytes"
-    BiosFreezeBytes -> "bios_freeze_bytes"
-    BiosSetBytes -> "bios_set_bytes"
 
 ----------------------------------------------------------------------
 -- Execute
@@ -498,6 +499,9 @@ state0 dmap = State
       , (Cx, VMemAddr aFinalCont)
       ]
     mem = Map.fromList (internal ++ user)
+
+    -- TODO: Use Symbolic addressses for internal constructed objected
+    -- TODO: Why do we even need an address for true/false?
     internal =
       [ (aFalse, VNum tFalse)
       , (aTrue, VNum tTrue)
@@ -516,9 +520,6 @@ instance Show State where
 
 -- Address for User Temps: 1..30
 -- Address for runtime system constants: 90,91,92
--- Address for User Globals: 101..
-
--- TODO: Avoid using Physical addressses here. (when have Symbolic working!)
 
 tempOffset :: Int -> MemAddr
 tempOffset n = Physical n
@@ -582,7 +583,7 @@ compileTopRef = \case
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
-  SRC.Return pos res -> do -- TODO: investigate misisng positions in check-compile output
+  SRC.Return pos res -> do
     pure $ doOps
       [ OpComment $ printf "(%s) Return: %s" (show pos) (ppRef res)
       -- arg = ...

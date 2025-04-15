@@ -36,7 +36,7 @@ data Ctag = Ctag Cid Number
 
 data Id = Id
   { optUnique :: Maybe Int
-  , optPos :: Maybe Position
+  , optPos :: Maybe Position -- TODO: make Position mandatory
   , name :: Name
   } deriving (Eq,Ord)
 
