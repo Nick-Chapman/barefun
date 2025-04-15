@@ -889,7 +889,7 @@ L66: ; Function: g25
   mov ax, [bp]
   jmp [ax]
 
-L67: ; Function: g63
+L67: ; Function: g125
   mov bx, dx
   mov ax, [bx+1]
   mov 1, ax
@@ -2757,7 +2757,7 @@ L192: ; Function: t3
   jmp [ax]
 
 L193: ; Continuation
-  ;; (217'17) Return: fs (f2)
+  ;; (225'18) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+1]
@@ -2775,49 +2775,62 @@ L194: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L195: ; Arm: 219'9
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  push [bp+2]
+L195: ; Arm: 235'7
+  push [bp+4]
   push cx
   push #L194
   mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_219'23 (g62)
+  ;; (114'38) Tail: explode (f1) @ lit_235'22 (g62)
   mov bp, [bp+1]
   mov dx, #g62
   mov ax, [bp]
   jmp [ax]
 
-L196: ; Arm: 188'9
-  ;; (0'0) Return: con_188'12 (g64)
-  mov dx, #g64
+L196: ; Arm: 177'9
+  ;; (0'0) Return: con_177'12 (g63)
+  mov dx, #g63
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L197: ; Continuation
-  ;; (189'48) Tail: loop (f2) @ xs (f3)
+L197: ; Arm: 181'35
+  push [bp+4]
+  push #1
+  mov 1, sp
+  ;; (0'0) Return: con_181'40 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L198: ; Continuation
+  mov bx, dx
+  cmp [bx], #1
+  bz L197
+  ;; (181'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]
   jmp [ax]
 
-L198: ; Continuation
+L199: ; Continuation
+  push [bp+5]
+  push [bp+4]
   push [bp+3]
-  push [bp+2]
   push cx
-  push #L197
+  push #L198
   mov cx, sp
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
+  ;; (181'28) Tail: app_181'23 (arg) @ x (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
   mov ax, [bp]
   jmp [ax]
 
-L199: ; Function: t1
+L200: ; Function: t3
   mov bx, dx
   cmp [bx], #0
   bz L196
@@ -2825,141 +2838,233 @@ L199: ; Function: t1
   mov 1, ax
   mov ax, [bx+2]
   mov 2, ax
-  mov ax, #' '
-  call bios_put_char
+  mov bx, [1]
+  mov ax, [bx+1]
   mov 3, ax
+  mov ax, [bx+2]
+  mov 4, ax
+  push [4]
   push [2]
   push bp
+  push [bp+2]
   push cx
-  push #L198
+  push #L199
   mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ x (t1)
+  ;; (181'23) Tail: eq_string (f1) @ name (t3)
   mov bp, [bp+1]
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L201: ; Arm: 177'9
+  ;; (0'0) Return: con_177'12 (g72)
+  mov dx, #g72
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L202: ; Arm: 181'35
+  push [bp+4]
+  push #1
+  mov 1, sp
+  ;; (0'0) Return: con_181'40 (t1)
   mov dx, [1]
-  mov ax, [bp]
-  jmp [ax]
-
-L200: ; Continuation
-  mov ax, #'\n'
-  call bios_put_char
-  mov 1, ax
-  ;; (217'17) Return: fs (f2)
-  mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L201: ; Arm: 192'9
-  ;; (0'0) Return: con_192'12 (g65)
-  mov dx, #g65
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L202: ; Continuation
-  ;; (193'34) Tail: loop (f2) @ xs (f3)
+L203: ; Continuation
+  mov bx, dx
+  cmp [bx], #1
+  bz L202
+  ;; (181'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]
   jmp [ax]
 
-L203: ; Continuation
+L204: ; Continuation
+  push [bp+5]
+  push [bp+4]
   push [bp+3]
+  push cx
+  push #L203
+  mov cx, sp
+  ;; (181'28) Tail: app_181'23 (arg) @ x (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L205: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L201
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  mov bx, [1]
+  mov ax, [bx+1]
+  mov 3, ax
+  mov ax, [bx+2]
+  mov 4, ax
+  push [4]
+  push [2]
+  push bp
   push [bp+2]
   push cx
-  push #L202
+  push #L204
   mov cx, sp
+  ;; (181'23) Tail: eq_string (f1) @ name (t3)
+  mov bp, [bp+1]
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L206: ; Continuation
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L204: ; Continuation
-  push [bp+2]
-  push #L199
-  mov 1, sp
-  push [bp+3]
+L207: ; Continuation
   push cx
-  push #L200
+  push #L206
   mov cx, sp
-  mov bx, dx
-  cmp [bx], #0
-  bz L201
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L208: ; Arm: 228'11
+  push #g76
+  push [bp+4]
+  push #1
+  mov 1, sp
+  push [1]
+  push #g73
+  push #1
+  mov 2, sp
+  push [bp+2]
+  push cx
+  push #L207
+  mov cx, sp
+  ;; (228'33) Tail: concat (f3) @ con_228'34 (t2)
+  mov bp, [bp+3]
+  mov dx, [2]
+  mov ax, [bp]
+  jmp [ax]
+
+L209: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L210: ; Arm: 231'16
   mov ax, [bx+1]
   mov 2, ax
-  mov ax, [bx+2]
-  mov 3, ax
-  push [3]
-  push [1]
   push cx
-  push #L203
+  push #L209
   mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ x (t2)
+  ;; (114'38) Tail: explode (f2) @ s (t2)
   mov bp, [bp+2]
   mov dx, [2]
   mov ax, [bp]
   jmp [ax]
 
-L205: ; Continuation
-  push [bp+3]
-  push [bp+2]
-  push cx
-  push #L204
-  mov cx, sp
-  ;; (223'43) Tail: app_223'33 (f4) @ case_172'18 (arg)
-  mov bp, [bp+4]
+L211: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L206: ; Continuation
-  push dx
+L212: ; Continuation
+  push cx
+  push #L211
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L213: ; Continuation
+  mov bx, dx
+  cmp [bx], #0
+  bz L208
+  mov ax, [bx+1]
+  mov 1, ax
+  mov bx, [1]
+  cmp [bx], #0
+  bz L210
+  mov ax, [bx+1]
+  mov 2, ax
+  mov ax, [bx+2]
+  mov 3, ax
+  push #g80
+  push [bp+4]
+  push #1
+  mov 4, sp
+  push [4]
+  push #g77
+  push #1
+  mov 5, sp
+  push [bp+2]
+  push cx
+  push #L212
+  mov cx, sp
+  ;; (232'48) Tail: concat (f3) @ con_232'49 (t5)
+  mov bp, [bp+3]
+  mov dx, [5]
+  mov ax, [bp]
+  jmp [ax]
+
+L214: ; Continuation
+  push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L205
+  push #L213
   mov cx, sp
-  mov bx, [bp+3]
-  mov ax, [bx+1]
-  mov 1, ax
-  ;; (172'43) Return: ps (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
+  ;; (183'17) Tail: loop (f5) @ case_172'18 (arg)
+  mov bp, [bp+5]
+  mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L207: ; Function: t1
-  mov bx, dx
-  cmp [bx], #1
-  bz L195
+L215: ; Function: t1
+  push dx
   push [bp+2]
+  push #L205
+  mov 1, sp
+  push [1]
+  push dx
+  push [bp+3]
   push [bp+1]
   push cx
-  push #L206
+  push #L214
   mov cx, sp
-  ;; (223'33) Tail: map (g3) @ lam_222'19 (g63)
-  mov bp, #g3
-  mov dx, #g63
-  mov ax, [bp]
-  jmp [ax]
-
-L208: ; Function: t1
-  push dx
-  push [bp+1]
-  push #L207
-  mov 1, sp
-  ;; (0'0) Return: lam_217'20 (t1)
-  mov dx, [1]
+  mov bx, [bp+4]
+  mov ax, [bx+1]
+  mov 2, ax
+  ;; (172'43) Return: ps (t2)
+  mov dx, [2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L209: ; Continuation
+L216: ; Continuation
   ;; (225'18) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
@@ -2967,165 +3072,70 @@ L209: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L210: ; Continuation
+L217: ; Continuation
   push [bp+2]
   push cx
-  push #L209
+  push #L216
   mov cx, sp
+  ;; (236'32) Tail: app_236'27 (arg) @ xs (f3)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+3]
+  mov ax, [bp]
+  jmp [ax]
+
+L218: ; Continuation
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push #L215
+  mov 1, sp
+  push [bp+6]
+  push [bp+5]
+  push cx
+  push #L217
+  mov cx, sp
+  ;; (236'27) Tail: iter (g5) @ lam_226'11 (t1)
+  mov bp, #g5
+  mov dx, [1]
+  mov ax, [bp]
+  jmp [ax]
+
+L219: ; Continuation
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
   mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L211: ; Arm: 235'7
-  push [bp+4]
-  push cx
-  push #L210
-  mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_235'22 (g68)
-  mov bp, [bp+1]
-  mov dx, #g68
-  mov ax, [bp]
-  jmp [ax]
-
-L212: ; Arm: 177'9
-  ;; (0'0) Return: con_177'12 (g69)
-  mov dx, #g69
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L213: ; Arm: 181'35
-  push [bp+4]
-  push #1
-  mov 1, sp
-  ;; (0'0) Return: con_181'40 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L214: ; Continuation
-  mov bx, dx
-  cmp [bx], #1
-  bz L213
-  ;; (181'60) Tail: loop (f2) @ ps (f3)
-  mov dx, [bp+3]
-  mov bp, [bp+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L215: ; Continuation
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push cx
-  push #L214
-  mov cx, sp
-  ;; (181'28) Tail: app_181'23 (arg) @ x (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L216: ; Function: t3
-  mov bx, dx
-  cmp [bx], #0
-  bz L212
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  mov bx, [1]
-  mov ax, [bx+1]
-  mov 3, ax
-  mov ax, [bx+2]
-  mov 4, ax
-  push [4]
-  push [2]
-  push bp
-  push [bp+2]
-  push cx
-  push #L215
-  mov cx, sp
-  ;; (181'23) Tail: eq_string (f1) @ name (t3)
-  mov bp, [bp+1]
-  mov dx, [3]
-  mov ax, [bp]
-  jmp [ax]
-
-L217: ; Arm: 177'9
-  ;; (0'0) Return: con_177'12 (g78)
-  mov dx, #g78
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L218: ; Arm: 181'35
-  push [bp+4]
-  push #1
-  mov 1, sp
-  ;; (0'0) Return: con_181'40 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L219: ; Continuation
-  mov bx, dx
-  cmp [bx], #1
-  bz L218
-  ;; (181'60) Tail: loop (f2) @ ps (f3)
-  mov dx, [bp+3]
-  mov bp, [bp+2]
-  mov ax, [bp]
-  jmp [ax]
-
 L220: ; Continuation
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
   push cx
   push #L219
   mov cx, sp
-  ;; (181'28) Tail: app_181'23 (arg) @ x (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+2]
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L221: ; Function: t1
-  mov bx, dx
-  cmp [bx], #0
-  bz L217
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  mov bx, [1]
-  mov ax, [bx+1]
-  mov 3, ax
-  mov ax, [bx+2]
-  mov 4, ax
-  push [4]
-  push [2]
-  push bp
+L221: ; Arm: 228'11
+  push #g67
+  push [bp+6]
+  push #1
+  mov 1, sp
+  push [1]
+  push #g64
+  push #1
+  mov 2, sp
   push [bp+2]
   push cx
   push #L220
   mov cx, sp
-  ;; (181'23) Tail: eq_string (f1) @ name (t3)
-  mov bp, [bp+1]
-  mov dx, [3]
+  ;; (228'33) Tail: concat (f4) @ con_228'34 (t2)
+  mov bp, [bp+4]
+  mov dx, [2]
   mov ax, [bp]
   jmp [ax]
 
@@ -3136,64 +3146,28 @@ L222: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L223: ; Continuation
+L223: ; Arm: 231'16
+  mov ax, [bx+1]
+  mov 2, ax
   push cx
   push #L222
   mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
+  ;; (114'38) Tail: explode (f2) @ s (t2)
   mov bp, [bp+2]
-  mov dx, dx
+  mov dx, [2]
   mov ax, [bp]
   jmp [ax]
 
-L224: ; Arm: 228'11
-  push #g82
-  push [bp+4]
-  push #1
-  mov 1, sp
-  push [1]
-  push #g79
-  push #1
-  mov 2, sp
-  push [bp+2]
-  push cx
-  push #L223
-  mov cx, sp
-  ;; (228'33) Tail: concat (f3) @ con_228'34 (t2)
-  mov bp, [bp+3]
-  mov dx, [2]
+L224: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
 L225: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L226: ; Arm: 231'16
-  mov ax, [bx+1]
-  mov 2, ax
   push cx
-  push #L225
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (t2)
-  mov bp, [bp+2]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L227: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L228: ; Continuation
-  push cx
-  push #L227
+  push #L224
   mov cx, sp
   ;; (114'38) Tail: explode (f2) @ s (arg)
   mov bp, [bp+2]
@@ -3201,215 +3175,38 @@ L228: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L229: ; Continuation
-  mov bx, dx
-  cmp [bx], #0
-  bz L224
-  mov ax, [bx+1]
-  mov 1, ax
-  mov bx, [1]
-  cmp [bx], #0
-  bz L226
-  mov ax, [bx+1]
-  mov 2, ax
-  mov ax, [bx+2]
-  mov 3, ax
-  push #g86
-  push [bp+4]
-  push #1
-  mov 4, sp
-  push [4]
-  push #g83
-  push #1
-  mov 5, sp
-  push [bp+2]
-  push cx
-  push #L228
-  mov cx, sp
-  ;; (232'48) Tail: concat (f3) @ con_232'49 (t5)
-  mov bp, [bp+3]
-  mov dx, [5]
-  mov ax, [bp]
-  jmp [ax]
-
-L230: ; Continuation
-  push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push cx
-  push #L229
-  mov cx, sp
-  ;; (183'17) Tail: loop (f5) @ case_172'18 (arg)
-  mov bp, [bp+5]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L231: ; Function: t1
-  push dx
-  push [bp+2]
-  push #L221
-  mov 1, sp
-  push [1]
-  push dx
-  push [bp+3]
-  push [bp+1]
-  push cx
-  push #L230
-  mov cx, sp
-  mov bx, [bp+4]
-  mov ax, [bx+1]
-  mov 2, ax
-  ;; (172'43) Return: ps (t2)
-  mov dx, [2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L232: ; Continuation
-  ;; (225'18) Return: fs (f2)
-  mov dx, [bp+2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L233: ; Continuation
-  push [bp+2]
-  push cx
-  push #L232
-  mov cx, sp
-  ;; (236'32) Tail: app_236'27 (arg) @ xs (f3)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+3]
-  mov ax, [bp]
-  jmp [ax]
-
-L234: ; Continuation
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push #L231
-  mov 1, sp
-  push [bp+6]
-  push [bp+5]
-  push cx
-  push #L233
-  mov cx, sp
-  ;; (236'27) Tail: iter (g5) @ lam_226'11 (t1)
-  mov bp, #g5
-  mov dx, [1]
-  mov ax, [bp]
-  jmp [ax]
-
-L235: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L236: ; Continuation
-  push cx
-  push #L235
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L237: ; Arm: 228'11
-  push #g73
-  push [bp+6]
-  push #1
-  mov 1, sp
-  push [1]
-  push #g70
-  push #1
-  mov 2, sp
-  push [bp+2]
-  push cx
-  push #L236
-  mov cx, sp
-  ;; (228'33) Tail: concat (f4) @ con_228'34 (t2)
-  mov bp, [bp+4]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L238: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L239: ; Arm: 231'16
-  mov ax, [bx+1]
-  mov 2, ax
-  push cx
-  push #L238
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (t2)
-  mov bp, [bp+2]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L240: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L241: ; Continuation
-  push cx
-  push #L240
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L242: ; Continuation
+L226: ; Continuation
   push [bp+7]
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L234
+  push #L218
   mov cx, sp
   mov bx, dx
   cmp [bx], #0
-  bz L237
+  bz L221
   mov ax, [bx+1]
   mov 1, ax
   mov bx, [1]
   cmp [bx], #0
-  bz L239
+  bz L223
   mov ax, [bx+1]
   mov 2, ax
   mov ax, [bx+2]
   mov 3, ax
-  push #g77
+  push #g71
   push [bp+6]
   push #1
   mov 4, sp
   push [4]
-  push #g74
+  push #g68
   push #1
   mov 5, sp
   push [bp+2]
   push cx
-  push #L241
+  push #L225
   mov cx, sp
   ;; (232'48) Tail: concat (f4) @ con_232'49 (t5)
   mov bp, [bp+4]
@@ -3417,7 +3214,7 @@ L242: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L243: ; Continuation
+L227: ; Continuation
   push [bp+7]
   push [bp+6]
   push [bp+5]
@@ -3425,7 +3222,7 @@ L243: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L242
+  push #L226
   mov cx, sp
   ;; (183'17) Tail: loop (f8) @ case_172'18 (arg)
   mov bp, [bp+8]
@@ -3433,17 +3230,17 @@ L243: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L244: ; Function: t1
+L228: ; Function: t1
   mov bx, dx
   cmp [bx], #0
-  bz L211
+  bz L195
   mov ax, [bx+1]
   mov 1, ax
   mov ax, [bx+2]
   mov 2, ax
   push [1]
   push [bp+2]
-  push #L216
+  push #L200
   mov 3, sp
   push [3]
   push [2]
@@ -3453,7 +3250,7 @@ L244: ; Function: t1
   push [bp+2]
   push [bp+1]
   push cx
-  push #L243
+  push #L227
   mov cx, sp
   mov bx, [bp+4]
   mov ax, [bx+1]
@@ -3465,12 +3262,12 @@ L244: ; Function: t1
   mov ax, [bp]
   jmp [ax]
 
-L245: ; Function: t4
+L229: ; Function: t1
   push dx
   push [bp+3]
   push [bp+2]
   push [bp+1]
-  push #L244
+  push #L228
   mov 1, sp
   ;; (0'0) Return: lam_225'21 (t1)
   mov dx, [1]
@@ -3479,802 +3276,7 @@ L245: ; Function: t4
   mov ax, [bp]
   jmp [ax]
 
-L246: ; Continuation
-  ;; (238'18) Return: fs (f2)
-  mov dx, [bp+2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L247: ; Continuation
-  push [bp+2]
-  push cx
-  push #L246
-  mov cx, sp
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L248: ; Arm: 249'7
-  push [bp+4]
-  push cx
-  push #L247
-  mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_249'22 (g89)
-  mov bp, [bp+1]
-  mov dx, #g89
-  mov ax, [bp]
-  jmp [ax]
-
-L249: ; Arm: 177'9
-  ;; (0'0) Return: con_177'12 (g90)
-  mov dx, #g90
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L250: ; Arm: 181'35
-  push [bp+4]
-  push #1
-  mov 1, sp
-  ;; (0'0) Return: con_181'40 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L251: ; Continuation
-  mov bx, dx
-  cmp [bx], #1
-  bz L250
-  ;; (181'60) Tail: loop (f2) @ ps (f3)
-  mov dx, [bp+3]
-  mov bp, [bp+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L252: ; Continuation
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push cx
-  push #L251
-  mov cx, sp
-  ;; (181'28) Tail: app_181'23 (arg) @ x (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L253: ; Function: t3
-  mov bx, dx
-  cmp [bx], #0
-  bz L249
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  mov bx, [1]
-  mov ax, [bx+1]
-  mov 3, ax
-  mov ax, [bx+2]
-  mov 4, ax
-  push [4]
-  push [2]
-  push bp
-  push [bp+2]
-  push cx
-  push #L252
-  mov cx, sp
-  ;; (181'23) Tail: eq_string (f1) @ name (t3)
-  mov bp, [bp+1]
-  mov dx, [3]
-  mov ax, [bp]
-  jmp [ax]
-
-L254: ; Arm: 177'9
-  ;; (0'0) Return: con_177'12 (g99)
-  mov dx, #g99
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L255: ; Arm: 181'35
-  push [bp+4]
-  push #1
-  mov 1, sp
-  ;; (0'0) Return: con_181'40 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L256: ; Continuation
-  mov bx, dx
-  cmp [bx], #1
-  bz L255
-  ;; (181'60) Tail: loop (f2) @ ps (f3)
-  mov dx, [bp+3]
-  mov bp, [bp+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L257: ; Continuation
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push cx
-  push #L256
-  mov cx, sp
-  ;; (181'28) Tail: app_181'23 (arg) @ name (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L258: ; Function: t1
-  mov bx, dx
-  cmp [bx], #0
-  bz L254
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  mov bx, [1]
-  mov ax, [bx+1]
-  mov 3, ax
-  mov ax, [bx+2]
-  mov 4, ax
-  push [4]
-  push [2]
-  push bp
-  push [bp+2]
-  push cx
-  push #L257
-  mov cx, sp
-  ;; (181'23) Tail: eq_string (f1) @ name (t3)
-  mov bp, [bp+1]
-  mov dx, [3]
-  mov ax, [bp]
-  jmp [ax]
-
-L259: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L260: ; Continuation
-  push cx
-  push #L259
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L261: ; Arm: 242'11
-  push #g103
-  push [bp+4]
-  push #1
-  mov 1, sp
-  push [1]
-  push #g100
-  push #1
-  mov 2, sp
-  push [bp+2]
-  push cx
-  push #L260
-  mov cx, sp
-  ;; (240'35) Tail: concat (f3) @ con_240'36 (t2)
-  mov bp, [bp+3]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L262: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L263: ; Continuation
-  push cx
-  push #L262
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L264: ; Arm: 245'16
-  mov ax, [bx+1]
-  mov 2, ax
-  push #g107
-  push [bp+4]
-  push #1
-  mov 3, sp
-  push [3]
-  push #g104
-  push #1
-  mov 4, sp
-  push [bp+2]
-  push cx
-  push #L263
-  mov cx, sp
-  ;; (240'35) Tail: concat (f3) @ con_240'36 (t4)
-  mov bp, [bp+3]
-  mov dx, [4]
-  mov ax, [bp]
-  jmp [ax]
-
-L265: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L266: ; Continuation
-  mov bx, dx
-  cmp [bx], #0
-  bz L261
-  mov ax, [bx+1]
-  mov 1, ax
-  mov bx, [1]
-  cmp [bx], #0
-  bz L264
-  mov ax, [bx+1]
-  mov 2, ax
-  mov ax, [bx+2]
-  mov 3, ax
-  push cx
-  push #L265
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ meta (t2)
-  mov bp, [bp+2]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L267: ; Continuation
-  push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push cx
-  push #L266
-  mov cx, sp
-  ;; (183'17) Tail: loop (f5) @ case_172'18 (arg)
-  mov bp, [bp+5]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L268: ; Function: t1
-  push dx
-  push [bp+2]
-  push #L258
-  mov 1, sp
-  push [1]
-  push dx
-  push [bp+3]
-  push [bp+1]
-  push cx
-  push #L267
-  mov cx, sp
-  mov bx, [bp+4]
-  mov ax, [bx+1]
-  mov 2, ax
-  ;; (172'43) Return: ps (t2)
-  mov dx, [2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L269: ; Continuation
-  ;; (238'18) Return: fs (f2)
-  mov dx, [bp+2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L270: ; Continuation
-  push [bp+2]
-  push cx
-  push #L269
-  mov cx, sp
-  ;; (250'32) Tail: app_250'27 (arg) @ xs (f3)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+3]
-  mov ax, [bp]
-  jmp [ax]
-
-L271: ; Continuation
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push #L268
-  mov 1, sp
-  push [bp+6]
-  push [bp+5]
-  push cx
-  push #L270
-  mov cx, sp
-  ;; (250'27) Tail: iter (g5) @ lam_239'11 (t1)
-  mov bp, #g5
-  mov dx, [1]
-  mov ax, [bp]
-  jmp [ax]
-
-L272: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L273: ; Continuation
-  push cx
-  push #L272
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L274: ; Arm: 242'11
-  push #g94
-  push [bp+6]
-  push #1
-  mov 1, sp
-  push [1]
-  push #g91
-  push #1
-  mov 2, sp
-  push [bp+2]
-  push cx
-  push #L273
-  mov cx, sp
-  ;; (240'35) Tail: concat (f4) @ con_240'36 (t2)
-  mov bp, [bp+4]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L275: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L276: ; Continuation
-  push cx
-  push #L275
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L277: ; Arm: 245'16
-  mov ax, [bx+1]
-  mov 2, ax
-  push #g98
-  push [bp+6]
-  push #1
-  mov 3, sp
-  push [3]
-  push #g95
-  push #1
-  mov 4, sp
-  push [bp+2]
-  push cx
-  push #L276
-  mov cx, sp
-  ;; (240'35) Tail: concat (f4) @ con_240'36 (t4)
-  mov bp, [bp+4]
-  mov dx, [4]
-  mov ax, [bp]
-  jmp [ax]
-
-L278: ; Continuation
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L279: ; Continuation
-  push [bp+7]
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push cx
-  push #L271
-  mov cx, sp
-  mov bx, dx
-  cmp [bx], #0
-  bz L274
-  mov ax, [bx+1]
-  mov 1, ax
-  mov bx, [1]
-  cmp [bx], #0
-  bz L277
-  mov ax, [bx+1]
-  mov 2, ax
-  mov ax, [bx+2]
-  mov 3, ax
-  push cx
-  push #L278
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ meta (t2)
-  mov bp, [bp+2]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L280: ; Continuation
-  push [bp+7]
-  push [bp+6]
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push cx
-  push #L279
-  mov cx, sp
-  ;; (183'17) Tail: loop (f8) @ case_172'18 (arg)
-  mov bp, [bp+8]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L281: ; Function: t1
-  mov bx, dx
-  cmp [bx], #0
-  bz L248
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  push [1]
-  push [bp+2]
-  push #L253
-  mov 3, sp
-  push [3]
-  push [2]
-  push [1]
-  push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push [bp+1]
-  push cx
-  push #L280
-  mov cx, sp
-  mov bx, [bp+4]
-  mov ax, [bx+1]
-  mov 4, ax
-  ;; (172'43) Return: ps (t4)
-  mov dx, [4]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L282: ; Function: t7
-  push dx
-  push [bp+3]
-  push [bp+2]
-  push [bp+1]
-  push #L281
-  mov 1, sp
-  ;; (0'0) Return: lam_238'21 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L283: ; Continuation
-  ;; (265'6) Return: fs (f2)
-  mov dx, [bp+2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L284: ; Continuation
-  push [bp+2]
-  push cx
-  push #L283
-  mov cx, sp
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L285: ; Arm: 267'7
-  push [bp+4]
-  push cx
-  push #L284
-  mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_267'22 (g110)
-  mov bp, [bp+1]
-  mov dx, #g110
-  mov ax, [bp]
-  jmp [ax]
-
-L286: ; Continuation
-  ;; (0'0) Return: con_256'92 (g115)
-  mov dx, #g115
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L287: ; Continuation
-  push cx
-  push #L286
-  mov cx, sp
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L288: ; Continuation
-  push cx
-  push #L287
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L289: ; Arm: 255'9
-  push #g114
-  push [bp+4]
-  push #1
-  mov 1, sp
-  push [1]
-  push #g111
-  push #1
-  mov 2, sp
-  push [bp+1]
-  push cx
-  push #L288
-  mov cx, sp
-  ;; (256'26) Tail: concat (f3) @ con_256'27 (t2)
-  mov bp, [bp+3]
-  mov dx, [2]
-  mov ax, [bp]
-  jmp [ax]
-
-L290: ; Arm: 260'35
-  ;; (257'10) Return: ps (f3)
-  mov dx, [bp+3]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L291: ; Continuation
-  push [bp+3]
-  push [bp+2]
-  push #0
-  mov 1, sp
-  push dx
-  push [1]
-  push #1
-  mov 2, sp
-  ;; (0'0) Return: con_0'0 (t2)
-  mov dx, [2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L292: ; Continuation
-  mov bx, dx
-  cmp [bx], #1
-  bz L290
-  push [bp+5]
-  push [bp+4]
-  push cx
-  push #L291
-  mov cx, sp
-  ;; (260'73) Tail: loop (f2) @ ps (f3)
-  mov dx, [bp+3]
-  mov bp, [bp+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L293: ; Continuation
-  push [bp+6]
-  push [bp+5]
-  push [bp+4]
-  push [bp+3]
-  push cx
-  push #L292
-  mov cx, sp
-  ;; (260'28) Tail: app_260'23 (arg) @ sought (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L294: ; Function: t1
-  mov bx, dx
-  cmp [bx], #0
-  bz L289
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  mov bx, [1]
-  mov ax, [bx+1]
-  mov 3, ax
-  mov ax, [bx+2]
-  mov 4, ax
-  push [4]
-  push [3]
-  push [2]
-  push bp
-  push [bp+4]
-  push cx
-  push #L293
-  mov cx, sp
-  ;; (260'23) Tail: eq_string (f2) @ name (t3)
-  mov bp, [bp+2]
-  mov dx, [3]
-  mov ax, [bp]
-  jmp [ax]
-
-L295: ; Continuation
-  push dx
-  push #0
-  mov 1, sp
-  ;; (0'0) Return: con_262'2 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L296: ; Continuation
-  push cx
-  push #L295
-  mov cx, sp
-  ;; (262'17) Tail: loop (f2) @ case_172'18 (arg)
-  mov bp, [bp+2]
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L297: ; Function: t1
-  push dx
-  push [bp+3]
-  push [bp+2]
-  push [bp+1]
-  push #L294
-  mov 1, sp
-  push [1]
-  push cx
-  push #L296
-  mov cx, sp
-  mov bx, [bp+4]
-  mov ax, [bx+1]
-  mov 2, ax
-  ;; (172'43) Return: ps (t2)
-  mov dx, [2]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L298: ; Function: t3
-  push dx
-  push [bp+3]
-  push [bp+2]
-  push [bp+1]
-  push #L297
-  mov 1, sp
-  ;; (0'0) Return: lam_252'11 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L299: ; Continuation
-  ;; (268'29) Tail: app_268'26 (arg) @ args (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L300: ; Continuation
-  push [bp+3]
-  push cx
-  push #L299
-  mov cx, sp
-  ;; (268'26) Tail: app_268'22 (arg) @ fs (f2)
-  ;; use temp ax while setting up bp/dx
-  mov ax, bp
-  mov bp, dx
-  mov dx, [ax+2]
-  mov ax, [bp]
-  jmp [ax]
-
-L301: ; Function: t1
-  mov bx, dx
-  cmp [bx], #0
-  bz L285
-  mov ax, [bx+1]
-  mov 1, ax
-  mov ax, [bx+2]
-  mov 2, ax
-  push [bp+3]
-  push [bp+2]
-  push [bp+1]
-  push #L298
-  mov 3, sp
-  push dx
-  push [bp+4]
-  push cx
-  push #L300
-  mov cx, sp
-  ;; (268'22) Tail: fold_left (g7) @ lam_252'8 (t3)
-  mov bp, #g7
-  mov dx, [3]
-  mov ax, [bp]
-  jmp [ax]
-
-L302: ; Function: t10
-  push dx
-  push [bp+3]
-  push [bp+2]
-  push [bp+1]
-  push #L301
-  mov 1, sp
-  ;; (0'0) Return: lam_265'9 (t1)
-  mov dx, [1]
-  mov bp, cx
-  mov cx, [bp+1]
-  mov ax, [bp]
-  jmp [ax]
-
-L303: ; Continuation
+L230: ; Continuation
   ;; (270'17) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
@@ -4282,10 +3284,10 @@ L303: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L304: ; Continuation
+L231: ; Continuation
   push [bp+2]
   push cx
-  push #L303
+  push #L230
   mov cx, sp
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
@@ -4293,18 +3295,18 @@ L304: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L305: ; Arm: 272'7
+L232: ; Arm: 272'7
   push [bp+4]
   push cx
-  push #L304
+  push #L231
   mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_272'22 (g118)
+  ;; (114'38) Tail: explode (f1) @ lit_272'22 (g83)
   mov bp, [bp+1]
-  mov dx, #g118
+  mov dx, #g83
   mov ax, [bp]
   jmp [ax]
 
-L306: ; Continuation
+L233: ; Continuation
   ;; (270'17) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
@@ -4312,10 +3314,10 @@ L306: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L307: ; Continuation
+L234: ; Continuation
   push [bp+2]
   push cx
-  push #L306
+  push #L233
   mov cx, sp
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
@@ -4323,10 +3325,10 @@ L307: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L308: ; Continuation
+L235: ; Continuation
   push [bp+3]
   push cx
-  push #L307
+  push #L234
   mov cx, sp
   ;; (114'38) Tail: explode (f2) @ s (arg)
   mov bp, [bp+2]
@@ -4334,19 +3336,19 @@ L308: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L309: ; Arm: 275'10
-  push #g122
+L236: ; Arm: 275'10
+  push #g87
   push [1]
   push #1
   mov 3, sp
   push [3]
-  push #g119
+  push #g84
   push #1
   mov 4, sp
   push [bp+4]
   push [bp+1]
   push cx
-  push #L308
+  push #L235
   mov cx, sp
   ;; (275'33) Tail: concat (f3) @ con_275'34 (t4)
   mov bp, [bp+3]
@@ -4354,7 +3356,7 @@ L309: ; Arm: 275'10
   mov ax, [bp]
   jmp [ax]
 
-L310: ; Continuation
+L237: ; Continuation
   ;; (270'17) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
@@ -4362,10 +3364,10 @@ L310: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L311: ; Continuation
+L238: ; Continuation
   push [bp+2]
   push cx
-  push #L310
+  push #L237
   mov cx, sp
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
@@ -4373,30 +3375,30 @@ L311: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L312: ; Arm: 278'12
+L239: ; Arm: 278'12
   mov ax, [bx+1]
   mov 5, ax
   mov ax, [bx+2]
   mov 6, ax
   push [bp+4]
   push cx
-  push #L311
+  push #L238
   mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_278'27 (g123)
+  ;; (114'38) Tail: explode (f1) @ lit_278'27 (g88)
   mov bp, [bp+1]
-  mov dx, #g123
+  mov dx, #g88
   mov ax, [bp]
   jmp [ax]
 
-L313: ; Arm: 177'9
-  ;; (0'0) Return: con_177'12 (g124)
-  mov dx, #g124
+L240: ; Arm: 177'9
+  ;; (0'0) Return: con_177'12 (g89)
+  mov dx, #g89
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L314: ; Arm: 181'35
+L241: ; Arm: 181'35
   push [bp+4]
   push #1
   mov 1, sp
@@ -4407,22 +3409,22 @@ L314: ; Arm: 181'35
   mov ax, [bp]
   jmp [ax]
 
-L315: ; Continuation
+L242: ; Continuation
   mov bx, dx
   cmp [bx], #1
-  bz L314
+  bz L241
   ;; (181'60) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
   mov bp, [bp+2]
   mov ax, [bp]
   jmp [ax]
 
-L316: ; Continuation
+L243: ; Continuation
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push cx
-  push #L315
+  push #L242
   mov cx, sp
   ;; (181'28) Tail: app_181'23 (arg) @ source (f2)
   ;; use temp ax while setting up bp/dx
@@ -4432,10 +3434,10 @@ L316: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L317: ; Function: t5
+L244: ; Function: t5
   mov bx, dx
   cmp [bx], #0
-  bz L313
+  bz L240
   mov ax, [bx+1]
   mov 1, ax
   mov ax, [bx+2]
@@ -4450,7 +3452,7 @@ L317: ; Function: t5
   push bp
   push [bp+2]
   push cx
-  push #L316
+  push #L243
   mov cx, sp
   ;; (181'23) Tail: eq_string (f1) @ name (t3)
   mov bp, [bp+1]
@@ -4458,7 +3460,7 @@ L317: ; Function: t5
   mov ax, [bp]
   jmp [ax]
 
-L318: ; Continuation
+L245: ; Continuation
   ;; (270'17) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
@@ -4466,10 +3468,10 @@ L318: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L319: ; Continuation
+L246: ; Continuation
   push [bp+2]
   push cx
-  push #L318
+  push #L245
   mov cx, sp
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
@@ -4477,10 +3479,10 @@ L319: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L320: ; Continuation
+L247: ; Continuation
   push [bp+3]
   push cx
-  push #L319
+  push #L246
   mov cx, sp
   ;; (114'38) Tail: explode (f2) @ s (arg)
   mov bp, [bp+2]
@@ -4488,19 +3490,19 @@ L320: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L321: ; Arm: 281'15
-  push #g128
+L248: ; Arm: 281'15
+  push #g93
   push [bp+5]
   push #1
   mov 1, sp
   push [1]
-  push #g125
+  push #g90
   push #1
   mov 2, sp
   push [bp+4]
   push [bp+2]
   push cx
-  push #L320
+  push #L247
   mov cx, sp
   ;; (281'38) Tail: concat (f3) @ con_281'39 (t2)
   mov bp, [bp+3]
@@ -4508,7 +3510,7 @@ L321: ; Arm: 281'15
   mov ax, [bp]
   jmp [ax]
 
-L322: ; Continuation
+L249: ; Continuation
   push [bp+3]
   push [bp+2]
   push #0
@@ -4527,16 +3529,16 @@ L322: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L323: ; Continuation
+L250: ; Continuation
   mov bx, dx
   cmp [bx], #0
-  bz L321
+  bz L248
   mov ax, [bx+1]
   mov 1, ax
   push [1]
   push [bp+6]
   push cx
-  push #L322
+  push #L249
   mov cx, sp
   mov bx, [bp+4]
   mov ax, [bx+1]
@@ -4548,14 +3550,14 @@ L323: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L324: ; Continuation
+L251: ; Continuation
   push [bp+6]
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L323
+  push #L250
   mov cx, sp
   ;; (183'17) Tail: loop (f7) @ case_172'18 (arg)
   mov bp, [bp+7]
@@ -4563,27 +3565,27 @@ L324: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L325: ; Function: t1
+L252: ; Function: t1
   mov bx, dx
   cmp [bx], #0
-  bz L305
+  bz L232
   mov ax, [bx+1]
   mov 1, ax
   mov ax, [bx+2]
   mov 2, ax
   mov bx, [2]
   cmp [bx], #0
-  bz L309
+  bz L236
   mov ax, [bx+1]
   mov 3, ax
   mov ax, [bx+2]
   mov 4, ax
   mov bx, [4]
   cmp [bx], #1
-  bz L312
+  bz L239
   push [1]
   push [bp+2]
-  push #L317
+  push #L244
   mov 5, sp
   push [5]
   push [3]
@@ -4592,7 +3594,7 @@ L325: ; Function: t1
   push [bp+3]
   push [bp+1]
   push cx
-  push #L324
+  push #L251
   mov cx, sp
   mov bx, [bp+4]
   mov ax, [bx+1]
@@ -4604,12 +3606,12 @@ L325: ; Function: t1
   mov ax, [bp]
   jmp [ax]
 
-L326: ; Function: t13
+L253: ; Function: t4
   push dx
   push [bp+3]
   push [bp+2]
   push [bp+1]
-  push #L325
+  push #L252
   mov 1, sp
   ;; (0'0) Return: lam_270'20 (t1)
   mov dx, [1]
@@ -4618,15 +3620,1085 @@ L326: ; Function: t13
   mov ax, [bp]
   jmp [ax]
 
-L327: ; Continuation
-  ;; (285'17) Return: fs (f2)
+L254: ; Continuation
+  ;; (313'21) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
+L255: ; Continuation
+  push [bp+2]
+  push cx
+  push #L254
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L256: ; Arm: 315'7
+  push [bp+6]
+  push cx
+  push #L255
+  mov cx, sp
+  ;; (114'38) Tail: explode (f3) @ lit_315'22 (g96)
+  mov bp, [bp+3]
+  mov dx, #g96
+  mov ax, [bp]
+  jmp [ax]
+
+L257: ; Continuation
+  ;; (313'21) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L258: ; Continuation
+  push [bp+2]
+  push cx
+  push #L257
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L259: ; Arm: 318'12
+  mov ax, [bx+1]
+  mov 3, ax
+  mov ax, [bx+2]
+  mov 4, ax
+  push [bp+6]
+  push cx
+  push #L258
+  mov cx, sp
+  ;; (114'38) Tail: explode (f3) @ lit_318'27 (g97)
+  mov bp, [bp+3]
+  mov dx, #g97
+  mov ax, [bp]
+  jmp [ax]
+
+L260: ; Arm: 132'22
+  mov ax, #'\n'
+  call bios_put_char
+  mov 4, ax
+  ;; (132'51) Tail: rev_implode (f1) @ acc (arg)
+  mov bp, [bp+1]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L261: ; Arm: 133'28
+  mov ax, #'^'
+  call bios_put_char
+  mov 5, ax
+  mov ax, #'D'
+  call bios_put_char
+  mov 6, ax
+  mov ax, #'\n'
+  call bios_put_char
+  mov 7, ax
+  push dx
+  push #'\EOT'
+  push #1
+  mov 8, sp
+  ;; (133'76) Tail: rev_implode (f1) @ con_0'0 (t8)
+  mov bp, [bp+1]
+  mov dx, [8]
+  mov ax, [bp]
+  jmp [ax]
+
+L262: ; Arm: 134'19
+  ;; (134'33) Tail: readloop (me) @ acc (arg)
+  mov bp, bp
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L263: ; Arm: 137'17
+  ;; (137'29) Tail: readloop (me) @ acc (arg)
+  mov bp, bp
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L264: ; Continuation
+  mov ax, #'\b'
+  call bios_put_char
+  mov 1, ax
+  mov ax, #' '
+  call bios_put_char
+  mov 2, ax
+  mov ax, #'\b'
+  call bios_put_char
+  mov 3, ax
+  ;; (141'24) Tail: readloop (f2) @ tail (f3)
+  mov dx, [bp+3]
+  mov bp, [bp+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L265: ; Arm: 139'31
+  mov ax, #'\b'
+  call bios_put_char
+  mov 1, ax
+  mov ax, #' '
+  call bios_put_char
+  mov 2, ax
+  mov ax, #'\b'
+  call bios_put_char
+  mov 3, ax
+  ;; (0'0) Return: prim_0'0 (t3)
+  mov dx, [3]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L266: ; Continuation
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L264
+  mov cx, sp
+  mov bx, dx
+  cmp [bx], #1
+  bz L265
+  ;; (0'0) Return: con_139'55 (g103)
+  mov dx, #g103
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L267: ; Arm: 8'9
+  ;; (0'0) Return: con_8'12 (g101)
+  mov dx, #g101
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L268: ; Arm: 135'21
+  mov bx, dx
+  cmp [bx], #0
+  bz L263
+  mov ax, [bx+1]
+  mov 7, ax
+  mov ax, [bx+2]
+  mov 8, ax
+  mov ax, [7]
+  call bios_char_to_num
+  mov 9, ax
+  mov ax, #26
+  cmp ax, [9]
+  call bios_make_bool_from_n
+  mov 10, ax
+  push [8]
+  push bp
+  push cx
+  push #L266
+  mov cx, sp
+  mov bx, [10]
+  cmp [bx], #1
+  bz L267
+  ;; (0'0) Return: con_9'13 (g102)
+  mov dx, #g102
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L269: ; Continuation
+  push [bp+2]
+  push [bp+4]
+  push #1
+  mov 1, sp
+  ;; (143'34) Tail: readloop (f3) @ con_0'0 (t1)
+  mov bp, [bp+3]
+  mov dx, [1]
+  mov ax, [bp]
+  jmp [ax]
+
+L270: ; Arm: 104'19
+  mov ax, [1]
+  call bios_put_char
+  mov 9, ax
+  ;; (0'0) Return: prim_0'0 (t9)
+  mov dx, [9]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L271: ; Arm: 105'22
+  mov ax, [1]
+  call bios_put_char
+  mov 10, ax
+  ;; (0'0) Return: prim_0'0 (t10)
+  mov dx, [10]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L272: ; Arm: 106'16
+  mov ax, [1]
+  call bios_put_char
+  mov 11, ax
+  ;; (0'0) Return: prim_0'0 (t11)
+  mov dx, [11]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L273: ; Function: t1
+  call bios_get_char
+  mov 1, ax
+  mov ax, [1]
+  call bios_char_to_num
+  mov 2, ax
+  mov ax, [1]
+  cmp ax, #'\n'
+  call bios_make_bool_from_z
+  mov 3, ax
+  mov bx, [3]
+  cmp [bx], #1
+  bz L260
+  mov ax, [1]
+  cmp ax, #'\EOT'
+  call bios_make_bool_from_z
+  mov 4, ax
+  mov bx, [4]
+  cmp [bx], #1
+  bz L261
+  mov ax, #127
+  cmp ax, [2]
+  call bios_make_bool_from_n
+  mov 5, ax
+  mov bx, [5]
+  cmp [bx], #1
+  bz L262
+  mov ax, [2]
+  cmp ax, #127
+  call bios_make_bool_from_z
+  mov 6, ax
+  mov bx, [6]
+  cmp [bx], #1
+  bz L268
+  mov ax, [1]
+  call bios_char_to_num
+  mov 7, ax
+  mov ax, [7]
+  cmp ax, #8
+  call bios_make_bool_from_z
+  mov 8, ax
+  push [1]
+  push bp
+  push dx
+  push cx
+  push #L269
+  mov cx, sp
+  mov bx, [8]
+  cmp [bx], #1
+  bz L270
+  mov ax, [1]
+  cmp ax, #'\n'
+  call bios_make_bool_from_z
+  mov 9, ax
+  mov bx, [9]
+  cmp [bx], #1
+  bz L271
+  mov ax, #26
+  cmp ax, [7]
+  call bios_make_bool_from_n
+  mov 10, ax
+  mov bx, [10]
+  cmp [bx], #1
+  bz L272
+  mov ax, #'^'
+  call bios_put_char
+  mov 11, ax
+  mov ax, #65
+  add ax, [7]
+  mov 12, ax
+  mov ax, [12]
+  sub ax, #1
+  mov 13, ax
+  mov ax, [13]
+  call bios_num_to_char
+  mov 14, ax
+  mov ax, [14]
+  call bios_put_char
+  mov 15, ax
+  ;; (0'0) Return: prim_0'0 (t15)
+  mov dx, [15]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L274: ; Continuation
+  ;; (324'56) Tail: concat (f2) @ app_44'25 (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L275: ; Continuation
+  push [bp+2]
+  push cx
+  push #L274
+  mov cx, sp
+  ;; (44'25) Tail: app_44'22 (arg) @ acc (f3)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+3]
+  mov ax, [bp]
+  jmp [ax]
+
+L276: ; Arm: 324'44
+  push [bp+5]
+  push [bp+4]
+  push cx
+  push #L275
+  mov cx, sp
+  ;; (44'22) Tail: rev_onto (g8) @ con_44'22 (g105)
+  mov bp, #g8
+  mov dx, #g105
+  mov ax, [bp]
+  jmp [ax]
+
+L277: ; Continuation
+  push [bp+2]
+  push dx
+  push #1
+  mov 1, sp
+  ;; (325'17) Tail: loop (f3) @ con_0'0 (t1)
+  mov bp, [bp+3]
+  mov dx, [1]
+  mov ax, [bp]
+  jmp [ax]
+
+L278: ; Continuation
+  push [bp+4]
+  push [bp+3]
+  push cx
+  push #L277
+  mov cx, sp
+  ;; (91'10) Tail: implode (f2) @ app_46'28 (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L279: ; Continuation
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L278
+  mov cx, sp
+  ;; (46'28) Tail: app_46'25 (f5) @ app_44'25 (arg)
+  mov bp, [bp+5]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L280: ; Continuation
+  push [bp+6]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L279
+  mov cx, sp
+  ;; (44'25) Tail: app_44'22 (arg) @ xs (f5)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+5]
+  mov ax, [bp]
+  jmp [ax]
+
+L281: ; Continuation
+  push dx
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L280
+  mov cx, sp
+  ;; (44'22) Tail: rev_onto (g8) @ con_44'22 (g107)
+  mov bp, #g8
+  mov dx, #g107
+  mov ax, [bp]
+  jmp [ax]
+
+L282: ; Continuation
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L281
+  mov cx, sp
+  ;; (46'25) Tail: rev_onto (g8) @ ys (arg)
+  mov bp, #g8
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L283: ; Continuation
+  push dx
+  push [bp+5]
+  push [bp+4]
+  push [bp+2]
+  push cx
+  push #L282
+  mov cx, sp
+  ;; (91'32) Tail: explode (f3) @ lit_325'26 (g106)
+  mov bp, [bp+3]
+  mov dx, #g106
+  mov ax, [bp]
+  jmp [ax]
+
+L284: ; Continuation
+  mov bx, dx
+  cmp [bx], #1
+  bz L276
+  push [bp+6]
+  push [bp+5]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L283
+  mov cx, sp
+  ;; (91'19) Tail: explode (f3) @ line (f7)
+  mov dx, [bp+7]
+  mov bp, [bp+3]
+  mov ax, [bp]
+  jmp [ax]
+
+L285: ; Continuation
+  push [bp+8]
+  push [bp+7]
+  push [bp+6]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L284
+  mov cx, sp
+  ;; (324'28) Tail: app_324'23 (arg) @ single_controlD (f5)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+5]
+  mov ax, [bp]
+  jmp [ax]
+
+L286: ; Continuation
+  push dx
+  push [bp+8]
+  push [bp+7]
+  push [bp+6]
+  push [bp+5]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L285
+  mov cx, sp
+  ;; (324'23) Tail: eq_string (f4) @ line (arg)
+  mov bp, [bp+4]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L287: ; Function: t1
+  push [bp+2]
+  push #L273
+  mov 1, sp
+  push bp
+  push dx
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+1]
+  push cx
+  push #L286
+  mov cx, sp
+  ;; (145'11) Tail: readloop (t1) @ con_145'11 (g104)
+  mov bp, [1]
+  mov dx, #g104
+  mov ax, [bp]
+  jmp [ax]
+
+L288: ; Continuation
+  push [bp+3]
+  push #0
+  mov 1, sp
+  push [1]
+  push [bp+2]
+  push #0
+  mov 2, sp
+  push dx
+  push [2]
+  push #1
+  mov 3, sp
+  push [3]
+  push #0
+  mov 4, sp
+  ;; (0'0) Return: con_328'8 (t4)
+  mov dx, [4]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L289: ; Continuation
+  push dx
+  push [bp+3]
+  push cx
+  push #L288
+  mov cx, sp
+  mov bx, [bp+2]
+  mov ax, [bx+1]
+  mov 1, ax
+  ;; (172'43) Return: ps (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L290: ; Continuation
+  push dx
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push #L287
+  mov 1, sp
+  push [bp+8]
+  push [bp+7]
+  push cx
+  push #L289
+  mov cx, sp
+  ;; (327'28) Tail: loop (t1) @ con_327'28 (g108)
+  mov bp, [1]
+  mov dx, #g108
+  mov ax, [bp]
+  jmp [ax]
+
+L291: ; Continuation
+  push #g99
+  push #'\EOT'
+  push #1
+  mov 1, sp
+  push [bp+8]
+  push [bp+7]
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L290
+  mov cx, sp
+  ;; (321'38) Tail: implode (f2) @ con_321'39 (t1)
+  mov bp, [bp+2]
+  mov dx, [1]
+  mov ax, [bp]
+  jmp [ax]
+
+L292: ; Continuation
+  push [bp+8]
+  push [bp+7]
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L291
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L293: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L256
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  mov bx, [2]
+  cmp [bx], #1
+  bz L259
+  push [1]
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push cx
+  push #L292
+  mov cx, sp
+  ;; (114'38) Tail: explode (f3) @ lit_320'19 (g98)
+  mov bp, [bp+3]
+  mov dx, #g98
+  mov ax, [bp]
+  jmp [ax]
+
+L294: ; Function: t7
+  push dx
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L293
+  mov 1, sp
+  ;; (0'0) Return: lam_313'24 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L295: ; Continuation
+  ;; (300'19) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L296: ; Continuation
+  push [bp+2]
+  push cx
+  push #L295
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L297: ; Arm: 310'7
+  push [bp+4]
+  push cx
+  push #L296
+  mov cx, sp
+  ;; (114'38) Tail: explode (f1) @ lit_310'22 (g111)
+  mov bp, [bp+1]
+  mov dx, #g111
+  mov ax, [bp]
+  jmp [ax]
+
+L298: ; Arm: 177'9
+  ;; (0'0) Return: con_177'12 (g112)
+  mov dx, #g112
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L299: ; Arm: 181'35
+  push [bp+4]
+  push #1
+  mov 1, sp
+  ;; (0'0) Return: con_181'40 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L300: ; Continuation
+  mov bx, dx
+  cmp [bx], #1
+  bz L299
+  ;; (181'60) Tail: loop (f2) @ ps (f3)
+  mov dx, [bp+3]
+  mov bp, [bp+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L301: ; Continuation
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push cx
+  push #L300
+  mov cx, sp
+  ;; (181'28) Tail: app_181'23 (arg) @ x (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L302: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L298
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  mov bx, [1]
+  mov ax, [bx+1]
+  mov 3, ax
+  mov ax, [bx+2]
+  mov 4, ax
+  push [4]
+  push [2]
+  push bp
+  push [bp+2]
+  push cx
+  push #L301
+  mov cx, sp
+  ;; (181'23) Tail: eq_string (f1) @ name (t3)
+  mov bp, [bp+1]
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L303: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L304: ; Continuation
+  push cx
+  push #L303
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L305: ; Arm: 303'11
+  push #g115
+  push [bp+4]
+  push #1
+  mov 1, sp
+  push [bp+2]
+  push cx
+  push #L304
+  mov cx, sp
+  ;; (303'33) Tail: concat (f3) @ con_303'34 (t1)
+  mov bp, [bp+3]
+  mov dx, [1]
+  mov ax, [bp]
+  jmp [ax]
+
+L306: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L307: ; Continuation
+  push cx
+  push #L306
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L308: ; Arm: 306'16
+  mov ax, [bx+1]
+  mov 2, ax
+  push #g118
+  push [bp+4]
+  push #1
+  mov 3, sp
+  push [bp+2]
+  push cx
+  push #L307
+  mov cx, sp
+  ;; (306'38) Tail: concat (f3) @ con_306'39 (t3)
+  mov bp, [bp+3]
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L309: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L310: ; Continuation
+  push cx
+  push #L309
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L311: ; Continuation
+  mov bx, dx
+  cmp [bx], #0
+  bz L305
+  mov ax, [bx+1]
+  mov 1, ax
+  mov bx, [1]
+  cmp [bx], #0
+  bz L308
+  mov ax, [bx+1]
+  mov 2, ax
+  mov ax, [bx+2]
+  mov 3, ax
+  push #g121
+  push [bp+4]
+  push #1
+  mov 4, sp
+  push [bp+2]
+  push cx
+  push #L310
+  mov cx, sp
+  ;; (307'48) Tail: concat (f3) @ con_307'49 (t4)
+  mov bp, [bp+3]
+  mov dx, [4]
+  mov ax, [bp]
+  jmp [ax]
+
+L312: ; Continuation
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L311
+  mov cx, sp
+  ;; (183'17) Tail: loop (f5) @ case_172'18 (arg)
+  mov bp, [bp+5]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L313: ; Function: t3
+  push dx
+  push [bp+2]
+  push #L302
+  mov 1, sp
+  push [1]
+  push dx
+  push [bp+3]
+  push [bp+1]
+  push cx
+  push #L312
+  mov cx, sp
+  mov bx, [bp+4]
+  mov ax, [bx+1]
+  mov 2, ax
+  ;; (172'43) Return: ps (t2)
+  mov dx, [2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L314: ; Continuation
+  ;; (300'19) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L315: ; Continuation
+  push [bp+2]
+  push cx
+  push #L314
+  mov cx, sp
+  ;; (311'24) Tail: app_311'18 (arg) @ args (f3)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+3]
+  mov ax, [bp]
+  jmp [ax]
+
+L316: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L297
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L313
+  mov 3, sp
+  push dx
+  push [bp+4]
+  push cx
+  push #L315
+  mov cx, sp
+  ;; (311'18) Tail: iter (g5) @ lam_301'12 (t3)
+  mov bp, #g5
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L317: ; Function: t10
+  push dx
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L316
+  mov 1, sp
+  ;; (0'0) Return: lam_300'22 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L318: ; Continuation
+  ;; (217'17) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L319: ; Continuation
+  push [bp+2]
+  push cx
+  push #L318
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L320: ; Arm: 219'9
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  push [bp+2]
+  push cx
+  push #L319
+  mov cx, sp
+  ;; (114'38) Tail: explode (f1) @ lit_219'23 (g124)
+  mov bp, [bp+1]
+  mov dx, #g124
+  mov ax, [bp]
+  jmp [ax]
+
+L321: ; Arm: 188'9
+  ;; (0'0) Return: con_188'12 (g126)
+  mov dx, #g126
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L322: ; Continuation
+  ;; (189'48) Tail: loop (f2) @ xs (f3)
+  mov dx, [bp+3]
+  mov bp, [bp+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L323: ; Continuation
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L322
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L324: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L321
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  mov ax, #' '
+  call bios_put_char
+  mov 3, ax
+  push [2]
+  push bp
+  push cx
+  push #L323
+  mov cx, sp
+  ;; (114'38) Tail: explode (f1) @ x (t1)
+  mov bp, [bp+1]
+  mov dx, [1]
+  mov ax, [bp]
+  jmp [ax]
+
+L325: ; Continuation
+  mov ax, #'\n'
+  call bios_put_char
+  mov 1, ax
+  ;; (217'17) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L326: ; Arm: 192'9
+  ;; (0'0) Return: con_192'12 (g127)
+  mov dx, #g127
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L327: ; Continuation
+  ;; (193'34) Tail: loop (f2) @ xs (f3)
+  mov dx, [bp+3]
+  mov bp, [bp+2]
+  mov ax, [bp]
+  jmp [ax]
+
 L328: ; Continuation
+  push [bp+3]
   push [bp+2]
   push cx
   push #L327
@@ -4637,69 +4709,90 @@ L328: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L329: ; Arm: 287'7
-  push [bp+4]
+L329: ; Continuation
+  push [bp+2]
+  push #L324
+  mov 1, sp
+  push [bp+3]
+  push cx
+  push #L325
+  mov cx, sp
+  mov bx, dx
+  cmp [bx], #0
+  bz L326
+  mov ax, [bx+1]
+  mov 2, ax
+  mov ax, [bx+2]
+  mov 3, ax
+  push [3]
+  push [1]
   push cx
   push #L328
   mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_287'22 (g131)
-  mov bp, [bp+1]
-  mov dx, #g131
+  ;; (114'38) Tail: explode (f2) @ x (t2)
+  mov bp, [bp+2]
+  mov dx, [2]
   mov ax, [bp]
   jmp [ax]
 
 L330: ; Continuation
-  ;; (285'17) Return: fs (f2)
-  mov dx, [bp+2]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L329
+  mov cx, sp
+  ;; (223'43) Tail: app_223'33 (f4) @ case_172'18 (arg)
+  mov bp, [bp+4]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L331: ; Continuation
+  push dx
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L330
+  mov cx, sp
+  mov bx, [bp+3]
+  mov ax, [bx+1]
+  mov 1, ax
+  ;; (172'43) Return: ps (t1)
+  mov dx, [1]
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L331: ; Continuation
+L332: ; Function: t1
+  mov bx, dx
+  cmp [bx], #1
+  bz L320
   push [bp+2]
-  push cx
-  push #L330
-  mov cx, sp
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
-  mov ax, [bp]
-  jmp [ax]
-
-L332: ; Continuation
-  push [bp+3]
+  push [bp+1]
   push cx
   push #L331
   mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
-  mov bp, [bp+2]
-  mov dx, dx
+  ;; (223'33) Tail: map (g3) @ lam_222'19 (g125)
+  mov bp, #g3
+  mov dx, #g125
   mov ax, [bp]
   jmp [ax]
 
-L333: ; Arm: 290'10
-  push #g135
-  push [1]
-  push #1
-  mov 3, sp
-  push [3]
-  push #g132
-  push #1
-  mov 4, sp
-  push [bp+4]
+L333: ; Function: t13
+  push dx
   push [bp+1]
-  push cx
   push #L332
-  mov cx, sp
-  ;; (290'33) Tail: concat (f3) @ con_290'34 (t4)
-  mov bp, [bp+3]
-  mov dx, [4]
+  mov 1, sp
+  ;; (0'0) Return: lam_217'20 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
 L334: ; Continuation
-  ;; (285'17) Return: fs (f2)
+  ;; (238'18) Return: fs (f2)
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+1]
@@ -4717,24 +4810,20 @@ L335: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L336: ; Arm: 293'12
-  mov ax, [bx+1]
-  mov 5, ax
-  mov ax, [bx+2]
-  mov 6, ax
+L336: ; Arm: 249'7
   push [bp+4]
   push cx
   push #L335
   mov cx, sp
-  ;; (114'38) Tail: explode (f1) @ lit_293'27 (g136)
+  ;; (114'38) Tail: explode (f1) @ lit_249'22 (g130)
   mov bp, [bp+1]
-  mov dx, #g136
+  mov dx, #g130
   mov ax, [bp]
   jmp [ax]
 
 L337: ; Arm: 177'9
-  ;; (0'0) Return: con_177'12 (g137)
-  mov dx, #g137
+  ;; (0'0) Return: con_177'12 (g131)
+  mov dx, #g131
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
@@ -4768,7 +4857,7 @@ L340: ; Continuation
   push cx
   push #L339
   mov cx, sp
-  ;; (181'28) Tail: app_181'23 (arg) @ source (f2)
+  ;; (181'28) Tail: app_181'23 (arg) @ x (f2)
   ;; use temp ax while setting up bp/dx
   mov ax, bp
   mov bp, dx
@@ -4776,7 +4865,7 @@ L340: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L341: ; Function: t5
+L341: ; Function: t3
   mov bx, dx
   cmp [bx], #0
   bz L337
@@ -4802,68 +4891,77 @@ L341: ; Function: t5
   mov ax, [bp]
   jmp [ax]
 
-L342: ; Continuation
-  ;; (285'17) Return: fs (f2)
-  mov dx, [bp+2]
+L342: ; Arm: 177'9
+  ;; (0'0) Return: con_177'12 (g140)
+  mov dx, #g140
   mov bp, cx
   mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
-L343: ; Continuation
-  push [bp+2]
-  push cx
-  push #L342
-  mov cx, sp
-  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
-  mov bp, #g25
-  mov dx, dx
+L343: ; Arm: 181'35
+  push [bp+4]
+  push #1
+  mov 1, sp
+  ;; (0'0) Return: con_181'40 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
   mov ax, [bp]
   jmp [ax]
 
 L344: ; Continuation
-  push [bp+3]
-  push cx
-  push #L343
-  mov cx, sp
-  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bx, dx
+  cmp [bx], #1
+  bz L343
+  ;; (181'60) Tail: loop (f2) @ ps (f3)
+  mov dx, [bp+3]
   mov bp, [bp+2]
-  mov dx, dx
   mov ax, [bp]
   jmp [ax]
 
-L345: ; Arm: 296'15
-  push #g141
-  push [bp+6]
-  push #1
-  mov 1, sp
-  push [1]
-  push #g138
-  push #1
-  mov 2, sp
+L345: ; Continuation
   push [bp+5]
-  push [bp+2]
+  push [bp+4]
+  push [bp+3]
   push cx
   push #L344
   mov cx, sp
-  ;; (296'38) Tail: concat (f4) @ con_296'39 (t2)
-  mov bp, [bp+4]
-  mov dx, [2]
+  ;; (181'28) Tail: app_181'23 (arg) @ name (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
   mov ax, [bp]
   jmp [ax]
 
-L346: ; Continuation
-  ;; (0'0) Return: con_256'92 (g146)
-  mov dx, #g146
-  mov bp, cx
-  mov cx, [bp+1]
+L346: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L342
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  mov bx, [1]
+  mov ax, [bx+1]
+  mov 3, ax
+  mov ax, [bx+2]
+  mov 4, ax
+  push [4]
+  push [2]
+  push bp
+  push [bp+2]
+  push cx
+  push #L345
+  mov cx, sp
+  ;; (181'23) Tail: eq_string (f1) @ name (t3)
+  mov bp, [bp+1]
+  mov dx, [3]
   mov ax, [bp]
   jmp [ax]
 
 L347: ; Continuation
-  push cx
-  push #L346
-  mov cx, sp
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
   mov dx, dx
@@ -4880,18 +4978,613 @@ L348: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L349: ; Arm: 255'9
-  push #g145
+L349: ; Arm: 242'11
+  push #g144
   push [bp+4]
   push #1
   mov 1, sp
   push [1]
-  push #g142
+  push #g141
+  push #1
+  mov 2, sp
+  push [bp+2]
+  push cx
+  push #L348
+  mov cx, sp
+  ;; (240'35) Tail: concat (f3) @ con_240'36 (t2)
+  mov bp, [bp+3]
+  mov dx, [2]
+  mov ax, [bp]
+  jmp [ax]
+
+L350: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L351: ; Continuation
+  push cx
+  push #L350
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L352: ; Arm: 245'16
+  mov ax, [bx+1]
+  mov 2, ax
+  push #g148
+  push [bp+4]
+  push #1
+  mov 3, sp
+  push [3]
+  push #g145
+  push #1
+  mov 4, sp
+  push [bp+2]
+  push cx
+  push #L351
+  mov cx, sp
+  ;; (240'35) Tail: concat (f3) @ con_240'36 (t4)
+  mov bp, [bp+3]
+  mov dx, [4]
+  mov ax, [bp]
+  jmp [ax]
+
+L353: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L354: ; Continuation
+  mov bx, dx
+  cmp [bx], #0
+  bz L349
+  mov ax, [bx+1]
+  mov 1, ax
+  mov bx, [1]
+  cmp [bx], #0
+  bz L352
+  mov ax, [bx+1]
+  mov 2, ax
+  mov ax, [bx+2]
+  mov 3, ax
+  push cx
+  push #L353
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ meta (t2)
+  mov bp, [bp+2]
+  mov dx, [2]
+  mov ax, [bp]
+  jmp [ax]
+
+L355: ; Continuation
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L354
+  mov cx, sp
+  ;; (183'17) Tail: loop (f5) @ case_172'18 (arg)
+  mov bp, [bp+5]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L356: ; Function: t1
+  push dx
+  push [bp+2]
+  push #L346
+  mov 1, sp
+  push [1]
+  push dx
+  push [bp+3]
+  push [bp+1]
+  push cx
+  push #L355
+  mov cx, sp
+  mov bx, [bp+4]
+  mov ax, [bx+1]
+  mov 2, ax
+  ;; (172'43) Return: ps (t2)
+  mov dx, [2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L357: ; Continuation
+  ;; (238'18) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L358: ; Continuation
+  push [bp+2]
+  push cx
+  push #L357
+  mov cx, sp
+  ;; (250'32) Tail: app_250'27 (arg) @ xs (f3)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+3]
+  mov ax, [bp]
+  jmp [ax]
+
+L359: ; Continuation
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push #L356
+  mov 1, sp
+  push [bp+6]
+  push [bp+5]
+  push cx
+  push #L358
+  mov cx, sp
+  ;; (250'27) Tail: iter (g5) @ lam_239'11 (t1)
+  mov bp, #g5
+  mov dx, [1]
+  mov ax, [bp]
+  jmp [ax]
+
+L360: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L361: ; Continuation
+  push cx
+  push #L360
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L362: ; Arm: 242'11
+  push #g135
+  push [bp+6]
+  push #1
+  mov 1, sp
+  push [1]
+  push #g132
+  push #1
+  mov 2, sp
+  push [bp+2]
+  push cx
+  push #L361
+  mov cx, sp
+  ;; (240'35) Tail: concat (f4) @ con_240'36 (t2)
+  mov bp, [bp+4]
+  mov dx, [2]
+  mov ax, [bp]
+  jmp [ax]
+
+L363: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L364: ; Continuation
+  push cx
+  push #L363
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L365: ; Arm: 245'16
+  mov ax, [bx+1]
+  mov 2, ax
+  push #g139
+  push [bp+6]
+  push #1
+  mov 3, sp
+  push [3]
+  push #g136
+  push #1
+  mov 4, sp
+  push [bp+2]
+  push cx
+  push #L364
+  mov cx, sp
+  ;; (240'35) Tail: concat (f4) @ con_240'36 (t4)
+  mov bp, [bp+4]
+  mov dx, [4]
+  mov ax, [bp]
+  jmp [ax]
+
+L366: ; Continuation
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L367: ; Continuation
+  push [bp+7]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L359
+  mov cx, sp
+  mov bx, dx
+  cmp [bx], #0
+  bz L362
+  mov ax, [bx+1]
+  mov 1, ax
+  mov bx, [1]
+  cmp [bx], #0
+  bz L365
+  mov ax, [bx+1]
+  mov 2, ax
+  mov ax, [bx+2]
+  mov 3, ax
+  push cx
+  push #L366
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ meta (t2)
+  mov bp, [bp+2]
+  mov dx, [2]
+  mov ax, [bp]
+  jmp [ax]
+
+L368: ; Continuation
+  push [bp+7]
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push cx
+  push #L367
+  mov cx, sp
+  ;; (183'17) Tail: loop (f8) @ case_172'18 (arg)
+  mov bp, [bp+8]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L369: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L336
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  push [1]
+  push [bp+2]
+  push #L341
+  mov 3, sp
+  push [3]
+  push [2]
+  push [1]
+  push [bp+4]
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push cx
+  push #L368
+  mov cx, sp
+  mov bx, [bp+4]
+  mov ax, [bx+1]
+  mov 4, ax
+  ;; (172'43) Return: ps (t4)
+  mov dx, [4]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L370: ; Function: t16
+  push dx
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L369
+  mov 1, sp
+  ;; (0'0) Return: lam_238'21 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L371: ; Continuation
+  ;; (285'17) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L372: ; Continuation
+  push [bp+2]
+  push cx
+  push #L371
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L373: ; Arm: 287'7
+  push [bp+4]
+  push cx
+  push #L372
+  mov cx, sp
+  ;; (114'38) Tail: explode (f1) @ lit_287'22 (g151)
+  mov bp, [bp+1]
+  mov dx, #g151
+  mov ax, [bp]
+  jmp [ax]
+
+L374: ; Continuation
+  ;; (285'17) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L375: ; Continuation
+  push [bp+2]
+  push cx
+  push #L374
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L376: ; Continuation
+  push [bp+3]
+  push cx
+  push #L375
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L377: ; Arm: 290'10
+  push #g155
+  push [1]
+  push #1
+  mov 3, sp
+  push [3]
+  push #g152
+  push #1
+  mov 4, sp
+  push [bp+4]
+  push [bp+1]
+  push cx
+  push #L376
+  mov cx, sp
+  ;; (290'33) Tail: concat (f3) @ con_290'34 (t4)
+  mov bp, [bp+3]
+  mov dx, [4]
+  mov ax, [bp]
+  jmp [ax]
+
+L378: ; Continuation
+  ;; (285'17) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L379: ; Continuation
+  push [bp+2]
+  push cx
+  push #L378
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L380: ; Arm: 293'12
+  mov ax, [bx+1]
+  mov 5, ax
+  mov ax, [bx+2]
+  mov 6, ax
+  push [bp+4]
+  push cx
+  push #L379
+  mov cx, sp
+  ;; (114'38) Tail: explode (f1) @ lit_293'27 (g156)
+  mov bp, [bp+1]
+  mov dx, #g156
+  mov ax, [bp]
+  jmp [ax]
+
+L381: ; Arm: 177'9
+  ;; (0'0) Return: con_177'12 (g157)
+  mov dx, #g157
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L382: ; Arm: 181'35
+  push [bp+4]
+  push #1
+  mov 1, sp
+  ;; (0'0) Return: con_181'40 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L383: ; Continuation
+  mov bx, dx
+  cmp [bx], #1
+  bz L382
+  ;; (181'60) Tail: loop (f2) @ ps (f3)
+  mov dx, [bp+3]
+  mov bp, [bp+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L384: ; Continuation
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push cx
+  push #L383
+  mov cx, sp
+  ;; (181'28) Tail: app_181'23 (arg) @ source (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L385: ; Function: t5
+  mov bx, dx
+  cmp [bx], #0
+  bz L381
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  mov bx, [1]
+  mov ax, [bx+1]
+  mov 3, ax
+  mov ax, [bx+2]
+  mov 4, ax
+  push [4]
+  push [2]
+  push bp
+  push [bp+2]
+  push cx
+  push #L384
+  mov cx, sp
+  ;; (181'23) Tail: eq_string (f1) @ name (t3)
+  mov bp, [bp+1]
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L386: ; Continuation
+  ;; (285'17) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L387: ; Continuation
+  push [bp+2]
+  push cx
+  push #L386
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L388: ; Continuation
+  push [bp+3]
+  push cx
+  push #L387
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L389: ; Arm: 296'15
+  push #g161
+  push [bp+6]
+  push #1
+  mov 1, sp
+  push [1]
+  push #g158
+  push #1
+  mov 2, sp
+  push [bp+5]
+  push [bp+2]
+  push cx
+  push #L388
+  mov cx, sp
+  ;; (296'38) Tail: concat (f4) @ con_296'39 (t2)
+  mov bp, [bp+4]
+  mov dx, [2]
+  mov ax, [bp]
+  jmp [ax]
+
+L390: ; Continuation
+  ;; (0'0) Return: con_256'92 (g166)
+  mov dx, #g166
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L391: ; Continuation
+  push cx
+  push #L390
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L392: ; Continuation
+  push cx
+  push #L391
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L393: ; Arm: 255'9
+  push #g165
+  push [bp+4]
+  push #1
+  mov 1, sp
+  push [1]
+  push #g162
   push #1
   mov 2, sp
   push [bp+1]
   push cx
-  push #L348
+  push #L392
   mov cx, sp
   ;; (256'26) Tail: concat (f3) @ con_256'27 (t2)
   mov bp, [bp+3]
@@ -4899,7 +5592,7 @@ L349: ; Arm: 255'9
   mov ax, [bp]
   jmp [ax]
 
-L350: ; Arm: 260'35
+L394: ; Arm: 260'35
   ;; (257'10) Return: ps (f3)
   mov dx, [bp+3]
   mov bp, cx
@@ -4907,7 +5600,7 @@ L350: ; Arm: 260'35
   mov ax, [bp]
   jmp [ax]
 
-L351: ; Continuation
+L395: ; Continuation
   push [bp+3]
   push [bp+2]
   push #0
@@ -4923,14 +5616,14 @@ L351: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L352: ; Continuation
+L396: ; Continuation
   mov bx, dx
   cmp [bx], #1
-  bz L350
+  bz L394
   push [bp+5]
   push [bp+4]
   push cx
-  push #L351
+  push #L395
   mov cx, sp
   ;; (260'73) Tail: loop (f2) @ ps (f3)
   mov dx, [bp+3]
@@ -4938,13 +5631,13 @@ L352: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L353: ; Continuation
+L397: ; Continuation
   push [bp+6]
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push cx
-  push #L352
+  push #L396
   mov cx, sp
   ;; (260'28) Tail: app_260'23 (arg) @ source (f2)
   ;; use temp ax while setting up bp/dx
@@ -4954,10 +5647,10 @@ L353: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L354: ; Function: t2
+L398: ; Function: t2
   mov bx, dx
   cmp [bx], #0
-  bz L349
+  bz L393
   mov ax, [bx+1]
   mov 1, ax
   mov ax, [bx+2]
@@ -4973,7 +5666,7 @@ L354: ; Function: t2
   push bp
   push [bp+4]
   push cx
-  push #L353
+  push #L397
   mov cx, sp
   ;; (260'23) Tail: eq_string (f2) @ name (t3)
   mov bp, [bp+2]
@@ -4981,7 +5674,7 @@ L354: ; Function: t2
   mov ax, [bp]
   jmp [ax]
 
-L355: ; Continuation
+L399: ; Continuation
   push [bp+3]
   push [bp+2]
   push #0
@@ -5000,11 +5693,11 @@ L355: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L356: ; Continuation
+L400: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L355
+  push #L399
   mov cx, sp
   ;; (262'17) Tail: loop (f4) @ case_172'18 (arg)
   mov bp, [bp+4]
@@ -5012,23 +5705,23 @@ L356: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L357: ; Continuation
+L401: ; Continuation
   mov bx, dx
   cmp [bx], #0
-  bz L345
+  bz L389
   mov ax, [bx+1]
   mov 1, ax
   push [bp+6]
   push [bp+4]
   push [bp+3]
   push [bp+2]
-  push #L354
+  push #L398
   mov 2, sp
   push [2]
   push [1]
   push [bp+7]
   push cx
-  push #L356
+  push #L400
   mov cx, sp
   mov bx, [bp+5]
   mov ax, [bx+1]
@@ -5040,7 +5733,7 @@ L357: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L358: ; Continuation
+L402: ; Continuation
   push [bp+7]
   push [bp+6]
   push [bp+5]
@@ -5048,7 +5741,7 @@ L358: ; Continuation
   push [bp+3]
   push [bp+2]
   push cx
-  push #L357
+  push #L401
   mov cx, sp
   ;; (183'17) Tail: loop (f8) @ case_172'18 (arg)
   mov bp, [bp+8]
@@ -5056,27 +5749,27 @@ L358: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L359: ; Function: t1
+L403: ; Function: t1
   mov bx, dx
   cmp [bx], #0
-  bz L329
+  bz L373
   mov ax, [bx+1]
   mov 1, ax
   mov ax, [bx+2]
   mov 2, ax
   mov bx, [2]
   cmp [bx], #0
-  bz L333
+  bz L377
   mov ax, [bx+1]
   mov 3, ax
   mov ax, [bx+2]
   mov 4, ax
   mov bx, [4]
   cmp [bx], #1
-  bz L336
+  bz L380
   push [1]
   push [bp+2]
-  push #L341
+  push #L385
   mov 5, sp
   push [5]
   push [3]
@@ -5086,7 +5779,7 @@ L359: ; Function: t1
   push [bp+2]
   push [bp+1]
   push cx
-  push #L358
+  push #L402
   mov cx, sp
   mov bx, [bp+4]
   mov ax, [bx+1]
@@ -5098,12 +5791,12 @@ L359: ; Function: t1
   mov ax, [bp]
   jmp [ax]
 
-L360: ; Function: t16
+L404: ; Function: t19
   push dx
   push [bp+3]
   push [bp+2]
   push [bp+1]
-  push #L359
+  push #L403
   mov 1, sp
   ;; (0'0) Return: lam_285'20 (t1)
   mov dx, [1]
@@ -5112,9 +5805,286 @@ L360: ; Function: t16
   mov ax, [bp]
   jmp [ax]
 
-L361: ; Continuation
+L405: ; Continuation
+  ;; (265'6) Return: fs (f2)
+  mov dx, [bp+2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L406: ; Continuation
   push [bp+2]
-  push #L208
+  push cx
+  push #L405
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L407: ; Arm: 267'7
+  push [bp+4]
+  push cx
+  push #L406
+  mov cx, sp
+  ;; (114'38) Tail: explode (f1) @ lit_267'22 (g169)
+  mov bp, [bp+1]
+  mov dx, #g169
+  mov ax, [bp]
+  jmp [ax]
+
+L408: ; Continuation
+  ;; (0'0) Return: con_256'92 (g174)
+  mov dx, #g174
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L409: ; Continuation
+  push cx
+  push #L408
+  mov cx, sp
+  ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
+  mov bp, #g25
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L410: ; Continuation
+  push cx
+  push #L409
+  mov cx, sp
+  ;; (114'38) Tail: explode (f2) @ s (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L411: ; Arm: 255'9
+  push #g173
+  push [bp+4]
+  push #1
+  mov 1, sp
+  push [1]
+  push #g170
+  push #1
+  mov 2, sp
+  push [bp+1]
+  push cx
+  push #L410
+  mov cx, sp
+  ;; (256'26) Tail: concat (f3) @ con_256'27 (t2)
+  mov bp, [bp+3]
+  mov dx, [2]
+  mov ax, [bp]
+  jmp [ax]
+
+L412: ; Arm: 260'35
+  ;; (257'10) Return: ps (f3)
+  mov dx, [bp+3]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L413: ; Continuation
+  push [bp+3]
+  push [bp+2]
+  push #0
+  mov 1, sp
+  push dx
+  push [1]
+  push #1
+  mov 2, sp
+  ;; (0'0) Return: con_0'0 (t2)
+  mov dx, [2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L414: ; Continuation
+  mov bx, dx
+  cmp [bx], #1
+  bz L412
+  push [bp+5]
+  push [bp+4]
+  push cx
+  push #L413
+  mov cx, sp
+  ;; (260'73) Tail: loop (f2) @ ps (f3)
+  mov dx, [bp+3]
+  mov bp, [bp+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L415: ; Continuation
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push [bp+3]
+  push cx
+  push #L414
+  mov cx, sp
+  ;; (260'28) Tail: app_260'23 (arg) @ sought (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L416: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L411
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  mov bx, [1]
+  mov ax, [bx+1]
+  mov 3, ax
+  mov ax, [bx+2]
+  mov 4, ax
+  push [4]
+  push [3]
+  push [2]
+  push bp
+  push [bp+4]
+  push cx
+  push #L415
+  mov cx, sp
+  ;; (260'23) Tail: eq_string (f2) @ name (t3)
+  mov bp, [bp+2]
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L417: ; Continuation
+  push dx
+  push #0
+  mov 1, sp
+  ;; (0'0) Return: con_262'2 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L418: ; Continuation
+  push cx
+  push #L417
+  mov cx, sp
+  ;; (262'17) Tail: loop (f2) @ case_172'18 (arg)
+  mov bp, [bp+2]
+  mov dx, dx
+  mov ax, [bp]
+  jmp [ax]
+
+L419: ; Function: t1
+  push dx
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L416
+  mov 1, sp
+  push [1]
+  push cx
+  push #L418
+  mov cx, sp
+  mov bx, [bp+4]
+  mov ax, [bx+1]
+  mov 2, ax
+  ;; (172'43) Return: ps (t2)
+  mov dx, [2]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L420: ; Function: t3
+  push dx
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L419
+  mov 1, sp
+  ;; (0'0) Return: lam_252'11 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L421: ; Continuation
+  ;; (268'29) Tail: app_268'26 (arg) @ args (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L422: ; Continuation
+  push [bp+3]
+  push cx
+  push #L421
+  mov cx, sp
+  ;; (268'26) Tail: app_268'22 (arg) @ fs (f2)
+  ;; use temp ax while setting up bp/dx
+  mov ax, bp
+  mov bp, dx
+  mov dx, [ax+2]
+  mov ax, [bp]
+  jmp [ax]
+
+L423: ; Function: t1
+  mov bx, dx
+  cmp [bx], #0
+  bz L407
+  mov ax, [bx+1]
+  mov 1, ax
+  mov ax, [bx+2]
+  mov 2, ax
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L420
+  mov 3, sp
+  push dx
+  push [bp+4]
+  push cx
+  push #L422
+  mov cx, sp
+  ;; (268'22) Tail: fold_left (g7) @ lam_252'8 (t3)
+  mov bp, #g7
+  mov dx, [3]
+  mov ax, [bp]
+  jmp [ax]
+
+L424: ; Function: t22
+  push dx
+  push [bp+3]
+  push [bp+2]
+  push [bp+1]
+  push #L423
+  mov 1, sp
+  ;; (0'0) Return: lam_265'9 (t1)
+  mov dx, [1]
+  mov bp, cx
+  mov cx, [bp+1]
+  mov ax, [bp]
+  jmp [ax]
+
+L425: ; Continuation
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push #L229
   mov 1, sp
   push [1]
   push #g61
@@ -5124,115 +6094,151 @@ L361: ; Continuation
   push #g60
   push #0
   mov 3, sp
+  push [bp+6]
+  push [bp+5]
   push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push #L245
+  push #L253
   mov 4, sp
   push [4]
-  push #g67
+  push #g82
   push #1
   mov 5, sp
   push [5]
-  push #g66
+  push #g81
   push #0
   mov 6, sp
+  push [bp+6]
+  push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
-  push #L282
+  push #L294
   mov 7, sp
   push [7]
-  push #g88
+  push #g95
   push #1
   mov 8, sp
   push [8]
-  push #g87
+  push #g94
   push #0
   mov 9, sp
+  push [bp+6]
+  push [bp+5]
   push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push #L302
+  push #L317
   mov 10, sp
   push [10]
-  push #g109
+  push #g110
   push #1
   mov 11, sp
   push [11]
-  push #g108
+  push #g109
   push #0
   mov 12, sp
   push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push #L326
+  push #L333
   mov 13, sp
   push [13]
-  push #g117
+  push #g123
   push #1
   mov 14, sp
   push [14]
-  push #g116
+  push #g122
   push #0
   mov 15, sp
+  push [bp+6]
+  push [bp+5]
   push [bp+4]
-  push [bp+3]
-  push [bp+2]
-  push #L360
+  push #L370
   mov 16, sp
   push [16]
-  push #g130
+  push #g129
   push #1
   mov 17, sp
   push [17]
-  push #g129
+  push #g128
   push #0
   mov 18, sp
-  push #g147
-  push [18]
-  push #1
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push #L404
   mov 19, sp
   push [19]
-  push [15]
+  push #g150
   push #1
   mov 20, sp
   push [20]
-  push [12]
-  push #1
+  push #g149
+  push #0
   mov 21, sp
-  push [21]
-  push [9]
-  push #1
+  push [bp+6]
+  push [bp+5]
+  push [bp+4]
+  push #L424
   mov 22, sp
   push [22]
-  push [6]
+  push #g168
   push #1
   mov 23, sp
   push [23]
-  push [3]
-  push #1
+  push #g167
+  push #0
   mov 24, sp
+  push #g180
   push [24]
-  push #g59
   push #1
   mov 25, sp
   push [25]
-  push #0
+  push [21]
+  push #1
   mov 26, sp
-  ;; (321'11) Tail: mainloop (f5) @ con_308'13 (t26)
-  mov bp, [bp+5]
-  mov dx, [26]
+  push [26]
+  push [18]
+  push #1
+  mov 27, sp
+  push [27]
+  push [15]
+  push #1
+  mov 28, sp
+  push [28]
+  push [12]
+  push #1
+  mov 29, sp
+  push [29]
+  push [9]
+  push #1
+  mov 30, sp
+  push [30]
+  push [6]
+  push #1
+  mov 31, sp
+  push [31]
+  push [3]
+  push #1
+  mov 32, sp
+  push [32]
+  push #g59
+  push #1
+  mov 33, sp
+  push [33]
+  push #0
+  mov 34, sp
+  ;; (358'11) Tail: mainloop (f7) @ con_343'12 (t34)
+  mov bp, [bp+7]
+  mov dx, [34]
   mov ax, [bp]
   jmp [ax]
 
-L362: ; Continuation
+L426: ; Continuation
+  push [bp+7]
+  push [bp+6]
   push [bp+5]
   push [bp+4]
   push [bp+3]
   push [bp+2]
   push cx
-  push #L361
+  push #L425
   mov cx, sp
   ;; (114'29) Tail: put_chars (g25) @ app_114'38 (arg)
   mov bp, #g25
@@ -5240,7 +6246,7 @@ L362: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L363: ; Continuation
+L427: ; Continuation
   push [bp+4]
   push [bp+2]
   push #L76
@@ -5259,21 +6265,23 @@ L363: ; Continuation
   push [1]
   push dx
   push [bp+4]
+  push [bp+3]
+  push [bp+2]
   push cx
-  push #L362
+  push #L426
   mov cx, sp
-  ;; (114'38) Tail: explode (f4) @ lit_320'13 (g55)
+  ;; (114'38) Tail: explode (f4) @ lit_357'13 (g55)
   mov bp, [bp+4]
   mov dx, #g55
   mov ax, [bp]
   jmp [ax]
 
-L364: ; Continuation
+L428: ; Continuation
   push dx
   push [bp+3]
   push [bp+2]
   push cx
-  push #L363
+  push #L427
   mov cx, sp
   ;; (78'25) Tail: block (g1) @ lam_78'30 (g22)
   mov bp, #g1
@@ -5281,11 +6289,11 @@ L364: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L365: ; Continuation
+L429: ; Continuation
   push dx
   push [bp+2]
   push cx
-  push #L364
+  push #L428
   mov cx, sp
   ;; (71'23) Tail: block (g1) @ lam_71'28 (g14)
   mov bp, #g1
@@ -5293,10 +6301,10 @@ L365: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L366: ; Continuation
+L430: ; Continuation
   push dx
   push cx
-  push #L365
+  push #L429
   mov cx, sp
   ;; (60'26) Tail: block (g1) @ lam_60'31 (g12)
   mov bp, #g1
@@ -5304,9 +6312,9 @@ L366: ; Continuation
   mov ax, [bp]
   jmp [ax]
 
-L367: ; Start
+L431: ; Start
   push cx
-  push #L366
+  push #L430
   mov cx, sp
   ;; (4'17) Tail: block (g1) @ lam_50'31 (g10)
   mov bp, #g1
@@ -5373,92 +6381,125 @@ g56: dw 1, 'r', g56+3, 1, 'e', g56+6, 1, 'a', g56+9, 1, 'd', g56+12, 1, 'm', g56
 g57: dw 1, 'W', g57+3, 1, 'e', g57+6, 1, 'l', g57+9, 1, 'c', g57+12, 1, 'o', g57+15, 1, 'm', g57+18, 1, 'e', g57+21, 1, ' ', g57+24, 1, 't', g57+27, 1, 'o', g57+30, 1, ' ', g57+33, 1, 's', g57+36, 1, 'h', g57+39, 1, 'a', g57+42, 1, 'm', g57+45, 1, ';', g57+48, 1, ' ', g57+51, 1, 'p', g57+54, 1, 'l', g57+57, 1, 'e', g57+60, 1, 'a', g57+63, 1, 's', g57+66, 1, 'e', g57+69, 1, ' ', g57+72, 1, 't', g57+75, 1, 'r', g57+78, 1, 'y', g57+81, 1, ' ', g57+84, 1, 'a', g57+87, 1, 'l', g57+90, 1, 'l', g57+93, 1, ' ', g57+96, 1, 't', g57+99, 1, 'h', g57+102, 1, 'e', g57+105, 1, ' ', g57+108, 1, 'c', g57+111, 1, 'o', g57+114, 1, 'm', g57+117, 1, 'm', g57+120, 1, 'a', g57+123, 1, 'n', g57+126, 1, 'd', g57+129, 1, 's', g57+132, 1, '!', g57+135, 1, '\n', g57+138, 1, 'C', g57+141, 1, 'a', g57+144, 1, 'n', g57+147, 1, ' ', g57+150, 1, 'y', g57+153, 1, 'o', g57+156, 1, 'u', g57+159, 1, ' ', g57+162, 1, 'f', g57+165, 1, 'i', g57+168, 1, 'n', g57+171, 1, 'd', g57+174, 1, ' ', g57+177, 1, 't', g57+180, 1, 'h', g57+183, 1, 'e', g57+186, 1, ' ', g57+189, 1, 'h', g57+192, 1, 'i', g57+195, 1, 'd', g57+198, 1, 'd', g57+201, 1, 'e', g57+204, 1, 'n', g57+207, 1, ' ', g57+210, 1, 'E', g57+213, 1, 'a', g57+216, 1, 's', g57+219, 1, 't', g57+222, 1, 'e', g57+225, 1, 'r', g57+228, 1, ' ', g57+231, 1, 'E', g57+234, 1, 'g', g57+237, 1, 'g', g57+240, 1, '?', g57+243, 1, '\n', g57+246, 0
 g58: dw 0, g57
 g59: dw 0, g56, g58
-g60: dw 1, 'l', g60+3, 1, 's', g60+6, 0
-g61: dw 1, 'l', g61+3, 1, 's', g61+6, 1, ' ', g61+9, 1, '-', g61+12, 1, ' ', g61+15, 1, 'l', g61+18, 1, 'i', g61+21, 1, 's', g61+24, 1, 't', g61+27, 1, ' ', g61+30, 1, 'd', g61+33, 1, 'i', g61+36, 1, 'r', g61+39, 1, 'e', g61+42, 1, 'c', g61+45, 1, 't', g61+48, 1, 'o', g61+51, 1, 'r', g61+54, 1, 'y', g61+57, 1, ' ', g61+60, 1, 'c', g61+63, 1, 'o', g61+66, 1, 'n', g61+69, 1, 't', g61+72, 1, 'e', g61+75, 1, 'n', g61+78, 1, 't', g61+81, 1, 's', g61+84, 1, '\n', g61+87, 0
-g62: dw 1, 'l', g62+3, 1, 's', g62+6, 1, ':', g62+9, 1, ' ', g62+12, 1, 't', g62+15, 1, 'a', g62+18, 1, 'k', g62+21, 1, 'e', g62+24, 1, 's', g62+27, 1, ' ', g62+30, 1, 'n', g62+33, 1, 'o', g62+36, 1, ' ', g62+39, 1, 'a', g62+42, 1, 'r', g62+45, 1, 'g', g62+48, 1, 'u', g62+51, 1, 'm', g62+54, 1, 'e', g62+57, 1, 'n', g62+60, 1, 't', g62+63, 1, 's', g62+66, 1, '\n', g62+69, 0
-g63: dw L67
-g64: dw 0
-g65: dw 0
-g66: dw 1, 'c', g66+3, 1, 'a', g66+6, 1, 't', g66+9, 0
-g67: dw 1, 'c', g67+3, 1, 'a', g67+6, 1, 't', g67+9, 1, ' ', g67+12, 1, '-', g67+15, 1, ' ', g67+18, 1, 'c', g67+21, 1, 'o', g67+24, 1, 'n', g67+27, 1, 'c', g67+30, 1, 'a', g67+33, 1, 't', g67+36, 1, 'e', g67+39, 1, 'n', g67+42, 1, 'a', g67+45, 1, 't', g67+48, 1, 'e', g67+51, 1, ' ', g67+54, 1, 'f', g67+57, 1, 'i', g67+60, 1, 'l', g67+63, 1, 'e', g67+66, 1, 's', g67+69, 1, ' ', g67+72, 1, 'a', g67+75, 1, 'n', g67+78, 1, 'd', g67+81, 1, ' ', g67+84, 1, 'p', g67+87, 1, 'r', g67+90, 1, 'i', g67+93, 1, 'n', g67+96, 1, 't', g67+99, 1, ' ', g67+102, 1, 'o', g67+105, 1, 'n', g67+108, 1, ' ', g67+111, 1, 't', g67+114, 1, 'h', g67+117, 1, 'e', g67+120, 1, ' ', g67+123, 1, 's', g67+126, 1, 't', g67+129, 1, 'a', g67+132, 1, 'n', g67+135, 1, 'd', g67+138, 1, 'a', g67+141, 1, 'r', g67+144, 1, 'd', g67+147, 1, ' ', g67+150, 1, 'o', g67+153, 1, 'u', g67+156, 1, 't', g67+159, 1, 'p', g67+162, 1, 'u', g67+165, 1, 't', g67+168, 1, '\n', g67+171, 0
-g68: dw 1, 'c', g68+3, 1, 'a', g68+6, 1, 't', g68+9, 1, ':', g68+12, 1, ' ', g68+15, 1, 't', g68+18, 1, 'a', g68+21, 1, 'k', g68+24, 1, 'e', g68+27, 1, 's', g68+30, 1, ' ', g68+33, 1, 'a', g68+36, 1, 't', g68+39, 1, ' ', g68+42, 1, 'l', g68+45, 1, 'e', g68+48, 1, 'a', g68+51, 1, 's', g68+54, 1, 't', g68+57, 1, ' ', g68+60, 1, 'o', g68+63, 1, 'n', g68+66, 1, 'e', g68+69, 1, ' ', g68+72, 1, 'a', g68+75, 1, 'r', g68+78, 1, 'g', g68+81, 1, 'u', g68+84, 1, 'm', g68+87, 1, 'e', g68+90, 1, 'n', g68+93, 1, 't', g68+96, 1, '\n', g68+99, 0
-g69: dw 0
-g70: dw 1, 'c', g70+3, 1, 'a', g70+6, 1, 't', g70+9, 1, ':', g70+12, 1, ' ', g70+15, 0
-g71: dw 1, ' ', g71+3, 1, ':', g71+6, 1, ' ', g71+9, 1, 'N', g71+12, 1, 'o', g71+15, 1, ' ', g71+18, 1, 's', g71+21, 1, 'u', g71+24, 1, 'c', g71+27, 1, 'h', g71+30, 1, ' ', g71+33, 1, 'f', g71+36, 1, 'i', g71+39, 1, 'l', g71+42, 1, 'e', g71+45, 1, '\n', g71+48, 0
+g60: dw 1, 'c', g60+3, 1, 'a', g60+6, 1, 't', g60+9, 0
+g61: dw 1, 'c', g61+3, 1, 'a', g61+6, 1, 't', g61+9, 1, ' ', g61+12, 1, '-', g61+15, 1, ' ', g61+18, 1, 'c', g61+21, 1, 'o', g61+24, 1, 'n', g61+27, 1, 'c', g61+30, 1, 'a', g61+33, 1, 't', g61+36, 1, 'e', g61+39, 1, 'n', g61+42, 1, 'a', g61+45, 1, 't', g61+48, 1, 'e', g61+51, 1, ' ', g61+54, 1, 'f', g61+57, 1, 'i', g61+60, 1, 'l', g61+63, 1, 'e', g61+66, 1, 's', g61+69, 1, ' ', g61+72, 1, 'a', g61+75, 1, 'n', g61+78, 1, 'd', g61+81, 1, ' ', g61+84, 1, 'p', g61+87, 1, 'r', g61+90, 1, 'i', g61+93, 1, 'n', g61+96, 1, 't', g61+99, 1, ' ', g61+102, 1, 'o', g61+105, 1, 'n', g61+108, 1, ' ', g61+111, 1, 't', g61+114, 1, 'h', g61+117, 1, 'e', g61+120, 1, ' ', g61+123, 1, 's', g61+126, 1, 't', g61+129, 1, 'a', g61+132, 1, 'n', g61+135, 1, 'd', g61+138, 1, 'a', g61+141, 1, 'r', g61+144, 1, 'd', g61+147, 1, ' ', g61+150, 1, 'o', g61+153, 1, 'u', g61+156, 1, 't', g61+159, 1, 'p', g61+162, 1, 'u', g61+165, 1, 't', g61+168, 1, '\n', g61+171, 0
+g62: dw 1, 'c', g62+3, 1, 'a', g62+6, 1, 't', g62+9, 1, ':', g62+12, 1, ' ', g62+15, 1, 't', g62+18, 1, 'a', g62+21, 1, 'k', g62+24, 1, 'e', g62+27, 1, 's', g62+30, 1, ' ', g62+33, 1, 'a', g62+36, 1, 't', g62+39, 1, ' ', g62+42, 1, 'l', g62+45, 1, 'e', g62+48, 1, 'a', g62+51, 1, 's', g62+54, 1, 't', g62+57, 1, ' ', g62+60, 1, 'o', g62+63, 1, 'n', g62+66, 1, 'e', g62+69, 1, ' ', g62+72, 1, 'a', g62+75, 1, 'r', g62+78, 1, 'g', g62+81, 1, 'u', g62+84, 1, 'm', g62+87, 1, 'e', g62+90, 1, 'n', g62+93, 1, 't', g62+96, 1, '\n', g62+99, 0
+g63: dw 0
+g64: dw 1, 'c', g64+3, 1, 'a', g64+6, 1, 't', g64+9, 1, ':', g64+12, 1, ' ', g64+15, 0
+g65: dw 1, ' ', g65+3, 1, ':', g65+6, 1, ' ', g65+9, 1, 'N', g65+12, 1, 'o', g65+15, 1, ' ', g65+18, 1, 's', g65+21, 1, 'u', g65+24, 1, 'c', g65+27, 1, 'h', g65+30, 1, ' ', g65+33, 1, 'f', g65+36, 1, 'i', g65+39, 1, 'l', g65+42, 1, 'e', g65+45, 1, ' ', g65+48, 1, 'o', g65+51, 1, 'r', g65+54, 1, ' ', g65+57, 1, 'd', g65+60, 1, 'i', g65+63, 1, 'r', g65+66, 1, 'e', g65+69, 1, 'c', g65+72, 1, 't', g65+75, 1, 'o', g65+78, 1, 'r', g65+81, 1, 'y', g65+84, 1, '\n', g65+87, 0
+g66: dw 0
+g67: dw 1, g65, g66
+g68: dw 1, 'c', g68+3, 1, 'a', g68+6, 1, 't', g68+9, 1, ':', g68+12, 1, ' ', g68+15, 0
+g69: dw 1, ' ', g69+3, 1, ':', g69+6, 1, ' ', g69+9, 1, 'N', g69+12, 1, 'o', g69+15, 1, 't', g69+18, 1, ' ', g69+21, 1, 'a', g69+24, 1, ' ', g69+27, 1, 'd', g69+30, 1, 'a', g69+33, 1, 't', g69+36, 1, 'a', g69+39, 1, ' ', g69+42, 1, 'f', g69+45, 1, 'i', g69+48, 1, 'l', g69+51, 1, 'e', g69+54, 1, '\n', g69+57, 0
+g70: dw 0
+g71: dw 1, g69, g70
 g72: dw 0
-g73: dw 1, g71, g72
-g74: dw 1, 'c', g74+3, 1, 'a', g74+6, 1, 't', g74+9, 1, ':', g74+12, 1, ' ', g74+15, 0
-g75: dw 1, ' ', g75+3, 1, ':', g75+6, 1, ' ', g75+9, 1, 'N', g75+12, 1, 'o', g75+15, 1, 't', g75+18, 1, ' ', g75+21, 1, 'a', g75+24, 1, ' ', g75+27, 1, 'd', g75+30, 1, 'a', g75+33, 1, 't', g75+36, 1, 'a', g75+39, 1, ' ', g75+42, 1, 'f', g75+45, 1, 'i', g75+48, 1, 'l', g75+51, 1, 'e', g75+54, 1, '\n', g75+57, 0
-g76: dw 0
-g77: dw 1, g75, g76
-g78: dw 0
-g79: dw 1, 'c', g79+3, 1, 'a', g79+6, 1, 't', g79+9, 1, ':', g79+12, 1, ' ', g79+15, 0
-g80: dw 1, ' ', g80+3, 1, ':', g80+6, 1, ' ', g80+9, 1, 'N', g80+12, 1, 'o', g80+15, 1, ' ', g80+18, 1, 's', g80+21, 1, 'u', g80+24, 1, 'c', g80+27, 1, 'h', g80+30, 1, ' ', g80+33, 1, 'f', g80+36, 1, 'i', g80+39, 1, 'l', g80+42, 1, 'e', g80+45, 1, '\n', g80+48, 0
-g81: dw 0
-g82: dw 1, g80, g81
-g83: dw 1, 'c', g83+3, 1, 'a', g83+6, 1, 't', g83+9, 1, ':', g83+12, 1, ' ', g83+15, 0
-g84: dw 1, ' ', g84+3, 1, ':', g84+6, 1, ' ', g84+9, 1, 'N', g84+12, 1, 'o', g84+15, 1, 't', g84+18, 1, ' ', g84+21, 1, 'a', g84+24, 1, ' ', g84+27, 1, 'd', g84+30, 1, 'a', g84+33, 1, 't', g84+36, 1, 'a', g84+39, 1, ' ', g84+42, 1, 'f', g84+45, 1, 'i', g84+48, 1, 'l', g84+51, 1, 'e', g84+54, 1, '\n', g84+57, 0
-g85: dw 0
-g86: dw 1, g84, g85
-g87: dw 1, 'm', g87+3, 1, 'a', g87+6, 1, 'n', g87+9, 0
-g88: dw 1, 'm', g88+3, 1, 'a', g88+6, 1, 'n', g88+9, 1, ' ', g88+12, 1, '-', g88+15, 1, ' ', g88+18, 1, 'a', g88+21, 1, 'n', g88+24, 1, ' ', g88+27, 1, 'i', g88+30, 1, 'n', g88+33, 1, 't', g88+36, 1, 'e', g88+39, 1, 'r', g88+42, 1, 'f', g88+45, 1, 'a', g88+48, 1, 'c', g88+51, 1, 'e', g88+54, 1, ' ', g88+57, 1, 't', g88+60, 1, 'o', g88+63, 1, ' ', g88+66, 1, 't', g88+69, 1, 'h', g88+72, 1, 'e', g88+75, 1, ' ', g88+78, 1, 's', g88+81, 1, 'y', g88+84, 1, 's', g88+87, 1, 't', g88+90, 1, 'e', g88+93, 1, 'm', g88+96, 1, ' ', g88+99, 1, 'r', g88+102, 1, 'e', g88+105, 1, 'f', g88+108, 1, 'e', g88+111, 1, 'r', g88+114, 1, 'e', g88+117, 1, 'n', g88+120, 1, 'c', g88+123, 1, 'e', g88+126, 1, ' ', g88+129, 1, 'm', g88+132, 1, 'a', g88+135, 1, 'n', g88+138, 1, 'u', g88+141, 1, 'a', g88+144, 1, 'l', g88+147, 1, 's', g88+150, 1, '\n', g88+153, 0
-g89: dw 1, 'W', g89+3, 1, 'h', g89+6, 1, 'a', g89+9, 1, 't', g89+12, 1, ' ', g89+15, 1, 'm', g89+18, 1, 'a', g89+21, 1, 'n', g89+24, 1, 'u', g89+27, 1, 'a', g89+30, 1, 'l', g89+33, 1, ' ', g89+36, 1, 'p', g89+39, 1, 'a', g89+42, 1, 'g', g89+45, 1, 'e', g89+48, 1, ' ', g89+51, 1, 'd', g89+54, 1, 'o', g89+57, 1, ' ', g89+60, 1, 'y', g89+63, 1, 'o', g89+66, 1, 'u', g89+69, 1, ' ', g89+72, 1, 'w', g89+75, 1, 'a', g89+78, 1, 'n', g89+81, 1, 't', g89+84, 1, '?', g89+87, 1, '\n', g89+90, 0
-g90: dw 0
-g91: dw 1, 'N', g91+3, 1, 'o', g91+6, 1, ' ', g91+9, 1, 'm', g91+12, 1, 'a', g91+15, 1, 'n', g91+18, 1, 'u', g91+21, 1, 'a', g91+24, 1, 'l', g91+27, 1, ' ', g91+30, 1, 'e', g91+33, 1, 'n', g91+36, 1, 't', g91+39, 1, 'r', g91+42, 1, 'y', g91+45, 1, ' ', g91+48, 1, 'f', g91+51, 1, 'o', g91+54, 1, 'r', g91+57, 1, ' ', g91+60, 0
-g92: dw 1, '\n', g92+3, 0
-g93: dw 0
-g94: dw 1, g92, g93
-g95: dw 1, 'N', g95+3, 1, 'o', g95+6, 1, ' ', g95+9, 1, 'm', g95+12, 1, 'a', g95+15, 1, 'n', g95+18, 1, 'u', g95+21, 1, 'a', g95+24, 1, 'l', g95+27, 1, ' ', g95+30, 1, 'e', g95+33, 1, 'n', g95+36, 1, 't', g95+39, 1, 'r', g95+42, 1, 'y', g95+45, 1, ' ', g95+48, 1, 'f', g95+51, 1, 'o', g95+54, 1, 'r', g95+57, 1, ' ', g95+60, 0
-g96: dw 1, '\n', g96+3, 0
-g97: dw 0
-g98: dw 1, g96, g97
+g73: dw 1, 'c', g73+3, 1, 'a', g73+6, 1, 't', g73+9, 1, ':', g73+12, 1, ' ', g73+15, 0
+g74: dw 1, ' ', g74+3, 1, ':', g74+6, 1, ' ', g74+9, 1, 'N', g74+12, 1, 'o', g74+15, 1, ' ', g74+18, 1, 's', g74+21, 1, 'u', g74+24, 1, 'c', g74+27, 1, 'h', g74+30, 1, ' ', g74+33, 1, 'f', g74+36, 1, 'i', g74+39, 1, 'l', g74+42, 1, 'e', g74+45, 1, ' ', g74+48, 1, 'o', g74+51, 1, 'r', g74+54, 1, ' ', g74+57, 1, 'd', g74+60, 1, 'i', g74+63, 1, 'r', g74+66, 1, 'e', g74+69, 1, 'c', g74+72, 1, 't', g74+75, 1, 'o', g74+78, 1, 'r', g74+81, 1, 'y', g74+84, 1, '\n', g74+87, 0
+g75: dw 0
+g76: dw 1, g74, g75
+g77: dw 1, 'c', g77+3, 1, 'a', g77+6, 1, 't', g77+9, 1, ':', g77+12, 1, ' ', g77+15, 0
+g78: dw 1, ' ', g78+3, 1, ':', g78+6, 1, ' ', g78+9, 1, 'N', g78+12, 1, 'o', g78+15, 1, 't', g78+18, 1, ' ', g78+21, 1, 'a', g78+24, 1, ' ', g78+27, 1, 'd', g78+30, 1, 'a', g78+33, 1, 't', g78+36, 1, 'a', g78+39, 1, ' ', g78+42, 1, 'f', g78+45, 1, 'i', g78+48, 1, 'l', g78+51, 1, 'e', g78+54, 1, '\n', g78+57, 0
+g79: dw 0
+g80: dw 1, g78, g79
+g81: dw 1, 'c', g81+3, 1, 'p', g81+6, 0
+g82: dw 1, 'c', g82+3, 1, 'p', g82+6, 1, ' ', g82+9, 1, '-', g82+12, 1, ' ', g82+15, 1, 'c', g82+18, 1, 'o', g82+21, 1, 'p', g82+24, 1, 'y', g82+27, 1, ' ', g82+30, 1, 'f', g82+33, 1, 'i', g82+36, 1, 'l', g82+39, 1, 'e', g82+42, 1, 's', g82+45, 1, ' ', g82+48, 1, 'a', g82+51, 1, 'n', g82+54, 1, 'd', g82+57, 1, ' ', g82+60, 1, 'd', g82+63, 1, 'i', g82+66, 1, 'r', g82+69, 1, 'e', g82+72, 1, 'c', g82+75, 1, 't', g82+78, 1, 'o', g82+81, 1, 'r', g82+84, 1, 'i', g82+87, 1, 'e', g82+90, 1, 's', g82+93, 1, '\n', g82+96, 0
+g83: dw 1, 'c', g83+3, 1, 'p', g83+6, 1, ':', g83+9, 1, ' ', g83+12, 1, 'm', g83+15, 1, 'i', g83+18, 1, 's', g83+21, 1, 's', g83+24, 1, 'i', g83+27, 1, 'n', g83+30, 1, 'g', g83+33, 1, ' ', g83+36, 1, 'f', g83+39, 1, 'i', g83+42, 1, 'l', g83+45, 1, 'e', g83+48, 1, ' ', g83+51, 1, 'o', g83+54, 1, 'p', g83+57, 1, 'e', g83+60, 1, 'r', g83+63, 1, 'a', g83+66, 1, 'n', g83+69, 1, 'd', g83+72, 1, '\n', g83+75, 0
+g84: dw 1, 'c', g84+3, 1, 'p', g84+6, 1, ':', g84+9, 1, ' ', g84+12, 1, 'm', g84+15, 1, 'i', g84+18, 1, 's', g84+21, 1, 's', g84+24, 1, 'i', g84+27, 1, 'n', g84+30, 1, 'g', g84+33, 1, ' ', g84+36, 1, 'd', g84+39, 1, 'e', g84+42, 1, 's', g84+45, 1, 't', g84+48, 1, 'i', g84+51, 1, 'n', g84+54, 1, 'a', g84+57, 1, 't', g84+60, 1, 'i', g84+63, 1, 'o', g84+66, 1, 'n', g84+69, 1, ' ', g84+72, 1, 'f', g84+75, 1, 'i', g84+78, 1, 'l', g84+81, 1, 'e', g84+84, 1, ' ', g84+87, 1, 'o', g84+90, 1, 'p', g84+93, 1, 'e', g84+96, 1, 'r', g84+99, 1, 'a', g84+102, 1, 'n', g84+105, 1, 'd', g84+108, 1, ' ', g84+111, 1, 'a', g84+114, 1, 'f', g84+117, 1, 't', g84+120, 1, 'e', g84+123, 1, 'r', g84+126, 1, ' ', g84+129, 1, '\'', g84+132, 0
+g85: dw 1, '\'', g85+3, 1, '\n', g85+6, 0
+g86: dw 0
+g87: dw 1, g85, g86
+g88: dw 1, 'c', g88+3, 1, 'p', g88+6, 1, ':', g88+9, 1, ' ', g88+12, 1, 'u', g88+15, 1, 'n', g88+18, 1, 'e', g88+21, 1, 'x', g88+24, 1, 'p', g88+27, 1, 'e', g88+30, 1, 'c', g88+33, 1, 't', g88+36, 1, 'e', g88+39, 1, 'd', g88+42, 1, ' ', g88+45, 1, 'e', g88+48, 1, 'x', g88+51, 1, 't', g88+54, 1, 'r', g88+57, 1, 'a', g88+60, 1, ' ', g88+63, 1, 'o', g88+66, 1, 'p', g88+69, 1, 'e', g88+72, 1, 'r', g88+75, 1, 'a', g88+78, 1, 'n', g88+81, 1, 'd', g88+84, 1, 's', g88+87, 1, '\n', g88+90, 0
+g89: dw 0
+g90: dw 1, 'c', g90+3, 1, 'p', g90+6, 1, ':', g90+9, 1, ' ', g90+12, 1, 'c', g90+15, 1, 'a', g90+18, 1, 'n', g90+21, 1, 'n', g90+24, 1, 'o', g90+27, 1, 't', g90+30, 1, ' ', g90+33, 1, 's', g90+36, 1, 't', g90+39, 1, 'a', g90+42, 1, 't', g90+45, 1, ' ', g90+48, 1, '\'', g90+51, 0
+g91: dw 1, '\'', g91+3, 1, ':', g91+6, 1, ' ', g91+9, 1, 'N', g91+12, 1, 'o', g91+15, 1, ' ', g91+18, 1, 's', g91+21, 1, 'u', g91+24, 1, 'c', g91+27, 1, 'h', g91+30, 1, ' ', g91+33, 1, 'f', g91+36, 1, 'i', g91+39, 1, 'l', g91+42, 1, 'e', g91+45, 1, ' ', g91+48, 1, 'o', g91+51, 1, 'r', g91+54, 1, ' ', g91+57, 1, 'd', g91+60, 1, 'i', g91+63, 1, 'r', g91+66, 1, 'e', g91+69, 1, 'c', g91+72, 1, 't', g91+75, 1, 'o', g91+78, 1, 'r', g91+81, 1, 'y', g91+84, 1, '\n', g91+87, 0
+g92: dw 0
+g93: dw 1, g91, g92
+g94: dw 1, 'c', g94+3, 1, 'r', g94+6, 1, 'e', g94+9, 1, 'a', g94+12, 1, 't', g94+15, 1, 'e', g94+18, 0
+g95: dw 1, 'c', g95+3, 1, 'r', g95+6, 1, 'e', g95+9, 1, 'a', g95+12, 1, 't', g95+15, 1, 'e', g95+18, 1, ' ', g95+21, 1, '\8212', g95+24, 1, ' ', g95+27, 1, 'c', g95+30, 1, 'r', g95+33, 1, 'e', g95+36, 1, 'a', g95+39, 1, 't', g95+42, 1, 'e', g95+45, 1, ' ', g95+48, 1, 'a', g95+51, 1, ' ', g95+54, 1, 'n', g95+57, 1, 'e', g95+60, 1, 'w', g95+63, 1, ' ', g95+66, 1, 'f', g95+69, 1, 'i', g95+72, 1, 'l', g95+75, 1, 'e', g95+78, 1, '\n', g95+81, 0
+g96: dw 1, 'c', g96+3, 1, 'r', g96+6, 1, 'e', g96+9, 1, 'a', g96+12, 1, 't', g96+15, 1, 'e', g96+18, 1, ':', g96+21, 1, ' ', g96+24, 1, 'm', g96+27, 1, 'i', g96+30, 1, 's', g96+33, 1, 's', g96+36, 1, 'i', g96+39, 1, 'n', g96+42, 1, 'g', g96+45, 1, ' ', g96+48, 1, 'f', g96+51, 1, 'i', g96+54, 1, 'l', g96+57, 1, 'e', g96+60, 1, ' ', g96+63, 1, 'n', g96+66, 1, 'a', g96+69, 1, 'm', g96+72, 1, 'e', g96+75, 1, '\n', g96+78, 0
+g97: dw 1, 'c', g97+3, 1, 'r', g97+6, 1, 'e', g97+9, 1, 'a', g97+12, 1, 't', g97+15, 1, 'e', g97+18, 1, ':', g97+21, 1, ' ', g97+24, 1, 'u', g97+27, 1, 'n', g97+30, 1, 'e', g97+33, 1, 'x', g97+36, 1, 'p', g97+39, 1, 'e', g97+42, 1, 'c', g97+45, 1, 't', g97+48, 1, 'e', g97+51, 1, 'd', g97+54, 1, ' ', g97+57, 1, 'e', g97+60, 1, 'x', g97+63, 1, 't', g97+66, 1, 'r', g97+69, 1, 'a', g97+72, 1, ' ', g97+75, 1, 'o', g97+78, 1, 'p', g97+81, 1, 'e', g97+84, 1, 'r', g97+87, 1, 'a', g97+90, 1, 'n', g97+93, 1, 'd', g97+96, 1, 's', g97+99, 1, '\n', g97+102, 0
+g98: dw 1, '(', g98+3, 1, 't', g98+6, 1, 'o', g98+9, 1, ' ', g98+12, 1, 'f', g98+15, 1, 'i', g98+18, 1, 'n', g98+21, 1, 'i', g98+24, 1, 's', g98+27, 1, 'h', g98+30, 1, ' ', g98+33, 1, 't', g98+36, 1, 'y', g98+39, 1, 'p', g98+42, 1, 'e', g98+45, 1, ' ', g98+48, 1, '^', g98+51, 1, 'D', g98+54, 1, ' ', g98+57, 1, 'o', g98+60, 1, 'n', g98+63, 1, ' ', g98+66, 1, 'a', g98+69, 1, ' ', g98+72, 1, 'n', g98+75, 1, 'e', g98+78, 1, 'w', g98+81, 1, ' ', g98+84, 1, 'l', g98+87, 1, 'i', g98+90, 1, 'n', g98+93, 1, 'e', g98+96, 1, ')', g98+99, 1, '\n', g98+102, 0
 g99: dw 0
-g100: dw 1, 'N', g100+3, 1, 'o', g100+6, 1, ' ', g100+9, 1, 'm', g100+12, 1, 'a', g100+15, 1, 'n', g100+18, 1, 'u', g100+21, 1, 'a', g100+24, 1, 'l', g100+27, 1, ' ', g100+30, 1, 'e', g100+33, 1, 'n', g100+36, 1, 't', g100+39, 1, 'r', g100+42, 1, 'y', g100+45, 1, ' ', g100+48, 1, 'f', g100+51, 1, 'o', g100+54, 1, 'r', g100+57, 1, ' ', g100+60, 0
-g101: dw 1, '\n', g101+3, 0
-g102: dw 0
-g103: dw 1, g101, g102
-g104: dw 1, 'N', g104+3, 1, 'o', g104+6, 1, ' ', g104+9, 1, 'm', g104+12, 1, 'a', g104+15, 1, 'n', g104+18, 1, 'u', g104+21, 1, 'a', g104+24, 1, 'l', g104+27, 1, ' ', g104+30, 1, 'e', g104+33, 1, 'n', g104+36, 1, 't', g104+39, 1, 'r', g104+42, 1, 'y', g104+45, 1, ' ', g104+48, 1, 'f', g104+51, 1, 'o', g104+54, 1, 'r', g104+57, 1, ' ', g104+60, 0
-g105: dw 1, '\n', g105+3, 0
-g106: dw 0
-g107: dw 1, g105, g106
-g108: dw 1, 'r', g108+3, 1, 'm', g108+6, 0
-g109: dw 1, 'r', g109+3, 1, 'm', g109+6, 1, ' ', g109+9, 1, '-', g109+12, 1, ' ', g109+15, 1, 'r', g109+18, 1, 'e', g109+21, 1, 'm', g109+24, 1, 'o', g109+27, 1, 'v', g109+30, 1, 'e', g109+33, 1, ' ', g109+36, 1, 'f', g109+39, 1, 'i', g109+42, 1, 'l', g109+45, 1, 'e', g109+48, 1, 's', g109+51, 1, ' ', g109+54, 1, 'o', g109+57, 1, 'r', g109+60, 1, ' ', g109+63, 1, 'd', g109+66, 1, 'i', g109+69, 1, 'r', g109+72, 1, 'e', g109+75, 1, 'c', g109+78, 1, 't', g109+81, 1, 'o', g109+84, 1, 'r', g109+87, 1, 'i', g109+90, 1, 'e', g109+93, 1, 's', g109+96, 1, ' ', g109+99, 1, '(', g109+102, 1, 'd', g109+105, 1, 'i', g109+108, 1, 'r', g109+111, 1, 'e', g109+114, 1, 'c', g109+117, 1, 't', g109+120, 1, 'o', g109+123, 1, 'r', g109+126, 1, 'i', g109+129, 1, 'e', g109+132, 1, 's', g109+135, 1, ' ', g109+138, 1, 'n', g109+141, 1, 'o', g109+144, 1, 't', g109+147, 1, ' ', g109+150, 1, 's', g109+153, 1, 'u', g109+156, 1, 'p', g109+159, 1, 'p', g109+162, 1, 'o', g109+165, 1, 'r', g109+168, 1, 't', g109+171, 1, 'e', g109+174, 1, 'd', g109+177, 1, ' ', g109+180, 1, 'y', g109+183, 1, 'e', g109+186, 1, 't', g109+189, 1, '!', g109+192, 1, ')', g109+195, 1, '\n', g109+198, 0
-g110: dw 1, 'r', g110+3, 1, 'm', g110+6, 1, ':', g110+9, 1, ' ', g110+12, 1, 'm', g110+15, 1, 'i', g110+18, 1, 's', g110+21, 1, 's', g110+24, 1, 'i', g110+27, 1, 'n', g110+30, 1, 'g', g110+33, 1, ' ', g110+36, 1, 'o', g110+39, 1, 'p', g110+42, 1, 'e', g110+45, 1, 'r', g110+48, 1, 'a', g110+51, 1, 'n', g110+54, 1, 'd', g110+57, 1, '\n', g110+60, 0
-g111: dw 1, 'r', g111+3, 1, 'm', g111+6, 1, ':', g111+9, 1, ' ', g111+12, 1, 'c', g111+15, 1, 'a', g111+18, 1, 'n', g111+21, 1, 'n', g111+24, 1, 'o', g111+27, 1, 't', g111+30, 1, ' ', g111+33, 1, 'r', g111+36, 1, 'e', g111+39, 1, 'm', g111+42, 1, 'o', g111+45, 1, 'v', g111+48, 1, 'e', g111+51, 1, ' ', g111+54, 1, '\'', g111+57, 0
-g112: dw 1, '\'', g112+3, 1, ':', g112+6, 1, ' ', g112+9, 1, 'N', g112+12, 1, 'o', g112+15, 1, ' ', g112+18, 1, 's', g112+21, 1, 'u', g112+24, 1, 'c', g112+27, 1, 'h', g112+30, 1, ' ', g112+33, 1, 'f', g112+36, 1, 'i', g112+39, 1, 'l', g112+42, 1, 'e', g112+45, 1, ' ', g112+48, 1, 'o', g112+51, 1, 'r', g112+54, 1, ' ', g112+57, 1, 'd', g112+60, 1, 'i', g112+63, 1, 'r', g112+66, 1, 'e', g112+69, 1, 'c', g112+72, 1, 't', g112+75, 1, 'o', g112+78, 1, 'r', g112+81, 1, 'y', g112+84, 1, '\n', g112+87, 0
-g113: dw 0
-g114: dw 1, g112, g113
-g115: dw 0
-g116: dw 1, 'c', g116+3, 1, 'p', g116+6, 0
-g117: dw 1, 'c', g117+3, 1, 'p', g117+6, 1, ' ', g117+9, 1, '-', g117+12, 1, ' ', g117+15, 1, 'c', g117+18, 1, 'o', g117+21, 1, 'p', g117+24, 1, 'y', g117+27, 1, ' ', g117+30, 1, 'f', g117+33, 1, 'i', g117+36, 1, 'l', g117+39, 1, 'e', g117+42, 1, 's', g117+45, 1, ' ', g117+48, 1, 'a', g117+51, 1, 'n', g117+54, 1, 'd', g117+57, 1, ' ', g117+60, 1, 'd', g117+63, 1, 'i', g117+66, 1, 'r', g117+69, 1, 'e', g117+72, 1, 'c', g117+75, 1, 't', g117+78, 1, 'o', g117+81, 1, 'r', g117+84, 1, 'i', g117+87, 1, 'e', g117+90, 1, 's', g117+93, 1, '\n', g117+96, 0
-g118: dw 1, 'c', g118+3, 1, 'p', g118+6, 1, ':', g118+9, 1, ' ', g118+12, 1, 'm', g118+15, 1, 'i', g118+18, 1, 's', g118+21, 1, 's', g118+24, 1, 'i', g118+27, 1, 'n', g118+30, 1, 'g', g118+33, 1, ' ', g118+36, 1, 'f', g118+39, 1, 'i', g118+42, 1, 'l', g118+45, 1, 'e', g118+48, 1, ' ', g118+51, 1, 'o', g118+54, 1, 'p', g118+57, 1, 'e', g118+60, 1, 'r', g118+63, 1, 'a', g118+66, 1, 'n', g118+69, 1, 'd', g118+72, 1, '\n', g118+75, 0
-g119: dw 1, 'c', g119+3, 1, 'p', g119+6, 1, ':', g119+9, 1, ' ', g119+12, 1, 'm', g119+15, 1, 'i', g119+18, 1, 's', g119+21, 1, 's', g119+24, 1, 'i', g119+27, 1, 'n', g119+30, 1, 'g', g119+33, 1, ' ', g119+36, 1, 'd', g119+39, 1, 'e', g119+42, 1, 's', g119+45, 1, 't', g119+48, 1, 'i', g119+51, 1, 'n', g119+54, 1, 'a', g119+57, 1, 't', g119+60, 1, 'i', g119+63, 1, 'o', g119+66, 1, 'n', g119+69, 1, ' ', g119+72, 1, 'f', g119+75, 1, 'i', g119+78, 1, 'l', g119+81, 1, 'e', g119+84, 1, ' ', g119+87, 1, 'o', g119+90, 1, 'p', g119+93, 1, 'e', g119+96, 1, 'r', g119+99, 1, 'a', g119+102, 1, 'n', g119+105, 1, 'd', g119+108, 1, ' ', g119+111, 1, 'a', g119+114, 1, 'f', g119+117, 1, 't', g119+120, 1, 'e', g119+123, 1, 'r', g119+126, 1, ' ', g119+129, 1, '\'', g119+132, 0
-g120: dw 1, '\'', g120+3, 1, '\n', g120+6, 0
-g121: dw 0
-g122: dw 1, g120, g121
-g123: dw 1, 'c', g123+3, 1, 'p', g123+6, 1, ':', g123+9, 1, ' ', g123+12, 1, 'u', g123+15, 1, 'n', g123+18, 1, 'e', g123+21, 1, 'x', g123+24, 1, 'p', g123+27, 1, 'e', g123+30, 1, 'c', g123+33, 1, 't', g123+36, 1, 'e', g123+39, 1, 'd', g123+42, 1, ' ', g123+45, 1, 'e', g123+48, 1, 'x', g123+51, 1, 't', g123+54, 1, 'r', g123+57, 1, 'a', g123+60, 1, ' ', g123+63, 1, 'o', g123+66, 1, 'p', g123+69, 1, 'e', g123+72, 1, 'r', g123+75, 1, 'a', g123+78, 1, 'n', g123+81, 1, 'd', g123+84, 1, 's', g123+87, 1, '\n', g123+90, 0
-g124: dw 0
-g125: dw 1, 'c', g125+3, 1, 'p', g125+6, 1, ':', g125+9, 1, ' ', g125+12, 1, 'c', g125+15, 1, 'a', g125+18, 1, 'n', g125+21, 1, 'n', g125+24, 1, 'o', g125+27, 1, 't', g125+30, 1, ' ', g125+33, 1, 's', g125+36, 1, 't', g125+39, 1, 'a', g125+42, 1, 't', g125+45, 1, ' ', g125+48, 1, '\'', g125+51, 0
-g126: dw 1, '\'', g126+3, 1, ':', g126+6, 1, ' ', g126+9, 1, 'N', g126+12, 1, 'o', g126+15, 1, ' ', g126+18, 1, 's', g126+21, 1, 'u', g126+24, 1, 'c', g126+27, 1, 'h', g126+30, 1, ' ', g126+33, 1, 'f', g126+36, 1, 'i', g126+39, 1, 'l', g126+42, 1, 'e', g126+45, 1, ' ', g126+48, 1, 'o', g126+51, 1, 'r', g126+54, 1, ' ', g126+57, 1, 'd', g126+60, 1, 'i', g126+63, 1, 'r', g126+66, 1, 'e', g126+69, 1, 'c', g126+72, 1, 't', g126+75, 1, 'o', g126+78, 1, 'r', g126+81, 1, 'y', g126+84, 1, '\n', g126+87, 0
+g100: dw 0
+g101: dw 0
+g102: dw 1
+g103: dw 0
+g104: dw 0
+g105: dw 0
+g106: dw 1, '\n', g106+3, 0
+g107: dw 0
+g108: dw 0
+g109: dw 1, 'f', g109+3, 1, 'i', g109+6, 1, 'l', g109+9, 1, 'e', g109+12, 0
+g110: dw 1, 'f', g110+3, 1, 'i', g110+6, 1, 'l', g110+9, 1, 'e', g110+12, 1, ' ', g110+15, 1, '\8212', g110+18, 1, ' ', g110+21, 1, 'd', g110+24, 1, 'e', g110+27, 1, 't', g110+30, 1, 'e', g110+33, 1, 'r', g110+36, 1, 'm', g110+39, 1, 'i', g110+42, 1, 'n', g110+45, 1, 'e', g110+48, 1, ' ', g110+51, 1, 'f', g110+54, 1, 'i', g110+57, 1, 'l', g110+60, 1, 'e', g110+63, 1, ' ', g110+66, 1, 't', g110+69, 1, 'y', g110+72, 1, 'p', g110+75, 1, 'e', g110+78, 1, '\n', g110+81, 0
+g111: dw 1, 'f', g111+3, 1, 'i', g111+6, 1, 'l', g111+9, 1, 'e', g111+12, 1, ':', g111+15, 1, ' ', g111+18, 1, 't', g111+21, 1, 'a', g111+24, 1, 'k', g111+27, 1, 'e', g111+30, 1, 's', g111+33, 1, ' ', g111+36, 1, 'a', g111+39, 1, 't', g111+42, 1, ' ', g111+45, 1, 'l', g111+48, 1, 'e', g111+51, 1, 'a', g111+54, 1, 's', g111+57, 1, 't', g111+60, 1, ' ', g111+63, 1, 'o', g111+66, 1, 'n', g111+69, 1, 'e', g111+72, 1, ' ', g111+75, 1, 'a', g111+78, 1, 'r', g111+81, 1, 'g', g111+84, 1, 'u', g111+87, 1, 'm', g111+90, 1, 'e', g111+93, 1, 'n', g111+96, 1, 't', g111+99, 1, '\n', g111+102, 0
+g112: dw 0
+g113: dw 1, ' ', g113+3, 1, ':', g113+6, 1, ' ', g113+9, 1, 'N', g113+12, 1, 'o', g113+15, 1, ' ', g113+18, 1, 's', g113+21, 1, 'u', g113+24, 1, 'c', g113+27, 1, 'h', g113+30, 1, ' ', g113+33, 1, 'f', g113+36, 1, 'i', g113+39, 1, 'l', g113+42, 1, 'e', g113+45, 1, ' ', g113+48, 1, 'o', g113+51, 1, 'r', g113+54, 1, ' ', g113+57, 1, 'd', g113+60, 1, 'i', g113+63, 1, 'r', g113+66, 1, 'e', g113+69, 1, 'c', g113+72, 1, 't', g113+75, 1, 'o', g113+78, 1, 'r', g113+81, 1, 'y', g113+84, 1, '\n', g113+87, 0
+g114: dw 0
+g115: dw 1, g113, g114
+g116: dw 1, ':', g116+3, 1, ' ', g116+6, 1, 'A', g116+9, 1, 'S', g116+12, 1, 'C', g116+15, 1, 'I', g116+18, 1, 'I', g116+21, 1, ' ', g116+24, 1, 't', g116+27, 1, 'e', g116+30, 1, 'x', g116+33, 1, 't', g116+36, 1, '\n', g116+39, 0
+g117: dw 0
+g118: dw 1, g116, g117
+g119: dw 1, ':', g119+3, 1, ' ', g119+6, 1, 'e', g119+9, 1, 'x', g119+12, 1, 'e', g119+15, 1, 'c', g119+18, 1, 'u', g119+21, 1, 't', g119+24, 1, 'a', g119+27, 1, 'b', g119+30, 1, 'l', g119+33, 1, 'e', g119+36, 1, '\n', g119+39, 0
+g120: dw 0
+g121: dw 1, g119, g120
+g122: dw 1, 'l', g122+3, 1, 's', g122+6, 0
+g123: dw 1, 'l', g123+3, 1, 's', g123+6, 1, ' ', g123+9, 1, '-', g123+12, 1, ' ', g123+15, 1, 'l', g123+18, 1, 'i', g123+21, 1, 's', g123+24, 1, 't', g123+27, 1, ' ', g123+30, 1, 'd', g123+33, 1, 'i', g123+36, 1, 'r', g123+39, 1, 'e', g123+42, 1, 'c', g123+45, 1, 't', g123+48, 1, 'o', g123+51, 1, 'r', g123+54, 1, 'y', g123+57, 1, ' ', g123+60, 1, 'c', g123+63, 1, 'o', g123+66, 1, 'n', g123+69, 1, 't', g123+72, 1, 'e', g123+75, 1, 'n', g123+78, 1, 't', g123+81, 1, 's', g123+84, 1, '\n', g123+87, 0
+g124: dw 1, 'l', g124+3, 1, 's', g124+6, 1, ':', g124+9, 1, ' ', g124+12, 1, 't', g124+15, 1, 'a', g124+18, 1, 'k', g124+21, 1, 'e', g124+24, 1, 's', g124+27, 1, ' ', g124+30, 1, 'n', g124+33, 1, 'o', g124+36, 1, ' ', g124+39, 1, 'a', g124+42, 1, 'r', g124+45, 1, 'g', g124+48, 1, 'u', g124+51, 1, 'm', g124+54, 1, 'e', g124+57, 1, 'n', g124+60, 1, 't', g124+63, 1, 's', g124+66, 1, '\n', g124+69, 0
+g125: dw L67
+g126: dw 0
 g127: dw 0
-g128: dw 1, g126, g127
-g129: dw 1, 'm', g129+3, 1, 'v', g129+6, 0
-g130: dw 1, 'm', g130+3, 1, 'v', g130+6, 1, ' ', g130+9, 1, '-', g130+12, 1, ' ', g130+15, 1, 'm', g130+18, 1, 'o', g130+21, 1, 'v', g130+24, 1, 'e', g130+27, 1, ' ', g130+30, 1, '(', g130+33, 1, 'r', g130+36, 1, 'e', g130+39, 1, 'n', g130+42, 1, 'a', g130+45, 1, 'm', g130+48, 1, 'e', g130+51, 1, ')', g130+54, 1, ' ', g130+57, 1, 'f', g130+60, 1, 'i', g130+63, 1, 'l', g130+66, 1, 'e', g130+69, 1, 's', g130+72, 1, '\n', g130+75, 0
-g131: dw 1, 'm', g131+3, 1, 'v', g131+6, 1, ':', g131+9, 1, ' ', g131+12, 1, 'm', g131+15, 1, 'i', g131+18, 1, 's', g131+21, 1, 's', g131+24, 1, 'i', g131+27, 1, 'n', g131+30, 1, 'g', g131+33, 1, ' ', g131+36, 1, 'f', g131+39, 1, 'i', g131+42, 1, 'l', g131+45, 1, 'e', g131+48, 1, ' ', g131+51, 1, 'o', g131+54, 1, 'p', g131+57, 1, 'e', g131+60, 1, 'r', g131+63, 1, 'a', g131+66, 1, 'n', g131+69, 1, 'd', g131+72, 1, '\n', g131+75, 0
-g132: dw 1, 'm', g132+3, 1, 'v', g132+6, 1, ':', g132+9, 1, ' ', g132+12, 1, 'm', g132+15, 1, 'i', g132+18, 1, 's', g132+21, 1, 's', g132+24, 1, 'i', g132+27, 1, 'n', g132+30, 1, 'g', g132+33, 1, ' ', g132+36, 1, 'd', g132+39, 1, 'e', g132+42, 1, 's', g132+45, 1, 't', g132+48, 1, 'i', g132+51, 1, 'n', g132+54, 1, 'a', g132+57, 1, 't', g132+60, 1, 'i', g132+63, 1, 'o', g132+66, 1, 'n', g132+69, 1, ' ', g132+72, 1, 'f', g132+75, 1, 'i', g132+78, 1, 'l', g132+81, 1, 'e', g132+84, 1, ' ', g132+87, 1, 'o', g132+90, 1, 'p', g132+93, 1, 'e', g132+96, 1, 'r', g132+99, 1, 'a', g132+102, 1, 'n', g132+105, 1, 'd', g132+108, 1, ' ', g132+111, 1, 'a', g132+114, 1, 'f', g132+117, 1, 't', g132+120, 1, 'e', g132+123, 1, 'r', g132+126, 1, ' ', g132+129, 1, '\'', g132+132, 0
-g133: dw 1, '\'', g133+3, 1, '\n', g133+6, 0
+g128: dw 1, 'm', g128+3, 1, 'a', g128+6, 1, 'n', g128+9, 0
+g129: dw 1, 'm', g129+3, 1, 'a', g129+6, 1, 'n', g129+9, 1, ' ', g129+12, 1, '-', g129+15, 1, ' ', g129+18, 1, 'a', g129+21, 1, 'n', g129+24, 1, ' ', g129+27, 1, 'i', g129+30, 1, 'n', g129+33, 1, 't', g129+36, 1, 'e', g129+39, 1, 'r', g129+42, 1, 'f', g129+45, 1, 'a', g129+48, 1, 'c', g129+51, 1, 'e', g129+54, 1, ' ', g129+57, 1, 't', g129+60, 1, 'o', g129+63, 1, ' ', g129+66, 1, 't', g129+69, 1, 'h', g129+72, 1, 'e', g129+75, 1, ' ', g129+78, 1, 's', g129+81, 1, 'y', g129+84, 1, 's', g129+87, 1, 't', g129+90, 1, 'e', g129+93, 1, 'm', g129+96, 1, ' ', g129+99, 1, 'r', g129+102, 1, 'e', g129+105, 1, 'f', g129+108, 1, 'e', g129+111, 1, 'r', g129+114, 1, 'e', g129+117, 1, 'n', g129+120, 1, 'c', g129+123, 1, 'e', g129+126, 1, ' ', g129+129, 1, 'm', g129+132, 1, 'a', g129+135, 1, 'n', g129+138, 1, 'u', g129+141, 1, 'a', g129+144, 1, 'l', g129+147, 1, 's', g129+150, 1, '\n', g129+153, 0
+g130: dw 1, 'W', g130+3, 1, 'h', g130+6, 1, 'a', g130+9, 1, 't', g130+12, 1, ' ', g130+15, 1, 'm', g130+18, 1, 'a', g130+21, 1, 'n', g130+24, 1, 'u', g130+27, 1, 'a', g130+30, 1, 'l', g130+33, 1, ' ', g130+36, 1, 'p', g130+39, 1, 'a', g130+42, 1, 'g', g130+45, 1, 'e', g130+48, 1, ' ', g130+51, 1, 'd', g130+54, 1, 'o', g130+57, 1, ' ', g130+60, 1, 'y', g130+63, 1, 'o', g130+66, 1, 'u', g130+69, 1, ' ', g130+72, 1, 'w', g130+75, 1, 'a', g130+78, 1, 'n', g130+81, 1, 't', g130+84, 1, '?', g130+87, 1, '\n', g130+90, 0
+g131: dw 0
+g132: dw 1, 'N', g132+3, 1, 'o', g132+6, 1, ' ', g132+9, 1, 'm', g132+12, 1, 'a', g132+15, 1, 'n', g132+18, 1, 'u', g132+21, 1, 'a', g132+24, 1, 'l', g132+27, 1, ' ', g132+30, 1, 'e', g132+33, 1, 'n', g132+36, 1, 't', g132+39, 1, 'r', g132+42, 1, 'y', g132+45, 1, ' ', g132+48, 1, 'f', g132+51, 1, 'o', g132+54, 1, 'r', g132+57, 1, ' ', g132+60, 0
+g133: dw 1, '\n', g133+3, 0
 g134: dw 0
 g135: dw 1, g133, g134
-g136: dw 1, 'm', g136+3, 1, 'v', g136+6, 1, ':', g136+9, 1, ' ', g136+12, 1, 'u', g136+15, 1, 'n', g136+18, 1, 'e', g136+21, 1, 'x', g136+24, 1, 'p', g136+27, 1, 'e', g136+30, 1, 'c', g136+33, 1, 't', g136+36, 1, 'e', g136+39, 1, 'd', g136+42, 1, ' ', g136+45, 1, 'e', g136+48, 1, 'x', g136+51, 1, 't', g136+54, 1, 'r', g136+57, 1, 'a', g136+60, 1, ' ', g136+63, 1, 'o', g136+66, 1, 'p', g136+69, 1, 'e', g136+72, 1, 'r', g136+75, 1, 'a', g136+78, 1, 'n', g136+81, 1, 'd', g136+84, 1, 's', g136+87, 1, '\n', g136+90, 0
-g137: dw 0
-g138: dw 1, 'm', g138+3, 1, 'v', g138+6, 1, ':', g138+9, 1, ' ', g138+12, 1, 'c', g138+15, 1, 'a', g138+18, 1, 'n', g138+21, 1, 'n', g138+24, 1, 'o', g138+27, 1, 't', g138+30, 1, ' ', g138+33, 1, 's', g138+36, 1, 't', g138+39, 1, 'a', g138+42, 1, 't', g138+45, 1, ' ', g138+48, 1, '\'', g138+51, 0
-g139: dw 1, '\'', g139+3, 1, ':', g139+6, 1, ' ', g139+9, 1, 'N', g139+12, 1, 'o', g139+15, 1, ' ', g139+18, 1, 's', g139+21, 1, 'u', g139+24, 1, 'c', g139+27, 1, 'h', g139+30, 1, ' ', g139+33, 1, 'f', g139+36, 1, 'i', g139+39, 1, 'l', g139+42, 1, 'e', g139+45, 1, ' ', g139+48, 1, 'o', g139+51, 1, 'r', g139+54, 1, ' ', g139+57, 1, 'd', g139+60, 1, 'i', g139+63, 1, 'r', g139+66, 1, 'e', g139+69, 1, 'c', g139+72, 1, 't', g139+75, 1, 'o', g139+78, 1, 'r', g139+81, 1, 'y', g139+84, 1, '\n', g139+87, 0
+g136: dw 1, 'N', g136+3, 1, 'o', g136+6, 1, ' ', g136+9, 1, 'm', g136+12, 1, 'a', g136+15, 1, 'n', g136+18, 1, 'u', g136+21, 1, 'a', g136+24, 1, 'l', g136+27, 1, ' ', g136+30, 1, 'e', g136+33, 1, 'n', g136+36, 1, 't', g136+39, 1, 'r', g136+42, 1, 'y', g136+45, 1, ' ', g136+48, 1, 'f', g136+51, 1, 'o', g136+54, 1, 'r', g136+57, 1, ' ', g136+60, 0
+g137: dw 1, '\n', g137+3, 0
+g138: dw 0
+g139: dw 1, g137, g138
 g140: dw 0
-g141: dw 1, g139, g140
-g142: dw 1, 'r', g142+3, 1, 'm', g142+6, 1, ':', g142+9, 1, ' ', g142+12, 1, 'c', g142+15, 1, 'a', g142+18, 1, 'n', g142+21, 1, 'n', g142+24, 1, 'o', g142+27, 1, 't', g142+30, 1, ' ', g142+33, 1, 'r', g142+36, 1, 'e', g142+39, 1, 'm', g142+42, 1, 'o', g142+45, 1, 'v', g142+48, 1, 'e', g142+51, 1, ' ', g142+54, 1, '\'', g142+57, 0
-g143: dw 1, '\'', g143+3, 1, ':', g143+6, 1, ' ', g143+9, 1, 'N', g143+12, 1, 'o', g143+15, 1, ' ', g143+18, 1, 's', g143+21, 1, 'u', g143+24, 1, 'c', g143+27, 1, 'h', g143+30, 1, ' ', g143+33, 1, 'f', g143+36, 1, 'i', g143+39, 1, 'l', g143+42, 1, 'e', g143+45, 1, ' ', g143+48, 1, 'o', g143+51, 1, 'r', g143+54, 1, ' ', g143+57, 1, 'd', g143+60, 1, 'i', g143+63, 1, 'r', g143+66, 1, 'e', g143+69, 1, 'c', g143+72, 1, 't', g143+75, 1, 'o', g143+78, 1, 'r', g143+81, 1, 'y', g143+84, 1, '\n', g143+87, 0
-g144: dw 0
-g145: dw 1, g143, g144
-g146: dw 0
+g141: dw 1, 'N', g141+3, 1, 'o', g141+6, 1, ' ', g141+9, 1, 'm', g141+12, 1, 'a', g141+15, 1, 'n', g141+18, 1, 'u', g141+21, 1, 'a', g141+24, 1, 'l', g141+27, 1, ' ', g141+30, 1, 'e', g141+33, 1, 'n', g141+36, 1, 't', g141+39, 1, 'r', g141+42, 1, 'y', g141+45, 1, ' ', g141+48, 1, 'f', g141+51, 1, 'o', g141+54, 1, 'r', g141+57, 1, ' ', g141+60, 0
+g142: dw 1, '\n', g142+3, 0
+g143: dw 0
+g144: dw 1, g142, g143
+g145: dw 1, 'N', g145+3, 1, 'o', g145+6, 1, ' ', g145+9, 1, 'm', g145+12, 1, 'a', g145+15, 1, 'n', g145+18, 1, 'u', g145+21, 1, 'a', g145+24, 1, 'l', g145+27, 1, ' ', g145+30, 1, 'e', g145+33, 1, 'n', g145+36, 1, 't', g145+39, 1, 'r', g145+42, 1, 'y', g145+45, 1, ' ', g145+48, 1, 'f', g145+51, 1, 'o', g145+54, 1, 'r', g145+57, 1, ' ', g145+60, 0
+g146: dw 1, '\n', g146+3, 0
 g147: dw 0
+g148: dw 1, g146, g147
+g149: dw 1, 'm', g149+3, 1, 'v', g149+6, 0
+g150: dw 1, 'm', g150+3, 1, 'v', g150+6, 1, ' ', g150+9, 1, '-', g150+12, 1, ' ', g150+15, 1, 'm', g150+18, 1, 'o', g150+21, 1, 'v', g150+24, 1, 'e', g150+27, 1, ' ', g150+30, 1, '(', g150+33, 1, 'r', g150+36, 1, 'e', g150+39, 1, 'n', g150+42, 1, 'a', g150+45, 1, 'm', g150+48, 1, 'e', g150+51, 1, ')', g150+54, 1, ' ', g150+57, 1, 'f', g150+60, 1, 'i', g150+63, 1, 'l', g150+66, 1, 'e', g150+69, 1, 's', g150+72, 1, '\n', g150+75, 0
+g151: dw 1, 'm', g151+3, 1, 'v', g151+6, 1, ':', g151+9, 1, ' ', g151+12, 1, 'm', g151+15, 1, 'i', g151+18, 1, 's', g151+21, 1, 's', g151+24, 1, 'i', g151+27, 1, 'n', g151+30, 1, 'g', g151+33, 1, ' ', g151+36, 1, 'f', g151+39, 1, 'i', g151+42, 1, 'l', g151+45, 1, 'e', g151+48, 1, ' ', g151+51, 1, 'o', g151+54, 1, 'p', g151+57, 1, 'e', g151+60, 1, 'r', g151+63, 1, 'a', g151+66, 1, 'n', g151+69, 1, 'd', g151+72, 1, '\n', g151+75, 0
+g152: dw 1, 'm', g152+3, 1, 'v', g152+6, 1, ':', g152+9, 1, ' ', g152+12, 1, 'm', g152+15, 1, 'i', g152+18, 1, 's', g152+21, 1, 's', g152+24, 1, 'i', g152+27, 1, 'n', g152+30, 1, 'g', g152+33, 1, ' ', g152+36, 1, 'd', g152+39, 1, 'e', g152+42, 1, 's', g152+45, 1, 't', g152+48, 1, 'i', g152+51, 1, 'n', g152+54, 1, 'a', g152+57, 1, 't', g152+60, 1, 'i', g152+63, 1, 'o', g152+66, 1, 'n', g152+69, 1, ' ', g152+72, 1, 'f', g152+75, 1, 'i', g152+78, 1, 'l', g152+81, 1, 'e', g152+84, 1, ' ', g152+87, 1, 'o', g152+90, 1, 'p', g152+93, 1, 'e', g152+96, 1, 'r', g152+99, 1, 'a', g152+102, 1, 'n', g152+105, 1, 'd', g152+108, 1, ' ', g152+111, 1, 'a', g152+114, 1, 'f', g152+117, 1, 't', g152+120, 1, 'e', g152+123, 1, 'r', g152+126, 1, ' ', g152+129, 1, '\'', g152+132, 0
+g153: dw 1, '\'', g153+3, 1, '\n', g153+6, 0
+g154: dw 0
+g155: dw 1, g153, g154
+g156: dw 1, 'm', g156+3, 1, 'v', g156+6, 1, ':', g156+9, 1, ' ', g156+12, 1, 'u', g156+15, 1, 'n', g156+18, 1, 'e', g156+21, 1, 'x', g156+24, 1, 'p', g156+27, 1, 'e', g156+30, 1, 'c', g156+33, 1, 't', g156+36, 1, 'e', g156+39, 1, 'd', g156+42, 1, ' ', g156+45, 1, 'e', g156+48, 1, 'x', g156+51, 1, 't', g156+54, 1, 'r', g156+57, 1, 'a', g156+60, 1, ' ', g156+63, 1, 'o', g156+66, 1, 'p', g156+69, 1, 'e', g156+72, 1, 'r', g156+75, 1, 'a', g156+78, 1, 'n', g156+81, 1, 'd', g156+84, 1, 's', g156+87, 1, '\n', g156+90, 0
+g157: dw 0
+g158: dw 1, 'm', g158+3, 1, 'v', g158+6, 1, ':', g158+9, 1, ' ', g158+12, 1, 'c', g158+15, 1, 'a', g158+18, 1, 'n', g158+21, 1, 'n', g158+24, 1, 'o', g158+27, 1, 't', g158+30, 1, ' ', g158+33, 1, 's', g158+36, 1, 't', g158+39, 1, 'a', g158+42, 1, 't', g158+45, 1, ' ', g158+48, 1, '\'', g158+51, 0
+g159: dw 1, '\'', g159+3, 1, ':', g159+6, 1, ' ', g159+9, 1, 'N', g159+12, 1, 'o', g159+15, 1, ' ', g159+18, 1, 's', g159+21, 1, 'u', g159+24, 1, 'c', g159+27, 1, 'h', g159+30, 1, ' ', g159+33, 1, 'f', g159+36, 1, 'i', g159+39, 1, 'l', g159+42, 1, 'e', g159+45, 1, ' ', g159+48, 1, 'o', g159+51, 1, 'r', g159+54, 1, ' ', g159+57, 1, 'd', g159+60, 1, 'i', g159+63, 1, 'r', g159+66, 1, 'e', g159+69, 1, 'c', g159+72, 1, 't', g159+75, 1, 'o', g159+78, 1, 'r', g159+81, 1, 'y', g159+84, 1, '\n', g159+87, 0
+g160: dw 0
+g161: dw 1, g159, g160
+g162: dw 1, 'r', g162+3, 1, 'm', g162+6, 1, ':', g162+9, 1, ' ', g162+12, 1, 'c', g162+15, 1, 'a', g162+18, 1, 'n', g162+21, 1, 'n', g162+24, 1, 'o', g162+27, 1, 't', g162+30, 1, ' ', g162+33, 1, 'r', g162+36, 1, 'e', g162+39, 1, 'm', g162+42, 1, 'o', g162+45, 1, 'v', g162+48, 1, 'e', g162+51, 1, ' ', g162+54, 1, '\'', g162+57, 0
+g163: dw 1, '\'', g163+3, 1, ':', g163+6, 1, ' ', g163+9, 1, 'N', g163+12, 1, 'o', g163+15, 1, ' ', g163+18, 1, 's', g163+21, 1, 'u', g163+24, 1, 'c', g163+27, 1, 'h', g163+30, 1, ' ', g163+33, 1, 'f', g163+36, 1, 'i', g163+39, 1, 'l', g163+42, 1, 'e', g163+45, 1, ' ', g163+48, 1, 'o', g163+51, 1, 'r', g163+54, 1, ' ', g163+57, 1, 'd', g163+60, 1, 'i', g163+63, 1, 'r', g163+66, 1, 'e', g163+69, 1, 'c', g163+72, 1, 't', g163+75, 1, 'o', g163+78, 1, 'r', g163+81, 1, 'y', g163+84, 1, '\n', g163+87, 0
+g164: dw 0
+g165: dw 1, g163, g164
+g166: dw 0
+g167: dw 1, 'r', g167+3, 1, 'm', g167+6, 0
+g168: dw 1, 'r', g168+3, 1, 'm', g168+6, 1, ' ', g168+9, 1, '-', g168+12, 1, ' ', g168+15, 1, 'r', g168+18, 1, 'e', g168+21, 1, 'm', g168+24, 1, 'o', g168+27, 1, 'v', g168+30, 1, 'e', g168+33, 1, ' ', g168+36, 1, 'f', g168+39, 1, 'i', g168+42, 1, 'l', g168+45, 1, 'e', g168+48, 1, 's', g168+51, 1, ' ', g168+54, 1, 'o', g168+57, 1, 'r', g168+60, 1, ' ', g168+63, 1, 'd', g168+66, 1, 'i', g168+69, 1, 'r', g168+72, 1, 'e', g168+75, 1, 'c', g168+78, 1, 't', g168+81, 1, 'o', g168+84, 1, 'r', g168+87, 1, 'i', g168+90, 1, 'e', g168+93, 1, 's', g168+96, 1, ' ', g168+99, 1, '(', g168+102, 1, 'd', g168+105, 1, 'i', g168+108, 1, 'r', g168+111, 1, 'e', g168+114, 1, 'c', g168+117, 1, 't', g168+120, 1, 'o', g168+123, 1, 'r', g168+126, 1, 'i', g168+129, 1, 'e', g168+132, 1, 's', g168+135, 1, ' ', g168+138, 1, 'n', g168+141, 1, 'o', g168+144, 1, 't', g168+147, 1, ' ', g168+150, 1, 's', g168+153, 1, 'u', g168+156, 1, 'p', g168+159, 1, 'p', g168+162, 1, 'o', g168+165, 1, 'r', g168+168, 1, 't', g168+171, 1, 'e', g168+174, 1, 'd', g168+177, 1, ' ', g168+180, 1, 'y', g168+183, 1, 'e', g168+186, 1, 't', g168+189, 1, '!', g168+192, 1, ')', g168+195, 1, '\n', g168+198, 0
+g169: dw 1, 'r', g169+3, 1, 'm', g169+6, 1, ':', g169+9, 1, ' ', g169+12, 1, 'm', g169+15, 1, 'i', g169+18, 1, 's', g169+21, 1, 's', g169+24, 1, 'i', g169+27, 1, 'n', g169+30, 1, 'g', g169+33, 1, ' ', g169+36, 1, 'o', g169+39, 1, 'p', g169+42, 1, 'e', g169+45, 1, 'r', g169+48, 1, 'a', g169+51, 1, 'n', g169+54, 1, 'd', g169+57, 1, '\n', g169+60, 0
+g170: dw 1, 'r', g170+3, 1, 'm', g170+6, 1, ':', g170+9, 1, ' ', g170+12, 1, 'c', g170+15, 1, 'a', g170+18, 1, 'n', g170+21, 1, 'n', g170+24, 1, 'o', g170+27, 1, 't', g170+30, 1, ' ', g170+33, 1, 'r', g170+36, 1, 'e', g170+39, 1, 'm', g170+42, 1, 'o', g170+45, 1, 'v', g170+48, 1, 'e', g170+51, 1, ' ', g170+54, 1, '\'', g170+57, 0
+g171: dw 1, '\'', g171+3, 1, ':', g171+6, 1, ' ', g171+9, 1, 'N', g171+12, 1, 'o', g171+15, 1, ' ', g171+18, 1, 's', g171+21, 1, 'u', g171+24, 1, 'c', g171+27, 1, 'h', g171+30, 1, ' ', g171+33, 1, 'f', g171+36, 1, 'i', g171+39, 1, 'l', g171+42, 1, 'e', g171+45, 1, ' ', g171+48, 1, 'o', g171+51, 1, 'r', g171+54, 1, ' ', g171+57, 1, 'd', g171+60, 1, 'i', g171+63, 1, 'r', g171+66, 1, 'e', g171+69, 1, 'c', g171+72, 1, 't', g171+75, 1, 'o', g171+78, 1, 'r', g171+81, 1, 'y', g171+84, 1, '\n', g171+87, 0
+g172: dw 0
+g173: dw 1, g171, g172
+g174: dw 0
+g175: dw 1, 'c', g175+3, 1, 'a', g175+6, 1, 't', g175+9, 0
+g176: dw 1, 'I', g176+3, 1, ' ', g176+6, 1, 'h', g176+9, 1, 'a', g176+12, 1, 'v', g176+15, 1, 'e', g176+18, 1, ' ', g176+21, 1, 'a', g176+24, 1, ' ', g176+27, 1, 'l', g176+30, 1, 'i', g176+33, 1, 't', g176+36, 1, 't', g176+39, 1, 'l', g176+42, 1, 'e', g176+45, 1, ' ', g176+48, 1, 's', g176+51, 1, 'h', g176+54, 1, 'a', g176+57, 1, 'd', g176+60, 1, 'o', g176+63, 1, 'w', g176+66, 1, ' ', g176+69, 1, 't', g176+72, 1, 'h', g176+75, 1, 'a', g176+78, 1, 't', g176+81, 1, ' ', g176+84, 1, 'g', g176+87, 1, 'o', g176+90, 1, 'e', g176+93, 1, 's', g176+96, 1, ' ', g176+99, 1, 'i', g176+102, 1, 'n', g176+105, 1, ' ', g176+108, 1, 'a', g176+111, 1, 'n', g176+114, 1, 'd', g176+117, 1, ' ', g176+120, 1, 'o', g176+123, 1, 'u', g176+126, 1, 't', g176+129, 1, ' ', g176+132, 1, 'w', g176+135, 1, 'i', g176+138, 1, 't', g176+141, 1, 'h', g176+144, 1, ' ', g176+147, 1, 'm', g176+150, 1, 'e', g176+153, 1, ',', g176+156, 1, '\n', g176+159, 1, 'A', g176+162, 1, 'n', g176+165, 1, 'd', g176+168, 1, ' ', g176+171, 1, 'w', g176+174, 1, 'h', g176+177, 1, 'a', g176+180, 1, 't', g176+183, 1, ' ', g176+186, 1, 'c', g176+189, 1, 'a', g176+192, 1, 'n', g176+195, 1, ' ', g176+198, 1, 'b', g176+201, 1, 'e', g176+204, 1, ' ', g176+207, 1, 't', g176+210, 1, 'h', g176+213, 1, 'e', g176+216, 1, ' ', g176+219, 1, 'u', g176+222, 1, 's', g176+225, 1, 'e', g176+228, 1, ' ', g176+231, 1, 'o', g176+234, 1, 'f', g176+237, 1, ' ', g176+240, 1, 'h', g176+243, 1, 'i', g176+246, 1, 'm', g176+249, 1, ' ', g176+252, 1, 'i', g176+255, 1, 's', g176+258, 1, ' ', g176+261, 1, 'm', g176+264, 1, 'o', g176+267, 1, 'r', g176+270, 1, 'e', g176+273, 1, ' ', g176+276, 1, 't', g176+279, 1, 'h', g176+282, 1, 'a', g176+285, 1, 'n', g176+288, 1, ' ', g176+291, 1, 'I', g176+294, 1, ' ', g176+297, 1, 'c', g176+300, 1, 'a', g176+303, 1, 'n', g176+306, 1, ' ', g176+309, 1, 's', g176+312, 1, 'e', g176+315, 1, 'e', g176+318, 1, '.', g176+321, 1, '\n', g176+324, 1, 'H', g176+327, 1, 'e', g176+330, 1, ' ', g176+333, 1, 'i', g176+336, 1, 's', g176+339, 1, ' ', g176+342, 1, 'v', g176+345, 1, 'e', g176+348, 1, 'r', g176+351, 1, 'y', g176+354, 1, ',', g176+357, 1, ' ', g176+360, 1, 'v', g176+363, 1, 'e', g176+366, 1, 'r', g176+369, 1, 'y', g176+372, 1, ' ', g176+375, 1, 'l', g176+378, 1, 'i', g176+381, 1, 'k', g176+384, 1, 'e', g176+387, 1, ' ', g176+390, 1, 'm', g176+393, 1, 'e', g176+396, 1, ' ', g176+399, 1, 'f', g176+402, 1, 'r', g176+405, 1, 'o', g176+408, 1, 'm', g176+411, 1, ' ', g176+414, 1, 't', g176+417, 1, 'h', g176+420, 1, 'e', g176+423, 1, ' ', g176+426, 1, 'h', g176+429, 1, 'e', g176+432, 1, 'e', g176+435, 1, 'l', g176+438, 1, 's', g176+441, 1, ' ', g176+444, 1, 'u', g176+447, 1, 'p', g176+450, 1, ' ', g176+453, 1, 't', g176+456, 1, 'o', g176+459, 1, ' ', g176+462, 1, 't', g176+465, 1, 'h', g176+468, 1, 'e', g176+471, 1, ' ', g176+474, 1, 'h', g176+477, 1, 'e', g176+480, 1, 'a', g176+483, 1, 'd', g176+486, 1, ';', g176+489, 1, '\n', g176+492, 1, 'A', g176+495, 1, 'n', g176+498, 1, 'd', g176+501, 1, ' ', g176+504, 1, 'I', g176+507, 1, ' ', g176+510, 1, 's', g176+513, 1, 'e', g176+516, 1, 'e', g176+519, 1, ' ', g176+522, 1, 'h', g176+525, 1, 'i', g176+528, 1, 'm', g176+531, 1, ' ', g176+534, 1, 'j', g176+537, 1, 'u', g176+540, 1, 'm', g176+543, 1, 'p', g176+546, 1, ' ', g176+549, 1, 'b', g176+552, 1, 'e', g176+555, 1, 'f', g176+558, 1, 'o', g176+561, 1, 'r', g176+564, 1, 'e', g176+567, 1, ' ', g176+570, 1, 'm', g176+573, 1, 'e', g176+576, 1, ',', g176+579, 1, ' ', g176+582, 1, 'w', g176+585, 1, 'h', g176+588, 1, 'e', g176+591, 1, 'n', g176+594, 1, ' ', g176+597, 1, 'I', g176+600, 1, ' ', g176+603, 1, 'j', g176+606, 1, 'u', g176+609, 1, 'm', g176+612, 1, 'p', g176+615, 1, ' ', g176+618, 1, 'i', g176+621, 1, 'n', g176+624, 1, 't', g176+627, 1, 'o', g176+630, 1, ' ', g176+633, 1, 'm', g176+636, 1, 'y', g176+639, 1, ' ', g176+642, 1, 'b', g176+645, 1, 'e', g176+648, 1, 'd', g176+651, 1, '.', g176+654, 1, '\n', g176+657, 0
+g177: dw 0, g176
+g178: dw 0, g175, g177
+g179: dw 0
+g180: dw 1, g178, g179
 

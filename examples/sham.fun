@@ -310,6 +310,23 @@ let file_behaviour fs args =
   | [] -> (put_string "file: takes at least one argument\n"; fs)
   | _::_ -> (iter file1 args; fs)
 
+let create_behaviour fs args =
+  match args with
+  | [] -> (put_string "create: missing file name\n"; fs)
+  | filename::args ->
+     match args with
+     | _::_ -> (put_string "create: unexpected extra operands\n"; fs)
+     | [] ->
+        put_string "(to finish type ^D on a new line)\n";
+        let single_controlD = implode [chr 4] in
+        let rec loop acc =
+          let line = read_line () in
+          if eq_string line single_controlD then concat (rev acc) else
+            loop ((line ^ "\n") :: acc)
+        in
+        let contents = loop [] in
+        Bindings (Pair (filename,Data contents) :: bindings fs)
+
 let readme = "Welcome to sham; please try all the commands!\nCan you find the hidden Easter Egg?\n"
 let man_ls = "ls - list directory contents\n"
 let man_cat = "cat - concatenate files and print on the standard output\n"
@@ -318,17 +335,22 @@ let man_rm = "rm - remove files or directories (directories not supported yet!)\
 let man_cp = "cp - copy files and directories\n"
 let man_mv = "mv - move (rename) files\n"
 let man_file = "file — determine file type\n"
+let man_create = "create — create a new file\n"
 
-let fs0 () = Bindings
-  ([ Pair ("readme", Data (readme))
-  ; Pair ("ls", Executable (man_ls, ls_behaviour))
+let shadow =
+  "I have a little shadow that goes in and out with me,\nAnd what can be the use of him is more than I can see.\nHe is very, very like me from the heels up to the head;\nAnd I see him jump before me, when I jump into my bed.\n"
+
+let fs0() = Bindings(
+  [ Pair ("readme", Data (readme))
   ; Pair ("cat", Executable (man_cat, cat_behaviour))
-  ; Pair ("man", Executable (man_man, man_behaviour))
-  ; Pair ("rm", Executable (man_rm, rm_behaviour))
   ; Pair ("cp", Executable (man_cp, cp_behaviour))
-  ; Pair ("mv", Executable (man_mv, mv_behaviour))
+  ; Pair ("create", Executable (man_create, create_behaviour))
   ; Pair ("file", Executable (man_file, file_behaviour))
-  (* TODO: file, create & Easter Egg *)
+  ; Pair ("ls", Executable (man_ls, ls_behaviour))
+  ; Pair ("man", Executable (man_man, man_behaviour))
+  ; Pair ("mv", Executable (man_mv, mv_behaviour))
+  ; Pair ("rm", Executable (man_rm, rm_behaviour))
+  ; Pair ("cat", Data shadow)
   ])
 
 let main () =
