@@ -26,6 +26,8 @@ positioned par = do
   x <- par
   pure (pos,x)
 
+data Precedence = L | R
+
 gram6 :: Par Prog
 gram6 = program where
 
@@ -229,7 +231,7 @@ gram6 = program where
     let loop f = alts [ pure f , do p <- position; e <- atom; loop (AST.App f p e)]
     atom >>= loop
 
-  infixOp names sub = sub >>= loop where
+  infixOpL names sub = sub >>= loop where
     loop acc =
       alts [ pure acc
            , do
@@ -251,21 +253,26 @@ gram6 = program where
              pure (mkApps (AST.Var p1 (mkUserId name)) [(p1,x),(p2,y)])
          ]
 
-  infixNames = infixGroup1 ++ infixGroup2 ++ infixGroup3 ++ infixGroup4
+  infixOp :: (Precedence,[String]) -> Par Exp -> Par Exp
+  infixOp (p,xs) = case p of L -> infixOpL xs; R -> infixOpR xs
 
   -- higest..lowest
-  infixGroup1 = ["*","%","/"]
-  infixGroup2 = ["+","-"]
-  infixGroup3 = ["::","^"]
-  infixGroup4 = ["=","<=","<",">=",">"]
+  infixGroup1 = (L,["*","%","/"])
+  infixGroup2 = (L,["+","-"])
+  infixGroup3 = (R,["::"])
+  infixGroup4 = (R,["^","@@","@"])
+  infixGroup5 = (L,["=","<=","<",">=",">"])
+
+  infixNames = concat (map snd [infixGroup1,infixGroup2,infixGroup3,infixGroup4,infixGroup5])
 
   infix0 = application
   infix1 = infixOp infixGroup1 infix0
   infix2 = infixOp infixGroup2 infix1
-  infix3 = infixOpR infixGroup3 infix2
+  infix3 = infixOp infixGroup3 infix2
   infix4 = infixOp infixGroup4 infix3
+  infix5 = infixOp infixGroup5 infix4
 
-  infixWeakestPrecendence = infix4
+  infixWeakestPrecendence = infix5
 
   bound :: Par Id -> Par Bid
   bound identPar = do

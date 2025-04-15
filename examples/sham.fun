@@ -1,6 +1,8 @@
 
 (* sham: example of a shell with an in-memory file-systems *)
 
+let (@@) f x = f x
+
 let not b =
   match b with
   | true -> false
@@ -41,11 +43,11 @@ let rec rev_onto acc xs =
 
 let rev xs = rev_onto [] xs
 
-let append xs ys = rev_onto ys (rev xs)
+let (@) xs ys = rev_onto ys (rev xs)
 
 (* string ops *)
 
-let implode = noinline (fun xs -> (* TODO $ or @@ op would be nice *)
+let implode = noinline @@ (fun xs -> (* TODO: fix parser to avoid need for paren after @@ *)
   let b = make_bytes (length xs) in
   let rec loop i xs =
     match xs with
@@ -86,7 +88,7 @@ let eq_string = noinline (fun s1 s2 ->
     loop (n1-1))
 
 let (^) s1 s2 =
-  implode (append (explode s1) (explode s2))
+  implode (explode s1 @ explode s2)
 
 let rec concat xs =
   match xs with
