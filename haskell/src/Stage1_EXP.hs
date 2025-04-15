@@ -36,7 +36,7 @@ data Arm = ArmTag Position Ctag [Id] Exp
 
 data Id = Id
   { optUnique :: Maybe Int
-  , optPos :: Maybe Position -- TODO: make Position mandatory
+  , pos :: Position
   , name :: Name
   } deriving (Eq,Ord)
 
@@ -60,18 +60,18 @@ sizeExp = \case
 ----------------------------------------------------------------------
 -- provenance
 
-provenanceExp :: Exp -> (String,Maybe Position)
+provenanceExp :: Exp -> (String,Position)
 provenanceExp = \case
   Var{} -> error "provenanceExp/Var" -- we never call on a Var
-  App _ pos _ -> ("app", Just pos)
-  Lit pos _ -> ("lit",Just pos)
-  ConTag pos _ _ -> ("con",Just pos)
-  Lam pos _ _ -> ("lam",Just pos)
+  App _ pos _ -> ("app", pos)
+  Lit pos _ -> ("lit",pos)
+  ConTag pos _ _ -> ("con",pos)
+  Lam pos _ _ -> ("lam",pos)
 
-  Let pos _ _ _ -> ("uLET", Just pos)
-  Prim pos _ _ -> ("prim", Just pos)
-  RecLam pos _ _ _ -> ("reclam",Just pos)
-  Match pos _ _ -> ("case",Just pos)
+  Let pos _ _ _ -> ("uLET", pos)
+  Prim pos _ _ -> ("prim", pos)
+  RecLam pos _ _ _ -> ("reclam",pos)
+  Match pos _ _ -> ("case",pos)
 
 ----------------------------------------------------------------------
 -- Show
@@ -106,21 +106,14 @@ prettyPat c = \case
   xs -> printf "%s(%s)" (show c) (intercalate "," (map show xs))
 
 prettyId :: Id -> String
-prettyId Id{name,optUnique,optPos} =
+prettyId Id{name,optUnique,pos} =
   maybePos (maybeTag (maybeBracket (show name)))
   where
     verbose = False
     maybePos s =
       case name of
-        UserName{} ->
-          if not verbose then s else
-            case optPos of
-              Nothing -> printf "%s_NoPos" s
-              Just pos -> printf "%s_%s" s (show pos)
-        GeneratedName{} ->
-          case optPos of
-            Nothing -> printf "%s_NoPos" s
-            Just pos -> printf "%s_%s" s (show pos)
+        UserName{} -> if not verbose then s else printf "%s_%s" s (show pos)
+        GeneratedName{} -> printf "%s_%s" s (show pos)
 
     maybeTag s =
       case optUnique of
@@ -271,7 +264,7 @@ posPropList = \case
 
 posProp :: Bid -> Cenv -> (Id,Cenv)
 posProp (Bid pos x) cenv = do
-  let x' = Id { optPos = Just pos, optUnique = Nothing, name = UserName x }
+  let x' = Id { pos, optUnique = Nothing, name = UserName x }
   (x', insertId x x' cenv)
 
 insertId :: SRC.Id -> Id -> Cenv -> Cenv

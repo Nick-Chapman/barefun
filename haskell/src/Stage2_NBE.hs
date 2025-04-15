@@ -44,8 +44,7 @@ data SemValue
 -- This wont allow values for which a constant is not possible to construct.i.e. VFunc and VBytes
 
 posOfId :: Id -> Position
-posOfId = \case Id{optPos=Just pos} -> pos; _ -> noPos
-  where noPos = Position 0 0
+posOfId = \case Id{pos} -> pos
 
 syn :: Id -> SemValue
 syn x = Syntax (Var (posOfId x) x)
@@ -194,10 +193,10 @@ look env x = maybe err id $ Map.lookup x env
   where err = error (show ("Normalize.walk/Var",x))
 
 fresh :: Id -> M Id
-fresh Id{name,optPos} = do
+fresh Id{name,pos} = do
   u <- Fresh
   let optUnique = Just u
-  let y = Id { optUnique, optPos, name}
+  let y = Id { optUnique, pos, name}
   pure y
 
 instance Functor M where fmap = liftM

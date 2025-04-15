@@ -53,13 +53,13 @@ type Fvs = [Id]
 ----------------------------------------------------------------------
 -- provenance
 
-provenanceAtomic :: Atomic -> (String,Maybe Position)
+provenanceAtomic :: Atomic -> (String,Position)
 provenanceAtomic = \case
-  LitS pos _ -> ("lit",Just pos)
-  Prim pos _ _ -> ("prim",Just pos)
-  ConTag pos _ _ -> ("con",Just pos)
-  Lam pos _ _ _ -> ("lam",Just pos)
-  RecLam pos _ _ _ _ -> undefined $ ("reclam",Just pos)
+  LitS pos _ -> ("lit",pos)
+  Prim pos _ _ -> ("prim",pos)
+  ConTag pos _ _ -> ("con",pos)
+  Lam pos _ _ _ -> ("lam",pos)
+  RecLam pos _ _ _ _ -> undefined $ ("reclam",pos)
 
 ----------------------------------------------------------------------
 -- Show
@@ -188,8 +188,8 @@ nameAtomic :: AC -> M Code
 nameAtomic = \case
   Compound code -> pure code
   Atomic a -> do
-    let (what,optPos) = provenanceAtomic a
-    x <- Fresh optPos what
+    let (what,pos) = provenanceAtomic a
+    x <- Fresh pos what
     let noPos = Position 0 0
     pure $ LetAtomic x a (Return noPos (Named x))
 
@@ -248,8 +248,8 @@ compileAsId = \case
   SRC.Lit _pos (SRC.LitN n) -> \k -> k (LitN n)
   SRC.Var _pos x -> \k -> k (Named x)
   e -> \k -> do
-    let (what,optPos) = provenanceExp e
-    x <- Fresh optPos what
+    let (what,pos) = provenanceExp e
+    x <- Fresh pos what
     compileExp e $ \code -> do
       body <- (k (Named x) >>= nameAtomic)
       pure $ Compound $ mkBind x code body
@@ -272,7 +272,7 @@ instance Monad M where (>>=) = Bind
 data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
-  Fresh :: Maybe Position -> String -> M Id
+  Fresh :: Position -> String -> M Id
 
 runM :: M a -> a
 runM m0 = loop 1 m0 $ \_ x -> x
@@ -281,9 +281,9 @@ runM m0 = loop 1 m0 $ \_ x -> x
     loop u m k = case m of
       Ret x -> k u x
       Bind m f -> loop u m $ \u x -> loop u (f x) k
-      Fresh optPos tag -> do
+      Fresh pos tag -> do
         let x = Id { optUnique = Just u
-                   , optPos
+                   , pos
                    , name = GeneratedName tag
                    }
         k (u+1) x
