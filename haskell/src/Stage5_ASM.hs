@@ -4,6 +4,7 @@ module Stage5_ASM
   , compile
   ) where
 
+import Prelude hiding (Word)
 import Builtin (Builtin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
@@ -22,7 +23,7 @@ type Transformed = Image
 
 data Image = Image
   { cmap :: Map CodeLabel Code
-  , dmap :: Map DataLabel [Val]
+  , dmap :: Map DataLabel [Word]
   , start :: CodeLabel
   }
 
@@ -33,7 +34,7 @@ data Code
 data Op -- target; source
   = OpComment String
   | OpMove Reg Source
-  | OpStore MemAddr Source
+  | OpStore Addr Source
   | OpCall BareBios
   | OpPush Source
   | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
@@ -52,32 +53,30 @@ data Jump
 
 data Source
   = SReg Reg
-  | SLit Val
-  | SMem MemAddr
+  | SLit Word
+  | SMem Addr
   | SMemIndirect Reg
   | SMemIndirectOffset Reg Int
 
--- TODO: rename Val --> Word
--- Val is a structured type for the contents of a register or memory location
+-- Word is a structured type for the contents of a register or memory location
 -- We use a variant type to help catch compiler bugs during dev.
 -- On a real system, the representations will overlap.
 -- Tagging will distinguish pointer from non-pointer.
 
-data Val
-  = VChar Char
-  | VNum Number
-  -- TODO: VTag CTag -- allow carrying more provenence info
-  | VMemAddr MemAddr
-  | VCodeLabel CodeLabel
+data Word
+  = WChar Char
+  | WNum Number
+  | WAddr Addr
+  | WCodeLabel CodeLabel
   deriving Eq
 
-vTag :: Ctag -> Val
-vTag (Ctag _ n) = VNum n
+vTag :: Ctag -> Word
+vTag (Ctag _ n) = WNum n
 
 data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si -- Di when needed
   deriving (Eq,Ord)
 
-data MemAddr  -- TODO: rename Addr
+data Addr -- memory address
   = Physical Int
   | Symbolic DataLabel Int
   deriving (Eq,Ord)
@@ -158,17 +157,17 @@ instance Show Jump where
 instance Show Source where
   show = \case
     SReg r -> show r
-    SLit v -> "#" ++ show v -- dont think x86 use this #-syntax
+    SLit w -> "#" ++ show w -- dont think x86 use this #-syntax
     SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
 
-instance Show Val where
+instance Show Word where
   show = \case
-    VChar c -> show c
-    VNum n -> show n
-    VMemAddr a -> show a
-    VCodeLabel lab -> show lab
+    WChar c -> show c
+    WNum n -> show n
+    WAddr a -> show a
+    WCodeLabel lab -> show lab
 
 instance Show Reg where
   show = \case
@@ -180,7 +179,7 @@ instance Show Reg where
     Bp -> "bp"
     Si -> "si"
 
-instance Show MemAddr where
+instance Show Addr where
   show = \case
     Physical n -> show n
     Symbolic d 0 -> printf "%s" (show d)
@@ -213,18 +212,18 @@ execCode = \case
 execOp :: Op -> M () -> M ()
 execOp = \case
   OpComment{} -> error "execOp/OpComment"
-  OpMove r s -> \cont -> do v <- evalSource s; SetReg r v; cont
-  OpStore a s -> \cont -> do v <- evalSource s; SetMem a v; cont
+  OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
+  OpStore a s -> \cont -> do w <- evalSource s; SetMem a w; cont
   OpCall bios -> \cont -> do execBios bios; cont
   OpPush s -> \cont -> do
-    v <- evalSource s
-    execPush v
+    w <- evalSource s
+    execPush w
     cont
   OpCmp s1 s2 -> \cont -> do
-    v1 <- evalSource s1
-    v2 <- evalSource s2
-    SetFlagZ (equalV v1 v2)
-    SetFlagN (lessV v1 v2) -- i.e. a subtraction would go negative
+    w1 <- evalSource s1
+    w2 <- evalSource s2
+    SetFlagZ (equalW w1 w2)
+    SetFlagN (lessW w1 w2) -- i.e. a subtraction would go negative
     cont
   OpBranchFlagZ lab -> \cont -> do
     b <- GetFlagZ
@@ -237,155 +236,155 @@ execOp = \case
   OpDivInto r s -> execBinaryOp div r s
   OpModInto r s -> execBinaryOp mod r s
 
-execPush :: Val -> M ()
-execPush v = do
-  a <- deMemAddr <$> GetReg Sp
+execPush :: Word -> M ()
+execPush w = do
+  a <- deAddr <$> GetReg Sp
   let a' = prevAddr a
-  SetMem a' v
-  SetReg Sp (VMemAddr a')
+  SetMem a' w
+  SetReg Sp (WAddr a')
 
 execBinaryOp :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
 execBinaryOp f r s = \cont -> do
-    v1 <- GetReg r
-    v2 <- evalSource s
-    SetReg r (binaryV f v1 v2)
+    w1 <- GetReg r
+    w2 <- evalSource s
+    SetReg r (binaryW f w1 w2)
     cont
 
-evalSource :: Source -> M Val
+evalSource :: Source -> M Word
 evalSource = \case
   SReg r -> GetReg r
-  SLit v -> pure v
+  SLit w -> pure w
   SMem a -> GetMem a
   SMemIndirect r -> do
-    a <- deMemAddr <$> GetReg r
+    a <- deAddr <$> GetReg r
     GetMem a
   SMemIndirectOffset r i -> do
-    a <- deMemAddr  <$> GetReg r
+    a <- deAddr  <$> GetReg r
     GetMem (addAddr i a)
 
 execBios :: BareBios -> M ()
 execBios = \case
   BiosHalt -> Halt
-  BiosGetCharInAx -> do c <- GetChar; SetReg Ax (VChar c)
+  BiosGetCharInAx -> do c <- GetChar; SetReg Ax (WChar c)
   BiosPutCharInAx -> do c <- deChar <$> GetReg Ax; PutChar c
   BiosMakeBoolFromFlagZ -> do
     b <- GetFlagZ
-    SetReg Ax (VMemAddr (if b then aTrue else aFalse))
+    SetReg Ax (WAddr (if b then aTrue else aFalse))
   BiosMakeBoolFromFlagN -> do
     b <- GetFlagN
-    SetReg Ax (VMemAddr (if b then aTrue else aFalse))
+    SetReg Ax (WAddr (if b then aTrue else aFalse))
 
   -- On real hardware Num/Char will have overlapping representations
   -- such that ord/chr have null implementations
   BiosNumToChar -> do
     n <- deNum <$> GetReg Ax
-    SetReg Ax (VChar (Char.chr (fromIntegral n)))
+    SetReg Ax (WChar (Char.chr (fromIntegral n)))
   BiosCharToNum -> do
     c <- deChar <$> GetReg Ax
-    SetReg Ax (VNum (fromIntegral $ Char.ord c))
+    SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
   BiosStringLength -> do
-    a <- deMemAddr <$> GetReg Ax
+    a <- deAddr <$> GetReg Ax
     n <- lengthOfListInMemory a
-    SetReg Ax (VNum n)
+    SetReg Ax (WNum n)
   BiosStringIndex -> do
-    a <- deMemAddr <$> GetReg Ax
+    a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
     e <- getBytesElement a i
     c <- GetMem (addAddr 1 e)
     SetReg Ax c
   BiosMakeBytes -> do
     n <- deNum <$> GetReg Ax
-    v <- createBytesInMemory n
-    SetReg Ax v
+    w <- createBytesInMemory n
+    SetReg Ax w
   BiosFreezeBytes -> do
     -- currently a null-imp, because we dont have a special rep for strings
     pure ()
   BiosSetBytes -> do
-    a <- deMemAddr <$> GetReg Ax
+    a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
     c <- deChar <$> GetReg Si
     e <- getBytesElement a i
-    SetMem (addAddr 1 e) (VChar c)
+    SetMem (addAddr 1 e) (WChar c)
     pure ()
 
-lengthOfListInMemory :: MemAddr -> M Number
+lengthOfListInMemory :: Addr -> M Number
 lengthOfListInMemory a = do
   n <- deNum <$> GetMem a
   case n of
     0 -> pure 0
     1 -> do
-      a' <- deMemAddr <$> GetMem (addAddr 2 a)
+      a' <- deAddr <$> GetMem (addAddr 2 a)
       (1+) <$> lengthOfListInMemory a'
     _ -> error (show ("lengthOfListInMemory",n))
 
 -- A string is represented as a list of chars, so we must walk the list to get the nth element
-getBytesElement :: MemAddr -> Number -> M MemAddr
+getBytesElement :: Addr -> Number -> M Addr
 getBytesElement a = \case
   0 -> pure a
   n -> do
-    a <- deMemAddr <$> GetMem (addAddr 2 a)
+    a <- deAddr <$> GetMem (addAddr 2 a)
     getBytesElement a (n-1)
 
-createBytesInMemory :: Number -> M Val
-createBytesInMemory = loop (VMemAddr aNil)
+createBytesInMemory :: Number -> M Word
+createBytesInMemory = loop (WAddr aNil)
   where
-    loop v = \case
-      0 -> pure v
+    loop w = \case
+      0 -> pure w
       n -> do
-        execPush v
-        execPush (VChar '\0')
+        execPush w
+        execPush (WChar '\0')
         execPush (vTag tCons)
-        v <- GetReg Sp
-        loop v (n-1)
+        w <- GetReg Sp
+        loop w (n-1)
 
 execJump :: Jump -> M ()
 execJump = \case
   JumpDirect{} -> undefined GetCode
   JumpIndirect r -> do
-    v <- GetReg r
-    let lab = deCodeLabel v
+    w <- GetReg r
+    let lab = deCodeLabel w
     code <- GetCode lab
     execCode code
   Crash -> do
     error "Crash"
 
-binaryV :: (Number -> Number -> Number) -> Val -> Val -> Val
-binaryV f v1 v2 =
-  case (v1,v2) of
-    (VNum n1,VNum n2) -> VNum (f n1 n2)
-    _ -> error (show ("binaryV/unexpected-types",v1,v2))
+binaryW :: (Number -> Number -> Number) -> Word -> Word -> Word
+binaryW f w1 w2 =
+  case (w1,w2) of
+    (WNum n1,WNum n2) -> WNum (f n1 n2)
+    _ -> error (show ("binaryW/unexpected-types",w1,w2))
 
-equalV :: Val -> Val -> Bool
-equalV v1 v2 =
-  case (v1,v2) of
-    (VNum{},VNum{}) -> (v1==v2)
-    (VChar{},VChar{}) -> (v1==v2)
+equalW :: Word -> Word -> Bool
+equalW w1 w2 =
+  case (w1,w2) of
+    (WNum{},WNum{}) -> (w1==w2)
+    (WChar{},WChar{}) -> (w1==w2)
     -- We shouldn't be comparing any other values
-    _ -> error (show ("equalV/unexpected-types",v1,v2))
+    _ -> error (show ("equalW/unexpected-types",w1,w2))
 
-lessV :: Val -> Val -> Bool
-lessV v1 v2 =
-  case (v1,v2) of
-    (VNum n1,VNum n2) -> (n1 < n2)
-    _ -> error (show ("lessV/unexpected-types",v1,v2))
+lessW :: Word -> Word -> Bool
+lessW w1 w2 =
+  case (w1,w2) of
+    (WNum n1,WNum n2) -> (n1 < n2)
+    _ -> error (show ("lessW/unexpected-types",w1,w2))
 
-deMemAddr :: Val -> MemAddr
-deMemAddr = \case VMemAddr x -> x; v -> error (show("deMemAddr",v))
+deAddr :: Word -> Addr
+deAddr = \case WAddr x -> x; w -> error (show("deAddr",w))
 
-deCodeLabel :: Val -> CodeLabel
-deCodeLabel = \case VCodeLabel x -> x; v -> error (show ("deCodeLabel", v))
+deCodeLabel :: Word -> CodeLabel
+deCodeLabel = \case WCodeLabel x -> x; w -> error (show ("deCodeLabel",w))
 
-deChar :: Val -> Char
-deChar = \case VChar x -> x; v -> error (show("deChar",v))
+deChar :: Word -> Char
+deChar = \case WChar x -> x; w -> error (show("deChar",w))
 
-deNum :: Val -> Number
-deNum = \case VNum x -> x; v -> error (show("deNum",v))
+deNum :: Word -> Number
+deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
-prevAddr :: MemAddr -> MemAddr
+prevAddr :: Addr -> Addr
 prevAddr = addAddr (-1)
 
-addAddr :: Int -> MemAddr -> MemAddr
+addAddr :: Int -> Addr -> Addr
 addAddr i = \case
   Physical n -> Physical (n+i)
   Symbolic lab n -> Symbolic lab (n+i) -- I had a nasty bug here -- 1 instead of i
@@ -404,10 +403,10 @@ data M a where
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
   GetCode :: CodeLabel -> M Code
-  SetReg :: Reg -> Val -> M ()
-  GetReg :: Reg -> M Val
-  SetMem :: MemAddr -> Val -> M ()
-  GetMem :: MemAddr -> M Val
+  SetReg :: Reg -> Word -> M ()
+  GetReg :: Reg -> M Word
+  SetMem :: Addr -> Word -> M ()
+  GetMem :: Addr -> M Word
   SetFlagZ :: Bool -> M ()
   GetFlagZ :: M Bool
   SetFlagN :: Bool -> M ()
@@ -458,11 +457,11 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
         k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
 
-      SetReg r v -> k s { rmap = Map.insert r v rmap } ()
+      SetReg r w -> k s { rmap = Map.insert r w rmap } ()
       GetReg r -> k s (maybe err id $ Map.lookup r rmap)
         where err = error (show ("GetReg/uninitialized",r))
 
-      SetMem a v -> k s { mem = Map.insert a v mem } ()
+      SetMem a w -> k s { mem = Map.insert a w mem } ()
       GetMem a -> k s (maybe err id $ Map.lookup a mem)
         where err = error (show ("GetMem/uninitialized",a))
 
@@ -477,8 +476,8 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
 
 data State = State
-  { rmap :: Map Reg Val
-  , mem :: Map MemAddr Val
+  { rmap :: Map Reg Word
+  , mem :: Map Addr Word
   , flagZ :: Bool
   , flagN :: Bool
   , countOps :: Int
@@ -486,7 +485,7 @@ data State = State
   , offsetFromLastLabel :: Int
   }
 
-state0 :: Map DataLabel [Val] -> State
+state0 :: Map DataLabel [Word] -> State
 state0 dmap = State
   { mem
   , rmap
@@ -499,8 +498,8 @@ state0 dmap = State
   where
     initialStackPointer = Physical 0 -- stack address are negative in stage5 emulation
     rmap = Map.fromList
-      [ (Sp, VMemAddr initialStackPointer)
-      , (Cx, VMemAddr aFinalCont)
+      [ (Sp, WAddr initialStackPointer)
+      , (Cx, WAddr aFinalCont)
       ]
     mem = Map.fromList (internal ++ user)
 
@@ -510,25 +509,25 @@ state0 dmap = State
       [ (aFalse, vTag tFalse)
       , (aTrue, vTag tTrue)
       , (aNil, vTag tNil)
-      , (aFinalCont, VCodeLabel finalCodeLabel)
-      , (addAddr 1 aFinalCont, VChar 'X') -- dummy next cont; without this we see error with -trace
+      , (aFinalCont, WCodeLabel finalCodeLabel)
+      , (addAddr 1 aFinalCont, WChar 'X') -- dummy next cont; without this we see error with -trace
       ]
     user =
-      concat [ [(Symbolic lab i,v) | (i,v) <- zip [0..] vals ]
+      concat [ [(Symbolic lab i,w) | (i,w) <- zip [0..] vals ]
              | (lab,vals) <- Map.toList dmap
              ]
 
 instance Show State where
   show State{rmap} =
-    intercalate " " [ show k ++ "=" ++ show v | (k,v) <- Map.toList rmap ]
+    intercalate " " [ show k ++ "=" ++ show w | (k,w) <- Map.toList rmap ]
 
 -- Address for User Temps: 1..30
 -- Address for runtime system constants: 90,91,92
 
-tempOffset :: Int -> MemAddr
+tempOffset :: Int -> Addr
 tempOffset n = Physical n
 
-aFalse,aTrue,aNil,aFinalCont :: MemAddr
+aFalse,aTrue,aNil,aFinalCont :: Addr
 aFalse = Physical 90
 aTrue = Physical 91
 aNil = Physical 92
@@ -560,29 +559,29 @@ compileImage = \case
     CutData lab vals
     compileImage body
 
-compileTopDef :: DataLabel -> SRC.Top -> Asm [Val]
+compileTopDef :: DataLabel -> SRC.Top -> Asm [Word]
 compileTopDef lab = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
   SRC.TopLitS string -> do
     -- string rep is currently the same as a list of chars. TODO: do better!
     pure ([ op
           | (i,c) <- zip [1..] string
-          , op <- [vTag tCons, VChar c, VMemAddr (Symbolic lab (i*3))]
+          , op <- [vTag tCons, WChar c, WAddr (Symbolic lab (i*3))]
           ] ++ [ vTag tNil ])
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
-    let v1 = VCodeLabel lab
-    pure [v1]
+    let w1 = WCodeLabel lab
+    pure [w1]
   SRC.TopConApp (Ctag _ tag) xs -> do
-    pure (VNum tag : map compileTopRef xs)
+    pure (WNum tag : map compileTopRef xs)
 
-compileTopRef :: SRC.Ref -> Val
+compileTopRef :: SRC.Ref -> Word
 compileTopRef = \case
-    SRC.RefLitC c -> VChar c
-    SRC.RefLitN n -> VNum n
+    SRC.RefLitC c -> WChar c
+    SRC.RefLitN n -> WNum n
     SRC.Ref _ loc -> do
     case loc of
-      SRC.InGlobal g -> VMemAddr (Symbolic (DataLabel g) 0)
+      SRC.InGlobal g -> WAddr (Symbolic (DataLabel g) 0)
       _ -> error "compileTopRef"
 
 compileCode :: SRC.Code -> Asm Code
@@ -620,7 +619,7 @@ compileCode = \case
       ops =
         map OpPush (reverse (map compileRef pre)) ++
         [ OpPush (SReg contReg)
-        , OpPush (SLit (VCodeLabel lab))
+        , OpPush (SLit (WCodeLabel lab))
         , OpMove contReg (SReg Sp)
         ]
     doOps ops <$> compileCode first
@@ -639,7 +638,7 @@ compileArm scrutReg arm =  do
   let (SRC.ArmTag pos (Ctag _ n) _xs _rhs) = arm
   code <- compileArmTaken scrutReg arm
   lab <- CutCode ("Arm: " ++ show pos) code
-  pure [ OpCmp (SMemIndirect scrutReg) (SLit (VNum n))
+  pure [ OpCmp (SMemIndirect scrutReg) (SLit (WNum n))
        , OpBranchFlagZ lab
        ]
 
@@ -697,14 +696,14 @@ compileConApp :: Number -> [SRC.Ref] -> [Op]
 compileConApp tag xs = construct tag (map compileRef xs)
 
 construct :: Number -> [Source] -> [Op]
-construct tag xs = map OpPush (reverse (SLit (VNum tag) : xs))
+construct tag xs = map OpPush (reverse (SLit (WNum tag) : xs))
 
 compileFunction :: String -> [SRC.Ref] -> SRC.Code -> Asm ([Op],Reg)
 compileFunction who freeVars body = do
   lab <- compileCode body >>= CutCode ("Function: " ++ who)
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
-    [ OpPush (SLit (VCodeLabel lab))
+    [ OpPush (SLit (WCodeLabel lab))
     ],Sp)
 
 -- TODO: target reg should be passed down
@@ -794,11 +793,11 @@ setTemp (SRC.Temp n) source = OpStore (tempOffset n) source
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
-    SRC.RefLitC c -> SLit (VChar c)
-    SRC.RefLitN n -> SLit (VNum n)
+    SRC.RefLitC c -> SLit (WChar c)
+    SRC.RefLitN n -> SLit (WNum n)
     SRC.Ref _ loc -> do
     case loc of
-      SRC.InGlobal g -> SLit (VMemAddr (Symbolic (DataLabel g) 0))
+      SRC.InGlobal g -> SLit (WAddr (Symbolic (DataLabel g) 0))
       SRC.InFrame n -> SMemIndirectOffset frameReg n
       SRC.InTemp (SRC.Temp n) -> SMem (tempOffset n)
       SRC.TheArg -> SReg argReg
@@ -825,7 +824,7 @@ data Asm a where
   AsmRet :: a -> Asm a
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
   CutCode :: String -> Code -> Asm CodeLabel
-  CutData :: DataLabel -> [Val] -> Asm ()
+  CutData :: DataLabel -> [Word] -> Asm ()
 
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
