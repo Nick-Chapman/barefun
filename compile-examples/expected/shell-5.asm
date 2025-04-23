@@ -173,7 +173,6 @@ L14: ; Function: t2
 
 L15: ; Continuation
   mov ax, [bp+4]
-  call Bare_freeze_bytes
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -252,7 +251,7 @@ L21: ; Function: t1
   jz L19
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_string_index
+  call Bare_get_bytes
   mov [4], ax
   push word [bp+4]
   push word [4]

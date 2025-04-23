@@ -105,7 +105,7 @@ L9: ; Function: t1
   jz L7
   mov ax, g5
   mov bx, dx
-  call Bare_string_index
+  call Bare_get_bytes
   mov [4], ax
   push word [bp+2]
   push word [4]
@@ -220,7 +220,7 @@ L17: ; Function: t1
   jz L15
   mov ax, g10
   mov bx, dx
-  call Bare_string_index
+  call Bare_get_bytes
   mov [4], ax
   push word [bp+2]
   push word [4]

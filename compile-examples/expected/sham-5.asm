@@ -392,7 +392,6 @@ L32: ; Function: t2
 
 L33: ; Continuation
   mov ax, [bp+4]
-  call Bare_freeze_bytes
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -501,7 +500,6 @@ L40: ; Function: t2
 
 L41: ; Continuation
   mov ax, [bp+4]
-  call Bare_freeze_bytes
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -583,7 +581,7 @@ L47: ; Function: t1
   jz L45
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_string_index
+  call Bare_get_bytes
   mov [4], ax
   push word [bp+4]
   push word [4]
@@ -694,11 +692,11 @@ L56: ; Function: t1
   jz L52
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_string_index
+  call Bare_get_bytes
   mov [4], ax
   mov ax, [bp+4]
   mov bx, dx
-  call Bare_string_index
+  call Bare_get_bytes
   mov [6], ax
   mov ax, [4]
   cmp word ax, [6]

@@ -38,6 +38,7 @@ data Op -- target; source
   = OpComment String
   | OpMove Reg Source
   | OpStore Addr Source
+  | OpStoreR Reg Source
   | OpCall BareBios
   | OpPush Source
   | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
@@ -94,6 +95,7 @@ data DataLabel = DataLabel SRC.Global
 -- BareBios; primitive routines available to the compiled code
 data BareBios
   = Bare_halt
+  | Bare_crash String
   | Bare_put_char
   | Bare_get_char
   | Bare_make_bool_from_z
@@ -101,10 +103,9 @@ data BareBios
   | Bare_num_to_char
   | Bare_char_to_num
   | Bare_string_length
-  | Bare_string_index
   | Bare_make_bytes
-  | Bare_freeze_bytes
   | Bare_set_bytes
+  | Bare_get_bytes
   -- Bare_check_heap_space
   deriving Show
 
@@ -129,7 +130,8 @@ instance Show Op where
   show = \case
     OpComment message ->  ";; " ++ message
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
-    OpStore a r -> "mov [" ++ show a ++ "], " ++ show r
+    OpStore a src -> "mov [" ++ show a ++ "], " ++ show src
+    OpStoreR t src -> "mov [" ++ show t ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push word " ++ show src
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
@@ -209,6 +211,11 @@ execOp = \case
   OpComment{} -> error "execOp/OpComment"
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
   OpStore a s -> \cont -> do w <- evalSource s; SetMem a w; cont
+  OpStoreR t s -> \cont -> do
+    a <- deAddr <$> GetReg t
+    w <- evalSource s
+    SetMem a w
+    cont
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
@@ -260,6 +267,7 @@ evalSource = \case
 execBare :: BareBios -> M ()
 execBare = \case
   Bare_halt -> Halt
+  Bare_crash msg -> error (printf "Bare_crash: %s" msg)
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
   Bare_put_char -> do c <- deChar <$> GetReg Ax; PutChar c
   Bare_make_bool_from_z -> do
@@ -282,19 +290,10 @@ execBare = \case
     a <- deAddr <$> GetReg Ax
     n <- lengthOfListInMemory a
     SetReg Ax (WNum n)
-  Bare_string_index -> do
-    a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Bx
-    e <- getBytesElement a i
-    c <- GetMem (addAddr 1 e)
-    SetReg Ax c
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
     w <- createBytesInMemory n
     SetReg Ax w
-  Bare_freeze_bytes -> do
-    -- currently a null-imp, because we dont have a special rep for strings
-    pure ()
   Bare_set_bytes -> do
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
@@ -302,6 +301,12 @@ execBare = \case
     e <- getBytesElement a i
     SetMem (addAddr 1 e) (WChar c)
     pure ()
+  Bare_get_bytes -> do
+    a <- deAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    e <- getBytesElement a i
+    c <- GetMem (addAddr 1 e)
+    SetReg Ax c
 
 lengthOfListInMemory :: Addr -> M Number
 lengthOfListInMemory a = do
@@ -705,85 +710,121 @@ compileFunction who freeVars body = do
 
 -- TODO: target reg should be passed down
 compileBuiltin :: Builtin -> [Source] -> [Op] -- --> Ax
-compileBuiltin b xs = case (b,xs) of
-  (SRC.GetChar,[_]) ->
-    [ OpCall Bare_get_char
-    ]
-  (SRC.PutChar,[s1]) ->
+compileBuiltin b = case b of
+  SRC.GetChar -> oneArg $ \_ ->
+    [ OpCall Bare_get_char ]
+  SRC.PutChar -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_put_char
     ]
-  (SRC.EqChar, [s1,s2]) ->
+  SRC.EqChar -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z
     ]
-  (SRC.AddInt, [s1,s2]) ->
+  SRC.AddInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpAddInto Ax s2
     ]
-  (SRC.SubInt, [s1,s2]) ->
+  SRC.SubInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpSubInto Ax s2
     ]
-  (SRC.MulInt, [s1,s2]) ->
+  SRC.MulInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMulInto Ax s2
     ]
-  (SRC.DivInt, [s1,s2]) ->
+  SRC.DivInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpDivInto Ax s2
     ]
-  (SRC.ModInt, [s1,s2]) ->
+  SRC.ModInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpModInto Ax s2
     ]
-  (SRC.EqInt, [s1,s2]) ->
+  SRC.EqInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z
     ]
-  (SRC.LessInt, [s1,s2]) ->
+  SRC.LessInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_n
     ]
-  (SRC.StringLength, [s1]) ->
+  SRC.StringLength -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_string_length
     ]
-  (SRC.StringIndex, [s1,s2]) ->
-    [ OpMove Ax s1
-    , OpMove Bx s2
-    , OpCall Bare_string_index
-    ]
-  (SRC.CharChr, [s1]) ->
+  SRC.CharChr -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_num_to_char
     ]
-  (SRC.CharOrd, [s1]) ->
+  SRC.CharOrd -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_char_to_num
     ]
-
-  (SRC.MakeBytes, [s1]) ->
+  SRC.MakeBytes -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_make_bytes
     ]
-  (SRC.FreezeBytes, [s1]) ->
-    [ OpMove Ax s1
-    , OpCall Bare_freeze_bytes
-    ]
-  (SRC.SetBytes, [s1,s2,s3]) ->
+  SRC.FreezeBytes -> oneArg $ \s1 ->
+    -- null-imp, bytes and string have the same representation
+    [ OpMove Ax s1 ]
+
+  SRC.ThawBytes -> oneArg $ \s1 ->
+    -- null-imp, bytes and string have the same representation
+    [ OpMove Ax s1 ]
+
+  SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpMove Si s3
     , OpCall Bare_set_bytes
     ]
 
-  _ ->
-    -- TODO: avoid chance of missing Builtin by using oneArg/TwoArgs/.. combinators
-    error (printf "Stage5.compileBuiltin: %s %s" (show b) (show xs))
+  SRC.GetBytes -> twoArgs $ \s1 s2 ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpCall Bare_get_bytes
+    ]
+
+  -- exactly same as GetBytes (TODO: can we merge the two builtin?)
+  SRC.StringIndex -> twoArgs $ \s1 s2 ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpCall Bare_get_bytes
+    ]
+
+  SRC.MakeRef -> oneArg $ \s1 ->
+    [ OpComment "MakeRef"
+    , OpPush s1
+    , OpMove Ax (SReg Sp)
+    , OpComment "MakeRef-done"
+    ]
+
+  SRC.DeRef -> oneArg $ \s1 ->
+    [ OpComment "DeRef"
+    , OpMove Bx s1
+    , OpMove Ax (SMemIndirect Bx)
+    , OpComment "DeRef-done"
+    ]
+
+  SRC.SetRef -> twoArgs $ \s1 s2 ->
+    [ OpComment "SetRef"
+    , OpMove Bx s1
+    , OpStoreR Bx s2
+    , OpComment "SetRef-done"
+    ]
+
+  SRC.Crash -> oneArg $ \_ -> [ OpCall (Bare_crash "Crash") ]
+
+  where
+    err = error (printf "Stage5.compileBuiltin: error: %s" (show b))
+    oneArg f = \case [v] -> f v; _ -> err
+    twoArgs f = \case [v1,v2] -> f v1 v2; _ -> err
+    threeArgs f = \case [v1,v2,v3] -> f v1 v2 v3; _ -> err
+
 
 setTemp :: SRC.Temp -> Source -> Op
 setTemp (SRC.Temp n) source = OpStore (tempOffset n) source

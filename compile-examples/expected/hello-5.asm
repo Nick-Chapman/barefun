@@ -51,7 +51,7 @@ L5: ; Function: t1
   jz L3
   mov ax, g4
   mov bx, dx
-  call Bare_string_index
+  call Bare_get_bytes
   mov [4], ax
   push word [bp+2]
   push word [4]
