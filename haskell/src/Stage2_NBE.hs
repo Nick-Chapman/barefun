@@ -4,10 +4,10 @@ module Stage2_NBE (compile,execute) where
 import Builtin (Builtin,isPure,evaluatePureBuiltin)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
-import Interaction (Interaction)
 import Par4 (Position(..))
 import Stage0_AST (Literal(..))
 import Stage1_EXP (Exp(..),Arm(..),Id(..),Ctag(..))
+import Value (Interaction)
 import Value (Value(..),Number)
 import qualified Data.Map as Map
 import qualified Stage1_EXP as SRC
@@ -39,6 +39,16 @@ data SemValue
   | Macro Id (SemValue -> M SemValue)
   | Constant Position BaseValue
   | Constructed Position Ctag [SemValue]
+
+
+isSharable :: SemValue -> Bool
+isSharable = \case
+  Constant{} -> True
+  Macro{} -> True
+  Constructed _ _ svs -> all isSharable svs
+  Syntax (Var{}) -> True
+  Syntax{} -> False
+
 
 data BaseValue -- should BaseValue contain the Position infi?
   = BVString String
@@ -93,15 +103,10 @@ reify = \case
 
 share :: Id -> SemValue -> M SemValue
 share x sv = do
-  case sv of
-    Constructed{} -> pure sv
-    Constant{} -> pure sv
-    Macro{} -> pure sv
-    Syntax (Var{}) -> pure sv
-    Syntax{} -> do
-      x <- fresh x
-      rhs <- reify sv
-      Wrap (Let (posOfId x) x rhs) (pure (syn x))
+  if isSharable sv then pure sv else do
+    x <- fresh x
+    rhs <- reify sv
+    Wrap (Let (posOfId x) x rhs) (pure (syn x))
 
 apply :: SemValue -> Position -> SemValue -> M SemValue
 apply fun p arg = do

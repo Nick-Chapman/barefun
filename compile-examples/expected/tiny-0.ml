@@ -16,7 +16,13 @@ let string_index = (fun x -> (fun y -> PRIM_StringIndex(x,y))) in
 let string_length = (fun x -> PRIM_StringLength(x)) in
 let make_bytes = (fun x -> PRIM_MakeBytes(x)) in
 let freeze_bytes = (fun x -> PRIM_FreezeBytes(x)) in
+let thaw_bytes = (fun x -> PRIM_ThawBytes(x)) in
 let set_bytes = (fun x -> (fun y -> (fun z -> PRIM_SetBytes(x,y,z)))) in
+let get_bytes = (fun x -> (fun y -> PRIM_GetBytes(x,y))) in
+let ref = (fun x -> PRIM_MakeRef(x)) in
+let deref = (fun x -> PRIM_DeRef(x)) in
+let set_ref = (fun x -> (fun y -> PRIM_SetRef(x,y))) in
+let crash = (fun x -> PRIM_Crash(x)) in
 let main =
   let mainloop =
     fix (fun mainloop _ ->

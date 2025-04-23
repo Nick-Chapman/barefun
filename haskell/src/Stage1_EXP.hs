@@ -8,16 +8,16 @@ module Stage1_EXP
 import Builtin (Builtin,executeBuiltin)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Stage0_AST (evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
+import Value (Interaction(..))
 import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..))
 import Value (cUnit,cFalse,cTrue,cNil,cCons)
 import qualified Data.Map as Map
-import qualified Interaction as I (Tickable(Prim,App))
 import qualified Stage0_AST as SRC
+import qualified Value as I (Tickable(Prim,App))
 
 type Transformed = Exp
 

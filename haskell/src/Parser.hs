@@ -297,6 +297,7 @@ gram6 = program where
         pure (f, AST.RecLam pos f x1 rhs)
       False -> do
         f <- bound $ alts [identOrUnit,bracketedInfixName]
+        _ <- opt type_annotation
         rhs <- bindingAbstraction
         pure (f,rhs)
 
@@ -382,6 +383,10 @@ gram6 = program where
     pure ()
 
   type_ = separated (alts [key "*", key "->"]) atomic_type
+
+  type_annotation = do
+    key ":"
+    type_
 
   maybe_tvar_seq =
     alts [ tvar

@@ -10,16 +10,16 @@ import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Set (notMember)
-import Interaction (Interaction(..))
 import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
 import Stage0_AST (apply)
 import Stage1_EXP (Id(..),Ctag(..))
 import Text.Printf (printf)
+import Value (Interaction(..))
 import Value (Value(..),deUnit,Number)
 import qualified Data.Map as Map
-import qualified Interaction as I (Tickable(..))
 import qualified Stage3_ANF as SRC (Code(..),Atomic(..),Val(..),Arm(..), fvs)
+import qualified Value as I (Tickable(..))
 
 type Transformed = Image
 

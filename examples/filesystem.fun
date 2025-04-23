@@ -104,10 +104,10 @@ let replicate : 'a -> int -> 'a list = fun x ->
 (*let rec crash () = crash ()*)
 let error m = put_string ("error: " ^ m ^ "\n"); crash()
 
-let trace0 m : unit = if trace0_on then put_string ("trace: " ^ m ^ "\n") else ()
-let trace m : unit = if trace_on then put_string ("trace: " ^ m ^ "\n") else ()
+let trace0 m = if trace0_on then put_string ("trace: " ^ m ^ "\n") else ()
+let trace m = if trace_on then put_string ("trace: " ^ m ^ "\n") else ()
 
-(*let assert : bool -> unit = fun b -> if b then () else error "assert failed"*)
+let my_assert : bool -> unit = fun b -> if b then () else error "assert failed"
 
 
 let get_slice_bytes : bytes -> int -> int -> bytes = (* pread? *)
@@ -136,7 +136,7 @@ let set_slice_bytes : bytes -> int -> int -> bytes -> unit = (* pwrite? *)
 (* emulate full disk in memory, with read_sector/write_sector *)
 
 type disk = Disk of bytes
-let deDisk thing = match thing with Disk x -> x
+let deDisk thing = match thing with | Disk x -> x
 
 let num_sectors = 32
 let sector_size = 512
@@ -148,7 +148,7 @@ let make_disk : unit -> disk =
   Disk (make_bytes disk_size)
 
 type sector = Sector of bytes
-let deSector thing = match thing with Sector x -> x
+let deSector thing = match thing with | Sector x -> x
 
 let bad_sector_index i = if i < 0 then true else i >= num_sectors
 
@@ -217,13 +217,13 @@ let update_sectorC1 : diskC1 -> int -> int -> int -> bytes -> unit =
 
 let block_size = 64
 let blocks_per_sector = 8
-let () = assert (block_size * blocks_per_sector = sector_size)
+let () = my_assert (block_size * blocks_per_sector = sector_size)
 
 let num_blocks = blocks_per_sector * num_sectors
-let () = assert (num_blocks = 256)
+let () = my_assert (num_blocks = 256)
 
 type block = Block of bytes
-let deBlock thing = match thing with Block x -> x
+let deBlock thing = match thing with | Block x -> x
 
 let bad_block_index i = if i < 0 then true else i >= num_blocks
 
@@ -249,7 +249,7 @@ let write_block : diskC1 -> int -> block -> unit =
 
 (* driving code *)
 
-let stripe_the_disk disk start stop : unit =
+let stripe_the_disk disk start stop =
   let rec loop i =
     if i > stop then () else
       let char = chr (ord '0' + (i % 10)) in
@@ -258,7 +258,7 @@ let stripe_the_disk disk start stop : unit =
   in
   loop start
 
-let splat_the_disk disk start stop : unit =
+let splat_the_disk disk start stop =
   let rec loop i =
     if i > stop then () else
       let char = '-' in
@@ -267,7 +267,7 @@ let splat_the_disk disk start stop : unit =
   in
   loop start
 
-let dump_the_disk disk start stop : unit =
+let dump_the_disk disk start stop =
   let rec loop i =
     if i > stop then () else
       let block_string = freeze_bytes (deBlock (read_block disk i)) in

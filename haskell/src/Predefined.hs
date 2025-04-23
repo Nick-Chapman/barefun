@@ -31,7 +31,13 @@ wrapPreDefs (Prog defs) =
       , ("string_length", prim1 StringLength)
       , ("make_bytes"   , prim1 MakeBytes)
       , ("freeze_bytes" , prim1 FreezeBytes)
+      , ("thaw_bytes"   , prim1 ThawBytes)
       , ("set_bytes"    , prim3 SetBytes)
+      , ("get_bytes"    , prim2 GetBytes)
+      , ("ref"          , prim1 MakeRef)
+      , ("deref"        , prim1 DeRef)
+      , ("set_ref"      , prim2 SetRef)
+      , ("crash"        , prim1 Crash)
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])

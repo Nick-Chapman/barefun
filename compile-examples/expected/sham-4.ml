@@ -1258,10 +1258,14 @@ let k = [], fun [] arg ->
                                   f2 t3 k in
                             let k = [f7,t1,t2], fun [f2,f3,f4] arg ->
                               let k = [f2,f3], fun [f2,f3] arg ->
-                                let t1 = Pair0[f2,f3] in
-                                let t2 = Cons1[t1,arg] in
-                                let t3 = Bindings0[t2] in
-                                k t3 in
+                                let t1 = Bindings0[arg] in
+                                let k = [f2,f3], fun [f2,f3] arg ->
+                                  let t1 = Pair0[f2,f3] in
+                                  let t2 = Cons1[t1,arg] in
+                                  let t3 = Bindings0[t2] in
+                                  k t3 in
+                                match t1 with
+                                | Bindings0(t2) -> k t2 in
                               f4 arg k in
                             match f5 with
                             | Bindings0(t3) -> k t3 in

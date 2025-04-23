@@ -1,16 +1,17 @@
 module Builtin ( Builtin(..), executeBuiltin, isPure, evaluatePureBuiltin ) where
 
-import Interaction (Interaction(..))
-import Value (Value(..),tUnit,mkBool,deUnit)
-import qualified Data.Char as Char (chr,ord)
 import Text.Printf (printf)
+import Value (Value(..),tUnit,mkBool,deUnit,Interaction(..))
+import qualified Data.Char as Char (chr,ord)
 
 data Builtin
   = PutChar | GetChar
   | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
   | EqChar | CharOrd | CharChr
   | StringLength | StringIndex
-  | MakeBytes | FreezeBytes | SetBytes
+  | MakeBytes | FreezeBytes | ThawBytes | SetBytes | GetBytes
+  | MakeRef | DeRef | SetRef
+  | Crash
   deriving (Show)
 
 data Semantics
@@ -54,17 +55,31 @@ defineBuiltin b =
     StringIndex -> Pure (\vs -> VChar ((\(s,i) -> s!!(fromIntegral i)) $ (twoArgs deString deNum vs)))
     MakeBytes -> Impure $ \vs k -> IMakeBytes (fromIntegral $ deNum (oneArg vs)) (\b -> k (VBytes b))
     FreezeBytes -> Impure $ \vs k -> IFreezeBytes (deBytes (oneArg vs)) (\s -> k (VString s))
+    ThawBytes -> Impure $ \vs k -> IThawBytes (deString (oneArg vs)) (\b -> k (VBytes b))
     SetBytes -> Impure $ \vs k -> do
       let (b,n,c) = threeArgs deBytes deNum deChar vs
       ISetBytes b (fromIntegral n) c (k unit)
+    GetBytes -> Impure $ \vs k -> do
+      let (b,n) = twoArgs deBytes deNum vs
+      IGetBytes b (fromIntegral n) $ \c -> k (VChar c)
+
+    MakeRef -> Impure $ \vs k -> IMakeRef (oneArg vs) $ \r -> k (VRef r)
+    DeRef -> Impure $ \vs k -> IDeRef (deRef (oneArg vs)) k
+    SetRef -> Impure $ \vs k -> do
+      let (r,v) = twoArgs deRef id vs
+      ISetRef r v (k unit)
+
+    Crash -> Impure $ undefined
+
   where
     unit = VCons tUnit []
     oneArg = \case [v] -> v; _ -> err
     twoArgs c1 c2 = \case [v1,v2] -> (c1 v1, c2 v2); _ -> err
     threeArgs c1 c2 c3 = \case [v1,v2,v3] -> (c1 v1, c2 v2, c3 v3); _ -> err
-    deNum = \case VNum n -> n; _ -> err
-    deChar = \case VChar c -> c; _ -> err
-    deBytes = \case VBytes b -> b; _ -> err
-    deString = \case VString s -> s; _ -> err
+    deNum = \case VNum x -> x; _ -> err
+    deChar = \case VChar x -> x; _ -> err
+    deBytes = \case VBytes x -> x; _ -> err
+    deString = \case VString x -> x; _ -> err
+    deRef = \case VRef x -> x; _ -> err
     err :: a
     err = error (printf "Builtin.hs: error: %s" (show b))

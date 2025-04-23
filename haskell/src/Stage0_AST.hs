@@ -8,14 +8,14 @@ module Stage0_AST
 import Builtin (Builtin,executeBuiltin)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Interaction (Interaction(..))
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Text.Printf (printf)
+import Value (Interaction(..))
 import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..),Cid(..))
 import Value (cUnit,cFalse,cTrue,cNil,cCons)
 import qualified Data.Map as Map
-import qualified Interaction as I (Tickable(Prim,App))
+import qualified Value as I (Tickable(Prim,App))
 
 data Prog = Prog [Def]
 data Def = ValDef Bid Exp | TypeDef [Cid]

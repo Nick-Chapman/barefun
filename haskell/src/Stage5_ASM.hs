@@ -4,20 +4,20 @@ module Stage5_ASM
   , compile
   ) where
 
-import Prelude hiding (Word)
 import Builtin (Builtin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Interaction (Interaction(..))
+import Prelude hiding (Word)
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
+import Value (Interaction(..))
 import Value (Number,tTrue,tFalse,tNil,tCons)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
-import qualified Interaction as I (Tickable(..))
 import qualified Stage4_CCF as SRC
+import qualified Value as I (Tickable(..))
 
 bytesPerWord :: Int
 bytesPerWord = 2 -- TODO: think about the correct way to do this!

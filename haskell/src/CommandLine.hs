@@ -1,16 +1,16 @@
 module CommandLine (main) where
 
-import Interaction (runTerm)
 import Parser (parseProg)
 import Predefined (wrapPreDefs)
 import System.Environment (getArgs)
+import Text.Printf (printf)
+import Value (runInteraction)
 import qualified Stage0_AST as Stage0 (execute)
 import qualified Stage1_EXP as Stage1 (compile,execute,sizeExp)
 import qualified Stage2_NBE as Stage2 (compile,execute)
 import qualified Stage3_ANF as Stage3 (compile,execute)
 import qualified Stage4_CCF as Stage4 (compile,execute)
 import qualified Stage5_ASM as Stage5 (compile,execute,TraceFlag(..))
-import Text.Printf (printf)
 
 main :: IO ()
 main = do
@@ -50,12 +50,12 @@ main = do
     (Stage4,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e4)
     (Stage5,Compile) -> do putStrLn (show e5)
 
-    (Stage0,Eval) -> do printf "[%s]\n" tag; runTerm (Stage0.execute e0)
-    (Stage1,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage1.execute e1)
-    (Stage2,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage2.execute e2)
-    (Stage3,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage3.execute e3)
-    (Stage4,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage4.execute e4)
-    (Stage5,Eval) -> do printf "[%s%s]\n" tag tagZ; runTerm (Stage5.execute e5 trace)
+    (Stage0,Eval) -> do printf "[%s]\n" tag; runInteraction (Stage0.execute e0)
+    (Stage1,Eval) -> do printf "[%s%s]\n" tag tagZ; runInteraction (Stage1.execute e1)
+    (Stage2,Eval) -> do printf "[%s%s]\n" tag tagZ; runInteraction (Stage2.execute e2)
+    (Stage3,Eval) -> do printf "[%s%s]\n" tag tagZ; runInteraction (Stage3.execute e3)
+    (Stage4,Eval) -> do printf "[%s%s]\n" tag tagZ; runInteraction (Stage4.execute e4)
+    (Stage5,Eval) -> do printf "[%s%s]\n" tag tagZ; runInteraction (Stage5.execute e5 trace)
 
 data Config = Config { paths :: [String], mode :: Mode, stage :: Stage, trace :: Stage5.TraceFlag }
 
