@@ -4,8 +4,9 @@ let with_terminal_no_buffering f =
   if isatty stdin then
     let tio = tcgetattr stdin in
     tcsetattr stdin TCSANOW { tio with c_echo = false; c_icanon = false };
-    f();
-    tcsetattr stdin TCSANOW tio
+    let opt = try f(); None with exn -> Some exn in
+    tcsetattr stdin TCSANOW tio; (* reset the terminal even when we got an exception *)
+    match opt with None -> () | Some exn -> raise exn
   else
     f()
 

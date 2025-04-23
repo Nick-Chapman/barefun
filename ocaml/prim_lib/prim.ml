@@ -1,5 +1,7 @@
 module X : sig
 
+  val crash : unit -> 'a
+
   val ( * ) : int -> int -> int
   val (%) : int -> int -> int
   val (+) : int -> int -> int
@@ -20,9 +22,18 @@ module X : sig
   type bytes
   val make_bytes : int -> bytes
   val freeze_bytes : bytes  -> string
+  val thaw_bytes : string -> bytes (* TODO: too cut a name: perhaps freeze/thaw should say unsafe *)
   val set_bytes : bytes -> int -> char -> unit
+  val get_bytes : bytes -> int -> char
 
+  type 'a ref
+  val ref : 'a -> 'a ref
+  val deref : 'a ref -> 'a (* TODO: (!) *)
+  val set_ref : 'a ref -> 'a -> unit (* TODO: (:=) *)
 end = struct
+
+  exception CRASH
+  let crash () = raise CRASH
 
   let (=) = (=)
   let (<) = (<)
@@ -57,8 +68,15 @@ end = struct
 
   type bytes = Bytes.t
   let make_bytes = Bytes.create
-  let freeze_bytes = Bytes.unsafe_to_string
+  let freeze_bytes = Bytes.(*unsafe_*)to_string
+  let thaw_bytes = Bytes.(*unsafe_*)of_string
   let set_bytes = Bytes.set
+  let get_bytes = Bytes.get
+
+  type 'a ref  = 'a Stdlib.ref
+  let ref = Stdlib.ref
+  let deref = (!)
+  let set_ref = (:=)
 
 end
 include X
