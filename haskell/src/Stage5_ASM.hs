@@ -284,6 +284,9 @@ execBare = \case
 
   -- On real hardware Num/Char will have overlapping representations
   -- such that ord/chr have null implementations
+
+  -- TODO: avoid these being Bare routines.
+  -- instead have pseudo "reinterpret" op, which is omitted (just printed as a comment) in the generated x86
   Bare_num_to_char -> do
     n <- deNum <$> GetReg Ax
     SetReg Ax (WChar (Char.chr (fromIntegral n)))

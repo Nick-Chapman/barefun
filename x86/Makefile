@@ -1,11 +1,16 @@
 
-default = gen1
+#top: run
+top: buildall
 
-top: run
+default = small
 
 build: build-$(default)
 run: run-$(default)
 burn: burn-$(default)
+
+# build all examples
+examples = $(patsubst ../examples/%.fun, %, $(wildcard ../examples/*.fun))
+buildall: $(patsubst %, build-%, $(examples))
 
 build-%: ,build ,build/%.img
 	@ echo -n

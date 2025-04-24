@@ -168,5 +168,8 @@ Bare_get_bytes:
     mov ax, [bx]
     ret
 
+Bare_num_to_char:
+    ret
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Generated code will be appended here.
