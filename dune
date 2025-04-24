@@ -1,4 +1,5 @@
 
+;; TODO: these rules need auto-generating
 ;; TODO: maybe also have aliases to run in ocaml and haskell emulators
 
 (rule
