@@ -21,7 +21,7 @@ NASM_FLAGS = -Werror
 	nasm $(NASM_FLAGS) -o $@ $< || rm -f $@
 
 .PRECIOUS:,build/%.asm
-,build/%.asm: bare.asm ../compile-examples/expected/%-5.asm
+,build/%.asm: bare.asm ../compile-examples/expected/%-5.asm epilog.asm
 	@ echo 'Combining $@'
 	cat $^ > $@
 

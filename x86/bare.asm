@@ -1,5 +1,3 @@
-;; This example is constructed by merging the 3 files ../../repl/src/{layout,bootloader,kernel}.asm
-;;; sector.asm...
 
 ;;; Note: page = 256 bytes; 16 bit address space is 64k or 256 pages
 
@@ -14,12 +12,10 @@
 ;;; i.e. the space between the 5 pages reserved for the BIOS and the start of the bootloader
 ;;; That is 59.5 sector.
 
-;;; We also load in embedded string data at 0x8000. So we have 128 pages here.
-
     bootloader_address equ 0x7c00
 
     kernel_load_address equ 0x500
-    kernel_size_in_sectors equ 6
+    kernel_size_in_sectors equ 3 ; TODO: make bigger or compute! making it small to check error is provoked
 
     bootloader_relocation_address equ \
        kernel_load_address + kernel_size_in_sectors * sector_size ; 0x1100
@@ -152,8 +148,25 @@ Bare_make_bool_from_z:
     mov ax, True
     ret
 
+Bare_make_bool_from_n:
+    jl .yes
+.no:
+    mov ax, False
+    ret
+.yes:
+    mov ax, True
+    ret
+
 False: dw 0
 True: dw 1
+
+Bare_get_bytes:
+    ;; TODO: revisit when we have tighter, byte-packed rep for strings
+    add bx, 1 ; +1 for the length
+    shl bx, 1 ; x2 to get from word-index to byte-index
+    add bx, ax
+    mov ax, [bx]
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Generated code will be appended here.
