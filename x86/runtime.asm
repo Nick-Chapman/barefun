@@ -100,7 +100,7 @@ final_code:
     ;; TODO: print halt here. better still. quit the emulator
     ;; at least print out a full message to say we are halting.
     ;; that would be useful anyway for compiled trace info.
-    mov ax, 'F'
+    mov ax, 'Q'
     call Bare_put_char
 spin:
     jmp spin
@@ -199,6 +199,21 @@ Bare_make_bytes:
     push ax
     mov ax, sp
     push bx ;; ... and restore
+    ret
+
+Bare_mod:
+    push dx
+    mov dx, 0
+    div bx ; dx:ax / bx. quotiant->ax, remainder->dx
+    mov ax, dx
+    pop dx
+    ret
+
+Bare_div:
+    push dx
+    mov dx, 0
+    div bx ; dx:ax / bx. quotiant->ax, remainder->dx
+    pop dx
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

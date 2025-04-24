@@ -1303,7 +1303,8 @@ L93: ; Arm: 113'13
 
 L94: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (114'45) Tail: app_114'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -1320,7 +1321,8 @@ L95: ; Function: t1
   cmp word [bx], 1
   jz L93
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]
@@ -1363,7 +1365,8 @@ L97: ; Arm: 113'13
 
 L98: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (114'45) Tail: app_114'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -1380,7 +1383,8 @@ L99: ; Function: t1
   cmp word [bx], 1
   jz L97
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]
@@ -1614,7 +1618,8 @@ L115: ; Arm: 113'13
 
 L116: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (114'45) Tail: app_114'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -1631,7 +1636,8 @@ L117: ; Function: t1
   cmp word [bx], 1
   jz L115
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]
@@ -1674,7 +1680,8 @@ L119: ; Arm: 113'13
 
 L120: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (114'45) Tail: app_114'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -1691,7 +1698,8 @@ L121: ; Function: t1
   cmp word [bx], 1
   jz L119
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]
@@ -1803,7 +1811,8 @@ L129: ; Arm: 113'13
 
 L130: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (114'45) Tail: app_114'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -1820,7 +1829,8 @@ L131: ; Function: t1
   cmp word [bx], 1
   jz L129
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]

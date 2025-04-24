@@ -19,9 +19,6 @@ let generate_rules x =
 
 let allow_example = function
   (* TODO: allow all examples when they work in nasm *)
-  | "put_int" -> false
-  | "tree" -> false
-  | "fib" -> false
   | "shell" -> false
   | "sham" -> false
   | "filesystem" -> false

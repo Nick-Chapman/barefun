@@ -142,7 +142,8 @@ L11: ; Arm: 13'13
 
 L12: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (14'41) Tail: app_14'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -159,7 +160,8 @@ L13: ; Function: t1
   cmp word [bx], 1
   jz L11
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]
@@ -257,7 +259,8 @@ L19: ; Arm: 13'13
 
 L20: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (14'41) Tail: app_14'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -274,7 +277,8 @@ L21: ; Function: t1
   cmp word [bx], 1
   jz L19
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]
@@ -419,9 +423,9 @@ L32: ; Continuation
   push word cx
   push word L31
   mov cx, sp
-  ;; (16'35) Tail: app_16'32 (arg) @ 20
+  ;; (16'35) Tail: app_16'32 (arg) @ 10
   mov bp, dx
-  mov dx, 20
+  mov dx, 10
   mov ax, [bp]
   jmp ax
 
@@ -473,9 +477,9 @@ L37: ; Start
   push word cx
   push word L36
   mov cx, sp
-  ;; (33'16) Tail: fib (g3) @ 20
+  ;; (33'16) Tail: fib (g3) @ 10
   mov bp, g3
-  mov dx, 20
+  mov dx, 10
   mov ax, [bp]
   jmp ax
 

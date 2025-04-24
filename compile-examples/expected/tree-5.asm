@@ -8,7 +8,8 @@ L1: ; Arm: 6'13
 
 L2: ; Continuation
   mov ax, [bp+4]
-  div ax, 10
+  mov bx, 10
+  call Bare_div
   mov [2], ax
   ;; (7'41) Tail: app_7'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
@@ -25,7 +26,8 @@ L3: ; Function: t1
   cmp word [bx], 1
   jz L1
   mov ax, dx
-  mod ax, 10
+  mov bx, 10
+  call Bare_mod
   mov [4], ax
   mov ax, 48
   add ax, [4]

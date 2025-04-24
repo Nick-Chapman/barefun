@@ -37,4 +37,4 @@ let runfib n =
   put_int res;
   newline ()
 
-let main () = runfib 20
+let main () = runfib 10

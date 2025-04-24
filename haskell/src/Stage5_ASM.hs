@@ -50,9 +50,6 @@ data Op -- target; source
   | OpAddInto Reg Source
   | OpSubInto Reg Source
   | OpMulInto Reg Source
-  -- TODO: x86 div/mod are the same instruction, making uses of specific registers
-  | OpDivInto Reg Source
-  | OpModInto Reg Source
 
 data Jump
   = JumpDirect CodeLabel
@@ -110,6 +107,8 @@ data BareBios
   | Bare_make_bytes
   | Bare_set_bytes
   | Bare_get_bytes
+  | Bare_mod
+  | Bare_div
   -- Bare_check_heap_space
   deriving Show
 
@@ -143,8 +142,6 @@ instance Show Op where
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulInto r src -> "mul " ++ show r ++ ", " ++ show src
-    OpDivInto r src -> "div " ++ show r ++ ", " ++ show src
-    OpModInto r src -> "mod " ++ show r ++ ", " ++ show src
 
 instance Show Jump where
   show = \case
@@ -239,8 +236,6 @@ execOp = \case
   OpAddInto r s -> execBinaryOp (+) r s
   OpSubInto r s -> execBinaryOp (-) r s
   OpMulInto r s -> execBinaryOp (*) r s
-  OpDivInto r s -> execBinaryOp div r s
-  OpModInto r s -> execBinaryOp mod r s
 
 execPush :: Word -> M ()
 execPush w = do
@@ -350,6 +345,16 @@ execBare = \case
         let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
         c <- GetMem a'
         SetReg Ax c
+
+  Bare_mod -> do
+    w1 <- GetReg Ax
+    w2 <- GetReg Bx
+    SetReg Ax (binaryW mod w1 w2)
+
+  Bare_div -> do
+    w1 <- GetReg Ax
+    w2 <- GetReg Bx
+    SetReg Ax (binaryW div w1 w2)
 
 
 createBytesInMemory :: Number -> M Word
@@ -806,11 +811,13 @@ compileBuiltin b = case b of
     ]
   SRC.DivInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
-    , OpDivInto Ax s2
+    , OpMove Bx s2
+    , OpCall Bare_div
     ]
   SRC.ModInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
-    , OpModInto Ax s2
+    , OpMove Bx s2
+    , OpCall Bare_mod
     ]
   SRC.EqInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
