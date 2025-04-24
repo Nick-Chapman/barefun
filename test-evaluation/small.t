@@ -71,4 +71,4 @@ Haskell REPL
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF:#op=2632]
+  > [EOF:#op=2632, #alloc=424]

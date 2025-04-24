@@ -139,6 +139,7 @@ data Tickable
   | PushContinuation | Enter | Return
   | Prim
   | Op
+  | Alloc
   deriving (Eq,Ord,Enum,Bounded)
 
 instance Show Tickable where
@@ -149,6 +150,7 @@ instance Show Tickable where
     Return -> "return"
     Prim -> "prim"
     Op -> "op"
+    Alloc -> "alloc"
 
 newtype Number = Number Int deriving (Eq,Ord,Num,Integral,Real,Enum)
 

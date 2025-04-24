@@ -14,4 +14,4 @@ Haskell REPL
 
   $ ../haskell/main.exe ../examples/cut.fun -5
   [Stage5 (ASM); post normalization size: 20]
-  4[HALT:#op=72]
+  4[HALT:#op=72, #alloc=10]

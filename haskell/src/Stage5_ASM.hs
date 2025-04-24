@@ -17,7 +17,7 @@ import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
-import qualified Value as I (Tickable(..))
+import qualified Value as I (Tickable(Op,Alloc))
 
 -- string rep is currently the same as a list of chars. TODO: do better!
 betterStringRep :: Bool
@@ -223,6 +223,7 @@ execOp = \case
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
+    TraceAlloc
     execPush w
     cont
   OpCmp s1 s2 -> \cont -> do
@@ -459,6 +460,7 @@ data M a where
   Halt :: M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
+  TraceAlloc :: M ()
   GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Word -> M ()
   GetReg :: Reg -> M Word
@@ -509,6 +511,7 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k
+      TraceAlloc{} -> ITick I.Alloc $ k s ()
 
       GetCode lab -> do
         k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)

@@ -47,4 +47,4 @@ Haskell (B)
   % This is line one.
   % Another
   % And one more!
-  % [EOF:#op=697]
+  % [EOF:#op=697, #alloc=8]
