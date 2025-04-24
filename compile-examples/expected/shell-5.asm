@@ -705,7 +705,7 @@ L53: ; Arm: 133'20
 
 L54: ; Continuation
   push word [bp+4]
-  push word '\EOT'
+  push word 4
   push word 1
   mov [2], sp
   ;; (102'28) Tail: app_102'25 (arg) @ con_0'0 (t1)
@@ -749,13 +749,13 @@ L57: ; Arm: 138'15
   jmp ax
 
 L58: ; Continuation
-  mov ax, '\b'
+  mov ax, 8
   call Bare_put_char
   mov [2], ax
   mov ax, ' '
   call Bare_put_char
   mov [4], ax
-  mov ax, '\b'
+  mov ax, 8
   call Bare_put_char
   mov [6], ax
   ;; (142'22) Tail: readloop (g18) @ tail (f2)
@@ -765,13 +765,13 @@ L58: ; Continuation
   jmp ax
 
 L59: ; Arm: 140'29
-  mov ax, '\b'
+  mov ax, 8
   call Bare_put_char
   mov [2], ax
   mov ax, ' '
   call Bare_put_char
   mov [4], ax
-  mov ax, '\b'
+  mov ax, 8
   call Bare_put_char
   mov [6], ax
   ;; (0'0) Return: prim_0'0 (t3)
@@ -891,7 +891,7 @@ L67: ; Function: g18
   cmp word [bx], 1
   jz L53
   mov ax, [2]
-  cmp word ax, '\EOT'
+  cmp word ax, 4
   call Bare_make_bool_from_z
   mov [8], ax
   mov bx, [8]
@@ -1018,7 +1018,8 @@ L71: ; Function: g25
 
 L72: ; Continuation
   mov ax, dx
-  mul ax, [bp+4]
+  mov bx, [bp+4]
+  call Bare_mul
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -1160,7 +1161,8 @@ L84: ; Continuation
   mov ax, [bx+2]
   mov [2], ax
   mov ax, 10
-  mul ax, [bp+4]
+  mov bx, [bp+4]
+  call Bare_mul
   mov [4], ax
   mov ax, [4]
   add ax, [2]
@@ -1475,7 +1477,8 @@ L106: ; Continuation
   mov ax, [bx+2]
   mov [2], ax
   mov ax, 10
-  mul ax, [bp+4]
+  mov bx, [bp+4]
+  call Bare_mul
   mov [4], ax
   mov ax, [4]
   add ax, [2]
@@ -3972,7 +3975,7 @@ L288: ; Continuation
 
 L289: ; Continuation
   push word g29
-  push word '\EOT'
+  push word 4
   push word 1
   mov [2], sp
   push word dx

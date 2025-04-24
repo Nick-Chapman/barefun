@@ -3414,7 +3414,8 @@ L234: ; Continuation
 
 L235: ; Continuation
   mov ax, [bp+4]
-  mul ax, 512
+  mov bx, 512
+  call Bare_mul
   mov [2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -4450,7 +4451,8 @@ L306: ; Continuation
 
 L307: ; Continuation
   mov ax, [bp+4]
-  mul ax, 512
+  mov bx, 512
+  call Bare_mul
   mov [2], ax
   push word [2]
   push word dx
@@ -5937,7 +5939,8 @@ L393: ; Continuation
   call Bare_mod
   mov [2], ax
   mov ax, 64
-  mul ax, [2]
+  mov bx, [2]
+  call Bare_mul
   mov [4], ax
   push word [4]
   push word [bp+14]
@@ -7758,7 +7761,8 @@ L512: ; Continuation
 
 L513: ; Continuation
   mov ax, [bp+4]
-  mul ax, 512
+  mov bx, 512
+  call Bare_mul
   mov [2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -8794,7 +8798,8 @@ L584: ; Continuation
 
 L585: ; Continuation
   mov ax, [bp+4]
-  mul ax, 512
+  mov bx, 512
+  call Bare_mul
   mov [2], ax
   push word [2]
   push word dx
@@ -10281,7 +10286,8 @@ L671: ; Continuation
   call Bare_mod
   mov [2], ax
   mov ax, 64
-  mul ax, [2]
+  mov bx, [2]
+  call Bare_mul
   mov [4], ax
   push word [4]
   push word [bp+14]
@@ -11845,7 +11851,8 @@ L771: ; Continuation
   call Bare_mod
   mov [2], ax
   mov ax, 64
-  mul ax, [2]
+  mov bx, [2]
+  call Bare_mul
   mov [4], ax
   push word [4]
   push word cx
@@ -12329,7 +12336,8 @@ L806: ; Continuation
 
 L807: ; Continuation
   mov ax, [bp+4]
-  mul ax, 512
+  mov bx, 512
+  call Bare_mul
   mov [2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -13361,7 +13369,8 @@ L878: ; Continuation
 
 L879: ; Continuation
   mov ax, [bp+4]
-  mul ax, 512
+  mov bx, 512
+  call Bare_mul
   mov [2], ax
   push word [2]
   push word dx

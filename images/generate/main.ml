@@ -19,8 +19,6 @@ let generate_rules x =
 
 let allow_example = function
   (* TODO: allow all examples when they work in nasm *)
-  | "shell" -> false
-  | "sham" -> false
   | "filesystem" -> false
   | _ -> true
 

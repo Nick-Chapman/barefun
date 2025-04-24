@@ -6,6 +6,7 @@ module Stage5_ASM
 
 import Builtin (Builtin)
 import Control.Monad (ap,liftM)
+import Data.Char (ord)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Prelude hiding (Word)
@@ -49,7 +50,6 @@ data Op -- target; source
   | OpBranchFlagZ CodeLabel
   | OpAddInto Reg Source
   | OpSubInto Reg Source
-  | OpMulInto Reg Source
 
 data Jump
   = JumpDirect CodeLabel
@@ -107,8 +107,9 @@ data BareBios
   | Bare_make_bytes
   | Bare_set_bytes
   | Bare_get_bytes
-  | Bare_mod
+  | Bare_mul
   | Bare_div
+  | Bare_mod
   -- Bare_check_heap_space
   deriving Show
 
@@ -141,7 +142,6 @@ instance Show Op where
     OpBranchFlagZ lab ->  "jz " ++ show lab
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
-    OpMulInto r src -> "mul " ++ show r ++ ", " ++ show src
 
 instance Show Jump where
   show = \case
@@ -161,7 +161,11 @@ instance Show Source where
 instance Show Word where
   show = \case
     -- nasm requires backticks around escape sequences
-    WChar c -> if c == '\n' then "`\\n`" else show c
+    WChar c -> do
+      let n = ord c
+      if c == '\n' then "`\\n`" else
+        if c == '\'' then "`\'`" else
+          if (n < 32 || n > 126) then show n else show c
     WNum n -> show n
     WAddr a -> show a
     WCodeLabel lab -> show lab
@@ -235,7 +239,6 @@ execOp = \case
       True -> GetCode lab >>= execCode -- branch taken; ignore the continuation
   OpAddInto r s -> execBinaryOp (+) r s
   OpSubInto r s -> execBinaryOp (-) r s
-  OpMulInto r s -> execBinaryOp (*) r s
 
 execPush :: Word -> M ()
 execPush w = do
@@ -346,15 +349,20 @@ execBare = \case
         c <- GetMem a'
         SetReg Ax c
 
-  Bare_mod -> do
+  Bare_mul -> do
     w1 <- GetReg Ax
     w2 <- GetReg Bx
-    SetReg Ax (binaryW mod w1 w2)
+    SetReg Ax (binaryW (*) w1 w2)
 
   Bare_div -> do
     w1 <- GetReg Ax
     w2 <- GetReg Bx
     SetReg Ax (binaryW div w1 w2)
+
+  Bare_mod -> do
+    w1 <- GetReg Ax
+    w2 <- GetReg Bx
+    SetReg Ax (binaryW mod w1 w2)
 
 
 createBytesInMemory :: Number -> M Word
@@ -807,7 +815,8 @@ compileBuiltin b = case b of
     ]
   SRC.MulInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
-    , OpMulInto Ax s2
+    , OpMove Bx s2
+    , OpCall Bare_mul
     ]
   SRC.DivInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1

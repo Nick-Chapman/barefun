@@ -15,7 +15,7 @@
     bootloader_address equ 0x7c00
 
     kernel_load_address equ 0x500
-    kernel_size_in_sectors equ 3 ; TODO: make bigger or compute! making it small to check error is provoked
+    kernel_size_in_sectors equ 38 ; TODO: make bigger or compute! making it small to check error is provoked
 
     bootloader_relocation_address equ \
        kernel_load_address + kernel_size_in_sectors * sector_size ; 0x1100
@@ -168,6 +168,10 @@ Bare_num_to_char:
     ;; this is meant to do nothing!
     ret
 
+Bare_char_to_num:
+    ;; this is meant to do nothing!
+    ret
+
 ;; must revisit when we have tighter, byte-packed rep for strings/bytes
 Bare_get_bytes:
     add bx, 1 ; +1 for the length
@@ -199,6 +203,10 @@ Bare_make_bytes:
     push ax
     mov ax, sp
     push bx ;; ... and restore
+    ret
+
+Bare_mul:
+    mul bx ; ax * bx -> ax
     ret
 
 Bare_mod:
