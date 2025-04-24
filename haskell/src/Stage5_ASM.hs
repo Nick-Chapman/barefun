@@ -19,6 +19,10 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(..))
 
+-- string rep is currently the same as a list of chars. TODO: do better!
+betterStringRep :: Bool
+betterStringRep = False
+
 bytesPerWord :: Int
 bytesPerWord = 2 -- TODO: think about the correct way to do this!
 
@@ -286,48 +290,100 @@ execBare = \case
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
-  Bare_string_length -> do
-    a <- deAddr <$> GetReg Ax
-    n <- lengthOfListInMemory a
-    SetReg Ax (WNum n)
   Bare_make_bytes -> do
-    n <- deNum <$> GetReg Ax
-    w <- createBytesInMemory n
-    SetReg Ax w
-  Bare_set_bytes -> do
-    a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Bx
-    c <- deChar <$> GetReg Si
-    e <- getBytesElement a i
-    SetMem (addAddr 1 e) (WChar c)
-    pure ()
-  Bare_get_bytes -> do
-    a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Bx
-    e <- getBytesElement a i
-    c <- GetMem (addAddr 1 e)
-    SetReg Ax c
+     -- TODO: allocates, so really we need a CPS-style BareBios
+    case betterStringRep of
+      False -> do
+        n <- deNum <$> GetReg Ax
+        w <- dep_createListCharInMemory n
+        SetReg Ax w
+      True -> do
+        n <- deNum <$> GetReg Ax
+        w <- createBytesInMemory n
+        SetReg Ax w
 
-lengthOfListInMemory :: Addr -> M Number
-lengthOfListInMemory a = do
+  Bare_string_length ->
+    case betterStringRep of
+      False -> do
+        a <- deAddr <$> GetReg Ax
+        n <- dep_lengthOfListInMemory a
+        SetReg Ax (WNum n)
+      True -> do
+        -- TODO: no need for Bare given better string rep; just generate ops
+        a <- deAddr <$> GetReg Ax
+        n <- deNum <$> GetMem a
+        SetReg Ax (WNum n)
+
+  Bare_set_bytes -> do
+    case betterStringRep of
+      False -> do
+        a <- deAddr <$> GetReg Ax
+        i <- deNum <$> GetReg Bx
+        c <- deChar <$> GetReg Si
+        e <- dep_getBytesElement a i
+        SetMem (addAddr 1 e) (WChar c)
+        pure ()
+      True -> do
+        -- TODO: no need for Bare given better string rep; just generate ops
+        a <- deAddr <$> GetReg Ax
+        i <- deNum <$> GetReg Bx
+        c <- deChar <$> GetReg Si
+        let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
+        SetMem a' (WChar c)
+
+  Bare_get_bytes -> do
+    case betterStringRep of
+      False -> do
+        a <- deAddr <$> GetReg Ax
+        i <- deNum <$> GetReg Bx
+        e <- dep_getBytesElement a i
+        c <- GetMem (addAddr 1 e)
+        SetReg Ax c
+      True -> do
+        -- TODO: no need for Bare given better string rep; just generate ops
+        a <- deAddr <$> GetReg Ax
+        i <- deNum <$> GetReg Bx
+        let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
+        c <- GetMem a'
+        SetReg Ax c
+
+
+createBytesInMemory :: Number -> M Word
+createBytesInMemory n = loop n
+  -- TODO: if we dont care about initializing the bytes, we could just decrement the stack pointer
+  -- initialization could happen in used code needed
+  where
+    loop = \case
+      0 -> do
+        execPush (WNum n)
+        GetReg Sp
+      i -> do
+        execPush (WChar '\0')
+        loop (i-1)
+
+
+-- original string rep: A string is represented as a list of chars
+-- so we must walk the list to get the nth element...
+
+dep_lengthOfListInMemory :: Addr -> M Number
+dep_lengthOfListInMemory a = do
   n <- deNum <$> GetMem a
   case n of
     0 -> pure 0
     1 -> do
       a' <- deAddr <$> GetMem (addAddr 2 a)
-      (1+) <$> lengthOfListInMemory a'
-    _ -> error (show ("lengthOfListInMemory",n))
+      (1+) <$> dep_lengthOfListInMemory a'
+    _ -> error (show ("dep_lengthOfListInMemory",n))
 
--- A string is represented as a list of chars, so we must walk the list to get the nth element
-getBytesElement :: Addr -> Number -> M Addr
-getBytesElement a = \case
+dep_getBytesElement :: Addr -> Number -> M Addr
+dep_getBytesElement a = \case
   0 -> pure a
   n -> do
     a <- deAddr <$> GetMem (addAddr 2 a)
-    getBytesElement a (n-1)
+    dep_getBytesElement a (n-1)
 
-createBytesInMemory :: Number -> M Word
-createBytesInMemory = loop (WAddr aNil)
+dep_createListCharInMemory :: Number -> M Word
+dep_createListCharInMemory = loop (WAddr aNil)
   where
     loop w = \case
       0 -> pure w
@@ -337,6 +393,7 @@ createBytesInMemory = loop (WAddr aNil)
         execPush (vTag tCons)
         w <- GetReg Sp
         loop w (n-1)
+
 
 execJump :: Jump -> M ()
 execJump = \case
@@ -382,7 +439,7 @@ deNum :: Word -> Number
 deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
 prevAddr :: Addr -> Addr
-prevAddr = addAddr (-1)
+prevAddr = addAddr (-1) -- TODO: we should be accessing memory in word (2-byte) units
 
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
@@ -562,12 +619,19 @@ compileImage = \case
 compileTopDef :: DataLabel -> SRC.Top -> Asm [Word]
 compileTopDef lab = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
-  SRC.TopLitS string -> do
-    -- string rep is currently the same as a list of chars. TODO: do better!
-    pure ([ op
-          | (i,c) <- zip [1..] string
-          , op <- [vTag tCons, WChar c, WAddr (Symbolic lab (i*3))]
-          ] ++ [ vTag tNil ])
+
+  SRC.TopLitS string ->
+    case betterStringRep of
+      False -> do
+        pure ([ w
+              | (i,c) <- zip [1..] string
+              , w <- [vTag tCons, WChar c, WAddr (Symbolic lab (i*3))]
+              ] ++ [ vTag tNil ])
+      True -> do
+        pure ([ WNum (fromIntegral $ length string) ] ++
+              [ WChar c | c <- string]
+             )
+
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
     let w1 = WCodeLabel lab

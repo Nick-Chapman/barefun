@@ -5,6 +5,7 @@ let explode s =
       explode_loop (string_index s i :: acc) (i-1)
   in
   explode_loop [] (string_length s - 1)
+
 let rec put_chars xs =
   match xs with
   | [] -> ()
