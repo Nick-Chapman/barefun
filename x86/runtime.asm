@@ -98,6 +98,8 @@ final_continuation:
 
 final_code:
     ;; TODO: print halt here. better still. quit the emulator
+    ;; at least print out a full message to say we are halting.
+    ;; that would be useful anyway for compiled trace info.
     mov ax, 'F'
     call Bare_put_char
 spin:
@@ -126,6 +128,8 @@ Bare_get_char: ; -> ax
 
 ;;; Print to the screen (Converting LF to CR/LF)
 
+;;; TODO: perhaps a bit more magic for conrol chars etc, so we can see them during dev
+;;; check out the haskell and ocaml code
 Bare_put_char: ; al->
     cmp ax, LF
     jnz .normal
@@ -160,15 +164,41 @@ Bare_make_bool_from_n:
 False: dw 0
 True: dw 1
 
+Bare_num_to_char:
+    ;; this is meant to do nothing!
+    ret
+
+;; must revisit when we have tighter, byte-packed rep for strings/bytes
 Bare_get_bytes:
-    ;; TODO: revisit when we have tighter, byte-packed rep for strings
     add bx, 1 ; +1 for the length
     shl bx, 1 ; x2 to get from word-index to byte-index
     add bx, ax
     mov ax, [bx]
     ret
 
-Bare_num_to_char:
+Bare_set_bytes:
+    add bx, 1 ; +1 for the length
+    shl bx, 1 ; x2 to get from word-index to byte-index
+    add bx, ax
+    mov [bx], si
+    ret
+
+Bare_string_length:
+    mov bx, ax
+    mov ax, [bx]
+    ret
+
+Bare_make_bytes:
+    ;;; TODO: maybe avoid subroutine so less trickery is needed
+    pop bx ;; heap allocation (at stack pointer); so we must first save return address...
+    ;; this version does not zero the allocated space...
+    shl ax, 1
+    sub sp, ax
+    shr ax, 1
+    ;; TODO: make better to loop, and actually push 0s
+    push ax
+    mov ax, sp
+    push bx ;; ... and restore
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

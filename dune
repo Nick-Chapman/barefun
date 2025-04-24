@@ -1,19 +1,21 @@
 
+;; TODO: maybe also have aliases to run in ocaml and haskell emulators
+
 (rule
- (alias small)
+ (alias small.qemu)
  (deps (universe) images/small.img)
  (action
   (progn
    (run chmod +w images/small.img)
    (run qemu-system-i386 -hda images/small.img))))
 
-;(rule
-; (alias bytes)
-; (deps (universe) images/bytes.img)
-; (action
-;  (progn
-;   (run chmod +w images/bytes.img)
-;   (run qemu-system-i386 -hda images/bytes.img))))
+(rule
+ (alias bytes.qemu)
+ (deps (universe) images/bytes.img)
+ (action
+  (progn
+   (run chmod +w images/bytes.img)
+   (run qemu-system-i386 -hda images/bytes.img))))
 
 (subdir images
 
@@ -23,10 +25,10 @@
    (with-stdout-to small.img
     (run nasm -Werror -o small.img -dCODE='../compile-examples/gen/small-5.gen' ../x86/runtime.asm))))
 
-; (rule
-;  (deps ../x86/runtime.asm ../compile-examples/gen/bytes-5.gen)
-;  (action
-;   (with-stdout-to bytes.img
-;    (run nasm -Werror -o bytes.img -dCODE='../compile-examples/gen/bytes-5.gen' ../x86/runtime.asm))))
+ (rule
+  (deps ../x86/runtime.asm ../compile-examples/gen/bytes-5.gen)
+  (action
+   (with-stdout-to bytes.img
+    (run nasm -Werror -o bytes.img -dCODE='../compile-examples/gen/bytes-5.gen' ../x86/runtime.asm))))
 
 )

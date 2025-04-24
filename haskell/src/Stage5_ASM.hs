@@ -838,6 +838,8 @@ compileBuiltin b = case b of
     [ OpMove Ax s1
     , OpCall Bare_make_bytes
     ]
+  -- TODO: avoid Builtins for null-imp.
+  -- better, have an identity function in Predefined which will get normalized away
   SRC.FreezeBytes -> oneArg $ \s1 ->
     -- null-imp, bytes and string have the same representation
     [ OpMove Ax s1 ]
