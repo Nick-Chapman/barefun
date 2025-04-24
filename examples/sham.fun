@@ -10,6 +10,7 @@ let not b =
 
 let (>) a b = b < a
 let (<=) a b = not (b < a)
+let (>=) a b = not (a < b)
 
 (* TODO: have a noinline pimitive *)
 let noinline = let rec block f a = let _ = block in f a in block
@@ -112,6 +113,17 @@ let rec put_chars xs =
   | x::xs -> put_char x; put_chars xs
 
 let put_string s = put_chars (explode s)
+
+let chars_of_int i =
+  let ord0 = ord '0' in
+  let char_of_digit c = chr (ord0 + c) in
+  let rec loop acc i =
+    if i = 0 then acc else
+      loop (char_of_digit (i%10) :: acc) (i/10)
+  in
+  if i = 0 then ['0'] else loop [] i
+
+let put_int i = put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
 
@@ -327,6 +339,49 @@ let create_behaviour fs args =
         let contents = loop [] in
         Bindings (Pair (filename,Data contents) :: bindings fs)
 
+let rec fib n =
+  if n < 2 then n else fib (n-1) + fib (n-2)
+
+let runfib n =
+  let rec loop i =
+    if i > n then () else
+      let res = fib i in
+      put_string "fib ";
+      put_int i;
+      put_string " --> ";
+      put_int res;
+      newline ();
+      loop (i+1)
+  in
+  loop 0
+
+let parse_digit c =
+  let n = ord c - ord '0' in
+  if n >= 0 then if n <= 9 then Some n else None else None
+
+let parse_num s =
+  let rec loop acc xs =
+    match xs with
+    | [] -> Some(acc)
+    | x::xs ->
+        match parse_digit x with
+        | None -> None
+        | Some d -> loop (10 * acc + d) xs
+  in
+  loop 0 s
+
+let fib_behaviour fs args =
+  match args with
+  | [] -> (put_string "fib: missing argument\n"; fs)
+  | arg1::args ->
+     match args with
+     | _::_ -> (put_string "create: unexpected extra argument\n"; fs)
+     | [] ->
+        match parse_num (explode arg1) with
+        | None -> (put_string "fib: expected numeric argument"; fs)
+        | Some n ->
+           runfib n; fs
+
 let readme = "Welcome to sham; please try all the commands!\nCan you find the hidden Easter Egg?\n"
 let man_ls = "ls - list directory contents\n"
 let man_cat = "cat - concatenate files and print on the standard output\n"
@@ -334,8 +389,9 @@ let man_man = "man - an interface to the system reference manuals\n"
 let man_rm = "rm - remove files or directories (directories not supported yet!)\n"
 let man_cp = "cp - copy files and directories\n"
 let man_mv = "mv - move (rename) files\n"
-let man_file = "file — determine file type\n"
-let man_create = "create — create a new file\n"
+let man_file = "file - determine file type\n"
+let man_create = "create - create a new file\n"
+let man_fib = "fib - naive fib computation upto the given number\n"
 
 let shadow =
   "I have a little shadow that goes in and out with me,\nAnd what can be the use of him is more than I can see.\nHe is very, very like me from the heels up to the head;\nAnd I see him jump before me, when I jump into my bed.\n"
@@ -351,6 +407,7 @@ let fs0() = Bindings(
   ; Pair ("mv", Executable (man_mv, mv_behaviour))
   ; Pair ("rm", Executable (man_rm, rm_behaviour))
   ; Pair ("cat", Data shadow)
+  ; Pair ("fib", Executable (man_fib, fib_behaviour))
   ])
 
 let main () =

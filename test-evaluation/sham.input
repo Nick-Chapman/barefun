@@ -7,3 +7,6 @@ cp ls xx
 rm ls
 ls
 xx
+fib 15
+mv cat cat2
+cat2 cat

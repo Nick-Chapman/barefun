@@ -65,10 +65,10 @@ firstFrameIndexForContinuations = 2
 firstTempIndex = 1
 firstGlobalIndex = 1
 
--- need 29 temps for the thrice example; no reason to not have more; but want to known when required
+-- need 29 temps for the thrice example; no reason to not have more; but want to know when required
 -- sham example needs more
 maxTempIndex :: Int
-maxTempIndex = 35
+maxTempIndex = 39
 
 ----------------------------------------------------------------------
 -- Show
