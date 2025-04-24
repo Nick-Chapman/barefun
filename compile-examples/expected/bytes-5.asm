@@ -395,7 +395,7 @@ g5: dw 0
 g6: dw L19
 g7: dw L21
 g8: dw 0
-g9: dw 1, 'O', g9+3, 1, 'n', g9+6, 1, 'e', g9+9, 1, `\n`, g9+12, 0
+g9: dw 4, 'O', 'n', 'e', `\n`
 g10: dw 0
 
 bare_start: jmp L30

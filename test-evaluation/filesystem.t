@@ -49,8 +49,8 @@ Ocaml REPL
 
 Haskell REPL
 
-  $ ../haskell/main.exe ../examples/filesystem.fun -4
-  [Stage4 (CCF); post normalization size: 3480]
+  $ ../haskell/main.exe ../examples/filesystem.fun -5
+  [Stage5 (ASM); post normalization size: 3480]
   trace: read_sector 0   **SLOW**
   trace: read_sector 12   **SLOW**
   trace: write_sector 12   **SLOW**
@@ -92,4 +92,4 @@ Haskell REPL
   123 : 3333333333333333333333333333333333333333333333333333333333333333
   124 : 4444444444444444444444444444444444444444444444444444444444444444
   125 : ^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@
-  [HALT:#push-continuation=70620, #enter=108743, #return=70621, #prim=159190]
+  [HALT:#op=2402546, #alloc=512816]

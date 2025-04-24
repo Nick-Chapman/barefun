@@ -21,7 +21,7 @@ import qualified Value as I (Tickable(Op,Alloc))
 
 -- string rep is currently the same as a list of chars. TODO: do better!
 betterStringRep :: Bool
-betterStringRep = False
+betterStringRep = True
 
 bytesPerWord :: Int
 bytesPerWord = 2 -- TODO: think about the correct way to do this!
