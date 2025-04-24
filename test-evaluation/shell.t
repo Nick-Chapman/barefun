@@ -61,4 +61,4 @@ Haskell REPL (stage5)
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#op=1514336, #alloc=194071]
+  > [EOF:#op=1514336, #alloc=194893]

@@ -223,7 +223,6 @@ execOp = \case
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
-    TraceAlloc
     execPush w
     cont
   OpCmp s1 s2 -> \cont -> do
@@ -245,6 +244,7 @@ execOp = \case
 
 execPush :: Word -> M ()
 execPush w = do
+  TraceAlloc
   a <- deAddr <$> GetReg Sp
   let a' = prevAddr a
   SetMem a' w
