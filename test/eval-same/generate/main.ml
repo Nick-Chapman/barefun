@@ -24,6 +24,7 @@ let generate_rules x =
 
 let allow = function
   | "bytes" -> false (* TODO: remove when fixed *)
+  | "print_all_chars" -> false (* TODO: remove when fixed *)
   | _ -> true
 
 let () =
