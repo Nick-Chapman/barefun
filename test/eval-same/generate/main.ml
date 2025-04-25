@@ -3,24 +3,37 @@
 
 let generate_rules x =
   let capX = String.capitalize_ascii x in (* TODO: make ocaml have same interface to avoid this hack *)
-  Printf.printf {|
-(rule (deps ../../../examples/%s.fun) (action (with-stdout-to %s.outX (run ../../../ocaml/bin//main.exe %s))))
 
-(rule (deps ../../../examples/%s.fun) (action (with-stdout-to %s.out0 (run ../../../haskell/main.exe -no-measure ../../../examples/%s.fun -0))))
-(rule (deps ../../../examples/%s.fun) (action (with-stdout-to %s.out1 (run ../../../haskell/main.exe -no-measure ../../../examples/%s.fun -1))))
-(rule (deps ../../../examples/%s.fun) (action (with-stdout-to %s.out2 (run ../../../haskell/main.exe -no-measure ../../../examples/%s.fun -2))))
-(rule (deps ../../../examples/%s.fun) (action (with-stdout-to %s.out3 (run ../../../haskell/main.exe -no-measure ../../../examples/%s.fun -3))))
-(rule (deps ../../../examples/%s.fun) (action (with-stdout-to %s.out4 (run ../../../haskell/main.exe -no-measure ../../../examples/%s.fun -4))))
-(rule (deps ../../../examples/%s.fun) (action (with-stdout-to %s.out5 (run ../../../haskell/main.exe -no-measure ../../../examples/%s.fun -5))))
+  Printf.printf
+{|
+ (rule (deps ../../../test-evaluation/input/%s.input ../../../examples/%s.fun ../../../ocaml/bin/main.exe)
+  (action
+   (with-stdin-from ../../../test-evaluation/input/%s.input
+    (with-stdout-to %s.out%c
+     (run ../../../ocaml/bin/main.exe %s)))))
+|}
+x x x x 'X' capX;
 
-(rule (alias runtest) (action (diff %s.outX %s.out0)))
-(rule (alias runtest) (action (diff %s.out0 %s.out1)))
-(rule (alias runtest) (action (diff %s.out1 %s.out2)))
-(rule (alias runtest) (action (diff %s.out2 %s.out3)))
-(rule (alias runtest) (action (diff %s.out3 %s.out4)))
-(rule (alias runtest) (action (diff %s.out4 %s.out5)))
+  let f v = Printf.printf
+{|
+ (rule (deps ../../../test-evaluation/input/%s.input ../../../examples/%s.fun ../../../haskell/main.exe)
+  (action
+   (with-stdin-from ../../../test-evaluation/input/%s.input
+    (with-stdout-to %s.out%c
+     (run ../../../haskell/main.exe -no-measure ../../../examples/%s.fun -%c)))))
+|}
+x x x x v x v
+  in
+  List.iter f ['0';'1';'2';'3';'4';'5'];
 
-|} x x capX x x x x x x x x  x x x x x x x x x x  x x x x x x x x x x  x x
+  let f (a,b) = Printf.printf
+{|
+ (rule
+  (alias runtest)
+   (action (diff %s.out%c %s.out%c)))
+|}
+x a x b in
+  List.iter f ['X','0'; '0','1'; '1','2'; '2','3'; '3','4'; '4','5';]
 
 let allow = function
   | _ -> true
