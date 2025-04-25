@@ -1,9 +1,6 @@
 (cram
  (deps
-  ../haskell/main.exe
-  ../ocaml/bin/main.exe
-
+  ../../haskell/main.exe
   (glob_files ../examples/*.fun)
   (glob_files input/*.input)
-
 ))

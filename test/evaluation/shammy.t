@@ -1,5 +1,5 @@
 
-  $ cat input/shammy.input | ../haskell/main.exe ../examples/shammy.fun
+  $ cat input/shammy.input | ../../haskell/main.exe ../examples/shammy.fun
   [Stage5 (ASM); post normalization size: 1148]
   Shammy: In-memory file-system. Consider typing "ls".
   % xxx

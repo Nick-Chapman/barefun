@@ -1,5 +1,5 @@
 
-  $ cat input/smaller.input | ../haskell/main.exe ../examples/smaller.fun
+  $ cat input/smaller.input | ../../haskell/main.exe ../examples/smaller.fun
   [Stage5 (ASM); post normalization size: 73]
   % Hello, World!
   Hello, World!

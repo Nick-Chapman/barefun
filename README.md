@@ -2,12 +2,12 @@
 
 The goal of this project is to write a small "operating system" to run on bare metal x86.
 
-- The WIP [operating system](examples/sham.fun) is implemented in an ocaml-style language (`.fun`).
+- The WIP [operating system](test/examples/sham.fun) is implemented in an ocaml-style language (`.fun`).
 - The WIP [compiler](haskell/README.md) for the ocaml-style language is written in haskell.
 
 Programming of the operating system & compiler are proceeding in tandem!
 
-- Examples of `.fun` code can be found [here](examples/README.md).
+- Examples of `.fun` code can be found [here](test/examples/README.md).
 - Since `.fun` is a subset of ocaml, we can leverage [ocaml](ocaml/README.md) as our development environment.
 - We test evaluation of the examples [here](test-evaluation/README.md), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
 - The generated ASM is embedded in the [runtime](x86/runtime.asm) and compiled with `nasm`.

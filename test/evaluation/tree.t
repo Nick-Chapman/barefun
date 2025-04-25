@@ -1,4 +1,4 @@
 
-  $ ../haskell/main.exe ../examples/tree.fun
+  $ ../../haskell/main.exe ../examples/tree.fun
   [Stage5 (ASM); post normalization size: 95]
   955[HALT:#op=353, #alloc=57]

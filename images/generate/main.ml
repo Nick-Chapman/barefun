@@ -23,7 +23,7 @@ let allow_example = function
   | _ -> true
 
 let () =
-  Sys.readdir "../examples"
+  Sys.readdir "../test/examples" (* TODO: depend on compile-examples/gen ? *)
   |> Array.to_list
   |> List.sort String.compare
   |> List.filter_map (Filename.chop_suffix_opt ~suffix:".fun")

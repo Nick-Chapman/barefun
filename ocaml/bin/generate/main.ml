@@ -17,7 +17,7 @@ let select : string -> (module S) =
 |}
 
 let () =
-  Sys.readdir "../../examples"
+  Sys.readdir "../../test/examples"
   |> Array.to_list
   |> List.sort String.compare
   |> List.filter_map (Filename.chop_suffix_opt ~suffix:".fun")
