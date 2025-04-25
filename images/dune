@@ -1,11 +1,4 @@
 
-;(rule
-; (deps ../x86/runtime.asm ../compile-examples/gen/small-5.gen)
-; (action
-;  (with-stdout-to small.img
-;   (run nasm -Werror -o small.img -dCODE='../compile-examples/gen/small-5.gen' ../x86/runtime.asm))))
-
-
 (subdir generate (executable (name main)))
 
 (rule
