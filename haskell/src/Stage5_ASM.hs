@@ -20,12 +20,8 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc))
 
--- string rep is currently the same as a list of chars. TODO: do better!
-betterStringRep :: Bool
-betterStringRep = True
-
 bytesPerWord :: Int
-bytesPerWord = 2 -- TODO: think about the correct way to do this!
+bytesPerWord = 2 -- TODO: We use this only in the x86 printer.
 
 type Transformed = Image
 
@@ -156,7 +152,7 @@ instance Show Source where
     SLit w -> show w
     SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
-    SMemIndirectOffset r n -> "["++show r++"+"++show (bytesPerWord*n)++"]" -- hack to fix frame refs
+    SMemIndirectOffset r n -> "["++show r++"+"++show (bytesPerWord * n)++"]"
 
 instance Show Word where
   show = \case
@@ -183,7 +179,7 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical n -> show (bytesPerWord*n) -- hack to fix temp refs
+    Physical n -> show (bytesPerWord * n)
     Symbolic d 0 -> printf "%s" (show d)
     Symbolic d n -> printf "%s+%d" (show d) n
 
@@ -293,7 +289,6 @@ execBare = \case
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
   Bare_make_bytes -> do
-     -- TODO: allocates, so really we need a CPS-style BareBios
     case betterStringRep of
       False -> do
         n <- deNum <$> GetReg Ax
@@ -312,6 +307,7 @@ execBare = \case
         SetReg Ax (WNum n)
       True -> do
         -- TODO: no need for Bare given better string rep; just generate ops
+        -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
         a <- deAddr <$> GetReg Ax
         n <- deNum <$> GetMem a
         SetReg Ax (WNum n)
@@ -326,7 +322,6 @@ execBare = \case
         SetMem (addAddr 1 e) (WChar c)
         pure ()
       True -> do
-        -- TODO: no need for Bare given better string rep; just generate ops
         a <- deAddr <$> GetReg Ax
         i <- deNum <$> GetReg Bx
         c <- deChar <$> GetReg Si
@@ -342,7 +337,6 @@ execBare = \case
         c <- GetMem (addAddr 1 e)
         SetReg Ax c
       True -> do
-        -- TODO: no need for Bare given better string rep; just generate ops
         a <- deAddr <$> GetReg Ax
         i <- deNum <$> GetReg Bx
         let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
@@ -364,11 +358,10 @@ execBare = \case
     w2 <- GetReg Bx
     SetReg Ax (binaryW mod w1 w2)
 
-
 createBytesInMemory :: Number -> M Word
 createBytesInMemory n = loop n
   -- TODO: if we dont care about initializing the bytes, we could just decrement the stack pointer
-  -- initialization could happen in used code needed
+  -- This is what we do in x86 runtime. Initialization will happen in caller code.
   where
     loop = \case
       0 -> do
@@ -378,9 +371,11 @@ createBytesInMemory n = loop n
         execPush (WChar '\0')
         loop (i-1)
 
+-- Original string rep: A string is represented as a list of chars
+-- We must walk the list to get the nth element. Very slow.
 
--- original string rep: A string is represented as a list of chars
--- so we must walk the list to get the nth element...
+betterStringRep :: Bool
+betterStringRep = True -- TODO: commit to this, and we can kill the dep_ function
 
 dep_lengthOfListInMemory :: Addr -> M Number
 dep_lengthOfListInMemory a = do
@@ -455,13 +450,15 @@ deChar = \case WChar x -> x; w -> error (show("deChar",w))
 deNum :: Word -> Number
 deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
+-- TODO: we should be accessing memory in word (2-byte) units
+-- Need to sort this before we move to a packed char representation for bytes/string
 prevAddr :: Addr -> Addr
-prevAddr = addAddr (-1) -- TODO: we should be accessing memory in word (2-byte) units
+prevAddr = addAddr (-1)
 
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
   Physical n -> Physical (n+i)
-  Symbolic lab n -> Symbolic lab (n+i) -- I had a nasty bug here -- 1 instead of i
+  Symbolic lab n -> Symbolic lab (n+i) -- I had a nasty bug here -- 1 instead of i :(
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -598,8 +595,6 @@ instance Show State where
 -- Address for User Temps: 1..30
 -- Address for runtime system constants: 90,91,92
 
--- TODO: we need to multiple by the #bytes/word for physical address
--- ie. temps should be at 0,2,4.. etc on a 16 bitarch
 tempOffset :: Int -> Addr
 tempOffset n = Physical n
 
@@ -671,6 +666,7 @@ compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return pos res -> do
     pure $ doOps
+      -- TODO: position info in comments in generated ASM is very unstable to tiny changes.
       [ OpComment $ printf "(%s) Return: %s" (show pos) (ppRef res)
       -- arg = ...
       -- frame = cont
@@ -855,7 +851,7 @@ compileBuiltin b = case b of
     , OpCall Bare_make_bytes
     ]
   -- TODO: avoid Builtins for null-imp.
-  -- better, have an identity function in Predefined which will get normalized away
+  -- Instead have an identity function in Predefined which will get normalized away
   SRC.FreezeBytes -> oneArg $ \s1 ->
     -- null-imp, bytes and string have the same representation
     [ OpMove Ax s1 ]

@@ -15,7 +15,7 @@
     bootloader_address equ 0x7c00
 
     kernel_load_address equ 0x500
-    kernel_size_in_sectors equ 38 ; TODO: make bigger or compute! making it small to check error is provoked
+    kernel_size_in_sectors equ 38
 
     bootloader_relocation_address equ \
        kernel_load_address + kernel_size_in_sectors * sector_size ; 0x1100
@@ -128,8 +128,7 @@ Bare_get_char: ; -> ax
 
 ;;; Print to the screen (Converting LF to CR/LF)
 
-;;; TODO: perhaps a bit more magic for conrol chars etc, so we can see them during dev
-;;; check out the haskell and ocaml code
+;;; TODO: show "\hh" for unprintable chars -- check out the haskell and ocaml code
 Bare_put_char: ; al->
     cmp ax, LF
     jnz .normal
@@ -193,23 +192,21 @@ Bare_string_length:
     ret
 
 Bare_make_bytes:
-    ;;; TODO: maybe avoid subroutine so less trickery is needed
-    pop bx ;; heap allocation (at stack pointer); so we must first save return address...
-    ;; this version does not zero the allocated space...
+    pop bx ;; we do heap allocation at stack pointer; so we must first save return address.
+    ;; Does not zero the allocated space. User caller code is expected to do this.
     shl ax, 1
     sub sp, ax
     shr ax, 1
-    ;; TODO: make better to loop, and actually push 0s
     push ax
     mov ax, sp
-    push bx ;; ... and restore
+    push bx ;; ... and restore: TODO: push/ret --> jmp ?
     ret
 
 Bare_mul:
     mul bx ; ax * bx -> ax
     ret
 
-Bare_mod:
+Bare_mod: ;; TODO: It would be nice to expose a combined div/mod builtin to user
     push dx
     mov dx, 0
     div bx ; dx:ax / bx. quotiant->ax, remainder->dx
@@ -220,7 +217,7 @@ Bare_mod:
 Bare_div:
     push dx
     mov dx, 0
-    div bx ; dx:ax / bx. quotiant->ax, remainder->dx
+    div bx
     pop dx
     ret
 

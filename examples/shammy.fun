@@ -12,7 +12,6 @@ let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
-(* TODO: have a noinline pimitive *)
 let noinline = let rec block f a = let _ = block in f a in block
 
 (* list ops *)
@@ -43,7 +42,7 @@ let (@) xs ys = rev_onto ys (rev xs)
 
 (* string ops *)
 
-let implode = noinline @@ (fun xs -> (* TODO: fix parser to avoid need for paren after @@ *)
+let implode = noinline @@ (fun xs ->
   let b = make_bytes (length xs) in
   let rec loop i xs =
     match xs with
@@ -173,7 +172,7 @@ let split_words =
 type 'a option = None | Some of 'a
 
 type ('a,'b) pair = Pair of 'a * 'b
-type 'file fs = Bindings of (string, 'file) pair list (* TODO: remove Bindings when parser can handle/ignore type aliases *)
+type 'file fs = Bindings of (string, 'file) pair list
 type file = Data of string | Executable of (file fs -> string list -> file fs)
 
 let bindings fs = match fs with | Bindings(ps) -> ps
@@ -225,7 +224,6 @@ let ls_behaviour fs args =
   match args with
   | _::_ -> put_string "ls: takes no arguments\n";fs
   | [] ->
-     (* TODO: sort and dedup *)
      let just_name p = match p with | Pair (name,_) -> name in
      (put_space_sep_strings (map just_name (bindings fs)); newline(); fs)
 

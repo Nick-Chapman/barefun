@@ -1,5 +1,5 @@
 
-(* TODO: maybe also have aliases to run in ocaml and haskell emulators *)
+(* TODO: merge the various rules generators *)
 
 let generate_rules x =
   Printf.printf {|

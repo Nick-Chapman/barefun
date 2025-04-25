@@ -22,7 +22,7 @@ module X : sig
   type bytes
   val make_bytes : int -> bytes
   val freeze_bytes : bytes  -> string
-  val thaw_bytes : string -> bytes (* TODO: too cut a name: perhaps freeze/thaw should say unsafe *)
+  val thaw_bytes : string -> bytes
   val set_bytes : bytes -> int -> char -> unit
   val get_bytes : bytes -> int -> char
 

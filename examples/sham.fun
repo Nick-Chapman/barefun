@@ -230,7 +230,6 @@ let ls_behaviour fs args =
   match args with
   | _::_ -> put_string "ls: takes no arguments\n";fs
   | [] ->
-     (* TODO: sort and dedup *)
      let just_name p = match p with | Pair (name,_) -> name in
      (put_space_sep_strings (map just_name (bindings fs)); newline(); fs)
 

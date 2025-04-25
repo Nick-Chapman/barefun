@@ -9,3 +9,5 @@
 - Execution entry point [here](bin/main.ml).
 - Primitives declared/defined [here](prim_lib/prim.ml).
 - Find the mapping file here: ../_build/default/ocaml/bin/select.ml
+
+TODO: flatten the ocaml dir. loose bin. loose prim_lib. move into ../test
