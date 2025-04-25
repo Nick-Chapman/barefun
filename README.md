@@ -13,16 +13,13 @@ Programming of the operating system & compiler are proceeding in tandem!
 - The generated ASM is embedded in the [runtime](x86/runtime.asm) and compiled with `nasm`.
 - The images produced from `nasm` can be run by `qemu`.
 
-## Expected output from the compiler is [here](compile-examples/expected).
+## Expected output from the compiler is [here](test/expected).
 - we use the suffix `.ml` for stages 0--4, as the code is still vaguely ML-ish.
 - we use the suffix `.asm` for stage 5.
 
 By default we generate output for just stages 4 and 5. For some some examples, we generate all stages.
 To see an example/stage not currently shown, update the control function:
-`select_versions_for_example` [here](compile-examples/generate/main.ml), and run `dune test --auto-promote`.
-
-TODO: Move this dir to `test/expected-compilation/`, under an embracing `test/` directory.
-
+`select_versions_for_example` [here](test/compile-examples/generate/main.ml), and run `dune test --auto-promote`.
 
 ## Pre-requisites
 

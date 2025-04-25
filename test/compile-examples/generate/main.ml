@@ -13,15 +13,15 @@ let generate_rules x v =
   let suf = suffix_of_version v in
   let m = Printf.sprintf "%d" v in
   Printf.printf {|
-(rule (alias runtest) (action (diff ../expected/%s-%s.%s %s-%s.gen)))
-(rule (deps ../../haskell/main.exe ../../test/examples/%s.fun) (action (with-stdout-to %s-%s.gen (run ../../haskell/main.exe ../../test/examples/%s.fun -compile -%s))))
+(rule (alias runtest) (action (diff ../../expected/%s-%s.%s %s-%s.gen)))
+(rule (deps ../../../haskell/main.exe ../../examples/%s.fun) (action (with-stdout-to %s-%s.gen (run ../../../haskell/main.exe ../../examples/%s.fun -compile -%s))))
  |} x m suf x m  x x m  x m
 
 let generate_rules_set example =
   List.iter (generate_rules example) (select_versions_for_example example)
 
 let () =
-  Sys.readdir "../test/examples"
+  Sys.readdir "../examples"
   |> Array.to_list
   |> List.sort String.compare
   |> List.filter_map (Filename.chop_suffix_opt ~suffix:".fun")
