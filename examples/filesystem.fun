@@ -1,5 +1,5 @@
 
-(* Lets code up my own filesystem... *)
+(* Lets code up my own filesystem... TODO: inodes etc... *)
 
 let trace0_on = true
 let trace_on = false

@@ -1,3 +1,4 @@
+(* Mutual recursion; kind-of. *)
 
 let rec is_even n =
   let is_odd n = if n = 0 then false else is_even (n-1) in

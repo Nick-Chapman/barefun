@@ -8,5 +8,3 @@ This directly contains Cram tests (`.t` files) for our [examples](../examples).
 - Update tests: `dune test --auto-promote`
 
 TODO: rename directory to `test/evaluation`
-
-TODO: add contents to init files where that makes sense

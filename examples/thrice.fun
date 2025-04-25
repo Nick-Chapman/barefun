@@ -1,4 +1,4 @@
-
+(* thrice: example to push NbE *)
 let thrice f x = f (f (f x))
 
 let main () =

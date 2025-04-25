@@ -1,4 +1,4 @@
-
+(* Print decimal representation of a number. *)
 let chars_of_int i =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in

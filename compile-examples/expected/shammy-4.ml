@@ -300,7 +300,7 @@ let g88 = fun arg k ->
       | true1 -> k g89
       | false0 -> k g90 in
   k t1 in
-let g96 = "fib: expected numeric argument" in
+let g96 = "fib: expected numeric argument\n" in
 let g97 = Unit0 in
 let g98 = "fib " in
 let g99 = fun arg k ->

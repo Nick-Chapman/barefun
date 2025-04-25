@@ -450,9 +450,9 @@ L37: ; Continuation
   push word cx
   push word L36
   mov cx, sp
-  ;; (7'18) Tail: app_7'15 (arg) @ 3
+  ;; (7'18) Tail: app_7'15 (arg) @ 34
   mov bp, dx
-  mov dx, 3
+  mov dx, 34
   mov ax, [bp]
   jmp ax
 
@@ -512,7 +512,7 @@ g13: dw 0
 g14: dw 0
 g15: dw 0
 g16: dw L27
-g17: dw 4, 'R', 'U', 'N', `\n`
+g17: dw 35, 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'm', 'a', 'l', 'l', ':', ' ', 'a', ' ', 'p', 'r', 'o', 't', 'o', ' ', 'r', 'e', 'a', 'd', 'l', 'i', 'n', 'e', `\n`
 g18: dw 0
 g19: dw 0
 g20: dw L31

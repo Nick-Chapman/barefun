@@ -1,4 +1,4 @@
-
+(* Simple user defined datatype for numeric exps *)
 let chars_of_int =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in

@@ -1,4 +1,4 @@
-
+(* TODO: die *)
 let rec loop def c =
   if c = 0 then def else
     loop (chr c) 0

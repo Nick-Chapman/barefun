@@ -1,4 +1,4 @@
-
+(* TODO: die? *)
 let main () =
   put_char 'X';
   put_char (get_char ());

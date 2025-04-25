@@ -1,5 +1,5 @@
+(* promptB: compiles to access frame variables; inner recursion is via "me" *)
 
-(* Version B, access frame variables; inner recursion is via "me" *)
 let rec outer c =
   put_char c;
   put_char ' ';

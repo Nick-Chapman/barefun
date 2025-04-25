@@ -1,5 +1,5 @@
 
-(* sham: example of a shell with an in-memory file-systems *)
+(* sham: shell with a fake in-memory file-system *)
 
 let (@@) f x = f x
 
@@ -377,7 +377,7 @@ let fib_behaviour fs args =
      | _::_ -> (put_string "create: unexpected extra argument\n"; fs)
      | [] ->
         match parse_num (explode arg1) with
-        | None -> (put_string "fib: expected numeric argument"; fs)
+        | None -> (put_string "fib: expected numeric argument\n"; fs)
         | Some n ->
            runfib n; fs
 

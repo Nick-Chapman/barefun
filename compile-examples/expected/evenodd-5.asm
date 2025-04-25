@@ -1,13 +1,13 @@
-L1: ; Arm: 4'27
-  ;; (0'0) Return: con_4'32 (g2)
+L1: ; Arm: 5'27
+  ;; (0'0) Return: con_5'32 (g2)
   mov dx, g2
   mov bp, cx
   mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
-L2: ; Arm: 3'26
-  ;; (0'0) Return: con_3'31 (g3)
+L2: ; Arm: 4'26
+  ;; (0'0) Return: con_4'31 (g3)
   mov dx, g3
   mov bp, cx
   mov cx, [bp+2]
@@ -35,7 +35,7 @@ L3: ; Function: g1
   mov ax, [4]
   sub ax, 1
   mov [8], ax
-  ;; (3'50) Tail: is_even (g1) @ prim_0'0 (t4)
+  ;; (4'50) Tail: is_even (g1) @ prim_0'0 (t4)
   mov bp, g1
   mov dx, [8]
   mov ax, [bp]
@@ -52,8 +52,8 @@ L4: ; Continuation
   mov ax, [bp]
   jmp ax
 
-L5: ; Arm: 8'25
-  ;; (8'30) Return: 'E'
+L5: ; Arm: 9'25
+  ;; (9'30) Return: 'E'
   mov dx, 'E'
   mov bp, cx
   mov cx, [bp+2]
@@ -67,7 +67,7 @@ L6: ; Continuation
   mov bx, dx
   cmp word [bx], 1
   jz L5
-  ;; (8'39) Return: 'O'
+  ;; (9'39) Return: 'O'
   mov dx, 'O'
   mov bp, cx
   mov cx, [bp+2]
@@ -81,14 +81,14 @@ L7: ; Continuation
   push word cx
   push word L6
   mov cx, sp
-  ;; (8'23) Tail: is_even (g1) @ 13
+  ;; (9'23) Tail: is_even (g1) @ 13
   mov bp, g1
   mov dx, 13
   mov ax, [bp]
   jmp ax
 
-L8: ; Arm: 8'25
-  ;; (8'30) Return: 'E'
+L8: ; Arm: 9'25
+  ;; (9'30) Return: 'E'
   mov dx, 'E'
   mov bp, cx
   mov cx, [bp+2]
@@ -102,7 +102,7 @@ L9: ; Continuation
   mov bx, dx
   cmp word [bx], 1
   jz L8
-  ;; (8'39) Return: 'O'
+  ;; (9'39) Return: 'O'
   mov dx, 'O'
   mov bp, cx
   mov cx, [bp+2]
@@ -113,7 +113,7 @@ L10: ; Start
   push word cx
   push word L9
   mov cx, sp
-  ;; (8'23) Tail: is_even (g1) @ 42
+  ;; (9'23) Tail: is_even (g1) @ 42
   mov bp, g1
   mov dx, 42
   mov ax, [bp]

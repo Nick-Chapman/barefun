@@ -1,5 +1,5 @@
 
-(* shammy: smaller version of the sham example *)
+(* shammy: reduced version of sham. runs on qemu *)
 
 let (@@) f x = f x
 
@@ -279,7 +279,7 @@ let fib_behaviour fs args =
      | _::_ -> (put_string "create: unexpected extra argument\n"; fs)
      | [] ->
         match parse_num (explode arg1) with
-        | None -> (put_string "fib: expected numeric argument"; fs)
+        | None -> (put_string "fib: expected numeric argument\n"; fs)
         | Some n ->
            runfib n; fs
 

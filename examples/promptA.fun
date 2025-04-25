@@ -1,5 +1,5 @@
+(* promptA: compiles to use only global function defs. *)
 
-(* Version A -- compiles to only use global function defs. *)
 let top c =
   let rec outer () =
     put_char c;

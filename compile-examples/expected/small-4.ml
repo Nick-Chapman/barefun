@@ -75,7 +75,7 @@ let g6 = fun arg k ->
       g1 arg k in
     arg 1 k in
   g7 g9 k in
-let g17 = "RUN\n" in
+let g17 = "Welcome to small: a proto readline\n" in
 let g16 = fun arg k ->
   let t1 = [arg], fun [f1] arg k ->
     let t1 = PRIM_LessInt(arg,0) in
@@ -119,7 +119,7 @@ let k = [], fun [] arg ->
               g20 g22 k in
             g6 g19 k in
           g1 arg k in
-        arg 3 k in
+        arg 34 k in
       g16 g18 k in
     g1 arg k in
   arg 4 k in

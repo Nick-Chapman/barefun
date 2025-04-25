@@ -41,6 +41,6 @@ let rec mainloop () =
   mainloop()
 
 let main () =
-  put_string "RUN\n";
+  put_string "Welcome to small: a proto readline\n";
   let () = mainloop () in
   put_string "NEVER\n"

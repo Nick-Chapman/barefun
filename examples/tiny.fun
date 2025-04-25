@@ -1,4 +1,4 @@
-
+(* tiny: a proto readline with a stutter *)
 let main =
   let rec mainloop () =
     let gotten = get_char () in

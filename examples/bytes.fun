@@ -1,5 +1,4 @@
-
-(* example: build strings using the builtin "bytes" ops *)
+(* Build strings using the builtin "bytes" ops. *)
 
 let noinline = let rec block f a = let _ = block in f a in block
 

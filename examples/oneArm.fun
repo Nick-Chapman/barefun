@@ -1,4 +1,4 @@
-
+(* TODO: die *)
 (* this example is to test single-arm variant types *)
 
 type 'a thing = Thing of 'a

@@ -411,7 +411,7 @@ let g184 = fun arg k ->
       | true1 -> k g185
       | false0 -> k g186 in
   k t1 in
-let g192 = "fib: expected numeric argument" in
+let g192 = "fib: expected numeric argument\n" in
 let g193 = Unit0 in
 let g194 = "fib " in
 let g195 = fun arg k ->
