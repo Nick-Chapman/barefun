@@ -56,8 +56,10 @@ end = struct
   let put_char : char -> unit = fun c ->
     let open Printf in
     let n = Char.code c in
-    let dontEscape = (32 <= n && n <= 126) || n = 8 || c = '\n' in
-    if dontEscape then printf "%c%!" c else printf "%s%!" (Char.escaped c)
+    let printable = n >= 32 && n <= 126 in
+    let nl = (n == 10) in
+    let erase = (n == 8) in
+    if printable || nl || erase then printf "%c%!" c else printf "\\%03d%!" n
 
   let upto i j =
     let rec loop acc i = if i > j then List.rev acc else loop (i::acc) (i+1) in

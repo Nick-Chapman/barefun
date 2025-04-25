@@ -6,7 +6,7 @@ module Value
   , Tickable(..)
   ) where
 
-import Data.Char (showLitChar,ord)
+import Data.Char (ord)
 import Data.IORef (IORef,newIORef,readIORef,writeIORef)
 import Data.List (intercalate)
 import Data.Map (Map)
@@ -56,8 +56,10 @@ runInteraction measure next = do
         loop state k
       IPut c k -> do
         let n = ord c
-        let dontEscape = (32 <= n && n <= 126) || n == 8 || c == '\n'
-        putStr (if dontEscape then [c] else showLitChar c "")
+        let printable = n >= 32 && n <= 126
+        let nl = (n == 10)
+        let erase = (n == 8)
+        putStr (if printable || nl || erase then [c] else printf "\\%03d" n)
         hFlush stdout
         loop state k
       IGet f -> do

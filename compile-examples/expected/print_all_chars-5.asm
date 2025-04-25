@@ -1,12 +1,65 @@
-L1: ; Arm: 6'15
-  ;; (0'0) Return: con_6'20 (g2)
+L1: ; Arm: 9'15
+  ;; (0'0) Return: con_9'20 (g2)
   mov dx, g2
   mov bp, cx
   mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
-L2: ; Function: g1
+L2: ; Continuation
+  mov ax, [bp+4]
+  add ax, 1
+  mov [2], ax
+  ;; (16'11) Tail: loop (g1) @ prim_0'0 (t1)
+  mov bp, g1
+  mov dx, [2]
+  mov ax, [bp]
+  jmp ax
+
+L3: ; Arm: 12'17
+  mov ax, '['
+  call Bare_put_char
+  mov [8], ax
+  mov ax, 'D'
+  call Bare_put_char
+  mov [10], ax
+  mov ax, 'E'
+  call Bare_put_char
+  mov [12], ax
+  mov ax, 'L'
+  call Bare_put_char
+  mov [14], ax
+  mov ax, ']'
+  call Bare_put_char
+  mov [16], ax
+  ;; (0'0) Return: prim_0'0 (t8)
+  mov dx, [16]
+  mov bp, cx
+  mov cx, [bp+2]
+  mov ax, [bp]
+  jmp ax
+
+L4: ; Arm: 13'20
+  mov ax, '['
+  call Bare_put_char
+  mov [10], ax
+  mov ax, 'N'
+  call Bare_put_char
+  mov [12], ax
+  mov ax, 'L'
+  call Bare_put_char
+  mov [14], ax
+  mov ax, ']'
+  call Bare_put_char
+  mov [16], ax
+  ;; (0'0) Return: prim_0'0 (t8)
+  mov dx, [16]
+  mov bp, cx
+  mov cx, [bp+2]
+  mov ax, [bp]
+  jmp ax
+
+L5: ; Function: g1
   mov ax, 255
   cmp word ax, dx
   call Bare_make_bool_from_n
@@ -18,28 +71,58 @@ L2: ; Function: g1
   call Bare_put_char
   mov [4], ax
   mov ax, dx
-  call Bare_num_to_char
+  cmp word ax, 8
+  call Bare_make_bool_from_z
   mov [6], ax
-  mov ax, [6]
-  call Bare_put_char
-  mov [8], ax
+  push word dx
+  push word cx
+  push word L2
+  mov cx, sp
+  mov bx, [6]
+  cmp word [bx], 1
+  jz L3
   mov ax, dx
-  add ax, 1
+  cmp word ax, 10
+  call Bare_make_bool_from_z
+  mov [8], ax
+  mov bx, [8]
+  cmp word [bx], 1
+  jz L4
+  mov ax, dx
+  call Bare_num_to_char
   mov [10], ax
-  ;; (9'11) Tail: loop (g1) @ prim_0'0 (t5)
-  mov bp, g1
-  mov dx, [10]
+  mov ax, [10]
+  call Bare_put_char
+  mov [12], ax
+  ;; (0'0) Return: prim_0'0 (t6)
+  mov dx, [12]
+  mov bp, cx
+  mov cx, [bp+2]
   mov ax, [bp]
   jmp ax
 
-L3: ; Start
-  ;; (11'7) Tail: loop (g1) @ 0
+L6: ; Continuation
+  mov ax, `\n`
+  call Bare_put_char
+  mov [2], ax
+  ;; (0'0) Return: prim_0'0 (t1)
+  mov dx, [2]
+  mov bp, cx
+  mov cx, [bp+2]
+  mov ax, [bp]
+  jmp ax
+
+L7: ; Start
+  push word cx
+  push word L6
+  mov cx, sp
+  ;; (18'7) Tail: loop (g1) @ 0
   mov bp, g1
   mov dx, 0
   mov ax, [bp]
   jmp ax
 
-g1: dw L2
+g1: dw L5
 g2: dw 0
 
-bare_start: jmp L3
+bare_start: jmp L7
