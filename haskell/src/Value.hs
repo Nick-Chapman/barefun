@@ -58,8 +58,8 @@ runInteraction measure next = do
         let n = ord c
         let printable = n >= 32 && n <= 126
         let nl = (n == 10)
-        let erase = (n == 8)
-        putStr (if printable || nl || erase then [c] else printf "\\%03d" n)
+        let bs = (n == 8)
+        putStr (if printable || nl || bs then [c] else printf "\\%02x" n)
         hFlush stdout
         loop state k
       IGet f -> do

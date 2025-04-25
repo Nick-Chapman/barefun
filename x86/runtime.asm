@@ -103,44 +103,76 @@ final_code:
     mov ax, 'Q'
     call Bare_put_char
 spin:
+    call Bare_get_char ;; avoid really spinning the fans
     jmp spin
 
-;;; These could be macros...
+
 Bare_clear_screen:
     mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
     int 0x10
     ret
 
-CR equ 13
+BS equ 8
 LF equ 10
+CR equ 13
+DEL equ 127
 
-;;; Read a key press (Converting CR to LF)
+;;; Read a key press (Converting CR to LF; BS to DEL)
 Bare_get_char: ; -> ax
     mov ah, 0
-    int 0x16
+    int 0x16 ; Function
     mov ah, 0
+    cmp ax, BS
+    je .bs
     cmp ax, CR
     jz .cr
     ret
 .cr:
     mov ax, LF
     ret
+.bs:
+    mov ax, DEL
+    ret
 
-;;; Print to the screen (Converting LF to CR/LF)
-
-;;; TODO: show "\hh" for unprintable chars -- check out the haskell and ocaml code
+;;; Print to the screen (Converting LF to CR/LF; showing unprintable chars as escaped hex)
 Bare_put_char: ; al->
+    cmp ax, BS
+    je .normal ; put the BS as normal to move cursor back one position
     cmp ax, LF
-    jnz .normal
-    mov al, CR
-    call .normal
-    mov al, LF
+    je .nl
+    cmp ax, 32
+    jl .as_code
+    cmp ax, 126
+    jg .as_code
+    ;; fall though to normal
 .normal:
     mov ah, 0x0e ; Function: Teletype output
     mov bh, 0
     int 0x10
-    mov ax, 0x77 ; splat so we can be sure we saved
     ret
+.nl:
+    mov al, LF
+    call .normal
+    mov al, CR
+    jmp .normal
+.hex: db "0123456789abcdef"
+.as_code:
+    push ax
+    push ax
+    mov al, '\'
+    call .normal
+    ;; hi nibble
+    pop bx
+    shr bx, 4
+    and bx, 0xF
+    mov ax, [bx + .hex]
+    call .normal
+    ;; lo nibble
+    pop bx
+    and bx, 0xF
+    mov ax, [bx + .hex]
+    jmp .normal
+
 
 Bare_make_bool_from_z:
     jz .yes
