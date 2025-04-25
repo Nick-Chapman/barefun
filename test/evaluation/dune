@@ -2,5 +2,5 @@
  (deps
   ../../haskell/main.exe
   (glob_files ../examples/*.fun)
-  (glob_files input/*.input)
+  (glob_files ../inputs/*.input)
 ))

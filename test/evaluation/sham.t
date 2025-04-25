@@ -1,5 +1,5 @@
 
-  $ cat input/sham.input | ../../haskell/main.exe ../examples/sham.fun
+  $ cat ../inputs/sham.input | ../../haskell/main.exe ../examples/sham.fun
   [Stage5 (ASM); post normalization size: 1949]
   Sham: In-memory file-system. Consider typing "ls".
   % xxx

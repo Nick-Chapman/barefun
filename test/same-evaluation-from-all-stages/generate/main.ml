@@ -6,9 +6,9 @@ let generate_rules x =
 
   Printf.printf
 {|
- (rule (deps ../../../test/evaluation/input/%s.input ../../examples/%s.fun ../../../ocaml/bin/main.exe)
+ (rule (deps ../../../test/inputs/%s.input ../../examples/%s.fun ../../../ocaml/bin/main.exe)
   (action
-   (with-stdin-from ../../../test/evaluation/input/%s.input
+   (with-stdin-from ../../../test/inputs/%s.input
     (with-stdout-to %s.out%c
      (run ../../../ocaml/bin/main.exe %s)))))
 |}
@@ -16,9 +16,9 @@ x x x x 'X' capX;
 
   let f v = Printf.printf
 {|
- (rule (deps ../../../test/evaluation/input/%s.input ../../examples/%s.fun ../../../haskell/main.exe)
+ (rule (deps ../../../test/inputs/%s.input ../../examples/%s.fun ../../../haskell/main.exe)
   (action
-   (with-stdin-from ../../../test/evaluation/input/%s.input
+   (with-stdin-from ../../../test/inputs/%s.input
     (with-stdout-to %s.out%c
      (run ../../../haskell/main.exe -no-measure ../../examples/%s.fun -%c)))))
 |}

@@ -1,5 +1,5 @@
 
-  $ cat input/shell.input | ../../haskell/main.exe ../examples/shell.fun
+  $ cat ../inputs/shell.input | ../../haskell/main.exe ../examples/shell.fun
   [Stage5 (ASM); post normalization size: 1101]
   This is a shell prototype. Try: fib, fact, rev
   > Hello, World!
