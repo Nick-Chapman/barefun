@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Put_int
-  [ocaml]
   42[HALT]
 
 Haskell REPL

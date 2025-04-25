@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Fib
-  [ocaml]
   fib 10 --> 55
   [HALT]
 

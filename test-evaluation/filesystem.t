@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Filesystem
-  [ocaml]
   trace: read_sector 0   **SLOW**
   trace: read_sector 12   **SLOW**
   trace: write_sector 12   **SLOW**

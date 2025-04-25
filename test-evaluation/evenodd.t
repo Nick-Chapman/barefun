@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Evenodd
-  [ocaml]
   EO[HALT]
 
 Haskell REPL

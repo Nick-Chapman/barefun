@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Tree
-  [ocaml]
   955[HALT]
 
 Haskell REPL

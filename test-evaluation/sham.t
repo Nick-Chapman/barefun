@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ cat sham.input | ../ocaml/bin/main.exe Sham
-  [ocaml]
   Sham: In-memory file-system. Consider typing "ls".
   % xxx
   sham: xxx: command not found

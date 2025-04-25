@@ -11,7 +11,7 @@ let with_terminal_no_buffering f =
     f()
 
 let () =
-  Printf.printf "[ocaml]\n";
+  (*Printf.printf "[ocaml]\n";*)
   match Array.to_list Sys.argv with
   | [_;name] ->
      let (module M:Select.S) = Select.select name in (* select.ml is generated code *)

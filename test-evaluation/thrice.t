@@ -1,6 +1,5 @@
 
   $ cat thrice.input | ../ocaml/bin/main.exe Thrice
-  [ocaml]
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT]
 

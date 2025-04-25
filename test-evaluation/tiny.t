@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ cat tiny.input | ../ocaml/bin/main.exe Tiny
-  [ocaml]
   HHeelllloo,,
   
   WWoorrlldd!!

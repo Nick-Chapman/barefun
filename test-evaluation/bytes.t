@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Bytes
-  [ocaml]
   One
   \000\000\000\000\000Two
   [HALT]

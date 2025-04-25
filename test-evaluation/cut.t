@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Cut
-  [ocaml]
   4[HALT]
 
 Haskell REPL

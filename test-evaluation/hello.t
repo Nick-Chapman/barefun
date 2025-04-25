@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ ../ocaml/bin/main.exe Hello
-  [ocaml]
   Hello, world!
   [HALT]
 

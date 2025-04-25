@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ cat small.input | ../ocaml/bin/main.exe Small
-  [ocaml]
   LOAD
   RUN
   > Hello, World!

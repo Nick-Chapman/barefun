@@ -2,7 +2,6 @@
 Ocaml REPL
 
   $ cat halts.input | ../ocaml/bin/main.exe Halts
-  [ocaml]
   XhYeZ[HALT]
 
 Haskell REPL
