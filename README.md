@@ -9,7 +9,7 @@ Programming of the operating system & compiler are proceeding in tandem!
 
 - Examples of `.fun` code can be found [here](test/examples/README.md).
 - Since `.fun` is a subset of ocaml, we can leverage [ocaml](ocaml/README.md) as our development environment.
-- We test evaluation of the examples [here](test-evaluation/README.md), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
+- We test evaluation of the examples [here](test/evaluation/README.md), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
 - The generated ASM is embedded in the [runtime](x86/runtime.asm) and compiled with `nasm`.
 - The images produced from `nasm` can be run by `qemu`.
 
