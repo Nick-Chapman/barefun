@@ -38,8 +38,8 @@ data Interaction
   | IDeRef (IORef Value) (Value -> Interaction)
   | ISetRef (IORef Value) Value Interaction
 
-runInteraction :: Interaction -> IO ()
-runInteraction next = do
+runInteraction :: Bool -> Interaction -> IO ()
+runInteraction measure next = do
   hSetEcho stdin False
   hSetBuffering stdin NoBuffering
   loop state0 next
@@ -50,7 +50,7 @@ runInteraction next = do
         let State{tm} = state
         loop state { tm = Map.insertWith (+) t 1 tm } k
       IDone -> do
-        printf "[HALT:%s]\n" (show state)
+        printf "[HALT%s]\n" (if measure then ":"++show state else "")
       ITrace mes k -> do
         printf "%s" mes
         loop state k
@@ -62,7 +62,7 @@ runInteraction next = do
         loop state k
       IGet f -> do
         b <- hIsEOF stdin
-        if b then printf "[EOF:%s]\n" (show state) else do
+        if b then printf "[EOF%s]\n" (if measure then ":"++show state else "") else do
           c <- getChar
           loop state (f c)
 
