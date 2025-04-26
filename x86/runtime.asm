@@ -15,7 +15,7 @@
     bootloader_address equ 0x7c00
 
     kernel_load_address equ 0x500
-    kernel_size_in_sectors equ 38
+    kernel_size_in_sectors equ 67
 
     bootloader_relocation_address equ \
        kernel_load_address + kernel_size_in_sectors * sector_size ; 0x1100
@@ -272,6 +272,11 @@ Bare_div:
     div bx
     pop dx
     ret
+
+Bare_crash:
+    print '[Crash]'
+.spin:
+    jmp .spin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

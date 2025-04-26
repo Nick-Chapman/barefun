@@ -2384,7 +2384,7 @@ L159: ; Continuation
   jmp ax
 
 L160: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -2810,7 +2810,8 @@ L191: ; Function: t1
 L192: ; Continuation
   ;; SetRef
   mov bx, [bp+4]
-  mov [bx], g71
+  mov ax, g71
+  mov word [bx], ax
   ;; SetRef-done
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
@@ -2930,7 +2931,8 @@ L199: ; Continuation
   mov [4], sp
   ;; SetRef
   mov bx, [bp+6]
-  mov [bx], [4]
+  mov ax, [4]
+  mov word [bx], ax
   ;; SetRef-done
   mov [6], ax
   ;; (0'0) Return: prim_0'0 (t3)
@@ -2978,7 +2980,7 @@ L201: ; Continuation
   jmp ax
 
 L202: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -4014,7 +4016,7 @@ L273: ; Continuation
   jmp ax
 
 L274: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -6731,7 +6733,7 @@ L437: ; Continuation
   jmp ax
 
 L438: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -7157,7 +7159,8 @@ L469: ; Function: t1
 L470: ; Continuation
   ;; SetRef
   mov bx, [bp+4]
-  mov [bx], g179
+  mov ax, g179
+  mov word [bx], ax
   ;; SetRef-done
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
@@ -7277,7 +7280,8 @@ L477: ; Continuation
   mov [4], sp
   ;; SetRef
   mov bx, [bp+6]
-  mov [bx], [4]
+  mov ax, [4]
+  mov word [bx], ax
   ;; SetRef-done
   mov [6], ax
   ;; (0'0) Return: prim_0'0 (t3)
@@ -7325,7 +7329,7 @@ L479: ; Continuation
   jmp ax
 
 L480: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -8361,7 +8365,7 @@ L551: ; Continuation
   jmp ax
 
 L552: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -11392,7 +11396,7 @@ L736: ; Continuation
   jmp ax
 
 L737: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -11889,7 +11893,8 @@ L773: ; Continuation
   mov [4], sp
   ;; SetRef
   mov bx, [bp+6]
-  mov [bx], [4]
+  mov ax, [4]
+  mov word [bx], ax
   ;; SetRef-done
   mov [6], ax
   ;; (192'14) Return: sector (arg)
@@ -11900,7 +11905,7 @@ L773: ; Continuation
   jmp ax
 
 L774: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
@@ -12932,7 +12937,7 @@ L845: ; Continuation
   jmp ax
 
 L846: ; Continuation
-  call Bare_crash "Crash"
+  call Bare_crash
   mov [2], ax
   ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]

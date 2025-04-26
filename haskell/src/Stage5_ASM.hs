@@ -92,7 +92,7 @@ data DataLabel = DataLabel SRC.Global
 -- BareBios; primitive routines available to the compiled code
 data BareBios
   = Bare_halt
-  | Bare_crash String
+  | Bare_crash
   | Bare_put_char
   | Bare_get_char
   | Bare_make_bool_from_z
@@ -106,7 +106,7 @@ data BareBios
   | Bare_mul
   | Bare_div
   | Bare_mod
-  -- Bare_check_heap_space
+  -- Bare_check_heap_space -- TODO: generate Check at eery code entry point
   deriving Show
 
 ----------------------------------------------------------------------
@@ -131,7 +131,7 @@ instance Show Op where
     OpComment message ->  ";; " ++ message
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
     OpStore a src -> "mov [" ++ show a ++ "], " ++ show src
-    OpStoreR t src -> "mov [" ++ show t ++ "], " ++ show src
+    OpStoreR t src -> "mov word [" ++ show t ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push word " ++ show src
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
@@ -266,7 +266,7 @@ evalSource = \case
 execBare :: BareBios -> M ()
 execBare = \case
   Bare_halt -> Halt
-  Bare_crash msg -> error (printf "Bare_crash: %s" msg)
+  Bare_crash -> error "Bare_crash"
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
   Bare_put_char -> do c <- deChar <$> GetReg Ax; PutChar c
   Bare_make_bool_from_z -> do
@@ -897,11 +897,12 @@ compileBuiltin b = case b of
   SRC.SetRef -> twoArgs $ \s1 s2 ->
     [ OpComment "SetRef"
     , OpMove Bx s1
-    , OpStoreR Bx s2
+    , OpMove Ax s2
+    , OpStoreR Bx (SReg Ax)
     , OpComment "SetRef-done"
     ]
 
-  SRC.Crash -> oneArg $ \_ -> [ OpCall (Bare_crash "Crash") ]
+  SRC.Crash -> oneArg $ \_ -> [ OpCall Bare_crash ]
 
   where
     err = error (printf "Stage5.compileBuiltin: error: %s" (show b))
