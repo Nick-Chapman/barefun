@@ -27,7 +27,7 @@ For example, a simple [readline](test/examples/readline.fun):
   qemu-system-i386 image
 ```
 
-Or burned to a bootable USB stick: `dd if=image of=/dev/sda`.
+Or burned to a USB stick: `dd if=image of=/dev/sda`.
 
 ## Dev
 
