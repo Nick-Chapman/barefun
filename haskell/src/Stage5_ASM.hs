@@ -13,7 +13,7 @@ import Prelude hiding (Word)
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
-import Value (Number,tTrue,tFalse,tNil,tCons)
+import Value (Number,tTrue,tFalse,tNil)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
@@ -289,59 +289,30 @@ execBare = \case
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
   Bare_make_bytes -> do
-    case betterStringRep of
-      False -> do
-        n <- deNum <$> GetReg Ax
-        w <- dep_createListCharInMemory n
-        SetReg Ax w
-      True -> do
-        n <- deNum <$> GetReg Ax
-        w <- createBytesInMemory n
-        SetReg Ax w
+    n <- deNum <$> GetReg Ax
+    w <- createBytesInMemory n
+    SetReg Ax w
 
-  Bare_string_length ->
-    case betterStringRep of
-      False -> do
-        a <- deAddr <$> GetReg Ax
-        n <- dep_lengthOfListInMemory a
-        SetReg Ax (WNum n)
-      True -> do
-        -- TODO: no need for Bare given better string rep; just generate ops
-        -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
-        a <- deAddr <$> GetReg Ax
-        n <- deNum <$> GetMem a
-        SetReg Ax (WNum n)
+  Bare_string_length -> do
+    -- TODO: no need for Bare given better string rep; just generate ops
+    -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
+    a <- deAddr <$> GetReg Ax
+    n <- deNum <$> GetMem a
+    SetReg Ax (WNum n)
 
   Bare_set_bytes -> do
-    case betterStringRep of
-      False -> do
-        a <- deAddr <$> GetReg Ax
-        i <- deNum <$> GetReg Bx
-        c <- deChar <$> GetReg Si
-        e <- dep_getBytesElement a i
-        SetMem (addAddr 1 e) (WChar c)
-        pure ()
-      True -> do
-        a <- deAddr <$> GetReg Ax
-        i <- deNum <$> GetReg Bx
-        c <- deChar <$> GetReg Si
-        let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
-        SetMem a' (WChar c)
+    a <- deAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    c <- deChar <$> GetReg Si
+    let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
+    SetMem a' (WChar c)
 
   Bare_get_bytes -> do
-    case betterStringRep of
-      False -> do
-        a <- deAddr <$> GetReg Ax
-        i <- deNum <$> GetReg Bx
-        e <- dep_getBytesElement a i
-        c <- GetMem (addAddr 1 e)
-        SetReg Ax c
-      True -> do
-        a <- deAddr <$> GetReg Ax
-        i <- deNum <$> GetReg Bx
-        let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
-        c <- GetMem a'
-        SetReg Ax c
+    a <- deAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
+    c <- GetMem a'
+    SetReg Ax c
 
   Bare_mul -> do
     w1 <- GetReg Ax
@@ -370,42 +341,6 @@ createBytesInMemory n = loop n
       i -> do
         execPush (WChar '\0')
         loop (i-1)
-
--- Original string rep: A string is represented as a list of chars
--- We must walk the list to get the nth element. Very slow.
-
-betterStringRep :: Bool
-betterStringRep = True -- TODO: commit to this, and we can kill the dep_ function
-
-dep_lengthOfListInMemory :: Addr -> M Number
-dep_lengthOfListInMemory a = do
-  n <- deNum <$> GetMem a
-  case n of
-    0 -> pure 0
-    1 -> do
-      a' <- deAddr <$> GetMem (addAddr 2 a)
-      (1+) <$> dep_lengthOfListInMemory a'
-    _ -> error (show ("dep_lengthOfListInMemory",n))
-
-dep_getBytesElement :: Addr -> Number -> M Addr
-dep_getBytesElement a = \case
-  0 -> pure a
-  n -> do
-    a <- deAddr <$> GetMem (addAddr 2 a)
-    dep_getBytesElement a (n-1)
-
-dep_createListCharInMemory :: Number -> M Word
-dep_createListCharInMemory = loop (WAddr aNil)
-  where
-    loop w = \case
-      0 -> pure w
-      n -> do
-        execPush w
-        execPush (WChar '\0')
-        execPush (vTag tCons)
-        w <- GetReg Sp
-        loop w (n-1)
-
 
 execJump :: Jump -> M ()
 execJump = \case
@@ -635,16 +570,8 @@ compileTopDef lab = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
 
   SRC.TopLitS string ->
-    case betterStringRep of
-      False -> do
-        pure ([ w
-              | (i,c) <- zip [1..] string
-              , w <- [vTag tCons, WChar c, WAddr (Symbolic lab (i*3))]
-              ] ++ [ vTag tNil ])
-      True -> do
-        pure ([ WNum (fromIntegral $ length string) ] ++
-              [ WChar c | c <- string]
-             )
+    pure ([ WNum (fromIntegral $ length string) ] ++
+          [ WChar c | c <- string ])
 
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
