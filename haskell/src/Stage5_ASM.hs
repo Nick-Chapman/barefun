@@ -132,7 +132,7 @@ instance Show Op where
   show = \case
     OpComment message ->  ";; " ++ message
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
-    OpStore a src -> "mov [" ++ show a ++ "], " ++ show src
+    OpStore a src -> "mov [Temps+" ++ show a ++ "], " ++ show src
     OpStoreR t src -> "mov word [" ++ show t ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push word " ++ show src
@@ -152,7 +152,7 @@ instance Show Source where
   show = \case
     SReg r -> show r
     SLit w -> show w
-    SMem a -> "["++show a++"]"
+    SMem a -> "[Temps+"++show a++"]"
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show (bytesPerWord * n)++"]"
 

@@ -1,12 +1,12 @@
 L1: ; Function: g1
   call Bare_get_char
-  mov [2], ax
-  mov ax, [2]
+  mov [Temps+2], ax
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [6], ax
+  mov [Temps+6], ax
   mov bp, g1
   mov dx, g3
   jmp [bp]

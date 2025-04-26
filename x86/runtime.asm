@@ -12,10 +12,12 @@
     bootloader_address equ 0x7c00
     bootloader_relocation_address equ 0xfe00
 
-    kernel_load_address equ 0x500
+    kernel_load_address equ 0x600
     kernel_size_in_sectors equ 124 ;; max before relocated bootloader
 
     bits 16
+
+    Temps equ 0x500
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Macros
@@ -333,16 +335,22 @@ Bare_enter_check:
     ;; how much space is left before we crash into the code?
     ;; when this reaches zero, examples crash.
     ;; however, sham example crashes much earlier
-    ;; a different issue? maybe temps in page 0 ??
-    ;Dot
-    ;mov ax, sp
-    ;sub ax, end_of_code
+    ;; a different issue? maybe temps in page 0 ?? -- YES
+    mov ax, sp
+    sub ax, end_of_code
+    jb .out_of_memory
     ;push ax
     ;mov al, ah
     ;PrintHexAX
     ;pop ax
     ;PrintHexAX
+    ;Dot
     ret
+.out_of_memory:
+    Print `[OOM]\n`
+.spin:
+    call Bare_get_char ;; avoid really spinning the fans
+    jmp .spin
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -362,9 +370,9 @@ final_continuation:
 final_code:
     ;;call end_of_time_play
     Print `[HALT]\n`
-spin:
+.spin:
     call Bare_get_char ;; avoid really spinning the fans
-    jmp spin
+    jmp .spin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; dev/play

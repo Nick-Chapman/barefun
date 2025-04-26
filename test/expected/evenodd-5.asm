@@ -14,33 +14,33 @@ L3: ; Function: g1
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L1
   mov ax, dx
   sub ax, 1
-  mov [4], ax
-  mov ax, [4]
+  mov [Temps+4], ax
+  mov ax, [Temps+4]
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [6], ax
-  mov bx, [6]
+  mov [Temps+6], ax
+  mov bx, [Temps+6]
   cmp word [bx], 1
   jz L2
-  mov ax, [4]
+  mov ax, [Temps+4]
   sub ax, 1
-  mov [8], ax
+  mov [Temps+8], ax
   mov bp, g1
-  mov dx, [8]
+  mov dx, [Temps+8]
   jmp [bp]
 
 L4: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
-  mov [2], ax
-  mov dx, [2]
+  mov [Temps+2], ax
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -68,7 +68,7 @@ L7: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   push word cx
   push word L6
   mov cx, sp

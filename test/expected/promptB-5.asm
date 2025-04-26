@@ -5,15 +5,15 @@ L1: ; Arm: 9'27
 
 L2: ; Function: t3
   call Bare_get_char
-  mov [2], ax
-  mov ax, [2]
+  mov [Temps+2], ax
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [6], ax
-  mov bx, [6]
+  mov [Temps+6], ax
+  mov bx, [Temps+6]
   cmp word [bx], 1
   jz L1
   mov bp, bp
@@ -23,14 +23,14 @@ L2: ; Function: t3
 L3: ; Function: g1
   mov ax, dx
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, ' '
   call Bare_put_char
-  mov [4], ax
+  mov [Temps+4], ax
   push word dx
   push word L2
-  mov [6], sp
-  mov bp, [6]
+  mov [Temps+6], sp
+  mov bp, [Temps+6]
   mov dx, g4
   jmp [bp]
 

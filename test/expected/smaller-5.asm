@@ -9,14 +9,14 @@ L2: ; Function: g1
   cmp word [bx], 0
   jz L1
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [6], ax
+  mov [Temps+6], ax
   mov bp, g1
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L3: ; Arm: 12'9
@@ -37,26 +37,26 @@ L5: ; Function: t1
   cmp word [bx], 0
   jz L3
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
+  mov [Temps+4], ax
   push word [bp+2]
-  push word [2]
+  push word [Temps+2]
   push word 1
-  mov [6], sp
-  push word [4]
+  mov [Temps+6], sp
+  push word [Temps+4]
   push word cx
   push word L4
   mov cx, sp
   mov bp, g6
-  mov dx, [6]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L6: ; Function: g6
   push word dx
   push word L5
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -71,7 +71,7 @@ L7: ; Continuation
 L8: ; Arm: 23'27
   mov ax, `\n`
   call Bare_put_char
-  mov [6], ax
+  mov [Temps+6], ax
   push word dx
   push word cx
   push word L7
@@ -82,30 +82,30 @@ L8: ; Arm: 23'27
 
 L9: ; Function: g4
   call Bare_get_char
-  mov [2], ax
-  mov ax, [2]
+  mov [Temps+2], ax
+  mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [4], ax
-  mov bx, [4]
+  mov [Temps+4], ax
+  mov bx, [Temps+4]
   cmp word [bx], 1
   jz L8
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [6], ax
+  mov [Temps+6], ax
   push word dx
-  push word [2]
+  push word [Temps+2]
   push word 1
-  mov [8], sp
+  mov [Temps+8], sp
   mov bp, g4
-  mov dx, [8]
+  mov dx, [Temps+8]
   jmp [bp]
 
 L10: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   mov bp, g3
   mov dx, g9
   jmp [bp]
@@ -122,10 +122,10 @@ L11: ; Continuation
 L12: ; Function: g3
   mov ax, '%'
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, ' '
   call Bare_put_char
-  mov [4], ax
+  mov [Temps+4], ax
   push word cx
   push word L11
   mov cx, sp

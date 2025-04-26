@@ -6,8 +6,8 @@ L1: ; Function: t1
 L2: ; Function: g1
   push word dx
   push word L1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -22,8 +22,8 @@ L4: ; Continuation
   call Bare_enter_check
   mov ax, 1
   add ax, dx
-  mov [2], ax
-  mov dx, [2]
+  mov [Temps+2], ax
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -33,14 +33,14 @@ L5: ; Function: g2
   cmp word [bx], 0
   jz L3
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
+  mov [Temps+4], ax
   push word cx
   push word L4
   mov cx, sp
   mov bp, g2
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L6: ; Arm: 26'7
@@ -54,8 +54,8 @@ L7: ; Continuation
   push word dx
   push word [bp+4]
   push word 1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -87,23 +87,23 @@ L10: ; Function: t1
   cmp word [bx], 0
   jz L6
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  push word [4]
+  mov [Temps+4], ax
+  push word [Temps+4]
   push word [bp+2]
   push word cx
   push word L9
   mov cx, sp
   mov bp, [bp+2]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L11: ; Function: g3
   push word dx
   push word L10
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -136,23 +136,23 @@ L15: ; Function: t1
   cmp word [bx], 0
   jz L12
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  push word [4]
+  mov [Temps+4], ax
+  push word [Temps+4]
   push word [bp+2]
   push word cx
   push word L14
   mov cx, sp
   mov bp, [bp+2]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L16: ; Function: g5
   push word dx
   push word L15
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -175,26 +175,26 @@ L19: ; Function: t1
   cmp word [bx], 0
   jz L17
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
+  mov [Temps+4], ax
   push word [bp+2]
-  push word [2]
+  push word [Temps+2]
   push word 1
-  mov [6], sp
-  push word [4]
+  mov [Temps+6], sp
+  push word [Temps+4]
   push word cx
   push word L18
   mov cx, sp
   mov bp, g7
-  mov dx, [6]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L20: ; Function: g7
   push word dx
   push word L19
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -217,23 +217,23 @@ L23: ; Function: t1
   cmp word [bx], 0
   jz L21
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, [bp+2]
   mov bx, [bp+4]
-  mov si, [2]
+  mov si, [Temps+2]
   call Bare_set_bytes
-  mov [6], ax
+  mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
-  mov [8], ax
-  push word [4]
+  mov [Temps+8], ax
+  push word [Temps+4]
   push word cx
   push word L22
   mov cx, sp
   mov bp, [bp+6]
-  mov dx, [8]
+  mov dx, [Temps+8]
   jmp [bp]
 
 L24: ; Function: t2
@@ -241,8 +241,8 @@ L24: ; Function: t2
   push word dx
   push word [bp+2]
   push word L23
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -250,8 +250,8 @@ L24: ; Function: t2
 L25: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
-  mov [2], ax
-  mov dx, [2]
+  mov [Temps+2], ax
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -271,16 +271,16 @@ L27: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_make_bytes
-  mov [2], ax
-  push word [2]
+  mov [Temps+2], ax
+  push word [Temps+2]
   push word L24
-  mov [4], sp
-  push word [2]
+  mov [Temps+4], sp
+  push word [Temps+2]
   push word [bp+4]
   push word cx
   push word L26
   mov cx, sp
-  mov bp, [4]
+  mov bp, [Temps+4]
   mov dx, 0
   jmp [bp]
 
@@ -311,23 +311,23 @@ L31: ; Function: t1
   cmp word [bx], 0
   jz L29
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, [bp+2]
   mov bx, [bp+4]
-  mov si, [2]
+  mov si, [Temps+2]
   call Bare_set_bytes
-  mov [6], ax
+  mov [Temps+6], ax
   mov ax, [bp+4]
   sub ax, 1
-  mov [8], ax
-  push word [4]
+  mov [Temps+8], ax
+  push word [Temps+4]
   push word cx
   push word L30
   mov cx, sp
   mov bp, [bp+6]
-  mov dx, [8]
+  mov dx, [Temps+8]
   jmp [bp]
 
 L32: ; Function: t2
@@ -335,8 +335,8 @@ L32: ; Function: t2
   push word dx
   push word [bp+2]
   push word L31
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -344,8 +344,8 @@ L32: ; Function: t2
 L33: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
-  mov [2], ax
-  mov dx, [2]
+  mov [Temps+2], ax
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -365,20 +365,20 @@ L35: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_make_bytes
-  mov [2], ax
-  push word [2]
+  mov [Temps+2], ax
+  push word [Temps+2]
   push word L32
-  mov [4], sp
+  mov [Temps+4], sp
   mov ax, dx
   sub ax, 1
-  mov [6], ax
-  push word [2]
+  mov [Temps+6], ax
+  push word [Temps+2]
   push word [bp+4]
   push word cx
   push word L34
   mov cx, sp
-  mov bp, [4]
-  mov dx, [6]
+  mov bp, [Temps+4]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L36: ; Function: g11
@@ -400,33 +400,33 @@ L38: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   sub ax, 1
-  mov [2], ax
+  mov [Temps+2], ax
   mov bp, dx
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L39: ; Function: t1
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L37
   mov ax, [bp+2]
   mov bx, dx
   call Bare_get_bytes
-  mov [4], ax
+  mov [Temps+4], ax
   push word [bp+4]
-  push word [4]
+  push word [Temps+4]
   push word 1
-  mov [6], sp
+  mov [Temps+6], sp
   push word dx
   push word cx
   push word L38
   mov cx, sp
   mov bp, [bp+6]
-  mov dx, [6]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L40: ; Function: t1
@@ -434,8 +434,8 @@ L40: ; Function: t1
   push word dx
   push word [bp+2]
   push word L39
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -444,23 +444,23 @@ L41: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   sub ax, 1
-  mov [2], ax
+  mov [Temps+2], ax
   mov bp, dx
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L42: ; Function: g13
   push word dx
   push word L40
-  mov [2], sp
+  mov [Temps+2], sp
   mov ax, dx
   call Bare_string_length
-  mov [4], ax
-  push word [4]
+  mov [Temps+4], ax
+  push word [Temps+4]
   push word cx
   push word L41
   mov cx, sp
-  mov bp, [2]
+  mov bp, [Temps+2]
   mov dx, g12
   jmp [bp]
 
@@ -489,9 +489,9 @@ L46: ; Continuation
   jz L45
   mov ax, [bp+4]
   sub ax, 1
-  mov [2], ax
+  mov [Temps+2], ax
   mov bp, [bp+6]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L47: ; Arm: 8'9
@@ -504,28 +504,28 @@ L48: ; Function: t1
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L44
   mov ax, [bp+2]
   mov bx, dx
   call Bare_get_bytes
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, [bp+4]
   mov bx, dx
   call Bare_get_bytes
-  mov [6], ax
-  mov ax, [4]
-  cmp word ax, [6]
+  mov [Temps+6], ax
+  mov ax, [Temps+4]
+  cmp word ax, [Temps+6]
   call Bare_make_bool_from_z
-  mov [8], ax
+  mov [Temps+8], ax
   push word bp
   push word dx
   push word cx
   push word L46
   mov cx, sp
-  mov bx, [8]
+  mov bx, [Temps+8]
   cmp word [bx], 1
   jz L47
   mov dx, g19
@@ -541,12 +541,12 @@ L49: ; Continuation
   push word [bp+6]
   push word [bp+4]
   push word L48
-  mov [2], sp
+  mov [Temps+2], sp
   mov ax, [bp+8]
   sub ax, 1
-  mov [4], ax
-  mov bp, [2]
-  mov dx, [4]
+  mov [Temps+4], ax
+  mov bp, [Temps+2]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L50: ; Arm: 8'9
@@ -558,21 +558,21 @@ L50: ; Arm: 8'9
 L51: ; Function: t1
   mov ax, [bp+2]
   call Bare_string_length
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, dx
   call Bare_string_length
-  mov [4], ax
-  mov ax, [2]
-  cmp word ax, [4]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
+  cmp word ax, [Temps+4]
   call Bare_make_bool_from_z
-  mov [6], ax
-  push word [2]
+  mov [Temps+6], ax
+  push word [Temps+2]
   push word dx
   push word [bp+2]
   push word cx
   push word L49
   mov cx, sp
-  mov bx, [6]
+  mov bx, [Temps+6]
   cmp word [bx], 1
   jz L50
   mov dx, g15
@@ -583,8 +583,8 @@ L51: ; Function: t1
 L52: ; Function: g21
   push word dx
   push word L51
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -602,28 +602,28 @@ L54: ; Continuation
   jmp [bp]
 
 L55: ; Arm: 99'19
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [10], ax
-  mov dx, [10]
+  mov [Temps+10], ax
+  mov dx, [Temps+10]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L56: ; Arm: 100'22
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [12], ax
-  mov dx, [12]
+  mov [Temps+12], ax
+  mov dx, [Temps+12]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L57: ; Arm: 101'16
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [14], ax
-  mov dx, [14]
+  mov [Temps+14], ax
+  mov dx, [Temps+14]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -633,53 +633,53 @@ L58: ; Function: g24
   cmp word [bx], 0
   jz L53
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   call Bare_char_to_num
-  mov [6], ax
-  mov ax, [6]
+  mov [Temps+6], ax
+  mov ax, [Temps+6]
   cmp word ax, 8
   call Bare_make_bool_from_z
-  mov [8], ax
-  push word [4]
+  mov [Temps+8], ax
+  push word [Temps+4]
   push word cx
   push word L54
   mov cx, sp
-  mov bx, [8]
+  mov bx, [Temps+8]
   cmp word [bx], 1
   jz L55
-  mov ax, [2]
+  mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [10], ax
-  mov bx, [10]
+  mov [Temps+10], ax
+  mov bx, [Temps+10]
   cmp word [bx], 1
   jz L56
   mov ax, 26
-  cmp word ax, [6]
+  cmp word ax, [Temps+6]
   call Bare_make_bool_from_n
-  mov [12], ax
-  mov bx, [12]
+  mov [Temps+12], ax
+  mov bx, [Temps+12]
   cmp word [bx], 1
   jz L57
   mov ax, '^'
   call Bare_put_char
-  mov [14], ax
+  mov [Temps+14], ax
   mov ax, 65
-  add ax, [6]
-  mov [16], ax
-  mov ax, [16]
+  add ax, [Temps+6]
+  mov [Temps+16], ax
+  mov ax, [Temps+16]
   sub ax, 1
-  mov [18], ax
-  mov ax, [18]
+  mov [Temps+18], ax
+  mov ax, [Temps+18]
   call Bare_num_to_char
-  mov [20], ax
-  mov ax, [20]
+  mov [Temps+20], ax
+  mov ax, [Temps+20]
   call Bare_put_char
-  mov [22], ax
-  mov dx, [22]
+  mov [Temps+22], ax
+  mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -694,8 +694,8 @@ L60: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   add ax, dx
-  mov [2], ax
-  mov dx, [2]
+  mov [Temps+2], ax
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -704,41 +704,41 @@ L61: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   sub ax, 2
-  mov [2], ax
+  mov [Temps+2], ax
   push word dx
   push word cx
   push word L60
   mov cx, sp
   mov bp, g54
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L62: ; Function: g54
   mov ax, dx
   cmp word ax, 2
   call Bare_make_bool_from_n
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L59
   mov ax, dx
   sub ax, 1
-  mov [4], ax
+  mov [Temps+4], ax
   push word dx
   push word cx
   push word L61
   mov cx, sp
   mov bp, g54
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L63: ; Function: g82
   mov bx, dx
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov dx, [2]
+  mov [Temps+4], ax
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -746,8 +746,8 @@ L63: ; Function: g82
 L64: ; Arm: 266'9
   push word [bp+2]
   push word 1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -771,27 +771,27 @@ L67: ; Continuation
   cmp word [bx], 0
   jz L65
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, 10
   mov bx, [bp+4]
   call Bare_mul
-  mov [4], ax
-  mov ax, [4]
-  add ax, [2]
-  mov [6], ax
+  mov [Temps+4], ax
+  mov ax, [Temps+4]
+  add ax, [Temps+2]
+  mov [Temps+6], ax
   push word [bp+6]
   push word cx
   push word L66
   mov cx, sp
   mov bp, g88
-  mov dx, [6]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L68: ; Arm: 261'27
   push word [bp+4]
   push word 1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -816,12 +816,12 @@ L71: ; Arm: 261'12
   mov ax, 9
   cmp word ax, [bp+8]
   call Bare_make_bool_from_n
-  mov [2], ax
+  mov [Temps+2], ax
   push word [bp+8]
   push word cx
   push word L69
   mov cx, sp
-  mov bx, [2]
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L70
   mov dx, g92
@@ -855,26 +855,26 @@ L74: ; Function: t1
   cmp word [bx], 0
   jz L64
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   call Bare_char_to_num
-  mov [6], ax
-  mov ax, [6]
+  mov [Temps+6], ax
+  mov ax, [Temps+6]
   sub ax, 48
-  mov [8], ax
-  mov ax, [8]
+  mov [Temps+8], ax
+  mov ax, [Temps+8]
   cmp word ax, 0
   call Bare_make_bool_from_n
-  mov [10], ax
-  push word [8]
-  push word [4]
+  mov [Temps+10], ax
+  push word [Temps+8]
+  push word [Temps+4]
   push word [bp+2]
   push word cx
   push word L72
   mov cx, sp
-  mov bx, [10]
+  mov bx, [Temps+10]
   cmp word [bx], 1
   jz L73
   mov dx, g90
@@ -885,8 +885,8 @@ L74: ; Function: t1
 L75: ; Function: g88
   push word dx
   push word L74
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -902,46 +902,46 @@ L77: ; Continuation
   mov ax, [bp+4]
   mov bx, 10
   call Bare_div
-  mov [2], ax
+  mov [Temps+2], ax
   mov bp, dx
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L78: ; Function: t1
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L76
   mov ax, dx
   mov bx, 10
   call Bare_mod
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, 48
-  add ax, [4]
-  mov [6], ax
-  mov ax, [6]
+  add ax, [Temps+4]
+  mov [Temps+6], ax
+  mov ax, [Temps+6]
   call Bare_num_to_char
-  mov [8], ax
+  mov [Temps+8], ax
   push word [bp+2]
-  push word [8]
+  push word [Temps+8]
   push word 1
-  mov [10], sp
+  mov [Temps+10], sp
   push word dx
   push word cx
   push word L77
   mov cx, sp
   mov bp, g99
-  mov dx, [10]
+  mov dx, [Temps+10]
   jmp [bp]
 
 L79: ; Function: g99
   push word dx
   push word L78
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -957,46 +957,46 @@ L81: ; Continuation
   mov ax, [bp+4]
   mov bx, 10
   call Bare_div
-  mov [2], ax
+  mov [Temps+2], ax
   mov bp, dx
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L82: ; Function: t1
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L80
   mov ax, dx
   mov bx, 10
   call Bare_mod
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, 48
-  add ax, [4]
-  mov [6], ax
-  mov ax, [6]
+  add ax, [Temps+4]
+  mov [Temps+6], ax
+  mov ax, [Temps+6]
   call Bare_num_to_char
-  mov [8], ax
+  mov [Temps+8], ax
   push word [bp+2]
-  push word [8]
+  push word [Temps+8]
   push word 1
-  mov [10], sp
+  mov [Temps+10], sp
   push word dx
   push word cx
   push word L81
   mov cx, sp
   mov bp, g103
-  mov dx, [10]
+  mov dx, [Temps+10]
   jmp [bp]
 
 L83: ; Function: g103
   push word dx
   push word L82
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1086,17 +1086,17 @@ L92: ; Function: t1
   cmp word [bx], 0
   jz L84
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  push word [2]
+  mov [Temps+4], ax
+  push word [Temps+2]
   push word [bp+4]
   push word [bp+2]
   push word cx
   push word L91
   mov cx, sp
   mov bp, bp
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L93: ; Continuation
@@ -1104,8 +1104,8 @@ L93: ; Continuation
   push word [bp+4]
   push word dx
   push word 1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1131,17 +1131,17 @@ L96: ; Continuation
   push word [bp+6]
   push word dx
   push word 1
-  mov [2], sp
+  mov [Temps+2], sp
   push word [bp+8]
   push word cx
   push word L95
   mov cx, sp
   mov bp, [bp+4]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L97: ; Arm: 159'26
-  push word [4]
+  push word [Temps+4]
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -1163,13 +1163,13 @@ L99: ; Continuation
   push word [bp+4]
   push word [bp+6]
   push word 1
-  mov [2], sp
+  mov [Temps+2], sp
   push word [bp+8]
   push word cx
   push word L98
   mov cx, sp
   mov bp, dx
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L100: ; Function: t1
@@ -1177,18 +1177,18 @@ L100: ; Function: t1
   cmp word [bx], 0
   jz L94
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   cmp word ax, ' '
   call Bare_make_bool_from_z
-  mov [6], ax
-  mov bx, [6]
+  mov [Temps+6], ax
+  mov bx, [Temps+6]
   cmp word [bx], 1
   jz L97
-  push word [4]
-  push word [2]
+  push word [Temps+4]
+  push word [Temps+2]
   push word [bp+10]
   push word cx
   push word L99
@@ -1204,8 +1204,8 @@ L101: ; Function: t1
   push word [bp+4]
   push word [bp+2]
   push word L100
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1216,8 +1216,8 @@ L102: ; Function: t1
   push word [bp+4]
   push word [bp+2]
   push word L101
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1236,7 +1236,7 @@ L104: ; Continuation
   jmp [bp]
 
 L105: ; Arm: 166'24
-  push word [4]
+  push word [Temps+4]
   push word cx
   push word L104
   mov cx, sp
@@ -1256,13 +1256,13 @@ L107: ; Continuation
   push word g26
   push word [bp+4]
   push word 1
-  mov [2], sp
+  mov [Temps+2], sp
   push word [bp+6]
   push word cx
   push word L106
   mov cx, sp
   mov bp, dx
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L108: ; Function: t2
@@ -1270,18 +1270,18 @@ L108: ; Function: t2
   cmp word [bx], 0
   jz L103
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   cmp word ax, ' '
   call Bare_make_bool_from_z
-  mov [6], ax
-  mov bx, [6]
+  mov [Temps+6], ax
+  mov bx, [Temps+6]
   cmp word [bx], 1
   jz L105
-  push word [4]
-  push word [2]
+  push word [Temps+4]
+  push word [Temps+2]
   push word cx
   push word L107
   mov cx, sp
@@ -1293,13 +1293,13 @@ L109: ; Function: t2
   push word bp
   push word [bp+2]
   push word L102
-  mov [2], sp
-  push word [2]
+  mov [Temps+2], sp
+  push word [Temps+2]
   push word bp
   push word dx
   push word L108
-  mov [4], sp
-  mov dx, [4]
+  mov [Temps+4], sp
+  mov dx, [Temps+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1307,7 +1307,7 @@ L109: ; Function: t2
 L110: ; Arm: 138'22
   mov ax, `\n`
   call Bare_put_char
-  mov [8], ax
+  mov [Temps+8], ax
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
@@ -1315,19 +1315,19 @@ L110: ; Arm: 138'22
 L111: ; Arm: 139'28
   mov ax, '^'
   call Bare_put_char
-  mov [10], ax
+  mov [Temps+10], ax
   mov ax, 'D'
   call Bare_put_char
-  mov [12], ax
+  mov [Temps+12], ax
   mov ax, `\n`
   call Bare_put_char
-  mov [14], ax
+  mov [Temps+14], ax
   push word dx
   push word 4
   push word 1
-  mov [16], sp
+  mov [Temps+16], sp
   mov bp, [bp+2]
-  mov dx, [16]
+  mov dx, [Temps+16]
   jmp [bp]
 
 L112: ; Arm: 140'19
@@ -1344,13 +1344,13 @@ L114: ; Continuation
   call Bare_enter_check
   mov ax, 8
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, ' '
   call Bare_put_char
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, 8
   call Bare_put_char
-  mov [6], ax
+  mov [Temps+6], ax
   mov dx, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
@@ -1358,14 +1358,14 @@ L114: ; Continuation
 L115: ; Arm: 145'31
   mov ax, 8
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, ' '
   call Bare_put_char
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, 8
   call Bare_put_char
-  mov [6], ax
-  mov dx, [6]
+  mov [Temps+6], ax
+  mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1396,22 +1396,22 @@ L118: ; Arm: 141'21
   cmp word [bx], 0
   jz L113
   mov ax, [bx+2]
-  mov [14], ax
+  mov [Temps+14], ax
   mov ax, [bx+4]
-  mov [16], ax
-  mov ax, [14]
+  mov [Temps+16], ax
+  mov ax, [Temps+14]
   call Bare_char_to_num
-  mov [18], ax
+  mov [Temps+18], ax
   mov ax, 26
-  cmp word ax, [18]
+  cmp word ax, [Temps+18]
   call Bare_make_bool_from_n
-  mov [20], ax
-  push word [16]
+  mov [Temps+20], ax
+  push word [Temps+16]
   push word bp
   push word cx
   push word L116
   mov cx, sp
-  mov bx, [20]
+  mov bx, [Temps+20]
   cmp word [bx], 1
   jz L117
   mov dx, g31
@@ -1424,118 +1424,118 @@ L119: ; Continuation
   push word [bp+4]
   push word [bp+8]
   push word 1
-  mov [2], sp
+  mov [Temps+2], sp
   mov bp, [bp+6]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L120: ; Arm: 99'19
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [18], ax
-  mov dx, [18]
+  mov [Temps+18], ax
+  mov dx, [Temps+18]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L121: ; Arm: 100'22
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [20], ax
-  mov dx, [20]
+  mov [Temps+20], ax
+  mov dx, [Temps+20]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L122: ; Arm: 101'16
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_put_char
-  mov [22], ax
-  mov dx, [22]
+  mov [Temps+22], ax
+  mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L123: ; Function: t1
   call Bare_get_char
-  mov [2], ax
-  mov ax, [2]
+  mov [Temps+2], ax
+  mov ax, [Temps+2]
   call Bare_char_to_num
-  mov [4], ax
-  mov ax, [2]
+  mov [Temps+4], ax
+  mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [6], ax
-  mov bx, [6]
+  mov [Temps+6], ax
+  mov bx, [Temps+6]
   cmp word [bx], 1
   jz L110
-  mov ax, [2]
+  mov ax, [Temps+2]
   cmp word ax, 4
   call Bare_make_bool_from_z
-  mov [8], ax
-  mov bx, [8]
+  mov [Temps+8], ax
+  mov bx, [Temps+8]
   cmp word [bx], 1
   jz L111
   mov ax, 127
-  cmp word ax, [4]
+  cmp word ax, [Temps+4]
   call Bare_make_bool_from_n
-  mov [10], ax
-  mov bx, [10]
+  mov [Temps+10], ax
+  mov bx, [Temps+10]
   cmp word [bx], 1
   jz L112
-  mov ax, [4]
+  mov ax, [Temps+4]
   cmp word ax, 127
   call Bare_make_bool_from_z
-  mov [12], ax
-  mov bx, [12]
+  mov [Temps+12], ax
+  mov bx, [Temps+12]
   cmp word [bx], 1
   jz L118
-  mov ax, [2]
+  mov ax, [Temps+2]
   call Bare_char_to_num
-  mov [14], ax
-  mov ax, [14]
+  mov [Temps+14], ax
+  mov ax, [Temps+14]
   cmp word ax, 8
   call Bare_make_bool_from_z
-  mov [16], ax
-  push word [2]
+  mov [Temps+16], ax
+  push word [Temps+2]
   push word bp
   push word dx
   push word cx
   push word L119
   mov cx, sp
-  mov bx, [16]
+  mov bx, [Temps+16]
   cmp word [bx], 1
   jz L120
-  mov ax, [2]
+  mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [18], ax
-  mov bx, [18]
+  mov [Temps+18], ax
+  mov bx, [Temps+18]
   cmp word [bx], 1
   jz L121
   mov ax, 26
-  cmp word ax, [14]
+  cmp word ax, [Temps+14]
   call Bare_make_bool_from_n
-  mov [20], ax
-  mov bx, [20]
+  mov [Temps+20], ax
+  mov bx, [Temps+20]
   cmp word [bx], 1
   jz L122
   mov ax, '^'
   call Bare_put_char
-  mov [22], ax
+  mov [Temps+22], ax
   mov ax, 65
-  add ax, [14]
-  mov [24], ax
-  mov ax, [24]
+  add ax, [Temps+14]
+  mov [Temps+24], ax
+  mov ax, [Temps+24]
   sub ax, 1
-  mov [26], ax
-  mov ax, [26]
+  mov [Temps+26], ax
+  mov ax, [Temps+26]
   call Bare_num_to_char
-  mov [28], ax
-  mov ax, [28]
+  mov [Temps+28], ax
+  mov ax, [Temps+28]
   call Bare_put_char
-  mov [30], ax
-  mov dx, [30]
+  mov [Temps+30], ax
+  mov dx, [Temps+30]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1567,8 +1567,8 @@ L127: ; Arm: 183'9
 L128: ; Arm: 187'35
   push word [bp+8]
   push word 1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -1600,23 +1600,23 @@ L131: ; Function: t3
   cmp word [bx], 0
   jz L127
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov bx, [2]
+  mov [Temps+4], ax
+  mov bx, [Temps+2]
   mov ax, [bx+2]
-  mov [6], ax
+  mov [Temps+6], ax
   mov ax, [bx+4]
-  mov [8], ax
-  push word [8]
-  push word [4]
+  mov [Temps+8], ax
+  push word [Temps+8]
+  push word [Temps+4]
   push word bp
   push word [bp+4]
   push word cx
   push word L130
   mov cx, sp
   mov bp, [bp+2]
-  mov dx, [6]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L132: ; Continuation
@@ -2413,7 +2413,7 @@ L192: ; Continuation
 
 L193: ; Arm: 207'14
   mov ax, [bx+2]
-  mov [4], ax
+  mov [Temps+4], ax
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2438,18 +2438,18 @@ L195: ; Continuation
   cmp word [bx], 0
   jz L162
   mov ax, [bx+2]
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 0
   jz L193
   mov ax, [bx+2]
-  mov [4], ax
+  mov [Temps+4], ax
   push word [bp+12]
   push word cx
   push word L194
   mov cx, sp
   mov dx, [bp+8]
-  mov bp, [4]
+  mov bp, [Temps+4]
   jmp [bp]
 
 L196: ; Continuation
@@ -2476,16 +2476,16 @@ L197: ; Continuation
   cmp word [bx], 0
   jz L126
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  push word [2]
+  mov [Temps+4], ax
+  push word [Temps+2]
   push word [bp+8]
   push word L131
-  mov [6], sp
-  push word [6]
-  push word [4]
-  push word [2]
+  mov [Temps+6], sp
+  push word [Temps+6]
+  push word [Temps+4]
+  push word [Temps+2]
   push word [bp+10]
   push word [bp+6]
   push word [bp+4]
@@ -2494,8 +2494,8 @@ L197: ; Continuation
   mov cx, sp
   mov bx, [bp+10]
   mov ax, [bx+2]
-  mov [8], ax
-  mov dx, [8]
+  mov [Temps+8], ax
+  mov dx, [Temps+8]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -2615,7 +2615,7 @@ L205: ; Continuation
   call Bare_enter_check
   push word [bp+6]
   push word L123
-  mov [2], sp
+  mov [Temps+2], sp
   push word dx
   push word [bp+16]
   push word [bp+14]
@@ -2626,7 +2626,7 @@ L205: ; Continuation
   push word cx
   push word L204
   mov cx, sp
-  mov bp, [2]
+  mov bp, [Temps+2]
   mov dx, g33
   jmp [bp]
 
@@ -2635,7 +2635,7 @@ L206: ; Continuation
   push word g28
   push word 4
   push word 1
-  mov [2], sp
+  mov [Temps+2], sp
   push word [bp+16]
   push word [bp+14]
   push word [bp+12]
@@ -2647,7 +2647,7 @@ L206: ; Continuation
   push word L205
   mov cx, sp
   mov bp, [bp+4]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L207: ; Continuation
@@ -2716,8 +2716,8 @@ L212: ; Arm: 183'9
 L213: ; Arm: 187'35
   push word [bp+8]
   push word 1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -2749,23 +2749,23 @@ L216: ; Function: t3
   cmp word [bx], 0
   jz L212
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov bx, [2]
+  mov [Temps+4], ax
+  mov bx, [Temps+2]
   mov ax, [bx+2]
-  mov [6], ax
+  mov [Temps+6], ax
   mov ax, [bx+4]
-  mov [8], ax
-  push word [8]
-  push word [4]
+  mov [Temps+8], ax
+  push word [Temps+8]
+  push word [Temps+4]
   push word bp
   push word [bp+4]
   push word cx
   push word L215
   mov cx, sp
   mov bp, [bp+2]
-  mov dx, [6]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L217: ; Arm: 183'9
@@ -2777,8 +2777,8 @@ L217: ; Arm: 183'9
 L218: ; Arm: 187'35
   push word [bp+8]
   push word 1
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -2810,23 +2810,23 @@ L221: ; Function: t1
   cmp word [bx], 0
   jz L217
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov bx, [2]
+  mov [Temps+4], ax
+  mov bx, [Temps+2]
   mov ax, [bx+2]
-  mov [6], ax
+  mov [Temps+6], ax
   mov ax, [bx+4]
-  mov [8], ax
-  push word [8]
-  push word [4]
+  mov [Temps+8], ax
+  push word [Temps+8]
+  push word [Temps+4]
   push word bp
   push word [bp+4]
   push word cx
   push word L220
   mov cx, sp
   mov bp, [bp+2]
-  mov dx, [6]
+  mov dx, [Temps+6]
   jmp [bp]
 
 L222: ; Continuation
@@ -2848,17 +2848,17 @@ L224: ; Arm: 233'11
   push word g75
   push word [bp+8]
   push word 1
-  mov [2], sp
-  push word [2]
+  mov [Temps+2], sp
+  push word [Temps+2]
   push word g72
   push word 1
-  mov [4], sp
+  mov [Temps+4], sp
   push word [bp+4]
   push word cx
   push word L223
   mov cx, sp
   mov bp, [bp+6]
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L225: ; Continuation
@@ -2869,12 +2869,12 @@ L225: ; Continuation
 
 L226: ; Arm: 236'16
   mov ax, [bx+2]
-  mov [4], ax
+  mov [Temps+4], ax
   push word cx
   push word L225
   mov cx, sp
   mov bp, [bp+4]
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L227: ; Continuation
@@ -2898,26 +2898,26 @@ L229: ; Continuation
   cmp word [bx], 0
   jz L224
   mov ax, [bx+2]
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 0
   jz L226
   mov ax, [bx+2]
-  mov [4], ax
+  mov [Temps+4], ax
   push word g79
   push word [bp+8]
   push word 1
-  mov [6], sp
-  push word [6]
+  mov [Temps+6], sp
+  push word [Temps+6]
   push word g76
   push word 1
-  mov [8], sp
+  mov [Temps+8], sp
   push word [bp+4]
   push word cx
   push word L228
   mov cx, sp
   mov bp, [bp+6]
-  mov dx, [8]
+  mov dx, [Temps+8]
   jmp [bp]
 
 L230: ; Continuation
@@ -2936,8 +2936,8 @@ L231: ; Function: t1
   push word dx
   push word [bp+4]
   push word L221
-  mov [2], sp
-  push word [2]
+  mov [Temps+2], sp
+  push word [Temps+2]
   push word dx
   push word [bp+6]
   push word [bp+2]
@@ -2946,8 +2946,8 @@ L231: ; Function: t1
   mov cx, sp
   mov bx, [bp+8]
   mov ax, [bx+2]
-  mov [4], ax
-  mov dx, [4]
+  mov [Temps+4], ax
+  mov dx, [Temps+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -2977,14 +2977,14 @@ L234: ; Continuation
   push word [bp+6]
   push word [bp+4]
   push word L231
-  mov [2], sp
+  mov [Temps+2], sp
   push word [bp+12]
   push word [bp+10]
   push word cx
   push word L233
   mov cx, sp
   mov bp, g5
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L235: ; Continuation
@@ -3006,17 +3006,17 @@ L237: ; Arm: 233'11
   push word g66
   push word [bp+12]
   push word 1
-  mov [2], sp
-  push word [2]
+  mov [Temps+2], sp
+  push word [Temps+2]
   push word g63
   push word 1
-  mov [4], sp
+  mov [Temps+4], sp
   push word [bp+4]
   push word cx
   push word L236
   mov cx, sp
   mov bp, [bp+8]
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L238: ; Continuation
@@ -3027,12 +3027,12 @@ L238: ; Continuation
 
 L239: ; Arm: 236'16
   mov ax, [bx+2]
-  mov [4], ax
+  mov [Temps+4], ax
   push word cx
   push word L238
   mov cx, sp
   mov bp, [bp+4]
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L240: ; Continuation
@@ -3064,26 +3064,26 @@ L242: ; Continuation
   cmp word [bx], 0
   jz L237
   mov ax, [bx+2]
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 0
   jz L239
   mov ax, [bx+2]
-  mov [4], ax
+  mov [Temps+4], ax
   push word g70
   push word [bp+12]
   push word 1
-  mov [6], sp
-  push word [6]
+  mov [Temps+6], sp
+  push word [Temps+6]
   push word g67
   push word 1
-  mov [8], sp
+  mov [Temps+8], sp
   push word [bp+4]
   push word cx
   push word L241
   mov cx, sp
   mov bp, [bp+8]
-  mov dx, [8]
+  mov dx, [Temps+8]
   jmp [bp]
 
 L243: ; Continuation
@@ -3106,16 +3106,16 @@ L244: ; Function: t1
   cmp word [bx], 0
   jz L211
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  push word [2]
+  mov [Temps+4], ax
+  push word [Temps+2]
   push word [bp+4]
   push word L216
-  mov [6], sp
-  push word [6]
-  push word [4]
-  push word [2]
+  mov [Temps+6], sp
+  push word [Temps+6]
+  push word [Temps+4]
+  push word [Temps+2]
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -3125,8 +3125,8 @@ L244: ; Function: t1
   mov cx, sp
   mov bx, [bp+8]
   mov ax, [bx+2]
-  mov [8], ax
-  mov dx, [8]
+  mov [Temps+8], ax
+  mov dx, [Temps+8]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -3137,8 +3137,8 @@ L245: ; Function: t1
   push word [bp+4]
   push word [bp+2]
   push word L244
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -3162,9 +3162,9 @@ L247: ; Continuation
 
 L248: ; Arm: 225'9
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
+  mov [Temps+4], ax
   push word [bp+4]
   push word cx
   push word L247
@@ -3201,26 +3201,26 @@ L252: ; Function: t1
   cmp word [bx], 0
   jz L249
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, ' '
   call Bare_put_char
-  mov [6], ax
-  push word [4]
+  mov [Temps+6], ax
+  push word [Temps+4]
   push word bp
   push word cx
   push word L251
   mov cx, sp
   mov bp, [bp+2]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L253: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
@@ -3253,7 +3253,7 @@ L257: ; Continuation
   call Bare_enter_check
   push word [bp+4]
   push word L252
-  mov [2], sp
+  mov [Temps+2], sp
   push word [bp+6]
   push word cx
   push word L253
@@ -3262,16 +3262,16 @@ L257: ; Continuation
   cmp word [bx], 0
   jz L254
   mov ax, [bx+2]
-  mov [4], ax
+  mov [Temps+4], ax
   mov ax, [bx+4]
-  mov [6], ax
-  push word [6]
-  push word [2]
+  mov [Temps+6], ax
+  push word [Temps+6]
+  push word [Temps+2]
   push word cx
   push word L256
   mov cx, sp
   mov bp, [bp+4]
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L258: ; Continuation
@@ -3295,8 +3295,8 @@ L259: ; Continuation
   mov cx, sp
   mov bx, [bp+6]
   mov ax, [bx+2]
-  mov [2], ax
-  mov dx, [2]
+  mov [Temps+2], ax
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -3318,8 +3318,8 @@ L261: ; Function: t4
   push word dx
   push word [bp+2]
   push word L260
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -3369,9 +3369,9 @@ L266: ; Continuation
 
 L267: ; Arm: 279'12
   mov ax, [bx+2]
-  mov [6], ax
+  mov [Temps+6], ax
   mov ax, [bx+4]
-  mov [8], ax
+  mov [Temps+8], ax
   push word [bp+4]
   push word cx
   push word L266
@@ -3416,12 +3416,12 @@ L272: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bp+4]
   add ax, 1
-  mov [4], ax
+  mov [Temps+4], ax
   mov bp, [bp+6]
-  mov dx, [4]
+  mov dx, [Temps+4]
   jmp [bp]
 
 L273: ; Continuation
@@ -3439,8 +3439,8 @@ L274: ; Arm: 118'11
   push word g104
   push word '0'
   push word 1
-  mov [4], sp
-  mov dx, [4]
+  mov [Temps+4], sp
+  mov dx, [Temps+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -3457,13 +3457,13 @@ L276: ; Continuation
   mov ax, [bp+8]
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [2], ax
+  mov [Temps+2], ax
   push word [bp+6]
   push word [bp+4]
   push word cx
   push word L273
   mov cx, sp
-  mov bx, [2]
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L274
   push word [bp+8]
@@ -3515,8 +3515,8 @@ L280: ; Arm: 118'11
   push word g100
   push word '0'
   push word 1
-  mov [4], sp
-  mov dx, [4]
+  mov [Temps+4], sp
+  mov dx, [Temps+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -3533,7 +3533,7 @@ L282: ; Continuation
   mov ax, [bp+6]
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [2], ax
+  mov [Temps+2], ax
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -3541,7 +3541,7 @@ L282: ; Continuation
   push word cx
   push word L279
   mov cx, sp
-  mov bx, [2]
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L280
   push word [bp+6]
@@ -3582,8 +3582,8 @@ L285: ; Function: t2
   mov ax, [bp+4]
   cmp word ax, dx
   call Bare_make_bool_from_n
-  mov [2], ax
-  mov bx, [2]
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
   cmp word [bx], 1
   jz L271
   push word bp
@@ -3609,16 +3609,16 @@ L287: ; Continuation
   cmp word [bx], 0
   jz L270
   mov ax, [bx+2]
-  mov [2], ax
-  push word [2]
+  mov [Temps+2], ax
+  push word [Temps+2]
   push word [bp+4]
   push word L285
-  mov [4], sp
+  mov [Temps+4], sp
   push word [bp+6]
   push word cx
   push word L286
   mov cx, sp
-  mov bp, [4]
+  mov bp, [Temps+4]
   mov dx, 0
   jmp [bp]
 
@@ -3651,10 +3651,10 @@ L290: ; Function: t1
   cmp word [bx], 0
   jz L264
   mov ax, [bx+2]
-  mov [2], ax
+  mov [Temps+2], ax
   mov ax, [bx+4]
-  mov [4], ax
-  mov bx, [4]
+  mov [Temps+4], ax
+  mov bx, [Temps+4]
   cmp word [bx], 1
   jz L267
   push word [bp+4]
@@ -3663,15 +3663,15 @@ L290: ; Function: t1
   push word L289
   mov cx, sp
   mov bp, [bp+2]
-  mov dx, [2]
+  mov dx, [Temps+2]
   jmp [bp]
 
 L291: ; Function: t7
   push word dx
   push word [bp+2]
   push word L290
-  mov [2], sp
-  mov dx, [2]
+  mov [Temps+2], sp
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -3682,55 +3682,55 @@ L292: ; Continuation
   push word [bp+6]
   push word [bp+4]
   push word L245
-  mov [2], sp
-  push word [2]
+  mov [Temps+2], sp
+  push word [Temps+2]
   push word 1
-  mov [4], sp
-  push word [4]
+  mov [Temps+4], sp
+  push word [Temps+4]
   push word g60
   push word 0
-  mov [6], sp
+  mov [Temps+6], sp
   push word [bp+4]
   push word L261
-  mov [8], sp
-  push word [8]
+  mov [Temps+8], sp
+  push word [Temps+8]
   push word 1
-  mov [10], sp
-  push word [10]
+  mov [Temps+10], sp
+  push word [Temps+10]
   push word g80
   push word 0
-  mov [12], sp
+  mov [Temps+12], sp
   push word [bp+4]
   push word L291
-  mov [14], sp
-  push word [14]
+  mov [Temps+14], sp
+  push word [Temps+14]
   push word 1
-  mov [16], sp
-  push word [16]
+  mov [Temps+16], sp
+  push word [Temps+16]
   push word g85
   push word 0
-  mov [18], sp
+  mov [Temps+18], sp
   push word g106
-  push word [18]
+  push word [Temps+18]
   push word 1
-  mov [20], sp
-  push word [20]
-  push word [12]
+  mov [Temps+20], sp
+  push word [Temps+20]
+  push word [Temps+12]
   push word 1
-  mov [22], sp
-  push word [22]
-  push word [6]
+  mov [Temps+22], sp
+  push word [Temps+22]
+  push word [Temps+6]
   push word 1
-  mov [24], sp
-  push word [24]
+  mov [Temps+24], sp
+  push word [Temps+24]
   push word g59
   push word 1
-  mov [26], sp
-  push word [26]
+  mov [Temps+26], sp
+  push word [Temps+26]
   push word 0
-  mov [28], sp
+  mov [Temps+28], sp
   mov bp, [bp+10]
-  mov dx, [28]
+  mov dx, [Temps+28]
   jmp [bp]
 
 L293: ; Continuation
@@ -3751,19 +3751,19 @@ L294: ; Continuation
   push word [bp+8]
   push word [bp+4]
   push word L92
-  mov [2], sp
+  mov [Temps+2], sp
   push word [bp+6]
   push word L109
-  mov [4], sp
-  push word [4]
+  mov [Temps+4], sp
+  push word [Temps+4]
   push word dx
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word L208
-  mov [6], sp
-  push word [6]
-  push word [2]
+  mov [Temps+6], sp
+  push word [Temps+6]
+  push word [Temps+2]
   push word dx
   push word [bp+8]
   push word cx
