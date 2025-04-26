@@ -6,14 +6,12 @@ L1: ; Function: g1
   mov [4], ax
   mov bp, g1
   mov dx, g3
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L2: ; Start
   mov bp, g1
   mov dx, g4
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 g1: dw L1
 g2: dw 0

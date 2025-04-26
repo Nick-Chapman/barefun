@@ -89,8 +89,7 @@ L1: ; Start
   mov dx, [58]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 
 bare_start: jmp L1

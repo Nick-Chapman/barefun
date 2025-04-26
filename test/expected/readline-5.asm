@@ -2,15 +2,13 @@ L1: ; Arm: 14'7
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L2: ; Continuation
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L3: ; Function: t1
   mov bx, dx
@@ -30,8 +28,7 @@ L3: ; Function: t1
   mov cx, sp
   mov bp, g1
   mov dx, [6]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L4: ; Function: g1
   push word dx
@@ -40,21 +37,18 @@ L4: ; Function: g1
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L5: ; Arm: 37'7
   mov dx, g3
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L6: ; Continuation
   mov dx, [bp+4]
   mov bp, g2
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L7: ; Arm: 30'19
   mov ax, [2]
@@ -63,8 +57,7 @@ L7: ; Arm: 30'19
   mov dx, [10]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L8: ; Arm: 31'22
   mov ax, [2]
@@ -73,8 +66,7 @@ L8: ; Arm: 31'22
   mov dx, [12]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L9: ; Arm: 32'16
   mov ax, [2]
@@ -83,8 +75,7 @@ L9: ; Arm: 32'16
   mov dx, [14]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L10: ; Function: g2
   mov bx, dx
@@ -140,15 +131,13 @@ L10: ; Function: g2
   mov dx, [22]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L11: ; Arm: 21'13
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L12: ; Continuation
   mov ax, [bp+4]
@@ -156,8 +145,7 @@ L12: ; Continuation
   mov [2], ax
   mov bp, dx
   mov dx, [2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L13: ; Function: t1
   mov ax, dx
@@ -181,8 +169,7 @@ L13: ; Function: t1
   mov cx, sp
   mov bp, g5
   mov dx, [6]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L14: ; Function: g5
   push word dx
@@ -191,15 +178,13 @@ L14: ; Function: g5
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L15: ; Continuation
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L16: ; Arm: 56'22
   mov ax, `\n`
@@ -211,8 +196,7 @@ L16: ; Arm: 56'22
   mov cx, sp
   mov bp, g1
   mov dx, g10
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L17: ; Continuation
   push word [bp+4]
@@ -221,8 +205,7 @@ L17: ; Continuation
   mov [2], sp
   mov bp, dx
   mov dx, [2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L18: ; Arm: 57'28
   mov ax, '^'
@@ -240,20 +223,17 @@ L18: ; Arm: 57'28
   mov cx, sp
   mov bp, g1
   mov dx, g11
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L19: ; Arm: 58'19
   mov bp, g8
   mov dx, dx
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L20: ; Arm: 61'17
   mov bp, g8
   mov dx, dx
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L21: ; Continuation
   mov ax, 8
@@ -267,8 +247,7 @@ L21: ; Continuation
   mov [6], ax
   mov dx, [bp+4]
   mov bp, g8
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L22: ; Arm: 63'31
   mov ax, 8
@@ -283,8 +262,7 @@ L22: ; Arm: 63'31
   mov dx, [6]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L23: ; Continuation
   push word [bp+4]
@@ -297,15 +275,13 @@ L23: ; Continuation
   mov dx, g14
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L24: ; Arm: 6'9
   mov dx, g12
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L25: ; Arm: 59'21
   mov bx, dx
@@ -332,8 +308,7 @@ L25: ; Arm: 59'21
   mov dx, g13
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L26: ; Continuation
   push word [bp+4]
@@ -342,8 +317,7 @@ L26: ; Continuation
   mov [2], sp
   mov bp, g8
   mov dx, [2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L27: ; Arm: 30'19
   mov ax, [2]
@@ -352,8 +326,7 @@ L27: ; Arm: 30'19
   mov dx, [18]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L28: ; Arm: 31'22
   mov ax, [2]
@@ -362,8 +335,7 @@ L28: ; Arm: 31'22
   mov dx, [20]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L29: ; Arm: 32'16
   mov ax, [2]
@@ -372,8 +344,7 @@ L29: ; Arm: 32'16
   mov dx, [22]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L30: ; Function: g8
   call Bare_get_char
@@ -456,15 +427,13 @@ L30: ; Function: g8
   mov dx, [30]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L31: ; Arm: 79'29
   mov dx, g17
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L32: ; Continuation
   mov ax, `\n`
@@ -472,8 +441,7 @@ L32: ; Continuation
   mov [2], ax
   mov bp, g4
   mov dx, g18
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L33: ; Continuation
   mov bx, dx
@@ -484,15 +452,13 @@ L33: ; Continuation
   mov cx, sp
   mov dx, [bp+4]
   mov bp, g2
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L34: ; Arm: 73'7
   mov dx, g16
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L35: ; Continuation
   push word dx
@@ -513,8 +479,7 @@ L35: ; Continuation
   mov dx, [6]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L36: ; Continuation
   push word cx
@@ -522,8 +487,7 @@ L36: ; Continuation
   mov cx, sp
   mov bp, g8
   mov dx, g15
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L37: ; Continuation
   push word cx
@@ -531,8 +495,7 @@ L37: ; Continuation
   mov cx, sp
   mov bp, g2
   mov dx, dx
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L38: ; Continuation
   push word cx
@@ -540,8 +503,7 @@ L38: ; Continuation
   mov cx, sp
   mov bp, dx
   mov dx, 1
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L39: ; Function: g4
   push word cx
@@ -549,15 +511,13 @@ L39: ; Function: g4
   mov cx, sp
   mov bp, g5
   mov dx, g7
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L40: ; Arm: 21'13
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L41: ; Continuation
   mov ax, [bp+4]
@@ -565,8 +525,7 @@ L41: ; Continuation
   mov [2], ax
   mov bp, dx
   mov dx, [2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L42: ; Function: t1
   mov ax, dx
@@ -590,8 +549,7 @@ L42: ; Function: t1
   mov cx, sp
   mov bp, g19
   mov dx, [6]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L43: ; Function: g19
   push word dx
@@ -600,14 +558,12 @@ L43: ; Function: g19
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L44: ; Continuation
   mov bp, g4
   mov dx, g22
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L45: ; Continuation
   push word cx
@@ -615,8 +571,7 @@ L45: ; Continuation
   mov cx, sp
   mov bp, g2
   mov dx, dx
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L46: ; Continuation
   push word cx
@@ -624,8 +579,7 @@ L46: ; Continuation
   mov cx, sp
   mov bp, dx
   mov dx, 44
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L47: ; Start
   push word cx
@@ -633,8 +587,7 @@ L47: ; Start
   mov cx, sp
   mov bp, g19
   mov dx, g21
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 g1: dw L4
 g2: dw L10

@@ -1,8 +1,7 @@
 L1: ; Arm: 9'27
   mov dx, [bp+2]
   mov bp, g1
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L2: ; Function: t3
   call Bare_get_char
@@ -19,8 +18,7 @@ L2: ; Function: t3
   jz L1
   mov bp, bp
   mov dx, g3
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L3: ; Function: g1
   mov ax, dx
@@ -34,14 +32,12 @@ L3: ; Function: g1
   mov [6], sp
   mov bp, [6]
   mov dx, g4
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L4: ; Start
   mov bp, g1
   mov dx, '%'
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 g1: dw L3
 g2: dw 0

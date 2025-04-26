@@ -2,8 +2,7 @@ L1: ; Arm: 6'7
   mov dx, g2
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L2: ; Function: g1
   mov bx, dx
@@ -18,22 +17,19 @@ L2: ; Function: g1
   mov [6], ax
   mov bp, g1
   mov dx, [4]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L3: ; Arm: 12'9
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L4: ; Continuation
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L5: ; Function: t1
   mov bx, dx
@@ -53,8 +49,7 @@ L5: ; Function: t1
   mov cx, sp
   mov bp, g6
   mov dx, [6]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L6: ; Function: g6
   push word dx
@@ -63,15 +58,13 @@ L6: ; Function: g6
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L7: ; Continuation
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L8: ; Arm: 23'27
   mov ax, `\n`
@@ -83,8 +76,7 @@ L8: ; Arm: 23'27
   mov cx, sp
   mov bp, g6
   mov dx, g7
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L9: ; Function: g4
   call Bare_get_char
@@ -105,8 +97,7 @@ L9: ; Function: g4
   mov [8], sp
   mov bp, g4
   mov dx, [8]
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L10: ; Continuation
   mov ax, `\n`
@@ -114,8 +105,7 @@ L10: ; Continuation
   mov [2], ax
   mov bp, g3
   mov dx, g9
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L11: ; Continuation
   push word cx
@@ -123,8 +113,7 @@ L11: ; Continuation
   mov cx, sp
   mov bp, g1
   mov dx, dx
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L12: ; Function: g3
   mov ax, '%'
@@ -138,14 +127,12 @@ L12: ; Function: g3
   mov cx, sp
   mov bp, g4
   mov dx, g8
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 L13: ; Start
   mov bp, g3
   mov dx, g10
-  mov ax, [bp]
-  jmp ax
+  jmp [bp]
 
 g1: dw L2
 g2: dw 0

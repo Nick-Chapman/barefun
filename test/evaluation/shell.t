@@ -27,4 +27,4 @@
   ^D
   > Goodbye
   You wrote: "G**dbye" (7 chars)
-  > [EOF:#op=1514403, #alloc=194383]
+  > [EOF:#op=1391724, #alloc=194383]

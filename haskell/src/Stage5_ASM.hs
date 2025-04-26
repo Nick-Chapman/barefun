@@ -50,7 +50,7 @@ data Op -- target; source
 data Jump
   = JumpDirect CodeLabel
   | JumpReg Reg
-  -- | JumpIndirect Reg
+  | JumpIndirect Reg
   | Crash
 
 data Source
@@ -143,7 +143,7 @@ instance Show Jump where
   show = \case
     JumpDirect c -> "jmp "  ++ show c
     JumpReg r -> "jmp "  ++ show r
-    --JumpIndirect r -> "jmp ["  ++ show r ++ "]"
+    JumpIndirect r -> "jmp ["  ++ show r ++ "]"
     Crash -> "crash"
 
 instance Show Source where
@@ -347,6 +347,12 @@ execJump = \case
   JumpDirect{} -> undefined GetCode
   JumpReg r -> do
     w <- GetReg r
+    let lab = deCodeLabel w
+    code <- GetCode lab
+    execCode code
+  JumpIndirect r -> do
+    a <- deAddr <$> GetReg r
+    w <- GetMem a
     let lab = deCodeLabel w
     code <- GetCode lab
     execCode code
@@ -595,26 +601,17 @@ compileCode = \case
     pure $ doOps
       -- position info in comments in generated ASM is very unstable to tiny changes.
       [ --OpComment $ printf "(%s) Return: %s" (show _pos) (ppRef res)
-      -- arg = ...
-      -- frame = cont
-      -- cont = frame[1]
         OpMove argReg (compileRef res)
       , OpMove frameReg (SReg contReg)
       , OpMove contReg (SMemIndirectOffset frameReg 1)
-      -- code = frame[0]; jmp [code]
-
-      -- TODO: JumpIndirect (SMemIndirect frameReg)
-      , OpMove Ax (SMemIndirect frameReg)
-      ] (Done (JumpReg Ax))
+      ] (Done (JumpIndirect frameReg))
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps (
       -- [ OpComment $ printf "(%s) Tail: %s @ %s" (show _pos) (ppRef fun) (ppRef arg) ] ++
       -- (arg,frame) = ...
        moveTwoRegsPar (frameReg,compileRef fun) (argReg,compileRef arg) ++
-      -- code = frame[0]; jmp [code]
-      [ OpMove Ax (SMemIndirect frameReg)
-      ]) (Done (JumpReg Ax))
+      []) (Done (JumpIndirect frameReg))
 
   SRC.LetAtomic (_,t) rhs body -> do
     (ops1,reg) <- compileAtomic (show t) rhs
