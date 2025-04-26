@@ -13,6 +13,7 @@ data Builtin
   | MakeRef | DeRef | SetRef
   | Crash
   | DumpSec
+  | LoadSec
   deriving (Show)
 
 data Semantics
@@ -72,6 +73,7 @@ defineBuiltin b =
 
     Crash -> Impure $ undefined
     DumpSec -> Impure $ undefined
+    LoadSec -> Impure $ undefined
 
   where
     unit = VCons tUnit []

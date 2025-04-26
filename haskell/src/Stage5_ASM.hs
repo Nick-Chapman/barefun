@@ -107,6 +107,7 @@ data BareBios
   | Bare_div
   | Bare_mod
   | Bare_dump_sector
+  | Bare_load_sector
   -- Bare_check_heap_space -- TODO: generate Check at eery code entry point
   deriving Show
 
@@ -331,6 +332,10 @@ execBare = \case
     SetReg Ax (binaryW mod w1 w2)
 
   Bare_dump_sector -> do
+    -- do nothing in haskell emulator -- TODO: when get to read/write will emulate
+    pure ()
+
+  Bare_load_sector -> do
     -- do nothing in haskell emulator -- TODO: when get to read/write will emulate
     pure ()
 
@@ -831,6 +836,12 @@ compileBuiltin b = case b of
   SRC.DumpSec -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_dump_sector
+    ]
+
+  SRC.LoadSec -> twoArgs $ \s1 s2 ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpCall Bare_load_sector
     ]
 
   where

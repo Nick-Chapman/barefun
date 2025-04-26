@@ -40,6 +40,11 @@ let g7 = fun arg k ->
 let g8 = Nil0 in
 let g9 = Nil0 in
 let g10 = Unit0 in
+let g11 = false0 in
+let g12 = true1 in
+let g13 = Unit0 in
+let g14 = false0 in
+let g15 = Unit0 in
 let g3 = fun arg k ->
   let k = [arg], fun [f2] arg ->
     let k = [f2], fun [f2] arg ->
@@ -49,10 +54,48 @@ let g3 = fun arg k ->
           let k = [f2], fun [f2] arg ->
             let t1 = PRIM_PutChar('\n') in
             let t2 = PRIM_DumpSec(f2) in
-            let t3 = PRIM_PutChar('\n') in
-            let t4 = PRIM_GetChar(g10) in
-            let t5 = PRIM_AddInt(f2,1) in
-            g3 t5 k in
+            let t3 = PRIM_MakeBytes(512) in
+            let t4 = PRIM_LoadSec(f2,t3) in
+            let t5 = PRIM_FreezeBytes(t3) in
+            let t6 = [t5], fun [f1] me arg k ->
+              let t1 = PRIM_ModInt(arg,64) in
+              let t2 = PRIM_EqInt(t1,0) in
+              let k = [f1,arg,me], fun [f2,f3,f4] arg ->
+                let t1 = PRIM_LessInt(f3,512) in
+                let k = [f2,f3,f4], fun [f2,f3,f4] arg ->
+                  match arg with
+                  | true1 -> k g13
+                  | false0 ->
+                    let t1 = PRIM_StringIndex(f2,f3) in
+                    let t2 = PRIM_CharOrd(t1) in
+                    let t3 = PRIM_LessInt(t2,32) in
+                    let k = [f3,f4,t1], fun [f2,f3,f4] arg ->
+                      let k = [f2,f3], fun [f2,f3] arg ->
+                        let t1 = PRIM_PutChar(arg) in
+                        let t2 = PRIM_AddInt(f2,1) in
+                        f3 t2 k in
+                      match arg with
+                      | true1 -> k f4
+                      | false0 -> k '.' in
+                    match t3 with
+                    | true1 -> k g14
+                    | false0 ->
+                      let t4 = PRIM_LessInt(t2,127) in
+                      k t4 in
+                match t1 with
+                | true1 -> k g11
+                | false0 -> k g12 in
+              match t2 with
+              | true1 ->
+                let t3 = PRIM_PutChar('\n') in
+                k t3
+              | false0 -> k g10 in
+            let k = [f2], fun [f2] arg ->
+              let t1 = PRIM_PutChar('\n') in
+              let t2 = PRIM_GetChar(g15) in
+              let t3 = PRIM_AddInt(f2,1) in
+              g3 t3 k in
+            t6 0 k in
           g1 arg k in
         match t1 with
         | true1 ->

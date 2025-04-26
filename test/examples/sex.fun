@@ -27,11 +27,37 @@ let put_int i = put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
 
+let not b =
+  match b with
+  | true -> false
+  | false -> true
+
+let (>=) a b = not (a < b)
+
+let read_sector : int -> string = fun n ->
+  let bs = make_bytes 512 in
+  load_sector n bs;
+  freeze_bytes bs
+
+let is_printable c =
+  let n = ord c in
+  if n < 32 then false else n < 127
+
+let put_sector_string s =
+  let rec loop i =
+    (if i % 64 = 0 then newline() else ());
+    if i >= 512 then () else
+      let c = string_index s i in
+      let c = if is_printable c then c else '.' in
+      (put_char c; loop (i+1))
+  in
+  loop 0
+
 let dump n =
-  put_string "sector:";
-  put_int n;
-  newline();
+  put_string "sector:"; put_int n; newline();
   load_sector_and_dump n;
+  let s = read_sector n in
+  put_sector_string s;
   newline()
 
 let main () =

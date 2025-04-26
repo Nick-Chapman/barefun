@@ -1,6 +1,11 @@
 
 (* TODO: merge the various rules generators *)
 
+(* TODO: dont use the generated code in compile-examples, but instead our own code
+   allowing to not have some examples in the compile-examples regression
+   when they are unstable.
+ *)
+
 let generate_rules x =
   Printf.printf {|
 (rule

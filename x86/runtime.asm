@@ -231,12 +231,13 @@ Bare_char_to_num:
     ;; this is meant to do nothing!
     ret
 
-;; must revisit when we have tighter, byte-packed rep for strings/bytes
+;;; TODO: byte-packed rep for strings/bytes
 Bare_get_bytes:
     add bx, 1 ; +1 for the length
     shl bx, 1 ; x2 to get from word-index to byte-index
     add bx, ax
     mov ax, [bx]
+    mov ah, 0
     ret
 
 Bare_set_bytes:
@@ -288,8 +289,42 @@ Bare_crash:
 Bare_dump_sector:
     push cx
     mov cl, al
-    call load_sector_into_buffers_cl
+    mov bx, buffer ; dest
+    call load_sector_into_buffers_cl_bx
     call show_buffer
+    pop cx
+    ret
+
+buffer:  times 512 db 0
+show_buffer:
+    mov si, buffer
+    call Dump_sector
+    ret
+
+Bare_load_sector:
+    push cx
+    mov cl, al
+
+    add bx, 2 ; +1 for the length word
+
+    ;; because we dont have byte-packed strings/bytes yet
+    ;; load the sector into a fixed buffer
+    push bx
+    mov bx, buffer
+    call load_sector_into_buffers_cl_bx
+    pop bx
+
+    ;; then copy it into the unpacked string, doubling the space it takes
+    mov si, 0
+    mov di, 0
+.loop:
+    mov ax, [buffer+si]
+    mov [bx+di], ax
+    add si, 1
+    add di, 2
+    cmp si, 512
+    jne .loop
+
     pop cx
     ret
 
@@ -317,26 +352,21 @@ spin:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; dev/play
 
-end_of_time_play:
-    mov cl, 1
-    call load_sector_into_buffers_cl
-    jmp show_buffer
+;end_of_time_play:
+;    mov cl, 1
+;    mov bx, buffer ; dest
+;    call load_sector_into_buffers_cl_bx
+;    jmp show_buffer
 
-load_sector_into_buffers_cl: ; tested via end_of_time_play
+load_sector_into_buffers_cl_bx:
     mov dl, [0] ; RESTORE DRIVE NUMBER
     mov ah, 0x02 ; Function: Read Sectors From Drive
     mov ch, 0 ; cylinder
     mov dh, 0 ; head
     mov al, 1 ; sector count
     ;mov cl, 2 ; start sector number (1 is boot; 2 is kernel)
-    mov bx, buffer ; dest
+    ;mov bx, buffer ; dest
     int 0x13
-    ret
-
-buffer:  times 512 db 0
-show_buffer:
-    mov si, buffer
-    call Dump_sector
     ret
 
 Dump_sector: ; (byte offset) si->

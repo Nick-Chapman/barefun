@@ -32,6 +32,7 @@ module X : sig
   val set_ref : 'a ref -> 'a -> unit (* TODO: (:=) *)
 
   val load_sector_and_dump : int -> unit
+  val load_sector : int -> bytes -> unit
 
 end = struct
 
@@ -84,7 +85,10 @@ end = struct
   let set_ref = (:=)
 
   let load_sector_and_dump n =
-    Printf.printf "Here is sector %d (NOT)\n" n
+    Printf.printf "[load_sector_and_dump:%d]\n" n
+
+  let load_sector n _ =
+    Printf.printf "[load_sector:%d]\n" n
 
 end
 include X
