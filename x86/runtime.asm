@@ -252,8 +252,7 @@ Bare_make_bytes:
     shr ax, 1
     push ax
     mov ax, sp
-    push bx ;; ... and restore: TODO: push/ret --> jmp ?
-    ret
+    jmp bx
 
 Bare_mul:
     mul bx ; ax * bx -> ax
