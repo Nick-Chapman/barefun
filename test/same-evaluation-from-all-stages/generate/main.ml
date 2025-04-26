@@ -1,8 +1,6 @@
 
-(* TODO: maybe also have aliases to run in ocaml and haskell emulators *)
-
 let generate_rules x =
-  let capX = String.capitalize_ascii x in (* TODO: make ocaml have same interface to avoid this hack *)
+  let capX = String.capitalize_ascii x in
 
   Printf.printf
 {|
