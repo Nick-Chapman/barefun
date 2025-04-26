@@ -84,6 +84,32 @@ part2:
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
     jmp begin
 
+%macro print 1
+    push di
+    jmp %%after
+%%message: db %1, 0
+%%after:
+    mov di, %%message
+    call internal_print_string
+    pop di
+%endmacro
+
+internal_print_string: ; in: DI=string; print null-terminated string.
+    push ax
+    push di
+.loop:
+    mov al, [di]
+    cmp al, 0 ; null?
+    je .done
+    mov ah, 0
+    call Bare_put_char
+    inc di
+    jmp .loop
+.done:
+    pop di
+    pop ax
+    ret
+
 top_of_memory equ 0
 
 begin:
@@ -92,16 +118,11 @@ begin:
     call Bare_clear_screen
     jmp bare_start
 
-
 final_continuation:
     dw final_code
 
 final_code:
-    ;; TODO: print halt here. better still. quit the emulator
-    ;; at least print out a full message to say we are halting.
-    ;; that would be useful anyway for compiled trace info.
-    mov ax, 'Q'
-    call Bare_put_char
+    print `[HALT]\n`
 spin:
     call Bare_get_char ;; avoid really spinning the fans
     jmp spin
