@@ -36,6 +36,7 @@ L3: ; Function: g1
   jmp [bp]
 
 L4: ; Continuation
+  call Bare_enter_check
   mov ax, dx
   call Bare_put_char
   mov [2], ax
@@ -51,6 +52,7 @@ L5: ; Arm: 9'25
   jmp [bp]
 
 L6: ; Continuation
+  call Bare_enter_check
   push word cx
   push word L4
   mov cx, sp
@@ -63,6 +65,7 @@ L6: ; Continuation
   jmp [bp]
 
 L7: ; Continuation
+  call Bare_enter_check
   mov ax, dx
   call Bare_put_char
   mov [2], ax
@@ -80,6 +83,7 @@ L8: ; Arm: 9'25
   jmp [bp]
 
 L9: ; Continuation
+  call Bare_enter_check
   push word cx
   push word L7
   mov cx, sp

@@ -79,7 +79,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di -- when needed
   deriving (Eq,Ord)
 
 data Addr -- memory address
-  = Physical Int
+  = Physical_raw Int
   | Symbolic DataLabel Int
   deriving (Eq,Ord)
 
@@ -108,7 +108,7 @@ data BareBios
   | Bare_mod
   | Bare_dump_sector
   | Bare_load_sector
-  -- Bare_check_heap_space -- TODO: generate Check at eery code entry point
+  | Bare_enter_check
   deriving Show
 
 ----------------------------------------------------------------------
@@ -181,7 +181,7 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical n -> show (bytesPerWord * n)
+    Physical_raw n -> show (bytesPerWord * n)
     Symbolic d 0 -> printf "%s" (show d)
     Symbolic d n -> printf "%s+%d" (show d) n
 
@@ -339,6 +339,11 @@ execBare = \case
     -- do nothing in haskell emulator -- TODO: when get to read/write will emulate
     pure ()
 
+  Bare_enter_check -> do
+    _x <- deAddr <$> GetReg Sp
+    --Debug (printf "[%s]" (show x))
+    pure ()
+
 
 createBytesInMemory :: Number -> M Word
 createBytesInMemory n = loop n
@@ -409,8 +414,13 @@ prevAddr = addAddr (-1)
 
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
-  Physical n -> Physical (n+i)
+  Physical_raw n -> mkPhysical (n+i)
   Symbolic lab n -> Symbolic lab (n+i) -- I had a nasty bug here -- 1 instead of i :(
+
+mkPhysical :: Int -> Addr
+mkPhysical n =
+  --if n < (-10000) then error "mkPhysical:too small" else
+    Physical_raw n
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -423,6 +433,7 @@ data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
   Halt :: M ()
+  Debug :: String -> M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
   TraceAlloc :: M ()
@@ -473,6 +484,7 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       Halt -> IDone
+      Debug m -> ITrace m $ k s ()
 
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k
@@ -499,7 +511,6 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       PutChar c -> IPut c (k s ())
       GetChar -> IGet $ \c -> k s c
 
-
 data State = State
   { rmap :: Map Reg Word
   , mem :: Map Addr Word
@@ -521,7 +532,7 @@ state0 dmap = State
   , offsetFromLastLabel = error "offsetFromLastLabel"
   }
   where
-    initialStackPointer = Physical 0 -- stack address are negative in stage5 emulation
+    initialStackPointer = mkPhysical 0 -- stack address are negative in stage5 emulation
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
@@ -548,13 +559,13 @@ instance Show State where
 -- Address for runtime system constants: 90,91,92
 
 tempOffset :: Int -> Addr
-tempOffset n = Physical n
+tempOffset n = mkPhysical n
 
 aFalse,aTrue,aNil,aFinalCont :: Addr
-aFalse = Physical 90
-aTrue = Physical 91
-aNil = Physical 92
-aFinalCont = Physical 93
+aFalse = mkPhysical 90
+aTrue = mkPhysical 91
+aNil = mkPhysical 92
+aFinalCont = mkPhysical 93
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
@@ -606,6 +617,11 @@ compileTopRef = \case
       SRC.InGlobal g -> WAddr (Symbolic (DataLabel g) 0)
       _ -> error "compileTopRef"
 
+cutCode :: String -> Code -> Asm CodeLabel
+cutCode name code = do
+  CutCode name $ do
+    doOps [ OpCall Bare_enter_check ] code
+
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return _pos res -> do
@@ -630,7 +646,7 @@ compileCode = \case
     doOps (ops1++ops2) <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
-    lab <- compileCode later >>= CutCode "Continuation"
+    lab <- compileCode later >>= cutCode "Continuation"
     let
       ops =
         map OpPush (reverse (map compileRef pre)) ++

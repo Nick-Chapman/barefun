@@ -26,6 +26,7 @@ L3: ; Arm: 5'13
   jmp [bp]
 
 L4: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   sub ax, 1
   mov [2], ax
@@ -73,6 +74,7 @@ L7: ; Arm: 21'13
   jmp [bp]
 
 L8: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
   call Bare_div
@@ -127,6 +129,7 @@ L11: ; Arm: 49'16
   jmp [bp]
 
 L12: ; Continuation
+  call Bare_enter_check
   mov ax, dx
   call Bare_put_char
   mov [2], ax
@@ -144,6 +147,7 @@ L13: ; Arm: 51'32
   jmp [bp]
 
 L14: ; Continuation
+  call Bare_enter_check
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -164,6 +168,7 @@ L15: ; Arm: 44'12
   jmp [bp]
 
 L16: ; Continuation
+  call Bare_enter_check
   mov bx, dx
   cmp word [bx], 1
   jz L11
@@ -203,6 +208,7 @@ L17: ; Arm: 32'9
   jmp [bp]
 
 L18: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+6]
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -254,6 +260,7 @@ L20: ; Function: t6
   jmp [bp]
 
 L21: ; Continuation
+  call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
   mov [2], ax
@@ -267,6 +274,7 @@ L21: ; Continuation
   jmp [bp]
 
 L22: ; Continuation
+  call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
   mov [2], ax
@@ -294,6 +302,7 @@ L22: ; Continuation
   jmp [bp]
 
 L23: ; Continuation
+  call Bare_enter_check
   push word [bp+4]
   push word cx
   push word L22
@@ -313,12 +322,14 @@ L24: ; Arm: 24'11
   jmp [bp]
 
 L25: ; Continuation
+  call Bare_enter_check
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
   jmp [bp]
 
 L26: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -339,6 +350,7 @@ L26: ; Continuation
   jmp [bp]
 
 L27: ; Continuation
+  call Bare_enter_check
   push word [bp+4]
   push word cx
   push word L26
@@ -348,6 +360,7 @@ L27: ; Continuation
   jmp [bp]
 
 L28: ; Continuation
+  call Bare_enter_check
   push word [bp+4]
   push word cx
   push word L27

@@ -5,6 +5,7 @@ L1: ; Arm: 6'13
   jmp [bp]
 
 L2: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
   call Bare_div
@@ -82,6 +83,7 @@ L7: ; Arm: 22'10
   jmp [bp]
 
 L8: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   add ax, dx
   mov [2], ax
@@ -91,6 +93,7 @@ L8: ; Continuation
   jmp [bp]
 
 L9: ; Continuation
+  call Bare_enter_check
   push word dx
   push word cx
   push word L8
@@ -113,6 +116,7 @@ L10: ; Arm: 23'15
   jmp [bp]
 
 L11: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   sub ax, dx
   mov [2], ax
@@ -122,6 +126,7 @@ L11: ; Continuation
   jmp [bp]
 
 L12: ; Continuation
+  call Bare_enter_check
   push word dx
   push word cx
   push word L11
@@ -149,6 +154,7 @@ L13: ; Function: g4
   jmp [bp]
 
 L14: ; Continuation
+  call Bare_enter_check
   mov bp, g2
   mov dx, dx
   jmp [bp]
@@ -164,12 +170,14 @@ L15: ; Arm: 9'20
   jmp [bp]
 
 L16: ; Continuation
+  call Bare_enter_check
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
   jmp [bp]
 
 L17: ; Continuation
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z

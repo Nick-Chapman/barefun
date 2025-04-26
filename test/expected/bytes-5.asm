@@ -19,6 +19,7 @@ L3: ; Arm: 7'7
   jmp [bp]
 
 L4: ; Continuation
+  call Bare_enter_check
   mov ax, 1
   add ax, dx
   mov [2], ax
@@ -49,6 +50,7 @@ L6: ; Arm: 14'9
   jmp [bp]
 
 L7: ; Continuation
+  call Bare_enter_check
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
@@ -90,6 +92,7 @@ L9: ; Function: t2
   jmp [bp]
 
 L10: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   mov [2], ax
   mov dx, [2]
@@ -98,6 +101,7 @@ L10: ; Continuation
   jmp [bp]
 
 L11: ; Continuation
+  call Bare_enter_check
   push word [bp+6]
   push word cx
   push word L10
@@ -108,6 +112,7 @@ L11: ; Continuation
   jmp [bp]
 
 L12: ; Continuation
+  call Bare_enter_check
   mov ax, dx
   call Bare_make_bytes
   mov [2], ax
@@ -139,6 +144,7 @@ L14: ; Arm: 24'13
   jmp [bp]
 
 L15: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   sub ax, 1
   mov [2], ax
@@ -182,6 +188,7 @@ L17: ; Function: t1
   jmp [bp]
 
 L18: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   sub ax, 1
   mov [2], ax
@@ -226,11 +233,13 @@ L21: ; Function: g7
   jmp [bp]
 
 L22: ; Continuation
+  call Bare_enter_check
   mov bp, g7
   mov dx, dx
   jmp [bp]
 
 L23: ; Continuation
+  call Bare_enter_check
   push word cx
   push word L22
   mov cx, sp
@@ -239,6 +248,7 @@ L23: ; Continuation
   jmp [bp]
 
 L24: ; Continuation
+  call Bare_enter_check
   push word g10
   push word `\n`
   push word 1
@@ -264,6 +274,7 @@ L24: ; Continuation
   jmp [bp]
 
 L25: ; Continuation
+  call Bare_enter_check
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -274,6 +285,7 @@ L25: ; Continuation
   jmp [bp]
 
 L26: ; Continuation
+  call Bare_enter_check
   mov ax, 5
   call Bare_make_bytes
   mov [2], ax
@@ -289,6 +301,7 @@ L26: ; Continuation
   jmp [bp]
 
 L27: ; Continuation
+  call Bare_enter_check
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -299,6 +312,7 @@ L27: ; Continuation
   jmp [bp]
 
 L28: ; Continuation
+  call Bare_enter_check
   push word dx
   push word [bp+4]
   push word cx
@@ -309,6 +323,7 @@ L28: ; Continuation
   jmp [bp]
 
 L29: ; Continuation
+  call Bare_enter_check
   push word dx
   push word cx
   push word L28

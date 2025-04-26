@@ -328,6 +328,23 @@ Bare_load_sector:
     pop cx
     ret
 
+
+Bare_enter_check:
+    ;; how much space is left before we crash into the code?
+    ;; when this reaches zero, examples crash.
+    ;; however, sham example crashes much earlier
+    ;; a different issue? maybe temps in page 0 ??
+    ;Dot
+    ;mov ax, sp
+    ;sub ax, end_of_code
+    ;push ax
+    ;mov al, ah
+    ;PrintHexAX
+    ;pop ax
+    ;PrintHexAX
+    ret
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; begin/end
 
@@ -414,6 +431,8 @@ Dump_sector: ; (byte offset) si->
 ;    times 512 db 'b'
 ;    times 512 db 'c'
 ;    times 512 db 'd'
+
+end_of_code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Check Size

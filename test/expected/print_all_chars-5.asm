@@ -5,6 +5,7 @@ L1: ; Arm: 9'15
   jmp [bp]
 
 L2: ; Continuation
+  call Bare_enter_check
   mov ax, [bp+4]
   add ax, 1
   mov [2], ax
@@ -92,6 +93,7 @@ L5: ; Function: g1
   jmp [bp]
 
 L6: ; Continuation
+  call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
   mov [2], ax
