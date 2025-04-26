@@ -1,5 +1,4 @@
 L1: ; Arm: 6'13
-  ;; (5'15) Return: acc (f1)
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -11,7 +10,6 @@ L2: ; Continuation
   mov bx, 10
   call Bare_div
   mov [2], ax
-  ;; (7'41) Tail: app_7'11 (arg) @ prim_0'0 (t1)
   mov bp, dx
   mov dx, [2]
   mov ax, [bp]
@@ -43,7 +41,6 @@ L3: ; Function: t1
   push word cx
   push word L2
   mov cx, sp
-  ;; (7'11) Tail: loop (g1) @ con_0'0 (t5)
   mov bp, g1
   mov dx, [10]
   mov ax, [bp]
@@ -53,7 +50,6 @@ L4: ; Function: g1
   push word dx
   push word L3
   mov [2], sp
-  ;; (0'0) Return: lam_5'19 (t1)
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
@@ -61,7 +57,6 @@ L4: ; Function: g1
   jmp ax
 
 L5: ; Arm: 13'7
-  ;; (0'0) Return: con_13'10 (g3)
   mov dx, g3
   mov bp, cx
   mov cx, [bp+2]
@@ -79,7 +74,6 @@ L6: ; Function: g2
   mov ax, [2]
   call Bare_put_char
   mov [6], ax
-  ;; (14'35) Tail: put_chars (g2) @ xs (t2)
   mov bp, g2
   mov dx, [4]
   mov ax, [bp]
@@ -88,7 +82,6 @@ L6: ; Function: g2
 L7: ; Arm: 22'10
   mov ax, [bx+2]
   mov [2], ax
-  ;; (22'8) Return: n (t1)
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
@@ -99,7 +92,6 @@ L8: ; Continuation
   mov ax, [bp+4]
   add ax, dx
   mov [2], ax
-  ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
@@ -111,7 +103,6 @@ L9: ; Continuation
   push word cx
   push word L8
   mov cx, sp
-  ;; (23'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+4]
   mov bp, g4
   mov ax, [bp]
@@ -126,7 +117,6 @@ L10: ; Arm: 23'15
   push word cx
   push word L9
   mov cx, sp
-  ;; (23'23) Tail: eval (g4) @ e1 (t1)
   mov bp, g4
   mov dx, [2]
   mov ax, [bp]
@@ -136,7 +126,6 @@ L11: ; Continuation
   mov ax, [bp+4]
   sub ax, dx
   mov [2], ax
-  ;; (0'0) Return: prim_0'0 (t1)
   mov dx, [2]
   mov bp, cx
   mov cx, [bp+2]
@@ -148,7 +137,6 @@ L12: ; Continuation
   push word cx
   push word L11
   mov cx, sp
-  ;; (24'33) Tail: eval (g4) @ e2 (f2)
   mov dx, [bp+4]
   mov bp, g4
   mov ax, [bp]
@@ -168,14 +156,12 @@ L13: ; Function: g4
   push word cx
   push word L12
   mov cx, sp
-  ;; (24'23) Tail: eval (g4) @ e1 (t1)
   mov bp, g4
   mov dx, [2]
   mov ax, [bp]
   jmp ax
 
 L14: ; Continuation
-  ;; (16'26) Tail: put_chars (g2) @ case_9'11 (arg)
   mov bp, g2
   mov dx, dx
   mov ax, [bp]
@@ -186,7 +172,6 @@ L15: ; Arm: 9'20
   push word '0'
   push word 1
   mov [4], sp
-  ;; (0'0) Return: con_9'26 (t2)
   mov dx, [4]
   mov bp, cx
   mov cx, [bp+2]
@@ -194,8 +179,6 @@ L15: ; Arm: 9'20
   jmp ax
 
 L16: ; Continuation
-  ;; (9'44) Tail: app_9'41 (arg) @ i (f2)
-  ;; use temp di while setting up bp/dx
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
@@ -217,7 +200,6 @@ L17: ; Continuation
   push word cx
   push word L16
   mov cx, sp
-  ;; (9'41) Tail: loop (g1) @ con_9'41 (g6)
   mov bp, g1
   mov dx, g6
   mov ax, [bp]
@@ -244,7 +226,6 @@ L18: ; Start
   push word cx
   push word L17
   mov cx, sp
-  ;; (29'16) Tail: eval (g4) @ con_26'15 (t5)
   mov bp, g4
   mov dx, [10]
   mov ax, [bp]

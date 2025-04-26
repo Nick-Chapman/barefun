@@ -86,7 +86,6 @@ L1: ; Start
   mov ax, `\n`
   call Bare_put_char
   mov [58], ax
-  ;; (0'0) Return: prim_0'0 (t29)
   mov dx, [58]
   mov bp, cx
   mov cx, [bp+2]

@@ -664,14 +664,14 @@ compileTopRef = \case
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
-  SRC.Return pos res -> do
+  SRC.Return _pos res -> do
     pure $ doOps
-      -- TODO: position info in comments in generated ASM is very unstable to tiny changes.
-      [ OpComment $ printf "(%s) Return: %s" (show pos) (ppRef res)
+      -- position info in comments in generated ASM is very unstable to tiny changes.
+      [ --OpComment $ printf "(%s) Return: %s" (show _pos) (ppRef res)
       -- arg = ...
       -- frame = cont
       -- cont = frame[1]
-      , OpMove argReg (compileRef res)
+        OpMove argReg (compileRef res)
       , OpMove frameReg (SReg contReg)
       , OpMove contReg (SMemIndirectOffset frameReg 1)
       -- code = frame[0]; jmp [code]
@@ -680,9 +680,9 @@ compileCode = \case
       , OpMove Ax (SMemIndirect frameReg)
       ] (Done (JumpReg Ax))
 
-  SRC.Tail fun pos arg -> do
+  SRC.Tail fun _pos arg -> do
     pure $ doOps (
-      [ OpComment $ printf "(%s) Tail: %s @ %s" (show pos) (ppRef fun) (ppRef arg) ] ++
+      -- [ OpComment $ printf "(%s) Tail: %s @ %s" (show _pos) (ppRef fun) (ppRef arg) ] ++
       -- (arg,frame) = ...
        moveTwoRegsPar (frameReg,compileRef fun) (argReg,compileRef arg) ++
       -- code = frame[0]; jmp [code]
@@ -741,8 +741,8 @@ moveTwoRegsPar (r1,s1) (r2,s2) = do
   let twoOne = needs r1 s2
   case (oneTwo,twoOne) of
     (True,True) ->
-      [ OpComment "use temp di while setting up bp/dx"
-      , OpMove Di (SReg r1)
+      [ --OpComment "use temp di while setting up bp/dx"
+        OpMove Di (SReg r1)
       , OpMove r1 s1
       , OpMove r2 (changeRegInSource r1 Di s2)
       ]
@@ -881,25 +881,19 @@ compileBuiltin b = case b of
     ]
 
   SRC.MakeRef -> oneArg $ \s1 ->
-    [ OpComment "MakeRef"
-    , OpPush s1
+    [ OpPush s1
     , OpMove Ax (SReg Sp)
-    , OpComment "MakeRef-done"
     ]
 
   SRC.DeRef -> oneArg $ \s1 ->
-    [ OpComment "DeRef"
-    , OpMove Bx s1
+    [ OpMove Bx s1
     , OpMove Ax (SMemIndirect Bx)
-    , OpComment "DeRef-done"
     ]
 
   SRC.SetRef -> twoArgs $ \s1 s2 ->
-    [ OpComment "SetRef"
-    , OpMove Bx s1
+    [ OpMove Bx s1
     , OpMove Ax s2
     , OpStoreR Bx (SReg Ax)
-    , OpComment "SetRef-done"
     ]
 
   SRC.Crash -> oneArg $ \_ -> [ OpCall Bare_crash ]
@@ -929,12 +923,13 @@ compileRef = \case
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
 
-ppRef :: SRC.Ref -> String
+{-ppRef :: SRC.Ref -> String
 ppRef = \case
   SRC.RefLitC c -> show c
   SRC.RefLitN n -> show n
   SRC.Ref id loc ->
     show id ++ " (" ++ show loc ++ ")"
+-}
 
 ----------------------------------------------------------------------
 -- Asm: compilation monad
