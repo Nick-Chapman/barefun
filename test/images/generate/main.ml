@@ -9,7 +9,7 @@ let generate_rules x =
   (with-stdout-to %s.img
    (run nasm -Werror -o %s.img -dCODE='../../compile-examples/gen/%s-5.gen' ../../../x86/runtime.asm))))
 (rule
- (alias %s.qemu)
+ (alias %s)
  (deps (universe) %s.img)
  (action
  (progn
