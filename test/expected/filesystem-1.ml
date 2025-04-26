@@ -23,6 +23,7 @@ let ref = (fun x -> PRIM_MakeRef(x)) in
 let deref = (fun x -> PRIM_DeRef(x)) in
 let set_ref = (fun x -> (fun y -> PRIM_SetRef(x,y))) in
 let crash = (fun x -> PRIM_Crash(x)) in
+let load_sector_and_dump = (fun x -> PRIM_DumpSec(x)) in
 let trace0_on = true1 in
 let trace_on = false0 in
 let @@ = (fun f -> (fun x -> (f x))) in

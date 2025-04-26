@@ -30,6 +30,9 @@ module X : sig
   val ref : 'a -> 'a ref
   val deref : 'a ref -> 'a (* TODO: (!) *)
   val set_ref : 'a ref -> 'a -> unit (* TODO: (:=) *)
+
+  val load_sector_and_dump : int -> unit
+
 end = struct
 
   exception CRASH
@@ -79,6 +82,9 @@ end = struct
   let ref = Stdlib.ref
   let deref = (!)
   let set_ref = (:=)
+
+  let load_sector_and_dump n =
+    Printf.printf "Here is sector %d (NOT)\n" n
 
 end
 include X

@@ -38,6 +38,7 @@ wrapPreDefs (Prog defs) =
       , ("deref"        , prim1 DeRef)
       , ("set_ref"      , prim2 SetRef)
       , ("crash"        , prim1 Crash)
+      , ("load_sector_and_dump", prim1 DumpSec)
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])

@@ -1,4 +1,7 @@
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Layout
+
 ;;; A page = 256 bytes; 16 bit address space is 64k or 256 pages
 ;;; A disk sector is 512 bytes
 ;;; The bootloader is initially be resident from page 124 (0x7c00)
@@ -14,7 +17,8 @@
 
     bits 16
 
-;; Macros...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Macros
 
 %macro PrintCharAL 0
     mov ah, 0x0e
@@ -66,6 +70,7 @@
     PrintHexNibbleBX
 %endmacro
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Bootloader...
 
     org bootloader_relocation_address
@@ -87,6 +92,9 @@ start:
     mov di, bootloader_relocation_address
     rep movsw
     jmp 0:part2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Relocated bootloader...
 
 part2:
     ;; Sectors are numbered from 1. The bootloader is in the 1st sector.
@@ -110,10 +118,14 @@ part2:
     times 510 - ($ - $$) db 0x00
     dw 0xaa55
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Kernel...
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
     jmp begin
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; misc
 
 hex_data: db "0123456789abcdef"
 
@@ -132,6 +144,9 @@ internal_print_string: ; in: DI=string; print null-terminated string.
     pop di
     pop ax
     ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Bare BIOS
 
 Bare_clear_screen:
     mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
@@ -270,6 +285,24 @@ Bare_crash:
 .spin:
     jmp .spin
 
+Bare_dump_sector:
+    push cx
+    mov cl, al
+    call load_sector_into_buffers_cl
+    call show_buffer
+    pop cx
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; begin/end
+
+top_of_memory equ 0
+
+begin:
+    mov sp, top_of_memory
+    mov cx, final_continuation
+    call Bare_clear_screen
+    jmp bare_start
 
 final_continuation:
     dw final_code
@@ -281,13 +314,8 @@ spin:
     call Bare_get_char ;; avoid really spinning the fans
     jmp spin
 
-top_of_memory equ 0
-
-begin:
-    mov sp, top_of_memory
-    mov cx, final_continuation
-    call Bare_clear_screen
-    jmp bare_start
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; dev/play
 
 end_of_time_play:
     mov cl, 1
@@ -316,7 +344,7 @@ Dump_sector: ; (byte offset) si->
     mov cx, 0 ; inner loop index (col)
 .outer:
     mov ax, di
-    shl ax, 1
+    shl ax, 2
     PrintHexAX
     mov al, '0'
     PrintCharAL
@@ -327,12 +355,12 @@ Dump_sector: ; (byte offset) si->
     call .one
     inc si
     inc cx
-    cmp cx, 32
+    cmp cx, 64
     jnz .chars
     Newline
     mov cx, 0
     inc di
-    cmp di, 16
+    cmp di, 8
     jnz .outer
     ret
 .one:
@@ -346,9 +374,16 @@ Dump_sector: ; (byte offset) si->
     Dot
     ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; User code
 
+;;; TODO: stop using first page of memory for temps
 %include CODE
+
+;    times 512 db 'a'
+;    times 512 db 'b'
+;    times 512 db 'c'
+;    times 512 db 'd'
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Check Size

@@ -12,6 +12,7 @@ data Builtin
   | MakeBytes | FreezeBytes | ThawBytes | SetBytes | GetBytes
   | MakeRef | DeRef | SetRef
   | Crash
+  | DumpSec
   deriving (Show)
 
 data Semantics
@@ -70,6 +71,7 @@ defineBuiltin b =
       ISetRef r v (k unit)
 
     Crash -> Impure $ undefined
+    DumpSec -> Impure $ undefined
 
   where
     unit = VCons tUnit []

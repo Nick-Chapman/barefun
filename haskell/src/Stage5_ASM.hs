@@ -106,6 +106,7 @@ data BareBios
   | Bare_mul
   | Bare_div
   | Bare_mod
+  | Bare_dump_sector
   -- Bare_check_heap_space -- TODO: generate Check at eery code entry point
   deriving Show
 
@@ -328,6 +329,11 @@ execBare = \case
     w1 <- GetReg Ax
     w2 <- GetReg Bx
     SetReg Ax (binaryW mod w1 w2)
+
+  Bare_dump_sector -> do
+    -- do nothing in haskell emulator -- TODO: when get to read/write will emulate
+    pure ()
+
 
 createBytesInMemory :: Number -> M Word
 createBytesInMemory n = loop n
@@ -821,6 +827,11 @@ compileBuiltin b = case b of
     ]
 
   SRC.Crash -> oneArg $ \_ -> [ OpCall Bare_crash ]
+
+  SRC.DumpSec -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    , OpCall Bare_dump_sector
+    ]
 
   where
     err = error (printf "Stage5.compileBuiltin: error: %s" (show b))

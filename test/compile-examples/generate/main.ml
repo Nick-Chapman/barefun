@@ -20,9 +20,13 @@ let generate_rules x v =
 let generate_rules_set example =
   List.iter (generate_rules example) (select_versions_for_example example)
 
+let allow = function
+  | _ -> true
+
 let () =
   Sys.readdir "../examples"
   |> Array.to_list
   |> List.sort String.compare
   |> List.filter_map (Filename.chop_suffix_opt ~suffix:".fun")
+  |> List.filter allow
   |> List.iter generate_rules_set
