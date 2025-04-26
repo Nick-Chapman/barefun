@@ -1,36 +1,73 @@
 
-;;; Note: page = 256 bytes; 16 bit address space is 64k or 256 pages
-
-;;; The bootloader will be resident from page 124 (0x7c00)
-;;; The lowest the kernel can be loaded is 0x500 (leaving 5 pages for the BIOS)
-
+;;; A page = 256 bytes; 16 bit address space is 64k or 256 pages
 ;;; A disk sector is 512 bytes
+;;; The bootloader is initially be resident from page 124 (0x7c00)
+;;; We relocate it to the top of memory: page 254/255 (0xfe00)
 
     sector_size equ 512
 
-;;; The maximum space available for a contiguously loaded kernel is therfore 119 pages. (124-5)
-;;; i.e. the space between the 5 pages reserved for the BIOS and the start of the bootloader
-;;; That is 59.5 sector.
-
     bootloader_address equ 0x7c00
+    bootloader_relocation_address equ 0xfe00
 
     kernel_load_address equ 0x500
-    kernel_size_in_sectors equ 67
-
-    bootloader_relocation_address equ \
-       kernel_load_address + kernel_size_in_sectors * sector_size ; 0x1100
-
-    embedded_load_address equ \
-       bootloader_relocation_address + sector_size ; 0x1300
-
-    ;; 124 because we leave 1k each for the param + return stack
-    embedded_size_in_sectors equ \
-        124 - (embedded_load_address / sector_size + 1)
-
-
-;;; bootloader.asm...
+    kernel_size_in_sectors equ 124 ;; max before relocated bootloader
 
     bits 16
+
+;; Macros...
+
+%macro PrintCharAL 0
+    mov ah, 0x0e
+    mov bh, 0
+    int 0x10
+%endmacro
+
+%macro PrintChar 1
+    mov al, %1
+    PrintCharAL
+%endmacro
+
+%macro Print 1
+    push di
+    jmp %%after
+%%message: db %1, 0
+%%after:
+    mov di, %%message
+    call internal_print_string
+    pop di
+%endmacro
+
+%macro Newline 0
+    PrintChar 10
+    PrintChar 13
+%endmacro
+
+%macro Space 0
+    PrintChar ' '
+%endmacro
+
+%macro Dot 0
+    PrintChar '.'
+%endmacro
+
+%macro PrintHexNibbleBX 0
+    mov ax, [bx + hex_data]
+    PrintCharAL
+%endmacro
+
+%macro PrintHexAX 0
+    push ax
+    mov bx, ax
+    shr bx, 4
+    and bx, 0xF
+    PrintHexNibbleBX
+    pop bx
+    and bx, 0xF
+    PrintHexNibbleBX
+%endmacro
+
+;;; Bootloader...
+
     org bootloader_relocation_address
     section BOOTSECTOR start=bootloader_relocation_address
 
@@ -44,6 +81,7 @@ start:
     mov ss, ax
     mov sp, 0
 
+    ;; Relocate the bootloader sector (256 words = 512 bytes)
     mov cx, 0x100
     mov si, bootloader_address
     mov di, bootloader_relocation_address
@@ -51,10 +89,11 @@ start:
     jmp 0:part2
 
 part2:
-    ;; Note. Sectors are numbered from 1. The bootloader (this file!) is in the 1st sector.
-    ;; So the kernel starts at sector 2
+    ;; Sectors are numbered from 1. The bootloader is in the 1st sector.
+    ;; Kernel starts at sector 2
     first_non_boot_sector equ 2
 
+    mov [0], dl ; SAVE DRIVE NUMBER ; TODO better place to put this?
     mov ah, 0x02 ; Function: Read Sectors From Drive
     mov ch, 0 ; cylinder
     mov dh, 0 ; head
@@ -63,15 +102,7 @@ part2:
     mov bx, kernel_load_address ; dest
     int 0x13
 
-    mov ah, 0x02 ; Function: Read Sectors From Drive
-    mov ch, 0 ; cylinder
-    mov dh, 0 ; head
-    mov al, embedded_size_in_sectors ; sector count
-    mov cl, first_non_boot_sector + kernel_size_in_sectors ; start sector
-    mov bx, embedded_load_address
-    int 0x13
-
-    jmp 0: kernel_load_address
+    jmp 0:kernel_load_address
 
     times 446 - ($ - $$) db 0xff
     ;; PMBR partition table, from byte 446
@@ -79,20 +110,12 @@ part2:
     times 510 - ($ - $$) db 0x00
     dw 0xaa55
 
-;;; kernel.asm
+;;; Kernel...
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
     jmp begin
 
-%macro print 1
-    push di
-    jmp %%after
-%%message: db %1, 0
-%%after:
-    mov di, %%message
-    call internal_print_string
-    pop di
-%endmacro
+hex_data: db "0123456789abcdef"
 
 internal_print_string: ; in: DI=string; print null-terminated string.
     push ax
@@ -109,24 +132,6 @@ internal_print_string: ; in: DI=string; print null-terminated string.
     pop di
     pop ax
     ret
-
-top_of_memory equ 0
-
-begin:
-    mov sp, top_of_memory
-    mov cx, final_continuation
-    call Bare_clear_screen
-    jmp bare_start
-
-final_continuation:
-    dw final_code
-
-final_code:
-    print `[HALT]\n`
-spin:
-    call Bare_get_char ;; avoid really spinning the fans
-    jmp spin
-
 
 Bare_clear_screen:
     mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
@@ -167,33 +172,20 @@ Bare_put_char: ; al->
     jg .as_code
     ;; fall though to normal
 .normal:
-    mov ah, 0x0e ; Function: Teletype output
-    mov bh, 0
-    int 0x10
+    PrintCharAL
     ret
 .nl:
     mov al, LF
     call .normal
     mov al, CR
     jmp .normal
-.hex: db "0123456789abcdef"
 .as_code:
     push ax
-    push ax
-    mov al, '\'
-    call .normal
-    ;; hi nibble
-    pop bx
-    shr bx, 4
-    and bx, 0xF
-    mov ax, [bx + .hex]
-    call .normal
-    ;; lo nibble
-    pop bx
-    and bx, 0xF
-    mov ax, [bx + .hex]
-    jmp .normal
-
+    mov al, `\\`
+    PrintCharAL
+    pop ax
+    PrintHexAX
+    ret
 
 Bare_make_bool_from_z:
     jz .yes
@@ -245,7 +237,7 @@ Bare_string_length:
     ret
 
 Bare_make_bytes:
-    pop bx ;; we do heap allocation at stack pointer; so we must first save return address.
+    pop bx ;; heap allocation is at SP; so first we save return address.
     ;; Does not zero the allocated space. User caller code is expected to do this.
     shl ax, 1
     sub sp, ax
@@ -274,9 +266,85 @@ Bare_div:
     ret
 
 Bare_crash:
-    print '[Crash]'
+    Print '[Crash]'
 .spin:
     jmp .spin
+
+
+final_continuation:
+    dw final_code
+
+final_code:
+    ;;call end_of_time_play
+    Print `[HALT]\n`
+spin:
+    call Bare_get_char ;; avoid really spinning the fans
+    jmp spin
+
+top_of_memory equ 0
+
+begin:
+    mov sp, top_of_memory
+    mov cx, final_continuation
+    call Bare_clear_screen
+    jmp bare_start
+
+end_of_time_play:
+    mov cl, 1
+    call load_sector_into_buffers_cl
+    jmp show_buffer
+
+load_sector_into_buffers_cl: ; tested via end_of_time_play
+    mov dl, [0] ; RESTORE DRIVE NUMBER
+    mov ah, 0x02 ; Function: Read Sectors From Drive
+    mov ch, 0 ; cylinder
+    mov dh, 0 ; head
+    mov al, 1 ; sector count
+    ;mov cl, 2 ; start sector number (1 is boot; 2 is kernel)
+    mov bx, buffer ; dest
+    int 0x13
+    ret
+
+buffer:  times 512 db 0
+show_buffer:
+    mov si, buffer
+    call Dump_sector
+    ret
+
+Dump_sector: ; (byte offset) si->
+    mov di, 0 ; outer loop index (line)
+    mov cx, 0 ; inner loop index (col)
+.outer:
+    mov ax, di
+    shl ax, 1
+    PrintHexAX
+    mov al, '0'
+    PrintCharAL
+    Space
+.chars:
+    mov ah, 0
+    mov al, [si]
+    call .one
+    inc si
+    inc cx
+    cmp cx, 32
+    jnz .chars
+    Newline
+    mov cx, 0
+    inc di
+    cmp di, 16
+    jnz .outer
+    ret
+.one:
+    cmp ax, 32
+    jl .dot
+    cmp ax, 126
+    jg .dot
+    PrintCharAL
+    ret
+.dot:
+    Dot
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -292,9 +360,6 @@ Bare_crash:
 ;; Size we actually require:
 %assign Rb ($ - $$)                     ; in bytes
 %assign Rs (1 + ((Rb-1)/sector_size))   ; in sectors
-
-;%error sectors allocated: As (bytes = Ab)
-;%error sectors required: Rs (bytes = Rb)
 
 %if Rb>Ab
 %error Kernel sectors allocated: As, required: Rs
