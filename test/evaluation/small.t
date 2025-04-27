@@ -1,5 +1,5 @@
 
-  $ cat ../inputs/small.input | ../../haskell/main.exe ../examples/small.fun
+  $ cat ../inputs/small.input | ../../haskell/main.exe -measure ../examples/small.fun
   [Stage5 (ASM); post normalization size: 171]
   LOAD
   Welcome to small: a proto readline

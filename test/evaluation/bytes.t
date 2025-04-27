@@ -1,5 +1,5 @@
 
-  $ ../../haskell/main.exe ../examples/bytes.fun
+  $ ../../haskell/main.exe -measure ../examples/bytes.fun
   [Stage5 (ASM); post normalization size: 130]
   One
   \00\00\00\00\00Two

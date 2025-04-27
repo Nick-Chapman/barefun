@@ -18,7 +18,7 @@ x x x x 'X' capX;
   (action
    (with-stdin-from ../../../test/inputs/%s.input
     (with-stdout-to %s.out%c
-     (run ../../../haskell/main.exe -no-measure ../../examples/%s.fun -%c)))))
+     (run ../../../haskell/main.exe ../../examples/%s.fun -%c)))))
 |}
 x x x x v x v
   in

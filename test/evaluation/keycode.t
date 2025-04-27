@@ -1,5 +1,5 @@
 
-  $ cat ../inputs/keycode.input | ../../haskell/main.exe ../examples/keycode.fun
+  $ cat ../inputs/keycode.input | ../../haskell/main.exe -measure ../examples/keycode.fun
   [Stage5 (ASM); post normalization size: 13]
   hey man
   \00\01

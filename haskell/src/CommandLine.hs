@@ -78,7 +78,7 @@ parseCommandLine = loop config0
     config0 = Config { paths = [], mode = Eval
                      , stage = Stage5
                      , trace = Stage5.TraceOff
-                     , measure = True -- TODO: consider having default False with flag to enable
+                     , measure = False
                      }
 
     loop :: Config -> [String] -> Config
@@ -93,6 +93,6 @@ parseCommandLine = loop config0
       "-4":xs           -> loop config { stage = Stage4 } xs
       "-5":xs           -> loop config { stage = Stage5 } xs
       "-trace":xs       -> loop config { trace = Stage5.TraceOn } xs
-      "-no-measure":xs  -> loop config { measure = False } xs
+      "-measure":xs     -> loop config { measure = True } xs
       ('-':flag):_      -> error (show ("unknown flag",flag))
       x:xs              -> loop config { paths = paths config ++ [x] } xs

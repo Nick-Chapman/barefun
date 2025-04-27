@@ -1,5 +1,5 @@
 
-  $ ../../haskell/main.exe ../examples/filesystem.fun
+  $ ../../haskell/main.exe -measure ../examples/filesystem.fun
   [Stage5 (ASM); post normalization size: 3480]
   trace: read_sector 0   **SLOW**
   trace: read_sector 12   **SLOW**
