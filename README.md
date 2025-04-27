@@ -1,15 +1,19 @@
 # barefun
 
-The goal of this project is to write a small "operating system" to run on bare metal x86.
+The goal of this project is to write a small _operating system_ to run on bare metal x86.
 
 - The WIP [operating system](test/examples/sham.fun) is implemented in an ocaml-style language (`.fun`).
-- The WIP [compiler](haskell/README.md) for the ocaml-style language is written in haskell.
+- The WIP [compiler](haskell/README.md) for the `.fun` language is written in haskell.
 
 Programming of the operating system & compiler are proceeding in tandem!
 
-## Pre-requisites
+## Prerequisites
 
-Ocaml (dune), haskell (stack), nasm, qemu : TODO: detailed instructions
+- [haskell](https://www.haskell.org) : To build the Barefun compiler which generates x86 ASM.
+- [ocaml](https://ocaml.org) : `.fun` development.
+- [dune](https://dune.build/install) (ocaml build system) : Barefun development and testing.
+- [nasm](https://www.nasm.us/) : Assembly of the generated x86 and the Barefun runtime.
+- [qemu](https://www.qemu.org/) : Emulation of assembled i386 image.
 
 ## Build/Test
 ```
