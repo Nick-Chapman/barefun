@@ -22,7 +22,8 @@ install the following, and possibly some of their dependencies.
 ## Milestone #1
 
 As of Saturday 26th April 2025, we can compile and run the
-[sham](test/examples/sham.fun) demo -- a toy shell with a fake in-memory filesystem.
+[sham](test/examples/sham.fun) demo -- a toy shell with a fake in-memory
+filesystem -- by running `h run`. Or, if you want to do each step manually:
 
 ```
 dune build @all @runtest
