@@ -191,7 +191,7 @@ let read_sectorC1 : diskC1 -> int -> sector =
           let () = if deref dirty then write_sector disk secj sector else () in (* write back *)
           let sector = read_sector disk seci in
           let cache_line = Cache_Line (ref false,seci,sector) in
-          set_ref r cache_line;
+          r := cache_line;
           sector
 
 let update_sectorC1 : diskC1 -> int -> int -> int -> bytes -> unit =
@@ -204,13 +204,13 @@ let update_sectorC1 : diskC1 -> int -> int -> int -> bytes -> unit =
      | Cache_Line (dirty,secj,sector) ->
         if seci = secj then
           let () = set_slice_bytes (deSector sector) offset len new_bytes in
-          set_ref dirty true
+          dirty := true
         else
           let () = if deref dirty then write_sector disk secj sector else () in (* write back *)
           let sector = read_sector disk seci in
           let () = set_slice_bytes (deSector sector) offset len new_bytes in
           let cache_line = Cache_Line (ref true,seci,sector) in
-          set_ref r cache_line
+          r := cache_line
 
 
 (* blocks: normally would be sized as some multiple of sectors, but my blocks are smaller *)

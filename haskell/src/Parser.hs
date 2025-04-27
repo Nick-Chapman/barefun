@@ -262,8 +262,9 @@ gram6 = program where
   infixGroup3 = (R,["::"])
   infixGroup4 = (R,["^","@@","@"])
   infixGroup5 = (L,["=","<=","<",">=",">"])
+  infixGroup6 = (R,[":="])
 
-  infixNames = concat (map snd [infixGroup1,infixGroup2,infixGroup3,infixGroup4,infixGroup5])
+  infixNames = concat (map snd [infixGroup1,infixGroup2,infixGroup3,infixGroup4,infixGroup5,infixGroup6])
 
   infix0 = application
   infix1 = infixOp infixGroup1 infix0
@@ -271,8 +272,9 @@ gram6 = program where
   infix3 = infixOp infixGroup3 infix2
   infix4 = infixOp infixGroup4 infix3
   infix5 = infixOp infixGroup5 infix4
+  infix6 = infixOp infixGroup6 infix5
 
-  infixWeakestPrecendence = infix5
+  infixWeakestPrecendence = infix6
 
   bound :: Par Id -> Par Bid
   bound identPar = do

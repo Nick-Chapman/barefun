@@ -36,7 +36,7 @@ wrapPreDefs (Prog defs) =
       , ("get_bytes"    , prim2 GetBytes)
       , ("ref"          , prim1 MakeRef)
       , ("deref"        , prim1 DeRef)
-      , ("set_ref"      , prim2 SetRef)
+      , (":="           , prim2 SetRef)
       , ("crash"        , prim1 Crash)
       , ("load_sector_and_dump", prim1 DumpSec)
       , ("load_sector", prim2 LoadSec)
