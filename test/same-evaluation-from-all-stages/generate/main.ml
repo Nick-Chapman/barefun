@@ -4,11 +4,11 @@ let generate_rules x =
 
   Printf.printf
 {|
- (rule (deps ../../../test/inputs/%s.input ../../examples/%s.fun ../../../ocaml/bin/main.exe)
+ (rule (deps ../../../test/inputs/%s.input ../../examples/%s.fun ../../../ocaml/main.exe)
   (action
    (with-stdin-from ../../../test/inputs/%s.input
     (with-stdout-to %s.out%c
-     (run ../../../ocaml/bin/main.exe %s)))))
+     (run ../../../ocaml/main.exe %s)))))
 |}
 x x x x 'X' capX;
 
