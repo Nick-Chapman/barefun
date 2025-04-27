@@ -1,7 +1,7 @@
 
 ## compile-examples
 
-Dune rules for compiling the test/examples to all the compilation stages.
+Dune rules for compiling specific [examples](test/examples) at specific compilation stages.
 
+- [generate/main.ml](generate/main.ml) : selectes which examples/stages
 - [expected](../expected) : Expected compilation output. Files commited to the repo.
-- [generate/main.ml](generate/main.ml) : dune rule generator; including `select_versions_for_example`.

@@ -1,26 +1,30 @@
 
 (* TODO: merge the various rules generators *)
 
-(* TODO: dont use the generated code in compile-examples, but instead our own code
-   allowing to not have some examples in the compile-examples regression
-   when they are unstable.
- *)
-
 let generate_rules x =
-  Printf.printf {|
-(rule
- (deps ../../../x86/runtime.asm ../../compile-examples/gen/%s-5.gen)
- (action
-  (with-stdout-to %s.img
-   (run nasm -Werror -o %s.img -dCODE='../../compile-examples/gen/%s-5.gen' ../../../x86/runtime.asm))))
-(rule
- (alias %s)
- (deps (universe) %s.img)
- (action
- (progn
-  (run chmod +w %s.img)
-  (run qemu-system-i386 -hda %s.img))))
-|} x x x x x x x x
+  Printf.printf
+{|
+ (rule
+  (deps ../../../haskell/main.exe ../../examples/%s.fun)
+  (action
+   (with-stdout-to %s.asm
+    (run ../../../haskell/main.exe ../../examples/%s.fun -compile))))
+
+ (rule
+  (deps ../../../x86/runtime.asm %s.asm)
+  (action
+   (with-stdout-to %s.img
+    (run nasm -Werror -o %s.img -dCODE='%s.asm' ../../../x86/runtime.asm))))
+
+ (rule
+  (alias %s)
+  (deps (universe) %s.img)
+  (action
+  (progn
+   (run chmod +w %s.img)
+   (run qemu-system-i386 -hda %s.img))))
+
+|} x x x x x x x x x x x
 
 let allow_example = function
   | _ -> true
