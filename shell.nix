@@ -8,6 +8,13 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     bash
     curl
+    dune_3
+    gmp
     jq
+    nasm
+    ncurses
+    ocaml
+    qemu
+    stack
   ];
 }
