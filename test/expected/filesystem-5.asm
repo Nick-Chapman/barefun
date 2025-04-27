@@ -4526,7 +4526,7 @@ L344: ; Arm: 13'9
   mov cx, [bp+2]
   jmp [bp]
 
-L345: ; Arm: 209'34
+L345: ; Arm: 209'29
   mov ax, [Temps+10]
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -8518,7 +8518,7 @@ L622: ; Arm: 13'9
   mov cx, [bp+2]
   jmp [bp]
 
-L623: ; Arm: 209'34
+L623: ; Arm: 209'29
   mov ax, [Temps+10]
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -12718,7 +12718,7 @@ L916: ; Arm: 13'9
   mov cx, [bp+2]
   jmp [bp]
 
-L917: ; Arm: 191'34
+L917: ; Arm: 191'29
   mov ax, [Temps+10]
   cmp word ax, 0
   call Bare_make_bool_from_n

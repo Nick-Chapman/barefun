@@ -183,12 +183,12 @@ let read_sectorC1 : diskC1 -> int -> sector =
   trace ("read_sectorC1 seci=" ^ sofi seci);
   match dc with
   | DiskC1 (disk,r) ->
-     let cache_line = deref r in
+     let cache_line = !r in
      match cache_line with
      | Cache_Line (dirty,secj,sector) ->
         if seci = secj then sector
         else
-          let () = if deref dirty then write_sector disk secj sector else () in (* write back *)
+          let () = if !dirty then write_sector disk secj sector else () in (* write back *)
           let sector = read_sector disk seci in
           let cache_line = Cache_Line (ref false,seci,sector) in
           r := cache_line;
@@ -199,14 +199,14 @@ let update_sectorC1 : diskC1 -> int -> int -> int -> bytes -> unit =
   trace ("update_sectorC1 seci=" ^ sofi seci ^ ", offset=" ^ sofi offset ^ ", len=" ^ sofi len);
   match dc with
   | DiskC1 (disk,r) ->
-     let cache_line = deref r in
+     let cache_line = !r in
      match cache_line with
      | Cache_Line (dirty,secj,sector) ->
         if seci = secj then
           let () = set_slice_bytes (deSector sector) offset len new_bytes in
           dirty := true
         else
-          let () = if deref dirty then write_sector disk secj sector else () in (* write back *)
+          let () = if !dirty then write_sector disk secj sector else () in (* write back *)
           let sector = read_sector disk seci in
           let () = set_slice_bytes (deSector sector) offset len new_bytes in
           let cache_line = Cache_Line (ref true,seci,sector) in

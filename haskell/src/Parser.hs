@@ -76,10 +76,10 @@ gram6 = program where
     then error (printf "Add \"%s\" to keywords list" s)
     else nibble (noError (mapM_ lit s))
 
-  bracketedInfixName = nibble $ noError $ do
+  bracketedOperatorName = nibble $ noError $ do
     lit '('
     s <- alts [ noError $ do mapM_ lit name; pure name
-              | name <- infixNames ]
+              | name <- infixNames ++ prefixNames ]
     lit ')'
     pure (mkUserId s)
 
@@ -178,7 +178,7 @@ gram6 = program where
 
   var = do
     pos <- position
-    x <- alts [identifier,bracketedInfixName]
+    x <- alts [identifier,bracketedOperatorName]
     pure (AST.Var pos x)
 
   positionedLit = do
@@ -225,7 +225,18 @@ gram6 = program where
       , pure (AST.Con pos c [])
       ]
 
-  atom = alts [literal,var,listExp,bracketed exp,consApp]
+  atom0 = alts [literal,var,listExp,bracketed exp,consApp]
+
+  prefixNames = ["!"]
+
+  prefixed = do
+    p1 <- position
+    name <- alts [ do key x; pure x | x <- prefixNames ]
+    p <- position
+    arg <- atom0
+    pure (AST.App (AST.Var p1 (mkUserId name)) p arg)
+
+  atom = alts [ atom0, prefixed ]
 
   application = do
     let loop f = alts [ pure f , do p <- position; e <- atom; loop (AST.App f p e)]
@@ -293,12 +304,12 @@ gram6 = program where
     pos <- position
     alts [do key "rec"; pure True, pure False] >>= \case
       True -> do
-        f <- bound $ alts [identifier,bracketedInfixName]
+        f <- bound $ alts [identifier,bracketedOperatorName]
         x1 <- bound identOrUnit
         rhs <- bindingAbstraction
         pure (f, AST.RecLam pos f x1 rhs)
       False -> do
-        f <- bound $ alts [identOrUnit,bracketedInfixName]
+        f <- bound $ alts [identOrUnit,bracketedOperatorName]
         _ <- opt type_annotation
         rhs <- bindingAbstraction
         pure (f,rhs)

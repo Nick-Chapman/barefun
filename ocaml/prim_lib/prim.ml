@@ -28,7 +28,7 @@ module X : sig
 
   type 'a ref
   val ref : 'a -> 'a ref
-  val deref : 'a ref -> 'a (* TODO: (!) *)
+  val (!) : 'a ref -> 'a
   val (:=) : 'a ref -> 'a -> unit
 
   val load_sector_and_dump : int -> unit
@@ -81,7 +81,7 @@ end = struct
 
   type 'a ref  = 'a Stdlib.ref
   let ref = Stdlib.ref
-  let deref = (!)
+  let (!) = (!)
   let (:=) = (:=)
 
   let load_sector_and_dump n =
