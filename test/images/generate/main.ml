@@ -1,6 +1,4 @@
 
-(* TODO: merge the various rules generators *)
-
 let generate_rules x =
   Printf.printf
 {|
