@@ -38,9 +38,9 @@ let allow = function
   | _ -> true
 
 let () =
-  Sys.readdir "../examples"
+  Sys.readdir "../inputs"
   |> Array.to_list
   |> List.sort String.compare
-  |> List.filter_map (Filename.chop_suffix_opt ~suffix:".fun")
+  |> List.filter_map (Filename.chop_suffix_opt ~suffix:".input")
   |> List.filter allow
   |> List.iter generate_rules
