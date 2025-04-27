@@ -2,8 +2,8 @@
 
 The goal of this project is to write a small _operating system_ to run on bare metal x86.
 
-- The WIP [operating system](test/examples/sham.fun) is implemented in an ocaml-style language (`.fun`).
-- The WIP [compiler](haskell/README.md) for the `.fun` language is written in haskell.
+- The _operating system_ will be implemented in an ocaml-style language (`.fun`).
+- The _compiler_ for the `.fun` language is written in haskell.
 
 Programming of the operating system & compiler are proceeding in tandem!
 
@@ -15,26 +15,23 @@ Programming of the operating system & compiler are proceeding in tandem!
 - [nasm](https://www.nasm.us/) : Assembly of the generated x86 and the Barefun runtime.
 - [qemu](https://www.qemu.org/) : Emulation of assembled i386 image.
 
-## Build/Test
+## Milestone #1
+
+As of Saturday 26th April 2025, we can compile and run the
+[sham](test/examples/sham.fun) demo -- a toy shell with a fake in-memory filesystem.
+
 ```
 dune build @all @runtest
-```
-
-## Running the `barefun` compiler
-
-The compiler generates ASM which is combined with the [runtime](x86/runtime.asm), assembled using `nasm`, to produde a bootable image disk image, which can be loaded with `qemu`.
-
-For example, a simple [readline](test/examples/readline.fun):
-```
-  dune exec -- haskell/main.exe test/examples/readline.fun -compile > code
-  nasm -Werror -dCODE="'code'" x86/runtime.asm -o image
-  qemu-system-i386 image
+dune exec -- haskell/main.exe test/examples/sham.fun -compile > code
+nasm -Werror -dCODE="'code'" x86/runtime.asm -o image
+qemu-system-i386 image
 ```
 
 Or burned to a USB stick: `dd if=image of=/dev/sda`.
 
 ## Dev
 
+- The [compiler](haskell/README.md) for the `.fun` language is written in haskell.
 - Examples of `.fun` code can be found [here](test/examples/README.md).
 - Since `.fun` is a subset of ocaml, we can leverage [ocaml](ocaml/README.md) as our development environment.
 - We test evaluation of the examples [here](test/evaluation/README.md), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
