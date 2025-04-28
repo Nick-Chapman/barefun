@@ -39,6 +39,7 @@ wrapPreDefs (Prog defs) =
       , (":="           , prim2 SetRef)
       , ("crash"        , prim1 Crash)
       , ("load_sector"  , prim2 LoadSec)
+      , ("store_sector" , prim2 StoreSec)
       , ("get_sp"       , prim1 GetStackPointer)
       -- When adding new ops, make sure to get the correct arg count!
       ]

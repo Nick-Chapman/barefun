@@ -34,6 +34,7 @@ module X : sig
   val string_length : string -> int
 
   val load_sector : int -> bytes -> unit
+  val store_sector : int -> string -> unit
 
   val get_sp : unit -> int
 
@@ -89,6 +90,9 @@ end = struct
 
   let load_sector n _ =
     Printf.printf "[load_sector:%d]\n" n
+
+  let store_sector n _ =
+    Printf.printf "[store_sector:%d]\n" n
 
   let get_sp () =
     777 (* return some dummy value *)

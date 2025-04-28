@@ -13,7 +13,7 @@ data Builtin
   | StringLength | StringIndex
   | MakeBytes | SetBytes | GetBytes
   | FreezeBytes | ThawBytes
-  | LoadSec
+  | LoadSec | StoreSec
   | GetStackPointer
   deriving (Show)
 
@@ -77,6 +77,7 @@ defineBuiltin b =
 
     Crash -> Impure $ undefined
     LoadSec -> Impure $ undefined -- TODO: emulate
+    StoreSec -> Impure $ undefined -- TODO: emulate
     GetStackPointer -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 777)
 
   where

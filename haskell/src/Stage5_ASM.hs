@@ -119,6 +119,7 @@ data BareBios
   | Bare_get_bytes
 
   | Bare_load_sector
+  | Bare_store_sector
 
   deriving Show
 
@@ -377,6 +378,8 @@ execBare = \case
     SetReg Ax (WNum n)
 
   Bare_load_sector -> do -- TODO: emulate in Value/Interaction
+    pure ()
+  Bare_store_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
 
 
@@ -893,6 +896,12 @@ compileBuiltin b = case b of
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_load_sector
+    ]
+
+  SRC.StoreSec -> twoArgs $ \s1 s2 ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpCall Bare_store_sector
     ]
 
   SRC.GetStackPointer -> oneArg $ \_ ->

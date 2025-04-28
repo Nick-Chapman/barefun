@@ -341,6 +341,25 @@ Bare_load_sector: ;Ax (Num bytes), Bx (The bytes buffer to load into)
     pop cx
     ret
 
+;;; YES, this really updates the image file when running in qemu
+Bare_store_sector: ;Ax (Num bytes), Bx (The string to store)
+
+    push cx ; save continuation
+    push dx ; save arg
+
+    mov cl, al ; start sector number (1 is boot; 2 is kernel)
+    mov dl, [0] ; RESTORE DRIVE NUMBER
+    mov ah, 0x03 ; Function: Write Sectors To Drive
+    mov ch, 0 ; cylinder
+    mov dh, 0 ; head
+    mov al, 1 ; sector count
+    add bx, 2 ; src buffer; skip 2 for the length word
+    int 0x13
+
+    pop dx
+    pop cx
+    ret
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; begin/end
 
@@ -364,10 +383,10 @@ final_code:
 
 %include CODE
 
-;    times 512 db 'a'
-;    times 512 db 'b'
-;    times 512 db 'c'
-;    times 512 db 'd'
+    align 512
+    times 512 db '5'
+    times 512 db '6'
+    times 512 db '7'
 
 end_of_code:
 

@@ -1,5 +1,7 @@
 (* Sector explorer *)
 
+let noinline = let rec block f a = let _ = block in f a in block
+
 let not b =
   match b with
   | true -> false
@@ -7,7 +9,7 @@ let not b =
 
 let (>=) a b = not (a < b)
 
-let put_string s =
+let _put_string s =
   let n = string_length s in
   let rec loop i =
     if i >= n then () else
@@ -16,7 +18,7 @@ let put_string s =
   in
   loop 0
 
-let put_int i =
+let _put_int i =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in
   let rec loop i =
@@ -47,17 +49,39 @@ let put_sector_string s =
   in
   loop 0
 
-let dump n =
+(*let _dump = noinline (fun n ->
   put_string "sector:"; put_int n;
   let s = read_sector n in
   put_sector_string s;
-  put_string "(space="; put_int (get_sp()); put_string ")";
-  newline()
+  (*put_string "(space="; put_int (get_sp()); put_string ")";*)
+  newline())*)
 
-let main () =
+(*let main () =
   let rec loop i =
     dump i;
     let _ : char = get_char () in
     loop (i+1)
   in
-  loop 1 (* sectors start from 1 *)
+  loop 5 (* sectors start from 1 *)*)
+
+let _make_sector = noinline (fun c ->
+  let b = make_bytes 512 in
+  let rec loop i =
+    if i >= 512 then () else
+      (set_bytes b i c; loop (i+1))
+  in
+  loop 0;
+  freeze_bytes b)
+
+let main () =
+
+  let sA = read_sector 6 in
+  put_sector_string sA ;
+
+  let sB = read_sector 7 in
+  put_sector_string sB ;
+
+  store_sector 6 sB;
+  store_sector 7 sA;
+
+  ()
