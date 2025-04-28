@@ -449,7 +449,47 @@ let g199 = fun arg k ->
   k t1 in
 let g200 = Nil0 in
 let g201 = Nil0 in
-let g202 = Nil0 in
+let g202 = "space" in
+let g203 = "space - where is the stack-pointer?\n" in
+let g204 = Unit0 in
+let g205 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_EqInt(arg,0) in
+    match t1 with
+    | true1 -> k f1
+    | false0 ->
+      let t2 = PRIM_ModInt(arg,10) in
+      let t3 = PRIM_AddInt(48,t2) in
+      let t4 = PRIM_CharChr(t3) in
+      let t5 = Cons1[t4,f1] in
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_DivInt(f2,10) in
+        arg t1 k in
+      g205 t5 k in
+  k t1 in
+let g206 = Nil0 in
+let g207 = Nil0 in
+let g208 = fun arg k ->
+  let t1 = [arg], fun [f1] arg k ->
+    let t1 = PRIM_GetStackPointer(g204) in
+    let t2 = PRIM_EqInt(t1,0) in
+    let k = [f1], fun [f2] arg ->
+      let k = [f2], fun [f2] arg ->
+        let t1 = PRIM_PutChar('\n') in
+        k f2 in
+      g25 arg k in
+    match t2 with
+    | true1 ->
+      let t3 = Cons1['0',g206] in
+      k t3
+    | false0 ->
+      let k = [t1], fun [f2] arg -> arg f2 k in
+      g205 g207 k in
+  k t1 in
+let g209 = Executable1[g203,g208] in
+let g210 = Pair0[g202,g209] in
+let g211 = Nil0 in
+let g212 = Cons1[g210,g211] in
 let k = [], fun [] arg ->
   let k = [arg], fun [f2] arg ->
     let k = [f2,arg], fun [f2,f3] arg ->
@@ -1498,7 +1538,7 @@ let k = [], fun [] arg ->
               k t1 in
             let t26 = Executable1[g181,t25] in
             let t27 = Pair0[g180,t26] in
-            let t28 = Cons1[t27,g202] in
+            let t28 = Cons1[t27,g212] in
             let t29 = Cons1[g179,t28] in
             let t30 = Cons1[t24,t29] in
             let t31 = Cons1[t21,t30] in

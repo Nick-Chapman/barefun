@@ -87,6 +87,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di -- when needed
 data Addr -- memory address
   = Physical_raw Int
   | Symbolic DataLabel Int
+  | TempSpace Int
   deriving (Eq,Ord)
 
 data CodeLabel = CodeLabel Int String -- unique label and provenance
@@ -107,6 +108,7 @@ data BareBios
   | Bare_make_bool_from_n
   | Bare_num_to_char
   | Bare_char_to_num
+  | Bare_addr_to_num
   | Bare_mul
   | Bare_div
   | Bare_mod
@@ -149,7 +151,7 @@ instance Show Op where
   show = \case
     OpComment message ->  ";; " ++ message
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
-    OpStore a src -> "mov [Temps+" ++ show a ++ "], " ++ show src
+    OpStore a src -> "mov [" ++ show a ++ "], " ++ show src
     OpStoreR t src -> "mov word [" ++ show t ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push word " ++ show src
@@ -169,7 +171,7 @@ instance Show Source where
   show = \case
     SReg r -> show r
     SLit w -> show w
-    SMem a -> "[Temps+"++show a++"]"
+    SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
 
@@ -201,9 +203,10 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical_raw n -> show (bytesPerWord * n) -- TODO: bytesPerWord here wrong?
+    Physical_raw{} -> undefined -- we only get Physical address at runtime from stack pushes
     Symbolic d 0 -> printf "%s" (show d)
-    Symbolic d n -> printf "%s+%d" (show d) n
+    Symbolic d n -> undefined d n -- printf "%s+%d" (show d) n
+    TempSpace n -> printf "Temps+%d" (2*n)
 
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
 instance Show DataLabel where show (DataLabel g) = show g
@@ -322,6 +325,10 @@ execBare = \case
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
+  Bare_addr_to_num -> do
+    a <- deAddr <$> GetReg Ax
+    SetReg Ax (WNum (fromIntegral $ dePhysical a))
+
   Bare_mul -> do
     w1 <- GetReg Ax
     w2 <- GetReg Bx
@@ -429,11 +436,18 @@ addAddr :: Int -> Addr -> Addr
 addAddr i = \case
   Physical_raw n -> mkPhysical (n+i)
   Symbolic lab n -> Symbolic lab (n+i) -- I had a nasty bug here -- 1 instead of i :(
+  TempSpace{} -> undefined
 
 mkPhysical :: Int -> Addr
 mkPhysical n =
   --if n < (-10000) then error "mkPhysical:too small" else
     Physical_raw n
+
+dePhysical :: Addr -> Int
+dePhysical = \case
+  Physical_raw n -> n
+  Symbolic{} -> undefined "dePhysical/Symbolic"
+  TempSpace{} -> undefined "dePhysical/TempSpace"
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -545,7 +559,7 @@ state0 dmap = State
   , offsetFromLastLabel = error "offsetFromLastLabel"
   }
   where
-    initialStackPointer = mkPhysical 0 -- stack address are negative in stage5 emulation
+    initialStackPointer = mkPhysical 65536 -- (not any more!) stack address are negative in stage5
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
@@ -582,13 +596,19 @@ instance Show State where
 -- Address for runtime system constants: 90,91,92
 
 tempOffset :: Int -> Addr
-tempOffset n = mkPhysical n
+--tempOffset n = mkPhysical n
+--tempOffset n = mkPhysical (10000 + n) -- hack to be higher than top of memory
+tempOffset n = TempSpace n
 
 aFalse,aTrue,aNil,aFinalCont :: Addr
-aFalse = mkPhysical 90
+{-aFalse = mkPhysical 90
 aTrue = mkPhysical 91
 aNil = mkPhysical 92
-aFinalCont = mkPhysical 93
+aFinalCont = mkPhysical 93-}
+aFalse = Symbolic (DataLabel (SRC.Global (-1))) 0
+aTrue = Symbolic (DataLabel (SRC.Global (-2))) 0
+aNil = Symbolic (DataLabel (SRC.Global (-3))) 0
+aFinalCont = Symbolic (DataLabel (SRC.Global (-4))) 0
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
@@ -873,6 +893,11 @@ compileBuiltin b = case b of
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_load_sector
+    ]
+
+  SRC.GetStackPointer -> oneArg $ \_ ->
+    [ OpMove Ax (SReg Sp)
+    , OpCall Bare_addr_to_num
     ]
 
   where

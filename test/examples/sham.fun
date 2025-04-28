@@ -381,6 +381,10 @@ let fib_behaviour fs args =
         | Some n ->
            runfib n; fs
 
+let space_behaviour fs _args =
+  let n = get_sp() in
+  put_int n; newline (); fs
+
 let readme = "Welcome to sham; please try all the commands!\nCan you find the hidden Easter Egg?\n"
 let man_ls = "ls - list directory contents\n"
 let man_cat = "cat - concatenate files and print on the standard output\n"
@@ -391,6 +395,7 @@ let man_mv = "mv - move (rename) files\n"
 let man_file = "file - determine file type\n"
 let man_create = "create - create a new file\n"
 let man_fib = "fib - naive fib computation upto the given number\n"
+let man_space = "space - where is the stack-pointer?\n"
 
 let shadow =
   "I have a little shadow that goes in and out with me,\nAnd what can be the use of him is more than I can see.\nHe is very, very like me from the heels up to the head;\nAnd I see him jump before me, when I jump into my bed.\n"
@@ -407,6 +412,7 @@ let fs0() = Bindings(
   ; Pair ("rm", Executable (man_rm, rm_behaviour))
   ; Pair ("cat", Data shadow)
   ; Pair ("fib", Executable (man_fib, fib_behaviour))
+  ; Pair ("space", Executable (man_space, space_behaviour))
   ])
 
 let main () =

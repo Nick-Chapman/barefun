@@ -271,6 +271,9 @@ Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the 
     ;;mov ah, 0
     ret
 
+Bare_addr_to_num: ;; called when we see where the Sp is
+    ;; when we have only 15bi nums, we ought to shift/tag this, so we gve answer in #words
+    ret
 
 Bare_mul:
     mul bx ; ax * bx -> ax
@@ -300,7 +303,11 @@ Bare_string_length:
 Bare_make_bytes:
     pop bx ;; heap allocation is at SP; so first we save return address.
     ;; Does not zero the allocated space. User caller code is expected to do this.
+
     sub sp, ax
+    ;; we need to keep the stack word aligned, so we must round-down sp to an even address
+    and sp, 0xFFFE
+
     push ax
     mov ax, sp
     jmp bx

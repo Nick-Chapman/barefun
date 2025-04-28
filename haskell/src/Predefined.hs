@@ -39,6 +39,8 @@ wrapPreDefs (Prog defs) =
       , (":="           , prim2 SetRef)
       , ("crash"        , prim1 Crash)
       , ("load_sector"  , prim2 LoadSec)
+      , ("get_sp"       , prim1 GetStackPointer)
+      -- When adding new ops, make sure to get the correct arg count!
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])

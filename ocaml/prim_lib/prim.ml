@@ -35,6 +35,8 @@ module X : sig
 
   val load_sector : int -> bytes -> unit
 
+  val get_sp : unit -> int
+
 end = struct
 
   exception CRASH
@@ -87,6 +89,9 @@ end = struct
 
   let load_sector n _ =
     Printf.printf "[load_sector:%d]\n" n
+
+  let get_sp () =
+    777 (* return some dummy value *)
 
 end
 include X

@@ -1,11 +1,11 @@
 
   $ cat ../inputs/sham.input | ../../haskell/main.exe -measure ../examples/sham.fun
-  [Stage5 (ASM); post normalization size: 1949]
+  [Stage5 (ASM); post normalization size: 2004]
   Sham: In-memory file-system. Consider typing "ls".
   % xxx
   sham: xxx: command not found
   % ls
-  readme cat cp create file ls man mv rm cat fib
+  readme cat cp create file ls man mv rm cat fib space
   % readme
   sham: readme: Permission denied
   % cat readme
@@ -18,7 +18,7 @@
   % ls
   sham: ls: command not found
   % xx
-  xx readme cat cp create file man mv rm cat fib
+  xx readme cat cp create file man mv rm cat fib space
   % fib 15
   fib 0 --> 0
   fib 1 --> 1
@@ -42,4 +42,4 @@
   And what can be the use of him is more than I can see.
   He is very, very like me from the heels up to the head;
   And I see him jump before me, when I jump into my bed.
-  % [EOF:#op=272723, #alloc=90770]
+  % [EOF:#op=274003, #alloc=91234]

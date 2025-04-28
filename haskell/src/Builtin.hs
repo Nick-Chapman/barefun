@@ -14,6 +14,7 @@ data Builtin
   | MakeBytes | SetBytes | GetBytes
   | FreezeBytes | ThawBytes
   | LoadSec
+  | GetStackPointer
   deriving (Show)
 
 data Semantics
@@ -76,6 +77,7 @@ defineBuiltin b =
 
     Crash -> Impure $ undefined
     LoadSec -> Impure $ undefined -- TODO: emulate
+    GetStackPointer -> Impure $ undefined -- TODO: emulate
 
   where
     unit = VCons tUnit []
