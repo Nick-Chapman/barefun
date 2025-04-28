@@ -34,7 +34,7 @@ data Image = Image
 data DataSpec
   = DW [Word]
   | DB [Char]
-  | DS String -- TODO
+  | DS String
 
 data Code
   = Do Op Code
@@ -188,7 +188,7 @@ escapeCharForNasm :: Char -> String
 escapeCharForNasm c = do
   let n = ord c
   if c == '\n' then "\\n" else
-    if c == '`' then "\\`" else -- TODO: example to provoke needd for this
+    if c == '`' then "\\`" else
       if (n < 32 || n > 126) then printf "\\x%02x" n else [c]
 
 instance Show Reg where

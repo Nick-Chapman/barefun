@@ -15,7 +15,6 @@ module X : sig
   val get_char : unit -> char
   val ord : char -> int
   val put_char : char -> unit
-  (*val upto : int -> int -> int list*) (*TODO:remove*)
 
   type 'a ref
   val ref : 'a -> 'a ref
@@ -68,10 +67,6 @@ end = struct
     let nl = (n == 10) in
     let bs = (n == 8) in
     if printable || nl || bs then printf "%c%!" c else printf "\\%02x%!" n
-
-  (*let upto i j =
-    let rec loop acc i = if i > j then List.rev acc else loop (i::acc) (i+1) in
-    loop [] i*)
 
   type 'a ref  = 'a Stdlib.ref
   let ref = Stdlib.ref

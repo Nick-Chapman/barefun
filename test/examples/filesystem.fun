@@ -79,7 +79,7 @@ let newline () = put_char '\n'
 
 (* grabbed from shell.fun *)
 
-let chars_of_int i = (* TODO: make this work for negative numbers *)
+let chars_of_int i = (* TODO: make this work for negative numbers -- copy from sex.fun *)
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in
   let rec loop acc i =
