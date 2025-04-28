@@ -63,7 +63,7 @@ data Source
   | SLit Word
   | SMem Addr
   | SMemIndirect Reg
-  | SMemIndirectOffset Reg Int -- TODO: byte indexing, was word indexing
+  | SMemIndirectOffset Reg Int -- byte indexing
 
 -- Word is a structured type for the contents of a register or memory location
 -- We use a variant type to help catch compiler bugs during dev.
@@ -449,12 +449,12 @@ data M a where
   Debug :: String -> M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
-  TraceAlloc :: M () -- TODO: take Int
+  TraceAlloc :: M ()
   GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Word -> M ()
   GetReg :: Reg -> M Word
   SetMem :: Addr -> Word -> M ()
-  GetMem :: Addr -> M Word -- TODO: Need byte addressing here as well as weord addressing
+  GetMem :: Addr -> M Word
   SetFlagZ :: Bool -> M ()
   GetFlagZ :: M Bool
   SetFlagN :: Bool -> M ()
