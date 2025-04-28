@@ -20,16 +20,24 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc))
 
+packedStrings :: Bool
+packedStrings = False  -- TODO: switch this on
+
 bytesPerWord :: Int
-bytesPerWord = 2 -- TODO: We use this only in the x86 printer.
+bytesPerWord = 2
 
 type Transformed = Image
 
 data Image = Image
   { cmap :: Map CodeLabel Code
-  , dmap :: Map DataLabel [Word]
+  , dmap :: Map DataLabel [DataSpec]
   , start :: CodeLabel
   }
+
+data DataSpec
+  = DW [Word]
+  | DB [Char]
+  -- | DS String -- TODO
 
 data Code
   = Do Op Code
@@ -58,7 +66,7 @@ data Source
   | SLit Word
   | SMem Addr
   | SMemIndirect Reg
-  | SMemIndirectOffset Reg Int
+  | SMemIndirectOffset Reg Int -- TODO: byte indexing, was word indexing
 
 -- Word is a structured type for the contents of a register or memory location
 -- We use a variant type to help catch compiler bugs during dev.
@@ -70,6 +78,7 @@ data Word
   | WNum Number
   | WAddr Addr
   | WCodeLabel CodeLabel
+  | WUninitialized
   deriving Eq
 
 vTag :: Ctag -> Word
@@ -91,24 +100,31 @@ data DataLabel = DataLabel SRC.Global
 
 -- BareBios; primitive routines available to the compiled code
 data BareBios
-  = Bare_halt
+  -- Base_clear_screen -- TODO: expose to user code
+  = Bare_halt -- TODO: not in runtime.asm -- so should not be a Bare call?
   | Bare_crash
+  | Bare_enter_check
   | Bare_put_char
   | Bare_get_char
   | Bare_make_bool_from_z
   | Bare_make_bool_from_n
   | Bare_num_to_char
   | Bare_char_to_num
-  | Bare_string_length
-  | Bare_make_bytes
-  | Bare_set_bytes
-  | Bare_get_bytes
   | Bare_mul
   | Bare_div
   | Bare_mod
+
+  | Bare_string_length
+  | Bare_make_bytes_unpacked
+  | Bare_set_bytes_unpacked
+  | Bare_get_bytes_unpacked
+  | Bare_make_bytes
+  | Bare_set_bytes
+  | Bare_get_bytes
+
   | Bare_dump_sector
   | Bare_load_sector
-  | Bare_enter_check
+
   deriving Show
 
 ----------------------------------------------------------------------
@@ -119,9 +135,16 @@ instance Show Image where
     unlines [ printf "%s: ; %s\n%s" (show lab) provenance (show code)
             | (lab@(CodeLabel _ provenance),code) <- Map.toList cmap ]
     ++
-    unlines [ printf "%s: dw %s" (show lab) (intercalate ", " (map show vals))
+    unlines [ printf "%s:%s" (show lab) (concat (map show vals))
             | (lab,vals) <- Map.toList dmap ]
     ++ printf "\nbare_start: jmp %s" (show start)
+
+instance Show DataSpec where
+  show = \case
+    DW [] -> ""
+    DW ws -> printf "\n  dw %s" (intercalate ", " [ show w | w <- ws ])
+    DB [] -> ""
+    DB cs -> printf "\n  db %s" (intercalate ", " [ showCharForNasm c | c <- cs ])
 
 instance Show Code where
   show = \case
@@ -154,19 +177,23 @@ instance Show Source where
     SLit w -> show w
     SMem a -> "[Temps+"++show a++"]"
     SMemIndirect r -> "["++show r++"]"
-    SMemIndirectOffset r n -> "["++show r++"+"++show (bytesPerWord * n)++"]"
+    SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
 
 instance Show Word where
   show = \case
-    -- nasm requires backticks around escape sequences
-    WChar c -> do
-      let n = ord c
-      if c == '\n' then "`\\n`" else
-        if c == '\'' then "`\'`" else
-          if (n < 32 || n > 126) then show n else show c
+    WChar c -> showCharForNasm c
     WNum n -> show n
     WAddr a -> show a
     WCodeLabel lab -> show lab
+    WUninitialized -> "<uninitialized>"
+
+showCharForNasm :: Char -> String
+showCharForNasm c = do
+  -- nasm requires backticks around escape sequences
+  let n = ord c
+  if c == '\n' then "`\\n`" else
+    if c == '\'' then "`\'`" else
+      if (n < 32 || n > 126) then show n else show c
 
 instance Show Reg where
   show = \case
@@ -181,7 +208,7 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical_raw n -> show (bytesPerWord * n)
+    Physical_raw n -> show (bytesPerWord * n) -- TODO: bytesPerWord here wrong?
     Symbolic d 0 -> printf "%s" (show d)
     Symbolic d n -> printf "%s+%d" (show d) n
 
@@ -222,7 +249,7 @@ execOp = \case
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
-    execPush w
+    execPushWord w
     cont
   OpCmp s1 s2 -> \cont -> do
     w1 <- evalSource s1
@@ -238,12 +265,20 @@ execOp = \case
   OpAddInto r s -> execBinaryOp (+) r s
   OpSubInto r s -> execBinaryOp (-) r s
 
-execPush :: Word -> M ()
-execPush w = do
-  TraceAlloc
+execPushWord :: Word -> M () -- we can't push individual bytes
+execPushWord w = do
+  -- but we are counting in bytes.
   a <- deAddr <$> GetReg Sp
-  let a' = prevAddr a
+  sequence_ (replicate bytesPerWord TraceAlloc)
+  let a' = addAddr (-(bytesPerWord)) a
   SetMem a' w
+  SetReg Sp (WAddr a')
+
+slideStackPointer :: Int -> M ()
+slideStackPointer nWords = do
+  sequence_ (replicate (bytesPerWord * nWords) TraceAlloc)
+  a <- deAddr <$> GetReg Sp
+  let a' = addAddr (-(bytesPerWord * nWords)) a
   SetReg Sp (WAddr a')
 
 execBinaryOp :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
@@ -269,8 +304,15 @@ execBare :: BareBios -> M ()
 execBare = \case
   Bare_halt -> Halt
   Bare_crash -> error "Bare_crash"
+
+  Bare_enter_check -> do
+    _x <- deAddr <$> GetReg Sp
+    --Debug (printf "[%s]" (show x))
+    pure ()
+
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
   Bare_put_char -> do c <- deChar <$> GetReg Ax; PutChar c
+
   Bare_make_bool_from_z -> do
     b <- GetFlagZ
     SetReg Ax (WAddr (if b then aTrue else aFalse))
@@ -279,42 +321,13 @@ execBare = \case
     SetReg Ax (WAddr (if b then aTrue else aFalse))
 
   -- On real hardware Num/Char will have overlapping representations
-  -- such that ord/chr have null implementations
-
-  -- TODO: avoid these being Bare routines.
-  -- instead have pseudo "reinterpret" op, which is omitted (just printed as a comment) in the generated x86
+  -- such that ord/chr have null implementations. maybe not quite. the high byte of a char will be zero
   Bare_num_to_char -> do
     n <- deNum <$> GetReg Ax
     SetReg Ax (WChar (Char.chr (fromIntegral n)))
   Bare_char_to_num -> do
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
-
-  Bare_make_bytes -> do
-    n <- deNum <$> GetReg Ax
-    w <- createBytesInMemory n
-    SetReg Ax w
-
-  Bare_string_length -> do
-    -- TODO: no need for Bare given better string rep; just generate ops
-    -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
-    a <- deAddr <$> GetReg Ax
-    n <- deNum <$> GetMem a
-    SetReg Ax (WNum n)
-
-  Bare_set_bytes -> do
-    a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Bx
-    c <- deChar <$> GetReg Si
-    let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
-    SetMem a' (WChar c)
-
-  Bare_get_bytes -> do
-    a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Bx
-    let a' = addAddr (fromIntegral i + 1) a  -- +1 for the length info
-    c <- GetMem a'
-    SetReg Ax c
 
   Bare_mul -> do
     w1 <- GetReg Ax
@@ -331,36 +344,69 @@ execBare = \case
     w2 <- GetReg Bx
     SetReg Ax (binaryW mod w1 w2)
 
-  Bare_dump_sector -> do
-    -- do nothing in haskell emulator -- TODO: when get to read/write will emulate
+  Bare_make_bytes_unpacked -> do
+    n <- deNum <$> GetReg Ax
+    let nWords = fromIntegral n -- One word per byte/char (BAD!)
+    slideStackPointer nWords
+    execPushWord (WNum n)
+    w <- GetReg Sp
+    SetReg Ax w
+
+  Bare_make_bytes -> do
+    n <- deNum <$> GetReg Ax
+    let nWords = (fromIntegral n + 1) `div` 2 -- half the space!
+    slideStackPointer nWords
+    execPushWord (WNum n)
+    w <- GetReg Sp
+    SetReg Ax w
+
+  -- TODO: no need for Bare given better string rep; just generate ops
+  -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
+
+  Bare_set_bytes_unpacked -> do
+    a <- deAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Si
+    c <- deChar <$> GetReg Bx
+    let a' = addAddr (bytesPerWord * (fromIntegral i + 1)) a  -- +1 for the length info
+    SetMem a' (WChar c)
+
+  Bare_set_bytes -> do
+    a <- deAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Si
+    c <- deChar <$> GetReg Bx
+    let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
+    SetMem a' (WChar c)
+
+  Bare_get_bytes_unpacked -> do
+    a <- deAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    let a' = addAddr (bytesPerWord * (fromIntegral i + 1)) a  -- +1 for the length info
+    c <- GetMem a'
+    SetReg Ax c
+
+  Bare_get_bytes -> do
+    a <- deAddr <$> GetReg Ax
+    i <- deNum <$> GetReg Bx
+    let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
+    c <- GetMem a'
+    SetReg Ax c
+
+
+  Bare_string_length -> do
+    a <- deAddr <$> GetReg Ax
+    n <- deNum <$> GetMem a
+    SetReg Ax (WNum n)
+
+  Bare_dump_sector -> do -- TODO: remove this. dump sector will be ser code
     pure ()
 
-  Bare_load_sector -> do
-    -- do nothing in haskell emulator -- TODO: when get to read/write will emulate
+  Bare_load_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
 
-  Bare_enter_check -> do
-    _x <- deAddr <$> GetReg Sp
-    --Debug (printf "[%s]" (show x))
-    pure ()
-
-
-createBytesInMemory :: Number -> M Word
-createBytesInMemory n = loop n
-  -- TODO: if we dont care about initializing the bytes, we could just decrement the stack pointer
-  -- This is what we do in x86 runtime. Initialization will happen in caller code.
-  where
-    loop = \case
-      0 -> do
-        execPush (WNum n)
-        GetReg Sp
-      i -> do
-        execPush (WChar '\0')
-        loop (i-1)
 
 execJump :: Jump -> M ()
 execJump = \case
-  JumpDirect{} -> undefined GetCode
+  JumpDirect{} -> undefined GetCode -- TODO: remove this if we dont need it
   JumpReg r -> do
     w <- GetReg r
     let lab = deCodeLabel w
@@ -402,15 +448,13 @@ deCodeLabel :: Word -> CodeLabel
 deCodeLabel = \case WCodeLabel x -> x; w -> error (show ("deCodeLabel",w))
 
 deChar :: Word -> Char
-deChar = \case WChar x -> x; w -> error (show("deChar",w))
+deChar = \case
+  WChar x -> x
+  WUninitialized -> '\0' -- for bytes example
+  w -> error (show("deChar",w))
 
 deNum :: Word -> Number
 deNum = \case WNum x -> x; w -> error (show("deNum",w))
-
--- TODO: we should be accessing memory in word (2-byte) units
--- Need to sort this before we move to a packed char representation for bytes/string
-prevAddr :: Addr -> Addr
-prevAddr = addAddr (-1)
 
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
@@ -436,12 +480,12 @@ data M a where
   Debug :: String -> M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
-  TraceAlloc :: M ()
+  TraceAlloc :: M () -- TODO: take Int
   GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Word -> M ()
   GetReg :: Reg -> M Word
   SetMem :: Addr -> Word -> M ()
-  GetMem :: Addr -> M Word
+  GetMem :: Addr -> M Word -- TODO: Need byte addressing here as well as weord addressing
   SetFlagZ :: Bool -> M ()
   GetFlagZ :: M Bool
   SetFlagN :: Bool -> M ()
@@ -500,7 +544,7 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
       SetMem a w -> k s { mem = Map.insert a w mem } ()
       GetMem a -> k s (maybe err id $ Map.lookup a mem)
-        where err = error (show ("GetMem/uninitialized",a))
+        where err = WUninitialized --error (show ("GetMem/uninitialized",a))
 
       SetFlagZ b -> k s { flagZ = b } ()
       GetFlagZ -> k s flagZ
@@ -521,7 +565,7 @@ data State = State
   , offsetFromLastLabel :: Int
   }
 
-state0 :: Map DataLabel [Word] -> State
+state0 :: Map DataLabel [DataSpec] -> State
 state0 dmap = State
   { mem
   , rmap
@@ -547,9 +591,17 @@ state0 dmap = State
       , (addAddr 1 aFinalCont, WChar 'X') -- dummy next cont; without this we see error with -trace
       ]
     user =
-      concat [ [(Symbolic lab i,w) | (i,w) <- zip [0..] vals ]
-             | (lab,vals) <- Map.toList dmap
+      concat [ [(Symbolic lab i,w) | (i,w) <- specsWords 0 specs ]
+             | (lab,specs) <- Map.toList dmap
              ]
+
+specsWords :: Int -> [DataSpec] -> [(Int,Word)]
+specsWords offset = \case
+  [] -> []
+  DW ws : specs ->
+    [ (offset + (2*i), w) | (i,w) <- zip [0..] ws ] ++ specsWords (offset + 2 * length ws) specs
+  DB cs : specs ->
+    [ (offset + i, WChar c) | (i,c) <- zip [0..] cs ] ++ specsWords (offset + length cs) specs
 
 instance Show State where
   show State{rmap} =
@@ -593,20 +645,26 @@ compileImage = \case
     CutData lab vals
     compileImage body
 
-compileTopDef :: DataLabel -> SRC.Top -> Asm [Word]
+compileTopDef :: DataLabel -> SRC.Top -> Asm [DataSpec]
 compileTopDef lab = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
 
   SRC.TopLitS string ->
-    pure ([ WNum (fromIntegral $ length string) ] ++
-          [ WChar c | c <- string ])
+    case packedStrings of
+      False -> do
+        pure (DW [ WNum (fromIntegral $ length string) ]
+              : [ DW [ WChar c | c <- string ] ])
+      True -> do
+        pure (DW [ WNum (fromIntegral $ length string) ]
+              : [ DB [ c | c <- string ] ])
 
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
     let w1 = WCodeLabel lab
-    pure [w1]
+    pure [DW [w1]]
+
   SRC.TopConApp (Ctag _ tag) xs -> do
-    pure (WNum tag : map compileTopRef xs)
+    pure [DW (WNum tag : map compileTopRef xs)]
 
 compileTopRef :: SRC.Ref -> Word
 compileTopRef = \case
@@ -630,7 +688,7 @@ compileCode = \case
       [ --OpComment $ printf "(%s) Return: %s" (show _pos) (ppRef res)
         OpMove argReg (compileRef res)
       , OpMove frameReg (SReg contReg)
-      , OpMove contReg (SMemIndirectOffset frameReg 1)
+      , OpMove contReg (SMemIndirectOffset frameReg bytesPerWord)
       ] (Done (JumpIndirect frameReg))
 
   SRC.Tail fun _pos arg -> do
@@ -677,7 +735,7 @@ compileArm scrutReg arm =  do
 compileArmTaken :: Reg -> SRC.Arm -> Asm Code
 compileArmTaken scrutReg arm =  do
   let (SRC.ArmTag _pos _tag xs rhs) = arm
-  let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg i)
+  let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg (bytesPerWord * i))
                      , setTemp temp (SReg Ax) ]
                    | (i,(_,temp)) <- zip [1..] xs
                    ]
@@ -785,10 +843,6 @@ compileBuiltin b = case b of
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_n
     ]
-  SRC.StringLength -> oneArg $ \s1 ->
-    [ OpMove Ax s1
-    , OpCall Bare_string_length
-    ]
   SRC.CharChr -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_num_to_char
@@ -796,39 +850,6 @@ compileBuiltin b = case b of
   SRC.CharOrd -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_char_to_num
-    ]
-  SRC.MakeBytes -> oneArg $ \s1 ->
-    [ OpMove Ax s1
-    , OpCall Bare_make_bytes
-    ]
-  -- TODO: avoid Builtins for null-imp.
-  -- Instead have an identity function in Predefined which will get normalized away
-  SRC.FreezeBytes -> oneArg $ \s1 ->
-    -- null-imp, bytes and string have the same representation
-    [ OpMove Ax s1 ]
-
-  SRC.ThawBytes -> oneArg $ \s1 ->
-    -- null-imp, bytes and string have the same representation
-    [ OpMove Ax s1 ]
-
-  SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
-    [ OpMove Ax s1
-    , OpMove Bx s2
-    , OpMove Si s3
-    , OpCall Bare_set_bytes
-    ]
-
-  SRC.GetBytes -> twoArgs $ \s1 s2 ->
-    [ OpMove Ax s1
-    , OpMove Bx s2
-    , OpCall Bare_get_bytes
-    ]
-
-  -- exactly same as GetBytes (TODO: can we merge the two builtin?)
-  SRC.StringIndex -> twoArgs $ \s1 s2 ->
-    [ OpMove Ax s1
-    , OpMove Bx s2
-    , OpCall Bare_get_bytes
     ]
 
   SRC.MakeRef -> oneArg $ \s1 ->
@@ -845,6 +866,37 @@ compileBuiltin b = case b of
     [ OpMove Bx s1
     , OpMove Ax s2
     , OpStoreR Bx (SReg Ax)
+    ]
+
+  SRC.MakeBytes -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    , OpCall (if packedStrings then Bare_make_bytes else Bare_make_bytes_unpacked)
+    ]
+  SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
+    [ OpMove Ax s1
+    , OpMove Si s2
+    , OpMove Bx s3
+    , OpCall (if packedStrings then Bare_set_bytes else Bare_set_bytes_unpacked)
+    ]
+  SRC.GetBytes -> twoArgs $ \s1 s2 ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpCall (if packedStrings then Bare_get_bytes else Bare_get_bytes_unpacked)
+    ]
+
+  -- Freeze/Thaw: null-imp, bytes/string have the same representation
+  SRC.FreezeBytes -> oneArg $ \s1 -> [ OpMove Ax s1 ]
+  SRC.ThawBytes -> oneArg $ \s1 -> [ OpMove Ax s1 ]
+
+  SRC.StringLength -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    , OpCall Bare_string_length
+    ]
+  -- same implementations as SRC.GetBytes
+  SRC.StringIndex -> twoArgs $ \s1 s2 ->
+    [ OpMove Ax s1
+    , OpMove Bx s2
+    , OpCall (if packedStrings then Bare_get_bytes else Bare_get_bytes_unpacked)
     ]
 
   SRC.Crash -> oneArg $ \_ -> [ OpCall Bare_crash ]
@@ -877,7 +929,7 @@ compileRef = \case
     SRC.Ref _ loc -> do
     case loc of
       SRC.InGlobal g -> SLit (WAddr (Symbolic (DataLabel g) 0))
-      SRC.InFrame n -> SMemIndirectOffset frameReg n
+      SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
       SRC.InTemp (SRC.Temp n) -> SMem (tempOffset n)
       SRC.TheArg -> SReg argReg
       SRC.TheFrame -> SReg frameReg
@@ -904,7 +956,7 @@ data Asm a where
   AsmRet :: a -> Asm a
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
   CutCode :: String -> Code -> Asm CodeLabel
-  CutData :: DataLabel -> [Word] -> Asm ()
+  CutData :: DataLabel -> [DataSpec] -> Asm ()
 
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0

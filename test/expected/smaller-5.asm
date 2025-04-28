@@ -138,15 +138,25 @@ L13: ; Start
   mov dx, g10
   jmp [bp]
 
-g1: dw L2
-g2: dw 0
-g3: dw L12
-g4: dw L9
-g5: dw 0
-g6: dw L6
-g7: dw 0
-g8: dw 0
-g9: dw 0
-g10: dw 0
+g1:
+  dw L2
+g2:
+  dw 0
+g3:
+  dw L12
+g4:
+  dw L9
+g5:
+  dw 0
+g6:
+  dw L6
+g7:
+  dw 0
+g8:
+  dw 0
+g9:
+  dw 0
+g10:
+  dw 0
 
 bare_start: jmp L13

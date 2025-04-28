@@ -39,9 +39,13 @@ L4: ; Start
   mov dx, '%'
   jmp [bp]
 
-g1: dw L3
-g2: dw 0
-g3: dw 0
-g4: dw 0
+g1:
+  dw L3
+g2:
+  dw 0
+g3:
+  dw 0
+g4:
+  dw 0
 
 bare_start: jmp L4

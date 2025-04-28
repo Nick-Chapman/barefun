@@ -141,7 +141,7 @@ data Tickable
   | PushContinuation | Enter | Return
   | Prim
   | Op
-  | Alloc
+  | Alloc -- counting bytes allocated on the heap
   deriving (Eq,Ord,Enum,Bounded)
 
 instance Show Tickable where

@@ -221,11 +221,17 @@ L18: ; Start
   mov dx, [Temps+10]
   jmp [bp]
 
-g1: dw L4
-g2: dw L6
-g3: dw 0
-g4: dw L13
-g5: dw 0
-g6: dw 0
+g1:
+  dw L4
+g2:
+  dw L6
+g3:
+  dw 0
+g4:
+  dw L13
+g5:
+  dw 0
+g6:
+  dw 0
 
 bare_start: jmp L18

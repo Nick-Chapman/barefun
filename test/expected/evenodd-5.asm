@@ -103,8 +103,11 @@ L10: ; Start
   mov dx, 42
   jmp [bp]
 
-g1: dw L3
-g2: dw 1
-g3: dw 0
+g1:
+  dw L3
+g2:
+  dw 1
+g3:
+  dw 0
 
 bare_start: jmp L10

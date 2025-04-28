@@ -5,15 +5,15 @@ import Value (Value(..),tUnit,mkBool,deUnit,Interaction(..))
 import qualified Data.Char as Char (chr,ord)
 
 data Builtin
-  = PutChar | GetChar
+  = Crash
+  | PutChar | GetChar
   | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
   | EqChar | CharOrd | CharChr
-  | StringLength | StringIndex
-  | MakeBytes | FreezeBytes | ThawBytes | SetBytes | GetBytes
   | MakeRef | DeRef | SetRef
-  | Crash
-  | DumpSec
-  | LoadSec
+  | StringLength | StringIndex
+  | MakeBytes | SetBytes | GetBytes
+  | FreezeBytes | ThawBytes
+  | DumpSec | LoadSec
   deriving (Show)
 
 data Semantics
@@ -53,17 +53,20 @@ defineBuiltin b =
     EqChar -> Pure (\vs -> mkBool (uncurry (==) (twoArgs deChar deChar vs)))
     CharOrd -> Pure (\vs -> VNum ((fromIntegral . Char.ord) (deChar (oneArg vs))))
     CharChr -> Pure (\vs -> VChar ((Char.chr . fromIntegral) (deNum (oneArg vs))))
-    StringLength -> Pure (\vs -> VNum (fromIntegral $ length (deString (oneArg vs))))
-    StringIndex -> Pure (\vs -> VChar ((\(s,i) -> s!!(fromIntegral i)) $ (twoArgs deString deNum vs)))
+
     MakeBytes -> Impure $ \vs k -> IMakeBytes (fromIntegral $ deNum (oneArg vs)) (\b -> k (VBytes b))
-    FreezeBytes -> Impure $ \vs k -> IFreezeBytes (deBytes (oneArg vs)) (\s -> k (VString s))
-    ThawBytes -> Impure $ \vs k -> IThawBytes (deString (oneArg vs)) (\b -> k (VBytes b))
     SetBytes -> Impure $ \vs k -> do
       let (b,n,c) = threeArgs deBytes deNum deChar vs
       ISetBytes b (fromIntegral n) c (k unit)
     GetBytes -> Impure $ \vs k -> do
       let (b,n) = twoArgs deBytes deNum vs
       IGetBytes b (fromIntegral n) $ \c -> k (VChar c)
+
+    FreezeBytes -> Impure $ \vs k -> IFreezeBytes (deBytes (oneArg vs)) (\s -> k (VString s))
+    ThawBytes -> Impure $ \vs k -> IThawBytes (deString (oneArg vs)) (\b -> k (VBytes b))
+
+    StringLength -> Pure (\vs -> VNum (fromIntegral $ length (deString (oneArg vs))))
+    StringIndex -> Pure (\vs -> VChar ((\(s,i) -> s!!(fromIntegral i)) $ (twoArgs deString deNum vs)))
 
     MakeRef -> Impure $ \vs k -> IMakeRef (oneArg vs) $ \r -> k (VRef r)
     DeRef -> Impure $ \vs k -> IDeRef (deRef (oneArg vs)) k
@@ -73,7 +76,7 @@ defineBuiltin b =
 
     Crash -> Impure $ undefined
     DumpSec -> Impure $ undefined
-    LoadSec -> Impure $ undefined
+    LoadSec -> Impure $ undefined -- TODO: emulate
 
   where
     unit = VCons tUnit []

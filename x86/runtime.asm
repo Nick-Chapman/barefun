@@ -72,6 +72,11 @@
     PrintHexNibbleBX
 %endmacro
 
+%macro Crash 1
+    Print %1
+    jmp halt
+%endmacro
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Bootloader...
 
@@ -147,13 +152,44 @@ internal_print_string: ; in: DI=string; print null-terminated string.
     pop ax
     ret
 
+
+halt:
+    call Bare_get_char ;; avoid really spinning the fans
+    jmp halt
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bare BIOS
 
-Bare_clear_screen:
+Bare_clear_screen: ;; -- TODO expose this as user builtin
     mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
     int 0x10
     ret
+
+Bare_crash:
+    Print '[Crash]'
+.spin:
+    jmp .spin
+
+Bare_enter_check:
+    ;; how much space is left before we crash into the code?
+    ;; when this reaches zero, examples crash.
+    ;; however, sham example crashes much earlier
+    ;; a different issue? maybe temps in page 0 ?? -- YES
+    mov ax, sp
+    sub ax, end_of_code
+    jb .out_of_memory
+    ;push ax
+    ;mov al, ah
+    ;PrintHexAX
+    ;pop ax
+    ;PrintHexAX
+    ;Dot
+    ret
+.out_of_memory:
+    Print `[OOM]\n`
+    jmp halt
+
 
 BS equ 8
 LF equ 10
@@ -233,39 +269,16 @@ Bare_char_to_num:
     ;; this is meant to do nothing!
     ret
 
-;;; TODO: byte-packed rep for strings/bytes
-Bare_get_bytes:
-    add bx, 1 ; +1 for the length
-    shl bx, 1 ; x2 to get from word-index to byte-index
-    add bx, ax
-    mov ax, [bx]
-    mov ah, 0
-    ret
-
-Bare_set_bytes:
-    add bx, 1 ; +1 for the length
-    shl bx, 1 ; x2 to get from word-index to byte-index
-    add bx, ax
-    mov [bx], si
-    ret
-
-Bare_string_length:
-    mov bx, ax
-    mov ax, [bx]
-    ret
-
-Bare_make_bytes:
-    pop bx ;; heap allocation is at SP; so first we save return address.
-    ;; Does not zero the allocated space. User caller code is expected to do this.
-    shl ax, 1
-    sub sp, ax
-    shr ax, 1
-    push ax
-    mov ax, sp
-    jmp bx
 
 Bare_mul:
     mul bx ; ax * bx -> ax
+    ret
+
+Bare_div:
+    push dx
+    mov dx, 0
+    div bx
+    pop dx
     ret
 
 Bare_mod: ;; TODO: It would be nice to expose a combined div/mod builtin to user
@@ -276,17 +289,60 @@ Bare_mod: ;; TODO: It would be nice to expose a combined div/mod builtin to user
     pop dx
     ret
 
-Bare_div:
-    push dx
-    mov dx, 0
-    div bx
-    pop dx
+
+Bare_string_length:
+    mov bx, ax
+    mov ax, [bx]
     ret
 
-Bare_crash:
-    Print '[Crash]'
-.spin:
-    jmp .spin
+;;; TODO: byte-packed rep for strings/bytes
+
+Bare_make_bytes_unpacked:
+    pop bx ;; heap allocation is at SP; so first we save return address.
+    ;; Does not zero the allocated space. User caller code is expected to do this.
+    shl ax, 1
+    sub sp, ax
+    shr ax, 1
+    push ax
+    mov ax, sp
+    jmp bx
+
+Bare_get_bytes_unpacked:
+    add bx, 1 ; +1 for the length
+    shl bx, 1 ; x2 to get from word-index to byte-index
+    add bx, ax
+    mov ax, [bx]
+    mov ah, 0
+    ret
+
+Bare_set_bytes_unpacked:
+    add si, 1 ; +1 for the length
+    shl si, 1 ; x2 to get from word-index to byte-index
+    add si, ax
+    mov [si], bx
+    ret
+
+
+Bare_make_bytes:
+    pop bx ;; heap allocation is at SP; so first we save return address.
+    ;; Does not zero the allocated space. User caller code is expected to do this.
+    sub sp, ax
+    push ax
+    mov ax, sp
+    jmp bx
+
+Bare_get_bytes:
+    add bx, 2 ; +2 for the length
+    add bx, ax
+    mov ax, [bx]
+    mov ah, 0
+    ret
+
+Bare_set_bytes:
+    add si, 2 ; +2 for the length
+    add si, ax
+    mov byte [si], bl
+    ret
 
 Bare_dump_sector:
     push cx
@@ -303,7 +359,7 @@ show_buffer:
     call Dump_sector
     ret
 
-Bare_load_sector:
+Bare_load_sector: ;; TODO: fix for packed strings
     push cx
     mov cl, al
 
@@ -331,28 +387,6 @@ Bare_load_sector:
     ret
 
 
-Bare_enter_check:
-    ;; how much space is left before we crash into the code?
-    ;; when this reaches zero, examples crash.
-    ;; however, sham example crashes much earlier
-    ;; a different issue? maybe temps in page 0 ?? -- YES
-    mov ax, sp
-    sub ax, end_of_code
-    jb .out_of_memory
-    ;push ax
-    ;mov al, ah
-    ;PrintHexAX
-    ;pop ax
-    ;PrintHexAX
-    ;Dot
-    ret
-.out_of_memory:
-    Print `[OOM]\n`
-.spin:
-    call Bare_get_char ;; avoid really spinning the fans
-    jmp .spin
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; begin/end
 
@@ -370,9 +404,7 @@ final_continuation:
 final_code:
     ;;call end_of_time_play
     Print `[HALT]\n`
-.spin:
-    call Bare_get_char ;; avoid really spinning the fans
-    jmp .spin
+    jmp halt
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; dev/play
@@ -432,7 +464,6 @@ Dump_sector: ; (byte offset) si->
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; User code
 
-;;; TODO: stop using first page of memory for temps
 %include CODE
 
 ;    times 512 db 'a'

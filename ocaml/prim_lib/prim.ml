@@ -15,23 +15,25 @@ module X : sig
   val get_char : unit -> char
   val ord : char -> int
   val put_char : char -> unit
-  val string_index : string -> int -> char
-  val string_length : string -> int
-  val upto : int -> int -> int list
-
-  type bytes
-  val make_bytes : int -> bytes
-  val freeze_bytes : bytes  -> string
-  val thaw_bytes : string -> bytes
-  val set_bytes : bytes -> int -> char -> unit
-  val get_bytes : bytes -> int -> char
+  (*val upto : int -> int -> int list*) (*TODO:remove*)
 
   type 'a ref
   val ref : 'a -> 'a ref
   val (!) : 'a ref -> 'a
   val (:=) : 'a ref -> 'a -> unit
 
-  val load_sector_and_dump : int -> unit
+  type bytes
+  val make_bytes : int -> bytes
+  (* TODO: length op is missing *)
+  val set_bytes : bytes -> int -> char -> unit
+  val get_bytes : bytes -> int -> char
+
+  val freeze_bytes : bytes  -> string
+  val thaw_bytes : string -> bytes
+  val string_index : string -> int -> char
+  val string_length : string -> int
+
+  val load_sector_and_dump : int -> unit (*TODO:die*)
   val load_sector : int -> bytes -> unit
 
 end = struct
@@ -65,12 +67,14 @@ end = struct
     let bs = (n == 8) in
     if printable || nl || bs then printf "%c%!" c else printf "\\%02x%!" n
 
-  let upto i j =
+  (*let upto i j =
     let rec loop acc i = if i > j then List.rev acc else loop (i::acc) (i+1) in
-    loop [] i
+    loop [] i*)
 
-  let string_length = String.length
-  let string_index s i = s.[i]
+  type 'a ref  = 'a Stdlib.ref
+  let ref = Stdlib.ref
+  let (!) = (!)
+  let (:=) = (:=)
 
   type bytes = Bytes.t
   let make_bytes = Bytes.create
@@ -79,10 +83,8 @@ end = struct
   let set_bytes = Bytes.set
   let get_bytes = Bytes.get
 
-  type 'a ref  = 'a Stdlib.ref
-  let ref = Stdlib.ref
-  let (!) = (!)
-  let (:=) = (:=)
+  let string_length = String.length
+  let string_index s i = s.[i]
 
   let load_sector_and_dump n =
     Printf.printf "[load_sector_and_dump:%d]\n" n

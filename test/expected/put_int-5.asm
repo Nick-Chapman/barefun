@@ -97,9 +97,13 @@ L9: ; Start
   mov dx, g4
   jmp [bp]
 
-g1: dw L2
-g2: dw 0
-g3: dw L6
-g4: dw 0
+g1:
+  dw L2
+g2:
+  dw 0
+g3:
+  dw L6
+g4:
+  dw 0
 
 bare_start: jmp L9

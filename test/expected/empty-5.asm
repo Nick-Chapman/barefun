@@ -4,6 +4,7 @@ L1: ; Start
   mov cx, [bp+2]
   jmp [bp]
 
-g1: dw 0
+g1:
+  dw 0
 
 bare_start: jmp L1

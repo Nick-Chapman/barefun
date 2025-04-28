@@ -36,12 +36,19 @@ L4: ; Start
   mov dx, g7
   jmp [bp]
 
-g1: dw L3
-g2: dw L2
-g3: dw 0
-g4: dw 0
-g5: dw 0
-g6: dw 0
-g7: dw 0
+g1:
+  dw L3
+g2:
+  dw L2
+g3:
+  dw 0
+g4:
+  dw 0
+g5:
+  dw 0
+g6:
+  dw 0
+g7:
+  dw 0
 
 bare_start: jmp L4

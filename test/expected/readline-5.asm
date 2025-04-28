@@ -160,7 +160,7 @@ L13: ; Function: t1
   jz L11
   mov ax, g6
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -552,7 +552,7 @@ L42: ; Function: t1
   jz L40
   mov ax, g20
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -607,27 +607,51 @@ L47: ; Start
   mov dx, g21
   jmp [bp]
 
-g1: dw L4
-g2: dw L10
-g3: dw 0
-g4: dw L39
-g5: dw L14
-g6: dw 2, '%', ' '
-g7: dw 0
-g8: dw L30
-g9: dw 0
-g10: dw 0
-g11: dw 0
-g12: dw 0
-g13: dw 1
-g14: dw 0
-g15: dw 0
-g16: dw 0
-g17: dw 0
-g18: dw 0
-g19: dw L43
-g20: dw 45, 'R', 'e', 'a', 'd', 'l', 'i', 'n', 'e', ':', ' ', 'e', 'd', 'i', 't', ' ', 'w', 'i', 't', 'h', ' ', 'b', 'a', 'c', 'k', 's', 'p', 'a', 'c', 'e', ';', ' ', 'e', 'x', 'i', 't', ' ', 'w', 'i', 't', 'h', ' ', '^', 'D', '.', `\n`
-g21: dw 0
-g22: dw 0
+g1:
+  dw L4
+g2:
+  dw L10
+g3:
+  dw 0
+g4:
+  dw L39
+g5:
+  dw L14
+g6:
+  dw 2
+  dw '%', ' '
+g7:
+  dw 0
+g8:
+  dw L30
+g9:
+  dw 0
+g10:
+  dw 0
+g11:
+  dw 0
+g12:
+  dw 0
+g13:
+  dw 1
+g14:
+  dw 0
+g15:
+  dw 0
+g16:
+  dw 0
+g17:
+  dw 0
+g18:
+  dw 0
+g19:
+  dw L43
+g20:
+  dw 45
+  dw 'R', 'e', 'a', 'd', 'l', 'i', 'n', 'e', ':', ' ', 'e', 'd', 'i', 't', ' ', 'w', 'i', 't', 'h', ' ', 'b', 'a', 'c', 'k', 's', 'p', 'a', 'c', 'e', ';', ' ', 'e', 'x', 'i', 't', ' ', 'w', 'i', 't', 'h', ' ', '^', 'D', '.', `\n`
+g21:
+  dw 0
+g22:
+  dw 0
 
 bare_start: jmp L47

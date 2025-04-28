@@ -221,9 +221,9 @@ L23: ; Function: t1
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [bp+2]
-  mov bx, [bp+4]
-  mov si, [Temps+2]
-  call Bare_set_bytes
+  mov si, [bp+4]
+  mov bx, [Temps+2]
+  call Bare_set_bytes_unpacked
   mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
@@ -270,7 +270,7 @@ L26: ; Continuation
 L27: ; Continuation
   call Bare_enter_check
   mov ax, dx
-  call Bare_make_bytes
+  call Bare_make_bytes_unpacked
   mov [Temps+2], ax
   push word [Temps+2]
   push word L24
@@ -315,9 +315,9 @@ L31: ; Function: t1
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [bp+2]
-  mov bx, [bp+4]
-  mov si, [Temps+2]
-  call Bare_set_bytes
+  mov si, [bp+4]
+  mov bx, [Temps+2]
+  call Bare_set_bytes_unpacked
   mov [Temps+6], ax
   mov ax, [bp+4]
   sub ax, 1
@@ -364,7 +364,7 @@ L34: ; Continuation
 L35: ; Continuation
   call Bare_enter_check
   mov ax, dx
-  call Bare_make_bytes
+  call Bare_make_bytes_unpacked
   mov [Temps+2], ax
   push word [Temps+2]
   push word L32
@@ -415,7 +415,7 @@ L39: ; Function: t1
   jz L37
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+4], ax
   push word [bp+4]
   push word [Temps+4]
@@ -510,11 +510,11 @@ L48: ; Function: t1
   jz L44
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+4], ax
   mov ax, [bp+4]
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+6], ax
   mov ax, [Temps+4]
   cmp word ax, [Temps+6]
@@ -3814,111 +3814,247 @@ L298: ; Start
   mov dx, g9
   jmp [bp]
 
-g1: dw L2
-g2: dw L5
-g3: dw L11
-g4: dw 0
-g5: dw L16
-g6: dw 0
-g7: dw L20
-g8: dw 0
-g9: dw L28
-g10: dw 0
-g11: dw L36
-g12: dw 0
-g13: dw L42
-g14: dw 0
-g15: dw 1
-g16: dw 0
-g17: dw 1
-g18: dw 0
-g19: dw 1
-g20: dw 0
-g21: dw L52
-g22: dw 0
-g23: dw 0
-g24: dw L58
-g25: dw 0
-g26: dw 0
-g27: dw 2, '%', ' '
-g28: dw 0
-g29: dw 0
-g30: dw 0
-g31: dw 1
-g32: dw 0
-g33: dw 0
-g34: dw 0
-g35: dw 0
-g36: dw 0
-g37: dw 0
-g38: dw 17, 'c', 'o', 'm', 'm', 'a', 'n', 'd', ' ', 'n', 'o', 't', ' ', 'f', 'o', 'u', 'n', 'd'
-g39: dw 1, `\n`
-g40: dw 0
-g41: dw 2, ':', ' '
-g42: dw 0
-g43: dw 0
-g44: dw 6, 's', 'h', 'a', 'm', ':', ' '
-g45: dw 0
-g46: dw 17, 'P', 'e', 'r', 'm', 'i', 's', 's', 'i', 'o', 'n', ' ', 'd', 'e', 'n', 'i', 'e', 'd'
-g47: dw 1, `\n`
-g48: dw 0
-g49: dw 2, ':', ' '
-g50: dw 0
-g51: dw 0
-g52: dw 6, 's', 'h', 'a', 'm', ':', ' '
-g53: dw 0
-g54: dw L62
-g55: dw 53, 'S', 'h', 'a', 'm', 'm', 'y', ':', ' ', 'I', 'n', '-', 'm', 'e', 'm', 'o', 'r', 'y', ' ', 'f', 'i', 'l', 'e', '-', 's', 'y', 's', 't', 'e', 'm', '.', ' ', 'C', 'o', 'n', 's', 'i', 'd', 'e', 'r', ' ', 't', 'y', 'p', 'i', 'n', 'g', ' ', '"', 'l', 's', '"', '.', `\n`
-g56: dw 6, 'r', 'e', 'a', 'd', 'm', 'e'
-g57: dw 46, 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'h', 'a', 'm', ';', ' ', 'p', 'l', 'e', 'a', 's', 'e', ' ', 't', 'r', 'y', ' ', 'a', 'l', 'l', ' ', 't', 'h', 'e', ' ', 'c', 'o', 'm', 'm', 'a', 'n', 'd', 's', '!', `\n`
-g58: dw 0, g57
-g59: dw 0, g56, g58
-g60: dw 3, 'c', 'a', 't'
-g61: dw 33, 'c', 'a', 't', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'a', 't', ' ', 'l', 'e', 'a', 's', 't', ' ', 'o', 'n', 'e', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
-g62: dw 0
-g63: dw 5, 'c', 'a', 't', ':', ' '
-g64: dw 29, ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
-g65: dw 0
-g66: dw 1, g64, g65
-g67: dw 5, 'c', 'a', 't', ':', ' '
-g68: dw 19, ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
-g69: dw 0
-g70: dw 1, g68, g69
-g71: dw 0
-g72: dw 5, 'c', 'a', 't', ':', ' '
-g73: dw 29, ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
-g74: dw 0
-g75: dw 1, g73, g74
-g76: dw 5, 'c', 'a', 't', ':', ' '
-g77: dw 19, ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
-g78: dw 0
-g79: dw 1, g77, g78
-g80: dw 2, 'l', 's'
-g81: dw 23, 'l', 's', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'n', 'o', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', 's', `\n`
-g82: dw L63
-g83: dw 0
-g84: dw 0
-g85: dw 3, 'f', 'i', 'b'
-g86: dw 22, 'f', 'i', 'b', ':', ' ', 'm', 'i', 's', 's', 'i', 'n', 'g', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
-g87: dw 34, 'c', 'r', 'e', 'a', 't', 'e', ':', ' ', 'u', 'n', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'e', 'x', 't', 'r', 'a', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
-g88: dw L75
-g89: dw 0
-g90: dw 1
-g91: dw 0
-g92: dw 1
-g93: dw 0
-g94: dw 0
-g95: dw 0
-g96: dw 31, 'f', 'i', 'b', ':', ' ', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'n', 'u', 'm', 'e', 'r', 'i', 'c', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
-g97: dw 0
-g98: dw 4, 'f', 'i', 'b', ' '
-g99: dw L79
-g100: dw 0
-g101: dw 0
-g102: dw 5, ' ', '-', '-', '>', ' '
-g103: dw L83
-g104: dw 0
-g105: dw 0
-g106: dw 0
+g1:
+  dw L2
+g2:
+  dw L5
+g3:
+  dw L11
+g4:
+  dw 0
+g5:
+  dw L16
+g6:
+  dw 0
+g7:
+  dw L20
+g8:
+  dw 0
+g9:
+  dw L28
+g10:
+  dw 0
+g11:
+  dw L36
+g12:
+  dw 0
+g13:
+  dw L42
+g14:
+  dw 0
+g15:
+  dw 1
+g16:
+  dw 0
+g17:
+  dw 1
+g18:
+  dw 0
+g19:
+  dw 1
+g20:
+  dw 0
+g21:
+  dw L52
+g22:
+  dw 0
+g23:
+  dw 0
+g24:
+  dw L58
+g25:
+  dw 0
+g26:
+  dw 0
+g27:
+  dw 2
+  dw '%', ' '
+g28:
+  dw 0
+g29:
+  dw 0
+g30:
+  dw 0
+g31:
+  dw 1
+g32:
+  dw 0
+g33:
+  dw 0
+g34:
+  dw 0
+g35:
+  dw 0
+g36:
+  dw 0
+g37:
+  dw 0
+g38:
+  dw 17
+  dw 'c', 'o', 'm', 'm', 'a', 'n', 'd', ' ', 'n', 'o', 't', ' ', 'f', 'o', 'u', 'n', 'd'
+g39:
+  dw 1
+  dw `\n`
+g40:
+  dw 0
+g41:
+  dw 2
+  dw ':', ' '
+g42:
+  dw 0
+g43:
+  dw 0
+g44:
+  dw 6
+  dw 's', 'h', 'a', 'm', ':', ' '
+g45:
+  dw 0
+g46:
+  dw 17
+  dw 'P', 'e', 'r', 'm', 'i', 's', 's', 'i', 'o', 'n', ' ', 'd', 'e', 'n', 'i', 'e', 'd'
+g47:
+  dw 1
+  dw `\n`
+g48:
+  dw 0
+g49:
+  dw 2
+  dw ':', ' '
+g50:
+  dw 0
+g51:
+  dw 0
+g52:
+  dw 6
+  dw 's', 'h', 'a', 'm', ':', ' '
+g53:
+  dw 0
+g54:
+  dw L62
+g55:
+  dw 53
+  dw 'S', 'h', 'a', 'm', 'm', 'y', ':', ' ', 'I', 'n', '-', 'm', 'e', 'm', 'o', 'r', 'y', ' ', 'f', 'i', 'l', 'e', '-', 's', 'y', 's', 't', 'e', 'm', '.', ' ', 'C', 'o', 'n', 's', 'i', 'd', 'e', 'r', ' ', 't', 'y', 'p', 'i', 'n', 'g', ' ', '"', 'l', 's', '"', '.', `\n`
+g56:
+  dw 6
+  dw 'r', 'e', 'a', 'd', 'm', 'e'
+g57:
+  dw 46
+  dw 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'h', 'a', 'm', ';', ' ', 'p', 'l', 'e', 'a', 's', 'e', ' ', 't', 'r', 'y', ' ', 'a', 'l', 'l', ' ', 't', 'h', 'e', ' ', 'c', 'o', 'm', 'm', 'a', 'n', 'd', 's', '!', `\n`
+g58:
+  dw 0, g57
+g59:
+  dw 0, g56, g58
+g60:
+  dw 3
+  dw 'c', 'a', 't'
+g61:
+  dw 33
+  dw 'c', 'a', 't', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'a', 't', ' ', 'l', 'e', 'a', 's', 't', ' ', 'o', 'n', 'e', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+g62:
+  dw 0
+g63:
+  dw 5
+  dw 'c', 'a', 't', ':', ' '
+g64:
+  dw 29
+  dw ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
+g65:
+  dw 0
+g66:
+  dw 1, g64, g65
+g67:
+  dw 5
+  dw 'c', 'a', 't', ':', ' '
+g68:
+  dw 19
+  dw ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
+g69:
+  dw 0
+g70:
+  dw 1, g68, g69
+g71:
+  dw 0
+g72:
+  dw 5
+  dw 'c', 'a', 't', ':', ' '
+g73:
+  dw 29
+  dw ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
+g74:
+  dw 0
+g75:
+  dw 1, g73, g74
+g76:
+  dw 5
+  dw 'c', 'a', 't', ':', ' '
+g77:
+  dw 19
+  dw ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
+g78:
+  dw 0
+g79:
+  dw 1, g77, g78
+g80:
+  dw 2
+  dw 'l', 's'
+g81:
+  dw 23
+  dw 'l', 's', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'n', 'o', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', 's', `\n`
+g82:
+  dw L63
+g83:
+  dw 0
+g84:
+  dw 0
+g85:
+  dw 3
+  dw 'f', 'i', 'b'
+g86:
+  dw 22
+  dw 'f', 'i', 'b', ':', ' ', 'm', 'i', 's', 's', 'i', 'n', 'g', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+g87:
+  dw 34
+  dw 'c', 'r', 'e', 'a', 't', 'e', ':', ' ', 'u', 'n', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'e', 'x', 't', 'r', 'a', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+g88:
+  dw L75
+g89:
+  dw 0
+g90:
+  dw 1
+g91:
+  dw 0
+g92:
+  dw 1
+g93:
+  dw 0
+g94:
+  dw 0
+g95:
+  dw 0
+g96:
+  dw 31
+  dw 'f', 'i', 'b', ':', ' ', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'n', 'u', 'm', 'e', 'r', 'i', 'c', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+g97:
+  dw 0
+g98:
+  dw 4
+  dw 'f', 'i', 'b', ' '
+g99:
+  dw L79
+g100:
+  dw 0
+g101:
+  dw 0
+g102:
+  dw 5
+  dw ' ', '-', '-', '>', ' '
+g103:
+  dw L83
+g104:
+  dw 0
+g105:
+  dw 0
+g106:
+  dw 0
 
 bare_start: jmp L298

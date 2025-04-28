@@ -110,7 +110,9 @@ L7: ; Start
   mov dx, 0
   jmp [bp]
 
-g1: dw L5
-g2: dw 0
+g1:
+  dw L5
+g2:
+  dw 0
 
 bare_start: jmp L7

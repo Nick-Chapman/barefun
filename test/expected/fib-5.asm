@@ -92,7 +92,7 @@ L9: ; Function: t1
   jz L7
   mov ax, g5
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -195,7 +195,7 @@ L17: ; Function: t1
   jz L15
   mov ax, g10
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -427,19 +427,35 @@ L37: ; Start
   mov dx, 10
   jmp [bp]
 
-g1: dw L2
-g2: dw 0
-g3: dw L6
-g4: dw L10
-g5: dw 4, 'f', 'i', 'b', ' '
-g6: dw 0
-g7: dw L14
-g8: dw 0
-g9: dw L18
-g10: dw 5, ' ', '-', '-', '>', ' '
-g11: dw 0
-g12: dw L22
-g13: dw 0
-g14: dw 0
+g1:
+  dw L2
+g2:
+  dw 0
+g3:
+  dw L6
+g4:
+  dw L10
+g5:
+  dw 4
+  dw 'f', 'i', 'b', ' '
+g6:
+  dw 0
+g7:
+  dw L14
+g8:
+  dw 0
+g9:
+  dw L18
+g10:
+  dw 5
+  dw ' ', '-', '-', '>', ' '
+g11:
+  dw 0
+g12:
+  dw L22
+g13:
+  dw 0
+g14:
+  dw 0
 
 bare_start: jmp L37

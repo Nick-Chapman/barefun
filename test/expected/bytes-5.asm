@@ -65,9 +65,9 @@ L8: ; Function: t1
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [bp+2]
-  mov bx, [bp+4]
-  mov si, [Temps+2]
-  call Bare_set_bytes
+  mov si, [bp+4]
+  mov bx, [Temps+2]
+  call Bare_set_bytes_unpacked
   mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
@@ -114,7 +114,7 @@ L11: ; Continuation
 L12: ; Continuation
   call Bare_enter_check
   mov ax, dx
-  call Bare_make_bytes
+  call Bare_make_bytes_unpacked
   mov [Temps+2], ax
   push word [Temps+2]
   push word L9
@@ -162,7 +162,7 @@ L16: ; Function: t1
   jz L14
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_get_bytes
+  call Bare_get_bytes_unpacked
   mov [Temps+4], ax
   push word [bp+4]
   push word [Temps+4]
@@ -287,7 +287,7 @@ L25: ; Continuation
 L26: ; Continuation
   call Bare_enter_check
   mov ax, 5
-  call Bare_make_bytes
+  call Bare_make_bytes_unpacked
   mov [Temps+2], ax
   mov ax, [Temps+2]
   mov [Temps+4], ax
@@ -340,15 +340,26 @@ L30: ; Start
   mov dx, g4
   jmp [bp]
 
-g1: dw L2
-g2: dw L5
-g3: dw 0
-g4: dw L13
-g5: dw 0
-g6: dw L19
-g7: dw L21
-g8: dw 0
-g9: dw 4, 'O', 'n', 'e', `\n`
-g10: dw 0
+g1:
+  dw L2
+g2:
+  dw L5
+g3:
+  dw 0
+g4:
+  dw L13
+g5:
+  dw 0
+g6:
+  dw L19
+g7:
+  dw L21
+g8:
+  dw 0
+g9:
+  dw 4
+  dw 'O', 'n', 'e', `\n`
+g10:
+  dw 0
 
 bare_start: jmp L30
