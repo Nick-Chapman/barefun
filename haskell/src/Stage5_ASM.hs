@@ -115,15 +115,18 @@ data BareBios
   | Bare_mod
 
   | Bare_string_length
-  | Bare_make_bytes_unpacked
-  | Bare_set_bytes_unpacked
-  | Bare_get_bytes_unpacked
   | Bare_make_bytes
   | Bare_set_bytes
   | Bare_get_bytes
 
-  | Bare_dump_sector
+  | Bare_dump_sector -- TODO remove
   | Bare_load_sector
+
+  -- TODO: rmeove these unpacked versions when I fully commit to packed string/bytes
+  | Bare_make_bytes_unpacked
+  | Bare_set_bytes_unpacked
+  | Bare_get_bytes_unpacked
+  | Bare_load_sector_unpacked
 
   deriving Show
 
@@ -400,6 +403,8 @@ execBare = \case
   Bare_dump_sector -> do -- TODO: remove this. dump sector will be ser code
     pure ()
 
+  Bare_load_sector_unpacked -> do
+    pure ()
   Bare_load_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
 
@@ -909,7 +914,7 @@ compileBuiltin b = case b of
   SRC.LoadSec -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpCall Bare_load_sector
+    , OpCall (if packedStrings then Bare_load_sector else Bare_load_sector_unpacked)
     ]
 
   where

@@ -54,9 +54,10 @@ let put_sector_string s =
   loop 0
 
 let dump n =
-  put_string "sector:"; put_int n; newline();
+  put_string "internal:"; put_int n; newline();
   load_sector_and_dump n;
   let s = read_sector n in
+  put_string "user-code:"; put_int n;
   put_sector_string s;
   newline()
 
@@ -66,4 +67,4 @@ let main () =
     let _ : char = get_char () in
     loop (i+1)
   in
-  loop 0
+  loop 1 (* sectors start from 1 *)

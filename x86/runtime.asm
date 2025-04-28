@@ -261,11 +261,11 @@ Bare_make_bool_from_n:
 False: dw 0
 True: dw 1
 
-Bare_num_to_char:
+Bare_num_to_char: ;; TODO: zero out high byte. Make test to provoke the need.
     ;; this is meant to do nothing!
     ret
 
-Bare_char_to_num:
+Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the need
     ;; this is meant to do nothing!
     ret
 
@@ -295,7 +295,6 @@ Bare_string_length:
     mov ax, [bx]
     ret
 
-;;; TODO: byte-packed rep for strings/bytes
 
 Bare_make_bytes_unpacked:
     pop bx ;; heap allocation is at SP; so first we save return address.
@@ -344,7 +343,7 @@ Bare_set_bytes:
     mov byte [si], bl
     ret
 
-Bare_dump_sector:
+Bare_dump_sector: ;; TODO: kill
     push cx
     mov cl, al
     mov bx, buffer ; dest
@@ -354,24 +353,21 @@ Bare_dump_sector:
     ret
 
 buffer:  times 512 db 0
-show_buffer:
+show_buffer: ;; TODO kill
     mov si, buffer
     call Dump_sector
     ret
 
-Bare_load_sector: ;; TODO: fix for packed strings
+Bare_load_sector_unpacked:
     push cx
     mov cl, al
-
-    add bx, 2 ; +1 for the length word
-
+    add bx, 2 ; for the length word
     ;; because we dont have byte-packed strings/bytes yet
     ;; load the sector into a fixed buffer
     push bx
     mov bx, buffer
     call load_sector_into_buffers_cl_bx
     pop bx
-
     ;; then copy it into the unpacked string, doubling the space it takes
     mov si, 0
     mov di, 0
@@ -379,13 +375,24 @@ Bare_load_sector: ;; TODO: fix for packed strings
     mov ax, [buffer+si]
     mov [bx+di], ax
     add si, 1
-    add di, 2
+    add di, 2 ;; 2 because of unpacked strings
     cmp si, 512
     jne .loop
-
     pop cx
     ret
 
+Bare_load_sector: ;Ax (Num bytes), Bx (The bytes buffer to load into)
+    push cx ; save continuation because we need cl for the INT
+    mov dl, [0] ; RESTORE DRIVE NUMBER
+    mov ah, 0x02 ; Function: Read Sectors From Drive
+    mov ch, 0 ; cylinder
+    mov dh, 0 ; head
+    mov cl, al ; start sector number (1 is boot; 2 is kernel)
+    mov al, 1 ; sector count
+    add bx, 2 ; dest buffer; skip 2 for the length word
+    int 0x13
+    pop cx
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; begin/end
@@ -426,16 +433,16 @@ load_sector_into_buffers_cl_bx:
     int 0x13
     ret
 
-Dump_sector: ; (byte offset) si->
+Dump_sector: ; (byte offset) si-> ;; TODO kill
     mov di, 0 ; outer loop index (line)
     mov cx, 0 ; inner loop index (col)
 .outer:
-    mov ax, di
-    shl ax, 2
-    PrintHexAX
-    mov al, '0'
-    PrintCharAL
-    Space
+    ;mov ax, di
+    ;shl ax, 2
+    ;PrintHexAX
+    ;mov al, '0'
+    ;PrintCharAL
+    ;Space
 .chars:
     mov ah, 0
     mov al, [si]
