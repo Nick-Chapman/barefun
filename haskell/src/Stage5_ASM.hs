@@ -20,9 +20,6 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc))
 
-packedStrings :: Bool
-packedStrings = True
-
 bytesPerWord :: Int
 bytesPerWord = 2
 
@@ -120,12 +117,6 @@ data BareBios
   | Bare_get_bytes
 
   | Bare_load_sector
-
-  -- TODO: rmeove these unpacked versions when I fully commit to packed string/bytes
-  | Bare_make_bytes_unpacked
-  | Bare_set_bytes_unpacked
-  | Bare_get_bytes_unpacked
-  | Bare_load_sector_unpacked
 
   deriving Show
 
@@ -346,13 +337,6 @@ execBare = \case
     w2 <- GetReg Bx
     SetReg Ax (binaryW mod w1 w2)
 
-  Bare_make_bytes_unpacked -> do
-    n <- deNum <$> GetReg Ax
-    let nWords = fromIntegral n -- One word per byte/char (BAD!)
-    slideStackPointer nWords
-    execPushWord (WNum n)
-    w <- GetReg Sp
-    SetReg Ax w
 
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
@@ -365,26 +349,12 @@ execBare = \case
   -- TODO: no need for Bare given better string rep; just generate ops
   -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
 
-  Bare_set_bytes_unpacked -> do
-    a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Si
-    c <- deChar <$> GetReg Bx
-    let a' = addAddr (bytesPerWord * (fromIntegral i + 1)) a  -- +1 for the length info
-    SetMem a' (WChar c)
-
   Bare_set_bytes -> do
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Si
     c <- deChar <$> GetReg Bx
     let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
     SetMem a' (WChar c)
-
-  Bare_get_bytes_unpacked -> do
-    a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Bx
-    let a' = addAddr (bytesPerWord * (fromIntegral i + 1)) a  -- +1 for the length info
-    c <- GetMem a'
-    SetReg Ax c
 
   Bare_get_bytes -> do
     a <- deAddr <$> GetReg Ax
@@ -399,8 +369,6 @@ execBare = \case
     n <- deNum <$> GetMem a
     SetReg Ax (WNum n)
 
-  Bare_load_sector_unpacked -> do
-    pure ()
   Bare_load_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
 
@@ -651,13 +619,8 @@ compileTopDef lab = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
 
   SRC.TopLitS string ->
-    case packedStrings of
-      False -> do
-        pure (DW [ WNum (fromIntegral $ length string) ]
-              : [ DW [ WChar c | c <- string ] ])
-      True -> do
-        pure (DW [ WNum (fromIntegral $ length string) ]
-              : [ DB [ c | c <- string ] ])
+    pure (DW [ WNum (fromIntegral $ length string) ]
+           : [ DB [ c | c <- string ] ])
 
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
@@ -871,18 +834,18 @@ compileBuiltin b = case b of
 
   SRC.MakeBytes -> oneArg $ \s1 ->
     [ OpMove Ax s1
-    , OpCall (if packedStrings then Bare_make_bytes else Bare_make_bytes_unpacked)
+    , OpCall Bare_make_bytes
     ]
   SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
     , OpMove Si s2
     , OpMove Bx s3
-    , OpCall (if packedStrings then Bare_set_bytes else Bare_set_bytes_unpacked)
+    , OpCall Bare_set_bytes
     ]
   SRC.GetBytes -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpCall (if packedStrings then Bare_get_bytes else Bare_get_bytes_unpacked)
+    , OpCall Bare_get_bytes
     ]
 
   -- Freeze/Thaw: null-imp, bytes/string have the same representation
@@ -897,7 +860,7 @@ compileBuiltin b = case b of
   SRC.StringIndex -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpCall (if packedStrings then Bare_get_bytes else Bare_get_bytes_unpacked)
+    , OpCall Bare_get_bytes
     ]
 
   SRC.Crash -> oneArg $ \_ -> [ OpCall Bare_crash ]
@@ -905,7 +868,7 @@ compileBuiltin b = case b of
   SRC.LoadSec -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpCall (if packedStrings then Bare_load_sector else Bare_load_sector_unpacked)
+    , OpCall Bare_load_sector
     ]
 
   where

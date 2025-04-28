@@ -297,33 +297,6 @@ Bare_string_length:
     mov ax, [bx]
     ret
 
-
-Bare_make_bytes_unpacked:
-    pop bx ;; heap allocation is at SP; so first we save return address.
-    ;; Does not zero the allocated space. User caller code is expected to do this.
-    shl ax, 1
-    sub sp, ax
-    shr ax, 1
-    push ax
-    mov ax, sp
-    jmp bx
-
-Bare_get_bytes_unpacked:
-    add bx, 1 ; +1 for the length
-    shl bx, 1 ; x2 to get from word-index to byte-index
-    add bx, ax
-    mov ax, [bx]
-    mov ah, 0
-    ret
-
-Bare_set_bytes_unpacked:
-    add si, 1 ; +1 for the length
-    shl si, 1 ; x2 to get from word-index to byte-index
-    add si, ax
-    mov [si], bx
-    ret
-
-
 Bare_make_bytes:
     pop bx ;; heap allocation is at SP; so first we save return address.
     ;; Does not zero the allocated space. User caller code is expected to do this.
@@ -344,9 +317,6 @@ Bare_set_bytes:
     add si, ax
     mov byte [si], bl
     ret
-
-Bare_load_sector_unpacked:
-    Crash "[Bare_load_sector_unpacked]"
 
 Bare_load_sector: ;Ax (Num bytes), Bx (The bytes buffer to load into)
     push cx ; save continuation
