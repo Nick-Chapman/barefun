@@ -445,7 +445,7 @@ mkPhysical n =
 
 dePhysical :: Addr -> Int
 dePhysical = \case
-  Physical_raw n -> n
+  Physical_raw n -> n `div` 2
   Symbolic{} -> undefined "dePhysical/Symbolic"
   TempSpace{} -> undefined "dePhysical/TempSpace"
 

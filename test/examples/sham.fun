@@ -123,7 +123,10 @@ let chars_of_int i =
   in
   if i = 0 then ['0'] else loop [] i
 
-let put_int i = put_chars (chars_of_int i)
+let put_int i =
+  if i < 0
+  then put_chars ('-' :: chars_of_int (0 - i))
+  else put_chars (chars_of_int i)
 
 let newline () = put_char '\n'
 
@@ -219,6 +222,7 @@ let execute fs line =
   | command::args -> dispatch fs command args
 
 let rec mainloop fs =
+  (*put_string "(space="; put_int (get_sp()); put_string ")";*)
   put_string "% ";
   let single_controlD = implode (chr 4 :: []) in
   let line = read_line () in
@@ -395,7 +399,7 @@ let man_mv = "mv - move (rename) files\n"
 let man_file = "file - determine file type\n"
 let man_create = "create - create a new file\n"
 let man_fib = "fib - naive fib computation upto the given number\n"
-let man_space = "space - where is the stack-pointer?\n"
+let man_space = "space - where is the stack-pointer? (in words)\n"
 
 let shadow =
   "I have a little shadow that goes in and out with me,\nAnd what can be the use of him is more than I can see.\nHe is very, very like me from the heels up to the head;\nAnd I see him jump before me, when I jump into my bed.\n"

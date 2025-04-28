@@ -77,7 +77,7 @@ defineBuiltin b =
 
     Crash -> Impure $ undefined
     LoadSec -> Impure $ undefined -- TODO: emulate
-    GetStackPointer -> Impure $ undefined -- TODO: emulate
+    GetStackPointer -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 777)
 
   where
     unit = VCons tUnit []

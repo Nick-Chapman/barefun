@@ -273,6 +273,7 @@ Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the 
 
 Bare_addr_to_num: ;; called when we see where the Sp is
     ;; when we have only 15bi nums, we ought to shift/tag this, so we gve answer in #words
+    shr ax, 1
     ret
 
 Bare_mul:
