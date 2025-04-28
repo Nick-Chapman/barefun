@@ -34,7 +34,7 @@ data Image = Image
 data DataSpec
   = DW [Word]
   | DB [Char]
-  -- | DS String -- TODO
+  | DS String -- TODO
 
 data Code
   = Do Op Code
@@ -137,7 +137,8 @@ instance Show DataSpec where
     DW [] -> ""
     DW ws -> printf "\n  dw %s" (intercalate ", " [ show w | w <- ws ])
     DB [] -> ""
-    DB cs -> printf "\n  db %s" (intercalate ", " [ showCharForNasm c | c <- cs ])
+    DB cs -> printf "\n  db %s" (intercalate ", " [ printf "`%s`" (escapeCharForNasm c) | c <- cs ])
+    DS s -> printf "\n  db `%s`" (concat (map escapeCharForNasm s))
 
 instance Show Code where
   show = \case
@@ -174,19 +175,18 @@ instance Show Source where
 
 instance Show Word where
   show = \case
-    WChar c -> showCharForNasm c
+    WChar c -> printf "`%s`" (escapeCharForNasm c)
     WNum n -> show n
     WAddr a -> show a
     WCodeLabel lab -> show lab
     WUninitialized -> "<uninitialized>"
 
-showCharForNasm :: Char -> String
-showCharForNasm c = do
-  -- nasm requires backticks around escape sequences
+escapeCharForNasm :: Char -> String
+escapeCharForNasm c = do
   let n = ord c
-  if c == '\n' then "`\\n`" else
-    if c == '\'' then "`\'`" else
-      if (n < 32 || n > 126) then show n else show c
+  if c == '\n' then "\\n" else
+    if c == '`' then "\\`" else -- TODO: example to provoke needd for this
+      if (n < 32 || n > 126) then printf "\\x%02x" n else [c]
 
 instance Show Reg where
   show = \case
@@ -571,6 +571,8 @@ specsWords offset = \case
     [ (offset + (2*i), w) | (i,w) <- zip [0..] ws ] ++ specsWords (offset + 2 * length ws) specs
   DB cs : specs ->
     [ (offset + i, WChar c) | (i,c) <- zip [0..] cs ] ++ specsWords (offset + length cs) specs
+  DS s : specs ->
+    [ (offset + i, WChar c) | (i,c) <- zip [0..] s ] ++ specsWords (offset + length s) specs
 
 instance Show State where
   show State{rmap} =
@@ -620,7 +622,9 @@ compileTopDef lab = \case
 
   SRC.TopLitS string ->
     pure (DW [ WNum (fromIntegral $ length string) ]
-           : [ DB [ c | c <- string ] ])
+--           : [ DB [ c | c <- string ] ]
+           : [ DS string ]
+         )
 
   SRC.TopLam _x body -> do
     lab <- compileCode body >>= CutCode ("Function: " ++ show lab)

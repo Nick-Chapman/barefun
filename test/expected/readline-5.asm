@@ -115,7 +115,7 @@ L10: ; Function: g2
   mov bx, [Temps+12]
   cmp word [bx], 1
   jz L9
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+14], ax
   mov ax, 65
@@ -205,7 +205,7 @@ L16: ; Arm: 56'22
 L17: ; Continuation
   call Bare_enter_check
   push word [bp+4]
-  push word 4
+  push word `\x04`
   push word 1
   mov [Temps+2], sp
   mov bp, dx
@@ -213,10 +213,10 @@ L17: ; Continuation
   jmp [bp]
 
 L18: ; Arm: 57'28
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+10], ax
-  mov ax, 'D'
+  mov ax, `D`
   call Bare_put_char
   mov [Temps+12], ax
   mov ax, `\n`
@@ -242,13 +242,13 @@ L20: ; Arm: 61'17
 
 L21: ; Continuation
   call Bare_enter_check
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+6], ax
   mov dx, [bp+4]
@@ -256,13 +256,13 @@ L21: ; Continuation
   jmp [bp]
 
 L22: ; Arm: 63'31
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+6], ax
   mov dx, [Temps+6]
@@ -368,7 +368,7 @@ L30: ; Function: g8
   cmp word [bx], 1
   jz L16
   mov ax, [Temps+2]
-  cmp word ax, 4
+  cmp word ax, `\x04`
   call Bare_make_bool_from_z
   mov [Temps+8], ax
   mov bx, [Temps+8]
@@ -417,7 +417,7 @@ L30: ; Function: g8
   mov bx, [Temps+20]
   cmp word [bx], 1
   jz L29
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+22], ax
   mov ax, 65
@@ -484,7 +484,7 @@ L35: ; Continuation
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [Temps+2]
-  cmp word ax, 4
+  cmp word ax, `\x04`
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   mov dx, [Temps+6]
@@ -619,7 +619,7 @@ g5:
   dw L14
 g6:
   dw 2
-  db '%', ' '
+  db `% `
 g7:
   dw 0
 g8:
@@ -648,7 +648,7 @@ g19:
   dw L43
 g20:
   dw 45
-  db 'R', 'e', 'a', 'd', 'l', 'i', 'n', 'e', ':', ' ', 'e', 'd', 'i', 't', ' ', 'w', 'i', 't', 'h', ' ', 'b', 'a', 'c', 'k', 's', 'p', 'a', 'c', 'e', ';', ' ', 'e', 'x', 'i', 't', ' ', 'w', 'i', 't', 'h', ' ', '^', 'D', '.', `\n`
+  db `Readline: edit with backspace; exit with ^D.\n`
 g21:
   dw 0
 g22:

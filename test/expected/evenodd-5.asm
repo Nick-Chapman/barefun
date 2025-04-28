@@ -46,7 +46,7 @@ L4: ; Continuation
   jmp [bp]
 
 L5: ; Arm: 9'25
-  mov dx, 'E'
+  mov dx, `E`
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -59,7 +59,7 @@ L6: ; Continuation
   mov bx, dx
   cmp word [bx], 1
   jz L5
-  mov dx, 'O'
+  mov dx, `O`
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -77,7 +77,7 @@ L7: ; Continuation
   jmp [bp]
 
 L8: ; Arm: 9'25
-  mov dx, 'E'
+  mov dx, `E`
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -90,7 +90,7 @@ L9: ; Continuation
   mov bx, dx
   cmp word [bx], 1
   jz L8
-  mov dx, 'O'
+  mov dx, `O`
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]

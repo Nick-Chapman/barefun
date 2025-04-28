@@ -24,7 +24,7 @@ L3: ; Function: g1
   mov ax, dx
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
   push word dx
@@ -36,7 +36,7 @@ L3: ; Function: g1
 
 L4: ; Start
   mov bp, g1
-  mov dx, '%'
+  mov dx, `%`
   jmp [bp]
 
 g1:

@@ -568,7 +568,7 @@ L51: ; Function: g16
   mov bx, [Temps+12]
   cmp word [bx], 1
   jz L50
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+14], ax
   mov ax, 65
@@ -610,7 +610,7 @@ L53: ; Arm: 133'20
 L54: ; Continuation
   call Bare_enter_check
   push word [bp+4]
-  push word 4
+  push word `\x04`
   push word 1
   mov [Temps+2], sp
   mov bp, dx
@@ -618,10 +618,10 @@ L54: ; Continuation
   jmp [bp]
 
 L55: ; Arm: 134'26
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+10], ax
-  mov ax, 'D'
+  mov ax, `D`
   call Bare_put_char
   mov [Temps+12], ax
   mov ax, `\n`
@@ -647,13 +647,13 @@ L57: ; Arm: 138'15
 
 L58: ; Continuation
   call Bare_enter_check
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+6], ax
   mov dx, [bp+4]
@@ -661,13 +661,13 @@ L58: ; Continuation
   jmp [bp]
 
 L59: ; Arm: 140'29
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+6], ax
   mov dx, [Temps+6]
@@ -773,7 +773,7 @@ L67: ; Function: g18
   cmp word [bx], 1
   jz L53
   mov ax, [Temps+2]
-  cmp word ax, 4
+  cmp word ax, `\x04`
   call Bare_make_bool_from_z
   mov [Temps+8], ax
   mov bx, [Temps+8]
@@ -822,7 +822,7 @@ L67: ; Function: g18
   mov bx, [Temps+20]
   cmp word [bx], 1
   jz L66
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+22], ax
   mov ax, 65
@@ -1558,14 +1558,14 @@ L126: ; Function: g95
   jmp [bp]
 
 L127: ; Arm: 211'52
-  mov dx, '*'
+  mov dx, `*`
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L128: ; Function: g100
   mov ax, dx
-  cmp word ax, 'o'
+  cmp word ax, `o`
   call Bare_make_bool_from_z
   mov [Temps+2], ax
   mov bx, [Temps+2]
@@ -1785,7 +1785,7 @@ L146: ; Function: t1
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [Temps+2]
-  cmp word ax, ' '
+  cmp word ax, ` `
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   mov bx, [Temps+6]
@@ -2008,7 +2008,7 @@ L168: ; Continuation
 
 L169: ; Arm: 116'11
   push word g63
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -2076,7 +2076,7 @@ L174: ; Continuation
 
 L175: ; Arm: 116'11
   push word g59
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -2358,7 +2358,7 @@ L200: ; Continuation
 
 L201: ; Arm: 116'11
   push word g87
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -2426,7 +2426,7 @@ L206: ; Continuation
 
 L207: ; Arm: 116'11
   push word g83
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -2854,7 +2854,7 @@ L242: ; Continuation
 
 L243: ; Arm: 116'11
   push word g104
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -3480,11 +3480,11 @@ L284: ; Continuation
 
 L285: ; Function: t2
   push word g34
-  push word ' '
+  push word ` `
   push word 1
   mov [Temps+2], sp
   push word [Temps+2]
-  push word '>'
+  push word `>`
   push word 1
   mov [Temps+4], sp
   push word bp
@@ -3537,7 +3537,7 @@ L288: ; Continuation
 L289: ; Continuation
   call Bare_enter_check
   push word g29
-  push word 4
+  push word `\x04`
   push word 1
   mov [Temps+2], sp
   push word dx
@@ -3649,24 +3649,24 @@ g40:
   dw 0
 g41:
   dw 3
-  db 'f', 'i', 'b'
+  db `fib`
 g42:
   dw L80
 g43:
   dw 5
-  db 'f', 'i', 'b', ':', ' '
+  db `fib: `
 g44:
   dw 7
-  db 'E', 'R', 'R', 'O', 'R', ':', ' '
+  db `ERROR: `
 g45:
   dw 20
-  db 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'a', 'n', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't'
+  db `expected an argument`
 g46:
   dw 7
-  db 'E', 'R', 'R', 'O', 'R', ':', ' '
+  db `ERROR: `
 g47:
   dw 29
-  db 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'e', 'x', 'a', 'c', 't', 'l', 'y', ' ', 'o', 'n', 'e', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't'
+  db `expected exactly one argument`
 g48:
   dw L92
 g49:
@@ -3685,10 +3685,10 @@ g55:
   dw 1
 g56:
   dw 7
-  db 'E', 'R', 'R', 'O', 'R', ':', ' '
+  db `ERROR: `
 g57:
   dw 27
-  db 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'a', 'r', 'g', '1', ' ', 't', 'o', ' ', 'b', 'e', ' ', 'n', 'u', 'm', 'e', 'r', 'i', 'c'
+  db `expected arg1 to be numeric`
 g58:
   dw L96
 g59:
@@ -3697,7 +3697,7 @@ g60:
   dw 0
 g61:
   dw 5
-  db ' ', '-', '-', '>', ' '
+  db ` --> `
 g62:
   dw L100
 g63:
@@ -3706,24 +3706,24 @@ g64:
   dw 0
 g65:
   dw 4
-  db 'f', 'a', 'c', 't'
+  db `fact`
 g66:
   dw L102
 g67:
   dw 6
-  db 'f', 'a', 'c', 't', ':', ' '
+  db `fact: `
 g68:
   dw 7
-  db 'E', 'R', 'R', 'O', 'R', ':', ' '
+  db `ERROR: `
 g69:
   dw 20
-  db 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'a', 'n', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't'
+  db `expected an argument`
 g70:
   dw 7
-  db 'E', 'R', 'R', 'O', 'R', ':', ' '
+  db `ERROR: `
 g71:
   dw 29
-  db 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'e', 'x', 'a', 'c', 't', 'l', 'y', ' ', 'o', 'n', 'e', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't'
+  db `expected exactly one argument`
 g72:
   dw L114
 g73:
@@ -3742,10 +3742,10 @@ g79:
   dw 1
 g80:
   dw 7
-  db 'E', 'R', 'R', 'O', 'R', ':', ' '
+  db `ERROR: `
 g81:
   dw 27
-  db 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'a', 'r', 'g', '1', ' ', 't', 'o', ' ', 'b', 'e', ' ', 'n', 'u', 'm', 'e', 'r', 'i', 'c'
+  db `expected arg1 to be numeric`
 g82:
   dw L118
 g83:
@@ -3754,7 +3754,7 @@ g84:
   dw 0
 g85:
   dw 5
-  db ' ', '-', '-', '>', ' '
+  db ` --> `
 g86:
   dw L122
 g87:
@@ -3763,18 +3763,18 @@ g88:
   dw 0
 g89:
   dw 3
-  db 'r', 'e', 'v'
+  db `rev`
 g90:
   dw L124
 g91:
   dw 7
-  db 'E', 'R', 'R', 'O', 'R', ':', ' '
+  db `ERROR: `
 g92:
   dw 26
-  db 'r', 'e', 'v', ':', ' ', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'n', 'o', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', 's'
+  db `rev: expected no arguments`
 g93:
   dw 31
-  db '(', 'r', 'e', 'v', 'e', 'r', 's', 'e', ' ', 't', 'y', 'p', 'e', 'd', ' ', 'l', 'i', 'n', 'e', 's', ' ', 'u', 'n', 't', 'i', 'l', ' ', '^', 'D', ')', `\n`
+  db `(reverse typed lines until ^D)\n`
 g94:
   dw 0
 g95:
@@ -3791,10 +3791,10 @@ g100:
   dw L128
 g101:
   dw 12
-  db 'Y', 'o', 'u', ' ', 'w', 'r', 'o', 't', 'e', ':', ' ', '"'
+  db `You wrote: "`
 g102:
   dw 3
-  db '"', ' ', '('
+  db `" (`
 g103:
   dw L132
 g104:
@@ -3803,12 +3803,12 @@ g105:
   dw 0
 g106:
   dw 7
-  db ' ', 'c', 'h', 'a', 'r', 's', ')'
+  db ` chars)`
 g107:
   dw 0
 g108:
   dw 47
-  db 'T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 's', 'h', 'e', 'l', 'l', ' ', 'p', 'r', 'o', 't', 'o', 't', 'y', 'p', 'e', '.', ' ', 'T', 'r', 'y', ':', ' ', 'f', 'i', 'b', ',', ' ', 'f', 'a', 'c', 't', ',', ' ', 'r', 'e', 'v', `\n`
+  db `This is a shell prototype. Try: fib, fact, rev\n`
 g109:
   dw 0
 

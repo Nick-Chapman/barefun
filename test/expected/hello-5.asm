@@ -98,7 +98,7 @@ g3:
   dw L6
 g4:
   dw 14
-  db 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', `\n`
+  db `Hello, world!\n`
 g5:
   dw 0
 

@@ -440,7 +440,7 @@ g3:
   dw L6
 g4:
   dw 5
-  db 'L', 'O', 'A', 'D', `\n`
+  db `LOAD\n`
 g5:
   dw 0
 g6:
@@ -449,7 +449,7 @@ g7:
   dw L10
 g8:
   dw 2
-  db '>', ' '
+  db `> `
 g9:
   dw 0
 g10:
@@ -468,7 +468,7 @@ g16:
   dw L27
 g17:
   dw 35
-  db 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'm', 'a', 'l', 'l', ':', ' ', 'a', ' ', 'p', 'r', 'o', 't', 'o', ' ', 'r', 'e', 'a', 'd', 'l', 'i', 'n', 'e', `\n`
+  db `Welcome to small: a proto readline\n`
 g18:
   dw 0
 g19:
@@ -477,7 +477,7 @@ g20:
   dw L31
 g21:
   dw 6
-  db 'N', 'E', 'V', 'E', 'R', `\n`
+  db `NEVER\n`
 g22:
   dw 0
 

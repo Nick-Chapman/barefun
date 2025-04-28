@@ -294,7 +294,7 @@ L24: ; Continuation
 
 L25: ; Arm: 16'11
   push word g13
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -437,7 +437,7 @@ g4:
   dw L10
 g5:
   dw 4
-  db 'f', 'i', 'b', ' '
+  db `fib `
 g6:
   dw 0
 g7:
@@ -448,7 +448,7 @@ g9:
   dw L18
 g10:
   dw 5
-  db ' ', '-', '-', '>', ' '
+  db ` --> `
 g11:
   dw 0
 g12:

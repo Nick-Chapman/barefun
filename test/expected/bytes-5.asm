@@ -254,15 +254,15 @@ L24: ; Continuation
   push word 1
   mov [Temps+2], sp
   push word [Temps+2]
-  push word 'o'
+  push word `o`
   push word 1
   mov [Temps+4], sp
   push word [Temps+4]
-  push word 'w'
+  push word `w`
   push word 1
   mov [Temps+6], sp
   push word [Temps+6]
-  push word 'T'
+  push word `T`
   push word 1
   mov [Temps+8], sp
   push word [bp+6]
@@ -358,7 +358,7 @@ g8:
   dw 0
 g9:
   dw 4
-  db 'O', 'n', 'e', `\n`
+  db `One\n`
 g10:
   dw 0
 

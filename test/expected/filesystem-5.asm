@@ -328,7 +328,7 @@ L29: ; Function: g8
   mov bx, [Temps+12]
   cmp word [bx], 1
   jz L28
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+14], ax
   mov ax, 65
@@ -922,7 +922,7 @@ L72: ; Function: t1
   cmp word [bx], 1
   jz L70
   push word [bp+2]
-  push word '-'
+  push word `-`
   push word 1
   mov [Temps+4], sp
   push word dx
@@ -2394,7 +2394,7 @@ L184: ; Continuation
 
 L185: ; Arm: 89'11
   push word g30
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -2929,7 +2929,7 @@ L226: ; Continuation
 
 L227: ; Arm: 89'11
   push word g104
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -3494,7 +3494,7 @@ L267: ; Continuation
 
 L268: ; Arm: 89'11
   push word g114
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -3876,7 +3876,7 @@ L298: ; Continuation
 
 L299: ; Arm: 89'11
   push word g76
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -4471,7 +4471,7 @@ L339: ; Continuation
 
 L340: ; Arm: 89'11
   push word g86
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -5256,7 +5256,7 @@ L385: ; Continuation
 
 L386: ; Arm: 89'11
   push word g56
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -5315,7 +5315,7 @@ L389: ; Continuation
 
 L390: ; Arm: 89'11
   push word g53
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -5861,7 +5861,7 @@ L422: ; Continuation
 
 L423: ; Arm: 89'11
   push word g43
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -5920,7 +5920,7 @@ L426: ; Continuation
 
 L427: ; Arm: 89'11
   push word g40
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+6], sp
   mov dx, [Temps+6]
@@ -6386,7 +6386,7 @@ L462: ; Continuation
 
 L463: ; Arm: 89'11
   push word g138
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -6921,7 +6921,7 @@ L504: ; Continuation
 
 L505: ; Arm: 89'11
   push word g212
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -7486,7 +7486,7 @@ L545: ; Continuation
 
 L546: ; Arm: 89'11
   push word g222
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -7868,7 +7868,7 @@ L576: ; Continuation
 
 L577: ; Arm: 89'11
   push word g184
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -8463,7 +8463,7 @@ L617: ; Continuation
 
 L618: ; Arm: 89'11
   push word g194
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -9248,7 +9248,7 @@ L663: ; Continuation
 
 L664: ; Arm: 89'11
   push word g164
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -9307,7 +9307,7 @@ L667: ; Continuation
 
 L668: ; Arm: 89'11
   push word g161
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -9853,7 +9853,7 @@ L700: ; Continuation
 
 L701: ; Arm: 89'11
   push word g151
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -9912,7 +9912,7 @@ L704: ; Continuation
 
 L705: ; Arm: 89'11
   push word g148
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+6], sp
   mov dx, [Temps+6]
@@ -10318,7 +10318,7 @@ L732: ; Continuation
 
 L733: ; Arm: 89'11
   push word g331
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+6], sp
   mov dx, [Temps+6]
@@ -10667,7 +10667,7 @@ L761: ; Continuation
 
 L762: ; Arm: 89'11
   push word g244
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -11125,7 +11125,7 @@ L798: ; Continuation
 
 L799: ; Arm: 89'11
   push word g303
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -11690,7 +11690,7 @@ L839: ; Continuation
 
 L840: ; Arm: 89'11
   push word g313
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -12068,7 +12068,7 @@ L870: ; Continuation
 
 L871: ; Arm: 89'11
   push word g275
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -12663,7 +12663,7 @@ L911: ; Continuation
 
 L912: ; Arm: 89'11
   push word g285
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -12914,7 +12914,7 @@ L926: ; Continuation
 
 L927: ; Arm: 89'11
   push word g267
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+6], sp
   mov dx, [Temps+6]
@@ -13379,7 +13379,7 @@ L958: ; Continuation
 
 L959: ; Arm: 89'11
   push word g257
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -13435,7 +13435,7 @@ L962: ; Continuation
 
 L963: ; Arm: 89'11
   push word g254
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+6], sp
   mov dx, [Temps+6]
@@ -14040,7 +14040,7 @@ L1005: ; Continuation
   push word 0
   mov [Temps+4], sp
   push word g11
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+6], sp
   push word [Temps+4]
@@ -14093,12 +14093,12 @@ g11:
   dw 0
 g12:
   dw 11
-  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db `   **SLOW**`
 g13:
   dw 0
 g14:
   dw 12
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `read_sector `
 g15:
   dw 0
 g16:
@@ -14108,7 +14108,7 @@ g17:
   dw 0
 g18:
   dw 7
-  db 't', 'r', 'a', 'c', 'e', ':', ' '
+  db `trace: `
 g19:
   dw 0
 g20:
@@ -14137,7 +14137,7 @@ g31:
   dw 0
 g32:
   dw 12
-  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db `write_block `
 g33:
   dw 0
 g34:
@@ -14147,7 +14147,7 @@ g35:
   dw 0
 g36:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g37:
   dw 0
 g38:
@@ -14166,19 +14166,19 @@ g44:
   dw 0
 g45:
   dw 1
-  db ']'
+  db `]`
 g46:
   dw 0
 g47:
   dw 1
-  db '['
+  db `[`
 g48:
   dw 0
 g49:
   dw 0
 g50:
   dw 12
-  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db `write_block `
 g51:
   dw 0
 g52:
@@ -14199,21 +14199,21 @@ g59:
   dw 0
 g60:
   dw 6
-  db ',', ' ', 'l', 'e', 'n', '='
+  db `, len=`
 g61:
   dw 0
 g62:
   dw 0
 g63:
   dw 9
-  db ',', ' ', 'o', 'f', 'f', 's', 'e', 't', '='
+  db `, offset=`
 g64:
   dw 0
 g65:
   dw 0
 g66:
   dw 21
-  db 'u', 'p', 'd', 'a', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
+  db `update_sectorC1 seci=`
 g67:
   dw 0
 g68:
@@ -14238,7 +14238,7 @@ g77:
   dw 0
 g78:
   dw 13
-  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `write_sector `
 g79:
   dw 0
 g80:
@@ -14248,7 +14248,7 @@ g81:
   dw 0
 g82:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g83:
   dw 0
 g84:
@@ -14261,12 +14261,12 @@ g87:
   dw 0
 g88:
   dw 11
-  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db `   **SLOW**`
 g89:
   dw 0
 g90:
   dw 13
-  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `write_sector `
 g91:
   dw 0
 g92:
@@ -14276,7 +14276,7 @@ g93:
   dw 0
 g94:
   dw 7
-  db 't', 'r', 'a', 'c', 'e', ':', ' '
+  db `trace: `
 g95:
   dw 0
 g96:
@@ -14301,7 +14301,7 @@ g105:
   dw 0
 g106:
   dw 12
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `read_sector `
 g107:
   dw 0
 g108:
@@ -14311,7 +14311,7 @@ g109:
   dw 0
 g110:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g111:
   dw 0
 g112:
@@ -14324,12 +14324,12 @@ g115:
   dw 0
 g116:
   dw 11
-  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db `   **SLOW**`
 g117:
   dw 0
 g118:
   dw 12
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `read_sector `
 g119:
   dw 0
 g120:
@@ -14339,7 +14339,7 @@ g121:
   dw 0
 g122:
   dw 7
-  db 't', 'r', 'a', 'c', 'e', ':', ' '
+  db `trace: `
 g123:
   dw 0
 g124:
@@ -14376,7 +14376,7 @@ g139:
   dw 0
 g140:
   dw 12
-  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db `write_block `
 g141:
   dw 0
 g142:
@@ -14386,7 +14386,7 @@ g143:
   dw 0
 g144:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g145:
   dw 0
 g146:
@@ -14405,19 +14405,19 @@ g152:
   dw 0
 g153:
   dw 1
-  db ']'
+  db `]`
 g154:
   dw 0
 g155:
   dw 1
-  db '['
+  db `[`
 g156:
   dw 0
 g157:
   dw 0
 g158:
   dw 12
-  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db `write_block `
 g159:
   dw 0
 g160:
@@ -14438,21 +14438,21 @@ g167:
   dw 0
 g168:
   dw 6
-  db ',', ' ', 'l', 'e', 'n', '='
+  db `, len=`
 g169:
   dw 0
 g170:
   dw 0
 g171:
   dw 9
-  db ',', ' ', 'o', 'f', 'f', 's', 'e', 't', '='
+  db `, offset=`
 g172:
   dw 0
 g173:
   dw 0
 g174:
   dw 21
-  db 'u', 'p', 'd', 'a', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
+  db `update_sectorC1 seci=`
 g175:
   dw 0
 g176:
@@ -14477,7 +14477,7 @@ g185:
   dw 0
 g186:
   dw 13
-  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `write_sector `
 g187:
   dw 0
 g188:
@@ -14487,7 +14487,7 @@ g189:
   dw 0
 g190:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g191:
   dw 0
 g192:
@@ -14500,12 +14500,12 @@ g195:
   dw 0
 g196:
   dw 11
-  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db `   **SLOW**`
 g197:
   dw 0
 g198:
   dw 13
-  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `write_sector `
 g199:
   dw 0
 g200:
@@ -14515,7 +14515,7 @@ g201:
   dw 0
 g202:
   dw 7
-  db 't', 'r', 'a', 'c', 'e', ':', ' '
+  db `trace: `
 g203:
   dw 0
 g204:
@@ -14540,7 +14540,7 @@ g213:
   dw 0
 g214:
   dw 12
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `read_sector `
 g215:
   dw 0
 g216:
@@ -14550,7 +14550,7 @@ g217:
   dw 0
 g218:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g219:
   dw 0
 g220:
@@ -14563,12 +14563,12 @@ g223:
   dw 0
 g224:
   dw 11
-  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db `   **SLOW**`
 g225:
   dw 0
 g226:
   dw 12
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `read_sector `
 g227:
   dw 0
 g228:
@@ -14578,7 +14578,7 @@ g229:
   dw 0
 g230:
   dw 7
-  db 't', 'r', 'a', 'c', 'e', ':', ' '
+  db `trace: `
 g231:
   dw 0
 g232:
@@ -14611,7 +14611,7 @@ g245:
   dw 0
 g246:
   dw 11
-  db 'r', 'e', 'a', 'd', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db `read_block `
 g247:
   dw 0
 g248:
@@ -14621,7 +14621,7 @@ g249:
   dw 0
 g250:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g251:
   dw 0
 g252:
@@ -14640,19 +14640,19 @@ g258:
   dw 0
 g259:
   dw 1
-  db ']'
+  db `]`
 g260:
   dw 0
 g261:
   dw 1
-  db '['
+  db `[`
 g262:
   dw 0
 g263:
   dw 0
 g264:
   dw 11
-  db 'r', 'e', 'a', 'd', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db `read_block `
 g265:
   dw 0
 g266:
@@ -14663,7 +14663,7 @@ g268:
   dw 0
 g269:
   dw 19
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
+  db `read_sectorC1 seci=`
 g270:
   dw 0
 g271:
@@ -14680,7 +14680,7 @@ g276:
   dw 0
 g277:
   dw 13
-  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `write_sector `
 g278:
   dw 0
 g279:
@@ -14690,7 +14690,7 @@ g280:
   dw 0
 g281:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g282:
   dw 0
 g283:
@@ -14703,12 +14703,12 @@ g286:
   dw 0
 g287:
   dw 11
-  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db `   **SLOW**`
 g288:
   dw 0
 g289:
   dw 13
-  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `write_sector `
 g290:
   dw 0
 g291:
@@ -14718,7 +14718,7 @@ g292:
   dw 0
 g293:
   dw 7
-  db 't', 'r', 'a', 'c', 'e', ':', ' '
+  db `trace: `
 g294:
   dw 0
 g295:
@@ -14743,7 +14743,7 @@ g304:
   dw 0
 g305:
   dw 12
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `read_sector `
 g306:
   dw 0
 g307:
@@ -14753,7 +14753,7 @@ g308:
   dw 0
 g309:
   dw 7
-  db 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db `error: `
 g310:
   dw 0
 g311:
@@ -14766,12 +14766,12 @@ g314:
   dw 0
 g315:
   dw 11
-  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db `   **SLOW**`
 g316:
   dw 0
 g317:
   dw 12
-  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db `read_sector `
 g318:
   dw 0
 g319:
@@ -14781,7 +14781,7 @@ g320:
   dw 0
 g321:
   dw 7
-  db 't', 'r', 'a', 'c', 'e', ':', ' '
+  db `trace: `
 g322:
   dw 0
 g323:
@@ -14806,7 +14806,7 @@ g332:
   dw 0
 g333:
   dw 3
-  db ' ', ':', ' '
+  db ` : `
 g334:
   dw 0
 g335:

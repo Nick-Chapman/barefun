@@ -120,10 +120,10 @@ L11: ; Continuation
   jmp [bp]
 
 L12: ; Function: g3
-  mov ax, '%'
+  mov ax, `%`
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
   push word cx

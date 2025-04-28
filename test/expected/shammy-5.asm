@@ -664,7 +664,7 @@ L58: ; Function: g24
   mov bx, [Temps+12]
   cmp word [bx], 1
   jz L57
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+14], ax
   mov ax, 65
@@ -1181,7 +1181,7 @@ L100: ; Function: t1
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [Temps+2]
-  cmp word ax, ' '
+  cmp word ax, ` `
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   mov bx, [Temps+6]
@@ -1274,7 +1274,7 @@ L108: ; Function: t2
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [Temps+2]
-  cmp word ax, ' '
+  cmp word ax, ` `
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   mov bx, [Temps+6]
@@ -1313,17 +1313,17 @@ L110: ; Arm: 138'22
   jmp [bp]
 
 L111: ; Arm: 139'28
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+10], ax
-  mov ax, 'D'
+  mov ax, `D`
   call Bare_put_char
   mov [Temps+12], ax
   mov ax, `\n`
   call Bare_put_char
   mov [Temps+14], ax
   push word dx
-  push word 4
+  push word `\x04`
   push word 1
   mov [Temps+16], sp
   mov bp, [bp+2]
@@ -1342,13 +1342,13 @@ L113: ; Arm: 143'17
 
 L114: ; Continuation
   call Bare_enter_check
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+6], ax
   mov dx, [bp+6]
@@ -1356,13 +1356,13 @@ L114: ; Continuation
   jmp [bp]
 
 L115: ; Arm: 145'31
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+2], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
-  mov ax, 8
+  mov ax, `\x08`
   call Bare_put_char
   mov [Temps+6], ax
   mov dx, [Temps+6]
@@ -1470,7 +1470,7 @@ L123: ; Function: t1
   cmp word [bx], 1
   jz L110
   mov ax, [Temps+2]
-  cmp word ax, 4
+  cmp word ax, `\x04`
   call Bare_make_bool_from_z
   mov [Temps+8], ax
   mov bx, [Temps+8]
@@ -1520,7 +1520,7 @@ L123: ; Function: t1
   mov bx, [Temps+20]
   cmp word [bx], 1
   jz L122
-  mov ax, '^'
+  mov ax, `^`
   call Bare_put_char
   mov [Temps+22], ax
   mov ax, 65
@@ -2633,7 +2633,7 @@ L205: ; Continuation
 L206: ; Continuation
   call Bare_enter_check
   push word g28
-  push word 4
+  push word `\x04`
   push word 1
   mov [Temps+2], sp
   push word [bp+16]
@@ -3204,7 +3204,7 @@ L252: ; Function: t1
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+6], ax
   push word [Temps+4]
@@ -3437,7 +3437,7 @@ L273: ; Continuation
 
 L274: ; Arm: 118'11
   push word g104
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -3513,7 +3513,7 @@ L279: ; Continuation
 
 L280: ; Arm: 118'11
   push word g100
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -3858,6 +3858,7 @@ g21:
   dw L52
 g22:
   dw 0
+  db ``
 g23:
   dw 0
 g24:
@@ -3868,7 +3869,7 @@ g26:
   dw 0
 g27:
   dw 2
-  db '%', ' '
+  db `% `
 g28:
   dw 0
 g29:
@@ -3891,7 +3892,7 @@ g37:
   dw 0
 g38:
   dw 17
-  db 'c', 'o', 'm', 'm', 'a', 'n', 'd', ' ', 'n', 'o', 't', ' ', 'f', 'o', 'u', 'n', 'd'
+  db `command not found`
 g39:
   dw 1
   db `\n`
@@ -3899,19 +3900,19 @@ g40:
   dw 0
 g41:
   dw 2
-  db ':', ' '
+  db `: `
 g42:
   dw 0
 g43:
   dw 0
 g44:
   dw 6
-  db 's', 'h', 'a', 'm', ':', ' '
+  db `sham: `
 g45:
   dw 0
 g46:
   dw 17
-  db 'P', 'e', 'r', 'm', 'i', 's', 's', 'i', 'o', 'n', ' ', 'd', 'e', 'n', 'i', 'e', 'd'
+  db `Permission denied`
 g47:
   dw 1
   db `\n`
@@ -3919,55 +3920,55 @@ g48:
   dw 0
 g49:
   dw 2
-  db ':', ' '
+  db `: `
 g50:
   dw 0
 g51:
   dw 0
 g52:
   dw 6
-  db 's', 'h', 'a', 'm', ':', ' '
+  db `sham: `
 g53:
   dw 0
 g54:
   dw L62
 g55:
   dw 53
-  db 'S', 'h', 'a', 'm', 'm', 'y', ':', ' ', 'I', 'n', '-', 'm', 'e', 'm', 'o', 'r', 'y', ' ', 'f', 'i', 'l', 'e', '-', 's', 'y', 's', 't', 'e', 'm', '.', ' ', 'C', 'o', 'n', 's', 'i', 'd', 'e', 'r', ' ', 't', 'y', 'p', 'i', 'n', 'g', ' ', '"', 'l', 's', '"', '.', `\n`
+  db `Shammy: In-memory file-system. Consider typing "ls".\n`
 g56:
   dw 6
-  db 'r', 'e', 'a', 'd', 'm', 'e'
+  db `readme`
 g57:
   dw 46
-  db 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'h', 'a', 'm', ';', ' ', 'p', 'l', 'e', 'a', 's', 'e', ' ', 't', 'r', 'y', ' ', 'a', 'l', 'l', ' ', 't', 'h', 'e', ' ', 'c', 'o', 'm', 'm', 'a', 'n', 'd', 's', '!', `\n`
+  db `Welcome to sham; please try all the commands!\n`
 g58:
   dw 0, g57
 g59:
   dw 0, g56, g58
 g60:
   dw 3
-  db 'c', 'a', 't'
+  db `cat`
 g61:
   dw 33
-  db 'c', 'a', 't', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'a', 't', ' ', 'l', 'e', 'a', 's', 't', ' ', 'o', 'n', 'e', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db `cat: takes at least one argument\n`
 g62:
   dw 0
 g63:
   dw 5
-  db 'c', 'a', 't', ':', ' '
+  db `cat: `
 g64:
   dw 29
-  db ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
+  db ` : No such file or directory\n`
 g65:
   dw 0
 g66:
   dw 1, g64, g65
 g67:
   dw 5
-  db 'c', 'a', 't', ':', ' '
+  db `cat: `
 g68:
   dw 19
-  db ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
+  db ` : Not a data file\n`
 g69:
   dw 0
 g70:
@@ -3976,30 +3977,30 @@ g71:
   dw 0
 g72:
   dw 5
-  db 'c', 'a', 't', ':', ' '
+  db `cat: `
 g73:
   dw 29
-  db ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
+  db ` : No such file or directory\n`
 g74:
   dw 0
 g75:
   dw 1, g73, g74
 g76:
   dw 5
-  db 'c', 'a', 't', ':', ' '
+  db `cat: `
 g77:
   dw 19
-  db ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
+  db ` : Not a data file\n`
 g78:
   dw 0
 g79:
   dw 1, g77, g78
 g80:
   dw 2
-  db 'l', 's'
+  db `ls`
 g81:
   dw 23
-  db 'l', 's', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'n', 'o', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', 's', `\n`
+  db `ls: takes no arguments\n`
 g82:
   dw L63
 g83:
@@ -4008,13 +4009,13 @@ g84:
   dw 0
 g85:
   dw 3
-  db 'f', 'i', 'b'
+  db `fib`
 g86:
   dw 22
-  db 'f', 'i', 'b', ':', ' ', 'm', 'i', 's', 's', 'i', 'n', 'g', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db `fib: missing argument\n`
 g87:
   dw 34
-  db 'c', 'r', 'e', 'a', 't', 'e', ':', ' ', 'u', 'n', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'e', 'x', 't', 'r', 'a', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db `create: unexpected extra argument\n`
 g88:
   dw L75
 g89:
@@ -4033,12 +4034,12 @@ g95:
   dw 0
 g96:
   dw 31
-  db 'f', 'i', 'b', ':', ' ', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'n', 'u', 'm', 'e', 'r', 'i', 'c', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db `fib: expected numeric argument\n`
 g97:
   dw 0
 g98:
   dw 4
-  db 'f', 'i', 'b', ' '
+  db `fib `
 g99:
   dw L79
 g100:
@@ -4047,7 +4048,7 @@ g101:
   dw 0
 g102:
   dw 5
-  db ' ', '-', '-', '>', ' '
+  db ` --> `
 g103:
   dw L83
 g104:

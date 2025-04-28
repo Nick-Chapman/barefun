@@ -14,19 +14,19 @@ L2: ; Continuation
   jmp [bp]
 
 L3: ; Arm: 12'17
-  mov ax, '['
+  mov ax, `[`
   call Bare_put_char
   mov [Temps+8], ax
-  mov ax, 'D'
+  mov ax, `D`
   call Bare_put_char
   mov [Temps+10], ax
-  mov ax, 'E'
+  mov ax, `E`
   call Bare_put_char
   mov [Temps+12], ax
-  mov ax, 'L'
+  mov ax, `L`
   call Bare_put_char
   mov [Temps+14], ax
-  mov ax, ']'
+  mov ax, `]`
   call Bare_put_char
   mov [Temps+16], ax
   mov dx, [Temps+16]
@@ -35,16 +35,16 @@ L3: ; Arm: 12'17
   jmp [bp]
 
 L4: ; Arm: 13'20
-  mov ax, '['
+  mov ax, `[`
   call Bare_put_char
   mov [Temps+10], ax
-  mov ax, 'N'
+  mov ax, `N`
   call Bare_put_char
   mov [Temps+12], ax
-  mov ax, 'L'
+  mov ax, `L`
   call Bare_put_char
   mov [Temps+14], ax
-  mov ax, ']'
+  mov ax, `]`
   call Bare_put_char
   mov [Temps+16], ax
   mov dx, [Temps+16]
@@ -60,7 +60,7 @@ L5: ; Function: g1
   mov bx, [Temps+2]
   cmp word [bx], 1
   jz L1
-  mov ax, ' '
+  mov ax, ` `
   call Bare_put_char
   mov [Temps+4], ax
   mov ax, dx

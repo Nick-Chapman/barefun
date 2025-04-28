@@ -161,7 +161,7 @@ L14: ; Continuation
 
 L15: ; Arm: 9'20
   push word g5
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]

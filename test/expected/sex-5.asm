@@ -156,7 +156,7 @@ L14: ; Continuation
   mov bx, dx
   cmp word [bx], 1
   jz L13
-  mov dx, '.'
+  mov dx, `.`
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -307,7 +307,7 @@ L23: ; Continuation
 
 L24: ; Arm: 24'11
   push word g8
-  push word '0'
+  push word `0`
   push word 1
   mov [Temps+4], sp
   mov dx, [Temps+4]
@@ -387,7 +387,7 @@ g4:
   dw L6
 g5:
   dw 7
-  db 's', 'e', 'c', 't', 'o', 'r', ':'
+  db `sector:`
 g6:
   dw 0
 g7:
