@@ -44,7 +44,7 @@ L5: ; Function: t1
   jz L3
   mov ax, g4
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -92,7 +92,7 @@ L9: ; Function: t1
   jz L7
   mov ax, g8
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -275,7 +275,7 @@ L26: ; Function: t1
   jz L24
   mov ax, g17
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -323,7 +323,7 @@ L30: ; Function: t1
   jz L28
   mov ax, g21
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -440,7 +440,7 @@ g3:
   dw L6
 g4:
   dw 5
-  dw 'L', 'O', 'A', 'D', `\n`
+  db 'L', 'O', 'A', 'D', `\n`
 g5:
   dw 0
 g6:
@@ -449,7 +449,7 @@ g7:
   dw L10
 g8:
   dw 2
-  dw '>', ' '
+  db '>', ' '
 g9:
   dw 0
 g10:
@@ -468,7 +468,7 @@ g16:
   dw L27
 g17:
   dw 35
-  dw 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'm', 'a', 'l', 'l', ':', ' ', 'a', ' ', 'p', 'r', 'o', 't', 'o', ' ', 'r', 'e', 'a', 'd', 'l', 'i', 'n', 'e', `\n`
+  db 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'm', 'a', 'l', 'l', ':', ' ', 'a', ' ', 'p', 'r', 'o', 't', 'o', ' ', 'r', 'e', 'a', 'd', 'l', 'i', 'n', 'e', `\n`
 g18:
   dw 0
 g19:
@@ -477,7 +477,7 @@ g20:
   dw L31
 g21:
   dw 6
-  dw 'N', 'E', 'V', 'E', 'R', `\n`
+  db 'N', 'E', 'V', 'E', 'R', `\n`
 g22:
   dw 0
 

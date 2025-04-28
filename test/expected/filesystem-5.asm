@@ -109,7 +109,7 @@ L12: ; Function: t1
   mov ax, [bp+2]
   mov si, [bp+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
@@ -156,7 +156,7 @@ L15: ; Continuation
 L16: ; Continuation
   call Bare_enter_check
   mov ax, dx
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   push word [Temps+2]
   push word L13
@@ -204,7 +204,7 @@ L20: ; Function: t1
   jz L18
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+4]
   push word [Temps+4]
@@ -2003,12 +2003,12 @@ L151: ; Continuation
   mov [Temps+2], ax
   mov ax, [bp+4]
   mov bx, [Temps+2]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   mov ax, [bp+6]
   mov si, [bp+8]
   mov bx, [Temps+4]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+8]
   add ax, 1
@@ -2443,7 +2443,7 @@ L189: ; Continuation
   jz L188
   mov ax, [bp+6]
   mov bx, [bp+10]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+4]
   add ax, [bp+10]
@@ -2451,7 +2451,7 @@ L189: ; Continuation
   mov ax, [bp+8]
   mov si, [Temps+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -2541,7 +2541,7 @@ L196: ; Continuation
   jz L195
   mov ax, [bp+6]
   mov bx, [bp+10]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+4]
   add ax, [bp+10]
@@ -2549,7 +2549,7 @@ L196: ; Continuation
   mov ax, [bp+8]
   mov si, [Temps+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -2981,12 +2981,12 @@ L231: ; Continuation
   mov [Temps+2], ax
   mov ax, [bp+4]
   mov bx, [Temps+2]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   mov ax, [bp+8]
   mov si, [bp+10]
   mov bx, [Temps+4]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -3039,7 +3039,7 @@ L235: ; Continuation
   call Bare_mul
   mov [Temps+2], ax
   mov ax, 512
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+4], ax
   push word [Temps+4]
   push word [Temps+2]
@@ -3925,7 +3925,7 @@ L303: ; Continuation
   jz L302
   mov ax, [bp+8]
   mov bx, [bp+10]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+6]
   add ax, [bp+10]
@@ -3933,7 +3933,7 @@ L303: ; Continuation
   mov ax, [bp+4]
   mov si, [Temps+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -6435,7 +6435,7 @@ L467: ; Continuation
   jz L466
   mov ax, [bp+6]
   mov bx, [bp+10]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+4]
   add ax, [bp+10]
@@ -6443,7 +6443,7 @@ L467: ; Continuation
   mov ax, [bp+8]
   mov si, [Temps+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -6533,7 +6533,7 @@ L474: ; Continuation
   jz L473
   mov ax, [bp+6]
   mov bx, [bp+10]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+4]
   add ax, [bp+10]
@@ -6541,7 +6541,7 @@ L474: ; Continuation
   mov ax, [bp+8]
   mov si, [Temps+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -6973,12 +6973,12 @@ L509: ; Continuation
   mov [Temps+2], ax
   mov ax, [bp+4]
   mov bx, [Temps+2]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   mov ax, [bp+8]
   mov si, [bp+10]
   mov bx, [Temps+4]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -7031,7 +7031,7 @@ L513: ; Continuation
   call Bare_mul
   mov [Temps+2], ax
   mov ax, 512
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+4], ax
   push word [Temps+4]
   push word [Temps+2]
@@ -7917,7 +7917,7 @@ L581: ; Continuation
   jz L580
   mov ax, [bp+8]
   mov bx, [bp+10]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+6]
   add ax, [bp+10]
@@ -7925,7 +7925,7 @@ L581: ; Continuation
   mov ax, [bp+4]
   mov si, [Temps+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -10719,12 +10719,12 @@ L766: ; Continuation
   mov [Temps+2], ax
   mov ax, [bp+6]
   mov bx, [Temps+2]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   mov ax, [bp+8]
   mov si, [bp+10]
   mov bx, [Temps+4]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -10773,7 +10773,7 @@ L769: ; Continuation
 L770: ; Continuation
   call Bare_enter_check
   mov ax, 64
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx
@@ -11177,12 +11177,12 @@ L803: ; Continuation
   mov [Temps+2], ax
   mov ax, [bp+4]
   mov bx, [Temps+2]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   mov ax, [bp+8]
   mov si, [bp+10]
   mov bx, [Temps+4]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -11235,7 +11235,7 @@ L807: ; Continuation
   call Bare_mul
   mov [Temps+2], ax
   mov ax, 512
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+4], ax
   push word [Temps+4]
   push word [Temps+2]
@@ -12117,7 +12117,7 @@ L875: ; Continuation
   jz L874
   mov ax, [bp+8]
   mov bx, [bp+10]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+6]
   add ax, [bp+10]
@@ -12125,7 +12125,7 @@ L875: ; Continuation
   mov ax, [bp+4]
   mov si, [Temps+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
@@ -13612,7 +13612,7 @@ L972: ; Continuation
 L973: ; Continuation
   call Bare_enter_check
   mov ax, 512
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx
@@ -14034,7 +14034,7 @@ L1004: ; Continuation
 L1005: ; Continuation
   call Bare_enter_check
   mov ax, 16384
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   push word [Temps+2]
   push word 0
@@ -14093,22 +14093,22 @@ g11:
   dw 0
 g12:
   dw 11
-  dw ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
 g13:
   dw 0
 g14:
   dw 12
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g15:
   dw 0
 g16:
   dw 1
-  dw `\n`
+  db `\n`
 g17:
   dw 0
 g18:
   dw 7
-  dw 't', 'r', 'a', 'c', 'e', ':', ' '
+  db 't', 'r', 'a', 'c', 'e', ':', ' '
 g19:
   dw 0
 g20:
@@ -14137,17 +14137,17 @@ g31:
   dw 0
 g32:
   dw 12
-  dw 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
 g33:
   dw 0
 g34:
   dw 1
-  dw `\n`
+  db `\n`
 g35:
   dw 0
 g36:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g37:
   dw 0
 g38:
@@ -14166,19 +14166,19 @@ g44:
   dw 0
 g45:
   dw 1
-  dw ']'
+  db ']'
 g46:
   dw 0
 g47:
   dw 1
-  dw '['
+  db '['
 g48:
   dw 0
 g49:
   dw 0
 g50:
   dw 12
-  dw 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
 g51:
   dw 0
 g52:
@@ -14199,21 +14199,21 @@ g59:
   dw 0
 g60:
   dw 6
-  dw ',', ' ', 'l', 'e', 'n', '='
+  db ',', ' ', 'l', 'e', 'n', '='
 g61:
   dw 0
 g62:
   dw 0
 g63:
   dw 9
-  dw ',', ' ', 'o', 'f', 'f', 's', 'e', 't', '='
+  db ',', ' ', 'o', 'f', 'f', 's', 'e', 't', '='
 g64:
   dw 0
 g65:
   dw 0
 g66:
   dw 21
-  dw 'u', 'p', 'd', 'a', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
+  db 'u', 'p', 'd', 'a', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
 g67:
   dw 0
 g68:
@@ -14238,17 +14238,17 @@ g77:
   dw 0
 g78:
   dw 13
-  dw 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g79:
   dw 0
 g80:
   dw 1
-  dw `\n`
+  db `\n`
 g81:
   dw 0
 g82:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g83:
   dw 0
 g84:
@@ -14261,22 +14261,22 @@ g87:
   dw 0
 g88:
   dw 11
-  dw ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
 g89:
   dw 0
 g90:
   dw 13
-  dw 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g91:
   dw 0
 g92:
   dw 1
-  dw `\n`
+  db `\n`
 g93:
   dw 0
 g94:
   dw 7
-  dw 't', 'r', 'a', 'c', 'e', ':', ' '
+  db 't', 'r', 'a', 'c', 'e', ':', ' '
 g95:
   dw 0
 g96:
@@ -14301,17 +14301,17 @@ g105:
   dw 0
 g106:
   dw 12
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g107:
   dw 0
 g108:
   dw 1
-  dw `\n`
+  db `\n`
 g109:
   dw 0
 g110:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g111:
   dw 0
 g112:
@@ -14324,22 +14324,22 @@ g115:
   dw 0
 g116:
   dw 11
-  dw ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
 g117:
   dw 0
 g118:
   dw 12
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g119:
   dw 0
 g120:
   dw 1
-  dw `\n`
+  db `\n`
 g121:
   dw 0
 g122:
   dw 7
-  dw 't', 'r', 'a', 'c', 'e', ':', ' '
+  db 't', 'r', 'a', 'c', 'e', ':', ' '
 g123:
   dw 0
 g124:
@@ -14376,17 +14376,17 @@ g139:
   dw 0
 g140:
   dw 12
-  dw 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
 g141:
   dw 0
 g142:
   dw 1
-  dw `\n`
+  db `\n`
 g143:
   dw 0
 g144:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g145:
   dw 0
 g146:
@@ -14405,19 +14405,19 @@ g152:
   dw 0
 g153:
   dw 1
-  dw ']'
+  db ']'
 g154:
   dw 0
 g155:
   dw 1
-  dw '['
+  db '['
 g156:
   dw 0
 g157:
   dw 0
 g158:
   dw 12
-  dw 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 'b', 'l', 'o', 'c', 'k', ' '
 g159:
   dw 0
 g160:
@@ -14438,21 +14438,21 @@ g167:
   dw 0
 g168:
   dw 6
-  dw ',', ' ', 'l', 'e', 'n', '='
+  db ',', ' ', 'l', 'e', 'n', '='
 g169:
   dw 0
 g170:
   dw 0
 g171:
   dw 9
-  dw ',', ' ', 'o', 'f', 'f', 's', 'e', 't', '='
+  db ',', ' ', 'o', 'f', 'f', 's', 'e', 't', '='
 g172:
   dw 0
 g173:
   dw 0
 g174:
   dw 21
-  dw 'u', 'p', 'd', 'a', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
+  db 'u', 'p', 'd', 'a', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
 g175:
   dw 0
 g176:
@@ -14477,17 +14477,17 @@ g185:
   dw 0
 g186:
   dw 13
-  dw 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g187:
   dw 0
 g188:
   dw 1
-  dw `\n`
+  db `\n`
 g189:
   dw 0
 g190:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g191:
   dw 0
 g192:
@@ -14500,22 +14500,22 @@ g195:
   dw 0
 g196:
   dw 11
-  dw ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
 g197:
   dw 0
 g198:
   dw 13
-  dw 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g199:
   dw 0
 g200:
   dw 1
-  dw `\n`
+  db `\n`
 g201:
   dw 0
 g202:
   dw 7
-  dw 't', 'r', 'a', 'c', 'e', ':', ' '
+  db 't', 'r', 'a', 'c', 'e', ':', ' '
 g203:
   dw 0
 g204:
@@ -14540,17 +14540,17 @@ g213:
   dw 0
 g214:
   dw 12
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g215:
   dw 0
 g216:
   dw 1
-  dw `\n`
+  db `\n`
 g217:
   dw 0
 g218:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g219:
   dw 0
 g220:
@@ -14563,22 +14563,22 @@ g223:
   dw 0
 g224:
   dw 11
-  dw ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
 g225:
   dw 0
 g226:
   dw 12
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g227:
   dw 0
 g228:
   dw 1
-  dw `\n`
+  db `\n`
 g229:
   dw 0
 g230:
   dw 7
-  dw 't', 'r', 'a', 'c', 'e', ':', ' '
+  db 't', 'r', 'a', 'c', 'e', ':', ' '
 g231:
   dw 0
 g232:
@@ -14611,17 +14611,17 @@ g245:
   dw 0
 g246:
   dw 11
-  dw 'r', 'e', 'a', 'd', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db 'r', 'e', 'a', 'd', '_', 'b', 'l', 'o', 'c', 'k', ' '
 g247:
   dw 0
 g248:
   dw 1
-  dw `\n`
+  db `\n`
 g249:
   dw 0
 g250:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g251:
   dw 0
 g252:
@@ -14640,19 +14640,19 @@ g258:
   dw 0
 g259:
   dw 1
-  dw ']'
+  db ']'
 g260:
   dw 0
 g261:
   dw 1
-  dw '['
+  db '['
 g262:
   dw 0
 g263:
   dw 0
 g264:
   dw 11
-  dw 'r', 'e', 'a', 'd', '_', 'b', 'l', 'o', 'c', 'k', ' '
+  db 'r', 'e', 'a', 'd', '_', 'b', 'l', 'o', 'c', 'k', ' '
 g265:
   dw 0
 g266:
@@ -14663,7 +14663,7 @@ g268:
   dw 0
 g269:
   dw 19
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', 'C', '1', ' ', 's', 'e', 'c', 'i', '='
 g270:
   dw 0
 g271:
@@ -14680,17 +14680,17 @@ g276:
   dw 0
 g277:
   dw 13
-  dw 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g278:
   dw 0
 g279:
   dw 1
-  dw `\n`
+  db `\n`
 g280:
   dw 0
 g281:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g282:
   dw 0
 g283:
@@ -14703,22 +14703,22 @@ g286:
   dw 0
 g287:
   dw 11
-  dw ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
 g288:
   dw 0
 g289:
   dw 13
-  dw 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'w', 'r', 'i', 't', 'e', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g290:
   dw 0
 g291:
   dw 1
-  dw `\n`
+  db `\n`
 g292:
   dw 0
 g293:
   dw 7
-  dw 't', 'r', 'a', 'c', 'e', ':', ' '
+  db 't', 'r', 'a', 'c', 'e', ':', ' '
 g294:
   dw 0
 g295:
@@ -14743,17 +14743,17 @@ g304:
   dw 0
 g305:
   dw 12
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g306:
   dw 0
 g307:
   dw 1
-  dw `\n`
+  db `\n`
 g308:
   dw 0
 g309:
   dw 7
-  dw 'e', 'r', 'r', 'o', 'r', ':', ' '
+  db 'e', 'r', 'r', 'o', 'r', ':', ' '
 g310:
   dw 0
 g311:
@@ -14766,22 +14766,22 @@ g314:
   dw 0
 g315:
   dw 11
-  dw ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
+  db ' ', ' ', ' ', '*', '*', 'S', 'L', 'O', 'W', '*', '*'
 g316:
   dw 0
 g317:
   dw 12
-  dw 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
+  db 'r', 'e', 'a', 'd', '_', 's', 'e', 'c', 't', 'o', 'r', ' '
 g318:
   dw 0
 g319:
   dw 1
-  dw `\n`
+  db `\n`
 g320:
   dw 0
 g321:
   dw 7
-  dw 't', 'r', 'a', 'c', 'e', ':', ' '
+  db 't', 'r', 'a', 'c', 'e', ':', ' '
 g322:
   dw 0
 g323:
@@ -14806,7 +14806,7 @@ g332:
   dw 0
 g333:
   dw 3
-  dw ' ', ':', ' '
+  db ' ', ':', ' '
 g334:
   dw 0
 g335:

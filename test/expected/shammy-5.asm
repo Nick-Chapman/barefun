@@ -223,7 +223,7 @@ L23: ; Function: t1
   mov ax, [bp+2]
   mov si, [bp+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
@@ -270,7 +270,7 @@ L26: ; Continuation
 L27: ; Continuation
   call Bare_enter_check
   mov ax, dx
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   push word [Temps+2]
   push word L24
@@ -317,7 +317,7 @@ L31: ; Function: t1
   mov ax, [bp+2]
   mov si, [bp+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+4]
   sub ax, 1
@@ -364,7 +364,7 @@ L34: ; Continuation
 L35: ; Continuation
   call Bare_enter_check
   mov ax, dx
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   push word [Temps+2]
   push word L32
@@ -415,7 +415,7 @@ L39: ; Function: t1
   jz L37
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+4]
   push word [Temps+4]
@@ -510,11 +510,11 @@ L48: ; Function: t1
   jz L44
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   mov ax, [bp+4]
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+6], ax
   mov ax, [Temps+4]
   cmp word ax, [Temps+6]
@@ -3868,7 +3868,7 @@ g26:
   dw 0
 g27:
   dw 2
-  dw '%', ' '
+  db '%', ' '
 g28:
   dw 0
 g29:
@@ -3891,83 +3891,83 @@ g37:
   dw 0
 g38:
   dw 17
-  dw 'c', 'o', 'm', 'm', 'a', 'n', 'd', ' ', 'n', 'o', 't', ' ', 'f', 'o', 'u', 'n', 'd'
+  db 'c', 'o', 'm', 'm', 'a', 'n', 'd', ' ', 'n', 'o', 't', ' ', 'f', 'o', 'u', 'n', 'd'
 g39:
   dw 1
-  dw `\n`
+  db `\n`
 g40:
   dw 0
 g41:
   dw 2
-  dw ':', ' '
+  db ':', ' '
 g42:
   dw 0
 g43:
   dw 0
 g44:
   dw 6
-  dw 's', 'h', 'a', 'm', ':', ' '
+  db 's', 'h', 'a', 'm', ':', ' '
 g45:
   dw 0
 g46:
   dw 17
-  dw 'P', 'e', 'r', 'm', 'i', 's', 's', 'i', 'o', 'n', ' ', 'd', 'e', 'n', 'i', 'e', 'd'
+  db 'P', 'e', 'r', 'm', 'i', 's', 's', 'i', 'o', 'n', ' ', 'd', 'e', 'n', 'i', 'e', 'd'
 g47:
   dw 1
-  dw `\n`
+  db `\n`
 g48:
   dw 0
 g49:
   dw 2
-  dw ':', ' '
+  db ':', ' '
 g50:
   dw 0
 g51:
   dw 0
 g52:
   dw 6
-  dw 's', 'h', 'a', 'm', ':', ' '
+  db 's', 'h', 'a', 'm', ':', ' '
 g53:
   dw 0
 g54:
   dw L62
 g55:
   dw 53
-  dw 'S', 'h', 'a', 'm', 'm', 'y', ':', ' ', 'I', 'n', '-', 'm', 'e', 'm', 'o', 'r', 'y', ' ', 'f', 'i', 'l', 'e', '-', 's', 'y', 's', 't', 'e', 'm', '.', ' ', 'C', 'o', 'n', 's', 'i', 'd', 'e', 'r', ' ', 't', 'y', 'p', 'i', 'n', 'g', ' ', '"', 'l', 's', '"', '.', `\n`
+  db 'S', 'h', 'a', 'm', 'm', 'y', ':', ' ', 'I', 'n', '-', 'm', 'e', 'm', 'o', 'r', 'y', ' ', 'f', 'i', 'l', 'e', '-', 's', 'y', 's', 't', 'e', 'm', '.', ' ', 'C', 'o', 'n', 's', 'i', 'd', 'e', 'r', ' ', 't', 'y', 'p', 'i', 'n', 'g', ' ', '"', 'l', 's', '"', '.', `\n`
 g56:
   dw 6
-  dw 'r', 'e', 'a', 'd', 'm', 'e'
+  db 'r', 'e', 'a', 'd', 'm', 'e'
 g57:
   dw 46
-  dw 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'h', 'a', 'm', ';', ' ', 'p', 'l', 'e', 'a', 's', 'e', ' ', 't', 'r', 'y', ' ', 'a', 'l', 'l', ' ', 't', 'h', 'e', ' ', 'c', 'o', 'm', 'm', 'a', 'n', 'd', 's', '!', `\n`
+  db 'W', 'e', 'l', 'c', 'o', 'm', 'e', ' ', 't', 'o', ' ', 's', 'h', 'a', 'm', ';', ' ', 'p', 'l', 'e', 'a', 's', 'e', ' ', 't', 'r', 'y', ' ', 'a', 'l', 'l', ' ', 't', 'h', 'e', ' ', 'c', 'o', 'm', 'm', 'a', 'n', 'd', 's', '!', `\n`
 g58:
   dw 0, g57
 g59:
   dw 0, g56, g58
 g60:
   dw 3
-  dw 'c', 'a', 't'
+  db 'c', 'a', 't'
 g61:
   dw 33
-  dw 'c', 'a', 't', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'a', 't', ' ', 'l', 'e', 'a', 's', 't', ' ', 'o', 'n', 'e', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db 'c', 'a', 't', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'a', 't', ' ', 'l', 'e', 'a', 's', 't', ' ', 'o', 'n', 'e', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
 g62:
   dw 0
 g63:
   dw 5
-  dw 'c', 'a', 't', ':', ' '
+  db 'c', 'a', 't', ':', ' '
 g64:
   dw 29
-  dw ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
+  db ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
 g65:
   dw 0
 g66:
   dw 1, g64, g65
 g67:
   dw 5
-  dw 'c', 'a', 't', ':', ' '
+  db 'c', 'a', 't', ':', ' '
 g68:
   dw 19
-  dw ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
+  db ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
 g69:
   dw 0
 g70:
@@ -3976,30 +3976,30 @@ g71:
   dw 0
 g72:
   dw 5
-  dw 'c', 'a', 't', ':', ' '
+  db 'c', 'a', 't', ':', ' '
 g73:
   dw 29
-  dw ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
+  db ' ', ':', ' ', 'N', 'o', ' ', 's', 'u', 'c', 'h', ' ', 'f', 'i', 'l', 'e', ' ', 'o', 'r', ' ', 'd', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', `\n`
 g74:
   dw 0
 g75:
   dw 1, g73, g74
 g76:
   dw 5
-  dw 'c', 'a', 't', ':', ' '
+  db 'c', 'a', 't', ':', ' '
 g77:
   dw 19
-  dw ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
+  db ' ', ':', ' ', 'N', 'o', 't', ' ', 'a', ' ', 'd', 'a', 't', 'a', ' ', 'f', 'i', 'l', 'e', `\n`
 g78:
   dw 0
 g79:
   dw 1, g77, g78
 g80:
   dw 2
-  dw 'l', 's'
+  db 'l', 's'
 g81:
   dw 23
-  dw 'l', 's', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'n', 'o', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', 's', `\n`
+  db 'l', 's', ':', ' ', 't', 'a', 'k', 'e', 's', ' ', 'n', 'o', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', 's', `\n`
 g82:
   dw L63
 g83:
@@ -4008,13 +4008,13 @@ g84:
   dw 0
 g85:
   dw 3
-  dw 'f', 'i', 'b'
+  db 'f', 'i', 'b'
 g86:
   dw 22
-  dw 'f', 'i', 'b', ':', ' ', 'm', 'i', 's', 's', 'i', 'n', 'g', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db 'f', 'i', 'b', ':', ' ', 'm', 'i', 's', 's', 'i', 'n', 'g', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
 g87:
   dw 34
-  dw 'c', 'r', 'e', 'a', 't', 'e', ':', ' ', 'u', 'n', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'e', 'x', 't', 'r', 'a', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db 'c', 'r', 'e', 'a', 't', 'e', ':', ' ', 'u', 'n', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'e', 'x', 't', 'r', 'a', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
 g88:
   dw L75
 g89:
@@ -4033,12 +4033,12 @@ g95:
   dw 0
 g96:
   dw 31
-  dw 'f', 'i', 'b', ':', ' ', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'n', 'u', 'm', 'e', 'r', 'i', 'c', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
+  db 'f', 'i', 'b', ':', ' ', 'e', 'x', 'p', 'e', 'c', 't', 'e', 'd', ' ', 'n', 'u', 'm', 'e', 'r', 'i', 'c', ' ', 'a', 'r', 'g', 'u', 'm', 'e', 'n', 't', `\n`
 g97:
   dw 0
 g98:
   dw 4
-  dw 'f', 'i', 'b', ' '
+  db 'f', 'i', 'b', ' '
 g99:
   dw L79
 g100:
@@ -4047,7 +4047,7 @@ g101:
   dw 0
 g102:
   dw 5
-  dw ' ', '-', '-', '>', ' '
+  db ' ', '-', '-', '>', ' '
 g103:
   dw L83
 g104:

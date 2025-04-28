@@ -44,7 +44,7 @@ L5: ; Function: t1
   jz L3
   mov ax, g5
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -147,7 +147,7 @@ L13: ; Function: t1
   jz L11
   mov ax, g11
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -277,7 +277,7 @@ L24: ; Continuation
   jz L19
   mov ax, [bp+4]
   mov bx, [bp+6]
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [Temps+2]
   call Bare_char_to_num
@@ -470,11 +470,11 @@ L37: ; Continuation
   call Bare_dump_sector
   mov [Temps+4], ax
   mov ax, 512
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+6], ax
   mov ax, [bp+4]
   mov bx, [Temps+6]
-  call Bare_load_sector_unpacked
+  call Bare_load_sector
   mov [Temps+8], ax
   mov ax, [Temps+6]
   mov [Temps+10], ax
@@ -579,7 +579,7 @@ g4:
   dw L6
 g5:
   dw 9
-  dw 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l', ':'
+  db 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l', ':'
 g6:
   dw 0
 g7:
@@ -592,7 +592,7 @@ g10:
   dw L14
 g11:
   dw 10
-  dw 'u', 's', 'e', 'r', '-', 'c', 'o', 'd', 'e', ':'
+  db 'u', 's', 'e', 'r', '-', 'c', 'o', 'd', 'e', ':'
 g12:
   dw 0
 g13:

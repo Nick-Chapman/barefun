@@ -44,7 +44,7 @@ L5: ; Function: t1
   jz L3
   mov ax, g4
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+2]
   push word [Temps+4]
@@ -98,7 +98,7 @@ g3:
   dw L6
 g4:
   dw 14
-  dw 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', `\n`
+  db 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', `\n`
 g5:
   dw 0
 

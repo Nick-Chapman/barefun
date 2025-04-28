@@ -21,7 +21,7 @@ import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc))
 
 packedStrings :: Bool
-packedStrings = False  -- TODO: switch this on
+packedStrings = True
 
 bytesPerWord :: Int
 bytesPerWord = 2

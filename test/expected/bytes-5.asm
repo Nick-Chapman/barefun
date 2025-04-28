@@ -67,7 +67,7 @@ L8: ; Function: t1
   mov ax, [bp+2]
   mov si, [bp+4]
   mov bx, [Temps+2]
-  call Bare_set_bytes_unpacked
+  call Bare_set_bytes
   mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
@@ -114,7 +114,7 @@ L11: ; Continuation
 L12: ; Continuation
   call Bare_enter_check
   mov ax, dx
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   push word [Temps+2]
   push word L9
@@ -162,7 +162,7 @@ L16: ; Function: t1
   jz L14
   mov ax, [bp+2]
   mov bx, dx
-  call Bare_get_bytes_unpacked
+  call Bare_get_bytes
   mov [Temps+4], ax
   push word [bp+4]
   push word [Temps+4]
@@ -287,7 +287,7 @@ L25: ; Continuation
 L26: ; Continuation
   call Bare_enter_check
   mov ax, 5
-  call Bare_make_bytes_unpacked
+  call Bare_make_bytes
   mov [Temps+2], ax
   mov ax, [Temps+2]
   mov [Temps+4], ax
@@ -358,7 +358,7 @@ g8:
   dw 0
 g9:
   dw 4
-  dw 'O', 'n', 'e', `\n`
+  db 'O', 'n', 'e', `\n`
 g10:
   dw 0
 
