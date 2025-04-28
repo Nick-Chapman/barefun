@@ -13,7 +13,7 @@ data Builtin
   | StringLength | StringIndex
   | MakeBytes | SetBytes | GetBytes
   | FreezeBytes | ThawBytes
-  | DumpSec | LoadSec
+  | LoadSec
   deriving (Show)
 
 data Semantics
@@ -75,7 +75,6 @@ defineBuiltin b =
       ISetRef r v (k unit)
 
     Crash -> Impure $ undefined
-    DumpSec -> Impure $ undefined
     LoadSec -> Impure $ undefined -- TODO: emulate
 
   where

@@ -119,7 +119,6 @@ data BareBios
   | Bare_set_bytes
   | Bare_get_bytes
 
-  | Bare_dump_sector -- TODO remove
   | Bare_load_sector
 
   -- TODO: rmeove these unpacked versions when I fully commit to packed string/bytes
@@ -399,9 +398,6 @@ execBare = \case
     a <- deAddr <$> GetReg Ax
     n <- deNum <$> GetMem a
     SetReg Ax (WNum n)
-
-  Bare_dump_sector -> do -- TODO: remove this. dump sector will be ser code
-    pure ()
 
   Bare_load_sector_unpacked -> do
     pure ()
@@ -905,11 +901,6 @@ compileBuiltin b = case b of
     ]
 
   SRC.Crash -> oneArg $ \_ -> [ OpCall Bare_crash ]
-
-  SRC.DumpSec -> oneArg $ \s1 ->
-    [ OpMove Ax s1
-    , OpCall Bare_dump_sector
-    ]
 
   SRC.LoadSec -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1

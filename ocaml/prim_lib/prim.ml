@@ -33,7 +33,6 @@ module X : sig
   val string_index : string -> int -> char
   val string_length : string -> int
 
-  val load_sector_and_dump : int -> unit (*TODO:die*)
   val load_sector : int -> bytes -> unit
 
 end = struct
@@ -85,9 +84,6 @@ end = struct
 
   let string_length = String.length
   let string_index s i = s.[i]
-
-  let load_sector_and_dump n =
-    Printf.printf "[load_sector_and_dump:%d]\n" n
 
   let load_sector n _ =
     Printf.printf "[load_sector:%d]\n" n

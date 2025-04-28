@@ -54,10 +54,8 @@ let put_sector_string s =
   loop 0
 
 let dump n =
-  put_string "internal:"; put_int n; newline();
-  load_sector_and_dump n;
+  put_string "sector:"; put_int n;
   let s = read_sector n in
-  put_string "user-code:"; put_int n;
   put_sector_string s;
   newline()
 
