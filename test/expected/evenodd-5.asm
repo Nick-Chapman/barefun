@@ -56,6 +56,7 @@ L6: ; Continuation
   push word cx
   push word L4
   mov cx, sp
+  push word 999
   mov bx, dx
   cmp word [bx], 1
   jz L5
@@ -72,6 +73,7 @@ L7: ; Continuation
   push word cx
   push word L6
   mov cx, sp
+  push word 999
   mov bp, g1
   mov dx, 13
   jmp [bp]
@@ -87,6 +89,7 @@ L9: ; Continuation
   push word cx
   push word L7
   mov cx, sp
+  push word 999
   mov bx, dx
   cmp word [bx], 1
   jz L8
@@ -99,6 +102,7 @@ L10: ; Start
   push word cx
   push word L9
   mov cx, sp
+  push word 999
   mov bp, g1
   mov dx, 42
   jmp [bp]

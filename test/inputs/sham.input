@@ -1,6 +1,5 @@
 ls
 cat readme
-man fib
 fib 5
 mv cat cat2
 cat2 cat

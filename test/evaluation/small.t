@@ -7,4 +7,4 @@
   Hello, World!
   > Good bye.
   Good bye.
-  > [EOF:#op=3991, #alloc=1344]
+  > [EOF:#op=4247, #alloc=1856]

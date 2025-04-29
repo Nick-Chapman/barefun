@@ -7,8 +7,6 @@
   % cat readme
   Welcome to sham; please try all the commands!
   Can you find the hidden Easter Egg?
-  % man fib
-  fib - naive fib computation upto the given number
   % fib 5
   fib 0 --> 0
   fib 1 --> 1
@@ -22,4 +20,4 @@
   And what can be the use of him is more than I can see.
   He is very, very like me from the heels up to the head;
   And I see him jump before me, when I jump into my bed.
-  % [EOF:#op=73639, #alloc=27170]
+  % [EOF:#op=67766, #alloc=30364]

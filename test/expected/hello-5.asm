@@ -50,10 +50,12 @@ L5: ; Function: t1
   push word [Temps+4]
   push word 1
   mov [Temps+6], sp
+  push word 999
   push word dx
   push word cx
   push word L4
   mov cx, sp
+  push word 999
   mov bp, g3
   mov dx, [Temps+6]
   jmp [bp]
@@ -62,6 +64,7 @@ L6: ; Function: g3
   push word dx
   push word L5
   mov [Temps+2], sp
+  push word 999
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -78,6 +81,7 @@ L8: ; Continuation
   push word cx
   push word L7
   mov cx, sp
+  push word 999
   mov bp, dx
   mov dx, 13
   jmp [bp]
@@ -86,6 +90,7 @@ L9: ; Start
   push word cx
   push word L8
   mov cx, sp
+  push word 999
   mov bp, g3
   mov dx, g5
   jmp [bp]

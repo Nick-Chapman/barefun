@@ -5,4 +5,4 @@
   Hello, World!
   % Good bye.
   Good bye.
-  % [EOF:#op=1522, #alloc=524]
+  % [EOF:#op=1619, #alloc=718]

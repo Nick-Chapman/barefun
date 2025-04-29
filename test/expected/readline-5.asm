@@ -23,10 +23,12 @@ L3: ; Function: t1
   push word [Temps+2]
   push word 1
   mov [Temps+6], sp
+  push word 999
   push word [Temps+4]
   push word cx
   push word L2
   mov cx, sp
+  push word 999
   mov bp, g1
   mov dx, [Temps+6]
   jmp [bp]
@@ -35,6 +37,7 @@ L4: ; Function: g1
   push word dx
   push word L3
   mov [Temps+2], sp
+  push word 999
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -98,6 +101,7 @@ L10: ; Function: g2
   push word cx
   push word L6
   mov cx, sp
+  push word 999
   mov bx, [Temps+8]
   cmp word [bx], 1
   jz L7
@@ -166,10 +170,12 @@ L13: ; Function: t1
   push word [Temps+4]
   push word 1
   mov [Temps+6], sp
+  push word 999
   push word dx
   push word cx
   push word L12
   mov cx, sp
+  push word 999
   mov bp, g5
   mov dx, [Temps+6]
   jmp [bp]
@@ -178,6 +184,7 @@ L14: ; Function: g5
   push word dx
   push word L13
   mov [Temps+2], sp
+  push word 999
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -198,6 +205,7 @@ L16: ; Arm: 56'22
   push word cx
   push word L15
   mov cx, sp
+  push word 999
   mov bp, g1
   mov dx, g10
   jmp [bp]
@@ -208,6 +216,7 @@ L17: ; Continuation
   push word `\x04`
   push word 1
   mov [Temps+2], sp
+  push word 999
   mov bp, dx
   mov dx, [Temps+2]
   jmp [bp]
@@ -226,6 +235,7 @@ L18: ; Arm: 57'28
   push word cx
   push word L17
   mov cx, sp
+  push word 999
   mov bp, g1
   mov dx, g11
   jmp [bp]
@@ -276,6 +286,7 @@ L23: ; Continuation
   push word cx
   push word L21
   mov cx, sp
+  push word 999
   mov bx, dx
   cmp word [bx], 1
   jz L22
@@ -309,6 +320,7 @@ L25: ; Arm: 59'21
   push word cx
   push word L23
   mov cx, sp
+  push word 999
   mov bx, [Temps+20]
   cmp word [bx], 1
   jz L24
@@ -323,6 +335,7 @@ L26: ; Continuation
   push word [bp+6]
   push word 1
   mov [Temps+2], sp
+  push word 999
   mov bp, g8
   mov dx, [Temps+2]
   jmp [bp]
@@ -400,6 +413,7 @@ L30: ; Function: g8
   push word cx
   push word L26
   mov cx, sp
+  push word 999
   mov bx, [Temps+16]
   cmp word [bx], 1
   jz L27
@@ -460,6 +474,7 @@ L33: ; Continuation
   push word cx
   push word L32
   mov cx, sp
+  push word 999
   mov dx, [bp+4]
   mov bp, g2
   jmp [bp]
@@ -476,6 +491,7 @@ L35: ; Continuation
   push word cx
   push word L33
   mov cx, sp
+  push word 999
   mov bx, dx
   cmp word [bx], 0
   jz L34
@@ -497,6 +513,7 @@ L36: ; Continuation
   push word cx
   push word L35
   mov cx, sp
+  push word 999
   mov bp, g8
   mov dx, g15
   jmp [bp]
@@ -506,6 +523,7 @@ L37: ; Continuation
   push word cx
   push word L36
   mov cx, sp
+  push word 999
   mov bp, g2
   mov dx, dx
   jmp [bp]
@@ -515,6 +533,7 @@ L38: ; Continuation
   push word cx
   push word L37
   mov cx, sp
+  push word 999
   mov bp, dx
   mov dx, 1
   jmp [bp]
@@ -523,6 +542,7 @@ L39: ; Function: g4
   push word cx
   push word L38
   mov cx, sp
+  push word 999
   mov bp, g5
   mov dx, g7
   jmp [bp]
@@ -558,10 +578,12 @@ L42: ; Function: t1
   push word [Temps+4]
   push word 1
   mov [Temps+6], sp
+  push word 999
   push word dx
   push word cx
   push word L41
   mov cx, sp
+  push word 999
   mov bp, g19
   mov dx, [Temps+6]
   jmp [bp]
@@ -570,6 +592,7 @@ L43: ; Function: g19
   push word dx
   push word L42
   mov [Temps+2], sp
+  push word 999
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -586,6 +609,7 @@ L45: ; Continuation
   push word cx
   push word L44
   mov cx, sp
+  push word 999
   mov bp, g2
   mov dx, dx
   jmp [bp]
@@ -595,6 +619,7 @@ L46: ; Continuation
   push word cx
   push word L45
   mov cx, sp
+  push word 999
   mov bp, dx
   mov dx, 44
   jmp [bp]
@@ -603,6 +628,7 @@ L47: ; Start
   push word cx
   push word L46
   mov cx, sp
+  push word 999
   mov bp, g19
   mov dx, g21
   jmp [bp]

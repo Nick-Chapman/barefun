@@ -78,6 +78,7 @@ data Word
   | WAddr Addr
   | WCodeLabel CodeLabel
   | WUninitialized
+  | WBlockDescriptor
   deriving Eq
 
 vTag :: Ctag -> Word
@@ -185,6 +186,7 @@ instance Show Word where
     WAddr a -> show a
     WCodeLabel lab -> show lab
     WUninitialized -> "<uninitialized>"
+    WBlockDescriptor -> "999" --"<block-descriptor>"
 
 escapeCharForNasm :: Char -> String
 escapeCharForNasm c = do
@@ -706,9 +708,8 @@ compileCode = \case
       []) (Done (JumpIndirect frameReg))
 
   SRC.LetAtomic (_,t) rhs body -> do
-    (ops1,reg) <- compileAtomic (show t) rhs
-    let ops2 = [setTemp t (SReg reg)]
-    doOps (ops1++ops2) <$> compileCode body
+    ops <- compileAtomicTo t rhs
+    doOps ops <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
     lab <- compileCode later >>= cutCode "Continuation"
@@ -718,6 +719,7 @@ compileCode = \case
         [ OpPush (SReg contReg)
         , OpPush (SLit (WCodeLabel lab))
         , OpMove contReg (SReg Sp)
+        , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
         ]
     doOps ops <$> compileCode first
 
@@ -782,30 +784,39 @@ changeRegInSource r1 r2 = \case
   SMemIndirect r -> SMemIndirect (if r==r1 then r2 else r1)
   SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
 
-compileAtomic :: String -> SRC.Atomic -> Asm ([Op],Reg)
-compileAtomic who = \case
-  SRC.Prim b xs -> pure (compileBuiltin b (map compileRef xs), Ax)
-  SRC.ConApp (Ctag _ tag) xs -> pure (compileConApp tag xs, Sp)
-  SRC.Lam pre _post _x body -> compileFunction who pre body
-  SRC.RecLam pre _post _f _x body -> compileFunction who pre body
 
-compileConApp :: Number -> [SRC.Ref] -> [Op]
-compileConApp tag xs = construct tag (map compileRef xs)
+compileAtomicTo :: SRC.Temp -> SRC.Atomic -> Asm [Op]
+compileAtomicTo temp = \case
+  SRC.Prim b xs -> pure (compileBuiltinTo temp b (map compileRef xs))
+  SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo temp tag xs)
+  SRC.Lam pre _post _x body -> compileFunctionTo temp pre body
+  SRC.RecLam pre _post _f _x body -> compileFunctionTo temp pre body
 
-construct :: Number -> [Source] -> [Op]
-construct tag xs = map OpPush (reverse (SLit (WNum tag) : xs))
+compileConAppTo :: SRC.Temp -> Number -> [SRC.Ref] -> [Op]
+compileConAppTo temp tag xs = do
+  map OpPush (reverse (SLit (WNum tag) : map compileRef xs)) ++
+    [ setTemp temp (SReg Sp)
+    , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
+    ]
 
-compileFunction :: String -> [SRC.Ref] -> SRC.Code -> Asm ([Op],Reg)
-compileFunction who freeVars body = do
-  lab <- compileCode body >>= CutCode ("Function: " ++ who)
+compileFunctionTo :: SRC.Temp -> [SRC.Ref] -> SRC.Code -> Asm [Op]
+compileFunctionTo temp freeVars body = do
+  lab <- compileCode body >>= CutCode ("Function: " ++ show temp)
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (WCodeLabel lab))
-    ],Sp)
+    , setTemp temp (SReg Sp)
+    , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
+    ])
 
--- TODO: target reg should be passed down
-compileBuiltin :: Builtin -> [Source] -> [Op] -- --> Ax
-compileBuiltin b = case b of
+compileBuiltinTo :: SRC.Temp -> Builtin -> [Source] -> [Op]
+compileBuiltinTo temp b args =
+  compileBuiltinToAx b args ++
+  [setTemp temp (SReg Ax)]
+
+-- TODO: target reg/temp should be passed down
+compileBuiltinToAx :: Builtin -> [Source] -> [Op] -- --> Ax
+compileBuiltinToAx b = case b of
   SRC.GetChar -> oneArg $ \_ ->
     [ OpCall Bare_get_char ]
   SRC.PutChar -> oneArg $ \s1 ->
@@ -862,6 +873,7 @@ compileBuiltin b = case b of
   SRC.MakeRef -> oneArg $ \s1 ->
     [ OpPush s1
     , OpMove Ax (SReg Sp)
+    , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
     ]
 
   SRC.DeRef -> oneArg $ \s1 ->
