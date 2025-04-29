@@ -78,7 +78,12 @@ data Word
   | WAddr Addr
   | WCodeLabel CodeLabel
   | WUninitialized
-  | WBlockDescriptor
+  | WBlockDescriptor BlockDescriptor
+  deriving Eq
+
+data BlockDescriptor
+  = Scanned { evenSizeInBytes :: Int }
+  | RawData { evenSizeInBytes :: Int }
   deriving Eq
 
 vTag :: Ctag -> Word
@@ -186,7 +191,12 @@ instance Show Word where
     WAddr a -> show a
     WCodeLabel lab -> show lab
     WUninitialized -> "<uninitialized>"
-    WBlockDescriptor -> "999" --"<block-descriptor>"
+    WBlockDescriptor d -> show d
+
+instance Show BlockDescriptor where
+  show = \case
+    Scanned n -> show n ++ " ;; scanned"
+    RawData n -> show n ++ " ;; raw-data"
 
 escapeCharForNasm :: Char -> String
 escapeCharForNasm c = do
@@ -275,6 +285,17 @@ execPushWord w = do
   let a' = addAddr (-(bytesPerWord)) a
   SetMem a' w
   SetReg Sp (WAddr a')
+  checkPushBlockDescriptor w
+
+checkPushBlockDescriptor :: Word -> M ()
+checkPushBlockDescriptor = \case
+  WBlockDescriptor desc ->
+    CheckRecentAlloc (sizeOfBD desc + 2) -- 2 for the block descriptor itself
+    where sizeOfBD = \case Scanned n -> n; RawData n -> n
+  _ ->
+    pure ()
+
+
 
 slideStackPointer :: Int -> M ()
 slideStackPointer nBytes = do
@@ -352,12 +373,13 @@ execBare = \case
 
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
-    let numBytes = align (fromIntegral n)
+    let numBytes = align (fromIntegral n) where align n = 2 * ((n+1) `div` 2)
     slideStackPointer numBytes
-    execPushWord (WNum n)
+    execPushWord (WNum n) -- length word; part of user data
     w <- GetReg Sp
     SetReg Ax w
-      where align n = 2 * ((n+1) `div` 2)
+    let desc = RawData { evenSizeInBytes = fromIntegral numBytes + 2 } -- 2 for the length word
+    execPushWord (WBlockDescriptor desc) -- size word; part of GC data
 
   -- TODO: no need for Bare given better string rep; just generate ops
   -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
@@ -472,6 +494,7 @@ data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
   Halt :: M ()
+  CheckRecentAlloc :: Int -> M ()
   Debug :: String -> M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
@@ -527,11 +550,23 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       Halt -> IDone
+
+      CheckRecentAlloc expect -> do
+        let State{allocsSinceLastCheck=actual} = s
+        let same = (expect == actual)
+        let m = printf "CheckRecentAlloc: expect=%d, actual=%d, same=%s\n" expect actual (show same)
+        --ITrace m $
+        if not same then error m else
+            k s { allocsSinceLastCheck = 0 } ()
+
       Debug m -> debug m $ k s ()
 
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k
-      TraceAlloc{} -> ITick I.Alloc $ k s ()
+
+      TraceAlloc{} -> do
+        let State{allocsSinceLastCheck} = s
+        ITick I.Alloc $ k s { allocsSinceLastCheck = 1 + allocsSinceLastCheck } ()
 
       GetCode lab -> do
         k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)
@@ -574,6 +609,7 @@ data State = State
   , countOps :: Int
   , lastCodeLabel :: CodeLabel
   , offsetFromLastLabel :: Int
+  , allocsSinceLastCheck :: Int
   }
 
 state0 :: Map DataLabel [DataSpec] -> State
@@ -585,6 +621,7 @@ state0 dmap = State
   , countOps = 0
   , lastCodeLabel = error "lastCodeLabel"
   , offsetFromLastLabel = error "offsetFromLastLabel"
+  , allocsSinceLastCheck = 0
   }
   where
     initialStackPointer = mkPhysical twoE16
@@ -714,12 +751,14 @@ compileCode = \case
   SRC.PushContinuation pre _post (_x,later) first -> do
     lab <- compileCode later >>= cutCode "Continuation"
     let
+      desc = Scanned { evenSizeInBytes = 2 * (length pre + 2) }
+    let
       ops =
         map OpPush (reverse (map compileRef pre)) ++
         [ OpPush (SReg contReg)
         , OpPush (SLit (WCodeLabel lab))
         , OpMove contReg (SReg Sp)
-        , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
+        , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
         ]
     doOps ops <$> compileCode first
 
@@ -794,19 +833,21 @@ compileAtomicTo temp = \case
 
 compileConAppTo :: SRC.Temp -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo temp tag xs = do
+  let desc = Scanned { evenSizeInBytes = 2 * (length xs + 1) }
   map OpPush (reverse (SLit (WNum tag) : map compileRef xs)) ++
     [ setTemp temp (SReg Sp)
-    , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
+    , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
 
 compileFunctionTo :: SRC.Temp -> [SRC.Ref] -> SRC.Code -> Asm [Op]
 compileFunctionTo temp freeVars body = do
   lab <- compileCode body >>= CutCode ("Function: " ++ show temp)
+  let desc = Scanned { evenSizeInBytes = 2 * (length freeVars + 1) }
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (WCodeLabel lab))
     , setTemp temp (SReg Sp)
-    , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
+    , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ])
 
 compileBuiltinTo :: SRC.Temp -> Builtin -> [Source] -> [Op]
@@ -871,9 +912,10 @@ compileBuiltinToAx b = case b of
     ]
 
   SRC.MakeRef -> oneArg $ \s1 ->
+    let desc = Scanned { evenSizeInBytes = 2 } in
     [ OpPush s1
     , OpMove Ax (SReg Sp)
-    , OpPush (SLit (WBlockDescriptor)) -- pushed *after* Sp is read
+    , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
 
   SRC.DeRef -> oneArg $ \s1 ->

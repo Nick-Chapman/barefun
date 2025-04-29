@@ -7,7 +7,7 @@ L2: ; Function: g1
   push word dx
   push word L1
   mov [Temps+2], sp
-  push word 999
+  push word 4 ;; scanned
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -40,7 +40,7 @@ L5: ; Function: g2
   push word cx
   push word L4
   mov cx, sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, g2
   mov dx, [Temps+4]
   jmp [bp]
@@ -78,7 +78,7 @@ L8: ; Function: t1
   push word cx
   push word L7
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, [bp+6]
   mov dx, [Temps+8]
   jmp [bp]
@@ -89,7 +89,7 @@ L9: ; Function: t2
   push word [bp+2]
   push word L8
   mov [Temps+2], sp
-  push word 999
+  push word 8 ;; scanned
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -110,7 +110,7 @@ L11: ; Continuation
   push word cx
   push word L10
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
@@ -124,13 +124,13 @@ L12: ; Continuation
   push word [Temps+2]
   push word L9
   mov [Temps+4], sp
-  push word 999
+  push word 4 ;; scanned
   push word [Temps+2]
   push word [bp+4]
   push word cx
   push word L11
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bp, [Temps+4]
   mov dx, 0
   jmp [bp]
@@ -140,7 +140,7 @@ L13: ; Function: g4
   push word cx
   push word L12
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, g2
   mov dx, dx
   jmp [bp]
@@ -176,12 +176,12 @@ L16: ; Function: t1
   push word [Temps+4]
   push word 1
   mov [Temps+6], sp
-  push word 999
+  push word 6 ;; scanned
   push word dx
   push word cx
   push word L15
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, [bp+6]
   mov dx, [Temps+6]
   jmp [bp]
@@ -192,7 +192,7 @@ L17: ; Function: t1
   push word [bp+2]
   push word L16
   mov [Temps+2], sp
-  push word 999
+  push word 8 ;; scanned
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -211,7 +211,7 @@ L19: ; Function: g6
   push word dx
   push word L17
   mov [Temps+2], sp
-  push word 999
+  push word 4 ;; scanned
   mov ax, dx
   call Bare_string_length
   mov [Temps+4], ax
@@ -219,7 +219,7 @@ L19: ; Function: g6
   push word cx
   push word L18
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, [Temps+2]
   mov dx, g5
   jmp [bp]
@@ -256,7 +256,7 @@ L23: ; Continuation
   push word cx
   push word L22
   mov cx, sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, [bp+4]
   mov dx, dx
   jmp [bp]
@@ -267,27 +267,27 @@ L24: ; Continuation
   push word `\n`
   push word 1
   mov [Temps+2], sp
-  push word 999
+  push word 6 ;; scanned
   push word [Temps+2]
   push word `o`
   push word 1
   mov [Temps+4], sp
-  push word 999
+  push word 6 ;; scanned
   push word [Temps+4]
   push word `w`
   push word 1
   mov [Temps+6], sp
-  push word 999
+  push word 6 ;; scanned
   push word [Temps+6]
   push word `T`
   push word 1
   mov [Temps+8], sp
-  push word 999
+  push word 6 ;; scanned
   push word [bp+6]
   push word cx
   push word L23
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, [bp+4]
   mov dx, [Temps+8]
   jmp [bp]
@@ -299,7 +299,7 @@ L25: ; Continuation
   push word cx
   push word L24
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bp, g7
   mov dx, dx
   jmp [bp]
@@ -316,7 +316,7 @@ L26: ; Continuation
   push word cx
   push word L25
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bp, [bp+6]
   mov dx, [Temps+4]
   jmp [bp]
@@ -328,7 +328,7 @@ L27: ; Continuation
   push word cx
   push word L26
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bp, g7
   mov dx, dx
   jmp [bp]
@@ -340,7 +340,7 @@ L28: ; Continuation
   push word cx
   push word L27
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bp, dx
   mov dx, g9
   jmp [bp]
@@ -351,7 +351,7 @@ L29: ; Continuation
   push word cx
   push word L28
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, g1
   mov dx, g6
   jmp [bp]
@@ -360,7 +360,7 @@ L30: ; Start
   push word cx
   push word L29
   mov cx, sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, g1
   mov dx, g4
   jmp [bp]

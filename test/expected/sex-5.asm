@@ -7,7 +7,7 @@ L2: ; Function: g1
   push word dx
   push word L1
   mov [Temps+2], sp
-  push word 999
+  push word 4 ;; scanned
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -54,7 +54,7 @@ L6: ; Function: t2
   push word cx
   push word L4
   mov cx, sp
-  push word 999
+  push word 12 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 1
   jz L5
@@ -80,12 +80,12 @@ L8: ; Function: g5
   push word dx
   push word L6
   mov [Temps+4], sp
-  push word 999
+  push word 6 ;; scanned
   push word [Temps+2]
   push word cx
   push word L7
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, [Temps+4]
   mov dx, 0
   jmp [bp]
@@ -121,7 +121,7 @@ L12: ; Continuation
   push word cx
   push word L10
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bx, dx
   cmp word [bx], 1
   jz L11
@@ -158,7 +158,7 @@ L14: ; Continuation
   push word cx
   push word L12
   mov cx, sp
-  push word 999
+  push word 10 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 1
   jz L13
@@ -189,7 +189,7 @@ L16: ; Continuation
   push word cx
   push word L14
   mov cx, sp
-  push word 999
+  push word 10 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 1
   jz L15
@@ -222,7 +222,7 @@ L18: ; Function: t4
   push word cx
   push word L16
   mov cx, sp
-  push word 999
+  push word 10 ;; scanned
   mov bx, [Temps+4]
   cmp word [bx], 1
   jz L17
@@ -262,7 +262,7 @@ L22: ; Continuation
   push word cx
   push word L20
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bx, dx
   cmp word [bx], 1
   jz L21
@@ -299,7 +299,7 @@ L24: ; Continuation
   push word cx
   push word L22
   mov cx, sp
-  push word 999
+  push word 10 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 1
   jz L23
@@ -330,7 +330,7 @@ L26: ; Continuation
   push word cx
   push word L24
   mov cx, sp
-  push word 999
+  push word 10 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 1
   jz L25
@@ -363,7 +363,7 @@ L28: ; Function: t4
   push word cx
   push word L26
   mov cx, sp
-  push word 999
+  push word 10 ;; scanned
   mov bx, [Temps+4]
   cmp word [bx], 1
   jz L27
@@ -401,13 +401,13 @@ L30: ; Continuation
   push word [Temps+6]
   push word L28
   mov [Temps+8], sp
-  push word 999
+  push word 4 ;; scanned
   push word [Temps+6]
   push word [bp+4]
   push word cx
   push word L29
   mov cx, sp
-  push word 999
+  push word 8 ;; scanned
   mov bp, [Temps+8]
   mov dx, 0
   jmp [bp]
@@ -426,12 +426,12 @@ L31: ; Continuation
   push word [Temps+6]
   push word L18
   mov [Temps+8], sp
-  push word 999
+  push word 4 ;; scanned
   push word [Temps+6]
   push word cx
   push word L30
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, [Temps+8]
   mov dx, 0
   jmp [bp]
@@ -440,7 +440,7 @@ L32: ; Start
   push word cx
   push word L31
   mov cx, sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, g1
   mov dx, g5
   jmp [bp]

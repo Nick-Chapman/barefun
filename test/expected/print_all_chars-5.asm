@@ -71,7 +71,7 @@ L5: ; Function: g1
   push word cx
   push word L2
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 1
   jz L3
@@ -107,7 +107,7 @@ L7: ; Start
   push word cx
   push word L6
   mov cx, sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, g1
   mov dx, 0
   jmp [bp]

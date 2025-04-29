@@ -30,7 +30,7 @@ L3: ; Function: g1
   push word dx
   push word L2
   mov [Temps+6], sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, [Temps+6]
   mov dx, g4
   jmp [bp]

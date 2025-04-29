@@ -44,12 +44,12 @@ L5: ; Function: t1
   push word [Temps+2]
   push word 1
   mov [Temps+6], sp
-  push word 999
+  push word 6 ;; scanned
   push word [Temps+4]
   push word cx
   push word L4
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, g6
   mov dx, [Temps+6]
   jmp [bp]
@@ -58,7 +58,7 @@ L6: ; Function: g6
   push word dx
   push word L5
   mov [Temps+2], sp
-  push word 999
+  push word 4 ;; scanned
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -79,7 +79,7 @@ L8: ; Arm: 23'27
   push word cx
   push word L7
   mov cx, sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, g6
   mov dx, g7
   jmp [bp]
@@ -101,7 +101,7 @@ L9: ; Function: g4
   push word [Temps+2]
   push word 1
   mov [Temps+8], sp
-  push word 999
+  push word 6 ;; scanned
   mov bp, g4
   mov dx, [Temps+8]
   jmp [bp]
@@ -120,7 +120,7 @@ L11: ; Continuation
   push word cx
   push word L10
   mov cx, sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, g1
   mov dx, dx
   jmp [bp]
@@ -135,7 +135,7 @@ L12: ; Function: g3
   push word cx
   push word L11
   mov cx, sp
-  push word 999
+  push word 4 ;; scanned
   mov bp, g4
   mov dx, g8
   jmp [bp]
