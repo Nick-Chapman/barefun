@@ -604,14 +604,12 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
       MaybeGC -> do
         IIO $ do
-          reachable <- discoverReachable [frameReg,argReg,contReg] s
+          let roots = [ maybe undefined id $ Map.lookup r rmap | r <- [frameReg,argReg,contReg] ]
+          reachable <- discoverReachable roots mem
           let
             isReachable :: Addr -> v -> Bool
             isReachable a _ =
               case a of
-                -- mustn't filter the global (Symbold) stuff or the temp space
-                -- also not the block descriptor words
-                -- also not anything in the data of a block ... hmm
                 AStatic{} -> True
                 ATempSpace{} -> True
                 AHeapSpace{} -> Set.member a reachable
@@ -634,7 +632,7 @@ checkAlignedSp = \case
 
 data State = State
   { rmap :: Map Reg Word
-  , mem :: Map Addr Word -- TODO: just a map from heap-addresses
+  , mem :: Map Addr Word
   , flagZ :: Bool
   , flagN :: Bool
   , countOps :: Int
@@ -699,79 +697,45 @@ finalCodeLabel = CodeLabel 0 "FINAL"
 ----------------------------------------------------------------------
 -- GC
 
-discoverReachable :: [Reg] -> State -> IO (Set Addr)
-discoverReachable roots State{rmap,mem} = do
-  --printf "discoverReachable: root regs=%s\n" (show roots)
-  let words = map lookReg roots
-  --printf "discoverReachable: root words=%s\n" (show words)
-  loop 0 [] Set.empty words
+discoverReachable :: [Word] -> Map Addr Word -> IO (Set Addr)
+discoverReachable roots mem = do
+  loop [] Set.empty roots
   where
-
-    lookReg :: Reg -> Word
-    lookReg r = maybe undefined id $ Map.lookup r rmap -- TODO: error
-
-    lookupMem :: Addr -> Maybe Word
-    lookupMem a = Map.lookup a mem
 
     lookMem :: Addr -> Word
     lookMem a = maybe err id $ Map.lookup a mem
-      where err = error (show ("discoverable/lookMem",a))
+      where err = error (show ("discoverReachable/lookMem",a))
 
-    --xxx v = v
-    xxx (_::IO ()) = pure ()
-
-    loop :: Int -> [Addr] -> Set Addr -> [Word] -> IO (Set Addr)
-    loop i live acc fringe = do
-      --printf "loop(%d):\n" i
-      case fringe of
-        [] -> do
-          xxx $ printf "loop(%d): fringe=[]\n" i
-          let liveSet = Set.fromList live
-          let combined = acc `Set.union` liveSet
-          pure combined
-
-        w1:fringe -> do
-          xxx $ printf "loop(%d): word1=%s\n" i (show w1)
-          case w1 of
-            WChar{} -> loop (i+1) live acc fringe
-            WNum{} -> loop (i+1) live acc fringe
-            WCodeLabel{} -> loop (i+1) live acc fringe
-            WUninitialized{} -> loop (i+1) live acc fringe
-            WBlockDescriptor{} -> undefined -- An addressed word can never be a block descriptor
-            WAddr a -> do
-              -- TODO: check if already visite & short cut if so
+    loop :: [Addr] -> Set Addr -> [Word] -> IO (Set Addr)
+    loop live acc = \case
+      [] -> pure (Set.fromList live)
+      w1:fringe -> do
+        case w1 of
+          WChar{} -> loop live acc fringe
+          WNum{} -> loop live acc fringe
+          WCodeLabel{} -> loop live acc fringe
+          WUninitialized{} -> loop live acc fringe
+          WBlockDescriptor{} -> error "An addressed word should never be a block descriptor"
+          WAddr a -> do
+            if a `Set.member` acc then loop live acc fringe else do
               acc <- pure (Set.insert a acc)
-              let
-                kind = case a of
-                  AHeapSpace{} -> "heap-address"
-                  AStatic{} -> "static-address"
-                  ATempSpace{} -> "tempspace-address"
-              xxx $ printf "loop(%d): address=%s (kind = %s)\n" i (show a) kind
-              case lookupMem (addAddr (-2) a) of
-                Nothing -> do
-                  xxx $ printf "loop(%d): points nowhere in mem space\n" i; -- because symbold or..
-                  loop (i+1) live acc fringe
+              case Map.lookup (addAddr (-2) a) mem of
+                Nothing -> loop live acc fringe
                 Just w -> do
                   case (case w of WBlockDescriptor d -> Just d; _ -> Nothing) of
-                    Nothing -> do
-                      xxx $ printf "loop(%d): points to a something without a preceeding block-descriptor\n" i
-                      undefined -- TODO: error?
+                    Nothing -> error "expected a block-descriptor"
                     Just d -> do
-                      xxx $ printf "loop(%d): have block descriptor: [%s]\n" i (show d)
                       case d of
                         RawData n -> do
-                          xxx $ printf "loop(%d): raw data, size in bytes = %d\n" i n
                           let newLive = [ addAddr off a | off <- [-2] ++ [0 .. n-1] ]
                           let live' = live ++ newLive
-                          loop (i+1) live' acc fringe
+                          loop live' acc fringe
                         Scanned n -> do
                           let sizeInWords = n `div` 2
-                          xxx $ printf "loop(%d): scanned, size in words = %d\n" i sizeInWords
                           let newWs = [ lookMem (addAddr (bytesPerWord * off) a) | off <- [0.. sizeInWords-1] ]
-                          xxx $ printf "loop(%d): new words to scan: %s\n" i (show newWs)
                           let newLive = [ addAddr (bytesPerWord * off) a | off <- [(-1).. sizeInWords-1] ]
                           let live' = live ++ newLive
-                          loop (i+1) live' acc (newWs ++ fringe)
+                          loop live' acc (newWs ++ fringe)
 
 ----------------------------------------------------------------------
 -- Compile
