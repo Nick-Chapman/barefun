@@ -90,13 +90,16 @@ data BlockDescriptor
 vTag :: Ctag -> Word
 vTag (Ctag _ n) = WNum n
 
-data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di -- when needed
+data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
   deriving (Eq,Ord)
 
 data Addr -- memory address
-  = Physical_raw Word16 -- TODO: Name type HeapAddr. Use as domain for mem.
-  | Symbolic DataLabel Int
-  | TempSpace Int
+  = AHeapSpace HeapAddr
+  | AStatic DataLabel Int -- This int is an offset at the data-label
+  | ATempSpace SRC.Temp
+  deriving (Eq,Ord)
+
+data HeapAddr = HeapAddr Word16
   deriving (Eq,Ord)
 
 data CodeLabel = CodeLabel Int String -- unique label and provenance
@@ -219,10 +222,13 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical_raw x -> show x
-    Symbolic d 0 -> printf "%s" (show d)
-    Symbolic d n -> printf "%s+%d" (show d) n
-    TempSpace n -> printf "Temps+%d" (2*n)
+    AHeapSpace x -> show x
+    AStatic d 0 -> printf "%s" (show d)
+    AStatic d n -> printf "%s+%d" (show d) n
+    ATempSpace (SRC.Temp n) -> printf "Temps+%d" (2*n)
+
+instance Show HeapAddr where
+  show (HeapAddr x) = "#" ++ show x
 
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
 instance Show DataLabel where show (DataLabel g) = show g
@@ -355,7 +361,7 @@ execBare = \case
 
   Bare_addr_to_num -> do
     a <- deAddr <$> GetReg Ax
-    SetReg Ax (WNum (fromIntegral $ dePhysical a))
+    SetReg Ax (WNum (fromIntegral $ deheapAddr a))
 
   Bare_mul -> do
     w1 <- GetReg Ax
@@ -465,24 +471,24 @@ deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
-  Physical_raw n -> mkPhysical (fromIntegral (n + fromIntegral i))
-  Symbolic lab n -> Symbolic lab (n+i)
-  TempSpace{} -> undefined
+  AHeapSpace (HeapAddr n) -> mkHeapAddr (fromIntegral (n + fromIntegral i))
+  AStatic lab n -> AStatic lab (n+i)
+  ATempSpace{} -> undefined
 
 twoE16 :: Int
 twoE16 = 65536
 
-mkPhysical :: Int -> Addr
-mkPhysical n =
-  if n < (twoE16 `div` 2) then error "mkPhysical:too small" else
-    if n > twoE16 then error "mkPhysical:too big" else
-      Physical_raw (fromIntegral n)
+mkHeapAddr :: Int -> Addr
+mkHeapAddr n =
+  if n < (twoE16 `div` 2) then error "mkHeapAddr:too small" else
+    if n > twoE16 then error "mkHeapAddr:too big" else
+      AHeapSpace (HeapAddr (fromIntegral n))
 
-dePhysical :: Addr -> Int
-dePhysical = \case
-  Physical_raw n -> fromIntegral n `div` 2
-  Symbolic{} -> undefined "dePhysical/Symbolic"
-  TempSpace{} -> undefined "dePhysical/TempSpace"
+deheapAddr :: Addr -> Int
+deheapAddr = \case
+  AHeapSpace (HeapAddr n) -> fromIntegral n `div` 2
+  AStatic{} -> undefined "deheapAddr/AStatic"
+  ATempSpace{} -> undefined "deheapAddr/ATempSpace"
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -606,9 +612,9 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
                 -- mustn't filter the global (Symbold) stuff or the temp space
                 -- also not the block descriptor words
                 -- also not anything in the data of a block ... hmm
-                Symbolic{} -> True
-                TempSpace{} -> True
-                Physical_raw{} -> Set.member a reachable
+                AStatic{} -> True
+                ATempSpace{} -> True
+                AHeapSpace{} -> Set.member a reachable
 
           mem <- pure $ Map.filterWithKey isReachable mem
           pure $ do
@@ -619,7 +625,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 checkAlignedSp :: Reg -> Word -> Interaction -> Interaction
 checkAlignedSp = \case
   Sp -> \case
-    WAddr (Physical_raw n) ->
+    WAddr (AHeapSpace (HeapAddr n)) ->
       if n `mod` 2 == 1 then error (show ("unaligned Sp",n)) else
         \i -> i
     w -> error (show ("trying to set Sp to a non address",w))
@@ -628,7 +634,7 @@ checkAlignedSp = \case
 
 data State = State
   { rmap :: Map Reg Word
-  , mem :: Map Addr Word -- TODO: just a map from Physical address; i.e. heap-addresses
+  , mem :: Map Addr Word -- TODO: just a map from heap-addresses
   , flagZ :: Bool
   , flagN :: Bool
   , countOps :: Int
@@ -649,7 +655,7 @@ state0 dmap = State
   , allocsSinceLastCheck = 0
   }
   where
-    initialStackPointer = mkPhysical twoE16
+    initialStackPointer = mkHeapAddr twoE16
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
@@ -663,7 +669,7 @@ state0 dmap = State
       , (aFinalCont, WCodeLabel finalCodeLabel)
       ]
     user =
-      concat [ [(Symbolic lab i,w) | (i,w) <- specsWords 0 specs ]
+      concat [ [(AStatic lab i,w) | (i,w) <- specsWords 0 specs ]
              | (lab,specs) <- Map.toList dmap
              ]
 
@@ -681,17 +687,11 @@ instance Show State where
   show State{rmap} =
     intercalate " " [ show k ++ "=" ++ show w | (k,w) <- Map.toList rmap ]
 
--- Address for User Temps: 1..30
--- Address for runtime system constants: 90,91,92
-
-tempOffset :: Int -> Addr
-tempOffset n = TempSpace n
-
 aFalse,aTrue,aNil,aFinalCont :: Addr
-aFalse = Symbolic (DataLabel (SRC.Global (-1))) 0
-aTrue = Symbolic (DataLabel (SRC.Global (-2))) 0
-aNil = Symbolic (DataLabel (SRC.Global (-3))) 0
-aFinalCont = Symbolic (DataLabel (SRC.Global (-4))) 0
+aFalse = AStatic (DataLabel (SRC.Global (-1))) 0
+aTrue = AStatic (DataLabel (SRC.Global (-2))) 0
+aNil = AStatic (DataLabel (SRC.Global (-3))) 0
+aFinalCont = AStatic (DataLabel (SRC.Global (-4))) 0
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
@@ -743,9 +743,9 @@ discoverReachable roots State{rmap,mem} = do
               acc <- pure (Set.insert a acc)
               let
                 kind = case a of
-                  Physical_raw{} -> "Physical"
-                  Symbolic{} -> "Symbolic"
-                  TempSpace{} -> "TempSpace"
+                  AHeapSpace{} -> "heap-address"
+                  AStatic{} -> "static-address"
+                  ATempSpace{} -> "tempspace-address"
               xxx $ printf "loop(%d): address=%s (kind = %s)\n" i (show a) kind
               case lookupMem (addAddr (-2) a) of
                 Nothing -> do
@@ -820,7 +820,7 @@ compileTopRef = \case
     SRC.RefLitN n -> WNum n
     SRC.Ref _ loc -> do
     case loc of
-      SRC.InGlobal g -> WAddr (Symbolic (DataLabel g) 0)
+      SRC.InGlobal g -> WAddr (AStatic (DataLabel g) 0)
       _ -> error "compileTopRef"
 
 cutCode :: String -> Code -> Asm CodeLabel
@@ -1089,7 +1089,7 @@ compileBuiltinToAx b = case b of
 
 
 setTemp :: SRC.Temp -> Source -> Op
-setTemp (SRC.Temp n) source = OpStore (tempOffset n) source
+setTemp temp source = OpStore (ATempSpace temp) source
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
@@ -1097,9 +1097,9 @@ compileRef = \case
     SRC.RefLitN n -> SLit (WNum n)
     SRC.Ref _ loc -> do
     case loc of
-      SRC.InGlobal g -> SLit (WAddr (Symbolic (DataLabel g) 0))
+      SRC.InGlobal g -> SLit (WAddr (AStatic (DataLabel g) 0))
       SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
-      SRC.InTemp (SRC.Temp n) -> SMem (tempOffset n)
+      SRC.InTemp temp -> SMem (ATempSpace temp)
       SRC.TheArg -> SReg argReg
       SRC.TheFrame -> SReg frameReg
 
