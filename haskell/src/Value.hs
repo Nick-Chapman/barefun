@@ -27,6 +27,7 @@ data Interaction
   = IDone
   | ITick Tickable Interaction
   | ITrace String Interaction
+  | IIO (IO Interaction)
   | IPut Char Interaction
   | IGet (Char -> Interaction)
   | IMakeBytes Int (Bytes -> Interaction)
@@ -46,6 +47,7 @@ runInteraction measure next = do
   where
     loop :: State -> Interaction -> IO ()
     loop state = \case
+      IIO io -> io >>= loop state
       ITick t k -> do
         let State{tm} = state
         loop state { tm = Map.insertWith (+) t 1 tm } k

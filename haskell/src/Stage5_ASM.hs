@@ -9,6 +9,8 @@ import Control.Monad (ap,liftM)
 import Data.Char (ord)
 import Data.List (intercalate)
 import Data.Map (Map)
+import Data.Set (Set)
+import Data.Word (Word16)
 import Prelude hiding (Word)
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
@@ -17,10 +19,9 @@ import Value (Number,tTrue,tFalse,tNil)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc))
-
-import Data.Word (Word16)
 
 bytesPerWord :: Int
 bytesPerWord = 2
@@ -77,7 +78,7 @@ data Word
   | WNum Number
   | WAddr Addr
   | WCodeLabel CodeLabel
-  | WUninitialized
+  | WUninitialized String
   | WBlockDescriptor BlockDescriptor
   deriving Eq
 
@@ -93,7 +94,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di -- when needed
   deriving (Eq,Ord)
 
 data Addr -- memory address
-  = Physical_raw Word16
+  = Physical_raw Word16 -- TODO: Name type HeapAddr. Use as domain for mem.
   | Symbolic DataLabel Int
   | TempSpace Int
   deriving (Eq,Ord)
@@ -190,7 +191,7 @@ instance Show Word where
     WNum n -> show n
     WAddr a -> show a
     WCodeLabel lab -> show lab
-    WUninitialized -> "<uninitialized>"
+    WUninitialized m -> printf "[uninitialized:%s]" m
     WBlockDescriptor d -> show d
 
 instance Show BlockDescriptor where
@@ -220,7 +221,7 @@ instance Show Addr where
   show = \case
     Physical_raw x -> show x
     Symbolic d 0 -> printf "%s" (show d)
-    Symbolic d n -> undefined d n -- printf "%s+%d" (show d) n
+    Symbolic d n -> printf "%s+%d" (show d) n
     TempSpace n -> printf "Temps+%d" (2*n)
 
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
@@ -330,6 +331,7 @@ execBare = \case
   Bare_enter_check -> do
     x <- deAddr <$> GetReg Sp
     Debug (printf "Bare_enter_check[%s]\n" (show x))
+    MaybeGC
     pure ()
 
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
@@ -455,7 +457,7 @@ deCodeLabel = \case WCodeLabel x -> x; w -> error (show ("deCodeLabel",w))
 deChar :: Word -> Char
 deChar = \case
   WChar x -> x
-  WUninitialized -> '\0' -- for bytes example
+  WUninitialized{} -> '\0' -- for bytes example
   w -> error (show("deChar",w))
 
 deNum :: Word -> Number
@@ -509,6 +511,7 @@ data M a where
   GetFlagN :: M Bool
   PutChar :: Char -> M ()
   GetChar :: M Char
+  MaybeGC :: M ()
 
 runM :: TraceFlag -> DebugFlag -> Image -> M () -> Interaction
 runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
@@ -578,8 +581,11 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       GetReg r -> k s (maybe err id $ Map.lookup r rmap)
         where err = error (show ("GetReg/uninitialized",r))
 
-      SetMem a w -> k s { mem = Map.insert a w mem } ()
-      GetMem a -> k s (maybe WUninitialized id $ Map.lookup a mem)
+      SetMem a w -> do
+        k s { mem = Map.insert a w mem } ()
+      GetMem a ->
+        k s (maybe err id $ Map.lookup a mem)
+        where err = WUninitialized $ show ("GetMem/uninitialized",a)
 
       SetFlagZ b -> k s { flagZ = b } ()
       GetFlagZ -> k s flagZ
@@ -589,6 +595,26 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
       PutChar c -> IPut c (k s ())
       GetChar -> IGet $ \c -> k s c
+
+      MaybeGC -> do
+        IIO $ do
+          reachable <- discoverReachable [frameReg,argReg,contReg] s
+          let
+            isReachable :: Addr -> v -> Bool
+            isReachable a _ =
+              case a of
+                -- mustn't filter the global (Symbold) stuff or the temp space
+                -- also not the block descriptor words
+                -- also not anything in the data of a block ... hmm
+                Symbolic{} -> True
+                TempSpace{} -> True
+                Physical_raw{} -> Set.member a reachable
+
+          mem <- pure $ Map.filterWithKey isReachable mem
+          pure $ do
+            debug (printf "#reachable:%d\n" (Set.size reachable)) $ do
+              debug (printf "#mem-space:%d\n" (Map.size mem)) $ do
+                k s { mem } ()
 
 checkAlignedSp :: Reg -> Word -> Interaction -> Interaction
 checkAlignedSp = \case
@@ -602,7 +628,7 @@ checkAlignedSp = \case
 
 data State = State
   { rmap :: Map Reg Word
-  , mem :: Map Addr Word
+  , mem :: Map Addr Word -- TODO: just a map from Physical address; i.e. heap-addresses
   , flagZ :: Bool
   , flagN :: Bool
   , countOps :: Int
@@ -669,6 +695,83 @@ aFinalCont = Symbolic (DataLabel (SRC.Global (-4))) 0
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
+
+----------------------------------------------------------------------
+-- GC
+
+discoverReachable :: [Reg] -> State -> IO (Set Addr)
+discoverReachable roots State{rmap,mem} = do
+  --printf "discoverReachable: root regs=%s\n" (show roots)
+  let words = map lookReg roots
+  --printf "discoverReachable: root words=%s\n" (show words)
+  loop 0 [] Set.empty words
+  where
+
+    lookReg :: Reg -> Word
+    lookReg r = maybe undefined id $ Map.lookup r rmap -- TODO: error
+
+    lookupMem :: Addr -> Maybe Word
+    lookupMem a = Map.lookup a mem
+
+    lookMem :: Addr -> Word
+    lookMem a = maybe err id $ Map.lookup a mem
+      where err = error (show ("discoverable/lookMem",a))
+
+    --xxx v = v
+    xxx (_::IO ()) = pure ()
+
+    loop :: Int -> [Addr] -> Set Addr -> [Word] -> IO (Set Addr)
+    loop i live acc fringe = do
+      --printf "loop(%d):\n" i
+      case fringe of
+        [] -> do
+          xxx $ printf "loop(%d): fringe=[]\n" i
+          let liveSet = Set.fromList live
+          let combined = acc `Set.union` liveSet
+          pure combined
+
+        w1:fringe -> do
+          xxx $ printf "loop(%d): word1=%s\n" i (show w1)
+          case w1 of
+            WChar{} -> loop (i+1) live acc fringe
+            WNum{} -> loop (i+1) live acc fringe
+            WCodeLabel{} -> loop (i+1) live acc fringe
+            WUninitialized{} -> loop (i+1) live acc fringe
+            WBlockDescriptor{} -> undefined -- An addressed word can never be a block descriptor
+            WAddr a -> do
+              -- TODO: check if already visite & short cut if so
+              acc <- pure (Set.insert a acc)
+              let
+                kind = case a of
+                  Physical_raw{} -> "Physical"
+                  Symbolic{} -> "Symbolic"
+                  TempSpace{} -> "TempSpace"
+              xxx $ printf "loop(%d): address=%s (kind = %s)\n" i (show a) kind
+              case lookupMem (addAddr (-2) a) of
+                Nothing -> do
+                  xxx $ printf "loop(%d): points nowhere in mem space\n" i; -- because symbold or..
+                  loop (i+1) live acc fringe
+                Just w -> do
+                  case (case w of WBlockDescriptor d -> Just d; _ -> Nothing) of
+                    Nothing -> do
+                      xxx $ printf "loop(%d): points to a something without a preceeding block-descriptor\n" i
+                      undefined -- TODO: error?
+                    Just d -> do
+                      xxx $ printf "loop(%d): have block descriptor: [%s]\n" i (show d)
+                      case d of
+                        RawData n -> do
+                          xxx $ printf "loop(%d): raw data, size in bytes = %d\n" i n
+                          let newLive = [ addAddr off a | off <- [-2] ++ [0 .. n-1] ]
+                          let live' = live ++ newLive
+                          loop (i+1) live' acc fringe
+                        Scanned n -> do
+                          let sizeInWords = n `div` 2
+                          xxx $ printf "loop(%d): scanned, size in words = %d\n" i sizeInWords
+                          let newWs = [ lookMem (addAddr (bytesPerWord * off) a) | off <- [0.. sizeInWords-1] ]
+                          xxx $ printf "loop(%d): new words to scan: %s\n" i (show newWs)
+                          let newLive = [ addAddr (bytesPerWord * off) a | off <- [(-1).. sizeInWords-1] ]
+                          let live' = live ++ newLive
+                          loop (i+1) live' acc (newWs ++ fringe)
 
 ----------------------------------------------------------------------
 -- Compile
