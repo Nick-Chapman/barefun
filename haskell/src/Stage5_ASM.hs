@@ -1,6 +1,6 @@
 -- | Generate x86 assembly
 module Stage5_ASM
-  ( execute, TraceFlag(..)
+  ( execute, TraceFlag(..), DebugFlag(..)
   , compile
   ) where
 
@@ -204,7 +204,7 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical_raw{} -> undefined -- we only get Physical address at runtime from stack pushes
+    Physical_raw x -> show x -- only need for trace debugging
     Symbolic d 0 -> printf "%s" (show d)
     Symbolic d n -> undefined d n -- printf "%s+%d" (show d) n
     TempSpace n -> printf "Temps+%d" (2*n)
@@ -216,9 +216,10 @@ instance Show DataLabel where show (DataLabel g) = show g
 -- Execute
 
 data TraceFlag = TraceOn | TraceOff
+data DebugFlag = DebugOn | DebugOff
 
-execute :: Transformed -> TraceFlag -> Interaction
-execute i trace = runM trace i (execImage i)
+execute :: Transformed -> TraceFlag -> DebugFlag -> Interaction
+execute i trace debug = runM trace debug i (execImage i)
 
 execImage :: Image -> M ()
 execImage Image{start} = GetCode start >>= execCode
@@ -303,8 +304,8 @@ execBare = \case
   Bare_crash -> error "Bare_crash"
 
   Bare_enter_check -> do
-    _x <- deAddr <$> GetReg Sp
-    --Debug (printf "[%s]" (show x))
+    x <- deAddr <$> GetReg Sp
+    Debug (printf "[%s]\n" (show x))
     pure ()
 
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
@@ -479,8 +480,8 @@ data M a where
   PutChar :: Char -> M ()
   GetChar :: M Char
 
-runM :: TraceFlag  -> Image -> M () -> Interaction
-runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
+runM :: TraceFlag -> DebugFlag -> Image -> M () -> Interaction
+runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
   where
 
@@ -495,6 +496,10 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
     trace = case traceFlag of
       TraceOn -> ITrace
       TraceOff -> \_s i -> i
+
+    debug = case debugFlag of
+      DebugOn -> ITrace
+      DebugOff -> \_s i -> i
 
     traceOpOJump thing s k = trace (show s ++ " ") $ ITick I.Op $ do
       let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
@@ -514,7 +519,7 @@ runM traceFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       Halt -> IDone
-      Debug m -> ITrace m $ k s ()
+      Debug m -> debug m $ k s ()
 
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k

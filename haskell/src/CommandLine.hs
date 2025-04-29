@@ -10,12 +10,12 @@ import qualified Stage1_EXP as Stage1 (compile,execute,sizeExp)
 import qualified Stage2_NBE as Stage2 (compile,execute)
 import qualified Stage3_ANF as Stage3 (compile,execute)
 import qualified Stage4_CCF as Stage4 (compile,execute)
-import qualified Stage5_ASM as Stage5 (compile,execute,TraceFlag(..))
+import qualified Stage5_ASM as Stage5 (compile,execute,TraceFlag(..),DebugFlag(..))
 
 main :: IO ()
 main = do
   config <- parseCommandLine <$> getArgs
-  let Config {paths,mode,stage,trace,measure} = config
+  let Config {paths,mode,stage,trace,debug,measure} = config
   let path = case paths of [] -> error "no .fun"; [x] -> x; _ -> error "too much .fun"
   s <- readFile path
 
@@ -57,9 +57,16 @@ main = do
     (Stage2,Eval) -> do putStr whoami; runInteraction (Stage2.execute e2)
     (Stage3,Eval) -> do putStr whoami; runInteraction (Stage3.execute e3)
     (Stage4,Eval) -> do putStr whoami; runInteraction (Stage4.execute e4)
-    (Stage5,Eval) -> do putStr whoami; runInteraction (Stage5.execute e5 trace)
+    (Stage5,Eval) -> do putStr whoami; runInteraction (Stage5.execute e5 trace debug)
 
-data Config = Config { paths :: [String], mode :: Mode, stage :: Stage, trace :: Stage5.TraceFlag, measure :: Bool }
+data Config = Config
+  { paths :: [String]
+  , mode :: Mode
+  , stage :: Stage
+  , trace :: Stage5.TraceFlag
+  , debug :: Stage5.DebugFlag
+  , measure :: Bool
+  }
 
 data Mode = Compile | Eval
 
@@ -78,6 +85,7 @@ parseCommandLine = loop config0
     config0 = Config { paths = [], mode = Eval
                      , stage = Stage5
                      , trace = Stage5.TraceOff
+                     , debug = Stage5.DebugOff
                      , measure = False
                      }
 
@@ -93,6 +101,7 @@ parseCommandLine = loop config0
       "-4":xs           -> loop config { stage = Stage4 } xs
       "-5":xs           -> loop config { stage = Stage5 } xs
       "-trace":xs       -> loop config { trace = Stage5.TraceOn } xs
+      "-debug":xs       -> loop config { debug = Stage5.DebugOn } xs
       "-measure":xs     -> loop config { measure = True } xs
       ('-':flag):_      -> error (show ("unknown flag",flag))
       x:xs              -> loop config { paths = paths config ++ [x] } xs
