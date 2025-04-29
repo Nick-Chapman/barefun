@@ -1,12 +1,6 @@
-xxx
 ls
-readme
 cat readme
-man man
-cp ls xx
-rm ls
-ls
-xx
-fib 15
+man fib
+fib 5
 mv cat cat2
 cat2 cat

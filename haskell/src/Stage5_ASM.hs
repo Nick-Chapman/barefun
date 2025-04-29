@@ -20,6 +20,8 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc))
 
+import Data.Word (Word16)
+
 bytesPerWord :: Int
 bytesPerWord = 2
 
@@ -85,7 +87,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di -- when needed
   deriving (Eq,Ord)
 
 data Addr -- memory address
-  = Physical_raw Int
+  = Physical_raw Word16
   | Symbolic DataLabel Int
   | TempSpace Int
   deriving (Eq,Ord)
@@ -204,7 +206,7 @@ instance Show Reg where
 
 instance Show Addr where
   show = \case
-    Physical_raw x -> show x -- only need for trace debugging
+    Physical_raw x -> show x
     Symbolic d 0 -> printf "%s" (show d)
     Symbolic d n -> undefined d n -- printf "%s+%d" (show d) n
     TempSpace n -> printf "Temps+%d" (2*n)
@@ -438,18 +440,23 @@ deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
-  Physical_raw n -> mkPhysical (n+i)
-  Symbolic lab n -> Symbolic lab (n+i) -- I had a nasty bug here -- 1 instead of i :(
+  Physical_raw n -> mkPhysical (fromIntegral (n + fromIntegral i))
+  Symbolic lab n -> Symbolic lab (n+i) -- I had a 1nasty bug here -- 1 instead of i :(
   TempSpace{} -> undefined
+
+
+twoE16 :: Int
+twoE16 = 65536
 
 mkPhysical :: Int -> Addr
 mkPhysical n =
-  --if n < (-10000) then error "mkPhysical:too small" else
-    Physical_raw n
+  if n < (twoE16 `div` 2) then error "mkPhysical:too small" else
+    if n > twoE16 then error "mkPhysical:too big" else
+      Physical_raw (fromIntegral n)
 
 dePhysical :: Addr -> Int
 dePhysical = \case
-  Physical_raw n -> n `div` 2
+  Physical_raw n -> fromIntegral n `div` 2
   Symbolic{} -> undefined "dePhysical/Symbolic"
   TempSpace{} -> undefined "dePhysical/TempSpace"
 
@@ -567,7 +574,7 @@ state0 dmap = State
   , offsetFromLastLabel = error "offsetFromLastLabel"
   }
   where
-    initialStackPointer = mkPhysical 65536 -- (not any more!) stack address are negative in stage5
+    initialStackPointer = mkPhysical twoE16
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
@@ -604,15 +611,9 @@ instance Show State where
 -- Address for runtime system constants: 90,91,92
 
 tempOffset :: Int -> Addr
---tempOffset n = mkPhysical n
---tempOffset n = mkPhysical (10000 + n) -- hack to be higher than top of memory
 tempOffset n = TempSpace n
 
 aFalse,aTrue,aNil,aFinalCont :: Addr
-{-aFalse = mkPhysical 90
-aTrue = mkPhysical 91
-aNil = mkPhysical 92
-aFinalCont = mkPhysical 93-}
 aFalse = Symbolic (DataLabel (SRC.Global (-1))) 0
 aTrue = Symbolic (DataLabel (SRC.Global (-2))) 0
 aNil = Symbolic (DataLabel (SRC.Global (-3))) 0
