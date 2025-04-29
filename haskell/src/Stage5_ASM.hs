@@ -471,18 +471,21 @@ deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
-  AHeapSpace (HeapAddr n) -> mkHeapAddr (fromIntegral (n + fromIntegral i))
+  AHeapSpace ha  -> AHeapSpace (addHeapAddr i ha)
   AStatic lab n -> AStatic lab (n+i)
   ATempSpace{} -> undefined
+
+addHeapAddr :: Int -> HeapAddr -> HeapAddr
+addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
 
 twoE16 :: Int
 twoE16 = 65536
 
-mkHeapAddr :: Int -> Addr
+mkHeapAddr :: Int -> HeapAddr
 mkHeapAddr n =
   if n < (twoE16 `div` 2) then error "mkHeapAddr:too small" else
     if n > twoE16 then error "mkHeapAddr:too big" else
-      AHeapSpace (HeapAddr (fromIntegral n))
+      HeapAddr (fromIntegral n)
 
 deheapAddr :: Addr -> Int
 deheapAddr = \case
@@ -612,7 +615,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
               case a of
                 AStatic{} -> True
                 ATempSpace{} -> True
-                AHeapSpace{} -> Set.member a reachable
+                AHeapSpace ha -> Set.member ha reachable
 
           mem <- pure $ Map.filterWithKey isReachable mem
           pure $ do
@@ -653,7 +656,7 @@ state0 dmap = State
   , allocsSinceLastCheck = 0
   }
   where
-    initialStackPointer = mkHeapAddr twoE16
+    initialStackPointer = AHeapSpace (mkHeapAddr twoE16)
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
@@ -697,7 +700,7 @@ finalCodeLabel = CodeLabel 0 "FINAL"
 ----------------------------------------------------------------------
 -- GC
 
-discoverReachable :: [Word] -> Map Addr Word -> IO (Set Addr)
+discoverReachable :: [Word] -> Map Addr Word -> IO (Set HeapAddr)
 discoverReachable roots mem = do
   loop [] Set.empty roots
   where
@@ -706,36 +709,49 @@ discoverReachable roots mem = do
     lookMem a = maybe err id $ Map.lookup a mem
       where err = error (show ("discoverReachable/lookMem",a))
 
-    loop :: [Addr] -> Set Addr -> [Word] -> IO (Set Addr)
-    loop live acc = \case
+    loop :: [HeapAddr] -> Set HeapAddr -> [Word] -> IO (Set HeapAddr)
+    loop live visited = \case
       [] -> pure (Set.fromList live)
-      w1:fringe -> do
-        case w1 of
-          WChar{} -> loop live acc fringe
-          WNum{} -> loop live acc fringe
-          WCodeLabel{} -> loop live acc fringe
-          WUninitialized{} -> loop live acc fringe
-          WBlockDescriptor{} -> error "An addressed word should never be a block descriptor"
-          WAddr a -> do
-            if a `Set.member` acc then loop live acc fringe else do
-              acc <- pure (Set.insert a acc)
-              case Map.lookup (addAddr (-2) a) mem of
-                Nothing -> loop live acc fringe
-                Just w -> do
-                  case (case w of WBlockDescriptor d -> Just d; _ -> Nothing) of
-                    Nothing -> error "expected a block-descriptor"
-                    Just d -> do
-                      case d of
-                        RawData n -> do
-                          let newLive = [ addAddr off a | off <- [-2] ++ [0 .. n-1] ]
-                          let live' = live ++ newLive
-                          loop live' acc fringe
-                        Scanned n -> do
-                          let sizeInWords = n `div` 2
-                          let newWs = [ lookMem (addAddr (bytesPerWord * off) a) | off <- [0.. sizeInWords-1] ]
-                          let newLive = [ addAddr (bytesPerWord * off) a | off <- [(-1).. sizeInWords-1] ]
-                          let live' = live ++ newLive
-                          loop live' acc (newWs ++ fringe)
+      scan1:toScan -> do
+        case heapAddressMaybe scan1 of
+          Nothing -> loop live visited toScan
+          Just ha -> do
+            if ha `Set.member` visited then loop live visited toScan else do
+              visited <- pure (Set.insert ha visited)
+              let descA = addHeapAddr (-bytesPerWord) ha
+              let d = lookupDescriptor descA
+              let size = case d of Scanned n -> n; RawData n -> n
+              let moreLive = [ addHeapAddr off ha | off <- [0 .. size-1] ]
+              let moreToScan = case d of
+                    RawData{} -> []
+                    Scanned{} ->
+                      [ lookMem (AHeapSpace (addHeapAddr offset ha))
+                      | offset <- [0..size-1]
+                      , offset `mod` bytesPerWord == 0
+                      ]
+              loop (descA : moreLive ++ live) visited (moreToScan ++ toScan)
+
+    lookupDescriptor :: HeapAddr -> BlockDescriptor
+    lookupDescriptor descA =
+      case Map.lookup (AHeapSpace descA) mem of
+        Nothing -> error "lookupDescriptor: missing"
+        Just w -> do
+          case (case w of WBlockDescriptor d -> Just d; _ -> Nothing) of
+            Nothing -> error "lookupDescriptor: not a block-descriptor"
+            Just d -> d
+
+
+
+heapAddressMaybe :: Word -> Maybe HeapAddr
+heapAddressMaybe = \case
+  WChar{} -> Nothing
+  WNum{} -> Nothing
+  WCodeLabel{} -> Nothing
+  WUninitialized{} -> Nothing
+  WBlockDescriptor{} -> error "An addressed word should never be a block descriptor"
+  WAddr (AHeapSpace ha) -> Just ha
+  WAddr{} -> Nothing
+
 
 ----------------------------------------------------------------------
 -- Compile
