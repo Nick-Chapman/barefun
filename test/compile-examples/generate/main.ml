@@ -5,7 +5,7 @@ let select_versions_for_example = function
   | "evenodd" -> [4;5]
   | "fib" -> [4;5]
   | "filesystem" -> [2;3;4;5]
-  | "hello" -> [4;5]
+  | "hello" -> [1;2;3;4;5]
   | "keycode" -> [4;5]
   | "print_all_chars" -> [4;5]
   | "promptA" -> [4;5]

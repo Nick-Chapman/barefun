@@ -113,7 +113,7 @@ prettyId Id{name,optUnique,pos} =
     maybePos s =
       case name of
         UserName{} -> if not verbose then s else printf "%s_%s" s (show pos)
-        GeneratedName{} -> printf "%s_%s" s (show pos)
+        GeneratedName{} -> if not verbose then s else printf "%s_%s" s (show pos)
 
     maybeTag s =
       case optUnique of

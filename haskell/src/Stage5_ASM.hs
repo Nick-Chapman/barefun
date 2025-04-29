@@ -296,7 +296,6 @@ checkPushBlockDescriptor = \case
     pure ()
 
 
-
 slideStackPointer :: Int -> M ()
 slideStackPointer nBytes = do
   sequence_ (replicate (nBytes) TraceAlloc)
@@ -330,7 +329,7 @@ execBare = \case
 
   Bare_enter_check -> do
     x <- deAddr <$> GetReg Sp
-    Debug (printf "[%s]\n" (show x))
+    Debug (printf "Bare_enter_check[%s]\n" (show x))
     pure ()
 
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
@@ -555,8 +554,8 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
         let State{allocsSinceLastCheck=actual} = s
         let same = (expect == actual)
         let m = printf "CheckRecentAlloc: expect=%d, actual=%d, same=%s\n" expect actual (show same)
-        --ITrace m $
-        if not same then error m else
+        debug m $
+          if not same then error m else
             k s { allocsSinceLastCheck = 0 } ()
 
       Debug m -> debug m $ k s ()
