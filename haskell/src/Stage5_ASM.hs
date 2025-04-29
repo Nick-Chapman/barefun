@@ -275,10 +275,10 @@ execPushWord w = do
   SetReg Sp (WAddr a')
 
 slideStackPointer :: Int -> M ()
-slideStackPointer nWords = do
-  sequence_ (replicate (bytesPerWord * nWords) TraceAlloc)
+slideStackPointer nBytes = do
+  sequence_ (replicate (nBytes) TraceAlloc)
   a <- deAddr <$> GetReg Sp
-  let a' = addAddr (-(bytesPerWord * nWords)) a
+  let a' = addAddr (-(nBytes)) a
   SetReg Sp (WAddr a')
 
 execBinaryOp :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
@@ -348,14 +348,14 @@ execBare = \case
     w2 <- GetReg Bx
     SetReg Ax (binaryW mod w1 w2)
 
-
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
-    let nWords = (fromIntegral n + 1) `div` 2 -- half the space!
-    slideStackPointer nWords
+    let numBytes = align (fromIntegral n)
+    slideStackPointer numBytes
     execPushWord (WNum n)
     w <- GetReg Sp
     SetReg Ax w
+      where align n = 2 * ((n+1) `div` 2)
 
   -- TODO: no need for Bare given better string rep; just generate ops
   -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
@@ -441,9 +441,8 @@ deNum = \case WNum x -> x; w -> error (show("deNum",w))
 addAddr :: Int -> Addr -> Addr
 addAddr i = \case
   Physical_raw n -> mkPhysical (fromIntegral (n + fromIntegral i))
-  Symbolic lab n -> Symbolic lab (n+i) -- I had a 1nasty bug here -- 1 instead of i :(
+  Symbolic lab n -> Symbolic lab (n+i)
   TempSpace{} -> undefined
-
 
 twoE16 :: Int
 twoE16 = 65536
@@ -536,13 +535,15 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
         k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
 
-      SetReg r w -> k s { rmap = Map.insert r w rmap } ()
+      SetReg r w -> do
+        checkAlignedSp r w $
+          k s { rmap = Map.insert r w rmap } ()
+
       GetReg r -> k s (maybe err id $ Map.lookup r rmap)
         where err = error (show ("GetReg/uninitialized",r))
 
       SetMem a w -> k s { mem = Map.insert a w mem } ()
-      GetMem a -> k s (maybe err id $ Map.lookup a mem)
-        where err = WUninitialized --error (show ("GetMem/uninitialized",a))
+      GetMem a -> k s (maybe WUninitialized id $ Map.lookup a mem)
 
       SetFlagZ b -> k s { flagZ = b } ()
       GetFlagZ -> k s flagZ
@@ -552,6 +553,16 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
       PutChar c -> IPut c (k s ())
       GetChar -> IGet $ \c -> k s c
+
+checkAlignedSp :: Reg -> Word -> Interaction -> Interaction
+checkAlignedSp = \case
+  Sp -> \case
+    WAddr (Physical_raw n) ->
+      if n `mod` 2 == 1 then error (show ("unaligned Sp",n)) else
+        \i -> i
+    w -> error (show ("trying to set Sp to a non address",w))
+  _ ->
+    \_ i -> i
 
 data State = State
   { rmap :: Map Reg Word
@@ -586,7 +597,6 @@ state0 dmap = State
       , (aTrue, vTag tTrue)
       , (aNil, vTag tNil)
       , (aFinalCont, WCodeLabel finalCodeLabel)
-      , (addAddr 1 aFinalCont, WChar 'X') -- dummy next cont; without this we see error with -trace
       ]
     user =
       concat [ [(Symbolic lab i,w) | (i,w) <- specsWords 0 specs ]
@@ -964,7 +974,7 @@ data Asm a where
 runAsm :: Asm CodeLabel  -> Image
 runAsm m = loop state0 m k0
   where
-    state0 = AsmState { u = 1 } -- user code labels start at 1; 0 labels the code for the final continuation
+    state0 = AsmState { u = 1 }
     k0 _s start = Image { cmap = Map.empty, dmap = Map.empty, start }
 
     loop :: AsmState -> Asm a -> (AsmState -> a -> Image) -> Image
