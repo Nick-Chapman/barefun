@@ -76,7 +76,6 @@ data Source
   = SReg Reg
   | SLit Word
   | SMem Addr
-  | SMemIndirect Reg -- TODO: eliminate in favour of offset version; optmize away +0 in PP.
   | SMemIndirectOffset Reg Int -- byte indexing
 
 -- Word is a structured type for the contents of a register or memory location
@@ -197,8 +196,9 @@ instance Show Source where
     SReg r -> show r
     SLit w -> show w
     SMem a -> "["++show a++"]"
-    SMemIndirect r -> "["++show r++"]"
-    SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
+    SMemIndirectOffset r n ->
+      if n == 0 then printf "[%s]" (show r) else
+        printf "[%s+%s]" (show r) (show n)
 
 instance Show Target where
   show = \case
@@ -364,9 +364,6 @@ evalSource = \case
   SReg r -> GetReg r
   SLit w -> pure w
   SMem a -> GetMem a
-  SMemIndirect r -> do
-    a <- deAddr <$> GetReg r
-    GetMem a
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
     GetMem (addAddr i a)
@@ -886,7 +883,7 @@ compileArm scrutReg arm =  do
   let (SRC.ArmTag pos (Ctag _ n) _xs _rhs) = arm
   code <- compileArmTaken scrutReg arm
   lab <- CutCode ("Arm: " ++ show pos) code
-  pure [ OpCmp (SMemIndirect scrutReg) (SLit (WNum n))
+  pure [ OpCmp (SMemIndirectOffset scrutReg 0) (SLit (WNum n))
        , OpBranchFlagZ lab
        ]
 
@@ -922,7 +919,6 @@ needs r2 = \case
   SReg r -> (r==r2)
   SLit{} -> False
   SMem{} -> False
-  SMemIndirect r -> (r==r2)
   SMemIndirectOffset r _ -> (r==r2)
 
 changeRegInSource :: Reg -> Reg -> Source -> Source
@@ -930,9 +926,7 @@ changeRegInSource r1 r2 = \case
   SReg r -> SReg (if r==r1 then r2 else r1)
   s@SLit{} -> s
   s@SMem{} -> s
-  SMemIndirect r -> SMemIndirect (if r==r1 then r2 else r1)
   SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
-
 
 compileAtomicTo :: SRC.Temp -> SRC.Atomic -> Asm [Op]
 compileAtomicTo temp = \case
@@ -1051,7 +1045,7 @@ compileBuiltinTo temp b = case b of
     ]
   SRC.DeRef -> oneArg $ \s1 ->
     [ OpMove Bx s1
-    , setTarget temp (SMemIndirect Bx)
+    , setTarget temp (SMemIndirectOffset Bx 0)
     ]
   SRC.SetRef -> twoArgs $ \s1 s2 ->
     [ OpMove Bx s1
