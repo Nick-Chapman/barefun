@@ -54,6 +54,7 @@ data Op -- target; source
   | OpBranchFlagZ CodeLabel
   | OpAddInto Reg Source
   | OpSubInto Reg Source
+  | OpMulIntoAx Reg  -- ax := ax * sourceReg
 
 data Jump
   = JumpDirect CodeLabel
@@ -121,7 +122,6 @@ data BareBios
   | Bare_num_to_char
   | Bare_char_to_num
   | Bare_addr_to_num
-  | Bare_mul
   | Bare_div
   | Bare_mod
 
@@ -172,6 +172,7 @@ instance Show Op where
     OpBranchFlagZ lab ->  "jz " ++ show lab
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
+    OpMulIntoAx src -> "mul word " ++ show src
 
 instance Show Jump where
   show = \case
@@ -281,8 +282,9 @@ execOp = \case
     case b of
       False -> cont -- branch not taken
       True -> GetCode lab >>= execCode -- branch taken; ignore the continuation
-  OpAddInto r s -> execBinaryOp (+) r s
-  OpSubInto r s -> execBinaryOp (-) r s
+  OpAddInto r s -> execBinaryOpInto (+) r s
+  OpSubInto r s -> execBinaryOpInto (-) r s
+  OpMulIntoAx s -> execBinaryOpInto (*) Ax (SReg s)
 
 execPushWord :: Word -> M () -- we can't push individual bytes
 execPushWord w = do
@@ -310,8 +312,8 @@ slideStackPointer nBytes = do
   let a' = addAddr (-(nBytes)) a
   SetReg Sp (WAddr a')
 
-execBinaryOp :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
-execBinaryOp f r s = \cont -> do
+execBinaryOpInto :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
+execBinaryOpInto f r s = \cont -> do
     w1 <- GetReg r
     w2 <- evalSource s
     SetReg r (binaryW f w1 w2)
@@ -362,11 +364,6 @@ execBare = \case
   Bare_addr_to_num -> do
     a <- deAddr <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ deheapAddr a))
-
-  Bare_mul -> do
-    w1 <- GetReg Ax
-    w2 <- GetReg Bx
-    SetReg Ax (binaryW (*) w1 w2)
 
   Bare_div -> do
     w1 <- GetReg Ax
@@ -960,10 +957,11 @@ compileBuiltinToAx b = case b of
     , OpSubInto Ax s2
     ]
   SRC.MulInt -> twoArgs $ \s1 s2 ->
-    [ OpMove Ax s1
-    , OpMove Bx s2
-    , OpCall Bare_mul
-    ]
+    [ OpMove Ax s1 ] ++
+    case s2 of
+      SReg s2Reg -> [ OpMulIntoAx s2Reg ]
+      _ -> [ OpMove Bx s2 , OpMulIntoAx Bx ]
+
   SRC.DivInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2

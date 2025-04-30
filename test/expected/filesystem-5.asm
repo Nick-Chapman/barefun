@@ -3213,7 +3213,7 @@ L235: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  call Bare_mul
+  mul word bx
   mov [Temps+2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -4229,7 +4229,7 @@ L307: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  call Bare_mul
+  mul word bx
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx
@@ -5693,7 +5693,7 @@ L393: ; Continuation
   mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
-  call Bare_mul
+  mul word bx
   mov [Temps+4], ax
   push word [Temps+4]
   push word [bp+14]
@@ -7467,7 +7467,7 @@ L513: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  call Bare_mul
+  mul word bx
   mov [Temps+2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -8483,7 +8483,7 @@ L585: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  call Bare_mul
+  mul word bx
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx
@@ -9947,7 +9947,7 @@ L671: ; Continuation
   mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
-  call Bare_mul
+  mul word bx
   mov [Temps+4], ax
   push word [Temps+4]
   push word [bp+14]
@@ -11482,7 +11482,7 @@ L771: ; Continuation
   mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
-  call Bare_mul
+  mul word bx
   mov [Temps+4], ax
   push word [Temps+4]
   push word cx
@@ -11950,7 +11950,7 @@ L807: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  call Bare_mul
+  mul word bx
   mov [Temps+2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -12962,7 +12962,7 @@ L879: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  call Bare_mul
+  mul word bx
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx

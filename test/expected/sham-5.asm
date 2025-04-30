@@ -903,7 +903,7 @@ L75: ; Continuation
   mov [Temps+2], ax
   mov ax, 10
   mov bx, [bp+4]
-  call Bare_mul
+  mul word bx
   mov [Temps+4], ax
   mov ax, [Temps+4]
   add ax, [Temps+2]

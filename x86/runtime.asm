@@ -276,10 +276,6 @@ Bare_addr_to_num: ;; called when we see where the Sp is
     shr ax, 1
     ret
 
-Bare_mul:
-    mul bx ; ax * bx -> ax
-    ret
-
 Bare_div:
     push dx
     mov dx, 0

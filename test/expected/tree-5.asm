@@ -158,8 +158,7 @@ L13: ; Arm: 24'15
 L14: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
-  mov bx, dx
-  call Bare_mul
+  mul word dx
   mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
