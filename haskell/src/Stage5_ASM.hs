@@ -842,19 +842,15 @@ compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return _pos res -> do
     pure $ doOps
-      -- position info in comments in generated ASM is very unstable to tiny changes.
-      [ --OpComment $ printf "(%s) Return: %s" (show _pos) (ppRef res)
-        OpMove argReg (compileRef res)
+      [ OpMove argReg (compileRef res)
       , OpMove frameReg (SReg contReg)
       , OpMove contReg (SMemIndirectOffset frameReg bytesPerWord)
       ] (Done (JumpIndirect frameReg))
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps (
-      -- [ OpComment $ printf "(%s) Tail: %s @ %s" (show _pos) (ppRef fun) (ppRef arg) ] ++
-      -- (arg,frame) = ...
-       moveTwoRegsPar (frameReg,compileRef fun) (argReg,compileRef arg) ++
-      []) (Done (JumpIndirect frameReg))
+      simultaneousMove (frameReg,compileRef fun) (argReg,compileRef arg)
+      ) (Done (JumpIndirect frameReg))
 
   SRC.LetAtomic (id,temp) rhs body -> do
     let who = show (id,temp)
@@ -902,19 +898,18 @@ compileArmTaken scrutReg arm =  do
     | (i,(_,temp)) <- zip [1..] xs
     ] <$> compileCode rhs
 
--- assign two regs in parallel, using a temp id required
-moveTwoRegsPar :: (Reg,Source) -> (Reg,Source) -> [Op]
-moveTwoRegsPar (r1,s1) (r2,s2) = do
+simultaneousMove :: (Reg,Source) -> (Reg,Source) -> [Op]
+simultaneousMove (r1,s1) (r2,s2) = do
+  let tempReg = Bx
   let op1 = OpMove r1 s1
   let op2 = OpMove r2 s2
   let oneTwo = needs r2 s1
   let twoOne = needs r1 s2
   case (oneTwo,twoOne) of
     (True,True) ->
-      [ --OpComment "use temp di while setting up bp/dx"
-        OpMove Di (SReg r1)
+      [ OpMove tempReg (SReg r1)
       , OpMove r1 s1
-      , OpMove r2 (changeRegInSource r1 Di s2)
+      , OpMove r2 (changeRegInSource r1 tempReg s2)
       ]
     (True,_) -> [op1,op2]
     (_,True) -> [op2,op1]

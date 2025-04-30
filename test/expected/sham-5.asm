@@ -69,9 +69,9 @@ L8: ; Continuation
   push word L7
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L9: ; Continuation
@@ -121,9 +121,9 @@ L12: ; Arm: 32'7
 
 L13: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L14: ; Continuation
@@ -172,9 +172,9 @@ L17: ; Arm: 37'7
 
 L18: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L19: ; Continuation
@@ -196,9 +196,9 @@ L20: ; Continuation
   push word L19
   mov cx, sp
   push word 8 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+6]
+  mov dx, [bx+6]
   jmp [bp]
 
 L21: ; Continuation
@@ -262,9 +262,9 @@ L25: ; Arm: 42'7
 
 L26: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L27: ; Function: (lam,t1)
@@ -306,9 +306,9 @@ L29: ; Arm: 55'9
 
 L30: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L31: ; Function: (lam,t1)
@@ -363,9 +363,9 @@ L34: ; Continuation
   push word L33
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L35: ; Continuation
@@ -405,9 +405,9 @@ L37: ; Arm: 66'9
 
 L38: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L39: ; Function: (lam,t1)
@@ -462,9 +462,9 @@ L42: ; Continuation
   push word L41
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L43: ; Continuation
@@ -875,9 +875,9 @@ L73: ; Arm: 371'15
 
 L74: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L75: ; Continuation
@@ -1427,9 +1427,9 @@ L110: ; Arm: 124'11
 
 L111: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L112: ; Arm: 128'2
@@ -1475,9 +1475,9 @@ L114: ; Arm: 124'11
 
 L115: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L116: ; Function: (lam,t1)
@@ -1557,9 +1557,9 @@ L121: ; Continuation
   push word L120
   mov cx, sp
   push word 8 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+8]
+  mov dx, [bx+8]
   jmp [bp]
 
 L122: ; Continuation
@@ -1654,9 +1654,9 @@ L128: ; Arm: 166'11
 
 L129: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L130: ; Continuation
@@ -1689,9 +1689,9 @@ L131: ; Arm: 168'26
 
 L132: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L133: ; Continuation
@@ -1770,9 +1770,9 @@ L137: ; Arm: 173'9
 
 L138: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L139: ; Arm: 175'24
@@ -1787,9 +1787,9 @@ L139: ; Arm: 175'24
 
 L140: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L141: ; Continuation
@@ -2127,9 +2127,9 @@ L164: ; Continuation
   push word L163
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L165: ; Function: (loop,t3)
@@ -2220,9 +2220,9 @@ L171: ; Continuation
   push word L170
   mov cx, sp
   push word 12 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+12]
+  mov dx, [bx+12]
   jmp [bp]
 
 L172: ; Continuation
@@ -2318,9 +2318,9 @@ L178: ; Continuation
   push word L177
   mov cx, sp
   push word 12 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+12]
+  mov dx, [bx+12]
   jmp [bp]
 
 L179: ; Continuation
@@ -2419,9 +2419,9 @@ L185: ; Continuation
   push word L184
   mov cx, sp
   push word 14 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+14]
+  mov dx, [bx+14]
   jmp [bp]
 
 L186: ; Continuation
@@ -2524,9 +2524,9 @@ L192: ; Continuation
   push word L191
   mov cx, sp
   push word 14 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+14]
+  mov dx, [bx+14]
   jmp [bp]
 
 L193: ; Continuation
@@ -2652,9 +2652,9 @@ L202: ; Continuation
   push word L201
   mov cx, sp
   push word 12 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+12]
+  mov dx, [bx+12]
   jmp [bp]
 
 L203: ; Continuation
@@ -2750,9 +2750,9 @@ L209: ; Continuation
   push word L208
   mov cx, sp
   push word 12 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+12]
+  mov dx, [bx+12]
   jmp [bp]
 
 L210: ; Continuation
@@ -2851,9 +2851,9 @@ L216: ; Continuation
   push word L215
   mov cx, sp
   push word 14 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+14]
+  mov dx, [bx+14]
   jmp [bp]
 
 L217: ; Continuation
@@ -2956,9 +2956,9 @@ L223: ; Continuation
   push word L222
   mov cx, sp
   push word 14 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+14]
+  mov dx, [bx+14]
   jmp [bp]
 
 L224: ; Continuation
@@ -3024,9 +3024,9 @@ L227: ; Arm: 216'14
 
 L228: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L229: ; Continuation
@@ -3113,9 +3113,9 @@ L232: ; Continuation
   push word L231
   mov cx, sp
   push word 14 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+14]
+  mov dx, [bx+14]
   jmp [bp]
 
 L233: ; Continuation
@@ -3197,9 +3197,9 @@ L237: ; Continuation
   push word L236
   mov cx, sp
   push word 18 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+16]
+  mov dx, [bx+16]
   jmp [bp]
 
 L238: ; Continuation
@@ -3358,9 +3358,9 @@ L249: ; Continuation
   push word L248
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L250: ; Function: (loop,t3)
@@ -3421,9 +3421,9 @@ L254: ; Continuation
   push word L253
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L255: ; Function: (loop,t1)
@@ -3600,9 +3600,9 @@ L267: ; Continuation
   push word L266
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+6]
+  mov dx, [bx+6]
   jmp [bp]
 
 L268: ; Continuation
@@ -3938,9 +3938,9 @@ L293: ; Continuation
   push word L292
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L294: ; Function: (loop,t5)
@@ -4425,9 +4425,9 @@ L325: ; Continuation
   push word L324
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+6]
+  mov dx, [bx+6]
   jmp [bp]
 
 L326: ; Arm: 339'44
@@ -4487,9 +4487,9 @@ L330: ; Continuation
   push word L329
   mov cx, sp
   push word 12 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+10]
+  mov dx, [bx+10]
   jmp [bp]
 
 L331: ; Continuation
@@ -4564,9 +4564,9 @@ L335: ; Continuation
   push word L334
   mov cx, sp
   push word 16 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+10]
+  mov dx, [bx+10]
   jmp [bp]
 
 L336: ; Continuation
@@ -4808,9 +4808,9 @@ L351: ; Continuation
   push word L350
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L352: ; Function: (loop,t1)
@@ -4993,9 +4993,9 @@ L365: ; Continuation
   push word L364
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+6]
+  mov dx, [bx+6]
   jmp [bp]
 
 L366: ; Function: (lam,t1)
@@ -5285,9 +5285,9 @@ L390: ; Continuation
   push word L389
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L391: ; Function: (loop,t3)
@@ -5348,9 +5348,9 @@ L395: ; Continuation
   push word L394
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L396: ; Function: (loop,t1)
@@ -5527,9 +5527,9 @@ L408: ; Continuation
   push word L407
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+6]
+  mov dx, [bx+6]
   jmp [bp]
 
 L409: ; Continuation
@@ -5865,9 +5865,9 @@ L434: ; Continuation
   push word L433
   mov cx, sp
   push word 10 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L435: ; Function: (loop,t5)
@@ -6039,9 +6039,9 @@ L447: ; Continuation
   push word L446
   mov cx, sp
   push word 12 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L448: ; Function: (loop,t2)
@@ -6343,9 +6343,9 @@ L466: ; Continuation
   push word L465
   mov cx, sp
   push word 12 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L467: ; Function: (loop,t1)
@@ -6430,9 +6430,9 @@ L471: ; Function: (lam,t3)
 
 L472: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L473: ; Continuation
@@ -6442,9 +6442,9 @@ L473: ; Continuation
   push word L472
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L474: ; Function: (lam,t1)
@@ -6612,9 +6612,9 @@ L488: ; Arm: 124'11
 
 L489: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L490: ; Arm: 128'2
@@ -6660,9 +6660,9 @@ L492: ; Arm: 124'11
 
 L493: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L494: ; Continuation
@@ -6750,9 +6750,9 @@ L498: ; Arm: 124'11
 
 L499: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L500: ; Arm: 128'2
@@ -6798,9 +6798,9 @@ L502: ; Arm: 124'11
 
 L503: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L504: ; Continuation
@@ -6922,9 +6922,9 @@ L510: ; Continuation
   push word L509
   mov cx, sp
   push word 8 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+8]
+  mov dx, [bx+8]
   jmp [bp]
 
 L511: ; Continuation

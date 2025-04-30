@@ -216,9 +216,9 @@ L18: ; Arm: 9'20
 
 L19: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L20: ; Continuation

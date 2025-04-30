@@ -52,9 +52,9 @@ L6: ; Arm: 14'9
 
 L7: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L8: ; Function: (lam,t1)
@@ -109,9 +109,9 @@ L11: ; Continuation
   push word L10
   mov cx, sp
   push word 6 ;; scanned
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L12: ; Continuation

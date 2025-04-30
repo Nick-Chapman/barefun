@@ -127,9 +127,9 @@ L11: ; Arm: 19'9
 
 L12: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L13: ; Function: (lam,t1)
@@ -165,9 +165,9 @@ L14: ; Function: (revloop,g12)
 
 L15: ; Continuation
   call Bare_enter_check
-  mov di, bp
+  mov bx, bp
   mov bp, dx
-  mov dx, [di+4]
+  mov dx, [bx+4]
   jmp [bp]
 
 L16: ; Arm: 30'27
