@@ -391,9 +391,8 @@ L32: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -456,9 +455,8 @@ L36: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -521,9 +519,8 @@ L40: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -586,9 +583,8 @@ L44: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -651,9 +647,8 @@ L48: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -716,9 +711,8 @@ L52: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -781,9 +775,8 @@ L56: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -846,9 +839,8 @@ L60: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -911,9 +903,8 @@ L64: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -976,9 +967,8 @@ L68: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1088,9 +1078,8 @@ L76: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1153,9 +1142,8 @@ L80: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1218,9 +1206,8 @@ L84: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1283,9 +1270,8 @@ L88: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1348,9 +1334,8 @@ L92: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1413,9 +1398,8 @@ L96: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1478,9 +1462,8 @@ L100: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1543,9 +1526,8 @@ L104: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1608,9 +1590,8 @@ L108: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1673,9 +1654,8 @@ L112: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1738,9 +1718,8 @@ L116: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1803,9 +1782,8 @@ L120: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1868,9 +1846,8 @@ L124: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1933,9 +1910,8 @@ L128: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -1998,9 +1974,8 @@ L132: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -2063,9 +2038,8 @@ L136: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -2128,9 +2102,8 @@ L140: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -2193,9 +2166,8 @@ L144: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -2258,9 +2230,8 @@ L148: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -2965,9 +2936,8 @@ L201: ; Function: t1
 L202: ; Continuation
   call Bare_enter_check
   push word g139
-  mov ax, sp
+  mov [Temps+2], sp
   push word 2 ;; scanned
-  mov [Temps+2], ax
   push word [bp+8]
   push word [bp+4]
   push word [Temps+2]
@@ -6173,9 +6143,8 @@ L414: ; Continuation
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+2], dx
   pop word dx ;; restore
-  mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
   mul bx
@@ -6926,8 +6895,7 @@ L458: ; Arm: 13'9
 
 L459: ; Continuation
   call Bare_enter_check
-  mov ax, dx
-  mov [Temps+2], ax
+  mov [Temps+2], dx
   push word [Temps+2]
   push word 0
   mov [Temps+4], sp
@@ -7004,9 +6972,8 @@ L462: ; Function: t6
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -7599,9 +7566,8 @@ L506: ; Function: t1
 L507: ; Continuation
   call Bare_enter_check
   push word g256
-  mov ax, sp
+  mov [Temps+2], sp
   push word 2 ;; scanned
-  mov [Temps+2], ax
   push word [bp+8]
   push word [bp+4]
   push word [Temps+2]
@@ -10807,9 +10773,8 @@ L719: ; Continuation
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+2], dx
   pop word dx ;; restore
-  mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
   mul bx
@@ -11560,8 +11525,7 @@ L763: ; Arm: 13'9
 
 L764: ; Continuation
   call Bare_enter_check
-  mov ax, dx
-  mov [Temps+2], ax
+  mov [Temps+2], dx
   push word [Temps+2]
   push word 0
   mov [Temps+4], sp
@@ -11973,8 +11937,7 @@ L791: ; Continuation
 
 L792: ; Continuation
   call Bare_enter_check
-  mov ax, dx
-  mov [Temps+2], ax
+  mov [Temps+2], dx
   mov ax, [bp+8]
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -12514,9 +12477,8 @@ L831: ; Continuation
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+2], dx
   pop word dx ;; restore
-  mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
   mul bx
@@ -12543,9 +12505,8 @@ L832: ; Arm: 189'23
 L833: ; Continuation
   call Bare_enter_check
   push word g352
-  mov ax, sp
+  mov [Temps+2], sp
   push word 2 ;; scanned
-  mov [Temps+2], ax
   push word dx
   push word [bp+4]
   push word [Temps+2]
@@ -15787,9 +15748,8 @@ L1052: ; Continuation
 L1053: ; Continuation
   call Bare_enter_check
   push word g23
-  mov ax, sp
+  mov [Temps+2], sp
   push word 2 ;; scanned
-  mov [Temps+2], ax
   push word [bp+10]
   push word 0
   mov [Temps+4], sp
@@ -15801,9 +15761,8 @@ L1053: ; Continuation
   mov [Temps+6], sp
   push word 8 ;; scanned
   push word [Temps+6]
-  mov ax, sp
+  mov [Temps+8], sp
   push word 2 ;; scanned
-  mov [Temps+8], ax
   push word [Temps+8]
   push word [bp+8]
   push word 0

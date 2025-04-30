@@ -151,9 +151,8 @@ L13: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax
@@ -267,9 +266,8 @@ L21: ; Function: t1
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
   mov [Temps+6], ax

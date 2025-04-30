@@ -210,9 +210,8 @@ L18: ; Function: t4
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+2], dx
   pop word dx ;; restore
-  mov [Temps+2], ax
   mov ax, [Temps+2]
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -353,9 +352,8 @@ L28: ; Function: t4
   push word dx ;; save
   mov dx, 0
   div bx
-  mov ax, dx
+  mov [Temps+2], dx
   pop word dx ;; restore
-  mov [Temps+2], ax
   mov ax, [Temps+2]
   cmp word ax, 0
   call Bare_make_bool_from_z
