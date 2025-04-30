@@ -43,7 +43,7 @@ L4: ; Arm: 13'20
   mov cx, [bp+2]
   jmp [bp]
 
-L5: ; Function: g1
+L5: ; Function: (loop,g1)
   mov ax, 255
   cmp word ax, dx
   call Bare_make_bool_from_n

@@ -1,9 +1,9 @@
-L1: ; Function: t1
+L1: ; Function: (lam,t1)
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
 
-L2: ; Function: g1
+L2: ; Function: (block,g1)
   push word dx
   push word L1
   mov [Temps+2], sp
@@ -41,7 +41,7 @@ L5: ; Arm: 7'9
   mov cx, [bp+2]
   jmp [bp]
 
-L6: ; Function: t2
+L6: ; Function: (loop,t2)
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -71,7 +71,7 @@ L7: ; Continuation
   mov cx, [bp+2]
   jmp [bp]
 
-L8: ; Function: g5
+L8: ; Function: (lam,g5)
   mov ax, 512
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -204,7 +204,7 @@ L17: ; Arm: 44'19
   mov cx, [bp+2]
   jmp [bp]
 
-L18: ; Function: t4
+L18: ; Function: (loop,t4)
   mov ax, dx
   mov bx, 64
   push word dx ;; save
@@ -346,7 +346,7 @@ L27: ; Arm: 44'19
   mov cx, [bp+2]
   jmp [bp]
 
-L28: ; Function: t4
+L28: ; Function: (loop,t4)
   mov ax, dx
   mov bx, 64
   push word dx ;; save

@@ -3,7 +3,7 @@ L1: ; Arm: 9'27
   mov bp, g1
   jmp [bp]
 
-L2: ; Function: t3
+L2: ; Function: (inner,t3)
   call Bare_get_char
   mov [Temps+2], ax
   mov ax, [Temps+2]
@@ -19,7 +19,7 @@ L2: ; Function: t3
   mov dx, g3
   jmp [bp]
 
-L3: ; Function: g1
+L3: ; Function: (outer,g1)
   mov ax, dx
   call Bare_put_char
   mov ax, ` `

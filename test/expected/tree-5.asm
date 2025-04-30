@@ -17,7 +17,7 @@ L2: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L3: ; Function: t1
+L3: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -52,7 +52,7 @@ L3: ; Function: t1
   mov dx, [Temps+10]
   jmp [bp]
 
-L4: ; Function: g1
+L4: ; Function: (loop,g1)
   push word dx
   push word L3
   mov [Temps+2], sp
@@ -68,7 +68,7 @@ L5: ; Arm: 13'7
   mov cx, [bp+2]
   jmp [bp]
 
-L6: ; Function: g2
+L6: ; Function: (put_chars,g2)
   mov bx, dx
   cmp word [bx], 0
   jz L5
@@ -181,7 +181,7 @@ L15: ; Continuation
   mov bp, g4
   jmp [bp]
 
-L16: ; Function: g4
+L16: ; Function: (eval,g4)
   mov bx, dx
   cmp word [bx], 0
   jz L7

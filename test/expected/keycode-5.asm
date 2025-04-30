@@ -1,4 +1,4 @@
-L1: ; Function: g1
+L1: ; Function: (main,g1)
   call Bare_get_char
   mov [Temps+2], ax
   mov ax, [Temps+2]

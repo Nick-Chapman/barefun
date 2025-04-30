@@ -795,25 +795,20 @@ contReg = Cx
 compileImage :: SRC.Image -> Asm Code
 compileImage = \case
   SRC.Run code -> compileCode code
-  SRC.LetTop (_,g) rhs body -> do
-    let lab = DataLabel g
-    vals <- compileTopDef lab rhs
-    CutData lab vals
+  SRC.LetTop (id,global) rhs body -> do
+    let who = show (id,global)
+    vals <- compileTopDef who rhs
+    CutData (DataLabel global) vals
     compileImage body
 
-compileTopDef :: DataLabel -> SRC.Top -> Asm [DataSpec]
-compileTopDef lab = \case
+compileTopDef :: String -> SRC.Top -> Asm [DataSpec]
+compileTopDef who = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
-
-  SRC.TopLitS string ->
-    pure (DW [ WNum (fromIntegral $ length string) ]
---           : [ DB [ c | c <- string ] ]
-           : [ DS string ]
-         )
+  SRC.TopLitS string -> pure (DW [ WNum (fromIntegral $ length string) ] : [ DS string ])
 
   SRC.TopLam _x body -> do
-    lab <- compileCode body >>= CutCode ("Function: " ++ show lab)
-    let w1 = WCodeLabel lab
+    codeLabel <- compileCode body >>= CutCode ("Function: " ++ who)
+    let w1 = WCodeLabel codeLabel
     pure [DW [w1]]
 
   SRC.TopConApp (Ctag _ tag) xs -> do
@@ -851,8 +846,8 @@ compileCode = \case
        moveTwoRegsPar (frameReg,compileRef fun) (argReg,compileRef arg) ++
       []) (Done (JumpIndirect frameReg))
 
-  SRC.LetAtomic (_,temp) rhs body -> do
-    let who = show temp -- TODO: do better than this. give the user function name
+  SRC.LetAtomic (id,temp) rhs body -> do
+    let who = show (id,temp)
     let target = TMem (ATempSpace temp)
     ops <- compileAtomicTo who target rhs
     doOps ops <$> compileCode body

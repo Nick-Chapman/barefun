@@ -4,7 +4,7 @@ L1: ; Arm: 6'7
   mov cx, [bp+2]
   jmp [bp]
 
-L2: ; Function: g1
+L2: ; Function: (put_chars,g1)
   mov bx, dx
   cmp word [bx], 0
   jz L1
@@ -31,7 +31,7 @@ L4: ; Continuation
   mov dx, [di+4]
   jmp [bp]
 
-L5: ; Function: t1
+L5: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L3
@@ -53,7 +53,7 @@ L5: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L6: ; Function: g6
+L6: ; Function: (revloop,g6)
   push word dx
   push word L5
   mov [Temps+2], sp
@@ -82,7 +82,7 @@ L8: ; Arm: 23'27
   mov dx, g7
   jmp [bp]
 
-L9: ; Function: g4
+L9: ; Function: (readloop,g4)
   call Bare_get_char
   mov [Temps+2], ax
   mov ax, [Temps+2]
@@ -121,7 +121,7 @@ L11: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L12: ; Function: g3
+L12: ; Function: (main,g3)
   mov ax, `%`
   call Bare_put_char
   mov ax, ` `

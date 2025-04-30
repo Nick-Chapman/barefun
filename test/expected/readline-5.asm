@@ -11,7 +11,7 @@ L2: ; Continuation
   mov dx, [di+4]
   jmp [bp]
 
-L3: ; Function: t1
+L3: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L1
@@ -33,7 +33,7 @@ L3: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L4: ; Function: g1
+L4: ; Function: (rev_onto,g1)
   push word dx
   push word L3
   mov [Temps+2], sp
@@ -79,7 +79,7 @@ L9: ; Arm: 32'16
   mov cx, [bp+2]
   jmp [bp]
 
-L10: ; Function: g2
+L10: ; Function: (put_chars,g2)
   mov bx, dx
   cmp word [bx], 0
   jz L5
@@ -149,7 +149,7 @@ L12: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L13: ; Function: t1
+L13: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -175,7 +175,7 @@ L13: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L14: ; Function: g5
+L14: ; Function: (explode_loop,g5)
   push word dx
   push word L13
   mov [Temps+2], sp
@@ -349,7 +349,7 @@ L29: ; Arm: 32'16
   mov cx, [bp+2]
   jmp [bp]
 
-L30: ; Function: g8
+L30: ; Function: (readloop,g8)
   call Bare_get_char
   mov [Temps+2], ax
   mov ax, [Temps+2]
@@ -517,7 +517,7 @@ L38: ; Continuation
   mov dx, 1
   jmp [bp]
 
-L39: ; Function: g4
+L39: ; Function: (mainloop,g4)
   push word cx
   push word L38
   mov cx, sp
@@ -541,7 +541,7 @@ L41: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L42: ; Function: t1
+L42: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -567,7 +567,7 @@ L42: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L43: ; Function: g19
+L43: ; Function: (explode_loop,g19)
   push word dx
   push word L42
   mov [Temps+2], sp

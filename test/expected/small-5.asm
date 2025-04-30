@@ -4,7 +4,7 @@ L1: ; Arm: 11'7
   mov cx, [bp+2]
   jmp [bp]
 
-L2: ; Function: g1
+L2: ; Function: (put_chars,g1)
   mov bx, dx
   cmp word [bx], 0
   jz L1
@@ -33,7 +33,7 @@ L4: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L5: ; Function: t1
+L5: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -59,7 +59,7 @@ L5: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L6: ; Function: g3
+L6: ; Function: (explode_loop,g3)
   push word dx
   push word L5
   mov [Temps+2], sp
@@ -84,7 +84,7 @@ L8: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L9: ; Function: t1
+L9: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -110,7 +110,7 @@ L9: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L10: ; Function: g7
+L10: ; Function: (explode_loop,g7)
   push word dx
   push word L9
   mov [Temps+2], sp
@@ -133,7 +133,7 @@ L12: ; Continuation
   mov dx, [di+4]
   jmp [bp]
 
-L13: ; Function: t1
+L13: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L11
@@ -155,7 +155,7 @@ L13: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L14: ; Function: g12
+L14: ; Function: (revloop,g12)
   push word dx
   push word L13
   mov [Temps+2], sp
@@ -184,7 +184,7 @@ L16: ; Arm: 30'27
   mov dx, g13
   jmp [bp]
 
-L17: ; Function: g10
+L17: ; Function: (readloop,g10)
   call Bare_get_char
   mov [Temps+2], ax
   mov ax, [Temps+2]
@@ -253,7 +253,7 @@ L22: ; Continuation
   mov dx, 1
   jmp [bp]
 
-L23: ; Function: g6
+L23: ; Function: (mainloop,g6)
   push word cx
   push word L22
   mov cx, sp
@@ -277,7 +277,7 @@ L25: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L26: ; Function: t1
+L26: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -303,7 +303,7 @@ L26: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L27: ; Function: g16
+L27: ; Function: (explode_loop,g16)
   push word dx
   push word L26
   mov [Temps+2], sp
@@ -328,7 +328,7 @@ L29: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L30: ; Function: t1
+L30: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -354,7 +354,7 @@ L30: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L31: ; Function: g20
+L31: ; Function: (explode_loop,g20)
   push word dx
   push word L30
   mov [Temps+2], sp

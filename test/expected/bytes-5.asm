@@ -1,9 +1,9 @@
-L1: ; Function: t1
+L1: ; Function: (lam,t1)
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
 
-L2: ; Function: g1
+L2: ; Function: (block,g1)
   push word dx
   push word L1
   mov [Temps+2], sp
@@ -29,7 +29,7 @@ L4: ; Continuation
   mov cx, [bp+2]
   jmp [bp]
 
-L5: ; Function: g2
+L5: ; Function: (length,g2)
   mov bx, dx
   cmp word [bx], 0
   jz L3
@@ -58,7 +58,7 @@ L7: ; Continuation
   mov dx, [di+4]
   jmp [bp]
 
-L8: ; Function: t1
+L8: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L6
@@ -82,7 +82,7 @@ L8: ; Function: t1
   mov dx, [Temps+8]
   jmp [bp]
 
-L9: ; Function: t2
+L9: ; Function: (loop,t2)
   push word bp
   push word dx
   push word [bp+2]
@@ -134,7 +134,7 @@ L12: ; Continuation
   mov dx, 0
   jmp [bp]
 
-L13: ; Function: g4
+L13: ; Function: (lam,g4)
   push word dx
   push word cx
   push word L12
@@ -159,7 +159,7 @@ L15: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L16: ; Function: t1
+L16: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -185,7 +185,7 @@ L16: ; Function: t1
   mov dx, [Temps+6]
   jmp [bp]
 
-L17: ; Function: t1
+L17: ; Function: (explode_loop,t1)
   push word bp
   push word dx
   push word [bp+2]
@@ -206,7 +206,7 @@ L18: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L19: ; Function: g6
+L19: ; Function: (lam,g6)
   push word dx
   push word L17
   mov [Temps+2], sp
@@ -229,7 +229,7 @@ L20: ; Arm: 33'7
   mov cx, [bp+2]
   jmp [bp]
 
-L21: ; Function: g7
+L21: ; Function: (put_chars,g7)
   mov bx, dx
   cmp word [bx], 0
   jz L20

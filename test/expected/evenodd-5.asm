@@ -10,7 +10,7 @@ L2: ; Arm: 4'26
   mov cx, [bp+2]
   jmp [bp]
 
-L3: ; Function: g1
+L3: ; Function: (is_even,g1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
