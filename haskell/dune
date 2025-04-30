@@ -5,5 +5,4 @@
  (action
  (progn
   (system "stack build")
-  (system "cp .stack-work/dist/x86_64-linux-tinfo6/ghc-9.2.7/build/main.exe/main.exe main.exe")
- )))
+  (bash "cp $(find .stack-work/dist -type f -name main.exe | head -1) main.exe"))))
