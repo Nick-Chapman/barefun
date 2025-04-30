@@ -851,8 +851,10 @@ compileCode = \case
        moveTwoRegsPar (frameReg,compileRef fun) (argReg,compileRef arg) ++
       []) (Done (JumpIndirect frameReg))
 
-  SRC.LetAtomic (_,t) rhs body -> do
-    ops <- compileAtomicTo t rhs
+  SRC.LetAtomic (_,temp) rhs body -> do
+    let who = show temp -- TODO: do better than this. give the user function name
+    let target = TMem (ATempSpace temp)
+    ops <- compileAtomicTo who target rhs
     doOps ops <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
@@ -891,8 +893,9 @@ compileArmTaken :: Reg -> SRC.Arm -> Asm Code
 compileArmTaken scrutReg arm =  do
   let (SRC.ArmTag _pos _tag xs rhs) = arm
   let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg (bytesPerWord * i))
-                     , setTarget temp (SReg Ax) ]
+                     , setTarget target (SReg Ax) ]
                    | (i,(_,temp)) <- zip [1..] xs
+                   , let target = TMem (ATempSpace temp)
                    ]
   doOps ops <$> compileCode rhs
 
@@ -928,40 +931,39 @@ changeRegInSource r1 r2 = \case
   s@SMem{} -> s
   SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
 
-compileAtomicTo :: SRC.Temp -> SRC.Atomic -> Asm [Op]
-compileAtomicTo temp = \case
-  SRC.Prim b xs -> pure (compileBuiltinTo temp b (map compileRef xs))
-  SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo temp tag xs)
-  SRC.Lam pre _post _x body -> compileFunctionTo temp pre body
-  SRC.RecLam pre _post _f _x body -> compileFunctionTo temp pre body
+compileAtomicTo :: String -> Target -> SRC.Atomic -> Asm [Op]
+compileAtomicTo who target = \case
+  SRC.Prim b xs -> pure (compileBuiltinTo target b (map compileRef xs))
+  SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
+  SRC.Lam pre _post _x body -> compileFunctionTo who target pre body
+  SRC.RecLam pre _post _f _x body -> compileFunctionTo who target pre body
 
-compileConAppTo :: SRC.Temp -> Number -> [SRC.Ref] -> [Op]
-compileConAppTo temp tag xs = do
+compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
+compileConAppTo target tag xs = do
   let desc = Scanned { evenSizeInBytes = 2 * (length xs + 1) }
   map OpPush (reverse (SLit (WNum tag) : map compileRef xs)) ++
-    [ setTarget temp (SReg Sp)
+    [ setTarget target (SReg Sp)
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
 
-compileFunctionTo :: SRC.Temp -> [SRC.Ref] -> SRC.Code -> Asm [Op]
-compileFunctionTo temp freeVars body = do
-  lab <- compileCode body >>= CutCode ("Function: " ++ show temp)
+compileFunctionTo :: String -> Target -> [SRC.Ref] -> SRC.Code -> Asm [Op]
+compileFunctionTo who target freeVars body = do
+  lab <- compileCode body >>= CutCode ("Function: " ++ who)
   let desc = Scanned { evenSizeInBytes = 2 * (length freeVars + 1) }
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (WCodeLabel lab))
-    , setTarget temp (SReg Sp)
+    , setTarget target (SReg Sp)
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ])
 
--- TODO: pass down Target instead of just Temp.. and then we might get a chance to optimize
 -- if a builtin returns unit, it may omit assigning the target
 -- because nothing will inspect that target. TODO: Is this true??
-compileBuiltinTo :: SRC.Temp -> Builtin -> [Source] -> [Op]
-compileBuiltinTo temp b = case b of
+compileBuiltinTo :: Target -> Builtin -> [Source] -> [Op]
+compileBuiltinTo target b = case b of
   SRC.GetChar -> oneArg $ \_ ->
     [ OpCall Bare_get_char
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.PutChar -> oneArg $ \s1 ->
     [ OpMove Ax s1
@@ -971,29 +973,29 @@ compileBuiltinTo temp b = case b of
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.AddInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpAddInto Ax s2
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.SubInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpSubInto Ax s2
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.MulInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1 ] ++
     case s2 of
       SReg s2Reg ->
         [ OpMulIntoAx s2Reg
-        , setTarget temp (SReg Ax)
+        , setTarget target (SReg Ax)
         ]
       _ ->
         [ OpMove Bx s2
         , OpMulIntoAx Bx
-        , setTarget temp (SReg Ax)
+        , setTarget target (SReg Ax)
         ]
   SRC.DivInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
@@ -1003,7 +1005,7 @@ compileBuiltinTo temp b = case b of
     , OpDivModIntoAxDx Bx
     -- quotiant already in Ax
     , OpPopRESTORE Dx
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.ModInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
@@ -1012,40 +1014,40 @@ compileBuiltinTo temp b = case b of
     , OpMove Dx (SLit (WNum 0))
     , OpDivModIntoAxDx Bx
     -- remainder in Dx
-    , setTarget temp (SReg Dx)
+    , setTarget target (SReg Dx)
     , OpPopRESTORE Dx
     ]
   SRC.EqInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z -- TODO: maybe remove/inline?
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.LessInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_n -- TODO: maybe remove/inline?
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.CharChr -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_num_to_char -- TODO: remove/inline
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.CharOrd -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_char_to_num -- TODO: remove/inline
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.MakeRef -> oneArg $ \s1 ->
     let desc = Scanned { evenSizeInBytes = 2 } in
     [ OpPush s1
-    , setTarget temp (SReg Sp)
+    , setTarget target (SReg Sp)
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
   SRC.DeRef -> oneArg $ \s1 ->
     [ OpMove Bx s1
-    , setTarget temp (SMemIndirectOffset Bx 0)
+    , setTarget target (SMemIndirectOffset Bx 0)
     ]
   SRC.SetRef -> twoArgs $ \s1 s2 ->
     [ OpMove Bx s1
@@ -1055,7 +1057,7 @@ compileBuiltinTo temp b = case b of
   SRC.MakeBytes -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_make_bytes
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
@@ -1067,27 +1069,27 @@ compileBuiltinTo temp b = case b of
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_get_bytes -- TODO: remove/inline
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.StringIndex -> twoArgs $ \s1 s2 ->
     -- same as SRC.GetBytes; bytes/string have the same rep. -- TODO: share common code
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_get_bytes -- TODO: remove/inline
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.FreezeBytes -> oneArg $ \s1 ->
     -- null-imp; bytes/string have the same representation
-    [ setTarget temp s1
+    [ setTarget target s1
     ]
   SRC.ThawBytes -> oneArg $ \s1 ->
     -- null-imp; bytes/string have the same representation
-    [ setTarget temp s1
+    [ setTarget target s1
     ]
   SRC.StringLength -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_string_length -- TODO: remove/inline
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
   SRC.Crash -> oneArg $ \_ ->
     [ OpCall Bare_crash
@@ -1105,7 +1107,7 @@ compileBuiltinTo temp b = case b of
   SRC.GetStackPointer -> oneArg $ \_ ->
     [ OpMove Ax (SReg Sp)
     , OpCall Bare_addr_to_num
-    , setTarget temp (SReg Ax)
+    , setTarget target (SReg Ax)
     ]
 
   where
@@ -1114,13 +1116,15 @@ compileBuiltinTo temp b = case b of
     twoArgs f = \case [v1,v2] -> f v1 v2; _ -> err
     threeArgs f = \case [v1,v2,v3] -> f v1 v2 v3; _ -> err
 
-setTarget :: SRC.Temp -> Source -> Op
-setTarget temp = \case
-  SReg sourceReg -> OpStore (TMem (ATempSpace temp)) sourceReg
-  source ->
-    OpMany  [ OpMove Ax source
-            , OpStore (TMem (ATempSpace temp)) Ax
-            ]
+setTarget :: Target -> Source -> Op
+setTarget = \case
+  TReg{} -> undefined -- TODO: here we can optimize!
+  TMem addr -> \case
+    SReg sourceReg -> OpStore (TMem addr) sourceReg
+    source ->
+      OpMany  [ OpMove Ax source
+              , OpStore (TMem addr) Ax
+              ]
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
