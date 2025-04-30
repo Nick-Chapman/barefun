@@ -1,4 +1,4 @@
 
   $ ../../haskell/main.exe -measure ../examples/put_int.fun
   [Stage5 (ASM); post normalization size: 46]
-  42[HALT:#op=164, #alloc=62]
+  42[HALT:#op=178, #alloc=62]

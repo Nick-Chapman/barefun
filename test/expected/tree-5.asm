@@ -8,7 +8,10 @@ L2: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -24,7 +27,11 @@ L3: ; Function: t1
   jz L1
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -158,7 +165,7 @@ L13: ; Arm: 24'15
 L14: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
-  mul word dx
+  mul dx
   mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx

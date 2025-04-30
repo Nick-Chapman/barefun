@@ -210,7 +210,11 @@ L17: ; Arm: 44'19
 L18: ; Function: t4
   mov ax, dx
   mov bx, 64
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, [Temps+2]
   cmp word ax, 0
@@ -351,7 +355,11 @@ L27: ; Arm: 44'19
 L28: ; Function: t4
   mov ax, dx
   mov bx, 64
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, [Temps+2]
   cmp word ax, 0

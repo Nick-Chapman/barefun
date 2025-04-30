@@ -26,6 +26,9 @@ import qualified Value as I (Tickable(Op,Alloc))
 bytesPerWord :: Int
 bytesPerWord = 2
 
+twoE16 :: Int
+twoE16 = 65536
+
 type Transformed = Image
 
 data Image = Image
@@ -50,11 +53,14 @@ data Op -- target; source
   | OpStoreR Reg Source
   | OpCall BareBios
   | OpPush Source
+  | OpPushSAVE Source
+  | OpPopRESTORE Reg
   | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
   | OpBranchFlagZ CodeLabel
   | OpAddInto Reg Source
   | OpSubInto Reg Source
   | OpMulIntoAx Reg  -- ax := ax * sourceReg
+  | OpDivModIntoAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
 
 data Jump
   = JumpDirect CodeLabel
@@ -122,8 +128,6 @@ data BareBios
   | Bare_num_to_char
   | Bare_char_to_num
   | Bare_addr_to_num
-  | Bare_div
-  | Bare_mod
 
   | Bare_string_length
   | Bare_make_bytes
@@ -168,11 +172,14 @@ instance Show Op where
     OpStoreR t src -> "mov word [" ++ show t ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push word " ++ show src
+    OpPushSAVE src -> "push word " ++ show src ++ " ;; save"
+    OpPopRESTORE src -> "pop word " ++ show src ++ " ;; restore"
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "jz " ++ show lab
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
-    OpMulIntoAx src -> "mul word " ++ show src
+    OpMulIntoAx src -> "mul " ++ show src
+    OpDivModIntoAxDx src -> "div " ++ show src
 
 instance Show Jump where
   show = \case
@@ -269,7 +276,14 @@ execOp = \case
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
-    execPushWord w
+    execPushAlloc w
+    cont
+  OpPushSAVE s -> \cont -> do
+    w <- evalSource s
+    execPushSAVE w
+    cont
+  OpPopRESTORE reg -> \cont -> do
+    execPopRESTORE reg
     cont
   OpCmp s1 s2 -> \cont -> do
     w1 <- evalSource s1
@@ -285,16 +299,37 @@ execOp = \case
   OpAddInto r s -> execBinaryOpInto (+) r s
   OpSubInto r s -> execBinaryOpInto (-) r s
   OpMulIntoAx s -> execBinaryOpInto (*) Ax (SReg s)
+  OpDivModIntoAxDx divisorReg -> \cont -> do
+    ax <- (fromIntegral . deNum) <$> GetReg Ax
+    dx <- (fromIntegral . deNum) <$> GetReg Dx
+    let dividend = (dx * twoE16 + ax)
+    divisor <- (fromIntegral . deNum) <$> GetReg divisorReg
+    SetReg Ax (WNum (fromIntegral (dividend `div` divisor)))
+    SetReg Dx (WNum (fromIntegral (dividend `mod` divisor)))
+    cont
 
-execPushWord :: Word -> M () -- we can't push individual bytes
-execPushWord w = do
-  -- but we are counting in bytes.
+execPushAlloc :: Word -> M ()
+execPushAlloc w = do
   a <- deAddr <$> GetReg Sp
   sequence_ (replicate bytesPerWord TraceAlloc)
   let a' = addAddr (-(bytesPerWord)) a
   SetMem a' w
   SetReg Sp (WAddr a')
   checkPushBlockDescriptor w
+
+execPushSAVE :: Word -> M ()
+execPushSAVE w = do -- pre decrement
+  a <- deAddr <$> GetReg Sp
+  let a' = addAddr (-(bytesPerWord)) a
+  SetReg Sp (WAddr a')
+  SetMem a' w
+
+execPopRESTORE :: Reg -> M ()
+execPopRESTORE reg = do -- post increment
+  a <- deAddr <$> GetReg Sp
+  GetMem a >>= SetReg reg
+  let a' = addAddr (bytesPerWord) a
+  SetReg Sp (WAddr a')
 
 checkPushBlockDescriptor :: Word -> M ()
 checkPushBlockDescriptor = \case
@@ -303,7 +338,6 @@ checkPushBlockDescriptor = \case
     where sizeOfBD = \case Scanned n -> n; RawData n -> n
   _ ->
     pure ()
-
 
 slideStackPointer :: Int -> M ()
 slideStackPointer nBytes = do
@@ -365,25 +399,15 @@ execBare = \case
     a <- deAddr <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ deheapAddr a))
 
-  Bare_div -> do
-    w1 <- GetReg Ax
-    w2 <- GetReg Bx
-    SetReg Ax (binaryW div w1 w2)
-
-  Bare_mod -> do
-    w1 <- GetReg Ax
-    w2 <- GetReg Bx
-    SetReg Ax (binaryW mod w1 w2)
-
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
     let numBytes = align (fromIntegral n) where align n = 2 * ((n+1) `div` 2)
     slideStackPointer numBytes
-    execPushWord (WNum n) -- length word; part of user data
+    execPushAlloc (WNum n) -- length word; part of user data
     w <- GetReg Sp
     SetReg Ax w
     let desc = RawData { evenSizeInBytes = fromIntegral numBytes + 2 } -- 2 for the length word
-    execPushWord (WBlockDescriptor desc) -- size word; part of GC data
+    execPushAlloc (WBlockDescriptor desc) -- size word; part of GC data
 
   -- TODO: no need for Bare given better string rep; just generate ops
   -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
@@ -401,7 +425,6 @@ execBare = \case
     let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
     c <- GetMem a'
     SetReg Ax c
-
 
   Bare_string_length -> do
     a <- deAddr <$> GetReg Ax
@@ -474,9 +497,6 @@ addAddr i = \case
 
 addHeapAddr :: Int -> HeapAddr -> HeapAddr
 addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
-
-twoE16 :: Int
-twoE16 = 65536
 
 mkHeapAddr :: Int -> HeapAddr
 mkHeapAddr n =
@@ -965,12 +985,21 @@ compileBuiltinToAx b = case b of
   SRC.DivInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpCall Bare_div
+    , OpPushSAVE (SReg Dx)
+    , OpMove Dx (SLit (WNum 0))
+    , OpDivModIntoAxDx Bx
+    -- quotiant already in Ax
+    , OpPopRESTORE Dx
     ]
   SRC.ModInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpCall Bare_mod
+    , OpPushSAVE (SReg Dx)
+    , OpMove Dx (SLit (WNum 0))
+    , OpDivModIntoAxDx Bx
+    -- remainder in Dx
+    , OpMove Ax (SReg Dx)
+    , OpPopRESTORE Dx
     ]
   SRC.EqInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1

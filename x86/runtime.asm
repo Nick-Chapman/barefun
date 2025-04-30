@@ -276,22 +276,6 @@ Bare_addr_to_num: ;; called when we see where the Sp is
     shr ax, 1
     ret
 
-Bare_div:
-    push dx
-    mov dx, 0
-    div bx
-    pop dx
-    ret
-
-Bare_mod: ;; TODO: It would be nice to expose a combined div/mod builtin to user
-    push dx
-    mov dx, 0
-    div bx ; dx:ax / bx. quotiant->ax, remainder->dx
-    mov ax, dx
-    pop dx
-    ret
-
-
 Bare_string_length:
     mov bx, ax
     mov ax, [bx]

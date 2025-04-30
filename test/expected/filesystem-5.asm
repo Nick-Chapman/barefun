@@ -375,7 +375,10 @@ L31: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -391,7 +394,11 @@ L32: ; Function: t1
   jz L30
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -433,7 +440,10 @@ L35: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -449,7 +459,11 @@ L36: ; Function: t1
   jz L34
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -491,7 +505,10 @@ L39: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -507,7 +524,11 @@ L40: ; Function: t1
   jz L38
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -549,7 +570,10 @@ L43: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -565,7 +589,11 @@ L44: ; Function: t1
   jz L42
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -607,7 +635,10 @@ L47: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -623,7 +654,11 @@ L48: ; Function: t1
   jz L46
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -665,7 +700,10 @@ L51: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -681,7 +719,11 @@ L52: ; Function: t1
   jz L50
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -723,7 +765,10 @@ L55: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -739,7 +784,11 @@ L56: ; Function: t1
   jz L54
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -781,7 +830,10 @@ L59: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -797,7 +849,11 @@ L60: ; Function: t1
   jz L58
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -839,7 +895,10 @@ L63: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -855,7 +914,11 @@ L64: ; Function: t1
   jz L62
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -897,7 +960,10 @@ L67: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -913,7 +979,11 @@ L68: ; Function: t1
   jz L66
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1002,7 +1072,10 @@ L75: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1018,7 +1091,11 @@ L76: ; Function: t1
   jz L74
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1060,7 +1137,10 @@ L79: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1076,7 +1156,11 @@ L80: ; Function: t1
   jz L78
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1118,7 +1202,10 @@ L83: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1134,7 +1221,11 @@ L84: ; Function: t1
   jz L82
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1176,7 +1267,10 @@ L87: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1192,7 +1286,11 @@ L88: ; Function: t1
   jz L86
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1234,7 +1332,10 @@ L91: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1250,7 +1351,11 @@ L92: ; Function: t1
   jz L90
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1292,7 +1397,10 @@ L95: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1308,7 +1416,11 @@ L96: ; Function: t1
   jz L94
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1350,7 +1462,10 @@ L99: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1366,7 +1481,11 @@ L100: ; Function: t1
   jz L98
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1408,7 +1527,10 @@ L103: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1424,7 +1546,11 @@ L104: ; Function: t1
   jz L102
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1466,7 +1592,10 @@ L107: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1482,7 +1611,11 @@ L108: ; Function: t1
   jz L106
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1524,7 +1657,10 @@ L111: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1540,7 +1676,11 @@ L112: ; Function: t1
   jz L110
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1582,7 +1722,10 @@ L115: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1598,7 +1741,11 @@ L116: ; Function: t1
   jz L114
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1640,7 +1787,10 @@ L119: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1656,7 +1806,11 @@ L120: ; Function: t1
   jz L118
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1698,7 +1852,10 @@ L123: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1714,7 +1871,11 @@ L124: ; Function: t1
   jz L122
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1756,7 +1917,10 @@ L127: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1772,7 +1936,11 @@ L128: ; Function: t1
   jz L126
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1814,7 +1982,10 @@ L131: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1830,7 +2001,11 @@ L132: ; Function: t1
   jz L130
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1872,7 +2047,10 @@ L135: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1888,7 +2066,11 @@ L136: ; Function: t1
   jz L134
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1930,7 +2112,10 @@ L139: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -1946,7 +2131,11 @@ L140: ; Function: t1
   jz L138
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -1988,7 +2177,10 @@ L143: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -2004,7 +2196,11 @@ L144: ; Function: t1
   jz L142
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -2046,7 +2242,10 @@ L147: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 10
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov bp, dx
   mov dx, [Temps+2]
@@ -2062,7 +2261,11 @@ L148: ; Function: t1
   jz L146
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -3213,7 +3416,7 @@ L235: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  mul word bx
+  mul bx
   mov [Temps+2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -4229,7 +4432,7 @@ L307: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  mul word bx
+  mul bx
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx
@@ -5689,11 +5892,15 @@ L393: ; Continuation
   call Bare_enter_check
   mov ax, [bp+10]
   mov bx, 8
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
-  mul word bx
+  mul bx
   mov [Temps+4], ax
   push word [Temps+4]
   push word [bp+14]
@@ -6312,7 +6519,10 @@ L429: ; Continuation
   jz L187
   mov ax, [bp+10]
   mov bx, 8
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, [bp+10]
   cmp word ax, 0
@@ -6429,7 +6639,11 @@ L435: ; Function: t6
   jz L154
   mov ax, dx
   mov bx, 10
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+4], ax
   mov ax, 48
   add ax, [Temps+4]
@@ -7467,7 +7681,7 @@ L513: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  mul word bx
+  mul bx
   mov [Temps+2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -8483,7 +8697,7 @@ L585: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  mul word bx
+  mul bx
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx
@@ -9943,11 +10157,15 @@ L671: ; Continuation
   call Bare_enter_check
   mov ax, [bp+10]
   mov bx, 8
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
-  mul word bx
+  mul bx
   mov [Temps+4], ax
   push word [Temps+4]
   push word [bp+14]
@@ -10566,7 +10784,10 @@ L707: ; Continuation
   jz L465
   mov ax, [bp+10]
   mov bx, 8
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, [bp+10]
   cmp word ax, 0
@@ -11478,11 +11699,15 @@ L771: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 8
-  call Bare_mod
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  mov ax, dx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, 64
   mov bx, [Temps+2]
-  mul word bx
+  mul bx
   mov [Temps+4], ax
   push word [Temps+4]
   push word cx
@@ -11950,7 +12175,7 @@ L807: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  mul word bx
+  mul bx
   mov [Temps+2], ax
   mov ax, 512
   call Bare_make_bytes
@@ -12962,7 +13187,7 @@ L879: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   mov bx, 512
-  mul word bx
+  mul bx
   mov [Temps+2], ax
   push word [Temps+2]
   push word dx
@@ -13767,7 +13992,10 @@ L929: ; Continuation
   call Bare_enter_check
   mov ax, [bp+10]
   mov bx, 8
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, [Temps+2]
   cmp word ax, 0
@@ -14335,7 +14563,10 @@ L965: ; Continuation
   jz L764
   mov ax, [bp+10]
   mov bx, 8
-  call Bare_div
+  push word dx ;; save
+  mov dx, 0
+  div bx
+  pop word dx ;; restore
   mov [Temps+2], ax
   mov ax, [bp+10]
   cmp word ax, 0

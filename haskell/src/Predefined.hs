@@ -15,6 +15,7 @@ wrapPreDefs (Prog defs) =
     bindings :: [(String,Exp)]
     bindings =
       [ ("+"            , prim2 AddInt)
+      -- TODO: It would be nice to expose a combined div/mod builtin
       , ("%"            , prim2 ModInt)
       , ("*"            , prim2 MulInt)
       , ("-"            , prim2 SubInt)
