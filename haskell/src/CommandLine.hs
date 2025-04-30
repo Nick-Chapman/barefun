@@ -6,7 +6,7 @@ import System.Environment (getArgs)
 import Text.Printf (printf)
 import Value (runInteraction)
 import qualified Stage0_AST as Stage0 (execute)
-import qualified Stage1_EXP as Stage1 (compile,execute,sizeExp)
+import qualified Stage1_EXP as Stage1 (compile,execute,sizeExp,pp,PPControl(..),PPPosFlag(..),PPUniqueFlag(..))
 import qualified Stage2_NBE as Stage2 (compile,execute)
 import qualified Stage3_ANF as Stage3 (compile,execute)
 import qualified Stage4_CCF as Stage4 (compile,execute)
@@ -15,7 +15,8 @@ import qualified Stage5_ASM as Stage5 (compile,execute,TraceFlag(..),DebugFlag(.
 main :: IO ()
 main = do
   config <- parseCommandLine <$> getArgs
-  let Config {paths,mode,stage,trace,debug,measure} = config
+  let Config {paths,mode,stage,trace,debug,measure,ppp,ppu} = config
+  let ppc = Stage1.PPControl {ppp,ppu}
   let path = case paths of [] -> error "no .fun"; [x] -> x; _ -> error "too much .fun"
   s <- readFile path
 
@@ -46,8 +47,8 @@ main = do
 
   case (stage,mode) of
     (Stage0,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e0)
-    (Stage1,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e1)
-    (Stage2,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e2)
+    (Stage1,Compile) -> do printf "(*%s*)\n" tag; putStrLn (Stage1.pp ppc e1)
+    (Stage2,Compile) -> do printf "(*%s*)\n" tag; putStrLn (Stage1.pp ppc e2)
     (Stage3,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e3)
     (Stage4,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e4)
     (Stage5,Compile) -> do putStrLn (show e5)
@@ -66,6 +67,8 @@ data Config = Config
   , trace :: Stage5.TraceFlag
   , debug :: Stage5.DebugFlag
   , measure :: Bool
+  , ppp :: Stage1.PPPosFlag
+  , ppu :: Stage1.PPUniqueFlag
   }
 
 data Mode = Compile | Eval
@@ -87,6 +90,8 @@ parseCommandLine = loop config0
                      , trace = Stage5.TraceOff
                      , debug = Stage5.DebugOff
                      , measure = False
+                     , ppp = Stage1.PPPosOff
+                     , ppu = Stage1.PPUniqueOff
                      }
 
     loop :: Config -> [String] -> Config
@@ -103,5 +108,7 @@ parseCommandLine = loop config0
       "-trace":xs       -> loop config { trace = Stage5.TraceOn } xs
       "-debug":xs       -> loop config { debug = Stage5.DebugOn } xs
       "-measure":xs     -> loop config { measure = True } xs
+      "-ppp":xs         -> loop config { ppp = Stage1.PPPosOn } xs
+      "-ppu":xs         -> loop config { ppu = Stage1.PPUniqueOn } xs
       ('-':flag):_      -> error (show ("unknown flag",flag))
       x:xs              -> loop config { paths = paths config ++ [x] } xs

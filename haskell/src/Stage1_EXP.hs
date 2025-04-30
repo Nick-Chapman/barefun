@@ -3,6 +3,7 @@ module Stage1_EXP
   ( Exp(..),Arm(..),Ctag(..),Id(..), Name(..), provenanceExp, sizeExp
   , execute
   , compile
+  , PPControl(..),PPPosFlag(..), PPUniqueFlag(..), pp
   ) where
 
 import Builtin (Builtin,executeBuiltin)
@@ -76,51 +77,63 @@ provenanceExp = \case
 ----------------------------------------------------------------------
 -- Show
 
-instance Show Id where show = prettyId
-instance Show Exp where show = intercalate "\n" . pretty
+data PPUniqueFlag = PPUniqueOn | PPUniqueOff
+data PPPosFlag = PPPosOn | PPPosOff
+
+data PPControl = PPControl { ppp :: PPPosFlag, ppu :: PPUniqueFlag }
+
+instance Show Id where show = prettyId0 PPControl { ppp = PPPosOff, ppu = PPUniqueOff }
 
 instance Show Name where
   show = \case
     UserName s -> show s
     GeneratedName s -> s
 
-pretty :: Exp -> Lines
-pretty = \case
-  Var _ x -> [show x]
-  Lit _ x -> [show x]
-  ConTag _ tag [] -> [show tag]
-  ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
-  Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
-  Lam _ x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
-  RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
-  App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
-  Let _ x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
-  Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
+pp :: PPControl -> Exp -> String
+pp control = intercalate "\n" . prettyTop control
 
-prettyArm :: Arm -> Lines
-prettyArm (ArmTag _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
+prettyTop :: PPControl -> Exp -> Lines
+prettyTop control = pretty
+  where
+    prettyId = prettyId0 control
 
-prettyPat :: Ctag -> [Id] -> String
-prettyPat c = \case
-  [] -> show c
-  xs -> printf "%s(%s)" (show c) (intercalate "," (map show xs))
+    pretty :: Exp -> Lines
+    pretty = \case
+      Var _ x -> [prettyId x]
+      Lit _ x -> [show x]
+      ConTag _ tag [] -> [show tag]
+      ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
+      Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (xs >>= pretty))]
+      Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
+      RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
+      App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
+      Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
+      Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
-prettyId :: Id -> String
-prettyId Id{name,optUnique,pos} =
+    prettyArm :: Arm -> Lines
+    prettyArm (ArmTag _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
+
+    prettyPat :: Ctag -> [Id] -> String
+    prettyPat c = \case
+      [] -> show c
+      xs -> printf "%s(%s)" (show c) (intercalate "," (map prettyId xs))
+
+prettyId0 :: PPControl -> Id -> String
+prettyId0 control Id{name,optUnique,pos} =
   maybePos (maybeTag (maybeBracket (show name)))
   where
-    verbose = False
     maybePos s =
-      case name of
-        UserName{} -> if not verbose then s else printf "%s_%s" s (show pos)
-        GeneratedName{} -> if not verbose then s else printf "%s_%s" s (show pos)
+      case ppp control of
+        PPPosOn -> printf "%s_%s" s (show pos)
+        PPPosOff -> s
 
     maybeTag s =
       case optUnique of
         Nothing -> s
         Just n ->
-          if not verbose then s else
-            printf "%s_%d" s n
+          case ppu control of
+            PPUniqueOn -> printf "%s_%d" s n
+            PPUniqueOff -> s
 
     maybeBracket s = if needBracket s then printf "( %s )" s else s
     needBracket = \case "*" -> True; _ -> False
