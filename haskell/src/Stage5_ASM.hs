@@ -48,9 +48,9 @@ data Code
 
 data Op -- target; source
   = OpComment String
+  | OpMany [Op]
   | OpMove Reg Source
-  | OpStore Addr Source
-  | OpStoreR Reg Source
+  | OpStore Target Reg
   | OpCall BareBios
   | OpPush Source
   | OpPushSAVE Source
@@ -67,6 +67,10 @@ data Jump
   | JumpReg Reg
   | JumpIndirect Reg
   | Crash
+
+data Target
+  = TReg Reg
+  | TMem Addr
 
 data Source
   = SReg Reg
@@ -167,9 +171,9 @@ instance Show Code where
 instance Show Op where
   show = \case
     OpComment message ->  ";; " ++ message
+    OpMany ops -> intercalate "\n  " (map show ops)
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
-    OpStore a src -> "mov [" ++ show a ++ "], " ++ show src
-    OpStoreR t src -> "mov word [" ++ show t ++ "], " ++ show src
+    OpStore target src -> "mov [" ++ show target ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push word " ++ show src
     OpPushSAVE src -> "push word " ++ show src ++ " ;; save"
@@ -195,6 +199,11 @@ instance Show Source where
     SMem a -> "["++show a++"]"
     SMemIndirect r -> "["++show r++"]"
     SMemIndirectOffset r n -> "["++show r++"+"++show n++"]"
+
+instance Show Target where
+  show = \case
+    TReg r -> show r
+    TMem a -> show a
 
 instance Show Word where
   show = \case
@@ -266,13 +275,10 @@ execCode = \case
 execOp :: Op -> M () -> M ()
 execOp = \case
   OpComment{} -> error "execOp/OpComment"
+  OpMany [] -> \cont -> cont
+  OpMany (x:xs) -> \cont -> do execOp x (execOp (OpMany xs) cont)
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
-  OpStore a s -> \cont -> do w <- evalSource s; SetMem a w; cont
-  OpStoreR t s -> \cont -> do
-    a <- deAddr <$> GetReg t
-    w <- evalSource s
-    SetMem a w
-    cont
+  OpStore t s -> \cont -> do w <- GetReg s; a <- evalTarget t; SetMem a w; cont
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
@@ -364,6 +370,11 @@ evalSource = \case
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
     GetMem (addAddr i a)
+
+evalTarget :: Target -> M Addr
+evalTarget = \case
+  TMem a -> pure a
+  TReg r -> deAddr <$> GetReg r
 
 execBare :: BareBios -> M ()
 execBare = \case
@@ -883,7 +894,7 @@ compileArmTaken :: Reg -> SRC.Arm -> Asm Code
 compileArmTaken scrutReg arm =  do
   let (SRC.ArmTag _pos _tag xs rhs) = arm
   let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg (bytesPerWord * i))
-                     , setTemp temp (SReg Ax) ]
+                     , setTemp temp Ax ]
                    | (i,(_,temp)) <- zip [1..] xs
                    ]
   doOps ops <$> compileCode rhs
@@ -934,7 +945,7 @@ compileConAppTo :: SRC.Temp -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo temp tag xs = do
   let desc = Scanned { evenSizeInBytes = 2 * (length xs + 1) }
   map OpPush (reverse (SLit (WNum tag) : map compileRef xs)) ++
-    [ setTemp temp (SReg Sp)
+    [ setTemp temp Sp
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
 
@@ -945,14 +956,14 @@ compileFunctionTo temp freeVars body = do
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (WCodeLabel lab))
-    , setTemp temp (SReg Sp)
+    , setTemp temp Sp
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ])
 
 compileBuiltinTo :: SRC.Temp -> Builtin -> [Source] -> [Op]
 compileBuiltinTo temp b args =
   compileBuiltinToAx b args ++
-  [setTemp temp (SReg Ax)]
+  [ setTemp temp Ax ]
 
 -- TODO: target reg/temp should be passed down
 compileBuiltinToAx :: Builtin -> [Source] -> [Op] -- --> Ax
@@ -1035,7 +1046,7 @@ compileBuiltinToAx b = case b of
   SRC.SetRef -> twoArgs $ \s1 s2 ->
     [ OpMove Bx s1
     , OpMove Ax s2
-    , OpStoreR Bx (SReg Ax)
+    , OpStore (TReg Bx) Ax
     ]
 
   SRC.MakeBytes -> oneArg $ \s1 ->
@@ -1094,9 +1105,8 @@ compileBuiltinToAx b = case b of
     twoArgs f = \case [v1,v2] -> f v1 v2; _ -> err
     threeArgs f = \case [v1,v2,v3] -> f v1 v2 v3; _ -> err
 
-
-setTemp :: SRC.Temp -> Source -> Op
-setTemp temp source = OpStore (ATempSpace temp) source
+setTemp :: SRC.Temp -> Reg -> Op
+setTemp temp src = OpStore (TMem (ATempSpace temp)) src
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case

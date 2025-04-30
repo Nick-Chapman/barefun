@@ -2875,7 +2875,7 @@ L195: ; Continuation
   call Bare_enter_check
   mov bx, [bp+4]
   mov ax, g76
-  mov word [bx], ax
+  mov [bx], ax
   mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
@@ -2987,7 +2987,7 @@ L202: ; Continuation
   push word 8 ;; scanned
   mov bx, [bp+6]
   mov ax, [Temps+4]
-  mov word [bx], ax
+  mov [bx], ax
   mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
@@ -7518,7 +7518,7 @@ L500: ; Continuation
   call Bare_enter_check
   mov bx, [bp+4]
   mov ax, g193
-  mov word [bx], ax
+  mov [bx], ax
   mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
@@ -7630,7 +7630,7 @@ L507: ; Continuation
   push word 8 ;; scanned
   mov bx, [bp+6]
   mov ax, [Temps+4]
-  mov word [bx], ax
+  mov [bx], ax
   mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
@@ -12582,7 +12582,7 @@ L833: ; Continuation
   push word 8 ;; scanned
   mov bx, [bp+6]
   mov ax, [Temps+4]
-  mov word [bx], ax
+  mov [bx], ax
   mov [Temps+6], ax
   mov dx, dx
   mov bp, cx
