@@ -66,7 +66,6 @@ data Jump
   = JumpDirect CodeLabel
   | JumpReg Reg
   | JumpIndirect Reg
-  | Crash
 
 data Target
   = TReg Reg
@@ -121,7 +120,7 @@ data DataLabel = DataLabel SRC.Global
 -- BareBios; primitive routines available to the compiled code
 data BareBios
   -- Base_clear_screen -- TODO: expose to user code
-  = Bare_halt -- TODO: not in runtime.asm -- so should not be a Bare call?
+  = Bare_halt
   | Bare_crash
   | Bare_enter_check
   | Bare_put_char
@@ -189,7 +188,6 @@ instance Show Jump where
     JumpDirect c -> "jmp "  ++ show c
     JumpReg r -> "jmp "  ++ show r
     JumpIndirect r -> "jmp ["  ++ show r ++ "]"
-    Crash -> "crash"
 
 instance Show Source where
   show = \case
@@ -377,7 +375,7 @@ evalTarget = \case
 execBare :: BareBios -> M ()
 execBare = \case
   Bare_halt -> Halt
-  Bare_crash -> error "Bare_crash"
+  Bare_crash -> Crash
 
   Bare_enter_check -> do
     x <- deAddr <$> GetReg Sp
@@ -460,8 +458,6 @@ execJump = \case
     let lab = deCodeLabel w
     code <- GetCode lab
     execCode code
-  Crash -> do
-    error "Crash"
 
 binaryW :: (Number -> Number -> Number) -> Word -> Word -> Word
 binaryW f w1 w2 =
@@ -530,6 +526,7 @@ data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
   Halt :: M ()
+  Crash :: M ()
   CheckRecentAlloc :: Int -> M ()
   Debug :: String -> M ()
   TraceOp :: Op -> M ()
@@ -558,7 +555,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
     k0 _s () = IDone
 
     cmap = Map.insert finalCodeLabel finalCode cmapUser
-    finalCode = Do (OpCall Bare_halt) (Done Crash)
+    finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
 
     trace :: String -> Interaction -> Interaction
     trace = case traceFlag of
@@ -587,6 +584,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       Halt -> IDone
+      Crash -> ITrace "[Crash]\n" $ IDone
 
       CheckRecentAlloc expect -> do
         let State{allocsSinceLastCheck=actual} = s

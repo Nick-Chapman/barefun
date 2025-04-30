@@ -101,7 +101,7 @@ let replicate : 'a -> int -> 'a list = fun x ->
   in
   loop []
 
-(*let rec crash () = crash ()*)
+
 let error m = put_string ("error: " ^ m ^ "\n"); crash()
 
 let trace0 m = if trace0_on then put_string ("trace: " ^ m ^ "\n") else ()

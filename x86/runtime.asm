@@ -75,7 +75,7 @@
 
 %macro Crash 1
     Print %1
-    jmp halt
+    jmp final_code
 %endmacro
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -153,7 +153,6 @@ internal_print_string: ; in: DI=string; print null-terminated string.
     pop ax
     ret
 
-
 halt:
     call Bare_get_char ;; avoid really spinning the fans
     jmp halt
@@ -168,9 +167,8 @@ Bare_clear_screen: ;; -- TODO expose this as user builtin
     ret
 
 Bare_crash:
-    Print '[Crash]'
-.spin:
-    jmp .spin
+    Print `[Crash]\n`
+    jmp final_code
 
 Bare_enter_check:
     ;; how much space is left before we crash into the code?
