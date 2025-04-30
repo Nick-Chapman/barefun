@@ -38,14 +38,23 @@ let g4 = fun arg k ->
         let t1 = PRIM_SubInt(f2,arg) in
         k t1 in
       g4 f2 k in
+    g4 t1 k
+  | Mul3(t1,t2) ->
+    let k = [t2], fun [f2] arg ->
+      let k = [arg], fun [f2] arg ->
+        let t1 = PRIM_MulInt(f2,arg) in
+        k t1 in
+      g4 f2 k in
     g4 t1 k in
 let g5 = Nil0 in
 let g6 = Nil0 in
 let t1 = Num0[1000] in
-let t2 = Num0[42] in
+let t2 = Num0[10] in
 let t3 = Num0[3] in
 let t4 = Add1[t2,t3] in
-let t5 = Sub2[t1,t4] in
+let t5 = Num0[17] in
+let t6 = Mul3[t4,t5] in
+let t7 = Sub2[t1,t6] in
 let k = [], fun [] arg ->
   let t1 = PRIM_EqInt(arg,0) in
   let k = [], fun [] arg -> g2 arg k in
@@ -56,4 +65,4 @@ let k = [], fun [] arg ->
   | false0 ->
     let k = [arg], fun [f2] arg -> arg f2 k in
     g1 g6 k in
-g4 t5 k
+g4 t7 k

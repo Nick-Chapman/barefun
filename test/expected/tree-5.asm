@@ -141,12 +141,7 @@ L12: ; Continuation
   mov bp, g4
   jmp [bp]
 
-L13: ; Function: g4
-  mov bx, dx
-  cmp word [bx], 0
-  jz L7
-  cmp word [bx], 1
-  jz L10
+L13: ; Arm: 24'15
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -162,11 +157,54 @@ L13: ; Function: g4
 
 L14: ; Continuation
   call Bare_enter_check
+  mov ax, [bp+4]
+  mov bx, dx
+  call Bare_mul
+  mov [Temps+2], ax
+  mov dx, [Temps+2]
+  mov bp, cx
+  mov cx, [bp+2]
+  jmp [bp]
+
+L15: ; Continuation
+  call Bare_enter_check
+  push word dx
+  push word cx
+  push word L14
+  mov cx, sp
+  push word 6 ;; scanned
+  mov dx, [bp+4]
+  mov bp, g4
+  jmp [bp]
+
+L16: ; Function: g4
+  mov bx, dx
+  cmp word [bx], 0
+  jz L7
+  cmp word [bx], 1
+  jz L10
+  cmp word [bx], 2
+  jz L13
+  mov ax, [bx+2]
+  mov [Temps+2], ax
+  mov ax, [bx+4]
+  mov [Temps+4], ax
+  push word [Temps+4]
+  push word cx
+  push word L15
+  mov cx, sp
+  push word 6 ;; scanned
+  mov bp, g4
+  mov dx, [Temps+2]
+  jmp [bp]
+
+L17: ; Continuation
+  call Bare_enter_check
   mov bp, g2
   mov dx, dx
   jmp [bp]
 
-L15: ; Arm: 9'20
+L18: ; Arm: 9'20
   push word g5
   push word `0`
   push word 1
@@ -177,41 +215,41 @@ L15: ; Arm: 9'20
   mov cx, [bp+2]
   jmp [bp]
 
-L16: ; Continuation
+L19: ; Continuation
   call Bare_enter_check
   mov di, bp
   mov bp, dx
   mov dx, [di+4]
   jmp [bp]
 
-L17: ; Continuation
+L20: ; Continuation
   call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
   mov [Temps+2], ax
   push word cx
-  push word L14
+  push word L17
   mov cx, sp
   push word 4 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 1
-  jz L15
+  jz L18
   push word dx
   push word cx
-  push word L16
+  push word L19
   mov cx, sp
   push word 6 ;; scanned
   mov bp, g1
   mov dx, g6
   jmp [bp]
 
-L18: ; Start
+L21: ; Start
   push word 1000
   push word 0
   mov [Temps+2], sp
   push word 4 ;; scanned
-  push word 42
+  push word 10
   push word 0
   mov [Temps+4], sp
   push word 4 ;; scanned
@@ -224,17 +262,26 @@ L18: ; Start
   push word 1
   mov [Temps+8], sp
   push word 6 ;; scanned
+  push word 17
+  push word 0
+  mov [Temps+10], sp
+  push word 4 ;; scanned
+  push word [Temps+10]
   push word [Temps+8]
+  push word 3
+  mov [Temps+12], sp
+  push word 6 ;; scanned
+  push word [Temps+12]
   push word [Temps+2]
   push word 2
-  mov [Temps+10], sp
+  mov [Temps+14], sp
   push word 6 ;; scanned
   push word cx
-  push word L17
+  push word L20
   mov cx, sp
   push word 4 ;; scanned
   mov bp, g4
-  mov dx, [Temps+10]
+  mov dx, [Temps+14]
   jmp [bp]
 
 g1:
@@ -244,10 +291,10 @@ g2:
 g3:
   dw 0
 g4:
-  dw L13
+  dw L16
 g5:
   dw 0
 g6:
   dw 0
 
-bare_start: jmp L18
+bare_start: jmp L21
