@@ -961,6 +961,8 @@ compileFunctionTo temp freeVars body = do
     ])
 
 -- TODO: pass down Target instead of just Temp.. and then we might get a chance to optimize
+-- if a builtin returns unit, it may omit assigning the target
+-- because nothing will inspect that target. TODO: Is this true??
 compileBuiltinTo :: SRC.Temp -> Builtin -> [Source] -> [Op]
 compileBuiltinTo temp b = case b of
   SRC.GetChar -> oneArg $ \_ ->
@@ -970,7 +972,6 @@ compileBuiltinTo temp b = case b of
   SRC.PutChar -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_put_char
-    , setTemp temp Ax
     ]
   SRC.EqChar -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
@@ -1059,7 +1060,6 @@ compileBuiltinTo temp b = case b of
     [ OpMove Bx s1
     , OpMove Ax s2
     , OpStore (TReg Bx) Ax
-    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
   SRC.MakeBytes -> oneArg $ \s1 ->
     [ OpMove Ax s1
@@ -1071,7 +1071,6 @@ compileBuiltinTo temp b = case b of
     , OpMove Si s2
     , OpMove Bx s3
     , OpCall Bare_set_bytes
-    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
   SRC.GetBytes -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
@@ -1103,19 +1102,16 @@ compileBuiltinTo temp b = case b of
     ]
   SRC.Crash -> oneArg $ \_ ->
     [ OpCall Bare_crash
-    , setTemp temp Ax -- TODO: we never get here!
     ]
   SRC.LoadSec -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_load_sector
-    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
   SRC.StoreSec -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_store_sector
-    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
   SRC.GetStackPointer -> oneArg $ \_ ->
     [ OpMove Ax (SReg Sp)

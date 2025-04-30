@@ -79,7 +79,6 @@ L6: ; Function: g2
   mov [Temps+4], ax
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+6], ax
   mov bp, g2
   mov dx, [Temps+4]
   jmp [bp]

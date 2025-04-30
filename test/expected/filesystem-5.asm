@@ -115,7 +115,6 @@ L12: ; Function: t1
   mov si, [bp+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
   mov [Temps+8], ax
@@ -284,7 +283,6 @@ L25: ; Continuation
 L26: ; Arm: 65'19
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+10], ax
   mov dx, [Temps+10]
   mov bp, cx
   mov cx, [bp+2]
@@ -293,7 +291,6 @@ L26: ; Arm: 65'19
 L27: ; Arm: 66'22
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+12], ax
   mov dx, [Temps+12]
   mov bp, cx
   mov cx, [bp+2]
@@ -302,7 +299,6 @@ L27: ; Arm: 66'22
 L28: ; Arm: 67'16
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+14], ax
   mov dx, [Temps+14]
   mov bp, cx
   mov cx, [bp+2]
@@ -347,7 +343,6 @@ L29: ; Function: g8
   jz L28
   mov ax, `^`
   call Bare_put_char
-  mov [Temps+14], ax
   mov ax, 65
   add ax, [Temps+6]
   mov [Temps+16], ax
@@ -359,7 +354,6 @@ L29: ; Function: g8
   mov [Temps+20], ax
   mov ax, [Temps+20]
   call Bare_put_char
-  mov [Temps+22], ax
   mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
@@ -2319,7 +2313,6 @@ L151: ; Continuation
   mov si, [bp+8]
   mov bx, [Temps+4]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+8]
   add ax, 1
   mov [Temps+8], ax
@@ -2421,7 +2414,6 @@ L159: ; Continuation
 L160: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -2835,7 +2827,6 @@ L192: ; Continuation
   mov si, [Temps+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -2876,7 +2867,6 @@ L195: ; Continuation
   mov bx, [bp+4]
   mov ax, g76
   mov [bx], ax
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -2937,7 +2927,6 @@ L199: ; Continuation
   mov si, [Temps+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -2988,7 +2977,6 @@ L202: ; Continuation
   mov bx, [bp+6]
   mov ax, [Temps+4]
   mov [bx], ax
-  mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -3035,7 +3023,6 @@ L204: ; Continuation
 L205: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -3449,7 +3436,6 @@ L237: ; Continuation
   mov si, [bp+10]
   mov bx, [Temps+4]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -4134,7 +4120,6 @@ L282: ; Continuation
 L283: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -4548,7 +4533,6 @@ L315: ; Continuation
   mov si, [Temps+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -7064,7 +7048,6 @@ L464: ; Continuation
 L465: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -7478,7 +7461,6 @@ L497: ; Continuation
   mov si, [Temps+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -7519,7 +7501,6 @@ L500: ; Continuation
   mov bx, [bp+4]
   mov ax, g193
   mov [bx], ax
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -7580,7 +7561,6 @@ L504: ; Continuation
   mov si, [Temps+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -7631,7 +7611,6 @@ L507: ; Continuation
   mov bx, [bp+6]
   mov ax, [Temps+4]
   mov [bx], ax
-  mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -7678,7 +7657,6 @@ L509: ; Continuation
 L510: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -8092,7 +8070,6 @@ L542: ; Continuation
   mov si, [bp+10]
   mov bx, [Temps+4]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -8777,7 +8754,6 @@ L587: ; Continuation
 L588: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -9191,7 +9167,6 @@ L620: ; Continuation
   mov si, [Temps+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -11681,7 +11656,6 @@ L769: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
-  mov [Temps+2], ax
   mov ax, [bp+4]
   add ax, 1
   mov [Temps+4], ax
@@ -12054,7 +12028,6 @@ L793: ; Continuation
 L794: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -12468,7 +12441,6 @@ L826: ; Continuation
   mov si, [bp+10]
   mov bx, [Temps+4]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -12583,7 +12555,6 @@ L833: ; Continuation
   mov bx, [bp+6]
   mov ax, [Temps+4]
   mov [bx], ax
-  mov [Temps+6], ax
   mov dx, dx
   mov bp, cx
   mov cx, [bp+2]
@@ -12592,7 +12563,6 @@ L833: ; Continuation
 L834: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -13006,7 +12976,6 @@ L866: ; Continuation
   mov si, [bp+10]
   mov bx, [Temps+4]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax
@@ -13687,7 +13656,6 @@ L911: ; Continuation
 L912: ; Continuation
   call Bare_enter_check
   call Bare_crash
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -14101,7 +14069,6 @@ L944: ; Continuation
   mov si, [Temps+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+10]
   add ax, 1
   mov [Temps+8], ax

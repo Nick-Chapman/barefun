@@ -14,7 +14,6 @@ L2: ; Function: g1
   mov [Temps+4], ax
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+6], ax
   mov bp, g1
   mov dx, [Temps+4]
   jmp [bp]

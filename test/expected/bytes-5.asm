@@ -70,7 +70,6 @@ L8: ; Function: t1
   mov si, [bp+4]
   mov bx, [Temps+2]
   call Bare_set_bytes
-  mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
   mov [Temps+8], ax
@@ -240,7 +239,6 @@ L21: ; Function: g7
   mov [Temps+4], ax
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+6], ax
   mov bp, g7
   mov dx, [Temps+4]
   jmp [bp]

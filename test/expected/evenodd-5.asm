@@ -39,7 +39,6 @@ L4: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -69,7 +68,6 @@ L7: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
-  mov [Temps+2], ax
   push word cx
   push word L6
   mov cx, sp

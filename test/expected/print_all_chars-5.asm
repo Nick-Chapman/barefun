@@ -16,19 +16,14 @@ L2: ; Continuation
 L3: ; Arm: 12'17
   mov ax, `[`
   call Bare_put_char
-  mov [Temps+8], ax
   mov ax, `D`
   call Bare_put_char
-  mov [Temps+10], ax
   mov ax, `E`
   call Bare_put_char
-  mov [Temps+12], ax
   mov ax, `L`
   call Bare_put_char
-  mov [Temps+14], ax
   mov ax, `]`
   call Bare_put_char
-  mov [Temps+16], ax
   mov dx, [Temps+16]
   mov bp, cx
   mov cx, [bp+2]
@@ -37,16 +32,12 @@ L3: ; Arm: 12'17
 L4: ; Arm: 13'20
   mov ax, `[`
   call Bare_put_char
-  mov [Temps+10], ax
   mov ax, `N`
   call Bare_put_char
-  mov [Temps+12], ax
   mov ax, `L`
   call Bare_put_char
-  mov [Temps+14], ax
   mov ax, `]`
   call Bare_put_char
-  mov [Temps+16], ax
   mov dx, [Temps+16]
   mov bp, cx
   mov cx, [bp+2]
@@ -62,7 +53,6 @@ L5: ; Function: g1
   jz L1
   mov ax, ` `
   call Bare_put_char
-  mov [Temps+4], ax
   mov ax, dx
   cmp word ax, 8
   call Bare_make_bool_from_z
@@ -87,7 +77,6 @@ L5: ; Function: g1
   mov [Temps+10], ax
   mov ax, [Temps+10]
   call Bare_put_char
-  mov [Temps+12], ax
   mov dx, [Temps+12]
   mov bp, cx
   mov cx, [bp+2]
@@ -97,7 +86,6 @@ L6: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
-  mov [Temps+2], ax
   mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]

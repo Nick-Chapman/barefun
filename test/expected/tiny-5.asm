@@ -3,10 +3,8 @@ L1: ; Function: g1
   mov [Temps+2], ax
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+4], ax
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+6], ax
   mov bp, g1
   mov dx, g3
   jmp [bp]

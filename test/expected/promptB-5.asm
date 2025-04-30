@@ -8,7 +8,6 @@ L2: ; Function: t3
   mov [Temps+2], ax
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+4], ax
   mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
@@ -23,10 +22,8 @@ L2: ; Function: t3
 L3: ; Function: g1
   mov ax, dx
   call Bare_put_char
-  mov [Temps+2], ax
   mov ax, ` `
   call Bare_put_char
-  mov [Temps+4], ax
   push word dx
   push word L2
   mov [Temps+6], sp

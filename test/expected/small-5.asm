@@ -14,7 +14,6 @@ L2: ; Function: g1
   mov [Temps+4], ax
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+6], ax
   mov bp, g1
   mov dx, [Temps+4]
   jmp [bp]
@@ -176,7 +175,6 @@ L15: ; Continuation
 L16: ; Arm: 30'27
   mov ax, `\n`
   call Bare_put_char
-  mov [Temps+6], ax
   push word dx
   push word cx
   push word L15
@@ -198,7 +196,6 @@ L17: ; Function: g10
   jz L16
   mov ax, [Temps+2]
   call Bare_put_char
-  mov [Temps+6], ax
   push word dx
   push word [Temps+2]
   push word 1
@@ -212,7 +209,6 @@ L18: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
-  mov [Temps+2], ax
   mov bp, g6
   mov dx, g15
   jmp [bp]
