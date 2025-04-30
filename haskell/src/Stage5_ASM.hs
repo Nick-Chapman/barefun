@@ -501,7 +501,7 @@ addAddr :: Int -> Addr -> Addr
 addAddr i = \case
   AHeapSpace ha  -> AHeapSpace (addHeapAddr i ha)
   AStatic lab n -> AStatic lab (n+i)
-  ATempSpace{} -> undefined
+  ATempSpace{} -> undefined -- TODO: why can this not happen?
 
 addHeapAddr :: Int -> HeapAddr -> HeapAddr
 addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
@@ -515,8 +515,8 @@ mkHeapAddr n =
 deheapAddr :: Addr -> Int
 deheapAddr = \case
   AHeapSpace (HeapAddr n) -> fromIntegral n `div` 2
-  AStatic{} -> undefined "deheapAddr/AStatic"
-  ATempSpace{} -> undefined "deheapAddr/ATempSpace"
+  AStatic{} -> error "deheapAddr/AStatic"
+  ATempSpace{} -> error "deheapAddr/ATempSpace"
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -613,7 +613,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
           k s { rmap = Map.insert r w rmap } ()
 
       GetReg r -> k s (maybe err id $ Map.lookup r rmap)
-        where err = error (show ("GetReg/uninitialized",r))
+        where err = WUninitialized $ show ("GetReg/uninitialized",r)
 
       SetMem a w -> do
         k s { mem = Map.insert a w mem } ()
@@ -632,7 +632,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
       MaybeGC -> do
         IIO $ do
-          let roots = [ maybe undefined id $ Map.lookup r rmap | r <- [frameReg,argReg,contReg] ]
+          let roots = [ maybe (error "MaybeGC") id $ Map.lookup r rmap | r <- [frameReg,argReg,contReg] ]
           reachable <- discoverReachable roots mem
           let
             isReachable :: Addr -> v -> Bool
@@ -781,15 +781,24 @@ heapAddressMaybe = \case
 ----------------------------------------------------------------------
 -- Compile
 
-compile :: SRC.Image -> Transformed
-compile x = runAsm (compileImage x >>= CutCode "Start")
-
 -- Calling conventions:
-frameReg,argReg,contReg :: Reg
+frameReg,argReg,contReg,_temp1Reg :: Reg
 -- Ax is the general scratch register
 frameReg = Bp
 argReg = Dx
 contReg = Cx
+_temp1Reg = Si
+
+targetOfTemp :: SRC.Temp -> Target
+targetOfTemp = \case
+  SRC.Temp 0 -> error "targetOfTemp/temps start from 1"
+  --SRC.Temp 1 -> TReg _temp1Reg -- TODO: why is this broken??
+  temp -> TMem (ATempSpace temp)
+
+
+compile :: SRC.Image -> Transformed
+compile x = runAsm (compileImage x >>= CutCode "Start")
+
 -- TODO: idea: use remaining regs for temps 1,2... etc
 
 compileImage :: SRC.Image -> Asm Code
@@ -848,7 +857,7 @@ compileCode = \case
 
   SRC.LetAtomic (id,temp) rhs body -> do
     let who = show (id,temp)
-    let target = TMem (ATempSpace temp)
+    let target = targetOfTemp temp
     ops <- compileAtomicTo who target rhs
     doOps ops <$> compileCode body
 
@@ -890,7 +899,7 @@ compileArmTaken scrutReg arm =  do
   let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg (bytesPerWord * i))
                      , setTarget target (SReg Ax) ]
                    | (i,(_,temp)) <- zip [1..] xs
-                   , let target = TMem (ATempSpace temp)
+                   , let target = targetOfTemp temp
                    ]
   doOps ops <$> compileCode rhs
 
@@ -1056,9 +1065,11 @@ compileBuiltinTo target b = case b of
     ]
   SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
+    -- , OpPushSAVE (SReg Si) -- TODO: when Si is used for Temp(1) -- but it dont work!!
     , OpMove Si s2
     , OpMove Bx s3
     , OpCall Bare_set_bytes -- TODO: remove/inline
+    -- , OpPopRESTORE Si
     ]
   SRC.GetBytes -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
@@ -1113,13 +1124,14 @@ compileBuiltinTo target b = case b of
 
 setTarget :: Target -> Source -> Op
 setTarget = \case
-  TReg{} -> undefined -- TODO: here we can optimize!
-  TMem addr -> \case
-    SReg sourceReg -> OpStore (TMem addr) sourceReg
+  TReg target -> \source -> OpMove target source
+  TMem targetAddr -> \case
+    SReg sourceReg -> OpStore (TMem targetAddr) sourceReg
     source ->
       OpMany  [ OpMove Ax source
-              , OpStore (TMem addr) Ax
+              , OpStore (TMem targetAddr) Ax
               ]
+
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
@@ -1129,9 +1141,14 @@ compileRef = \case
     case loc of
       SRC.InGlobal g -> SLit (WAddr (AStatic (DataLabel g) 0))
       SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
-      SRC.InTemp temp -> SMem (ATempSpace temp) -- TODO: idea: try having temp(1) in a reg
+      SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
       SRC.TheArg -> SReg argReg
       SRC.TheFrame -> SReg frameReg
+
+sourceOfTarget :: Target -> Source
+sourceOfTarget = \case
+  TReg r -> SReg r
+  TMem a -> SMem a
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
