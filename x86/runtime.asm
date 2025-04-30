@@ -17,7 +17,8 @@
 
     bits 16
 
-    Temps equ 0x500
+    drive_number equ 0x500 ; Space is available here because
+    Temps equ 0x500 ; temps are stored at Temps+2, Temps+4 etc.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Macros
@@ -108,7 +109,7 @@ part2:
     ;; Kernel starts at sector 2
     first_non_boot_sector equ 2
 
-    mov [0], dl ; SAVE DRIVE NUMBER ; TODO better place to put this?
+    mov [drive_number], dl
     mov ah, 0x02 ; Function: Read Sectors From Drive
     mov ch, 0 ; cylinder
     mov dh, 0 ; head
@@ -310,7 +311,7 @@ Bare_load_sector: ;Ax (Num bytes), Bx (The bytes buffer to load into)
     push cx ; save continuation
     push dx ; save arg
     mov cl, al ; start sector number (1 is boot; 2 is kernel)
-    mov dl, [0] ; RESTORE DRIVE NUMBER
+    mov dl, [drive_number]
     mov ah, 0x02 ; Function: Read Sectors From Drive
     mov ch, 0 ; cylinder
     mov dh, 0 ; head
