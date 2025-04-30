@@ -9,12 +9,11 @@ L2: ; Function: (put_chars,g1)
   cmp word [bx], 0
   jz L1
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
+  mov di, [bx+4]
   mov ax, si
   call Bare_put_char
   mov bp, g1
-  mov dx, [Temps+4]
+  mov dx, di
   jmp [bp]
 
 L3: ; Arm: 4'13
@@ -43,9 +42,9 @@ L5: ; Function: (lam,t1)
   mov ax, g4
   mov bx, dx
   call Bare_get_bytes
-  mov [Temps+4], ax
+  mov di, ax
   push word [bp+2]
-  push word [Temps+4]
+  push word di
   push word 1
   mov [Temps+6], sp
   push word 6 ;; scanned

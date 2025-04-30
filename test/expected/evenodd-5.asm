@@ -20,15 +20,15 @@ L3: ; Function: (is_even,g1)
   jz L1
   mov ax, dx
   sub ax, 1
-  mov [Temps+4], ax
-  mov ax, [Temps+4]
+  mov di, ax
+  mov ax, di
   cmp word ax, 0
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   mov bx, [Temps+6]
   cmp word [bx], 1
   jz L2
-  mov ax, [Temps+4]
+  mov ax, di
   sub ax, 1
   mov [Temps+8], ax
   mov bp, g1

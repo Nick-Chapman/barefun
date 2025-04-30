@@ -783,24 +783,24 @@ heapAddressMaybe = \case
 -- Compile
 
 -- Calling conventions:
-frameReg,argReg,contReg,temp1Reg :: Reg
--- Ax is the general scratch register
+frameReg,argReg,contReg :: Reg
 frameReg = Bp
 argReg = Dx
 contReg = Cx
-temp1Reg = Si
 
+-- Use S1/Di for first couple of temps
 targetOfTemp :: SRC.Temp -> Target
 targetOfTemp = \case
   SRC.Temp 0 -> error "targetOfTemp/temps start from 1"
-  SRC.Temp 1 -> TReg temp1Reg
+  SRC.Temp 1 -> TReg Si
+  SRC.Temp 2 -> TReg Di
   temp -> TMem (ATempSpace temp)
 
+-- Ax is the general scratch register
+-- Bx is used for case-scrutinee and temp for simultaneousMove
 
 compile :: SRC.Image -> Transformed
 compile x = runAsm (compileImage x >>= CutCode "Start")
-
--- TODO: idea: use remaining regs for temps 1,2... etc
 
 compileImage :: SRC.Image -> Asm Code
 compileImage = \case

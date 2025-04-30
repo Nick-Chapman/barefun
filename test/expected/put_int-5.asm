@@ -9,12 +9,11 @@ L2: ; Function: (put_chars,g1)
   cmp word [bx], 0
   jz L1
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
+  mov di, [bx+4]
   mov ax, si
   call Bare_put_char
   mov bp, g1
-  mov dx, [Temps+4]
+  mov dx, di
   jmp [bp]
 
 L3: ; Arm: 6'13
@@ -49,10 +48,10 @@ L5: ; Function: (lam,t1)
   push word dx ;; save
   mov dx, 0
   div bx
-  mov [Temps+4], dx
+  mov di, dx
   pop word dx ;; restore
   mov ax, 48
-  add ax, [Temps+4]
+  add ax, di
   mov [Temps+6], ax
   mov ax, [Temps+6]
   call Bare_num_to_char

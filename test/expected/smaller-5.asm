@@ -9,12 +9,11 @@ L2: ; Function: (put_chars,g1)
   cmp word [bx], 0
   jz L1
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
+  mov di, [bx+4]
   mov ax, si
   call Bare_put_char
   mov bp, g1
-  mov dx, [Temps+4]
+  mov dx, di
   jmp [bp]
 
 L3: ; Arm: 12'9
@@ -35,14 +34,13 @@ L5: ; Function: (lam,t1)
   cmp word [bx], 0
   jz L3
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
+  mov di, [bx+4]
   push word [bp+2]
   push word si
   push word 1
   mov [Temps+6], sp
   push word 6 ;; scanned
-  push word [Temps+4]
+  push word di
   push word cx
   push word L4
   mov cx, sp
@@ -86,8 +84,8 @@ L9: ; Function: (readloop,g4)
   mov ax, si
   cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [Temps+4], ax
-  mov bx, [Temps+4]
+  mov di, ax
+  mov bx, di
   cmp word [bx], 1
   jz L8
   mov ax, si

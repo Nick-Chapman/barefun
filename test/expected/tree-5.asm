@@ -30,10 +30,10 @@ L3: ; Function: (lam,t1)
   push word dx ;; save
   mov dx, 0
   div bx
-  mov [Temps+4], dx
+  mov di, dx
   pop word dx ;; restore
   mov ax, 48
-  add ax, [Temps+4]
+  add ax, di
   mov [Temps+6], ax
   mov ax, [Temps+6]
   call Bare_num_to_char
@@ -73,12 +73,11 @@ L6: ; Function: (put_chars,g2)
   cmp word [bx], 0
   jz L5
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
+  mov di, [bx+4]
   mov ax, si
   call Bare_put_char
   mov bp, g2
-  mov dx, [Temps+4]
+  mov dx, di
   jmp [bp]
 
 L7: ; Arm: 22'10
@@ -111,9 +110,8 @@ L9: ; Continuation
 
 L10: ; Arm: 23'15
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
-  push word [Temps+4]
+  mov di, [bx+4]
+  push word di
   push word cx
   push word L9
   mov cx, sp
@@ -145,9 +143,8 @@ L12: ; Continuation
 
 L13: ; Arm: 24'15
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
-  push word [Temps+4]
+  mov di, [bx+4]
+  push word di
   push word cx
   push word L12
   mov cx, sp
@@ -186,9 +183,8 @@ L16: ; Function: (eval,g4)
   cmp word [bx], 2
   jz L13
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
-  push word [Temps+4]
+  mov di, [bx+4]
+  push word di
   push word cx
   push word L15
   mov cx, sp
@@ -207,9 +203,9 @@ L18: ; Arm: 9'20
   push word g5
   push word `0`
   push word 1
-  mov [Temps+4], sp
+  mov di, sp
   push word 6 ;; scanned
-  mov dx, [Temps+4]
+  mov dx, di
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -250,14 +246,14 @@ L21: ; Start
   push word 4 ;; scanned
   push word 10
   push word 0
-  mov [Temps+4], sp
+  mov di, sp
   push word 4 ;; scanned
   push word 3
   push word 0
   mov [Temps+6], sp
   push word 4 ;; scanned
   push word [Temps+6]
-  push word [Temps+4]
+  push word di
   push word 1
   mov [Temps+8], sp
   push word 6 ;; scanned

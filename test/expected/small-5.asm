@@ -9,12 +9,11 @@ L2: ; Function: (put_chars,g1)
   cmp word [bx], 0
   jz L1
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
+  mov di, [bx+4]
   mov ax, si
   call Bare_put_char
   mov bp, g1
-  mov dx, [Temps+4]
+  mov dx, di
   jmp [bp]
 
 L3: ; Arm: 4'13
@@ -43,9 +42,9 @@ L5: ; Function: (lam,t1)
   mov ax, g4
   mov bx, dx
   call Bare_get_bytes
-  mov [Temps+4], ax
+  mov di, ax
   push word [bp+2]
-  push word [Temps+4]
+  push word di
   push word 1
   mov [Temps+6], sp
   push word 6 ;; scanned
@@ -94,9 +93,9 @@ L9: ; Function: (lam,t1)
   mov ax, g8
   mov bx, dx
   call Bare_get_bytes
-  mov [Temps+4], ax
+  mov di, ax
   push word [bp+2]
-  push word [Temps+4]
+  push word di
   push word 1
   mov [Temps+6], sp
   push word 6 ;; scanned
@@ -137,14 +136,13 @@ L13: ; Function: (lam,t1)
   cmp word [bx], 0
   jz L11
   mov si, [bx+2]
-  mov ax, [bx+4]
-  mov [Temps+4], ax
+  mov di, [bx+4]
   push word [bp+2]
   push word si
   push word 1
   mov [Temps+6], sp
   push word 6 ;; scanned
-  push word [Temps+4]
+  push word di
   push word cx
   push word L12
   mov cx, sp
@@ -188,8 +186,8 @@ L17: ; Function: (readloop,g10)
   mov ax, si
   cmp word ax, `\n`
   call Bare_make_bool_from_z
-  mov [Temps+4], ax
-  mov bx, [Temps+4]
+  mov di, ax
+  mov bx, di
   cmp word [bx], 1
   jz L16
   mov ax, si
@@ -286,9 +284,9 @@ L26: ; Function: (lam,t1)
   mov ax, g17
   mov bx, dx
   call Bare_get_bytes
-  mov [Temps+4], ax
+  mov di, ax
   push word [bp+2]
-  push word [Temps+4]
+  push word di
   push word 1
   mov [Temps+6], sp
   push word 6 ;; scanned
@@ -337,9 +335,9 @@ L30: ; Function: (lam,t1)
   mov ax, g21
   mov bx, dx
   call Bare_get_bytes
-  mov [Temps+4], ax
+  mov di, ax
   push word [bp+2]
-  push word [Temps+4]
+  push word di
   push word 1
   mov [Temps+6], sp
   push word 6 ;; scanned
