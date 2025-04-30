@@ -5,10 +5,10 @@ L1: ; Arm: 10'29
 
 L2: ; Function: (inner,g2)
   call Bare_get_char
-  mov [Temps+2], ax
-  mov ax, [Temps+2]
+  mov si, ax
+  mov ax, si
   call Bare_put_char
-  mov ax, [Temps+2]
+  mov ax, si
   cmp word ax, `\n`
   call Bare_make_bool_from_z
   mov [Temps+6], ax

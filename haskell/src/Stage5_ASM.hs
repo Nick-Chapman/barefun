@@ -782,17 +782,17 @@ heapAddressMaybe = \case
 -- Compile
 
 -- Calling conventions:
-frameReg,argReg,contReg,_temp1Reg :: Reg
+frameReg,argReg,contReg,temp1Reg :: Reg
 -- Ax is the general scratch register
 frameReg = Bp
 argReg = Dx
 contReg = Cx
-_temp1Reg = Si
+temp1Reg = Si
 
 targetOfTemp :: SRC.Temp -> Target
 targetOfTemp = \case
   SRC.Temp 0 -> error "targetOfTemp/temps start from 1"
-  --SRC.Temp 1 -> TReg _temp1Reg -- TODO: why is this broken??
+  SRC.Temp 1 -> TReg temp1Reg
   temp -> TMem (ATempSpace temp)
 
 
@@ -1065,11 +1065,11 @@ compileBuiltinTo target b = case b of
     ]
   SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
-    -- , OpPushSAVE (SReg Si) -- TODO: when Si is used for Temp(1) -- but it dont work!!
-    , OpMove Si s2
     , OpMove Bx s3
+    , OpPushSAVE (SReg Si)
+    , OpMove Si s2
     , OpCall Bare_set_bytes -- TODO: remove/inline
-    -- , OpPopRESTORE Si
+    , OpPopRESTORE Si
     ]
   SRC.GetBytes -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1

@@ -6,9 +6,9 @@ L1: ; Function: (lam,t1)
 L2: ; Function: (block,g1)
   push word dx
   push word L1
-  mov [Temps+2], sp
+  mov si, sp
   push word 4 ;; scanned
-  mov dx, [Temps+2]
+  mov dx, si
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -25,9 +25,11 @@ L4: ; Continuation
   cmp word [bx], 1
   jz L3
   mov ax, [bp+6]
-  mov si, [bp+8]
   mov bx, [bp+4]
+  push word si ;; save
+  mov si, [bp+8]
   call Bare_set_bytes
+  pop word si ;; restore
   mov ax, [bp+8]
   add ax, 1
   mov [Temps+4], ax
@@ -45,7 +47,7 @@ L6: ; Function: (loop,t2)
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
-  mov [Temps+2], ax
+  mov si, ax
   push word bp
   push word dx
   push word [bp+4]
@@ -54,7 +56,7 @@ L6: ; Function: (loop,t2)
   push word L4
   mov cx, sp
   push word 12 ;; scanned
-  mov bx, [Temps+2]
+  mov bx, si
   cmp word [bx], 1
   jz L5
   mov dx, g3
@@ -64,9 +66,8 @@ L6: ; Function: (loop,t2)
 
 L7: ; Continuation
   call Bare_enter_check
-  mov ax, [bp+4]
-  mov [Temps+2], ax
-  mov dx, [Temps+2]
+  mov si, [bp+4]
+  mov dx, si
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -74,13 +75,13 @@ L7: ; Continuation
 L8: ; Function: (lam,g5)
   mov ax, 512
   call Bare_make_bytes
-  mov [Temps+2], ax
-  push word [Temps+2]
+  mov si, ax
+  push word si
   push word dx
   push word L6
   mov [Temps+4], sp
   push word 6 ;; scanned
-  push word [Temps+2]
+  push word si
   push word cx
   push word L7
   mov cx, sp
@@ -142,15 +143,15 @@ L14: ; Continuation
   mov ax, [bp+4]
   mov bx, [bp+6]
   call Bare_get_bytes
-  mov [Temps+2], ax
-  mov ax, [Temps+2]
+  mov si, ax
+  mov ax, si
   call Bare_char_to_num
   mov [Temps+4], ax
   mov ax, [Temps+4]
   cmp word ax, 32
   call Bare_make_bool_from_n
   mov [Temps+6], ax
-  push word [Temps+2]
+  push word si
   push word [bp+8]
   push word [bp+6]
   push word cx
@@ -180,7 +181,7 @@ L16: ; Continuation
   mov ax, [bp+6]
   cmp word ax, 512
   call Bare_make_bool_from_n
-  mov [Temps+2], ax
+  mov si, ax
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -188,7 +189,7 @@ L16: ; Continuation
   push word L14
   mov cx, sp
   push word 10 ;; scanned
-  mov bx, [Temps+2]
+  mov bx, si
   cmp word [bx], 1
   jz L15
   mov dx, g8
@@ -210,9 +211,9 @@ L18: ; Function: (loop,t4)
   push word dx ;; save
   mov dx, 0
   div bx
-  mov [Temps+2], dx
+  mov si, dx
   pop word dx ;; restore
-  mov ax, [Temps+2]
+  mov ax, si
   cmp word ax, 0
   call Bare_make_bool_from_z
   mov [Temps+4], ax
@@ -284,15 +285,15 @@ L24: ; Continuation
   mov ax, [bp+4]
   mov bx, [bp+6]
   call Bare_get_bytes
-  mov [Temps+2], ax
-  mov ax, [Temps+2]
+  mov si, ax
+  mov ax, si
   call Bare_char_to_num
   mov [Temps+4], ax
   mov ax, [Temps+4]
   cmp word ax, 32
   call Bare_make_bool_from_n
   mov [Temps+6], ax
-  push word [Temps+2]
+  push word si
   push word [bp+8]
   push word [bp+6]
   push word cx
@@ -322,7 +323,7 @@ L26: ; Continuation
   mov ax, [bp+6]
   cmp word ax, 512
   call Bare_make_bool_from_n
-  mov [Temps+2], ax
+  mov si, ax
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -330,7 +331,7 @@ L26: ; Continuation
   push word L24
   mov cx, sp
   push word 10 ;; scanned
-  mov bx, [Temps+2]
+  mov bx, si
   cmp word [bx], 1
   jz L25
   mov dx, g13
@@ -352,9 +353,9 @@ L28: ; Function: (loop,t4)
   push word dx ;; save
   mov dx, 0
   div bx
-  mov [Temps+2], dx
+  mov si, dx
   pop word dx ;; restore
-  mov ax, [Temps+2]
+  mov ax, si
   cmp word ax, 0
   call Bare_make_bool_from_z
   mov [Temps+4], ax
@@ -390,12 +391,11 @@ L30: ; Continuation
   call Bare_enter_check
   mov ax, 512
   call Bare_make_bytes
-  mov [Temps+2], ax
+  mov si, ax
   mov ax, 7
-  mov bx, [Temps+2]
+  mov bx, si
   call Bare_load_sector
-  mov ax, [Temps+2]
-  mov [Temps+6], ax
+  mov [Temps+6], si
   push word [Temps+6]
   push word L28
   mov [Temps+8], sp
@@ -414,12 +414,11 @@ L31: ; Continuation
   call Bare_enter_check
   mov ax, 512
   call Bare_make_bytes
-  mov [Temps+2], ax
+  mov si, ax
   mov ax, 6
-  mov bx, [Temps+2]
+  mov bx, si
   call Bare_load_sector
-  mov ax, [Temps+2]
-  mov [Temps+6], ax
+  mov [Temps+6], si
   push word [Temps+6]
   push word L18
   mov [Temps+8], sp

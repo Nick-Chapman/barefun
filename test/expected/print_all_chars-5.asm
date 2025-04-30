@@ -8,9 +8,9 @@ L2: ; Continuation
   call Bare_enter_check
   mov ax, [bp+4]
   add ax, 1
-  mov [Temps+2], ax
+  mov si, ax
   mov bp, g1
-  mov dx, [Temps+2]
+  mov dx, si
   jmp [bp]
 
 L3: ; Arm: 12'17
@@ -47,8 +47,8 @@ L5: ; Function: (loop,g1)
   mov ax, 255
   cmp word ax, dx
   call Bare_make_bool_from_n
-  mov [Temps+2], ax
-  mov bx, [Temps+2]
+  mov si, ax
+  mov bx, si
   cmp word [bx], 1
   jz L1
   mov ax, ` `
@@ -86,7 +86,7 @@ L6: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
-  mov dx, [Temps+2]
+  mov dx, si
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]

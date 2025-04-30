@@ -1,9 +1,9 @@
 L1: ; Function: (mainloop,g1)
   call Bare_get_char
-  mov [Temps+2], ax
-  mov ax, [Temps+2]
+  mov si, ax
+  mov ax, si
   call Bare_put_char
-  mov ax, [Temps+2]
+  mov ax, si
   call Bare_put_char
   mov bp, g1
   mov dx, g3

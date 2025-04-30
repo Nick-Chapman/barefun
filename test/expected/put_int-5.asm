@@ -9,10 +9,10 @@ L2: ; Function: (put_chars,g1)
   cmp word [bx], 0
   jz L1
   mov ax, [bx+2]
-  mov [Temps+2], ax
+  mov si, ax
   mov ax, [bx+4]
   mov [Temps+4], ax
-  mov ax, [Temps+2]
+  mov ax, si
   call Bare_put_char
   mov bp, g1
   mov dx, [Temps+4]
@@ -32,17 +32,17 @@ L4: ; Continuation
   mov dx, 0
   div bx
   pop word dx ;; restore
-  mov [Temps+2], ax
+  mov si, ax
   mov bp, dx
-  mov dx, [Temps+2]
+  mov dx, si
   jmp [bp]
 
 L5: ; Function: (lam,t1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [Temps+2], ax
-  mov bx, [Temps+2]
+  mov si, ax
+  mov bx, si
   cmp word [bx], 1
   jz L3
   mov ax, dx
@@ -75,9 +75,9 @@ L5: ; Function: (lam,t1)
 L6: ; Function: (loop,g3)
   push word dx
   push word L5
-  mov [Temps+2], sp
+  mov si, sp
   push word 4 ;; scanned
-  mov dx, [Temps+2]
+  mov dx, si
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]

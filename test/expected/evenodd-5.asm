@@ -14,8 +14,8 @@ L3: ; Function: (is_even,g1)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
-  mov [Temps+2], ax
-  mov bx, [Temps+2]
+  mov si, ax
+  mov bx, si
   cmp word [bx], 1
   jz L1
   mov ax, dx
@@ -39,7 +39,7 @@ L4: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
-  mov dx, [Temps+2]
+  mov dx, si
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
