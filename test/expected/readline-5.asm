@@ -15,8 +15,7 @@ L3: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L1
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [bp+2]
@@ -83,8 +82,7 @@ L10: ; Function: (put_chars,g2)
   mov bx, dx
   cmp word [bx], 0
   jz L5
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si
@@ -474,8 +472,7 @@ L35: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L34
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si

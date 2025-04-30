@@ -8,8 +8,7 @@ L2: ; Function: (put_chars,g1)
   mov bx, dx
   cmp word [bx], 0
   jz L1
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si

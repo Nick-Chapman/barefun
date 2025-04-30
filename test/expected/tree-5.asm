@@ -72,8 +72,7 @@ L6: ; Function: (put_chars,g2)
   mov bx, dx
   cmp word [bx], 0
   jz L5
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si
@@ -83,8 +82,7 @@ L6: ; Function: (put_chars,g2)
   jmp [bp]
 
 L7: ; Arm: 22'10
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov dx, si
   mov bp, cx
   mov cx, [bp+2]
@@ -112,8 +110,7 @@ L9: ; Continuation
   jmp [bp]
 
 L10: ; Arm: 23'15
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
@@ -147,8 +144,7 @@ L12: ; Continuation
   jmp [bp]
 
 L13: ; Arm: 24'15
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
@@ -189,8 +185,7 @@ L16: ; Function: (eval,g4)
   jz L10
   cmp word [bx], 2
   jz L13
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]

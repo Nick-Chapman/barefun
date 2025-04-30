@@ -265,6 +265,8 @@ execImage Image{start} = GetCode start >>= execCode
 execCode :: Code -> M ()
 execCode = \case
   Do (OpComment{}) code -> execCode code
+  Do (OpMany []) code -> execCode code
+  Do (OpMany (op:ops)) code -> execCode $ Do op (Do (OpMany ops) code)
   Do op code -> do
     TraceOp op -- TODO: move to compile time to allow debug on qemu/real-hardware
     execOp op (execCode code)
@@ -275,8 +277,7 @@ execCode = \case
 execOp :: Op -> M () -> M ()
 execOp = \case
   OpComment{} -> error "execOp/OpComment"
-  OpMany [] -> \cont -> cont
-  OpMany (x:xs) -> \cont -> do execOp x (execOp (OpMany xs) cont)
+  OpMany{} -> error "execOp/OpMany"
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
   OpStore t s -> \cont -> do w <- GetReg s; a <- evalTarget t; SetMem a w; cont
   OpCall bare -> \cont -> do execBare bare; cont
@@ -896,12 +897,10 @@ compileArm scrutReg arm =  do
 compileArmTaken :: Reg -> SRC.Arm -> Asm Code
 compileArmTaken scrutReg arm =  do
   let (SRC.ArmTag _pos _tag xs rhs) = arm
-  let ops = concat [ [ OpMove Ax (SMemIndirectOffset scrutReg (bytesPerWord * i))
-                     , setTarget target (SReg Ax) ]
-                   | (i,(_,temp)) <- zip [1..] xs
-                   , let target = targetOfTemp temp
-                   ]
-  doOps ops <$> compileCode rhs
+  doOps
+    [ setTarget (targetOfTemp temp) (SMemIndirectOffset scrutReg (bytesPerWord * i))
+    | (i,(_,temp)) <- zip [1..] xs
+    ] <$> compileCode rhs
 
 -- assign two regs in parallel, using a temp id required
 moveTwoRegsPar :: (Reg,Source) -> (Reg,Source) -> [Op]

@@ -33,8 +33,7 @@ L5: ; Function: (length,g2)
   mov bx, dx
   cmp word [bx], 0
   jz L3
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word cx
@@ -91,8 +90,7 @@ L10: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L6
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
@@ -143,8 +141,7 @@ L15: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L12
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
@@ -221,8 +218,7 @@ L22: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L17
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
@@ -275,8 +271,7 @@ L27: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L25
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [bp+2]
@@ -320,8 +315,7 @@ L31: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L29
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [bp+2]
@@ -420,8 +414,7 @@ L39: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L37
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [bp+2]
@@ -754,8 +747,7 @@ L66: ; Function: (put_chars,g25)
   mov bx, dx
   cmp word [bx], 0
   jz L61
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si
@@ -857,8 +849,7 @@ L70: ; Function: (fib,g55)
 
 L71: ; Function: (lam,g126)
   mov bx, dx
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov dx, si
@@ -894,8 +885,7 @@ L75: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L73
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, 10
   mov bx, [bp+4]
   mul bx
@@ -982,8 +972,7 @@ L82: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L72
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si
@@ -1627,8 +1616,7 @@ L126: ; Function: (concat,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L118
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word si
@@ -1726,8 +1714,7 @@ L134: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L128
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si
@@ -1825,8 +1812,7 @@ L142: ; Function: (lam,t2)
   mov bx, dx
   cmp word [bx], 0
   jz L137
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, si
@@ -2150,8 +2136,7 @@ L165: ; Function: (loop,t3)
   mov bx, dx
   cmp word [bx], 0
   jz L161
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -3049,8 +3034,7 @@ L229: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L196
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov bx, si
   cmp word [bx], 0
   jz L227
@@ -3092,8 +3076,7 @@ L231: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L160
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word si
@@ -3384,8 +3367,7 @@ L250: ; Function: (loop,t3)
   mov bx, dx
   cmp word [bx], 0
   jz L246
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -3448,8 +3430,7 @@ L255: ; Function: (loop,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L251
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -3543,8 +3524,7 @@ L263: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L258
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov bx, si
   cmp word [bx], 0
   jz L260
@@ -3727,8 +3707,7 @@ L276: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L271
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov bx, si
   cmp word [bx], 0
   jz L273
@@ -3775,8 +3754,7 @@ L278: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L245
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word si
@@ -3969,8 +3947,7 @@ L294: ; Function: (loop,t5)
   mov bx, dx
   cmp word [bx], 0
   jz L290
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -4066,8 +4043,7 @@ L300: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L298
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   push word si
   push word [bp+12]
   push word cx
@@ -4101,8 +4077,7 @@ L302: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L282
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
@@ -4665,8 +4640,7 @@ L339: ; Continuation
   mov cx, sp
   push word 8 ;; scanned
   mov bx, [bp+4]
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov dx, si
   mov bp, cx
   mov cx, [bp+2]
@@ -4736,8 +4710,7 @@ L343: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L306
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
@@ -4844,8 +4817,7 @@ L352: ; Function: (loop,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L348
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -4950,8 +4922,7 @@ L361: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L355
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov bx, si
   cmp word [bx], 0
   jz L358
@@ -5031,8 +5002,7 @@ L366: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L347
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [bp+8]
@@ -5084,8 +5054,7 @@ L369: ; Continuation
   jmp [bp]
 
 L370: ; Arm: 235'9
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [bp+4]
@@ -5125,8 +5094,7 @@ L374: ; Function: (loop,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L371
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, ` `
@@ -5224,8 +5192,7 @@ L381: ; Continuation
   mov cx, sp
   push word 10 ;; scanned
   mov bx, [bp+6]
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov dx, si
   mov bp, cx
   mov cx, [bp+2]
@@ -5327,8 +5294,7 @@ L391: ; Function: (loop,t3)
   mov bx, dx
   cmp word [bx], 0
   jz L387
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -5391,8 +5357,7 @@ L396: ; Function: (loop,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L392
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -5497,8 +5462,7 @@ L404: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L399
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov bx, si
   cmp word [bx], 0
   jz L402
@@ -5681,8 +5645,7 @@ L417: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L412
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov bx, si
   cmp word [bx], 0
   jz L415
@@ -5718,8 +5681,7 @@ L419: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L386
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word si
@@ -5912,8 +5874,7 @@ L435: ; Function: (loop,t5)
   mov bx, dx
   cmp word [bx], 0
   jz L431
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -6087,8 +6048,7 @@ L448: ; Function: (loop,t2)
   mov bx, dx
   cmp word [bx], 0
   jz L443
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -6167,8 +6127,7 @@ L452: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L439
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   push word [bp+12]
   push word [bp+8]
   push word [bp+6]
@@ -6211,8 +6170,7 @@ L454: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L423
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
@@ -6394,8 +6352,7 @@ L467: ; Function: (loop,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L462
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, si
@@ -6494,8 +6451,7 @@ L474: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L458
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [bp+6]
@@ -6943,8 +6899,7 @@ L509: ; Continuation
   mov bx, dx
   cmp word [bx], 0
   jz L484
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   push word si
   push word [bp+4]
   push word L507
@@ -6989,8 +6944,7 @@ L512: ; Function: (lam,t1)
   mov bx, dx
   cmp word [bx], 0
   jz L478
-  mov ax, [bx+2]
-  mov si, ax
+  mov si, [bx+2]
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
