@@ -76,7 +76,7 @@ data Source
   = SReg Reg
   | SLit Word
   | SMem Addr
-  | SMemIndirect Reg
+  | SMemIndirect Reg -- TODO: eliminate in favour of offset version; optmize away +0 in PP.
   | SMemIndirectOffset Reg Int -- byte indexing
 
 -- Word is a structured type for the contents of a register or memory location
@@ -1136,7 +1136,7 @@ compileRef = \case
     case loc of
       SRC.InGlobal g -> SLit (WAddr (AStatic (DataLabel g) 0))
       SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
-      SRC.InTemp temp -> SMem (ATempSpace temp)
+      SRC.InTemp temp -> SMem (ATempSpace temp) -- TODO: idea: try having temp(1) in a reg
       SRC.TheArg -> SReg argReg
       SRC.TheFrame -> SReg frameReg
 
