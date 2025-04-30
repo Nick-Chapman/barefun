@@ -960,39 +960,46 @@ compileFunctionTo temp freeVars body = do
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ])
 
+-- TODO: pass down Target instead of just Temp.. and then we might get a chance to optimize
 compileBuiltinTo :: SRC.Temp -> Builtin -> [Source] -> [Op]
-compileBuiltinTo temp b args =
-  compileBuiltinToAx b args ++
-  [ setTemp temp Ax ]
-
--- TODO: target reg/temp should be passed down
-compileBuiltinToAx :: Builtin -> [Source] -> [Op] -- --> Ax
-compileBuiltinToAx b = case b of
+compileBuiltinTo temp b = case b of
   SRC.GetChar -> oneArg $ \_ ->
-    [ OpCall Bare_get_char ]
+    [ OpCall Bare_get_char
+    , setTemp temp Ax
+    ]
   SRC.PutChar -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_put_char
+    , setTemp temp Ax
     ]
   SRC.EqChar -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z
+    , setTemp temp Ax
     ]
   SRC.AddInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpAddInto Ax s2
+    , setTemp temp Ax
     ]
   SRC.SubInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpSubInto Ax s2
+    , setTemp temp Ax
     ]
   SRC.MulInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1 ] ++
     case s2 of
-      SReg s2Reg -> [ OpMulIntoAx s2Reg ]
-      _ -> [ OpMove Bx s2 , OpMulIntoAx Bx ]
-
+      SReg s2Reg ->
+        [ OpMulIntoAx s2Reg
+        , setTemp temp Ax
+        ]
+      _ ->
+        [ OpMove Bx s2
+        , OpMulIntoAx Bx
+        , setTemp temp Ax
+        ]
   SRC.DivInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
@@ -1001,6 +1008,7 @@ compileBuiltinToAx b = case b of
     , OpDivModIntoAxDx Bx
     -- quotiant already in Ax
     , OpPopRESTORE Dx
+    , setTemp temp Ax
     ]
   SRC.ModInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
@@ -1011,92 +1019,108 @@ compileBuiltinToAx b = case b of
     -- remainder in Dx
     , OpMove Ax (SReg Dx)
     , OpPopRESTORE Dx
+    , setTemp temp Ax
     ]
   SRC.EqInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z
+    , setTemp temp Ax
     ]
   SRC.LessInt -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_n
+    , setTemp temp Ax
     ]
   SRC.CharChr -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_num_to_char
+    , setTemp temp Ax
     ]
   SRC.CharOrd -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_char_to_num
+    , setTemp temp Ax
     ]
-
   SRC.MakeRef -> oneArg $ \s1 ->
     let desc = Scanned { evenSizeInBytes = 2 } in
     [ OpPush s1
     , OpMove Ax (SReg Sp)
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
+    , setTemp temp Ax
     ]
-
   SRC.DeRef -> oneArg $ \s1 ->
     [ OpMove Bx s1
     , OpMove Ax (SMemIndirect Bx)
+    , setTemp temp Ax
     ]
-
   SRC.SetRef -> twoArgs $ \s1 s2 ->
     [ OpMove Bx s1
     , OpMove Ax s2
     , OpStore (TReg Bx) Ax
+    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
-
   SRC.MakeBytes -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_make_bytes
+    , setTemp temp Ax
     ]
   SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
     , OpMove Si s2
     , OpMove Bx s3
     , OpCall Bare_set_bytes
+    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
   SRC.GetBytes -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_get_bytes
+    , setTemp temp Ax
     ]
-
-  -- Freeze/Thaw: null-imp, bytes/string have the same representation
-  SRC.FreezeBytes -> oneArg $ \s1 -> [ OpMove Ax s1 ]
-  SRC.ThawBytes -> oneArg $ \s1 -> [ OpMove Ax s1 ]
-
-  SRC.StringLength -> oneArg $ \s1 ->
-    [ OpMove Ax s1
-    , OpCall Bare_string_length
-    ]
-  -- same implementations as SRC.GetBytes
   SRC.StringIndex -> twoArgs $ \s1 s2 ->
+    -- same implementations as SRC.GetBytes, because bytes/string have the same rep.
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_get_bytes
+    , setTemp temp Ax
     ]
-
-  SRC.Crash -> oneArg $ \_ -> [ OpCall Bare_crash ]
-
+  SRC.FreezeBytes -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    -- null-imp, bytes/string have the same representation
+    , setTemp temp Ax -- TODO: optimize here
+    ]
+  SRC.ThawBytes -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    -- null-imp, bytes/string have the same representation
+    , setTemp temp Ax -- TODO: optimize here
+    ]
+  SRC.StringLength -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    , OpCall Bare_string_length
+    , setTemp temp Ax
+    ]
+  SRC.Crash -> oneArg $ \_ ->
+    [ OpCall Bare_crash
+    , setTemp temp Ax -- TODO: we never get here!
+    ]
   SRC.LoadSec -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_load_sector
+    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
-
   SRC.StoreSec -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_store_sector
+    , setTemp temp Ax -- TODO: hmm. we should return unit
     ]
-
   SRC.GetStackPointer -> oneArg $ \_ ->
     [ OpMove Ax (SReg Sp)
     , OpCall Bare_addr_to_num
+    , setTemp temp Ax
     ]
 
   where
