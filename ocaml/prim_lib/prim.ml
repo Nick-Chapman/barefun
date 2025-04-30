@@ -23,10 +23,8 @@ module X : sig
 
   type bytes
   val make_bytes : int -> bytes
-  (* TODO: length op is missing *)
   val set_bytes : bytes -> int -> char -> unit
   val get_bytes : bytes -> int -> char
-
   val freeze_bytes : bytes  -> string
   val thaw_bytes : string -> bytes
   val string_index : string -> int -> char

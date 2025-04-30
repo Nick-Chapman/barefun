@@ -76,18 +76,18 @@ let put_string s = put_chars (explode s)
 
 let newline () = put_char '\n'
 
-
 (* grabbed from shell.fun *)
 
-let chars_of_int i = (* TODO: make this work for negative numbers -- copy from sex.fun *)
+let chars_of_int i =
   let ord0 = ord '0' in
   let char_of_digit c = chr (ord0 + c) in
   let rec loop acc i =
     if i = 0 then acc else
       loop (char_of_digit (i%10) :: acc) (i/10)
   in
-  if i = 0 then ['0'] else loop [] i
-
+  if i = 0 then ['0'] else
+    if i < 0 then '-' :: loop [] (0 - i) else
+      loop [] i
 
 (* new misc here... *)
 
