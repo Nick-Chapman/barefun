@@ -21,6 +21,7 @@ let select_versions_for_example = function
   | "thrice" -> [4;5]
   | "tiny" -> [2;3;4;5]
   | "tree" -> [4;5]
+  | "read3" -> [0;1;2;3;4;5]
   | _ -> []
 
 let suffix_of_version v =

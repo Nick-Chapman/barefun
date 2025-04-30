@@ -66,7 +66,7 @@ Fri 25 Apr 2025 : eval-same (all examples/stages); print_all_chars example; reor
 Sat 26 Apr 2025 : sham working on real h/w
 
 Mon 28 Apr 2025 : packed string rep
-Tue 29 Apr 2025 : GC...
-Wed 30 Apr 2025 :
+Tue 29 Apr 2025 : GC... reachability (in stage5) working
+Wed 30 Apr 2025 : read3 example
 Thu 01 May 2025 :
 Fri 02 May 2025 :
