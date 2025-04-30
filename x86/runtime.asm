@@ -275,11 +275,6 @@ Bare_addr_to_num: ;; called when we see where the Sp is
     shr ax, 1
     ret
 
-Bare_string_length:
-    mov bx, ax
-    mov ax, [bx]
-    ret
-
 Bare_make_bytes:
     pop bx ;; heap allocation is at SP; so first we save return address.
     ;; Does not zero the allocated space. User caller code is expected to do this.

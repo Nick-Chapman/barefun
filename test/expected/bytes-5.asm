@@ -208,9 +208,8 @@ L19: ; Function: (lam,g6)
   push word L17
   mov si, sp
   push word 4 ;; scanned
-  mov ax, dx
-  call Bare_string_length
-  mov di, ax
+  mov bx, dx
+  mov di, [bx]
   push word di
   push word cx
   push word L18

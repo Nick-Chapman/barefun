@@ -559,9 +559,8 @@ L50: ; Function: (lam,g14)
   push word L48
   mov si, sp
   push word 4 ;; scanned
-  mov ax, dx
-  call Bare_string_length
-  mov di, ax
+  mov bx, dx
+  mov di, [bx]
   push word di
   push word cx
   push word L49
@@ -665,12 +664,10 @@ L58: ; Arm: 8'9
   jmp [bp]
 
 L59: ; Function: (lam,t1)
-  mov ax, [bp+2]
-  call Bare_string_length
-  mov si, ax
-  mov ax, dx
-  call Bare_string_length
-  mov di, ax
+  mov bx, [bp+2]
+  mov si, [bx]
+  mov bx, dx
+  mov di, [bx]
   mov ax, si
   cmp word ax, di
   call Bare_make_bool_from_z

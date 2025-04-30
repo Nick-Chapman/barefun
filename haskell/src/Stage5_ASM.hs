@@ -131,7 +131,6 @@ data BareBios
   | Bare_char_to_num
   | Bare_addr_to_num
 
-  | Bare_string_length
   | Bare_make_bytes
   | Bare_set_bytes
   | Bare_get_bytes
@@ -416,27 +415,19 @@ execBare = \case
     let desc = RawData { evenSizeInBytes = fromIntegral numBytes + 2 } -- 2 for the length word
     execPushAlloc (WBlockDescriptor desc) -- size word; part of GC data
 
-  -- TODO: no need for Bare given better string rep; just generate ops
-  -- 3x cases: Bare_string_length, Bare_set_bytes, Bare_get_bytes
-
-  Bare_set_bytes -> do
+  Bare_set_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Si
     c <- deChar <$> GetReg Bx
     let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
     SetMem a' (WChar c)
 
-  Bare_get_bytes -> do
+  Bare_get_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
     let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
     c <- GetMem a'
     SetReg Ax c
-
-  Bare_string_length -> do
-    a <- deAddr <$> GetReg Ax
-    n <- deNum <$> GetMem a
-    SetReg Ax (WNum n)
 
   Bare_load_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
@@ -1085,9 +1076,8 @@ compileBuiltinTo target b = case b of
     [ setTarget target s1
     ]
   SRC.StringLength -> oneArg $ \s1 ->
-    [ OpMove Ax s1
-    , OpCall Bare_string_length -- TODO: remove/inline
-    , setTarget target (SReg Ax)
+    [ OpMove Bx s1
+    , setTarget target (SMemIndirectOffset Bx 0)
     ]
   SRC.Crash -> oneArg $ \_ ->
     [ OpCall Bare_crash

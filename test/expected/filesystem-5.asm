@@ -251,9 +251,8 @@ L23: ; Function: (lam,g7)
   push word L21
   mov si, sp
   push word 4 ;; scanned
-  mov ax, dx
-  call Bare_string_length
-  mov di, ax
+  mov bx, dx
+  mov di, [bx]
   push word di
   push word cx
   push word L22
