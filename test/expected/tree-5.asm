@@ -76,6 +76,8 @@ L6: ; Function: (put_chars,g2)
   mov di, [bx+4]
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov bp, g2
   mov dx, di
   jmp [bp]

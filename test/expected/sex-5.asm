@@ -30,6 +30,7 @@ L4: ; Continuation
   mov si, [bp+8]
   call Bare_set_bytes
   pop word si ;; restore
+  mov si, Bare_unit
   mov ax, [bp+8]
   add ax, 1
   mov di, ax
@@ -100,6 +101,7 @@ L10: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, [bp+4]
   add ax, 1
   mov di, ax
@@ -200,6 +202,8 @@ L16: ; Continuation
 L17: ; Arm: 44'19
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -242,6 +246,7 @@ L20: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, [bp+4]
   add ax, 1
   mov di, ax
@@ -342,6 +347,8 @@ L26: ; Continuation
 L27: ; Arm: 44'19
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -379,9 +386,11 @@ L29: ; Continuation
   mov ax, 6
   mov bx, [bp+6]
   call Bare_store_sector
+  mov si, Bare_unit
   mov ax, 7
   mov bx, [bp+4]
   call Bare_store_sector
+  mov di, Bare_unit
   mov dx, g16
   mov bp, cx
   mov cx, [bp+2]
@@ -395,6 +404,7 @@ L30: ; Continuation
   mov ax, 7
   mov bx, si
   call Bare_load_sector
+  mov di, Bare_unit
   mov [Temps+6], si
   push word [Temps+6]
   push word L28
@@ -418,6 +428,7 @@ L31: ; Continuation
   mov ax, 6
   mov bx, si
   call Bare_load_sector
+  mov di, Bare_unit
   mov [Temps+6], si
   push word [Temps+6]
   push word L18

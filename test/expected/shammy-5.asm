@@ -229,6 +229,8 @@ L23: ; Function: (lam,t1)
   mov si, [bp+4]
   call Bare_set_bytes
   pop word si ;; restore
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
   mov [Temps+8], ax
@@ -327,6 +329,8 @@ L31: ; Function: (lam,t1)
   mov si, [bp+4]
   call Bare_set_bytes
   pop word si ;; restore
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov ax, [bp+4]
   sub ax, 1
   mov [Temps+8], ax
@@ -623,6 +627,8 @@ L54: ; Continuation
 L55: ; Arm: 99'19
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+10], ax
   mov dx, [Temps+10]
   mov bp, cx
   mov cx, [bp+2]
@@ -631,6 +637,8 @@ L55: ; Arm: 99'19
 L56: ; Arm: 100'22
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+12], ax
   mov dx, [Temps+12]
   mov bp, cx
   mov cx, [bp+2]
@@ -639,6 +647,8 @@ L56: ; Arm: 100'22
 L57: ; Arm: 101'16
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   mov dx, [Temps+14]
   mov bp, cx
   mov cx, [bp+2]
@@ -681,6 +691,8 @@ L58: ; Function: (put_chars,g24)
   jz L57
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   mov ax, 65
   add ax, [Temps+6]
   mov [Temps+16], ax
@@ -692,6 +704,8 @@ L58: ; Function: (put_chars,g24)
   mov [Temps+20], ax
   mov ax, [Temps+20]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
@@ -1359,6 +1373,8 @@ L109: ; Function: (at_word_start,t2)
 L110: ; Arm: 138'22
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+8], ax
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
@@ -1366,10 +1382,16 @@ L110: ; Arm: 138'22
 L111: ; Arm: 139'28
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+10], ax
   mov ax, `D`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+12], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   push word dx
   push word `\x04`
   push word 1
@@ -1393,10 +1415,14 @@ L114: ; Continuation
   call Bare_enter_check
   mov ax, `\x08`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, `\x08`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
@@ -1404,10 +1430,14 @@ L114: ; Continuation
 L115: ; Arm: 145'31
   mov ax, `\x08`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, `\x08`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -1478,6 +1508,8 @@ L119: ; Continuation
 L120: ; Arm: 99'19
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+18], ax
   mov dx, [Temps+18]
   mov bp, cx
   mov cx, [bp+2]
@@ -1486,6 +1518,8 @@ L120: ; Arm: 99'19
 L121: ; Arm: 100'22
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+20], ax
   mov dx, [Temps+20]
   mov bp, cx
   mov cx, [bp+2]
@@ -1494,6 +1528,8 @@ L121: ; Arm: 100'22
 L122: ; Arm: 101'16
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
@@ -1566,6 +1602,8 @@ L123: ; Function: (readloop,t1)
   jz L122
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov ax, 65
   add ax, [Temps+14]
   mov [Temps+24], ax
@@ -1577,6 +1615,8 @@ L123: ; Function: (readloop,t1)
   mov [Temps+28], ax
   mov ax, [Temps+28]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+30], ax
   mov dx, [Temps+30]
   mov bp, cx
   mov cx, [bp+2]
@@ -3345,6 +3385,8 @@ L252: ; Function: (loop,t1)
   mov di, [bx+4]
   mov ax, ` `
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   push word di
   push word bp
   push word cx
@@ -3359,6 +3401,7 @@ L253: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
+  mov si, Bare_unit
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
@@ -3566,6 +3609,7 @@ L272: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, [bp+4]
   add ax, 1
   mov di, ax

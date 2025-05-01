@@ -144,6 +144,8 @@ data Tickable
   | Prim
   | Op
   | Alloc -- counting bytes allocated on the heap
+  | GC
+  | Copied -- counting bytes copied by GC between Hemispaces
   deriving (Eq,Ord,Enum,Bounded)
 
 instance Show Tickable where
@@ -155,6 +157,8 @@ instance Show Tickable where
     Prim -> "prim"
     Op -> "op"
     Alloc -> "alloc"
+    GC -> "gc"
+    Copied -> "copied"
 
 newtype Number = Number Int deriving (Eq,Ord,Num,Integral,Real,Enum)
 

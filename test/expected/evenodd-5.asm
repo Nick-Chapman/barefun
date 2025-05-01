@@ -39,6 +39,7 @@ L4: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
+  mov si, Bare_unit
   mov dx, si
   mov bp, cx
   mov cx, [bp+2]
@@ -68,6 +69,7 @@ L7: ; Continuation
   call Bare_enter_check
   mov ax, dx
   call Bare_put_char
+  mov si, Bare_unit
   push word cx
   push word L6
   mov cx, sp

@@ -68,6 +68,8 @@ L8: ; Function: (lam,t1)
   mov si, [bp+4]
   call Bare_set_bytes
   pop word si ;; restore
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
   mov [Temps+8], ax
@@ -233,6 +235,8 @@ L21: ; Function: (put_chars,g7)
   mov di, [bx+4]
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov bp, g7
   mov dx, di
   jmp [bp]

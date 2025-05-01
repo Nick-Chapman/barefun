@@ -7,4 +7,4 @@
   ABCDEF
   \0d
   done
-  [EOF:#op=242]
+  [EOF:#op=276]

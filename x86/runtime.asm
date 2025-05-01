@@ -334,6 +334,9 @@ Bare_store_sector: ;Ax (Num bytes), Bx (The string to store)
     pop cx
     ret
 
+Bare_unit:
+    dw 42 ;; TODO: does it matter what is here?
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; begin/end
 

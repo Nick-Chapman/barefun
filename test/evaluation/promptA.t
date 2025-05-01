@@ -4,4 +4,4 @@
   % This is line one.
   % Another
   % And one more!
-  % [EOF:#op=592]
+  % [EOF:#op=640]

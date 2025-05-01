@@ -1,56 +1,100 @@
 L1: ; Start
   mov ax, `3`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, `>`
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   call Bare_get_char
   mov [Temps+8], ax
   mov ax, [Temps+8]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+10], ax
   call Bare_get_char
   mov [Temps+12], ax
   mov ax, [Temps+12]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   call Bare_get_char
   mov [Temps+16], ax
   mov ax, [Temps+16]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+18], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+20], ax
   mov ax, [Temps+8]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov ax, [Temps+12]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+24], ax
   mov ax, [Temps+16]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+26], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+28], ax
   mov ax, [Temps+12]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+30], ax
   mov ax, [Temps+16]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+32], ax
   mov ax, [Temps+8]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+34], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+36], ax
   mov ax, [Temps+16]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+38], ax
   mov ax, [Temps+8]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+40], ax
   mov ax, [Temps+12]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+42], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+44], ax
   mov ax, [Temps+8]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+46], ax
   mov ax, [Temps+12]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+48], ax
   mov ax, [Temps+16]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+50], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+52], ax
   mov dx, [Temps+52]
   mov bp, cx
   mov cx, [bp+2]

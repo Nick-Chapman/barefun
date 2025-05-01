@@ -3,8 +3,11 @@ L1: ; Function: (mainloop,g1)
   mov si, ax
   mov ax, si
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov bp, g1
   mov dx, g3
   jmp [bp]

@@ -8,6 +8,7 @@ L2: ; Function: (inner,t3)
   mov si, ax
   mov ax, si
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, si
   cmp word ax, `\n`
   call Bare_make_bool_from_z
@@ -22,8 +23,10 @@ L2: ; Function: (inner,t3)
 L3: ; Function: (outer,g1)
   mov ax, dx
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   push word dx
   push word L2
   mov [Temps+6], sp

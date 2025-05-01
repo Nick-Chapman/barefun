@@ -12,6 +12,8 @@ L2: ; Function: (put_chars,g1)
   mov di, [bx+4]
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov bp, g1
   mov dx, di
   jmp [bp]

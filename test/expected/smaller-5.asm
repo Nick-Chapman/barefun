@@ -12,6 +12,8 @@ L2: ; Function: (put_chars,g1)
   mov di, [bx+4]
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov bp, g1
   mov dx, di
   jmp [bp]
@@ -69,6 +71,8 @@ L7: ; Continuation
 L8: ; Arm: 23'27
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   push word dx
   push word cx
   push word L7
@@ -90,6 +94,8 @@ L9: ; Function: (readloop,g4)
   jz L8
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   push word dx
   push word si
   push word 1
@@ -103,6 +109,7 @@ L10: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
+  mov si, Bare_unit
   mov bp, g3
   mov dx, g9
   jmp [bp]
@@ -120,8 +127,10 @@ L11: ; Continuation
 L12: ; Function: (main,g3)
   mov ax, `%`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   push word cx
   push word L11
   mov cx, sp

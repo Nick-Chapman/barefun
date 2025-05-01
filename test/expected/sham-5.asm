@@ -318,6 +318,8 @@ L31: ; Function: (lam,t1)
   mov si, [bp+4]
   call Bare_set_bytes
   pop word si ;; restore
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov ax, [bp+4]
   add ax, 1
   mov [Temps+8], ax
@@ -416,6 +418,8 @@ L39: ; Function: (lam,t1)
   mov si, [bp+4]
   call Bare_set_bytes
   pop word si ;; restore
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov ax, [bp+4]
   sub ax, 1
   mov [Temps+8], ax
@@ -712,6 +716,8 @@ L62: ; Continuation
 L63: ; Arm: 105'19
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+10], ax
   mov dx, [Temps+10]
   mov bp, cx
   mov cx, [bp+2]
@@ -720,6 +726,8 @@ L63: ; Arm: 105'19
 L64: ; Arm: 106'22
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+12], ax
   mov dx, [Temps+12]
   mov bp, cx
   mov cx, [bp+2]
@@ -728,6 +736,8 @@ L64: ; Arm: 106'22
 L65: ; Arm: 107'16
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   mov dx, [Temps+14]
   mov bp, cx
   mov cx, [bp+2]
@@ -770,6 +780,8 @@ L66: ; Function: (put_chars,g25)
   jz L65
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   mov ax, 65
   add ax, [Temps+6]
   mov [Temps+16], ax
@@ -781,6 +793,8 @@ L66: ; Function: (put_chars,g25)
   mov [Temps+20], ax
   mov ax, [Temps+20]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
@@ -1385,6 +1399,7 @@ L108: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
+  mov si, Bare_unit
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
@@ -1836,6 +1851,8 @@ L143: ; Function: (at_word_start,t2)
 L144: ; Arm: 147'22
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+8], ax
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
@@ -1843,10 +1860,16 @@ L144: ; Arm: 147'22
 L145: ; Arm: 148'28
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+10], ax
   mov ax, `D`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+12], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   push word dx
   push word `\x04`
   push word 1
@@ -1870,10 +1893,14 @@ L148: ; Continuation
   call Bare_enter_check
   mov ax, `\x08`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, `\x08`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
@@ -1881,10 +1908,14 @@ L148: ; Continuation
 L149: ; Arm: 154'31
   mov ax, `\x08`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, `\x08`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -1955,6 +1986,8 @@ L153: ; Continuation
 L154: ; Arm: 105'19
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+18], ax
   mov dx, [Temps+18]
   mov bp, cx
   mov cx, [bp+2]
@@ -1963,6 +1996,8 @@ L154: ; Arm: 105'19
 L155: ; Arm: 106'22
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+20], ax
   mov dx, [Temps+20]
   mov bp, cx
   mov cx, [bp+2]
@@ -1971,6 +2006,8 @@ L155: ; Arm: 106'22
 L156: ; Arm: 107'16
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
@@ -2043,6 +2080,8 @@ L157: ; Function: (readloop,t1)
   jz L156
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov ax, 65
   add ax, [Temps+14]
   mov [Temps+24], ax
@@ -2054,6 +2093,8 @@ L157: ; Function: (readloop,t1)
   mov [Temps+28], ax
   mov ax, [Temps+28]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+30], ax
   mov dx, [Temps+30]
   mov bp, cx
   mov cx, [bp+2]
@@ -4158,6 +4199,8 @@ L309: ; Arm: 333'12
 L310: ; Arm: 147'22
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+8], ax
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
@@ -4165,10 +4208,16 @@ L310: ; Arm: 147'22
 L311: ; Arm: 148'28
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+10], ax
   mov ax, `D`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+12], ax
   mov ax, `\n`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
   push word dx
   push word `\x04`
   push word 1
@@ -4192,10 +4241,14 @@ L314: ; Continuation
   call Bare_enter_check
   mov ax, `\x08`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, `\x08`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
@@ -4203,10 +4256,14 @@ L314: ; Continuation
 L315: ; Arm: 154'31
   mov ax, `\x08`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, ` `
   call Bare_put_char
+  mov di, Bare_unit
   mov ax, `\x08`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   mov dx, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -4277,6 +4334,8 @@ L319: ; Continuation
 L320: ; Arm: 105'19
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+18], ax
   mov dx, [Temps+18]
   mov bp, cx
   mov cx, [bp+2]
@@ -4285,6 +4344,8 @@ L320: ; Arm: 105'19
 L321: ; Arm: 106'22
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+20], ax
   mov dx, [Temps+20]
   mov bp, cx
   mov cx, [bp+2]
@@ -4293,6 +4354,8 @@ L321: ; Arm: 106'22
 L322: ; Arm: 107'16
   mov ax, si
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov dx, [Temps+22]
   mov bp, cx
   mov cx, [bp+2]
@@ -4365,6 +4428,8 @@ L323: ; Function: (readloop,t1)
   jz L322
   mov ax, `^`
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
   mov ax, 65
   add ax, [Temps+14]
   mov [Temps+24], ax
@@ -4376,6 +4441,8 @@ L323: ; Function: (readloop,t1)
   mov [Temps+28], ax
   mov ax, [Temps+28]
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+30], ax
   mov dx, [Temps+30]
   mov bp, cx
   mov cx, [bp+2]
@@ -5060,6 +5127,8 @@ L374: ; Function: (loop,t1)
   mov di, [bx+4]
   mov ax, ` `
   call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
   push word di
   push word bp
   push word cx
@@ -5074,6 +5143,7 @@ L375: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
+  mov si, Bare_unit
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
@@ -6526,6 +6596,7 @@ L486: ; Continuation
   call Bare_enter_check
   mov ax, `\n`
   call Bare_put_char
+  mov si, Bare_unit
   mov ax, [bp+4]
   add ax, 1
   mov di, ax
