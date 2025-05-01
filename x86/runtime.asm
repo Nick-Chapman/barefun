@@ -357,10 +357,10 @@ final_code:
 
 %include CODE
 
-    align 512
-    times 512 db '5'
-    times 512 db '6'
-    times 512 db '7'
+    ;align 512
+    ;times 512 db '5'
+    ;times 512 db '6'
+    ;times 512 db '7'
 
 end_of_code:
 
