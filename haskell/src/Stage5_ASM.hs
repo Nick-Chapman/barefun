@@ -893,7 +893,7 @@ compileFunctionTo who target freeVars body = do
 -- making the fix below... (***) made it work.
 -- think this needs to be in all arms which return unit -- ok, just a few more.. all fixed now.
 
-
+-- TODO: take "Target" after Builtin; push lambda into each branch to be sure it is never ignored.
 compileBuiltinTo :: Target -> Builtin -> [Source] -> [Op]
 compileBuiltinTo target b = case b of
   SRC.GetChar -> oneArg $ \_ ->
@@ -903,7 +903,7 @@ compileBuiltinTo target b = case b of
   SRC.PutChar -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_put_char
-    , setTarget target (SLit (WAddr aUnit)) -- TODO: does this make things better? (***)
+    , setTarget target (SLit (WAddr aUnit))
     ]
   SRC.EqChar -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
@@ -1005,19 +1005,8 @@ compileBuiltinTo target b = case b of
     , OpPopRESTORE Si
     , setTarget target (SLit (WAddr aUnit))
     ]
-  SRC.GetBytes -> twoArgs $ \s1 s2 ->
-    [ OpMove Ax s1
-    , OpMove Bx s2
-    , OpCall Bare_get_bytes -- TODO: remove/inline
-    , setTarget target (SReg Ax)
-    ]
-  SRC.StringIndex -> twoArgs $ \s1 s2 ->
-    -- same as SRC.GetBytes; bytes/string have the same rep. -- TODO: share common code
-    [ OpMove Ax s1
-    , OpMove Bx s2
-    , OpCall Bare_get_bytes -- TODO: remove/inline
-    , setTarget target (SReg Ax)
-    ]
+  SRC.GetBytes -> twoArgs $ codeForGetBytes
+  SRC.StringIndex -> twoArgs $ codeForGetBytes
   SRC.FreezeBytes -> oneArg $ \s1 ->
     -- null-imp; bytes/string have the same representation
     [ setTarget target s1
@@ -1052,6 +1041,13 @@ compileBuiltinTo target b = case b of
     ]
 
   where
+    codeForGetBytes s1 s2 =
+      [ OpMove Ax s1
+      , OpMove Bx s2
+      , OpCall Bare_get_bytes -- TODO: remove/inline
+      , setTarget target (SReg Ax)
+      ]
+
     err = error (printf "Stage5.compileBuiltin: error: %s" (show b))
     oneArg f = \case [v] -> f v; _ -> err
     twoArgs f = \case [v1,v2] -> f v1 v2; _ -> err
