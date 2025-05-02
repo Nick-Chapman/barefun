@@ -20,8 +20,16 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM_AbstractSyntax
 
-enableGC :: Bool
-enableGC = True
+gcLiveWordsTrace :: Bool
+gcLiveWordsTrace = False
+
+-- During dev, we can have quite small heap spaces
+-- experimentation shows the sham example needs more that 2000; but 3000 seems enough
+hemiSizeInBytes :: Int
+hemiSizeInBytes = 3000
+
+guessedNeed :: Int
+guessedNeed = 500 -- TODO: compute at compile-time a max-bound for each Bare_enter_check
 
 ----------------------------------------------------------------------
 -- Execute
@@ -58,7 +66,7 @@ execOp = \case
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
-    execPushAlloc I.Alloc w
+    execPushAlloc AllocForUser w
     cont
   OpPushSAVE s -> \cont -> do
     w <- evalSource s
@@ -96,10 +104,10 @@ twoE16 = 65536
 -- this is called from user code which does OpPush & also from GC when copying
 -- it records #bytes allocated (why am I recording in #bytes not #words?)
 -- and it does sanity checks for the pushed block-descriptor
-execPushAlloc :: I.Tickable -> Word -> M ()
-execPushAlloc ticker w = do
+execPushAlloc :: AllocMode -> Word -> M ()
+execPushAlloc mode w = do
   a <- deAddr <$> GetReg Sp
-  sequence_ (replicate bytesPerWord (TraceAlloc ticker))
+  sequence_ (replicate bytesPerWord (TraceAlloc mode))
   a' <- addAddr (-(bytesPerWord)) a
   SetMem a' w
   SetReg Sp (WAddr a')
@@ -129,9 +137,9 @@ checkPushBlockDescriptor = \case
   _ ->
     pure ()
 
-slideStackPointer :: I.Tickable -> Int -> M ()
-slideStackPointer ticker nBytes = do
-  sequence_ (replicate (nBytes) (TraceAlloc ticker))
+slideStackPointer :: AllocMode -> Int -> M ()
+slideStackPointer mode nBytes = do
+  sequence_ (replicate (nBytes) (TraceAlloc mode))
   a <- deAddr <$> GetReg Sp
   a' <- addAddr (-(nBytes)) a
   SetReg Sp (WAddr a')
@@ -167,9 +175,16 @@ execBare = \case
   Bare_crash -> Crash
 
   Bare_enter_check -> do
-    _x <- deAddr <$> GetReg Sp
-    if not enableGC then pure () else do
-      gcTop
+    let need = guessedNeed
+    n <- heapBytesRemaining
+    let willGC = n < need
+    --Print (printf "Bare_enter_check: heapBytesRemaining = %d%s\n" n (if willGC then " (will GC)" else ""))
+    if willGC then gcTop else pure ()
+    n' <- heapBytesRemaining
+    let enoughtSpaceRecovered = n' >= need
+    if enoughtSpaceRecovered then BudgedForAllocation need else do
+      Print (printf "[Not enough space recovered by GC: need=%d; have:%d]\n" need n')
+      Crash
 
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
   Bare_put_char -> do c <- deChar <$> GetReg Ax; PutChar c
@@ -200,12 +215,12 @@ execBare = \case
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
     let numBytes = align (fromIntegral n) where align n = 2 * ((n+1) `div` 2)
-    slideStackPointer I.Alloc numBytes
-    execPushAlloc I.Alloc (WNum n) -- length word; part of user data
+    slideStackPointer AllocForUser numBytes
+    execPushAlloc AllocForUser (WNum n) -- length word; part of user data
     w <- GetReg Sp
     SetReg Ax w
     let desc = RawData { evenSizeInBytes = fromIntegral numBytes + 2 } -- 2 for the length word
-    execPushAlloc I.Alloc (WBlockDescriptor desc) -- size word; part of GC data
+    execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
 
   Bare_set_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
@@ -313,12 +328,13 @@ data M a where
   Bind :: M a -> (a -> M b) -> M b
   Halt :: M ()
   Crash :: M ()
-  CheckRecentAlloc :: Int -> M ()
+  CheckRecentAlloc :: Int -> M () -- This is ensure block-descriptors are correct
+  BudgedForAllocation :: Int -> M ()
   Debug :: String -> M ()
-  Debug1 :: String -> M ()
+  Print :: String -> M ()
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
-  TraceAlloc :: I.Tickable -> M ()
+  TraceAlloc :: AllocMode -> M ()
   GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Word -> M () -- TODO: SetReg/GetReg will operate on Val
   GetReg :: Reg -> M Word
@@ -332,6 +348,9 @@ data M a where
   GetChar :: M Char
   BumpGC :: M Int
   WhatHemi :: M Hemi -- in which we are allocating
+
+
+data AllocMode = AllocForUser | AllocForGC
 
 runM :: TraceFlag -> DebugFlag -> Image -> M () -> Interaction
 runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
@@ -378,18 +397,35 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
         let State{allocsSinceLastCheck=actual} = s
         let same = (expect == actual)
         let m = printf "CheckRecentAlloc: expect=%d, actual=%d, same=%s\n" expect actual (show same)
+        --ITrace m $
         if not same then error m else
             k s { allocsSinceLastCheck = 0 } ()
 
+      BudgedForAllocation n -> do
+        --let State{budgetAlloc=last,allocsSinceLastEnter=used} = s
+        --let m = printf "Over-budgeted by: %d.\nNew budget: %d\n" (last-used) n
+        --ITrace m $
+        k s { budgetAlloc = n, allocsSinceLastEnter = 0 } ()
+
       Debug m -> debug m $ k s ()
-      Debug1 m -> ITrace m $ k s ()
+      Print m -> ITrace m $ k s ()
 
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k
 
-      TraceAlloc ticker -> do
+
+      TraceAlloc AllocForUser -> do
+        let State{allocsSinceLastCheck,allocsSinceLastEnter,budgetAlloc} = s
+        let die = ITrace (printf "alloc-budget-exceeded: %d" budgetAlloc) IDone
+        if allocsSinceLastEnter == budgetAlloc then die else do
+          ITick I.Alloc $ k s { allocsSinceLastCheck = 1 + allocsSinceLastCheck
+                             , allocsSinceLastEnter = 1 + allocsSinceLastEnter
+                             } ()
+
+      TraceAlloc AllocForGC -> do -- no budget checking
         let State{allocsSinceLastCheck} = s
-        ITick ticker $ k s { allocsSinceLastCheck = 1 + allocsSinceLastCheck } ()
+        ITick I.Copied $ k s { allocsSinceLastCheck = 1 + allocsSinceLastCheck
+                             } ()
 
       GetCode lab -> do
         k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)
@@ -448,6 +484,8 @@ data State = State
   , lastCodeLabel :: CodeLabel
   , offsetFromLastLabel :: Int
   , allocsSinceLastCheck :: Int
+  , allocsSinceLastEnter :: Int
+  , budgetAlloc :: Int
   , gcNum :: Int
   , hemi :: Hemi
   }
@@ -462,6 +500,8 @@ state0 dmap = State
   , lastCodeLabel = error "lastCodeLabel"
   , offsetFromLastLabel = error "offsetFromLastLabel"
   , allocsSinceLastCheck = 0
+  , allocsSinceLastEnter = 0
+  , budgetAlloc = hemiSizeInBytes
   , gcNum = 1
   , hemi = HemiA
   }
@@ -588,19 +628,17 @@ instance Show Hemi where show = \case HemiA -> "A"; HemiB -> "B"
 otherHemi :: Hemi -> Hemi
 otherHemi = \case HemiA -> HemiB; HemiB -> HemiA
 
--- During dev, we can have quite small heap spaces
--- experimentation shows the sham example needs more that 2000; but 3000 seems enough
-heapSizeInBytes :: Int
-heapSizeInBytes = 3000
-
 topA,botA,topB,botB :: Int
 topA = 50000
-botA = topA - heapSizeInBytes
+botA = topA - hemiSizeInBytes
 topB = 40000
-botB = topB - heapSizeInBytes
+botB = topB - hemiSizeInBytes
 
 topOfHemi :: Hemi -> Int
 topOfHemi = \case HemiA -> topA; HemiB -> topB
+
+botOfHemi :: Hemi -> Int
+botOfHemi = \case HemiA -> botA; HemiB -> botB
 
 inA,inB :: Int -> Bool
 inA n = n <= topA && n >= botA
@@ -640,6 +678,11 @@ addAddr i = \case
   AStatic lab n -> pure $ AStatic lab (n+i)
   ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
 
+heapBytesRemaining :: M Int
+heapBytesRemaining = do
+  HeapAddr sp <- getSP
+  hemi <- WhatHemi
+  pure (fromIntegral sp - botOfHemi hemi)
 
 setStackPointerToTopOfHemi :: Hemi -> M ()
 setStackPointerToTopOfHemi hemi = do
@@ -651,6 +694,7 @@ gcTop = do
   fromSpace <- WhatHemi
   gcNum <- BumpGC
   toSpace <- WhatHemi
+  if gcLiveWordsTrace then Print "[" else pure ()
   Debug (printf "GC(%d) starting: %s --> %s\n" gcNum (show fromSpace) (show toSpace))
   setStackPointerToTopOfHemi toSpace
 
@@ -662,6 +706,7 @@ gcTop = do
   HeapAddr sp <- getSP
   let liveBytes = topOfHemi toSpace - fromIntegral sp
   Debug (printf "GC(%d) finished: liveBytes=%d\n" gcNum liveBytes)
+  if gcLiveWordsTrace then  Print (printf "%d]" liveBytes) else pure ()
 
   where
     loop :: Int -> HeapAddr -> M ()
@@ -690,7 +735,7 @@ gcTop = do
 
 evacuateReg :: Reg -> M ()
 evacuateReg reg = do
-  --Debug1 (printf "evacuateReg: %s\n" (show reg))
+  --Print (printf "evacuateReg: %s\n" (show reg))
   w <- GetReg reg
   evacuate w >>= \case
     Just w' -> SetReg reg w'
@@ -758,7 +803,7 @@ evacuateHA objectA = do
 copyAlloc :: HeapAddr -> M ()
 copyAlloc ha = do
   w <- GetMem (AHeapSpace ha)
-  execPushAlloc I.Copied w
+  execPushAlloc AllocForGC w
   --_newAddress <- getSP
   --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
   pure ()
