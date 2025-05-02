@@ -1,9 +1,11 @@
 L1: ; Function: (lam,t1)
+  call Bare_enter_check
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
 
 L2: ; Function: (block,g1)
+  call Bare_enter_check
   push word dx
   push word L1
   mov si, sp
@@ -45,6 +47,7 @@ L5: ; Arm: 7'9
   jmp [bp]
 
 L6: ; Function: (loop,t2)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -74,6 +77,7 @@ L7: ; Continuation
   jmp [bp]
 
 L8: ; Function: (lam,g5)
+  call Bare_enter_check
   mov ax, 512
   call Bare_make_bytes
   mov si, ax
@@ -210,6 +214,7 @@ L17: ; Arm: 44'19
   jmp [bp]
 
 L18: ; Function: (loop,t4)
+  call Bare_enter_check
   mov ax, dx
   mov bx, 64
   push word dx ;; save
@@ -355,6 +360,7 @@ L27: ; Arm: 44'19
   jmp [bp]
 
 L28: ; Function: (loop,t4)
+  call Bare_enter_check
   mov ax, dx
   mov bx, 64
   push word dx ;; save
@@ -444,6 +450,7 @@ L31: ; Continuation
   jmp [bp]
 
 L32: ; Start
+  call Bare_enter_check
   push word cx
   push word L31
   mov cx, sp

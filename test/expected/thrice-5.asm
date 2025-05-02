@@ -1,4 +1,5 @@
 L1: ; Start
+  call Bare_enter_check
   mov ax, `@`
   call Bare_put_char
   mov si, Bare_unit

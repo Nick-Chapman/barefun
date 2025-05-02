@@ -11,6 +11,7 @@ L2: ; Arm: 4'26
   jmp [bp]
 
 L3: ; Function: (is_even,g1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -99,6 +100,7 @@ L9: ; Continuation
   jmp [bp]
 
 L10: ; Start
+  call Bare_enter_check
   push word cx
   push word L9
   mov cx, sp

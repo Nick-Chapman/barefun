@@ -62,6 +62,7 @@ L4: ; Arm: 13'20
   jmp [bp]
 
 L5: ; Function: (loop,g1)
+  call Bare_enter_check
   mov ax, 255
   cmp word ax, dx
   call Bare_make_bool_from_n
@@ -114,6 +115,7 @@ L6: ; Continuation
   jmp [bp]
 
 L7: ; Start
+  call Bare_enter_check
   push word cx
   push word L6
   mov cx, sp

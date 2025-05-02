@@ -501,7 +501,7 @@ state0 dmap = State
   , offsetFromLastLabel = error "offsetFromLastLabel"
   , allocsSinceLastCheck = 0
   , allocsSinceLastEnter = 0
-  , budgetAlloc = hemiSizeInBytes
+  , budgetAlloc = 0
   , gcNum = 1
   , hemi = HemiA
   }

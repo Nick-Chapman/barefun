@@ -1,4 +1,5 @@
 L1: ; Start
+  call Bare_enter_check
   mov dx, g1
   mov bp, cx
   mov cx, [bp+2]

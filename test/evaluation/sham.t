@@ -20,4 +20,4 @@
   And what can be the use of him is more than I can see.
   He is very, very like me from the heels up to the head;
   And I see him jump before me, when I jump into my bed.
-  % [EOF:#op=66890, #alloc=30406, #gc=19, #copied=17874]
+  % [EOF:#op=69455, #alloc=30406, #gc=19, #copied=17792]

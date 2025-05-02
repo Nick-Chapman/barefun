@@ -1,9 +1,11 @@
 L1: ; Function: (lam,t1)
+  call Bare_enter_check
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
 
 L2: ; Function: (block,g1)
+  call Bare_enter_check
   push word dx
   push word L1
   mov si, sp
@@ -30,6 +32,7 @@ L4: ; Continuation
   jmp [bp]
 
 L5: ; Function: (length,g2)
+  call Bare_enter_check
   mov bx, dx
   cmp word [bx], 0
   jz L3
@@ -57,6 +60,7 @@ L7: ; Continuation
   jmp [bp]
 
 L8: ; Function: (lam,t1)
+  call Bare_enter_check
   mov bx, dx
   cmp word [bx], 0
   jz L6
@@ -77,6 +81,7 @@ L8: ; Function: (lam,t1)
   jmp [bp]
 
 L9: ; Function: (rev_onto,g3)
+  call Bare_enter_check
   push word dx
   push word L8
   mov si, sp
@@ -100,6 +105,7 @@ L11: ; Continuation
   jmp [bp]
 
 L12: ; Function: (lam,t1)
+  call Bare_enter_check
   mov bx, dx
   cmp word [bx], 0
   jz L10
@@ -126,6 +132,7 @@ L12: ; Function: (lam,t1)
   jmp [bp]
 
 L13: ; Function: (loop,t2)
+  call Bare_enter_check
   push word bp
   push word dx
   push word [bp+2]
@@ -177,6 +184,7 @@ L16: ; Continuation
   jmp [bp]
 
 L17: ; Function: (lam,g5)
+  call Bare_enter_check
   push word dx
   push word cx
   push word L16
@@ -202,6 +210,7 @@ L19: ; Continuation
   jmp [bp]
 
 L20: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -228,6 +237,7 @@ L20: ; Function: (lam,t1)
   jmp [bp]
 
 L21: ; Function: (explode_loop,t1)
+  call Bare_enter_check
   push word bp
   push word dx
   push word [bp+2]
@@ -249,6 +259,7 @@ L22: ; Continuation
   jmp [bp]
 
 L23: ; Function: (lam,g7)
+  call Bare_enter_check
   push word dx
   push word L21
   mov si, sp
@@ -307,6 +318,7 @@ L28: ; Arm: 67'16
   jmp [bp]
 
 L29: ; Function: (put_chars,g8)
+  call Bare_enter_check
   mov bx, dx
   cmp word [bx], 0
   jz L24
@@ -383,6 +395,7 @@ L31: ; Continuation
   jmp [bp]
 
 L32: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -418,6 +431,7 @@ L32: ; Function: (lam,t1)
   jmp [bp]
 
 L33: ; Function: (loop,g29)
+  call Bare_enter_check
   push word dx
   push word L32
   mov si, sp
@@ -447,6 +461,7 @@ L35: ; Continuation
   jmp [bp]
 
 L36: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -482,6 +497,7 @@ L36: ; Function: (lam,t1)
   jmp [bp]
 
 L37: ; Function: (loop,g40)
+  call Bare_enter_check
   push word dx
   push word L36
   mov si, sp
@@ -511,6 +527,7 @@ L39: ; Continuation
   jmp [bp]
 
 L40: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -546,6 +563,7 @@ L40: ; Function: (lam,t1)
   jmp [bp]
 
 L41: ; Function: (loop,g44)
+  call Bare_enter_check
   push word dx
   push word L40
   mov si, sp
@@ -575,6 +593,7 @@ L43: ; Continuation
   jmp [bp]
 
 L44: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -610,6 +629,7 @@ L44: ; Function: (lam,t1)
   jmp [bp]
 
 L45: ; Function: (loop,g55)
+  call Bare_enter_check
   push word dx
   push word L44
   mov si, sp
@@ -639,6 +659,7 @@ L47: ; Continuation
   jmp [bp]
 
 L48: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -674,6 +695,7 @@ L48: ; Function: (lam,t1)
   jmp [bp]
 
 L49: ; Function: (loop,g59)
+  call Bare_enter_check
   push word dx
   push word L48
   mov si, sp
@@ -703,6 +725,7 @@ L51: ; Continuation
   jmp [bp]
 
 L52: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -738,6 +761,7 @@ L52: ; Function: (lam,t1)
   jmp [bp]
 
 L53: ; Function: (loop,g63)
+  call Bare_enter_check
   push word dx
   push word L52
   mov si, sp
@@ -767,6 +791,7 @@ L55: ; Continuation
   jmp [bp]
 
 L56: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -802,6 +827,7 @@ L56: ; Function: (lam,t1)
   jmp [bp]
 
 L57: ; Function: (loop,g80)
+  call Bare_enter_check
   push word dx
   push word L56
   mov si, sp
@@ -831,6 +857,7 @@ L59: ; Continuation
   jmp [bp]
 
 L60: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -866,6 +893,7 @@ L60: ; Function: (lam,t1)
   jmp [bp]
 
 L61: ; Function: (loop,g91)
+  call Bare_enter_check
   push word dx
   push word L60
   mov si, sp
@@ -895,6 +923,7 @@ L63: ; Continuation
   jmp [bp]
 
 L64: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -930,6 +959,7 @@ L64: ; Function: (lam,t1)
   jmp [bp]
 
 L65: ; Function: (loop,g110)
+  call Bare_enter_check
   push word dx
   push word L64
   mov si, sp
@@ -959,6 +989,7 @@ L67: ; Continuation
   jmp [bp]
 
 L68: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -994,6 +1025,7 @@ L68: ; Function: (lam,t1)
   jmp [bp]
 
 L69: ; Function: (loop,g121)
+  call Bare_enter_check
   push word dx
   push word L68
   mov si, sp
@@ -1019,6 +1051,7 @@ L71: ; Continuation
   jmp [bp]
 
 L72: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1041,6 +1074,7 @@ L72: ; Function: (lam,t1)
   jmp [bp]
 
 L73: ; Function: (loop,g141)
+  call Bare_enter_check
   push word dx
   push word L72
   mov si, sp
@@ -1070,6 +1104,7 @@ L75: ; Continuation
   jmp [bp]
 
 L76: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1105,6 +1140,7 @@ L76: ; Function: (lam,t1)
   jmp [bp]
 
 L77: ; Function: (loop,g146)
+  call Bare_enter_check
   push word dx
   push word L76
   mov si, sp
@@ -1134,6 +1170,7 @@ L79: ; Continuation
   jmp [bp]
 
 L80: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1169,6 +1206,7 @@ L80: ; Function: (lam,t1)
   jmp [bp]
 
 L81: ; Function: (loop,g157)
+  call Bare_enter_check
   push word dx
   push word L80
   mov si, sp
@@ -1198,6 +1236,7 @@ L83: ; Continuation
   jmp [bp]
 
 L84: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1233,6 +1272,7 @@ L84: ; Function: (lam,t1)
   jmp [bp]
 
 L85: ; Function: (loop,g161)
+  call Bare_enter_check
   push word dx
   push word L84
   mov si, sp
@@ -1262,6 +1302,7 @@ L87: ; Continuation
   jmp [bp]
 
 L88: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1297,6 +1338,7 @@ L88: ; Function: (lam,t1)
   jmp [bp]
 
 L89: ; Function: (loop,g172)
+  call Bare_enter_check
   push word dx
   push word L88
   mov si, sp
@@ -1326,6 +1368,7 @@ L91: ; Continuation
   jmp [bp]
 
 L92: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1361,6 +1404,7 @@ L92: ; Function: (lam,t1)
   jmp [bp]
 
 L93: ; Function: (loop,g176)
+  call Bare_enter_check
   push word dx
   push word L92
   mov si, sp
@@ -1390,6 +1434,7 @@ L95: ; Continuation
   jmp [bp]
 
 L96: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1425,6 +1470,7 @@ L96: ; Function: (lam,t1)
   jmp [bp]
 
 L97: ; Function: (loop,g180)
+  call Bare_enter_check
   push word dx
   push word L96
   mov si, sp
@@ -1454,6 +1500,7 @@ L99: ; Continuation
   jmp [bp]
 
 L100: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1489,6 +1536,7 @@ L100: ; Function: (lam,t1)
   jmp [bp]
 
 L101: ; Function: (loop,g197)
+  call Bare_enter_check
   push word dx
   push word L100
   mov si, sp
@@ -1518,6 +1566,7 @@ L103: ; Continuation
   jmp [bp]
 
 L104: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1553,6 +1602,7 @@ L104: ; Function: (lam,t1)
   jmp [bp]
 
 L105: ; Function: (loop,g208)
+  call Bare_enter_check
   push word dx
   push word L104
   mov si, sp
@@ -1582,6 +1632,7 @@ L107: ; Continuation
   jmp [bp]
 
 L108: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1617,6 +1668,7 @@ L108: ; Function: (lam,t1)
   jmp [bp]
 
 L109: ; Function: (loop,g227)
+  call Bare_enter_check
   push word dx
   push word L108
   mov si, sp
@@ -1646,6 +1698,7 @@ L111: ; Continuation
   jmp [bp]
 
 L112: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1681,6 +1734,7 @@ L112: ; Function: (lam,t1)
   jmp [bp]
 
 L113: ; Function: (loop,g238)
+  call Bare_enter_check
   push word dx
   push word L112
   mov si, sp
@@ -1710,6 +1764,7 @@ L115: ; Continuation
   jmp [bp]
 
 L116: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1745,6 +1800,7 @@ L116: ; Function: (lam,t1)
   jmp [bp]
 
 L117: ; Function: (loop,g261)
+  call Bare_enter_check
   push word dx
   push word L116
   mov si, sp
@@ -1774,6 +1830,7 @@ L119: ; Continuation
   jmp [bp]
 
 L120: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1809,6 +1866,7 @@ L120: ; Function: (lam,t1)
   jmp [bp]
 
 L121: ; Function: (loop,g272)
+  call Bare_enter_check
   push word dx
   push word L120
   mov si, sp
@@ -1838,6 +1896,7 @@ L123: ; Continuation
   jmp [bp]
 
 L124: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1873,6 +1932,7 @@ L124: ; Function: (lam,t1)
   jmp [bp]
 
 L125: ; Function: (loop,g276)
+  call Bare_enter_check
   push word dx
   push word L124
   mov si, sp
@@ -1902,6 +1962,7 @@ L127: ; Continuation
   jmp [bp]
 
 L128: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1937,6 +1998,7 @@ L128: ; Function: (lam,t1)
   jmp [bp]
 
 L129: ; Function: (loop,g287)
+  call Bare_enter_check
   push word dx
   push word L128
   mov si, sp
@@ -1966,6 +2028,7 @@ L131: ; Continuation
   jmp [bp]
 
 L132: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -2001,6 +2064,7 @@ L132: ; Function: (lam,t1)
   jmp [bp]
 
 L133: ; Function: (loop,g296)
+  call Bare_enter_check
   push word dx
   push word L132
   mov si, sp
@@ -2030,6 +2094,7 @@ L135: ; Continuation
   jmp [bp]
 
 L136: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -2065,6 +2130,7 @@ L136: ; Function: (lam,t1)
   jmp [bp]
 
 L137: ; Function: (loop,g307)
+  call Bare_enter_check
   push word dx
   push word L136
   mov si, sp
@@ -2094,6 +2160,7 @@ L139: ; Continuation
   jmp [bp]
 
 L140: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -2129,6 +2196,7 @@ L140: ; Function: (lam,t1)
   jmp [bp]
 
 L141: ; Function: (loop,g326)
+  call Bare_enter_check
   push word dx
   push word L140
   mov si, sp
@@ -2158,6 +2226,7 @@ L143: ; Continuation
   jmp [bp]
 
 L144: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -2193,6 +2262,7 @@ L144: ; Function: (lam,t1)
   jmp [bp]
 
 L145: ; Function: (loop,g337)
+  call Bare_enter_check
   push word dx
   push word L144
   mov si, sp
@@ -2222,6 +2292,7 @@ L147: ; Continuation
   jmp [bp]
 
 L148: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -2257,6 +2328,7 @@ L148: ; Function: (lam,t1)
   jmp [bp]
 
 L149: ; Function: (loop,g356)
+  call Bare_enter_check
   push word dx
   push word L148
   mov si, sp
@@ -2306,6 +2378,7 @@ L152: ; Arm: 13'9
   jmp [bp]
 
 L153: ; Function: (loop,t2)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -2348,6 +2421,7 @@ L156: ; Continuation
   jmp [bp]
 
 L157: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -2370,6 +2444,7 @@ L157: ; Function: (lam,t1)
   jmp [bp]
 
 L158: ; Function: (loop,t5)
+  call Bare_enter_check
   push word bp
   push word dx
   push word [bp+2]
@@ -2824,6 +2899,7 @@ L193: ; Arm: 13'9
   jmp [bp]
 
 L194: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 64
   call Bare_make_bool_from_n
@@ -2929,6 +3005,7 @@ L200: ; Arm: 13'9
   jmp [bp]
 
 L201: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 64
   call Bare_make_bool_from_n
@@ -3442,6 +3519,7 @@ L238: ; Arm: 13'9
   jmp [bp]
 
 L239: ; Function: (loop,t3)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -4542,6 +4620,7 @@ L316: ; Arm: 13'9
   jmp [bp]
 
 L317: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -6980,6 +7059,7 @@ L461: ; Continuation
   jmp [bp]
 
 L462: ; Function: (loop,t6)
+  call Bare_enter_check
   mov ax, 124
   cmp word ax, dx
   call Bare_make_bool_from_n
@@ -7466,6 +7546,7 @@ L498: ; Arm: 13'9
   jmp [bp]
 
 L499: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 64
   call Bare_make_bool_from_n
@@ -7571,6 +7652,7 @@ L505: ; Arm: 13'9
   jmp [bp]
 
 L506: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 64
   call Bare_make_bool_from_n
@@ -8084,6 +8166,7 @@ L543: ; Arm: 13'9
   jmp [bp]
 
 L544: ; Function: (loop,t3)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -9184,6 +9267,7 @@ L621: ; Arm: 13'9
   jmp [bp]
 
 L622: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -11622,6 +11706,7 @@ L766: ; Continuation
   jmp [bp]
 
 L767: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, 119
   cmp word ax, dx
   call Bare_make_bool_from_n
@@ -12454,6 +12539,7 @@ L827: ; Arm: 13'9
   jmp [bp]
 
 L828: ; Function: (loop,t2)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 64
   call Bare_make_bool_from_n
@@ -12992,6 +13078,7 @@ L867: ; Arm: 13'9
   jmp [bp]
 
 L868: ; Function: (loop,t3)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -14088,6 +14175,7 @@ L945: ; Arm: 13'9
   jmp [bp]
 
 L946: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 512
   call Bare_make_bool_from_n
@@ -15708,6 +15796,7 @@ L1048: ; Arm: 13'9
   jmp [bp]
 
 L1049: ; Function: (loop,t1)
+  call Bare_enter_check
   mov ax, 125
   cmp word ax, dx
   call Bare_make_bool_from_n
@@ -16316,6 +16405,7 @@ L1087: ; Continuation
   jmp [bp]
 
 L1088: ; Start
+  call Bare_enter_check
   push word cx
   push word L1087
   mov cx, sp

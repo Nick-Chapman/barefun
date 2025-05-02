@@ -3,4 +3,4 @@
   [Stage5 (ASM); post normalization size: 130]
   One
   \00\00\00\00\00Two
-  [HALT:#op=1267, #alloc=678]
+  [HALT:#op=1341, #alloc=678]

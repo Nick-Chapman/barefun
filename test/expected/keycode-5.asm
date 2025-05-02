@@ -1,4 +1,5 @@
 L1: ; Function: (main,g1)
+  call Bare_enter_check
   call Bare_get_char
   mov si, ax
   mov ax, si
@@ -9,6 +10,7 @@ L1: ; Function: (main,g1)
   jmp [bp]
 
 L2: ; Start
+  call Bare_enter_check
   mov bp, g1
   mov dx, g4
   jmp [bp]

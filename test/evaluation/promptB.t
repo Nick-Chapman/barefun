@@ -4,4 +4,4 @@
   % This is line one.
   % Another
   % And one more!
-  % [EOF:#op=656, #alloc=24]
+  % [EOF:#op=702, #alloc=24]

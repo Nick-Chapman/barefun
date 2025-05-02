@@ -4,6 +4,7 @@ L1: ; Arm: 10'29
   jmp [bp]
 
 L2: ; Function: (inner,g2)
+  call Bare_enter_check
   call Bare_get_char
   mov si, ax
   mov ax, si
@@ -21,6 +22,7 @@ L2: ; Function: (inner,g2)
   jmp [bp]
 
 L3: ; Function: (outer,g1)
+  call Bare_enter_check
   mov ax, `%`
   call Bare_put_char
   mov si, Bare_unit
@@ -32,6 +34,7 @@ L3: ; Function: (outer,g1)
   jmp [bp]
 
 L4: ; Start
+  call Bare_enter_check
   mov bp, g1
   mov dx, g7
   jmp [bp]

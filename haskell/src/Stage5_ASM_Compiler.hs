@@ -29,7 +29,7 @@ targetOfTemp = \case
 -- Bx is used for case-scrutinee and temp for simultaneousMove
 
 compile :: SRC.Image -> Transformed
-compile x = runAsm (compileImage x >>= CutCode "Start")
+compile x = runAsm (compileImage x >>= cutEntryCode "Start")
 
 compileImage :: SRC.Image -> Asm Code
 compileImage = \case
@@ -46,7 +46,7 @@ compileTopDef who = \case
   SRC.TopLitS string -> pure (DW [ LNum (fromIntegral $ length string) ] : [ DS string ])
 
   SRC.TopLam _x body -> do
-    codeLabel <- compileCode body >>= CutCode ("Function: " ++ who)
+    codeLabel <- compileCode body >>= cutEntryCode ("Function: " ++ who)
     let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
 
@@ -62,8 +62,8 @@ compileTopRef = \case
       SRC.InGlobal g -> LStatic (DataLabelG g)
       _ -> error "compileTopRef"
 
-cutCode :: String -> Code -> Asm CodeLabel
-cutCode name code = do
+cutEntryCode :: String -> Code -> Asm CodeLabel
+cutEntryCode name code = do
   CutCode name $ do
     doOps [ OpCall Bare_enter_check ] code
 
@@ -88,7 +88,7 @@ compileCode = \case
     doOps ops <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
-    lab <- compileCode later >>= cutCode "Continuation"
+    lab <- compileCode later >>= cutEntryCode "Continuation"
     let
       desc = Scanned { evenSizeInBytes = 2 * (length pre + 2) }
     let
@@ -175,7 +175,7 @@ compileConAppTo target tag xs = do
 
 compileFunctionTo :: String -> Target -> [SRC.Ref] -> SRC.Code -> Asm [Op]
 compileFunctionTo who target freeVars body = do
-  lab <- compileCode body >>= CutCode ("Function: " ++ who)
+  lab <- compileCode body >>= cutEntryCode ("Function: " ++ who)
   let desc = Scanned { evenSizeInBytes = 2 * (length freeVars + 1) }
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++

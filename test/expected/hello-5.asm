@@ -5,6 +5,7 @@ L1: ; Arm: 11'7
   jmp [bp]
 
 L2: ; Function: (put_chars,g1)
+  call Bare_enter_check
   mov bx, dx
   cmp word [bx], 0
   jz L1
@@ -34,6 +35,7 @@ L4: ; Continuation
   jmp [bp]
 
 L5: ; Function: (lam,t1)
+  call Bare_enter_check
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -60,6 +62,7 @@ L5: ; Function: (lam,t1)
   jmp [bp]
 
 L6: ; Function: (explode_loop,g3)
+  call Bare_enter_check
   push word dx
   push word L5
   mov si, sp
@@ -86,6 +89,7 @@ L8: ; Continuation
   jmp [bp]
 
 L9: ; Start
+  call Bare_enter_check
   push word cx
   push word L8
   mov cx, sp
