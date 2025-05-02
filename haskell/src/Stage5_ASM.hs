@@ -40,7 +40,7 @@ data Image = Image
   }
 
 data DataSpec
-  = DW [Word]
+  = DW [Lit]
   | DS String
 
 data Code
@@ -74,9 +74,24 @@ data Target
 
 data Source
   = SReg Reg
-  | SLit Word -- TODO: introduce Lit; a reduced version of Word
+  | SLit Lit
   | SMem Addr
   | SMemIndirectOffset Reg Int -- byte indexing
+
+data Lit
+  = LChar Char
+  | LNum Number
+  | LStatic DataLabel
+  | LCodeLabel CodeLabel
+  | LBlockDescriptor BlockDescriptor
+
+fromLit :: Lit -> Word
+fromLit = \case
+  LChar x -> WChar x
+  LNum x -> WNum x
+  LStatic x -> WAddr (AStatic x 0)
+  LCodeLabel x -> WCodeLabel x
+  LBlockDescriptor x -> WBlockDescriptor x
 
 vTag :: Ctag -> Word
 vTag (Ctag _ n) = WNum n
@@ -87,7 +102,9 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
 data CodeLabel = CodeLabel Int String -- unique label and provenance
   deriving (Eq,Ord)
 
-data DataLabel = DataLabel SRC.Global -- TODO: better a String (normally naming the Global) but subsuming ARuntime
+data DataLabel
+  = DataLabelG SRC.Global -- for user-code globals
+  | DataLabelR String -- for runtime internals
   deriving (Eq,Ord)
 
 -- BareBios; primitive routines available to the compiled code
@@ -173,17 +190,13 @@ instance Show Target where
     TReg r -> show r
     TMem a -> show a
 
--- TODO when Lit is split from Word, we can be sure to always PP in style that nasm wants
-instance Show Word where
+instance Show Lit where
   show = \case
-    WChar c -> printf "`%s`" (escapeCharForNasm c) -- a char(byte) in a word(16bits)
-    WCharPair (c,d) -> printf "`%s%s`" (escapeCharForNasm c) (escapeCharForNasm d)
-    WNum n -> show n
-    WAddr a -> show a
-    WCodeLabel lab -> show lab
-    WUninitialized m -> printf "[uninitialized:%s]" m
-    WBlockDescriptor d -> show d
-    WUninitializedCharPair -> printf "[uninitialized-char-pair]"
+    LChar c -> printf "`%s`" (escapeCharForNasm c)
+    LNum n -> show n
+    LStatic a -> show a
+    LCodeLabel lab -> show lab
+    LBlockDescriptor d -> show d
 
 instance Show BlockDescriptor where
   show = \case
@@ -215,13 +228,12 @@ instance Show Addr where
     AStatic d 0 -> printf "%s" (show d)
     AStatic d n -> printf "%s+%d" (show d) n
     ATempSpace (SRC.Temp n) -> printf "Temps+%d" (2*n)
-    ARuntime s -> s
 
 instance Show HeapAddr where
   show (HeapAddr x) = "#" ++ show x
 
 instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
-instance Show DataLabel where show (DataLabel g) = show g
+instance Show DataLabel where show = \case DataLabelG g -> show g; DataLabelR s -> s
 
 ----------------------------------------------------------------------
 -- Execute
@@ -344,7 +356,7 @@ execBinaryOpInto f r s = \cont -> do
 evalSource :: Source -> M Word
 evalSource = \case
   SReg r -> GetReg r
-  SLit w -> pure w
+  SLit l -> pure (fromLit l)
   SMem a -> GetMem a
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
@@ -675,34 +687,38 @@ state0 dmap = State
       , (aFinalCont, WCodeLabel finalCodeLabel)
       ]
     user =
-      concat [ [(AStatic lab i,w) | (i,w) <- specsWords 0 specs ]
+      concat [ [(AStatic lab i,w) | (i,w) <- specsWords specs ]
              | (lab,specs) <- Map.toList dmap
              ]
 
-specsWords :: Int -> [DataSpec] -> [(Int,Word)] -- TODO: clean up this mess!
-specsWords offset = \case
-  [] -> []
-  DW ws : specs ->
-    [ (offset + (2*i), w) | (i,w) <- zip [0..] ws ] ++ specsWords (offset + 2 * length ws) specs
-  DS{} : (_:_) -> undefined
-  [DS s] -> [ (offset + (2*i), WCharPair (c,d)) | (i,(c,d)) <- zip [0..] (pairUp s) ]
+specsWords :: [DataSpec] -> [(Int,Word)]
+specsWords specs = [ (2*i,w) | (i,w) <- zip [0..] (specs >>= wordsOfSpec) ]
   where
-    pairUp :: [Char] -> [(Char,Char)]
-    pairUp = \case
-      [] -> []
-      a:b:xs -> (a,b):pairUp xs
-      [a] -> [(a,'\0')]
+    wordsOfSpec :: DataSpec -> [Word]
+    wordsOfSpec = \case
+      DW lits -> map fromLit lits
+      DS string -> [ WCharPair (c,d) | (c,d) <- pairUp string ]
+      where
+        pairUp :: [Char] -> [(Char,Char)]
+        pairUp = \case [] -> []; a:b:xs -> (a,b):pairUp xs; [a] -> [(a,'\0')]
+
 
 instance Show State where
   show State{rmap} =
     intercalate " " [ show k ++ "=" ++ show w | (k,w) <- Map.toList rmap ]
 
 aFalse,aTrue,aUnit,aFinalCont :: Addr
-aFalse = AStatic (DataLabel (SRC.Global (-1))) 0
-aTrue = AStatic (DataLabel (SRC.Global (-2))) 0
-aFinalCont = AStatic (DataLabel (SRC.Global (-4))) 0
 
-aUnit = ARuntime "Bare_unit"
+-- These three addresses are only used internally by stage5
+aFalse = AStatic (DataLabelR "Bare_false") 0
+aTrue = AStatic (DataLabelR "Bare_true") 0
+aFinalCont = AStatic (DataLabelR "Bare_finalCont") 0
+
+-- This address must be defined in runtime.asm
+aUnit = AStatic dUnit 0
+
+dUnit :: DataLabel
+dUnit = DataLabelR "Bare_unit"
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
@@ -736,29 +752,29 @@ compileImage = \case
   SRC.LetTop (id,global) rhs body -> do
     let who = show (id,global)
     vals <- compileTopDef who rhs
-    CutData (DataLabel global) vals
+    CutData (DataLabelG global) vals
     compileImage body
 
 compileTopDef :: String -> SRC.Top -> Asm [DataSpec]
 compileTopDef who = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
-  SRC.TopLitS string -> pure (DW [ WNum (fromIntegral $ length string) ] : [ DS string ])
+  SRC.TopLitS string -> pure (DW [ LNum (fromIntegral $ length string) ] : [ DS string ])
 
   SRC.TopLam _x body -> do
     codeLabel <- compileCode body >>= CutCode ("Function: " ++ who)
-    let w1 = WCodeLabel codeLabel
+    let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
 
   SRC.TopConApp (Ctag _ tag) xs -> do
-    pure [DW (WNum tag : map compileTopRef xs)]
+    pure [DW (LNum tag : map compileTopRef xs)]
 
-compileTopRef :: SRC.Ref -> Word
+compileTopRef :: SRC.Ref -> Lit
 compileTopRef = \case
-    SRC.RefLitC c -> WChar c
-    SRC.RefLitN n -> WNum n
+    SRC.RefLitC c -> LChar c
+    SRC.RefLitN n -> LNum n
     SRC.Ref _ loc -> do
     case loc of
-      SRC.InGlobal g -> WAddr (AStatic (DataLabel g) 0)
+      SRC.InGlobal g -> LStatic (DataLabelG g)
       _ -> error "compileTopRef"
 
 cutCode :: String -> Code -> Asm CodeLabel
@@ -794,9 +810,9 @@ compileCode = \case
       ops =
         map OpPush (reverse (map compileRef pre)) ++
         [ OpPush (SReg contReg)
-        , OpPush (SLit (WCodeLabel lab))
+        , OpPush (SLit (LCodeLabel lab))
         , OpMove contReg (SReg Sp)
-        , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
+        , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
         ]
     doOps ops <$> compileCode first
 
@@ -814,7 +830,7 @@ compileArm scrutReg arm =  do
   let (SRC.ArmTag pos (Ctag _ n) _xs _rhs) = arm
   code <- compileArmTaken scrutReg arm
   lab <- CutCode ("Arm: " ++ show pos) code
-  pure [ OpCmp (SMemIndirectOffset scrutReg 0) (SLit (WNum n))
+  pure [ OpCmp (SMemIndirectOffset scrutReg 0) (SLit (LNum n))
        , OpBranchFlagZ lab
        ]
 
@@ -867,9 +883,9 @@ compileAtomicTo who target = \case
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo target tag xs = do
   let desc = Scanned { evenSizeInBytes = 2 * (length xs + 1) }
-  map OpPush (reverse (SLit (WNum tag) : map compileRef xs)) ++
+  map OpPush (reverse (SLit (LNum tag) : map compileRef xs)) ++
     [ setTarget target (SReg Sp)
-    , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
+    , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
 
 compileFunctionTo :: String -> Target -> [SRC.Ref] -> SRC.Code -> Asm [Op]
@@ -878,9 +894,9 @@ compileFunctionTo who target freeVars body = do
   let desc = Scanned { evenSizeInBytes = 2 * (length freeVars + 1) }
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
-    [ OpPush (SLit (WCodeLabel lab))
+    [ OpPush (SLit (LCodeLabel lab))
     , setTarget target (SReg Sp)
-    , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
+    , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
     ])
 
 -- The target must always be assigned to satisfy GC invariants. Even when the resul is just unit "()"
@@ -890,7 +906,7 @@ compileBuiltinTo builtin = case builtin of
   SRC.PutChar -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_put_char
-    , setTarget target (SLit (WAddr aUnit)) -- .. so missing this line is a unused ident error.
+    , setTarget target sUnit -- .. so missing this line is a unused ident error.
     ]
   SRC.GetChar -> \target -> oneArg $ \_ ->
     [ OpCall Bare_get_char
@@ -928,7 +944,7 @@ compileBuiltinTo builtin = case builtin of
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpPushSAVE (SReg Dx)
-    , OpMove Dx (SLit (WNum 0))
+    , OpMove Dx (SLit (LNum 0))
     , OpDivModIntoAxDx Bx
     -- quotiant already in Ax
     , OpPopRESTORE Dx
@@ -938,7 +954,7 @@ compileBuiltinTo builtin = case builtin of
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpPushSAVE (SReg Dx)
-    , OpMove Dx (SLit (WNum 0))
+    , OpMove Dx (SLit (LNum 0))
     , OpDivModIntoAxDx Bx
     -- remainder in Dx
     , setTarget target (SReg Dx)
@@ -970,7 +986,7 @@ compileBuiltinTo builtin = case builtin of
     let desc = Scanned { evenSizeInBytes = 2 } in
     [ OpPush s1
     , setTarget target (SReg Sp)
-    , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
+    , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
   SRC.DeRef -> \target -> oneArg $ \s1 ->
     [ OpMove Bx s1
@@ -980,7 +996,7 @@ compileBuiltinTo builtin = case builtin of
     [ OpMove Bx s1
     , OpMove Ax s2
     , OpStore (TReg Bx) Ax
-    , setTarget target (SLit (WAddr aUnit))
+    , setTarget target sUnit
     ]
   SRC.MakeBytes -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
@@ -994,7 +1010,7 @@ compileBuiltinTo builtin = case builtin of
     , OpMove Si s2
     , OpCall Bare_set_bytes -- TODO: remove/inline
     , OpPopRESTORE Si
-    , setTarget target (SLit (WAddr aUnit))
+    , setTarget target sUnit
     ]
   SRC.GetBytes -> codeForGetBytes
   SRC.StringIndex -> codeForGetBytes
@@ -1018,13 +1034,13 @@ compileBuiltinTo builtin = case builtin of
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_load_sector
-    , setTarget target (SLit (WAddr aUnit))
+    , setTarget target sUnit
     ]
   SRC.StoreSec -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_store_sector
-    , setTarget target (SLit (WAddr aUnit))
+    , setTarget target sUnit
     ]
   SRC.GetStackPointer -> \target -> oneArg $ \_ -> -- TODO: replace with builtin to discover #live-words
     [ OpMove Ax (SReg Sp)
@@ -1046,6 +1062,8 @@ compileBuiltinTo builtin = case builtin of
 
     err = error (printf "Stage5.compileBuiltin: error: %s" (show builtin))
 
+    sUnit = SLit (LStatic dUnit)
+
 setTarget :: Target -> Source -> Op
 setTarget = \case
   TReg target -> \source -> OpMove target source
@@ -1058,11 +1076,11 @@ setTarget = \case
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
-    SRC.RefLitC c -> SLit (WChar c)
-    SRC.RefLitN n -> SLit (WNum n)
+    SRC.RefLitC c -> SLit (LChar c)
+    SRC.RefLitN n -> SLit (LNum n)
     SRC.Ref _ loc -> do
     case loc of
-      SRC.InGlobal g -> SLit (WAddr (AStatic (DataLabel g) 0))
+      SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
       SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
       SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
       SRC.TheArg -> SReg argReg
@@ -1140,7 +1158,7 @@ data Word
   | WUninitialized String
   | WBlockDescriptor BlockDescriptor
   | WUninitializedCharPair
-  deriving Eq
+  deriving (Eq,Show)
 
 -- Of the 3 kinds of Addr. Only AHeapSpace and AStatic represent user values
 -- The ATempSpace is more like a register, in that it is a location for values.
@@ -1149,7 +1167,6 @@ data Word
 data Addr -- memory address
   = AHeapSpace HeapAddr
   | AStatic DataLabel Int -- This int is an offset at the data-label
-  | ARuntime String -- TOOD: remove when DataLabel is allows any name
   | ATempSpace SRC.Temp
   deriving (Eq,Ord)
 
@@ -1167,14 +1184,12 @@ deHeapAddr = \case
   AHeapSpace ha -> ha
   AStatic{} -> error "deHeapAddr/AStatic"
   ATempSpace{} -> error "deHeapAddr/ATempSpace"
-  ARuntime{} -> error "deHeapAddr/ARuntime"
 
 evenAddr :: Addr -> Bool
 evenAddr = \case
   AHeapSpace (HeapAddr n) -> (n `mod` 2) == 0
   AStatic _ offset -> (offset `mod` 2) == 0
   ATempSpace{} -> True
-  ARuntime{} -> True
 
 ----------------------------------------------------------------------
 -- GC
@@ -1237,7 +1252,6 @@ addAddr i = \case
   AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
   AStatic lab n -> pure $ AStatic lab (n+i)
   ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
-  ARuntime{} -> undefined
 
 
 setStackPointerToTopOfHemi :: Hemi -> M ()
