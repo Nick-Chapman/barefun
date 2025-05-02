@@ -41,7 +41,6 @@ data Image = Image
 
 data DataSpec
   = DW [Word]
-  | DB [Char] -- TODO: remove? we always use String
   | DS String
 
 data Code
@@ -130,8 +129,6 @@ instance Show DataSpec where
   show = \case
     DW [] -> ""
     DW ws -> printf "\n  dw %s" (intercalate ", " [ show w | w <- ws ])
-    DB [] -> ""
-    DB cs -> printf "\n  db %s" (intercalate ", " [ printf "`%s`" (escapeCharForNasm c) | c <- cs ])
     DS s -> printf "\n  db `%s`" (concat (map escapeCharForNasm s))
 
 instance Show Code where
@@ -683,16 +680,11 @@ state0 dmap = State
              | (lab,specs) <- Map.toList dmap
              ]
 
-specsWords :: Int -> [DataSpec] -> [(Int,Word)]   -- TODO: clean up this mess!
+specsWords :: Int -> [DataSpec] -> [(Int,Word)] -- TODO: clean up this mess!
 specsWords offset = \case
   [] -> []
   DW ws : specs ->
     [ (offset + (2*i), w) | (i,w) <- zip [0..] ws ] ++ specsWords (offset + 2 * length ws) specs
-  {-DB cs : specs ->
-    [ (offset + i, WChar c) | (i,c) <- zip [0..] cs ] ++ specsWords (offset + length cs) specs
-  DS s : specs ->
-    [ (offset + i, WChar c) | (i,c) <- zip [0..] s ] ++ specsWords (offset + length s) specs-}
-  DB{} : _ -> undefined
   DS{} : (_:_) -> undefined
   [DS s] -> [ (offset + (2*i), WCharPair (c,d)) | (i,(c,d)) <- zip [0..] (pairUp s) ]
   where
