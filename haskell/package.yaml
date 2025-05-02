@@ -51,6 +51,7 @@ ghc-options:
 - -Werror
 - -Wall
 - -Wno-name-shadowing
+- -O0 # asserts and faster compiles (7s to 4s)
 
 library:
   source-dirs: src

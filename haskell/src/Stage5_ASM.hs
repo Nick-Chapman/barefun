@@ -496,16 +496,6 @@ deChar = \case
 deNum :: Word -> Number
 deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
-addAddr :: Int -> Addr -> M Addr
-addAddr i = \case
-  AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
-  AStatic lab n -> pure $ AStatic lab (n+i)
-  ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
-  ARuntime{} -> undefined
-
-addHeapAddr :: Int -> HeapAddr -> M HeapAddr
-addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
-
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
 
@@ -536,6 +526,7 @@ data M a where
   PutChar :: Char -> M ()
   GetChar :: M Char
   BumpGC :: M Int
+  WhatHemi :: M Hemi -- in which we are allocating
 
 runM :: TraceFlag -> DebugFlag -> Image -> M () -> Interaction
 runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
@@ -571,7 +562,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
             } ()
 
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
-    loop s@State{rmap,mem,flagZ,flagN,gcNum} m k = case m of
+    loop s@State{rmap,mem,flagZ,flagN} m k = case m of
 
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
@@ -624,8 +615,13 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       GetChar -> IGet $ \c -> k s c
 
       BumpGC -> do
-        ITick I.GC $
-          k s { gcNum = gcNum + 1 } gcNum
+        let State{hemi,gcNum} = s -- gnNum trackked in M for Debug
+        ITick I.GC $ -- also tracked as a tickable for reporting
+          k s { gcNum = gcNum + 1, hemi = otherHemi hemi } gcNum
+
+      WhatHemi -> do
+        let State{hemi} = s
+        k s hemi
 
 checkAlignedSp :: Reg -> Word -> Interaction -> Interaction
 checkAlignedSp = \case
@@ -648,6 +644,7 @@ data State = State
   , offsetFromLastLabel :: Int
   , allocsSinceLastCheck :: Int
   , gcNum :: Int
+  , hemi :: Hemi
   }
 
 state0 :: Map DataLabel [DataSpec] -> State
@@ -661,6 +658,7 @@ state0 dmap = State
   , offsetFromLastLabel = error "offsetFromLastLabel"
   , allocsSinceLastCheck = 0
   , gcNum = 1
+  , hemi = HemiA
   }
   where
     initialStackPointer = AHeapSpace (HeapAddr (fromIntegral topA))
@@ -1181,8 +1179,9 @@ evenAddr = \case
 ----------------------------------------------------------------------
 -- GC
 
-data Hemi = HemiA | HemiB
-  deriving Show
+data Hemi = HemiA | HemiB deriving (Eq)
+
+instance Show Hemi where show = \case HemiA -> "A"; HemiB -> "B"
 
 otherHemi :: Hemi -> Hemi
 otherHemi = \case HemiA -> HemiB; HemiB -> HemiA
@@ -1205,48 +1204,65 @@ inA,inB :: Int -> Bool
 inA n = n <= topA && n >= botA
 inB n = n <= topB && n >= botB
 
+inHemi :: Int -> Hemi -> Bool
+inHemi n = \case HemiA -> inA n; HemiB -> inB n
+
 -- Invariant: The Sp will always be a HeapAddr
 getSP :: M HeapAddr
 getSP = (deHeapAddr . deAddr) <$> GetReg Sp
 
-mkHeapAddr :: Int -> M HeapAddr -- TODO: return in Monad(M) so can check we are allocating the correct Hemi
-mkHeapAddr n =
-  if not (inA n || inB n) then error (printf "mkHeapAddr: %d" n) else
+-- Check heap-address is in the hemi-space in which we are ALLOCATING.
+mkHeapAddr :: Int -> M HeapAddr
+mkHeapAddr n = do
+  hemi <- WhatHemi
+  if not (n `inHemi` hemi) then error (printf "mkHeapAddr: %d" n) else
     pure $ HeapAddr (fromIntegral n)
 
-whatHemi :: M Hemi
-whatHemi = do
-  ha <- getSP
-  let HeapAddr w16 = ha
-  let n = fromIntegral w16
-  if inA n then pure HemiA else
-    if inB n then pure HemiB else
-      error (printf "whatHemi: %d is in neither\n" n)
+-- Check heap-address is in the hemi-space from which we are EVACUATING.
+-- This version is used during GC when evacuating the old space.
+mkHeapAddr_OTHER :: Int -> M HeapAddr
+mkHeapAddr_OTHER n = do
+  hemi <- WhatHemi
+  if not (n `inHemi` otherHemi hemi) then error (printf "mkHeapAddr_OTHER: %d" n) else
+    pure $ HeapAddr (fromIntegral n)
 
-setHemi :: Hemi -> M ()
-setHemi hemi = do
+addHeapAddr :: Int -> HeapAddr -> M HeapAddr
+addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
+
+addHeapAddr_OTHER :: Int -> HeapAddr -> M HeapAddr
+addHeapAddr_OTHER i (HeapAddr n) = mkHeapAddr_OTHER (fromIntegral (n + fromIntegral i))
+
+addAddr :: Int -> Addr -> M Addr
+addAddr i = \case
+  AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
+  AStatic lab n -> pure $ AStatic lab (n+i)
+  ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
+  ARuntime{} -> undefined
+
+
+setStackPointerToTopOfHemi :: Hemi -> M ()
+setStackPointerToTopOfHemi hemi = do
   ha <- mkHeapAddr (topOfHemi hemi)
   SetReg Sp (WAddr (AHeapSpace ha))
 
 gcTop :: M ()
 gcTop = do
-
+  fromSpace <- WhatHemi
   gcNum <- BumpGC
-
-  fromSpace <- whatHemi
-  let toSpace = otherHemi fromSpace
-
-  sp <- getSP
-  Debug (printf "GC(%d): %s --> %s (sp=%s)\n" gcNum (show fromSpace) (show toSpace) (show sp))
-  --Debug1 (printf "GC(%d)\n" gcNum)
-  --Debug1 "{"
-  setHemi toSpace
+  toSpace <- WhatHemi
+  Debug (printf "GC(%d) starting: %s --> %s\n" gcNum (show fromSpace) (show toSpace))
+  setStackPointerToTopOfHemi toSpace
 
   let roots = [frameReg,argReg,contReg]
   watermark0 <- getSP
   mapM_ evacuateReg roots
+  loop 1 watermark0
 
-  let
+  HeapAddr sp <- getSP
+  let liveBytes = topOfHemi toSpace - fromIntegral sp
+  Debug (printf "GC(%d) finished: liveBytes=%d\n" gcNum liveBytes)
+
+  where
     loop :: Int -> HeapAddr -> M ()
     loop step watermark = do
       sp <- getSP
@@ -1256,8 +1272,10 @@ gcTop = do
         True -> pure ()
         False -> do
           nextWM <- getSP
+          scanLoop 1 nextWM
+          loop (step+1) nextWM
 
-          let
+          where
             scanLoop :: Int -> HeapAddr -> M ()
             scanLoop substep scanPointer = do
               --Debug (printf "inner(%d.%d.%d): scan=%s < watermark=%s\n" gcNum step substep (show scanPointer) (show watermark))
@@ -1268,20 +1286,6 @@ gcTop = do
                 False -> do
                   nextScanPointer <- scavenge scanPointer
                   scanLoop (substep+1) nextScanPointer
-
-          scanLoop 1 nextWM
-          loop (step+1) nextWM
-          pure ()
-
-  loop 1 watermark0
-
-  HeapAddr x :: HeapAddr <- getSP
-  HeapAddr y <- mkHeapAddr (topOfHemi toSpace)
-  let liveBytes = y - x
-
-  Debug (printf "GC(%d): DONE: liveBytes=%d\n" gcNum liveBytes)
-  --Debug1 (printf "%d}" liveBytes)
-  pure ()
 
 evacuateReg :: Reg -> M ()
 evacuateReg reg = do
@@ -1330,14 +1334,14 @@ evacuate w = do
 
 evacuateHA :: HeapAddr -> M HeapAddr
 evacuateHA objectA = do
-  descA <- addHeapAddr (-bytesPerWord) objectA
+  descA <- addHeapAddr_OTHER (-bytesPerWord) objectA
   --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
   desc <- getBlockDescriptor "for-evacuate" descA
   let sizeBytesMaybe = (case desc of Scanned n -> Just n; RawData n -> Just n; BrokenHeart -> Nothing)
   case sizeBytesMaybe of
     Just sizeBytes -> do
       let sizeWords = sizeBytes `div` 2
-      xs <- sequence $ reverse [ addHeapAddr (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
+      xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
       mapM_ copyAlloc xs
       sp <- getSP
       relocatedA <- addHeapAddr bytesPerWord sp -- point one word past the new desc
