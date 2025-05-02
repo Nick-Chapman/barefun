@@ -18,4 +18,6 @@
 - [Stage2](src/Stage2_NBE.hs): Normalization by Evaluation. (Inlining & Constant Folding).
 - [Stage3](src/Stage3_ANF.hs): A-normal form.
 - [Stage4](src/Stage4_CCF.hs): Closure converted form.
-- [Stage5](src/Stage5_ASM.hs): x86 ASM.
+- [Stage5](src/Stage5_ASM_AbstractSyntax.hs): x86 ASM.
+[compiler](src/Stage5_ASM_Compiler.hs)
+[emulation](src/Stage5_ASM_Emulation.hs)
