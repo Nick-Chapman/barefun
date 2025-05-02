@@ -70,12 +70,12 @@ data Jump
 
 data Target
   = TReg Reg
-  | TMem Addr
+  | TTemp SRC.Temp
 
 data Source
   = SReg Reg
   | SLit Lit
-  | SMem Addr
+  | STemp SRC.Temp
   | SMemIndirectOffset Reg Int -- byte indexing
 
 data Lit
@@ -180,7 +180,7 @@ instance Show Source where
   show = \case
     SReg r -> show r
     SLit w -> show w
-    SMem a -> "["++show a++"]"
+    STemp temp -> printf "[%s]" (ppTemp temp)
     SMemIndirectOffset r n ->
       if n == 0 then printf "[%s]" (show r) else
         printf "[%s+%s]" (show r) (show n)
@@ -188,7 +188,10 @@ instance Show Source where
 instance Show Target where
   show = \case
     TReg r -> show r
-    TMem a -> show a
+    TTemp temp -> ppTemp temp
+
+ppTemp :: SRC.Temp -> String
+ppTemp (SRC.Temp n) = printf "Temps+%d" (bytesPerWord * n)
 
 instance Show Lit where
   show = \case
@@ -222,12 +225,12 @@ instance Show Reg where
     Si -> "si"
     Di -> "di"
 
-instance Show Addr where
+{-instance Show Addr where
   show = \case
     AHeapSpace x -> show x
     AStatic d 0 -> printf "%s" (show d)
     AStatic d n -> printf "%s+%d" (show d) n
-    ATempSpace (SRC.Temp n) -> printf "Temps+%d" (2*n)
+    ATempSpace (SRC.Temp n) -> printf "Temps+%d" (2*n)-}
 
 instance Show HeapAddr where
   show (HeapAddr x) = "#" ++ show x
@@ -357,7 +360,7 @@ evalSource :: Source -> M Word
 evalSource = \case
   SReg r -> GetReg r
   SLit l -> pure (fromLit l)
-  SMem a -> GetMem a
+  STemp temp -> GetMem (ATempSpace temp)
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
     a' <- addAddr i a
@@ -365,7 +368,7 @@ evalSource = \case
 
 evalTarget :: Target -> M Addr
 evalTarget = \case
-  TMem a -> pure a
+  TTemp temp -> pure (ATempSpace temp)
   TReg r -> deAddr <$> GetReg r
 
 execBare :: BareBios -> M ()
@@ -738,7 +741,7 @@ targetOfTemp = \case
   SRC.Temp 0 -> error "targetOfTemp/temps start from 1"
   SRC.Temp 1 -> TReg Si
   SRC.Temp 2 -> TReg Di
-  temp -> TMem (ATempSpace temp)
+  temp -> TTemp temp
 
 -- Ax is the general scratch register
 -- Bx is used for case-scrutinee and temp for simultaneousMove
@@ -863,14 +866,14 @@ needs :: Reg -> Source -> Bool
 needs r2 = \case
   SReg r -> (r==r2)
   SLit{} -> False
-  SMem{} -> False
+  STemp{} -> False
   SMemIndirectOffset r _ -> (r==r2)
 
 changeRegInSource :: Reg -> Reg -> Source -> Source
 changeRegInSource r1 r2 = \case
   SReg r -> SReg (if r==r1 then r2 else r1)
   s@SLit{} -> s
-  s@SMem{} -> s
+  s@STemp{} -> s
   SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
 
 compileAtomicTo :: String -> Target -> SRC.Atomic -> Asm [Op]
@@ -1067,11 +1070,11 @@ compileBuiltinTo builtin = case builtin of
 setTarget :: Target -> Source -> Op
 setTarget = \case
   TReg target -> \source -> OpMove target source
-  TMem targetAddr -> \case
-    SReg sourceReg -> OpStore (TMem targetAddr) sourceReg
+  TTemp targetTemp -> \case
+    SReg sourceReg -> OpStore (TTemp targetTemp) sourceReg
     source ->
       OpMany  [ OpMove Ax source
-              , OpStore (TMem targetAddr) Ax
+              , OpStore (TTemp targetTemp) Ax
               ]
 
 compileRef :: SRC.Ref -> Source
@@ -1089,7 +1092,7 @@ compileRef = \case
 sourceOfTarget :: Target -> Source
 sourceOfTarget = \case
   TReg r -> SReg r
-  TMem a -> SMem a
+  TTemp t -> STemp t
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
@@ -1168,7 +1171,7 @@ data Addr -- memory address
   = AHeapSpace HeapAddr
   | AStatic DataLabel Int -- This int is an offset at the data-label
   | ATempSpace SRC.Temp
-  deriving (Eq,Ord)
+  deriving (Eq,Ord,Show)
 
 data HeapAddr = HeapAddr Word16
   deriving (Eq,Ord)
