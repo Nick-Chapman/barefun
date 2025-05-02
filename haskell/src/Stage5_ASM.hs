@@ -5,28 +5,25 @@ module Stage5_ASM
   ) where
 
 import Builtin (Builtin)
+import Control.Exception (assert)
 import Control.Monad (ap,liftM)
 import Data.Char (ord)
 import Data.List (intercalate)
 import Data.Map (Map)
---import Data.Set (Set) -- TODO
 import Data.Word (Word16)
 import Prelude hiding (Word)
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
-import Value (Number,tTrue,tFalse,tUnit) -- TODO,tNil)
+import Value (Number,tTrue,tFalse,tUnit)
 import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
---import qualified Data.Set as Set
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
-import Control.Exception (assert)
-
 enableGC :: Bool
-enableGC = True -- TODO: dont forget to turn on!!
+enableGC = True
 
 bytesPerWord :: Int
 bytesPerWord = 2
@@ -44,7 +41,7 @@ data Image = Image
 
 data DataSpec
   = DW [Word]
-  | DB [Char]
+  | DB [Char] -- TODO: remove? we always use String
   | DS String
 
 data Code
@@ -78,7 +75,7 @@ data Target
 
 data Source
   = SReg Reg
-  | SLit Word
+  | SLit Word -- TODO: introduce Lit; a reduced version of Word
   | SMem Addr
   | SMemIndirectOffset Reg Int -- byte indexing
 
@@ -91,7 +88,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
 data CodeLabel = CodeLabel Int String -- unique label and provenance
   deriving (Eq,Ord)
 
-data DataLabel = DataLabel SRC.Global
+data DataLabel = DataLabel SRC.Global -- TODO: better a String (normally naming the Global) but subsuming ARuntime
   deriving (Eq,Ord)
 
 -- BareBios; primitive routines available to the compiled code
@@ -179,6 +176,7 @@ instance Show Target where
     TReg r -> show r
     TMem a -> show a
 
+-- TODO when Lit is split from Word, we can be sure to always PP in style that nasm wants
 instance Show Word where
   show = \case
     WChar c -> printf "`%s`" (escapeCharForNasm c) -- a char(byte) in a word(16bits)
@@ -390,8 +388,7 @@ execBare = \case
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
   -- this is only called by builtin GetStackPointer, to implement "space"
-  -- we halve the answer to be sure to get a 15bit answer. not sure wht we care
-  -- bit of a hack
+  -- we halve the answer to be sure to get a 15bit answer, i.e. in units of words; not sure why we care.
   Bare_addr_to_num -> do -- TODO: remove this
     a <- deAddr <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ halve $ deHeapAddr a))
@@ -426,7 +423,6 @@ execBare = \case
   Bare_store_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
 
-
 setMemByte :: Addr -> Char -> M ()
 setMemByte a x = do
   --Debug (printf "setB: %s = %s\n" (show a) (show x))
@@ -450,9 +446,8 @@ getMemByte a = do
 splitWord :: Word -> (Char,Char)
 splitWord = \case
   WCharPair (c,d) -> (c,d)
-  WUninitializedCharPair -> ('\0','\0') -- TODO: check other data '\0'
+  WUninitializedCharPair -> ('\0','\0')
   w -> error (show ("splitWord",w))
-
 
 execJump :: Jump -> M ()
 execJump = \case
@@ -498,9 +493,6 @@ deCodeLabel = \case WCodeLabel x -> x; w -> error (show ("deCodeLabel",w))
 deChar :: Word -> Char
 deChar = \case
   WChar x -> x
-  --WUninitialized{} -> '\0' -- for bytes example
-  --'Z' -- a garbage char -- TODO: unhack this
-  --WUninitializedCharPair -> '\0' -- for bytes example
   w -> error (show("deChar",w))
 
 deNum :: Word -> Number
@@ -510,7 +502,7 @@ addAddr :: Int -> Addr -> Addr
 addAddr i = \case
   AHeapSpace ha  -> AHeapSpace (addHeapAddr i ha)
   AStatic lab n -> AStatic lab (n+i)
-  ATempSpace{} -> undefined -- TODO: why can this not happen? -- see note in GC below
+  ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
   ARuntime{} -> undefined
 
 addHeapAddr :: Int -> HeapAddr -> HeapAddr
@@ -535,7 +527,7 @@ data M a where
   TraceJump :: Jump -> M ()
   TraceAlloc :: I.Tickable -> M ()
   GetCode :: CodeLabel -> M Code
-  SetReg :: Reg -> Word -> M ()
+  SetReg :: Reg -> Word -> M () -- TODO: SetReg/GetReg will operate on Val
   GetReg :: Reg -> M Word
   SetMem :: Addr -> Word -> M ()
   GetMem :: Addr -> M Word
@@ -545,7 +537,6 @@ data M a where
   GetFlagN :: M Bool
   PutChar :: Char -> M ()
   GetChar :: M Char
-  --MaybeGC :: M ()
   BumpGC :: M Int
 
 runM :: TraceFlag -> DebugFlag -> Image -> M () -> Interaction
@@ -593,7 +584,6 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
         let State{allocsSinceLastCheck=actual} = s
         let same = (expect == actual)
         let m = printf "CheckRecentAlloc: expect=%d, actual=%d, same=%s\n" expect actual (show same)
-        --debug m $
         if not same then error m else
             k s { allocsSinceLastCheck = 0 } ()
 
@@ -618,17 +608,13 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       GetReg r -> k s (maybe err id $ Map.lookup r rmap)
         where err = WUninitialized $ show ("GetReg/uninitialized",r)
 
-      -- TODO: SetMem/GetMem should only work for even addresses
-      -- And we have a different verson fo byte store data
       SetMem a w -> do
-        --ITrace (printf "SetMem: %s = %s\n" (show a) (show w)) $ do
-          if not (evenAddr a) then error (printf "SetMem(odd): %s" (show a)) else
-            k s { mem = Map.insert a w mem } ()
+        if not (evenAddr a) then error (printf "SetMem(odd): %s" (show a)) else
+          k s { mem = Map.insert a w mem } ()
       GetMem a -> do
         if not (evenAddr a) then error (printf "GetMem(odd): %s" (show a)) else
           k s (maybe err id $ Map.lookup a mem)
           where err = WUninitialized $ show ("GetMem/uninitialized",a)
-
 
       SetFlagZ b -> k s { flagZ = b } ()
       GetFlagZ -> k s flagZ
@@ -642,27 +628,11 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       BumpGC -> do
         ITick I.GC $
           k s { gcNum = gcNum + 1 } gcNum
-      {-MaybeGC -> do
-        IIO $ do
-          let roots = [ maybe (error "MaybeGC") id $ Map.lookup r rmap | r <- [frameReg,argReg,contReg] ]
-          reachable <- discoverReachable roots mem
-          let
-            isReachable :: Addr -> v -> Bool
-            isReachable a _ =
-              case a of
-                AStatic{} -> True
-                ATempSpace{} -> True
-                AHeapSpace ha -> Set.member ha reachable
-
-          mem <- pure $ Map.filterWithKey isReachable mem
-          pure $ do
-            debug (printf "#reachable:%d\n" (Set.size reachable)) $ do
-              debug (printf "#mem-space:%d\n" (Map.size mem)) $ do
-                k s { mem } ()-}
 
 checkAlignedSp :: Reg -> Word -> Interaction -> Interaction
 checkAlignedSp = \case
   Sp -> \case
+    -- TODO: subsume with check that all heap addresses are aligned
     WAddr (AHeapSpace (HeapAddr n)) ->
       if n `mod` 2 == 1 then error (show ("unaligned Sp",n)) else
         \i -> i
@@ -705,7 +675,6 @@ state0 dmap = State
     internal =
       [ (aFalse, vTag tFalse)
       , (aTrue, vTag tTrue)
---      , (aNil, vTag tNil)
       , (aUnit, vTag tUnit)
       , (aFinalCont, WCodeLabel finalCodeLabel)
       ]
@@ -714,7 +683,7 @@ state0 dmap = State
              | (lab,specs) <- Map.toList dmap
              ]
 
-specsWords :: Int -> [DataSpec] -> [(Int,Word)]
+specsWords :: Int -> [DataSpec] -> [(Int,Word)]   -- TODO: clean up this mess!
 specsWords offset = \case
   [] -> []
   DW ws : specs ->
@@ -725,14 +694,13 @@ specsWords offset = \case
     [ (offset + i, WChar c) | (i,c) <- zip [0..] s ] ++ specsWords (offset + length s) specs-}
   DB{} : _ -> undefined
   DS{} : (_:_) -> undefined
-  [DS s] -> do
-    [ (offset + (2*i), WCharPair (c,d)) | (i,(c,d)) <- zip [0..] (pairUp s) ] -- ++ specsWords (offset + length s) specs
-
-pairUp :: [Char] -> [(Char,Char)]
-pairUp = \case
-  [] -> []
-  a:b:xs -> (a,b):pairUp xs
-  [a] -> [(a,'Q')] -- TODO: should be unit char
+  [DS s] -> [ (offset + (2*i), WCharPair (c,d)) | (i,(c,d)) <- zip [0..] (pairUp s) ]
+  where
+    pairUp :: [Char] -> [(Char,Char)]
+    pairUp = \case
+      [] -> []
+      a:b:xs -> (a,b):pairUp xs
+      [a] -> [(a,'\0')]
 
 instance Show State where
   show State{rmap} =
@@ -741,69 +709,12 @@ instance Show State where
 aFalse,aTrue,aUnit,aFinalCont :: Addr
 aFalse = AStatic (DataLabel (SRC.Global (-1))) 0
 aTrue = AStatic (DataLabel (SRC.Global (-2))) 0
---aNil = AStatic (DataLabel (SRC.Global (-3))) 0
---aUnit = AStatic (DataLabel (SRC.Global (-3))) 0
 aFinalCont = AStatic (DataLabel (SRC.Global (-4))) 0
 
 aUnit = ARuntime "Bare_unit"
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
-
-----------------------------------------------------------------------
--- discoverability (warn up to GC)
-
-{-
-discoverReachable :: [Word] -> Map Addr Word -> IO (Set HeapAddr)
-discoverReachable roots mem = do
-  loop [] Set.empty roots
-  where
-
-    lookMem :: Addr -> Word
-    lookMem a = maybe err id $ Map.lookup a mem
-      where err = error (show ("discoverReachable/lookMem",a))
-
-    loop :: [HeapAddr] -> Set HeapAddr -> [Word] -> IO (Set HeapAddr)
-    loop live visited = \case
-      [] -> pure (Set.fromList live)
-      scan1:toScan -> do
-        case heapAddressMaybe scan1 of
-          Nothing -> loop live visited toScan
-          Just ha -> do
-            if ha `Set.member` visited then loop live visited toScan else do
-              visited <- pure (Set.insert ha visited)
-              let descA = addHeapAddr (-bytesPerWord) ha
-              let d = lookupDescriptor descA
-              let size = case d of Scanned n -> n; RawData n -> n
-              let moreLive = [ addHeapAddr off ha | off <- [0 .. size-1] ]
-              let moreToScan = case d of
-                    RawData{} -> []
-                    Scanned{} ->
-                      [ lookMem (AHeapSpace (addHeapAddr offset ha))
-                      | offset <- [0..size-1]
-                      , offset `mod` bytesPerWord == 0
-                      ]
-              loop (descA : moreLive ++ live) visited (moreToScan ++ toScan)
-
-    lookupDescriptor :: HeapAddr -> BlockDescriptor
-    lookupDescriptor descA =
-      case Map.lookup (AHeapSpace descA) mem of
-        Nothing -> error "lookupDescriptor: missing"
-        Just w -> do
-          case (case w of WBlockDescriptor d -> Just d; _ -> Nothing) of
-            Nothing -> error "lookupDescriptor: not a block-descriptor"
-            Just d -> d
-
-heapAddressMaybe :: Word -> Maybe HeapAddr
-heapAddressMaybe = \case
-  WChar{} -> Nothing
-  WNum{} -> Nothing
-  WCodeLabel{} -> Nothing
-  WUninitialized{} -> Nothing
-  WBlockDescriptor{} -> error "An addressed word should never be a block descriptor"
-  WAddr (AHeapSpace ha) -> Just ha
-  WAddr{} -> Nothing
--}
 
 ----------------------------------------------------------------------
 -- Compile
@@ -1142,7 +1053,7 @@ compileBuiltinTo target b = case b of
     , OpCall Bare_store_sector
     , setTarget target (SLit (WAddr aUnit))
     ]
-  SRC.GetStackPointer -> oneArg $ \_ -> -- TODO: remove this hack
+  SRC.GetStackPointer -> oneArg $ \_ -> -- TODO: replace with builtin to discover #live-words
     [ OpMove Ax (SReg Sp)
     , OpCall Bare_addr_to_num
     , setTarget target (SReg Ax)
@@ -1163,7 +1074,6 @@ setTarget = \case
       OpMany  [ OpMove Ax source
               , OpStore (TMem targetAddr) Ax
               ]
-
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
@@ -1239,6 +1149,7 @@ data AsmState = AsmState { u :: Int }
 -- WCodeLabel -- Found only in slot 0 of a continuation/closure frame.
 -- WBlockDescriptor -- Found only in slot -1 of all heap block.
 
+-- TODO: distinuish type for "Val" (what a register can hold) from "Word" (what can be in a memory cell)
 data Word
   = WChar Char
   | WCharPair (Char,Char)
@@ -1257,7 +1168,7 @@ data Word
 data Addr -- memory address
   = AHeapSpace HeapAddr
   | AStatic DataLabel Int -- This int is an offset at the data-label
-  | ARuntime String
+  | ARuntime String -- TOOD: remove when DataLabel is allows any name
   | ATempSpace SRC.Temp
   deriving (Eq,Ord)
 
@@ -1270,14 +1181,12 @@ data BlockDescriptor -- TODO improve rep, have one variant with size field + sca
   | BrokenHeart
   deriving Eq
 
-
 deHeapAddr :: Addr -> HeapAddr
 deHeapAddr = \case
   AHeapSpace ha -> ha
   AStatic{} -> error "deHeapAddr/AStatic"
   ATempSpace{} -> error "deHeapAddr/ATempSpace"
   ARuntime{} -> error "deHeapAddr/ARuntime"
-
 
 evenAddr :: Addr -> Bool
 evenAddr = \case
@@ -1289,39 +1198,36 @@ evenAddr = \case
 ----------------------------------------------------------------------
 -- GC
 
--- During dev, lets have two small heap spaces:...
--- A will have address in the high 40000s, and B in the high 30000s
-
 data Hemi = HemiA | HemiB
   deriving Show
 
 otherHemi :: Hemi -> Hemi
 otherHemi = \case HemiA -> HemiB; HemiB -> HemiA
 
+-- During dev, we can have quite small heap spaces
+-- experimentation shows the sham example needs more that 2000; but 3000 seems enough
+heapSizeInBytes :: Int
+heapSizeInBytes = 3000
+
 topA,botA,topB,botB :: Int
 topA = 50000
-botA = 30000
-topB = 30000
-botB = 10000
+botA = topA - heapSizeInBytes
+topB = 40000
+botB = topB - heapSizeInBytes
 
 topOfHemi :: Hemi -> Int
 topOfHemi = \case HemiA -> topA; HemiB -> topB
 
 inA,inB :: Int -> Bool
-inA n = n <= topA && n >= botA -- inclusive both ends???
-inB n = n <= topB && n >= botB -- inclusive both ends???
+inA n = n <= topA && n >= botA
+inB n = n <= topB && n >= botB
 
 -- Invariant: The Sp will always be a HeapAddr
-
 getSP :: M HeapAddr
 getSP = (deHeapAddr . deAddr) <$> GetReg Sp
 
-
-mkHeapAddr :: Int -> HeapAddr
+mkHeapAddr :: Int -> HeapAddr -- TODO: return in Monad(M) so can check we are allocating the correct Hemi
 mkHeapAddr n =
-  --if n < (twoE16 `div` 2) then error "mkHeapAddr:too small" else
-    --if n > twoE16 then error "mkHeapAddr:too big" else
-  -- Check allocating in correct space -- nah,  need to be in M monad for that
   if not (inA n || inB n) then error (printf "mkHeapAddr: %d" n) else
     HeapAddr (fromIntegral n)
 
@@ -1451,21 +1357,20 @@ evacuateHA objectA = do
       mapM_ copyAlloc xs
       sp <- getSP
       let relocatedA = addHeapAddr bytesPerWord sp -- point one word past the new desc
-      -- TODO: overwrite original object with broken Heart
+      -- overwrite original object with broken Heart; which points tothe relocated object
       SetMem (AHeapSpace descA) (WBlockDescriptor BrokenHeart)
       SetMem (AHeapSpace objectA) (WAddr (AHeapSpace relocatedA))
       pure relocatedA
 
     Nothing -> do -- BrokenHeart
-      -- TODO: return the indirected previously copied object
+      -- return the indirected previously copied object
       (deHeapAddr . deAddr)  <$> GetMem (AHeapSpace objectA)
-
 
 copyAlloc :: HeapAddr -> M ()
 copyAlloc ha = do
   w <- GetMem (AHeapSpace ha)
   execPushAlloc I.Copied w
-  _newAddress <- getSP
+  --_newAddress <- getSP
   --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
   pure ()
 
