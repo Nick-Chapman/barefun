@@ -10,7 +10,9 @@ import qualified Stage1_EXP as Stage1 (compile,execute,sizeExp,pp,PPControl(..),
 import qualified Stage2_NBE as Stage2 (compile,execute)
 import qualified Stage3_ANF as Stage3 (compile,execute)
 import qualified Stage4_CCF as Stage4 (compile,execute)
-import qualified Stage5_ASM as Stage5 (compile,execute,TraceFlag(..),DebugFlag(..))
+
+import qualified Stage5_ASM_Compiler as Stage5 (compile)
+import qualified Stage5_ASM_Emulation as Stage5 (execute,TraceFlag(..),DebugFlag(..))
 
 main :: IO ()
 main = do
