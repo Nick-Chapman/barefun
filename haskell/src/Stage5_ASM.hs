@@ -295,7 +295,7 @@ execPushAlloc :: I.Tickable -> Word -> M ()
 execPushAlloc ticker w = do
   a <- deAddr <$> GetReg Sp
   sequence_ (replicate bytesPerWord (TraceAlloc ticker))
-  let a' = addAddr (-(bytesPerWord)) a
+  a' <- addAddr (-(bytesPerWord)) a
   SetMem a' w
   SetReg Sp (WAddr a')
   --Debug (printf "Alloc: %s = %s\n" (show a') (show w))
@@ -304,7 +304,7 @@ execPushAlloc ticker w = do
 execPushSAVE :: Word -> M ()
 execPushSAVE w = do -- pre decrement
   a <- deAddr <$> GetReg Sp
-  let a' = addAddr (-(bytesPerWord)) a
+  a' <- addAddr (-(bytesPerWord)) a
   SetReg Sp (WAddr a')
   SetMem a' w
 
@@ -312,7 +312,7 @@ execPopRESTORE :: Reg -> M ()
 execPopRESTORE reg = do -- post increment
   a <- deAddr <$> GetReg Sp
   GetMem a >>= SetReg reg
-  let a' = addAddr (bytesPerWord) a
+  a' <- addAddr (bytesPerWord) a
   SetReg Sp (WAddr a')
 
 checkPushBlockDescriptor :: Word -> M ()
@@ -328,10 +328,10 @@ slideStackPointer :: I.Tickable -> Int -> M ()
 slideStackPointer ticker nBytes = do
   sequence_ (replicate (nBytes) (TraceAlloc ticker))
   a <- deAddr <$> GetReg Sp
-  let a' = addAddr (-(nBytes)) a
+  a' <- addAddr (-(nBytes)) a
   SetReg Sp (WAddr a')
   let nWords = nBytes `div` 2
-  let xs = [ addAddr (bytesPerWord * offset) a' | offset <- [ 0.. nWords -1 ] ]
+  xs <- sequence [ addAddr (bytesPerWord * offset) a' | offset <- [ 0.. nWords -1 ] ]
   sequence_ [ SetMem x WUninitializedCharPair | x <- xs ]
 
 execBinaryOpInto :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
@@ -348,7 +348,8 @@ evalSource = \case
   SMem a -> GetMem a
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
-    GetMem (addAddr i a)
+    a' <- addAddr i a
+    GetMem a'
 
 evalTarget :: Target -> M Addr
 evalTarget = \case
@@ -405,13 +406,13 @@ execBare = \case
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Si
     c <- deChar <$> GetReg Bx
-    let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
+    a' <- addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
     setMemByte a' c
 
   Bare_get_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
-    let a' = addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
+    a' <- addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
     c <- getMemByte a'
     SetReg Ax (WChar c)
 
@@ -424,7 +425,7 @@ setMemByte :: Addr -> Char -> M ()
 setMemByte a x = do
   --Debug (printf "setB: %s = %s\n" (show a) (show x))
   let even = evenAddr a
-  let aligned = (if even then a else addAddr (-1) a)
+  aligned <- (if even then pure a else addAddr (-1) a)
   w <- GetMem aligned
   let (c,d) = splitWord w
   let w' = WCharPair (if even then (x,d) else (c,x))
@@ -433,7 +434,7 @@ setMemByte a x = do
 getMemByte :: Addr -> M Char
 getMemByte a = do
   let even = evenAddr a
-  let aligned = (if even then a else addAddr (-1) a)
+  aligned <- (if even then pure a else addAddr (-1) a)
   w <- GetMem aligned
   let (c,d) = splitWord w
   let x = (if even then c else d)
@@ -495,14 +496,14 @@ deChar = \case
 deNum :: Word -> Number
 deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
-addAddr :: Int -> Addr -> Addr
+addAddr :: Int -> Addr -> M Addr
 addAddr i = \case
-  AHeapSpace ha  -> AHeapSpace (addHeapAddr i ha)
-  AStatic lab n -> AStatic lab (n+i)
+  AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
+  AStatic lab n -> pure $ AStatic lab (n+i)
   ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
   ARuntime{} -> undefined
 
-addHeapAddr :: Int -> HeapAddr -> HeapAddr
+addHeapAddr :: Int -> HeapAddr -> M HeapAddr
 addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
 
 ----------------------------------------------------------------------
@@ -662,7 +663,7 @@ state0 dmap = State
   , gcNum = 1
   }
   where
-    initialStackPointer = AHeapSpace (mkHeapAddr topA)
+    initialStackPointer = AHeapSpace (HeapAddr (fromIntegral topA))
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
@@ -1208,10 +1209,10 @@ inB n = n <= topB && n >= botB
 getSP :: M HeapAddr
 getSP = (deHeapAddr . deAddr) <$> GetReg Sp
 
-mkHeapAddr :: Int -> HeapAddr -- TODO: return in Monad(M) so can check we are allocating the correct Hemi
+mkHeapAddr :: Int -> M HeapAddr -- TODO: return in Monad(M) so can check we are allocating the correct Hemi
 mkHeapAddr n =
   if not (inA n || inB n) then error (printf "mkHeapAddr: %d" n) else
-    HeapAddr (fromIntegral n)
+    pure $ HeapAddr (fromIntegral n)
 
 whatHemi :: M Hemi
 whatHemi = do
@@ -1223,7 +1224,9 @@ whatHemi = do
       error (printf "whatHemi: %d is in neither\n" n)
 
 setHemi :: Hemi -> M ()
-setHemi hemi = SetReg Sp (WAddr (AHeapSpace (mkHeapAddr (topOfHemi hemi))))
+setHemi hemi = do
+  ha <- mkHeapAddr (topOfHemi hemi)
+  SetReg Sp (WAddr (AHeapSpace ha))
 
 gcTop :: M ()
 gcTop = do
@@ -1273,7 +1276,7 @@ gcTop = do
   loop 1 watermark0
 
   HeapAddr x :: HeapAddr <- getSP
-  let HeapAddr y :: HeapAddr = mkHeapAddr (topOfHemi toSpace)
+  HeapAddr y <- mkHeapAddr (topOfHemi toSpace)
   let liveBytes = y - x
 
   Debug (printf "GC(%d): DONE: liveBytes=%d\n" gcNum liveBytes)
@@ -1301,13 +1304,12 @@ scavenge scanPointer = do
   case mustScan of
     True -> do
       -- 1..size because we are pointing at descriptor
-      let xs = [ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
+      xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
       mapM_ scavengeHA xs
       pure ()
     False -> pure ()
 
-  let nextScanPointer = addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
-  pure nextScanPointer
+  addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
 
 scavengeHA :: HeapAddr -> M ()
 scavengeHA ha = do
@@ -1328,17 +1330,17 @@ evacuate w = do
 
 evacuateHA :: HeapAddr -> M HeapAddr
 evacuateHA objectA = do
-  let descA = addHeapAddr (-bytesPerWord) objectA
+  descA <- addHeapAddr (-bytesPerWord) objectA
   --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
   desc <- getBlockDescriptor "for-evacuate" descA
   let sizeBytesMaybe = (case desc of Scanned n -> Just n; RawData n -> Just n; BrokenHeart -> Nothing)
   case sizeBytesMaybe of
     Just sizeBytes -> do
       let sizeWords = sizeBytes `div` 2
-      let xs = reverse [ addHeapAddr (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
+      xs <- sequence $ reverse [ addHeapAddr (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
       mapM_ copyAlloc xs
       sp <- getSP
-      let relocatedA = addHeapAddr bytesPerWord sp -- point one word past the new desc
+      relocatedA <- addHeapAddr bytesPerWord sp -- point one word past the new desc
       -- overwrite original object with broken Heart; which points tothe relocated object
       SetMem (AHeapSpace descA) (WBlockDescriptor BrokenHeart)
       SetMem (AHeapSpace objectA) (WAddr (AHeapSpace relocatedA))
