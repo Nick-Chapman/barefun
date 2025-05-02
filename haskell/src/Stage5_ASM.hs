@@ -860,7 +860,7 @@ changeRegInSource r1 r2 = \case
 
 compileAtomicTo :: String -> Target -> SRC.Atomic -> Asm [Op]
 compileAtomicTo who target = \case
-  SRC.Prim b xs -> pure (compileBuiltinTo target b (map compileRef xs))
+  SRC.Prim builtin xs -> pure (compileBuiltinTo builtin target (map compileRef xs))
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
   SRC.Lam pre _post _x body -> compileFunctionTo who target pre body
   SRC.RecLam pre _post _f _x body -> compileFunctionTo who target pre body
@@ -884,44 +884,36 @@ compileFunctionTo who target freeVars body = do
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ])
 
--- if a builtin returns unit, it may omit assigning the target
--- because nothing will inspect that target. TODO: Is this true?? -- NO IT IS NOT
--- hmm, maybe this is breakaing GC... YES WAS. FIX PutChar.. return unit
--- so it seems that prob was in the "better" put_char
--- which in one branch just disptched to the underlying putchar, returning what it did
--- but this meanit set dx (the arg/return reg) to a Temp which hadn't been set.
--- making the fix below... (***) made it work.
--- think this needs to be in all arms which return unit -- ok, just a few more.. all fixed now.
-
--- TODO: take "Target" after Builtin; push lambda into each branch to be sure it is never ignored.
-compileBuiltinTo :: Target -> Builtin -> [Source] -> [Op]
-compileBuiltinTo target b = case b of
-  SRC.GetChar -> oneArg $ \_ ->
+-- The target must always be assigned to satisfy GC invariants. Even when the resul is just unit "()"
+-- So we don't forget, w take "Target" after "Builtin"; and push the lambda into each branch...
+compileBuiltinTo :: Builtin -> Target -> [Source] -> [Op]
+compileBuiltinTo builtin = case builtin of
+  SRC.PutChar -> \target -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    , OpCall Bare_put_char
+    , setTarget target (SLit (WAddr aUnit)) -- .. so missing this line is a unused ident error.
+    ]
+  SRC.GetChar -> \target -> oneArg $ \_ ->
     [ OpCall Bare_get_char
     , setTarget target (SReg Ax)
     ]
-  SRC.PutChar -> oneArg $ \s1 ->
-    [ OpMove Ax s1
-    , OpCall Bare_put_char
-    , setTarget target (SLit (WAddr aUnit))
-    ]
-  SRC.EqChar -> twoArgs $ \s1 s2 ->
+  SRC.EqChar -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z
     , setTarget target (SReg Ax)
     ]
-  SRC.AddInt -> twoArgs $ \s1 s2 ->
+  SRC.AddInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpAddInto Ax s2
     , setTarget target (SReg Ax)
     ]
-  SRC.SubInt -> twoArgs $ \s1 s2 ->
+  SRC.SubInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpSubInto Ax s2
     , setTarget target (SReg Ax)
     ]
-  SRC.MulInt -> twoArgs $ \s1 s2 ->
+  SRC.MulInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1 ] ++
     case s2 of
       SReg s2Reg ->
@@ -933,7 +925,7 @@ compileBuiltinTo target b = case b of
         , OpMulIntoAx Bx
         , setTarget target (SReg Ax)
         ]
-  SRC.DivInt -> twoArgs $ \s1 s2 ->
+  SRC.DivInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpPushSAVE (SReg Dx)
@@ -943,7 +935,7 @@ compileBuiltinTo target b = case b of
     , OpPopRESTORE Dx
     , setTarget target (SReg Ax)
     ]
-  SRC.ModInt -> twoArgs $ \s1 s2 ->
+  SRC.ModInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpPushSAVE (SReg Dx)
@@ -953,50 +945,50 @@ compileBuiltinTo target b = case b of
     , setTarget target (SReg Dx)
     , OpPopRESTORE Dx
     ]
-  SRC.EqInt -> twoArgs $ \s1 s2 ->
+  SRC.EqInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_z -- TODO: maybe remove/inline?
     , setTarget target (SReg Ax)
     ]
-  SRC.LessInt -> twoArgs $ \s1 s2 ->
+  SRC.LessInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpCmp (SReg Ax) s2
     , OpCall Bare_make_bool_from_n -- TODO: maybe remove/inline?
     , setTarget target (SReg Ax)
     ]
-  SRC.CharChr -> oneArg $ \s1 ->
+  SRC.CharChr -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_num_to_char -- TODO: remove/inline
     , setTarget target (SReg Ax)
     ]
-  SRC.CharOrd -> oneArg $ \s1 ->
+  SRC.CharOrd -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_char_to_num -- TODO: remove/inline
     , setTarget target (SReg Ax)
     ]
-  SRC.MakeRef -> oneArg $ \s1 ->
+  SRC.MakeRef -> \target -> oneArg $ \s1 ->
     let desc = Scanned { evenSizeInBytes = 2 } in
     [ OpPush s1
     , setTarget target (SReg Sp)
     , OpPush (SLit (WBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
-  SRC.DeRef -> oneArg $ \s1 ->
+  SRC.DeRef -> \target -> oneArg $ \s1 ->
     [ OpMove Bx s1
     , setTarget target (SMemIndirectOffset Bx 0)
     ]
-  SRC.SetRef -> twoArgs $ \s1 s2 ->
+  SRC.SetRef -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Bx s1
     , OpMove Ax s2
     , OpStore (TReg Bx) Ax
     , setTarget target (SLit (WAddr aUnit))
     ]
-  SRC.MakeBytes -> oneArg $ \s1 ->
+  SRC.MakeBytes -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_make_bytes
     , setTarget target (SReg Ax)
     ]
-  SRC.SetBytes -> threeArgs $ \s1 s2 s3 ->
+  SRC.SetBytes -> \target -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
     , OpMove Bx s3
     , OpPushSAVE (SReg Si)
@@ -1005,53 +997,55 @@ compileBuiltinTo target b = case b of
     , OpPopRESTORE Si
     , setTarget target (SLit (WAddr aUnit))
     ]
-  SRC.GetBytes -> twoArgs $ codeForGetBytes
-  SRC.StringIndex -> twoArgs $ codeForGetBytes
-  SRC.FreezeBytes -> oneArg $ \s1 ->
+  SRC.GetBytes -> codeForGetBytes
+  SRC.StringIndex -> codeForGetBytes
+  SRC.FreezeBytes -> \target -> oneArg $ \s1 ->
     -- null-imp; bytes/string have the same representation
     [ setTarget target s1
     ]
-  SRC.ThawBytes -> oneArg $ \s1 ->
+  SRC.ThawBytes -> \target -> oneArg $ \s1 ->
     -- null-imp; bytes/string have the same representation
     [ setTarget target s1
     ]
-  SRC.StringLength -> oneArg $ \s1 ->
+  SRC.StringLength -> \target -> oneArg $ \s1 ->
     [ OpMove Bx s1
     , setTarget target (SMemIndirectOffset Bx 0)
     ]
-  SRC.Crash -> oneArg $ \_ ->
+  SRC.Crash -> \_target -> oneArg $ \_ ->
     [ OpCall Bare_crash
+    -- no need to assign target; we wont return from Bare_crash
     ]
-  SRC.LoadSec -> twoArgs $ \s1 s2 ->
+  SRC.LoadSec -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_load_sector
     , setTarget target (SLit (WAddr aUnit))
     ]
-  SRC.StoreSec -> twoArgs $ \s1 s2 ->
+  SRC.StoreSec -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_store_sector
     , setTarget target (SLit (WAddr aUnit))
     ]
-  SRC.GetStackPointer -> oneArg $ \_ -> -- TODO: replace with builtin to discover #live-words
+  SRC.GetStackPointer -> \target -> oneArg $ \_ -> -- TODO: replace with builtin to discover #live-words
     [ OpMove Ax (SReg Sp)
     , OpCall Bare_addr_to_num
     , setTarget target (SReg Ax)
     ]
 
   where
-    codeForGetBytes s1 s2 =
+    codeForGetBytes = \target -> twoArgs $ \s1 s2 ->
       [ OpMove Ax s1
       , OpMove Bx s2
       , OpCall Bare_get_bytes -- TODO: remove/inline
       , setTarget target (SReg Ax)
       ]
 
-    err = error (printf "Stage5.compileBuiltin: error: %s" (show b))
     oneArg f = \case [v] -> f v; _ -> err
     twoArgs f = \case [v1,v2] -> f v1 v2; _ -> err
     threeArgs f = \case [v1,v2,v3] -> f v1 v2 v3; _ -> err
+
+    err = error (printf "Stage5.compileBuiltin: error: %s" (show builtin))
 
 setTarget :: Target -> Source -> Op
 setTarget = \case
