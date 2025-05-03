@@ -65,6 +65,7 @@ data Op -- target; source (Intel Syntax style)
   | OpSubInto Reg Source
   | OpMulIntoAx Reg  -- ax := ax * sourceReg
   | OpDivModIntoAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
+  | OpEnterCheck Int -- macro
 
 data Jump
   = JumpDirect CodeLabel
@@ -107,7 +108,6 @@ data BareBios
   -- Base_clear_screen -- TODO: expose to user code
   = Bare_halt
   | Bare_crash
-  | Bare_enter_check
   | Bare_put_char
   | Bare_get_char
   | Bare_make_bool_from_z
@@ -161,6 +161,7 @@ instance Show Op where
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulIntoAx src -> "mul " ++ show src
     OpDivModIntoAxDx src -> "div " ++ show src
+    OpEnterCheck need -> printf "Bare_enter_check(%d)" need
 
 instance Show Jump where
   show = \case

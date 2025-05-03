@@ -78,6 +78,10 @@
     jmp final_code
 %endmacro
 
+%macro Bare_enter_check 1 ;; TODO: pay attention to "need" argument
+    call Bare_enter_check_function
+%endmacro
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Bootloader...
 
@@ -170,7 +174,7 @@ Bare_crash:
     Print `[Crash]\n`
     jmp final_code
 
-Bare_enter_check:
+Bare_enter_check_function:
     ;; how much space is left before we crash into the code?
     ;; when this reaches zero, examples crash.
     ;; however, sham example crashes much earlier

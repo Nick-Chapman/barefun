@@ -64,8 +64,9 @@ compileTopRef = \case
 
 cutEntryCode :: String -> Code -> Asm CodeLabel
 cutEntryCode name code = do
+  let guessedNeed = 500 -- TODO
   CutCode name $ do
-    doOps [ OpCall Bare_enter_check ] code
+    doOps [ OpEnterCheck guessedNeed ] code
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case

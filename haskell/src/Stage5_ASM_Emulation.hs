@@ -28,9 +28,6 @@ gcLiveWordsTrace = False
 hemiSizeInBytes :: Int
 hemiSizeInBytes = 3000
 
-guessedNeed :: Int
-guessedNeed = 500 -- TODO: compute at compile-time a max-bound for each Bare_enter_check
-
 topA,botA,topB,botB :: Int
 topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0
 botA = topA - hemiSizeInBytes
@@ -107,6 +104,12 @@ execOp = \case
     SetReg Ax (WNum (fromIntegral (dividend `div` divisor)))
     SetReg Dx (WNum (fromIntegral (dividend `mod` divisor)))
     cont
+  OpEnterCheck need -> \cont -> do
+    n <- heapBytesRemaining
+    if (n < need) then gcTop else pure ()
+    n <- heapBytesRemaining
+    if (n < need) then do Print (printf "[Not enough space recovered by GC: need=%d; have:%d]\n" need n); Crash else
+      do BudgedForAllocation need; cont
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- it records #bytes allocated (why am I recording in #bytes not #words?)
@@ -180,18 +183,6 @@ execBare :: BareBios -> M ()
 execBare = \case
   Bare_halt -> Halt
   Bare_crash -> Crash
-
-  Bare_enter_check -> do
-    let need = guessedNeed
-    n <- heapBytesRemaining
-    let willGC = n < need
-    --Print (printf "Bare_enter_check: heapBytesRemaining = %d%s\n" n (if willGC then " (will GC)" else ""))
-    if willGC then gcTop else pure ()
-    n' <- heapBytesRemaining
-    let enoughtSpaceRecovered = n' >= need
-    if enoughtSpaceRecovered then BudgedForAllocation need else do
-      Print (printf "[Not enough space recovered by GC: need=%d; have:%d]\n" need n')
-      Crash
 
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
   Bare_put_char -> do c <- deChar <$> GetReg Ax; PutChar c

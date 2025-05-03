@@ -1,5 +1,5 @@
 L1: ; Start
-  call Bare_enter_check
+  Bare_enter_check(500)
   mov ax, `3`
   call Bare_put_char
   mov si, Bare_unit
