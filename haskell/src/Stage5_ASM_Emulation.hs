@@ -146,7 +146,7 @@ execPopRESTORE reg = do -- post increment
 checkPushBlockDescriptor :: Word -> M ()
 checkPushBlockDescriptor = \case
   WBlockDescriptor desc -> do
-    let sizeInBytes = case desc of Scanned n -> n; RawData n -> n; BrokenHeart -> error "checkPushBlockDescriptor/BrokenHeart"
+    let sizeInBytes = case desc of Scanned n -> n; RawData n -> n
     CheckRecentAlloc (sizeInBytes + 2) -- 2 for the block descriptor itself
     pure ()
   _ ->
@@ -587,6 +587,7 @@ data Word
   | WUninitialized String
   | WBlockDescriptor BlockDescriptor
   | WUninitializedCharPair
+  | WBrokenHeart
   deriving (Eq)
 
 -- Of the 3 kinds of Addr. Only AHeapSpace and AStatic represent user values
@@ -627,6 +628,7 @@ instance Show Word where
     WUninitialized s -> printf "[uninialized:%s]" s
     WUninitializedCharPair -> "[uninialized-char-pair]"
     WCharPair p -> show p
+    WBrokenHeart -> "[broken-heart]"
 
 instance Show Addr where
   show = \case
@@ -753,14 +755,9 @@ evacuateReg reg = do
 
 scavenge :: HeapAddr -> M HeapAddr
 scavenge scanPointer = do
-  desc <- getBlockDescriptor "for-scavenge" scanPointer
-  let
-    (sizeWords,mustScan) =
-      case desc of
-        Scanned n -> (n `div` 2, True)
-        RawData n -> (n `div` 2, False)
-        BrokenHeart -> error "scavenge/BrokenHeart"
-
+  descOpt <- getBlockDescriptor scanPointer
+  let desc = case descOpt of Just d -> d; Nothing -> error "scavenge/BrokenHeart"
+  let (sizeWords,mustScan) = case desc of Scanned n -> (n `div` 2, True); RawData n -> (n `div` 2, False)
   case mustScan of
     True -> do
       -- 1..size because we are pointing at descriptor
@@ -792,8 +789,8 @@ evacuateHA :: HeapAddr -> M HeapAddr
 evacuateHA objectA = do
   descA <- addHeapAddr_OTHER (-bytesPerWord) objectA
   --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
-  desc <- getBlockDescriptor "for-evacuate" descA
-  let sizeBytesMaybe = (case desc of Scanned n -> Just n; RawData n -> Just n; BrokenHeart -> Nothing)
+  descOpt <- getBlockDescriptor descA
+  let sizeBytesMaybe = (case descOpt of Just (Scanned n) -> Just n; Just (RawData n) -> Just n; Nothing -> Nothing)
   case sizeBytesMaybe of
     Just sizeBytes -> do
       let sizeWords = sizeBytes `div` 2
@@ -802,7 +799,7 @@ evacuateHA objectA = do
       sp <- getSP
       relocatedA <- addHeapAddr bytesPerWord sp -- point one word past the new desc
       -- overwrite original object with broken Heart; which points tothe relocated object
-      SetMem (AHeapSpace descA) (WBlockDescriptor BrokenHeart)
+      SetMem (AHeapSpace descA) WBrokenHeart
       SetMem (AHeapSpace objectA) (WAddr (AHeapSpace relocatedA))
       pure relocatedA
 
@@ -818,11 +815,10 @@ copyAlloc ha = do
   --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
   pure ()
 
-getBlockDescriptor :: String -> HeapAddr -> M BlockDescriptor
-getBlockDescriptor who ha = do
+getBlockDescriptor :: HeapAddr -> M (Maybe BlockDescriptor) -- TODO: inline is cleaner
+getBlockDescriptor ha = do
   w <- GetMem (AHeapSpace ha)
   case w of
-    WBlockDescriptor d -> pure d
-    w ->
-      error (printf "getBlockDescriptor(%s): not a block-descriptor: %s at %s"
-              who (show w) (show ha))
+    WBlockDescriptor d -> pure (Just d)
+    WBrokenHeart -> pure Nothing
+    w -> error (printf "getBlockDescriptor: not a block-descriptor: %s at %s" (show w) (show ha))

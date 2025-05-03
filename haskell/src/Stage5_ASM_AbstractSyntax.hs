@@ -100,7 +100,6 @@ data DataLabel
 data BlockDescriptor -- TODO improve rep, have one variant with size field + scan/raw flag
   = Scanned { evenSizeInBytes :: Int }
   | RawData { evenSizeInBytes :: Int }
-  | BrokenHeart
   deriving Eq
 
 -- BareBios; primitive routines available to the compiled code
@@ -199,7 +198,6 @@ instance Show BlockDescriptor where
   show = \case
     Scanned n -> show n ++ " ;; scanned"
     RawData n -> show n ++ " ;; raw-data"
-    BrokenHeart -> "[broken-heart]" -- TODO: should only be a runtime Word
 
 instance Show Reg where
   show = \case
