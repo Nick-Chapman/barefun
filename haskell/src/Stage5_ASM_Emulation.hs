@@ -108,8 +108,13 @@ execOp = \case
     n <- heapBytesRemaining
     if (n < need) then gcTop else pure ()
     n <- heapBytesRemaining
-    if (n < need) then do Print (printf "[Not enough space recovered by GC: need=%d; have:%d]\n" need n); Crash else
-      do BudgedForAllocation need; cont
+    if (n < need)
+      then do Print (printf "[Not enough space recovered by GC: need=%d; have:%d]\n" need n); Crash
+      else
+      do
+        Debug (printf "BudgedForAllocation: %d\n" need)
+        BudgedForAllocation need
+        cont
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- it records #bytes allocated (why am I recording in #bytes not #words?)
@@ -117,11 +122,11 @@ execOp = \case
 execPushAlloc :: AllocMode -> Word -> M ()
 execPushAlloc mode w = do
   a <- deAddr <$> GetReg Sp
-  sequence_ (replicate bytesPerWord (TraceAlloc mode))
   a' <- addAddr (-(bytesPerWord)) a
   SetMem a' w
   SetReg Sp (WAddr a')
-  --Debug (printf "Alloc: %s = %s\n" (show a') (show w))
+  Debug (printf "Alloc: %s = %s\n" (show a') (show w))
+  sequence_ (replicate bytesPerWord (TraceAlloc mode))
   checkPushBlockDescriptor w
 
 execPushSAVE :: Word -> M ()
@@ -149,6 +154,7 @@ checkPushBlockDescriptor = \case
 
 slideStackPointer :: AllocMode -> Int -> M ()
 slideStackPointer mode nBytes = do
+  Debug (printf "SLIDE: %d\n" nBytes)
   sequence_ (replicate (nBytes) (TraceAlloc mode))
   a <- deAddr <$> GetReg Sp
   a' <- addAddr (-(nBytes)) a
@@ -373,7 +379,7 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
     traceOpOJump thing s k = trace (show s ++ " ") $ ITick I.Op $ do
       let State{countOps,lastCodeLabel,offsetFromLastLabel} = s
-      trace (printf "#%03d: %s.%d : %s\n"
+      trace (printf "{%03d}: %s.%d : %s\n"
              countOps
              (show lastCodeLabel)
              offsetFromLastLabel
@@ -395,14 +401,10 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
         let State{allocsSinceLastCheck=actual} = s
         let same = (expect == actual)
         let m = printf "CheckRecentAlloc: expect=%d, actual=%d, same=%s\n" expect actual (show same)
-        --ITrace m $
         if not same then error m else
-            k s { allocsSinceLastCheck = 0 } ()
+          k s { allocsSinceLastCheck = 0 } ()
 
       BudgedForAllocation n -> do
-        --let State{budgetAlloc=last,allocsSinceLastEnter=used} = s
-        --let m = printf "Over-budgeted by: %d.\nNew budget: %d\n" (last-used) n
-        --ITrace m $
         k s { budgetAlloc = n, allocsSinceLastEnter = 0 } ()
 
       Debug m -> debug m $ k s ()
@@ -411,10 +413,9 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k
 
-
       TraceAlloc AllocForUser -> do
         let State{allocsSinceLastCheck,allocsSinceLastEnter,budgetAlloc} = s
-        let die = ITrace (printf "alloc-budget-exceeded: %d" budgetAlloc) IDone
+        let die = ITrace (printf "alloc-budget-exceeded: %d\n" budgetAlloc) IDone
         if allocsSinceLastEnter == budgetAlloc then die else do
           ITick I.Alloc $ k s { allocsSinceLastCheck = 1 + allocsSinceLastCheck
                              , allocsSinceLastEnter = 1 + allocsSinceLastEnter
@@ -586,7 +587,7 @@ data Word
   | WUninitialized String
   | WBlockDescriptor BlockDescriptor
   | WUninitializedCharPair
-  deriving (Eq,Show)
+  deriving (Eq)
 
 -- Of the 3 kinds of Addr. Only AHeapSpace and AStatic represent user values
 -- The ATempSpace is more like a register, in that it is a location for values.
@@ -596,7 +597,7 @@ data Addr -- memory address
   = AHeapSpace HeapAddr
   | AStatic DataLabel Int -- This int is an offset at the data-label
   | ATempSpace SRC.Temp
-  deriving (Eq,Ord,Show)
+  deriving (Eq,Ord)
 
 data HeapAddr = HeapAddr Word16
   deriving (Eq,Ord)
@@ -615,6 +616,23 @@ evenAddr = \case
   AHeapSpace (HeapAddr n) -> (n `mod` 2) == 0
   AStatic _ offset -> (offset `mod` 2) == 0
   ATempSpace{} -> True
+
+instance Show Word where
+  show = \case
+    WChar c -> show c
+    WNum n -> show n
+    WAddr a -> show a
+    WCodeLabel lab -> show lab
+    WBlockDescriptor d -> show d
+    WUninitialized s -> printf "[uninialized:%s]" s
+    WUninitializedCharPair -> "[uninialized-char-pair]"
+    WCharPair p -> show p
+
+instance Show Addr where
+  show = \case
+    AHeapSpace ha -> show ha
+    AStatic d offset -> printf "%s+%d" (show d) offset
+    ATempSpace{} -> undefined
 
 ----------------------------------------------------------------------
 -- GC

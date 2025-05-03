@@ -1,5 +1,5 @@
 L1: ; Start
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, g1
   mov bp, cx
   mov cx, [bp+2]

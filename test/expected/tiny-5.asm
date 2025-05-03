@@ -1,5 +1,5 @@
 L1: ; Function: (mainloop,g1)
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   call Bare_get_char
   mov si, ax
   mov ax, si
@@ -14,7 +14,7 @@ L1: ; Function: (mainloop,g1)
   jmp [bp]
 
 L2: ; Start
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, g1
   mov dx, g4
   jmp [bp]

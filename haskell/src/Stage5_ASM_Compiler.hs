@@ -3,6 +3,7 @@ module Stage5_ASM_Compiler ( compile ) where
 
 import Builtin (Builtin)
 import Control.Monad (ap,liftM)
+import Data.Map (Map)
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
 import Value (Number)
@@ -64,9 +65,9 @@ compileTopRef = \case
 
 cutEntryCode :: String -> Code -> Asm CodeLabel
 cutEntryCode name code = do
-  let guessedNeed = 500 -- TODO
+  need <- Needed code
   CutCode name $ do
-    doOps [ OpEnterCheck guessedNeed ] code
+    doOps [ OpEnterCheck need ] code
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -393,10 +394,13 @@ data Asm a where
   AsmBind :: Asm a -> (a -> Asm b) -> Asm b
   CutCode :: String -> Code -> Asm CodeLabel
   CutData :: DataLabel -> [DataSpec] -> Asm ()
+  Needed :: Code -> Asm Int -- access to the lazy allocation-needed computation
 
 runAsm :: Asm CodeLabel  -> Image
-runAsm m = loop state0 m k0
+runAsm asm = finalImage
   where
+    finalImage = loop state0 asm k0
+
     state0 = AsmState { u = 1 }
     k0 _s start = Image { cmap = Map.empty, dmap = Map.empty, start }
 
@@ -412,5 +416,38 @@ runAsm m = loop state0 m k0
       CutData lab vals -> \k -> do
         let image@Image{dmap} = k s ()
         image { dmap = Map.insert lab vals dmap }
+
+      -- Compute bound on allocation needed for Bare_enter_check
+      Needed code -> \k -> do
+        k s (needC code)
+
+
+    Image{cmap=finalCmap} = finalImage
+
+    m :: Map CodeLabel Int
+    m = Map.fromList [ (lab, needC code) | (lab,code) <- Map.toList finalCmap ]
+
+    needL :: CodeLabel -> Int
+    needL lab = maybe err id $ Map.lookup lab m
+      where err = error (show ("needL",lab))
+
+    needC :: Code -> Int
+    needC = \case
+      Do op code -> needOp (needC code) op
+      Done{} -> 0
+
+    needOp :: Int -> Op -> Int
+    needOp after = \case
+      OpPush{} -> 2 + after
+      OpBranchFlagZ lab -> max after (needL lab)
+
+      OpCall Bare_make_bytes -> do
+        -- We need to budget for the allocation made by Bare_make_bytes.
+        -- But there is a snag -- The amount of space needed is dynamic.
+        -- One solution is to call this primitive in CPS style & have it do its own GC check.
+        -- For now we hack it with a big number.
+        100 -- TODO: remove this hack for Bare_make_bytes allocation budget
+
+      _ -> after
 
 data AsmState = AsmState { u :: Int }

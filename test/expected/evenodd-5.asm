@@ -11,7 +11,7 @@ L2: ; Arm: 4'26
   jmp [bp]
 
 L3: ; Function: (is_even,g1)
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -37,7 +37,7 @@ L3: ; Function: (is_even,g1)
   jmp [bp]
 
 L4: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, dx
   call Bare_put_char
   mov si, Bare_unit
@@ -53,7 +53,7 @@ L5: ; Arm: 9'25
   jmp [bp]
 
 L6: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L4
   mov cx, sp
@@ -67,7 +67,7 @@ L6: ; Continuation
   jmp [bp]
 
 L7: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   mov ax, dx
   call Bare_put_char
   mov si, Bare_unit
@@ -86,7 +86,7 @@ L8: ; Arm: 9'25
   jmp [bp]
 
 L9: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L7
   mov cx, sp
@@ -100,7 +100,7 @@ L9: ; Continuation
   jmp [bp]
 
 L10: ; Start
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L9
   mov cx, sp

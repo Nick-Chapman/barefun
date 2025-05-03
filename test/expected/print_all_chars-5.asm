@@ -5,7 +5,7 @@ L1: ; Arm: 9'15
   jmp [bp]
 
 L2: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, [bp+4]
   add ax, 1
   mov si, ax
@@ -62,7 +62,7 @@ L4: ; Arm: 13'20
   jmp [bp]
 
 L5: ; Function: (loop,g1)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov ax, 255
   cmp word ax, dx
   call Bare_make_bool_from_n
@@ -105,7 +105,7 @@ L5: ; Function: (loop,g1)
   jmp [bp]
 
 L6: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, `\n`
   call Bare_put_char
   mov si, Bare_unit
@@ -115,7 +115,7 @@ L6: ; Continuation
   jmp [bp]
 
 L7: ; Start
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L6
   mov cx, sp

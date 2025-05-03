@@ -1,11 +1,11 @@
 L1: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, [bp+2]
   mov dx, dx
   jmp [bp]
 
 L2: ; Function: (block,g1)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L1
   mov si, sp
@@ -22,7 +22,7 @@ L3: ; Arm: 21'7
   jmp [bp]
 
 L4: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, 1
   add ax, dx
   mov si, ax
@@ -32,7 +32,7 @@ L4: ; Continuation
   jmp [bp]
 
 L5: ; Function: (length,g2)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   mov bx, dx
   cmp word [bx], 0
   jz L3
@@ -53,7 +53,7 @@ L6: ; Arm: 26'7
   jmp [bp]
 
 L7: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word dx
   push word [bp+4]
   push word 1
@@ -65,7 +65,7 @@ L7: ; Continuation
   jmp [bp]
 
 L8: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+6]
   push word cx
   push word L7
@@ -77,7 +77,7 @@ L8: ; Continuation
   jmp [bp]
 
 L9: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word dx
   push word [bp+6]
   push word cx
@@ -89,7 +89,7 @@ L9: ; Continuation
   jmp [bp]
 
 L10: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   mov bx, dx
   cmp word [bx], 0
   jz L6
@@ -106,7 +106,7 @@ L10: ; Function: (lam,t1)
   jmp [bp]
 
 L11: ; Function: (map,g3)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L10
   mov si, sp
@@ -123,14 +123,14 @@ L12: ; Arm: 31'7
   jmp [bp]
 
 L13: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L14: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+6]
   push word cx
   push word L13
@@ -141,7 +141,7 @@ L14: ; Continuation
   jmp [bp]
 
 L15: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   mov bx, dx
   cmp word [bx], 0
   jz L12
@@ -158,7 +158,7 @@ L15: ; Function: (lam,t1)
   jmp [bp]
 
 L16: ; Function: (iter,g5)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L15
   mov si, sp
@@ -175,14 +175,14 @@ L17: ; Arm: 36'7
   jmp [bp]
 
 L18: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L19: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   mov bx, dx
   cmp word [bx], 0
   jz L17
@@ -203,7 +203,7 @@ L19: ; Function: (lam,t1)
   jmp [bp]
 
 L20: ; Function: (rev_onto,g7)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L19
   mov si, sp
@@ -220,14 +220,14 @@ L21: ; Arm: 49'9
   jmp [bp]
 
 L22: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L23: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov bx, dx
   cmp word [bx], 0
   jz L21
@@ -254,7 +254,7 @@ L23: ; Function: (lam,t1)
   jmp [bp]
 
 L24: ; Function: (loop,t2)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word bp
   push word dx
   push word [bp+2]
@@ -267,7 +267,7 @@ L24: ; Function: (loop,t2)
   jmp [bp]
 
 L25: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov si, [bp+4]
   mov dx, si
   mov bp, cx
@@ -275,7 +275,7 @@ L25: ; Continuation
   jmp [bp]
 
 L26: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+6]
   push word cx
   push word L25
@@ -287,7 +287,7 @@ L26: ; Continuation
   jmp [bp]
 
 L27: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(100)
   mov ax, dx
   call Bare_make_bytes
   mov si, ax
@@ -306,7 +306,7 @@ L27: ; Continuation
   jmp [bp]
 
 L28: ; Function: (lam,g9)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word dx
   push word cx
   push word L27
@@ -323,14 +323,14 @@ L29: ; Arm: 60'9
   jmp [bp]
 
 L30: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L31: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov bx, dx
   cmp word [bx], 0
   jz L29
@@ -357,7 +357,7 @@ L31: ; Function: (lam,t1)
   jmp [bp]
 
 L32: ; Function: (loop,t2)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word bp
   push word dx
   push word [bp+2]
@@ -370,7 +370,7 @@ L32: ; Function: (loop,t2)
   jmp [bp]
 
 L33: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov si, [bp+4]
   mov dx, si
   mov bp, cx
@@ -378,7 +378,7 @@ L33: ; Continuation
   jmp [bp]
 
 L34: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+6]
   push word cx
   push word L33
@@ -390,7 +390,7 @@ L34: ; Continuation
   jmp [bp]
 
 L35: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(100)
   mov ax, dx
   call Bare_make_bytes
   mov si, ax
@@ -412,7 +412,7 @@ L35: ; Continuation
   jmp [bp]
 
 L36: ; Function: (lam,g11)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word dx
   push word cx
   push word L35
@@ -429,7 +429,7 @@ L37: ; Arm: 68'13
   jmp [bp]
 
 L38: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, [bp+4]
   sub ax, 1
   mov si, ax
@@ -438,7 +438,7 @@ L38: ; Continuation
   jmp [bp]
 
 L39: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -465,7 +465,7 @@ L39: ; Function: (lam,t1)
   jmp [bp]
 
 L40: ; Function: (explode_loop,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word bp
   push word dx
   push word [bp+2]
@@ -478,7 +478,7 @@ L40: ; Function: (explode_loop,t1)
   jmp [bp]
 
 L41: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, [bp+4]
   sub ax, 1
   mov si, ax
@@ -487,7 +487,7 @@ L41: ; Continuation
   jmp [bp]
 
 L42: ; Function: (lam,g13)
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word L40
   mov si, sp
@@ -522,7 +522,7 @@ L45: ; Arm: 81'31
   jmp [bp]
 
 L46: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, dx
   cmp word [bx], 1
   jz L45
@@ -540,7 +540,7 @@ L47: ; Arm: 8'9
   jmp [bp]
 
 L48: ; Function: (loop,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_n
@@ -575,7 +575,7 @@ L48: ; Function: (loop,t1)
   jmp [bp]
 
 L49: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov bx, dx
   cmp word [bx], 1
   jz L43
@@ -598,7 +598,7 @@ L50: ; Arm: 8'9
   jmp [bp]
 
 L51: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   mov bx, [bp+2]
   mov si, [bx]
   mov bx, dx
@@ -623,7 +623,7 @@ L51: ; Function: (lam,t1)
   jmp [bp]
 
 L52: ; Function: (lam,g21)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L51
   mov si, sp
@@ -640,7 +640,7 @@ L53: ; Arm: 106'7
   jmp [bp]
 
 L54: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, g24
   jmp [bp]
@@ -676,7 +676,7 @@ L57: ; Arm: 101'16
   jmp [bp]
 
 L58: ; Function: (put_chars,g24)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov bx, dx
   cmp word [bx], 0
   jz L53
@@ -740,7 +740,7 @@ L59: ; Arm: 244'11
   jmp [bp]
 
 L60: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, [bp+4]
   add ax, dx
   mov si, ax
@@ -750,7 +750,7 @@ L60: ; Continuation
   jmp [bp]
 
 L61: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov ax, [bp+4]
   sub ax, 2
   mov si, ax
@@ -764,7 +764,7 @@ L61: ; Continuation
   jmp [bp]
 
 L62: ; Function: (fib,g54)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov ax, dx
   cmp word ax, 2
   call Bare_make_bool_from_n
@@ -785,7 +785,7 @@ L62: ; Function: (fib,g54)
   jmp [bp]
 
 L63: ; Function: (lam,g82)
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, dx
   mov si, [bx+2]
   mov di, [bx+4]
@@ -811,14 +811,14 @@ L65: ; Arm: 269'15
   jmp [bp]
 
 L66: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L67: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   mov bx, dx
   cmp word [bx], 0
   jz L65
@@ -850,7 +850,7 @@ L68: ; Arm: 261'27
   jmp [bp]
 
 L69: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   mov bx, dx
   cmp word [bx], 1
   jz L68
@@ -884,7 +884,7 @@ L71: ; Arm: 261'12
   jmp [bp]
 
 L72: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -906,7 +906,7 @@ L73: ; Arm: 8'9
   jmp [bp]
 
 L74: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   mov bx, dx
   cmp word [bx], 0
   jz L64
@@ -938,7 +938,7 @@ L74: ; Function: (lam,t1)
   jmp [bp]
 
 L75: ; Function: (loop,g88)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L74
   mov si, sp
@@ -955,7 +955,7 @@ L76: ; Arm: 115'13
   jmp [bp]
 
 L77: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, [bp+4]
   mov bx, 10
   push word dx ;; save
@@ -968,7 +968,7 @@ L77: ; Continuation
   jmp [bp]
 
 L78: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1004,7 +1004,7 @@ L78: ; Function: (lam,t1)
   jmp [bp]
 
 L79: ; Function: (loop,g99)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L78
   mov si, sp
@@ -1021,7 +1021,7 @@ L80: ; Arm: 115'13
   jmp [bp]
 
 L81: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, [bp+4]
   mov bx, 10
   push word dx ;; save
@@ -1034,7 +1034,7 @@ L81: ; Continuation
   jmp [bp]
 
 L82: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   mov ax, dx
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -1070,7 +1070,7 @@ L82: ; Function: (lam,t1)
   jmp [bp]
 
 L83: ; Function: (loop,g103)
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word dx
   push word L82
   mov si, sp
@@ -1087,13 +1087,13 @@ L84: ; Arm: 90'7
   jmp [bp]
 
 L85: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, [bp+4]
   mov dx, dx
   jmp [bp]
 
 L86: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L85
@@ -1104,7 +1104,7 @@ L86: ; Continuation
   jmp [bp]
 
 L87: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -1117,7 +1117,7 @@ L87: ; Continuation
   jmp [bp]
 
 L88: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+6]
   push word dx
   push word [bp+4]
@@ -1130,7 +1130,7 @@ L88: ; Continuation
   jmp [bp]
 
 L89: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -1142,7 +1142,7 @@ L89: ; Continuation
   jmp [bp]
 
 L90: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word dx
   push word [bp+4]
   push word cx
@@ -1154,7 +1154,7 @@ L90: ; Continuation
   jmp [bp]
 
 L91: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word dx
   push word [bp+6]
   push word [bp+4]
@@ -1167,7 +1167,7 @@ L91: ; Continuation
   jmp [bp]
 
 L92: ; Function: (concat,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   mov bx, dx
   cmp word [bx], 0
   jz L84
@@ -1185,7 +1185,7 @@ L92: ; Function: (concat,t1)
   jmp [bp]
 
 L93: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word dx
   push word 1
@@ -1207,14 +1207,14 @@ L94: ; Arm: 157'11
   jmp [bp]
 
 L95: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L96: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+6]
   push word dx
   push word 1
@@ -1242,14 +1242,14 @@ L97: ; Arm: 159'26
   jmp [bp]
 
 L98: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L99: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+4]
   push word [bp+6]
   push word 1
@@ -1265,7 +1265,7 @@ L99: ; Continuation
   jmp [bp]
 
 L100: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   mov bx, dx
   cmp word [bx], 0
   jz L94
@@ -1290,7 +1290,7 @@ L100: ; Function: (lam,t1)
   jmp [bp]
 
 L101: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -1305,7 +1305,7 @@ L101: ; Function: (lam,t1)
   jmp [bp]
 
 L102: ; Function: (have_letter,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word bp
   push word dx
   push word [bp+4]
@@ -1325,7 +1325,7 @@ L103: ; Arm: 164'9
   jmp [bp]
 
 L104: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
@@ -1342,14 +1342,14 @@ L105: ; Arm: 166'24
   jmp [bp]
 
 L106: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L107: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word g26
   push word [bp+4]
   push word 1
@@ -1365,7 +1365,7 @@ L107: ; Continuation
   jmp [bp]
 
 L108: ; Function: (lam,t2)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   mov bx, dx
   cmp word [bx], 0
   jz L103
@@ -1389,7 +1389,7 @@ L108: ; Function: (lam,t2)
   jmp [bp]
 
 L109: ; Function: (at_word_start,t2)
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word bp
   push word [bp+2]
   push word L102
@@ -1448,7 +1448,7 @@ L113: ; Arm: 143'17
   jmp [bp]
 
 L114: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, `\x08`
   call Bare_put_char
   mov si, Bare_unit
@@ -1480,7 +1480,7 @@ L115: ; Arm: 145'31
   jmp [bp]
 
 L116: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -1531,7 +1531,7 @@ L118: ; Arm: 141'21
   jmp [bp]
 
 L119: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word [bp+8]
   push word 1
@@ -1572,7 +1572,7 @@ L122: ; Arm: 101'16
   jmp [bp]
 
 L123: ; Function: (readloop,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   call Bare_get_char
   mov si, ax
   mov ax, si
@@ -1666,7 +1666,7 @@ L124: ; Arm: 219'36
   jmp [bp]
 
 L125: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, [bp+4]
   mov dx, dx
   jmp [bp]
@@ -1694,7 +1694,7 @@ L128: ; Arm: 187'35
   jmp [bp]
 
 L129: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   mov bx, dx
   cmp word [bx], 1
   jz L128
@@ -1703,7 +1703,7 @@ L129: ; Continuation
   jmp [bp]
 
 L130: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -1717,7 +1717,7 @@ L130: ; Continuation
   jmp [bp]
 
 L131: ; Function: (loop,t3)
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   mov bx, dx
   cmp word [bx], 0
   jz L127
@@ -1741,14 +1741,14 @@ L131: ; Function: (loop,t3)
   jmp [bp]
 
 L132: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L133: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L132
@@ -1759,7 +1759,7 @@ L133: ; Continuation
   jmp [bp]
 
 L134: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+6]
   push word cx
   push word L133
@@ -1770,7 +1770,7 @@ L134: ; Continuation
   jmp [bp]
 
 L135: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+8]
   push word [bp+6]
   push word cx
@@ -1782,7 +1782,7 @@ L135: ; Continuation
   jmp [bp]
 
 L136: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -1795,7 +1795,7 @@ L136: ; Continuation
   jmp [bp]
 
 L137: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -1810,7 +1810,7 @@ L137: ; Continuation
   jmp [bp]
 
 L138: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+10]
   push word dx
   push word [bp+8]
@@ -1825,7 +1825,7 @@ L138: ; Continuation
   jmp [bp]
 
 L139: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -1839,7 +1839,7 @@ L139: ; Continuation
   jmp [bp]
 
 L140: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -1853,7 +1853,7 @@ L140: ; Continuation
   jmp [bp]
 
 L141: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -1867,7 +1867,7 @@ L141: ; Continuation
   jmp [bp]
 
 L142: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -1880,7 +1880,7 @@ L142: ; Continuation
   jmp [bp]
 
 L143: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -1893,7 +1893,7 @@ L143: ; Continuation
   jmp [bp]
 
 L144: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -1908,7 +1908,7 @@ L144: ; Continuation
   jmp [bp]
 
 L145: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+10]
   push word dx
   push word [bp+8]
@@ -1923,7 +1923,7 @@ L145: ; Continuation
   jmp [bp]
 
 L146: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -1937,7 +1937,7 @@ L146: ; Continuation
   jmp [bp]
 
 L147: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -1951,7 +1951,7 @@ L147: ; Continuation
   jmp [bp]
 
 L148: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -1965,7 +1965,7 @@ L148: ; Continuation
   jmp [bp]
 
 L149: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -1979,7 +1979,7 @@ L149: ; Continuation
   jmp [bp]
 
 L150: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+12]
   push word [bp+8]
   push word [bp+6]
@@ -1993,7 +1993,7 @@ L150: ; Continuation
   jmp [bp]
 
 L151: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2009,7 +2009,7 @@ L151: ; Continuation
   jmp [bp]
 
 L152: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word [bp+12]
   push word [bp+10]
   push word dx
@@ -2025,7 +2025,7 @@ L152: ; Continuation
   jmp [bp]
 
 L153: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2040,7 +2040,7 @@ L153: ; Continuation
   jmp [bp]
 
 L154: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word dx
   push word [bp+10]
   push word [bp+8]
@@ -2055,7 +2055,7 @@ L154: ; Continuation
   jmp [bp]
 
 L155: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word dx
   push word [bp+10]
   push word [bp+8]
@@ -2070,7 +2070,7 @@ L155: ; Continuation
   jmp [bp]
 
 L156: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2084,7 +2084,7 @@ L156: ; Continuation
   jmp [bp]
 
 L157: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+12]
   push word [bp+8]
   push word [bp+6]
@@ -2098,7 +2098,7 @@ L157: ; Continuation
   jmp [bp]
 
 L158: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2114,7 +2114,7 @@ L158: ; Continuation
   jmp [bp]
 
 L159: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word [bp+12]
   push word [bp+10]
   push word dx
@@ -2130,7 +2130,7 @@ L159: ; Continuation
   jmp [bp]
 
 L160: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2145,7 +2145,7 @@ L160: ; Continuation
   jmp [bp]
 
 L161: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word dx
   push word [bp+10]
   push word [bp+8]
@@ -2173,14 +2173,14 @@ L162: ; Arm: 204'9
   jmp [bp]
 
 L163: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L164: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L163
@@ -2191,7 +2191,7 @@ L164: ; Continuation
   jmp [bp]
 
 L165: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+6]
   push word cx
   push word L164
@@ -2202,7 +2202,7 @@ L165: ; Continuation
   jmp [bp]
 
 L166: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+8]
   push word [bp+6]
   push word cx
@@ -2214,7 +2214,7 @@ L166: ; Continuation
   jmp [bp]
 
 L167: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -2227,7 +2227,7 @@ L167: ; Continuation
   jmp [bp]
 
 L168: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2242,7 +2242,7 @@ L168: ; Continuation
   jmp [bp]
 
 L169: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+10]
   push word dx
   push word [bp+8]
@@ -2257,7 +2257,7 @@ L169: ; Continuation
   jmp [bp]
 
 L170: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2271,7 +2271,7 @@ L170: ; Continuation
   jmp [bp]
 
 L171: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -2285,7 +2285,7 @@ L171: ; Continuation
   jmp [bp]
 
 L172: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -2299,7 +2299,7 @@ L172: ; Continuation
   jmp [bp]
 
 L173: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -2312,7 +2312,7 @@ L173: ; Continuation
   jmp [bp]
 
 L174: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -2325,7 +2325,7 @@ L174: ; Continuation
   jmp [bp]
 
 L175: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2340,7 +2340,7 @@ L175: ; Continuation
   jmp [bp]
 
 L176: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+10]
   push word dx
   push word [bp+8]
@@ -2355,7 +2355,7 @@ L176: ; Continuation
   jmp [bp]
 
 L177: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2369,7 +2369,7 @@ L177: ; Continuation
   jmp [bp]
 
 L178: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -2383,7 +2383,7 @@ L178: ; Continuation
   jmp [bp]
 
 L179: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -2397,7 +2397,7 @@ L179: ; Continuation
   jmp [bp]
 
 L180: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2411,7 +2411,7 @@ L180: ; Continuation
   jmp [bp]
 
 L181: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2425,7 +2425,7 @@ L181: ; Continuation
   jmp [bp]
 
 L182: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2441,7 +2441,7 @@ L182: ; Continuation
   jmp [bp]
 
 L183: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word [bp+12]
   push word dx
   push word [bp+10]
@@ -2457,7 +2457,7 @@ L183: ; Continuation
   jmp [bp]
 
 L184: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2472,7 +2472,7 @@ L184: ; Continuation
   jmp [bp]
 
 L185: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word dx
   push word [bp+10]
   push word [bp+8]
@@ -2487,7 +2487,7 @@ L185: ; Continuation
   jmp [bp]
 
 L186: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word dx
   push word [bp+10]
   push word [bp+8]
@@ -2502,7 +2502,7 @@ L186: ; Continuation
   jmp [bp]
 
 L187: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2516,7 +2516,7 @@ L187: ; Continuation
   jmp [bp]
 
 L188: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2530,7 +2530,7 @@ L188: ; Continuation
   jmp [bp]
 
 L189: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2546,7 +2546,7 @@ L189: ; Continuation
   jmp [bp]
 
 L190: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word [bp+12]
   push word dx
   push word [bp+10]
@@ -2562,7 +2562,7 @@ L190: ; Continuation
   jmp [bp]
 
 L191: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2577,7 +2577,7 @@ L191: ; Continuation
   jmp [bp]
 
 L192: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word dx
   push word [bp+10]
   push word [bp+8]
@@ -2606,14 +2606,14 @@ L193: ; Arm: 207'14
   jmp [bp]
 
 L194: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L195: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   mov bx, dx
   cmp word [bx], 0
   jz L162
@@ -2632,7 +2632,7 @@ L195: ; Continuation
   jmp [bp]
 
 L196: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2647,7 +2647,7 @@ L196: ; Continuation
   jmp [bp]
 
 L197: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(34)
   push word [bp+12]
   push word cx
   push word L125
@@ -2682,7 +2682,7 @@ L197: ; Continuation
   jmp [bp]
 
 L198: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -2698,7 +2698,7 @@ L198: ; Continuation
   jmp [bp]
 
 L199: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word dx
   push word [bp+12]
   push word [bp+10]
@@ -2714,7 +2714,7 @@ L199: ; Continuation
   jmp [bp]
 
 L200: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   push word [bp+14]
   push word [bp+12]
   push word [bp+8]
@@ -2729,7 +2729,7 @@ L200: ; Continuation
   jmp [bp]
 
 L201: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word [bp+12]
   push word [bp+10]
   push word dx
@@ -2745,7 +2745,7 @@ L201: ; Continuation
   jmp [bp]
 
 L202: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   mov bx, dx
   cmp word [bx], 1
   jz L124
@@ -2764,7 +2764,7 @@ L202: ; Continuation
   jmp [bp]
 
 L203: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(20)
   push word [bp+18]
   push word [bp+14]
   push word [bp+12]
@@ -2782,7 +2782,7 @@ L203: ; Continuation
   jmp [bp]
 
 L204: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(22)
   push word dx
   push word [bp+16]
   push word [bp+14]
@@ -2800,7 +2800,7 @@ L204: ; Continuation
   jmp [bp]
 
 L205: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(26)
   push word [bp+6]
   push word L123
   mov si, sp
@@ -2821,7 +2821,7 @@ L205: ; Continuation
   jmp [bp]
 
 L206: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(28)
   push word g28
   push word `\x04`
   push word 1
@@ -2843,7 +2843,7 @@ L206: ; Continuation
   jmp [bp]
 
 L207: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(20)
   push word [bp+16]
   push word [bp+14]
   push word [bp+12]
@@ -2860,7 +2860,7 @@ L207: ; Continuation
   jmp [bp]
 
 L208: ; Function: (mainloop,t3)
-  Bare_enter_check(500)
+  Bare_enter_check(20)
   push word bp
   push word dx
   push word [bp+10]
@@ -2877,14 +2877,14 @@ L208: ; Function: (mainloop,t3)
   jmp [bp]
 
 L209: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L210: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L209
@@ -2921,7 +2921,7 @@ L213: ; Arm: 187'35
   jmp [bp]
 
 L214: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   mov bx, dx
   cmp word [bx], 1
   jz L213
@@ -2930,7 +2930,7 @@ L214: ; Continuation
   jmp [bp]
 
 L215: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -2944,7 +2944,7 @@ L215: ; Continuation
   jmp [bp]
 
 L216: ; Function: (loop,t3)
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   mov bx, dx
   cmp word [bx], 0
   jz L212
@@ -2984,7 +2984,7 @@ L218: ; Arm: 187'35
   jmp [bp]
 
 L219: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   mov bx, dx
   cmp word [bx], 1
   jz L218
@@ -2993,7 +2993,7 @@ L219: ; Continuation
   jmp [bp]
 
 L220: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -3007,7 +3007,7 @@ L220: ; Continuation
   jmp [bp]
 
 L221: ; Function: (loop,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   mov bx, dx
   cmp word [bx], 0
   jz L217
@@ -3031,13 +3031,13 @@ L221: ; Function: (loop,t1)
   jmp [bp]
 
 L222: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, g24
   mov dx, dx
   jmp [bp]
 
 L223: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L222
   mov cx, sp
@@ -3067,7 +3067,7 @@ L224: ; Arm: 233'11
   jmp [bp]
 
 L225: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, g24
   mov dx, dx
   jmp [bp]
@@ -3083,13 +3083,13 @@ L226: ; Arm: 236'16
   jmp [bp]
 
 L227: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, g24
   mov dx, dx
   jmp [bp]
 
 L228: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L227
   mov cx, sp
@@ -3099,7 +3099,7 @@ L228: ; Continuation
   jmp [bp]
 
 L229: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(24)
   mov bx, dx
   cmp word [bx], 0
   jz L224
@@ -3128,7 +3128,7 @@ L229: ; Continuation
   jmp [bp]
 
 L230: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -3141,7 +3141,7 @@ L230: ; Continuation
   jmp [bp]
 
 L231: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(22)
   push word dx
   push word [bp+4]
   push word L221
@@ -3163,14 +3163,14 @@ L231: ; Function: (lam,t1)
   jmp [bp]
 
 L232: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L233: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L232
@@ -3182,7 +3182,7 @@ L233: ; Continuation
   jmp [bp]
 
 L234: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(22)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -3201,13 +3201,13 @@ L234: ; Continuation
   jmp [bp]
 
 L235: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, g24
   mov dx, dx
   jmp [bp]
 
 L236: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L235
   mov cx, sp
@@ -3237,7 +3237,7 @@ L237: ; Arm: 233'11
   jmp [bp]
 
 L238: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, g24
   mov dx, dx
   jmp [bp]
@@ -3253,13 +3253,13 @@ L239: ; Arm: 236'16
   jmp [bp]
 
 L240: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bp, g24
   mov dx, dx
   jmp [bp]
 
 L241: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L240
   mov cx, sp
@@ -3269,7 +3269,7 @@ L241: ; Continuation
   jmp [bp]
 
 L242: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(40)
   push word [bp+14]
   push word [bp+10]
   push word [bp+8]
@@ -3307,7 +3307,7 @@ L242: ; Continuation
   jmp [bp]
 
 L243: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   push word [bp+14]
   push word [bp+12]
   push word [bp+10]
@@ -3323,7 +3323,7 @@ L243: ; Continuation
   jmp [bp]
 
 L244: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(28)
   mov bx, dx
   cmp word [bx], 0
   jz L211
@@ -3354,7 +3354,7 @@ L244: ; Function: (lam,t1)
   jmp [bp]
 
 L245: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word dx
   push word [bp+6]
   push word [bp+4]
@@ -3368,14 +3368,14 @@ L245: ; Function: (lam,t1)
   jmp [bp]
 
 L246: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L247: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L246
@@ -3404,13 +3404,13 @@ L249: ; Arm: 194'9
   jmp [bp]
 
 L250: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
 L251: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -3422,7 +3422,7 @@ L251: ; Continuation
   jmp [bp]
 
 L252: ; Function: (loop,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   mov bx, dx
   cmp word [bx], 0
   jz L249
@@ -3443,7 +3443,7 @@ L252: ; Function: (loop,t1)
   jmp [bp]
 
 L253: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, `\n`
   call Bare_put_char
   mov si, Bare_unit
@@ -3459,13 +3459,13 @@ L254: ; Arm: 198'9
   jmp [bp]
 
 L255: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
 L256: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -3477,7 +3477,7 @@ L256: ; Continuation
   jmp [bp]
 
 L257: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(24)
   push word [bp+4]
   push word L252
   mov si, sp
@@ -3504,7 +3504,7 @@ L257: ; Continuation
   jmp [bp]
 
 L258: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -3516,7 +3516,7 @@ L258: ; Continuation
   jmp [bp]
 
 L259: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word dx
   push word [bp+6]
   push word [bp+4]
@@ -3532,7 +3532,7 @@ L259: ; Continuation
   jmp [bp]
 
 L260: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   mov bx, dx
   cmp word [bx], 1
   jz L248
@@ -3547,7 +3547,7 @@ L260: ; Function: (lam,t1)
   jmp [bp]
 
 L261: ; Function: (lam,t4)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word dx
   push word [bp+2]
   push word L260
@@ -3559,14 +3559,14 @@ L261: ; Function: (lam,t4)
   jmp [bp]
 
 L262: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L263: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L262
@@ -3587,14 +3587,14 @@ L264: ; Arm: 276'7
   jmp [bp]
 
 L265: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L266: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L265
@@ -3619,14 +3619,14 @@ L267: ; Arm: 279'12
   jmp [bp]
 
 L268: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L269: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word [bp+4]
   push word cx
   push word L268
@@ -3653,7 +3653,7 @@ L271: ; Arm: 248'13
   jmp [bp]
 
 L272: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov ax, `\n`
   call Bare_put_char
   mov si, Bare_unit
@@ -3665,7 +3665,7 @@ L272: ; Continuation
   jmp [bp]
 
 L273: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -3688,14 +3688,14 @@ L274: ; Arm: 118'11
   jmp [bp]
 
 L275: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L276: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(18)
   mov ax, [bp+8]
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -3719,7 +3719,7 @@ L276: ; Continuation
   jmp [bp]
 
 L277: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -3732,7 +3732,7 @@ L277: ; Continuation
   jmp [bp]
 
 L278: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -3745,7 +3745,7 @@ L278: ; Continuation
   jmp [bp]
 
 L279: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -3770,14 +3770,14 @@ L280: ; Arm: 118'11
   jmp [bp]
 
 L281: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov bx, bp
   mov bp, dx
   mov dx, [bx+4]
   jmp [bp]
 
 L282: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(22)
   mov ax, [bp+6]
   cmp word ax, 0
   call Bare_make_bool_from_z
@@ -3803,7 +3803,7 @@ L282: ; Continuation
   jmp [bp]
 
 L283: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -3817,7 +3817,7 @@ L283: ; Continuation
   jmp [bp]
 
 L284: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word dx
   push word [bp+8]
   push word [bp+6]
@@ -3831,7 +3831,7 @@ L284: ; Continuation
   jmp [bp]
 
 L285: ; Function: (loop,t2)
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   mov ax, [bp+4]
   cmp word ax, dx
   call Bare_make_bool_from_n
@@ -3851,14 +3851,14 @@ L285: ; Function: (loop,t2)
   jmp [bp]
 
 L286: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(0)
   mov dx, [bp+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L287: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(16)
   mov bx, dx
   cmp word [bx], 0
   jz L270
@@ -3878,7 +3878,7 @@ L287: ; Continuation
   jmp [bp]
 
 L288: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word cx
@@ -3891,7 +3891,7 @@ L288: ; Continuation
   jmp [bp]
 
 L289: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word dx
   push word [bp+6]
   push word [bp+4]
@@ -3904,7 +3904,7 @@ L289: ; Continuation
   jmp [bp]
 
 L290: ; Function: (lam,t1)
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   mov bx, dx
   cmp word [bx], 0
   jz L264
@@ -3924,7 +3924,7 @@ L290: ; Function: (lam,t1)
   jmp [bp]
 
 L291: ; Function: (lam,t7)
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word dx
   push word [bp+2]
   push word L290
@@ -3936,7 +3936,7 @@ L291: ; Function: (lam,t7)
   jmp [bp]
 
 L292: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(102)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -4007,7 +4007,7 @@ L292: ; Continuation
   jmp [bp]
 
 L293: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(14)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -4021,7 +4021,7 @@ L293: ; Continuation
   jmp [bp]
 
 L294: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(42)
   push word [bp+8]
   push word [bp+4]
   push word L92
@@ -4052,7 +4052,7 @@ L294: ; Continuation
   jmp [bp]
 
 L295: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(12)
   push word dx
   push word [bp+6]
   push word [bp+4]
@@ -4065,7 +4065,7 @@ L295: ; Continuation
   jmp [bp]
 
 L296: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(10)
   push word dx
   push word [bp+4]
   push word cx
@@ -4077,7 +4077,7 @@ L296: ; Continuation
   jmp [bp]
 
 L297: ; Continuation
-  Bare_enter_check(500)
+  Bare_enter_check(8)
   push word dx
   push word cx
   push word L296
@@ -4088,7 +4088,7 @@ L297: ; Continuation
   jmp [bp]
 
 L298: ; Start
-  Bare_enter_check(500)
+  Bare_enter_check(6)
   push word cx
   push word L297
   mov cx, sp
