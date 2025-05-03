@@ -31,6 +31,16 @@ hemiSizeInBytes = 3000
 guessedNeed :: Int
 guessedNeed = 500 -- TODO: compute at compile-time a max-bound for each Bare_enter_check
 
+topA,botA,topB,botB :: Int
+topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0
+botA = topA - hemiSizeInBytes
+
+topB = botA
+botB = topB - hemiSizeInBytes
+
+twoE16 :: Int
+twoE16 = 256 * 256
+
 ----------------------------------------------------------------------
 -- Execute
 
@@ -97,9 +107,6 @@ execOp = \case
     SetReg Ax (WNum (fromIntegral (dividend `div` divisor)))
     SetReg Dx (WNum (fromIntegral (dividend `mod` divisor)))
     cont
-
-twoE16 :: Int
-twoE16 = 65536
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- it records #bytes allocated (why am I recording in #bytes not #words?)
@@ -627,12 +634,6 @@ instance Show Hemi where show = \case HemiA -> "A"; HemiB -> "B"
 
 otherHemi :: Hemi -> Hemi
 otherHemi = \case HemiA -> HemiB; HemiB -> HemiA
-
-topA,botA,topB,botB :: Int
-topA = 50000
-botA = topA - hemiSizeInBytes
-topB = 40000
-botB = topB - hemiSizeInBytes
 
 topOfHemi :: Hemi -> Int
 topOfHemi = \case HemiA -> topA; HemiB -> topB
