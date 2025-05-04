@@ -326,7 +326,7 @@ Bare_store_sector: ;Ax (Num bytes), Bx (The string to store)
     push dx ; save arg
 
     mov cl, al ; start sector number (1 is boot; 2 is kernel)
-    mov dl, [0] ; RESTORE DRIVE NUMBER
+    mov dl, [drive_number]
     mov ah, 0x03 ; Function: Write Sectors To Drive
     mov ch, 0 ; cylinder
     mov dh, 0 ; head
