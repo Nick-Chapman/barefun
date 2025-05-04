@@ -44,7 +44,7 @@ compileImage = \case
 compileTopDef :: String -> SRC.Top -> Asm [DataSpec]
 compileTopDef who = \case
   SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
-  SRC.TopLitS string -> pure (DW [ LNum (fromIntegral $ length string) ] : [ DS string ])
+  SRC.TopLitS string -> pure (DW [ lnumTagging (fromIntegral $ length string) ] : [ DS string ])
 
   SRC.TopLam _x body -> do
     codeLabel <- compileCode body >>= cutEntryCode ("Function: " ++ who)
@@ -52,12 +52,12 @@ compileTopDef who = \case
     pure [DW [w1]]
 
   SRC.TopConApp (Ctag _ tag) xs -> do
-    pure [DW (LNum tag : map compileTopRef xs)]
+    pure [DW (lnumTagging tag : map compileTopRef xs)]
 
 compileTopRef :: SRC.Ref -> Lit
 compileTopRef = \case
     SRC.RefLitC c -> LChar c
-    SRC.RefLitN n -> LNum n
+    SRC.RefLitN n -> lnumTagging n
     SRC.Ref _ loc -> do
     case loc of
       SRC.InGlobal g -> LStatic (DataLabelG g)
@@ -117,7 +117,7 @@ compileArm scrutReg arm =  do
   let (SRC.ArmTag pos (Ctag _ n) _xs _rhs) = arm
   code <- compileArmTaken scrutReg arm
   lab <- CutCode ("Arm: " ++ show pos) code
-  pure [ OpCmp (SMemIndirectOffset scrutReg 0) (SLit (LNum n))
+  pure [ OpCmp (SMemIndirectOffset scrutReg 0) (SLit (lnumTagging n))
        , OpBranchFlagZ lab
        ]
 
@@ -170,7 +170,7 @@ compileAtomicTo who target = \case
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo target tag xs = do
   let desc = Scanned { evenSizeInBytes = 2 * (length xs + 1) }
-  map OpPush (reverse (SLit (LNum tag) : map compileRef xs)) ++
+  map OpPush (reverse (SLit (lnumTagging tag) : map compileRef xs)) ++
     [ setTarget target (SReg Sp)
     , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
@@ -207,43 +207,69 @@ compileBuiltinTo builtin = case builtin of
     ]
   SRC.AddInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
-    , OpAddInto Ax s2
+    , OpShiftR1 Ax
+    , OpMove Bx s2
+    , OpShiftR1 Bx
+    , OpAddInto Ax (SReg Bx)
+    , OpShiftL1 Ax
+    , OpInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.SubInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
-    , OpSubInto Ax s2
+    , OpShiftR1 Ax
+    , OpMove Bx s2
+    , OpShiftR1 Bx
+    , OpSubInto Ax (SReg Bx)
+    , OpShiftL1 Ax
+    , OpInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.MulInt -> \target -> twoArgs $ \s1 s2 ->
-    [ OpMove Ax s1 ] ++
+    [ OpMove Ax s1
+    , OpShiftR1 Ax
+    ] ++
     case s2 of
       SReg s2Reg ->
-        [ OpMulIntoAx s2Reg
+        [ OpShiftR1 s2Reg
+        , OpMulIntoAx s2Reg
+        , OpShiftL1 Ax
+        , OpInc Ax
         , setTarget target (SReg Ax)
         ]
       _ ->
         [ OpMove Bx s2
+        , OpShiftR1 Bx
         , OpMulIntoAx Bx
+        , OpShiftL1 Ax
+        , OpInc Ax
         , setTarget target (SReg Ax)
         ]
   SRC.DivInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
+    , OpShiftR1 Ax
     , OpMove Bx s2
+    , OpShiftR1 Bx
     , OpPushSAVE (SReg Dx)
     , OpMove Dx (SLit (LNum 0))
     , OpDivModIntoAxDx Bx
     -- quotiant already in Ax
     , OpPopRESTORE Dx
+    , OpShiftL1 Ax
+    , OpInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.ModInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
+    , OpShiftR1 Ax
     , OpMove Bx s2
+    , OpShiftR1 Bx
     , OpPushSAVE (SReg Dx)
     , OpMove Dx (SLit (LNum 0))
     , OpDivModIntoAxDx Bx
     -- remainder in Dx
+    , OpShiftL1 Dx
+    , OpInc Dx
     , setTarget target (SReg Dx)
     , OpPopRESTORE Dx
     ]
@@ -261,12 +287,15 @@ compileBuiltinTo builtin = case builtin of
     ]
   SRC.CharChr -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
+    , OpShiftR1 Ax
     , OpCall Bare_num_to_char -- TODO: remove/inline
     , setTarget target (SReg Ax)
     ]
   SRC.CharOrd -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_char_to_num -- TODO: remove/inline
+    , OpShiftL1 Ax
+    , OpInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.MakeRef -> \target -> oneArg $ \s1 ->
@@ -295,6 +324,7 @@ compileBuiltinTo builtin = case builtin of
     , OpMove Bx s3
     , OpPushSAVE (SReg Si)
     , OpMove Si s2
+    , OpShiftR1 Si
     , OpCall Bare_set_bytes -- TODO: remove/inline
     , OpPopRESTORE Si
     , setTarget target sUnit
@@ -332,6 +362,8 @@ compileBuiltinTo builtin = case builtin of
   SRC.GetStackPointer -> \target -> oneArg $ \_ -> -- TODO: replace with builtin to discover #live-words
     [ OpMove Ax (SReg Sp)
     , OpCall Bare_addr_to_num
+    , OpShiftL1 Ax
+    , OpInc Ax
     , setTarget target (SReg Ax)
     ]
 
@@ -339,6 +371,7 @@ compileBuiltinTo builtin = case builtin of
     codeForGetBytes = \target -> twoArgs $ \s1 s2 ->
       [ OpMove Ax s1
       , OpMove Bx s2
+      , OpShiftR1 Bx
       , OpCall Bare_get_bytes -- TODO: remove/inline
       , setTarget target (SReg Ax)
       ]
@@ -365,7 +398,7 @@ setTarget = \case
 compileRef :: SRC.Ref -> Source
 compileRef = \case
     SRC.RefLitC c -> SLit (LChar c)
-    SRC.RefLitN n -> SLit (LNum n)
+    SRC.RefLitN n -> SLit (lnumTagging n)
     SRC.Ref _ loc -> do
     case loc of
       SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
@@ -381,6 +414,9 @@ sourceOfTarget = \case
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
+
+lnumTagging :: Number -> Lit
+lnumTagging n = LNum (2 * n + 1)
 
 ----------------------------------------------------------------------
 -- Asm: compilation monad

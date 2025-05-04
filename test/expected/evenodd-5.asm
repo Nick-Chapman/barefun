@@ -13,24 +13,34 @@ L2: ; Arm: 4'26
 L3: ; Function: (is_even,g1)
   Bare_enter_check(0)
   mov ax, dx
-  cmp word ax, 0
+  cmp word ax, 1
   call Bare_make_bool_from_z
   mov si, ax
   mov bx, si
-  cmp word [bx], 1
+  cmp word [bx], 3
   jz L1
   mov ax, dx
-  sub ax, 1
+  shr ax, 1
+  mov bx, 3
+  shr bx, 1
+  sub ax, bx
+  shl ax, 1
+  add ax, 1
   mov di, ax
   mov ax, di
-  cmp word ax, 0
+  cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   mov bx, [Temps+6]
-  cmp word [bx], 1
+  cmp word [bx], 3
   jz L2
   mov ax, di
-  sub ax, 1
+  shr ax, 1
+  mov bx, 3
+  shr bx, 1
+  sub ax, bx
+  shl ax, 1
+  add ax, 1
   mov [Temps+8], ax
   mov bp, g1
   mov dx, [Temps+8]
@@ -59,7 +69,7 @@ L6: ; Continuation
   mov cx, sp
   push word 4 ;; scanned
   mov bx, dx
-  cmp word [bx], 1
+  cmp word [bx], 3
   jz L5
   mov dx, `O`
   mov bp, cx
@@ -76,7 +86,7 @@ L7: ; Continuation
   mov cx, sp
   push word 4 ;; scanned
   mov bp, g1
-  mov dx, 13
+  mov dx, 27
   jmp [bp]
 
 L8: ; Arm: 9'25
@@ -92,7 +102,7 @@ L9: ; Continuation
   mov cx, sp
   push word 4 ;; scanned
   mov bx, dx
-  cmp word [bx], 1
+  cmp word [bx], 3
   jz L8
   mov dx, `O`
   mov bp, cx
@@ -106,14 +116,14 @@ L10: ; Start
   mov cx, sp
   push word 4 ;; scanned
   mov bp, g1
-  mov dx, 42
+  mov dx, 85
   jmp [bp]
 
 g1:
   dw L3
 g2:
-  dw 1
+  dw 3
 g3:
-  dw 0
+  dw 1
 
 bare_start: jmp L10

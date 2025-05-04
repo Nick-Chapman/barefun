@@ -22,10 +22,10 @@ L2: ; Start
 g1:
   dw L1
 g2:
-  dw 0
+  dw 1
 g3:
-  dw 0
+  dw 1
 g4:
-  dw 0
+  dw 1
 
 bare_start: jmp L2

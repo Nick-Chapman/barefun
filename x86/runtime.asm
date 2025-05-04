@@ -261,8 +261,9 @@ Bare_make_bool_from_n:
     mov ax, True
     ret
 
-False: dw 0
-True: dw 1
+;; tagged false & true
+False: dw 1
+True: dw 3
 
 Bare_num_to_char: ;; TODO: zero out high byte. Make test to provoke the need.
     ;; this is meant to do nothing!
@@ -279,15 +280,18 @@ Bare_addr_to_num: ;; called when we see where the Sp is
     shr ax, 1
     ret
 
+;;; This takes N-bytes to allocate in 2n+1 rep.
 Bare_make_bytes:
     pop bx ;; heap allocation is at SP; so first we save return address.
     ;; Does not zero the allocated space. User caller code is expected to do this.
 
+    ;; TODO: we should untag the value in ax, or else we slide sp twice as far as intended
+    ;; But I cant see any evidence this bug is causing an issue.
     sub sp, ax
     ;; we need to keep the stack word aligned, so we must round-down sp to an even address
     and sp, 0xFFFE
 
-    push ax
+    push ax ;; Pushing the tagged size is correct
     mov ax, sp
     jmp bx
 
@@ -307,6 +311,7 @@ Bare_set_bytes:
 Bare_load_sector: ;Ax (Num bytes), Bx (The bytes buffer to load into)
     push cx ; save continuation
     push dx ; save arg
+    shr ax, 1
     mov cl, al ; start sector number (1 is boot; 2 is kernel)
     mov dl, [drive_number]
     mov ah, 0x02 ; Function: Read Sectors From Drive
@@ -325,6 +330,7 @@ Bare_store_sector: ;Ax (Num bytes), Bx (The string to store)
     push cx ; save continuation
     push dx ; save arg
 
+    shr ax, 1
     mov cl, al ; start sector number (1 is boot; 2 is kernel)
     mov dl, [drive_number]
     mov ah, 0x03 ; Function: Write Sectors To Drive
@@ -364,10 +370,10 @@ final_code:
 
 %include CODE
 
-    ;align 512
-    ;times 512 db '5'
-    ;times 512 db '6'
-    ;times 512 db '7'
+    align 512
+    times 512 db '5'
+    times 512 db '6'
+    times 512 db '7'
 
 end_of_code:
 

@@ -93,6 +93,18 @@ execOp = \case
     case b of
       False -> cont -- branch not taken
       True -> GetCode lab >>= execCode -- branch taken; ignore the continuation
+  OpShiftR1 r -> \cont -> do
+    x <- deNum <$> GetReg r
+    SetReg r (WNum (x `div` 2)) -- unatg
+    cont
+  OpShiftL1 r -> \cont -> do
+    x <- deNum <$> GetReg r
+    SetReg r (WNum (2 * x)) -- tag step 1
+    cont
+  OpInc r -> \cont -> do
+    x <- deNum <$> GetReg r
+    SetReg r (WNum (x + 1)) -- tag step 2
+    cont
   OpAddInto r s -> execBinaryOpInto (+) r s
   OpSubInto r s -> execBinaryOpInto (-) r s
   OpMulIntoAx s -> execBinaryOpInto (*) Ax (SReg s)
@@ -202,6 +214,7 @@ execBare = \case
 
   -- On real hardware Num/Char will have overlapping representations
   -- such that ord/chr have null implementations. maybe not quite. the high byte of a char will be zero
+  -- always numbers will be 2n+1 tagged. but untagged will happen before call to num->char
   Bare_num_to_char -> do
     n <- deNum <$> GetReg Ax
     SetReg Ax (WChar (Char.chr (fromIntegral n)))
@@ -218,12 +231,13 @@ execBare = \case
 
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
-    let numBytes = align (fromIntegral n) where align n = 2 * ((n+1) `div` 2)
-    slideStackPointer AllocForUser numBytes
-    execPushAlloc AllocForUser (WNum n) -- length word; part of user data
+    let nBytes = n `div` 2
+    let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
+    slideStackPointer AllocForUser nBytesAligned
+    execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
     w <- GetReg Sp
     SetReg Ax w
-    let desc = RawData { evenSizeInBytes = fromIntegral numBytes + 2 } -- 2 for the length word
+    let desc = RawData { evenSizeInBytes = fromIntegral nBytesAligned + 2 } -- 2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
 
   Bare_set_bytes -> do -- TODO: no need for Bare
@@ -292,6 +306,11 @@ binaryW f w1 w2 =
     (WNum n1,WNum n2) -> WNum (f n1 n2)
     _ -> error (show ("binaryW/unexpected-types",w1,w2))
 
+deNum :: Word -> Number -- giving the 2n+1 rep -- this is the one we want everywhere
+deNum = \case
+  WNum x -> x --
+  w -> error (show("deNum",w))
+
 equalW :: Word -> Word -> Bool
 equalW w1 w2 =
   case (w1,w2) of
@@ -316,9 +335,6 @@ deChar :: Word -> Char
 deChar = \case
   WChar x -> x
   w -> error (show("deChar",w))
-
-deNum :: Word -> Number
-deNum = \case WNum x -> x; w -> error (show("deNum",w))
 
 ----------------------------------------------------------------------
 -- Execution monad (emulation!)
@@ -513,9 +529,9 @@ state0 dmap = State
     mem = Map.fromList (internal ++ user)
 
     internal =
-      [ (aFalse, vTag tFalse)
-      , (aTrue, vTag tTrue)
-      , (aUnit, vTag tUnit)
+      [ (aFalse, tagging tFalse)
+      , (aTrue, tagging tTrue)
+      , (aUnit, tagging tUnit)
       , (aFinalCont, WCodeLabel finalCodeLabel)
       ]
     user =
@@ -523,8 +539,8 @@ state0 dmap = State
              | (lab,specs) <- Map.toList dmap
              ]
 
-vTag :: Ctag -> Word
-vTag (Ctag _ n) = WNum n
+tagging :: Ctag -> Word
+tagging (Ctag _ n) = WNum (2 * n + 1)
 
 specsWords :: [DataSpec] -> [(Int,Word)]
 specsWords specs = [ (2*i,w) | (i,w) <- zip [0..] (specs >>= wordsOfSpec) ]
@@ -578,10 +594,10 @@ finalCodeLabel = CodeLabel 0 "FINAL"
 
 -- TODO: distinuish type for "Val" (what a register can hold) from "Word" (what can be in a memory cell)
 
-data Word
+data Word -- TODO: reorder the file so this is at the top
   = WChar Char
   | WCharPair (Char,Char)
-  | WNum Number
+  | WNum Number -- number with 2n+1
   | WAddr Addr
   | WCodeLabel CodeLabel
   | WUninitialized String
@@ -621,7 +637,7 @@ evenAddr = \case
 instance Show Word where
   show = \case
     WChar c -> show c
-    WNum n -> show n
+    WNum n -> "T:"++show n -- TODO: remove the T: ?
     WAddr a -> show a
     WCodeLabel lab -> show lab
     WBlockDescriptor d -> show d

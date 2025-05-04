@@ -61,6 +61,9 @@ data Op -- target; source (Intel Syntax style)
   | OpPopRESTORE Reg
   | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
   | OpBranchFlagZ CodeLabel
+  | OpShiftR1 Reg -- untag
+  | OpShiftL1 Reg -- tag-step1
+  | OpInc Reg -- tag-step2
   | OpAddInto Reg Source
   | OpSubInto Reg Source
   | OpMulIntoAx Reg  -- ax := ax * sourceReg
@@ -156,6 +159,9 @@ instance Show Op where
     OpPopRESTORE src -> "pop word " ++ show src ++ " ;; restore"
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "jz " ++ show lab
+    OpShiftR1 r -> "shr " ++ show r ++ ", 1"
+    OpShiftL1 r -> "shl " ++ show r ++ ", 1"
+    OpInc r -> "add " ++ show r ++ ", 1"
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulIntoAx src -> "mul " ++ show src

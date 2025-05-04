@@ -15,7 +15,7 @@ L2: ; Function: (inner,g2)
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   mov bx, [Temps+6]
-  cmp word [bx], 1
+  cmp word [bx], 3
   jz L1
   mov bp, g2
   mov dx, g5
@@ -44,14 +44,14 @@ g1:
 g2:
   dw L2
 g3:
-  dw 0
+  dw 1
 g4:
-  dw 0
+  dw 1
 g5:
-  dw 0
+  dw 1
 g6:
-  dw 0
+  dw 1
 g7:
-  dw 0
+  dw 1
 
 bare_start: jmp L4

@@ -6,6 +6,6 @@ L1: ; Start
   jmp [bp]
 
 g1:
-  dw 0
+  dw 1
 
 bare_start: jmp L1
