@@ -7,7 +7,7 @@ module Stage5_ASM_AbstractSyntax
   , Code(..)
   , Op(..)
   , Jump(..)
-  , BlockDescriptor(..)
+  , BlockDescriptor(..), ScanMode(..)
   , Source(..)
   , Target(..)
   , BareBios(..)
@@ -100,10 +100,11 @@ data DataLabel
   | DataLabelR String -- for runtime internals
   deriving (Eq,Ord)
 
-data BlockDescriptor -- TODO improve rep, have one variant with size field + scan/raw flag
-  = Scanned { evenSizeInBytes :: Int }
-  | RawData { evenSizeInBytes :: Int }
-  deriving Eq
+data BlockDescriptor = BlockDescriptor { scanMode :: ScanMode, sizeInBytes :: Int }
+  deriving (Eq)
+
+data ScanMode = Scanned | RawData
+  deriving (Eq)
 
 -- BareBios; primitive routines available to the compiled code
 data BareBios
@@ -201,9 +202,13 @@ instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
 instance Show DataLabel where show = \case DataLabelG g -> show g; DataLabelR s -> s
 
 instance Show BlockDescriptor where
+  show BlockDescriptor{sizeInBytes,scanMode} =
+    printf "%d ;; %s" sizeInBytes (show scanMode)
+
+instance Show ScanMode where
   show = \case
-    Scanned n -> show n ++ " ;; scanned"
-    RawData n -> show n ++ " ;; raw-data"
+    Scanned -> "scanned"
+    RawData -> "raw-data"
 
 instance Show Reg where
   show = \case

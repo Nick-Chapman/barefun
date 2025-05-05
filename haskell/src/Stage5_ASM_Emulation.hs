@@ -157,10 +157,8 @@ execPopRESTORE reg = do -- post increment
 
 checkPushBlockDescriptor :: Word -> M ()
 checkPushBlockDescriptor = \case
-  WBlockDescriptor desc -> do
-    let sizeInBytes = case desc of Scanned n -> n; RawData n -> n
+  WBlockDescriptor (BlockDescriptor {sizeInBytes}) -> do
     CheckRecentAlloc (sizeInBytes + 2) -- 2 for the block descriptor itself
-    pure ()
   _ ->
     pure ()
 
@@ -230,7 +228,7 @@ execBare = \case
     execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
     w <- GetReg Sp
     SetReg Ax w
-    let desc = RawData { evenSizeInBytes = fromIntegral nBytesAligned + 2 } -- 2 for the length word
+    let desc = BlockDescriptor RawData (fromIntegral nBytesAligned + 2) -- 2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
 
   Bare_set_bytes -> do -- TODO: no need for Bare
@@ -779,14 +777,15 @@ scavenge :: HeapAddr -> M HeapAddr
 scavenge scanPointer = do
   descOpt <- getBlockDescriptor scanPointer
   let desc = case descOpt of Just d -> d; Nothing -> error "scavenge/BrokenHeart"
-  let (sizeWords,mustScan) = case desc of Scanned n -> (n `div` 2, True); RawData n -> (n `div` 2, False)
-  case mustScan of
-    True -> do
+  let BlockDescriptor{sizeInBytes,scanMode} = desc
+  let sizeWords = sizeInBytes `div` 2
+  case scanMode of
+    Scanned -> do
       -- 1..size because we are pointing at descriptor
       xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
       mapM_ scavengeHA xs
       pure ()
-    False -> pure ()
+    RawData -> pure ()
 
   addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
 
@@ -812,10 +811,10 @@ evacuateHA objectA = do
   descA <- addHeapAddr_OTHER (-bytesPerWord) objectA
   --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
   descOpt <- getBlockDescriptor descA
-  let sizeBytesMaybe = (case descOpt of Just (Scanned n) -> Just n; Just (RawData n) -> Just n; Nothing -> Nothing)
-  case sizeBytesMaybe of
-    Just sizeBytes -> do
-      let sizeWords = sizeBytes `div` 2
+  case descOpt of
+    Just desc -> do
+      let BlockDescriptor{sizeInBytes} = desc
+      let sizeWords = sizeInBytes `div` 2
       xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
       mapM_ copyAlloc xs
       sp <- getSP

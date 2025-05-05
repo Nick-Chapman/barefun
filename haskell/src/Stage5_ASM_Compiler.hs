@@ -92,7 +92,7 @@ compileCode = \case
   SRC.PushContinuation pre _post (_x,later) first -> do
     lab <- compileCode later >>= cutEntryCode "Continuation"
     let
-      desc = Scanned { evenSizeInBytes = 2 * (length pre + 2) }
+      desc = BlockDescriptor Scanned (2 * (length pre + 2))
     let
       ops =
         map OpPush (reverse (map compileRef pre)) ++
@@ -169,7 +169,7 @@ compileAtomicTo who target = \case
 
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo target tag xs = do
-  let desc = Scanned { evenSizeInBytes = 2 * (length xs + 1) }
+  let desc = BlockDescriptor Scanned (2 * (length xs + 1))
   map OpPush (reverse (SLit (lnumTagging tag) : map compileRef xs)) ++
     [ setTarget target (SReg Sp)
     , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
@@ -178,7 +178,7 @@ compileConAppTo target tag xs = do
 compileFunctionTo :: String -> Target -> [SRC.Ref] -> SRC.Code -> Asm [Op]
 compileFunctionTo who target freeVars body = do
   lab <- compileCode body >>= cutEntryCode ("Function: " ++ who)
-  let desc = Scanned { evenSizeInBytes = 2 * (length freeVars + 1) }
+  let desc = BlockDescriptor Scanned (2 * (length freeVars + 1))
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++
     [ OpPush (SLit (LCodeLabel lab))
@@ -299,7 +299,7 @@ compileBuiltinTo builtin = case builtin of
     , setTarget target (SReg Ax)
     ]
   SRC.MakeRef -> \target -> oneArg $ \s1 ->
-    let desc = Scanned { evenSizeInBytes = 2 } in
+    let desc = BlockDescriptor Scanned 2 in
     [ OpPush s1
     , setTarget target (SReg Sp)
     , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
