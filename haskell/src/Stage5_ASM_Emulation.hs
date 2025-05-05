@@ -39,18 +39,14 @@ twoE16 :: Int
 twoE16 = 256 * 256
 
 ----------------------------------------------------------------------
--- Runtime values...
-
--- Word is a structured type for the contents of a memory location
--- We use a variant type to help catch compiler bugs during dev.
--- On a real system, the representations will overlap.
--- Tagging will distinguish pointer from non-pointer.
+-- Runtime values.
 
 -- WChar, VNum, VAddr -- Representation of user Values. Things that user code can compute with.
 -- WCodeLabel -- Found only in slot 0 of a continuation/closure frame.
 -- WBlockDescriptor -- Found only in slot -1 of all heap block.
 
--- TODO: distinuish type for "Val" (what a register can hold) from "Word" (what can be in a memory cell)
+-- Heap address are word aligned, and so always have an even value.
+-- Numbers are tagged (2n+1) and so are always odd.
 
 data Word
   = WChar Char
@@ -64,26 +60,13 @@ data Word
   | WUninitializedCharPair
   deriving (Eq)
 
-data Addr -- TODO: inline into Word
-  = AHeapSpace HeapAddr
+data Addr
+  = AHeap HeapAddr
   | AStatic DataLabel Int -- This int is an offset at the data-label
   deriving (Eq,Ord)
 
 data HeapAddr = HeapAddr Word16
   deriving (Eq,Ord)
-
-instance Show HeapAddr where
-  show (HeapAddr x) = "#" ++ show x
-
-deHeapAddr :: Addr -> HeapAddr
-deHeapAddr = \case
-  AHeapSpace ha -> ha
-  AStatic{} -> error "deHeapAddr/AStatic"
-
-evenAddr :: Addr -> Bool
-evenAddr = \case
-  AHeapSpace (HeapAddr n) -> (n `mod` 2) == 0
-  AStatic _ offset -> (offset `mod` 2) == 0
 
 instance Show Word where
   show = \case
@@ -99,8 +82,21 @@ instance Show Word where
 
 instance Show Addr where
   show = \case
-    AHeapSpace ha -> show ha
+    AHeap ha -> show ha
     AStatic d offset -> printf "%s+%d" (show d) offset
+
+instance Show HeapAddr where
+  show (HeapAddr x) = "#" ++ show x
+
+deHeapAddr :: Word -> HeapAddr
+deHeapAddr = \case
+  WAddr (AHeap ha) -> ha
+  _ -> error "deHeapAddr"
+
+evenAddr :: Addr -> Bool
+evenAddr = \case
+  AHeap (HeapAddr n) -> (n `mod` 2) == 0
+  AStatic _ offset -> (offset `mod` 2) == 0
 
 ----------------------------------------------------------------------
 -- GC
@@ -127,7 +123,7 @@ inHemi n = \case HemiA -> inA n; HemiB -> inB n
 
 -- Invariant: The Sp will always be a HeapAddr
 getSP :: M HeapAddr
-getSP = (deHeapAddr . deAddr) <$> GetReg Sp
+getSP = deHeapAddr <$> GetReg Sp
 
 -- Check heap-address is in the hemi-space in which we are ALLOCATING.
 mkHeapAddr :: Int -> M HeapAddr
@@ -152,7 +148,7 @@ addHeapAddr_OTHER i (HeapAddr n) = mkHeapAddr_OTHER (fromIntegral (n + fromInteg
 
 addAddr :: Int -> Addr -> M Addr
 addAddr i = \case
-  AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
+  AHeap ha  -> AHeap <$> addHeapAddr i ha
   AStatic lab n -> pure $ AStatic lab (n+i)
 
 heapBytesRemaining :: M Int
@@ -164,7 +160,7 @@ heapBytesRemaining = do
 setStackPointerToTopOfHemi :: Hemi -> M ()
 setStackPointerToTopOfHemi hemi = do
   ha <- mkHeapAddr (topOfHemi hemi)
-  SetReg Sp (WAddr (AHeapSpace ha))
+  SetReg Sp (WAddr (AHeap ha))
 
 gcTop :: M ()
 gcTop = do
@@ -236,9 +232,9 @@ scavenge scanPointer = do
 
 scavengeHA :: HeapAddr -> M ()
 scavengeHA ha = do
-  w <- GetMem (AHeapSpace ha)
+  w <- GetMem (AHeap ha)
   evacuate w >>= \case
-    Just w' -> SetMem (AHeapSpace ha) w'
+    Just w' -> SetMem (AHeap ha) w'
       --Debug (printf "scavengeHA: %s : %s --> %s\n" (show ha) (show w) (show w'))
     Nothing -> do
       --Debug (printf "scavengeHA: %s : unmoved\n" (show ha))
@@ -248,7 +244,7 @@ evacuate :: Word -> M (Maybe Word)
 evacuate w = do
   --Debug (printf "evacuate: %s\n" (show w))
   case w of
-    WAddr (AHeapSpace ha) -> (Just . WAddr . AHeapSpace) <$> evacuateHA ha
+    WAddr (AHeap ha) -> (Just . WAddr . AHeap) <$> evacuateHA ha
     _ -> pure Nothing
 
 evacuateHA :: HeapAddr -> M HeapAddr
@@ -265,17 +261,17 @@ evacuateHA objectA = do
       sp <- getSP
       relocatedA <- addHeapAddr bytesPerWord sp -- point one word past the new desc
       -- overwrite original object with broken Heart; which points tothe relocated object
-      SetMem (AHeapSpace descA) WBrokenHeart
-      SetMem (AHeapSpace objectA) (WAddr (AHeapSpace relocatedA))
+      SetMem (AHeap descA) WBrokenHeart
+      SetMem (AHeap objectA) (WAddr (AHeap relocatedA))
       pure relocatedA
 
     Nothing -> do -- BrokenHeart
       -- return the indirected previously copied object
-      (deHeapAddr . deAddr)  <$> GetMem (AHeapSpace objectA)
+      deHeapAddr <$> GetMem (AHeap objectA)
 
 copyAlloc :: HeapAddr -> M ()
 copyAlloc ha = do
-  w <- GetMem (AHeapSpace ha)
+  w <- GetMem (AHeap ha)
   execPushAlloc AllocForGC w
   --_newAddress <- getSP
   --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
@@ -283,7 +279,7 @@ copyAlloc ha = do
 
 getBlockDescriptor :: HeapAddr -> M (Maybe BlockDescriptor) -- TODO: inline is cleaner
 getBlockDescriptor ha = do
-  w <- GetMem (AHeapSpace ha)
+  w <- GetMem (AHeap ha)
   case w of
     WBlockDescriptor d -> pure (Just d)
     WBrokenHeart -> pure Nothing
@@ -772,7 +768,7 @@ state0 dmap = State
   , hemi = HemiA
   }
   where
-    initialStackPointer = AHeapSpace (HeapAddr (fromIntegral topA))
+    initialStackPointer = AHeap (HeapAddr (fromIntegral topA))
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
