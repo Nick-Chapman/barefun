@@ -116,12 +116,12 @@ data BareBios
   | Bare_make_bool_from_n
   | Bare_num_to_char
   | Bare_char_to_num
-  | Bare_addr_to_num
   | Bare_make_bytes
   | Bare_set_bytes
   | Bare_get_bytes
   | Bare_load_sector
   | Bare_store_sector
+  | Bare_free_words
   deriving Show
 
 ----------------------------------------------------------------------

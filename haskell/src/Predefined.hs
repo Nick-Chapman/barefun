@@ -41,7 +41,7 @@ wrapPreDefs (Prog defs) =
       , ("crash"        , prim1 Crash)
       , ("load_sector"  , prim2 LoadSec)
       , ("store_sector" , prim2 StoreSec)
-      , ("get_sp"       , prim1 GetStackPointer)
+      , ("free_words"   , prim1 FreeWords)
       -- When adding new ops, make sure to get the correct arg count!
       ]
       where

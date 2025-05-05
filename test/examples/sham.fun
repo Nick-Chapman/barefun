@@ -222,7 +222,7 @@ let execute fs line =
   | command::args -> dispatch fs command args
 
 let rec mainloop fs =
-  (*put_string "(space="; put_int (get_sp()); put_string ")";*)
+  put_string "{"; put_int (free_words()); put_string "}";
   put_string "% ";
   let single_controlD = implode (chr 4 :: []) in
   let line = read_line () in
@@ -386,7 +386,7 @@ let fib_behaviour fs args =
            runfib n; fs
 
 let space_behaviour fs _args =
-  let n = get_sp() in
+  let n = free_words() in
   put_int n; newline (); fs
 
 let readme = "Welcome to sham; please try all the commands!\nCan you find the hidden Easter Egg?\n"

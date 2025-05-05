@@ -33,7 +33,7 @@ module X : sig
   val load_sector : int -> bytes -> unit
   val store_sector : int -> string -> unit
 
-  val get_sp : unit -> int
+  val free_words : unit -> int
 
 end = struct
 
@@ -87,8 +87,8 @@ end = struct
   let store_sector n _ =
     Printf.printf "[store_sector:%d]\n" n
 
-  let get_sp () =
-    777 (* return some dummy value *)
+  let free_words () =
+    0 (* return some dummy value *)
 
 end
 include X

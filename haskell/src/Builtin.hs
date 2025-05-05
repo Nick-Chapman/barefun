@@ -14,7 +14,7 @@ data Builtin
   | MakeBytes | SetBytes | GetBytes
   | FreezeBytes | ThawBytes
   | LoadSec | StoreSec
-  | GetStackPointer
+  | FreeWords
   deriving (Show)
 
 data Semantics
@@ -78,7 +78,7 @@ defineBuiltin b =
     Crash -> Impure $ undefined
     LoadSec -> Impure $ undefined -- TODO: emulate
     StoreSec -> Impure $ undefined -- TODO: emulate
-    GetStackPointer -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 777)
+    FreeWords -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 0)
 
   where
     unit = VCons tUnit []

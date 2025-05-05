@@ -25,7 +25,7 @@ let := = (fun x -> (fun y -> PRIM_SetRef(x,y))) in
 let crash = (fun x -> PRIM_Crash(x)) in
 let load_sector = (fun x -> (fun y -> PRIM_LoadSec(x,y))) in
 let store_sector = (fun x -> (fun y -> PRIM_StoreSec(x,y))) in
-let get_sp = (fun x -> PRIM_GetStackPointer(x)) in
+let free_words = (fun x -> PRIM_FreeWords(x)) in
 let explode =
   (fun s ->
     let explode_loop =

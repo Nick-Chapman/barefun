@@ -60,7 +60,7 @@ main = do
     (Stage2,Eval) -> do putStr whoami; runInteraction (Stage2.execute e2)
     (Stage3,Eval) -> do putStr whoami; runInteraction (Stage3.execute e3)
     (Stage4,Eval) -> do putStr whoami; runInteraction (Stage4.execute e4)
-    (Stage5,Eval) -> do putStr whoami; runInteraction (Stage5.execute e5 trace debug)
+    (Stage5,Eval) -> do putStr whoami; runInteraction (Stage5.execute e5 trace debug measure)
 
 data Config = Config
   { paths :: [String]

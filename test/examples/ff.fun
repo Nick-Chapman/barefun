@@ -38,7 +38,7 @@ let main () =
     put_int i;
     put_string " --> ";
     put_int res;
-    put_string " (space="; put_int (get_sp()); put_string ")";
+    put_string " (space="; put_int (free_words()); put_string ")";
     newline ();
     loop (i+1)
   in

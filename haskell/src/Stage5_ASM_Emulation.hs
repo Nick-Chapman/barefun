@@ -46,8 +46,8 @@ type Transformed = Image
 data TraceFlag = TraceOn | TraceOff
 data DebugFlag = DebugOn | DebugOff
 
-execute :: Transformed -> TraceFlag -> DebugFlag -> Interaction
-execute i trace debug = runM trace debug i (execImage i)
+execute :: Transformed -> TraceFlag -> DebugFlag -> Bool -> Interaction
+execute i trace debug measureFlag = runM trace debug measureFlag i (execImage i)
 
 execImage :: Image -> M ()
 execImage Image{start} = GetCode start >>= execCode
@@ -222,13 +222,6 @@ execBare = \case
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
-  -- this is only called by builtin GetStackPointer, to implement "space"
-  -- we halve the answer to be sure to get a 15bit answer, i.e. in units of words; not sure why we care.
-  Bare_addr_to_num -> do -- TODO: remove this
-    a <- deAddr <$> GetReg Ax
-    SetReg Ax (WNum (fromIntegral $ halve $ deHeapAddr a))
-      where halve (HeapAddr n) = n `div` 2
-
   Bare_make_bytes -> do
     n <- deNum <$> GetReg Ax
     let nBytes = n `div` 2
@@ -258,6 +251,16 @@ execBare = \case
     pure ()
   Bare_store_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
+
+  Bare_free_words -> do
+    DoMeasure >>= \case
+      False -> SetReg Ax (WNum 0)
+      True -> do
+        gcTop -- force a GC before we calculate the #free-words
+        hemi <- WhatHemi
+        HeapAddr sp <- getSP
+        let freeWords = fromIntegral ((fromIntegral sp - botOfHemi hemi) `div` 2)
+        SetReg Ax (WNum freeWords)
 
 setMemByte :: Addr -> Char -> M ()
 setMemByte a x = do
@@ -352,6 +355,7 @@ data M a where
   BudgedForAllocation :: Int -> M ()
   Debug :: String -> M ()
   Print :: String -> M ()
+  DoMeasure :: M Bool
   TraceOp :: Op -> M ()
   TraceJump :: Jump -> M ()
   TraceAlloc :: AllocMode -> M ()
@@ -372,8 +376,8 @@ data M a where
 
 data AllocMode = AllocForUser | AllocForGC
 
-runM :: TraceFlag -> DebugFlag -> Image -> M () -> Interaction
-runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
+runM :: TraceFlag -> DebugFlag -> Bool -> Image -> M () -> Interaction
+runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
   where
 
@@ -425,6 +429,8 @@ runM traceFlag debugFlag Image{cmap=cmapUser,dmap} m = loop stateLoaded m k0
 
       Debug m -> debug m $ k s ()
       Print m -> ITrace m $ k s ()
+
+      DoMeasure -> k s measureFlag
 
       TraceOp op -> traceOpOJump (show op) s k
       TraceJump jump -> traceOpOJump (show jump) s k

@@ -175,19 +175,9 @@ Bare_crash:
     jmp final_code
 
 Bare_enter_check_function:
-    ;; how much space is left before we crash into the code?
-    ;; when this reaches zero, examples crash.
-    ;; however, sham example crashes much earlier
-    ;; a different issue? maybe temps in page 0 ?? -- YES
     mov ax, sp
-    sub ax, end_of_code
+    sub ax, bot_of_heap
     jb .out_of_memory
-    ;push ax
-    ;mov al, ah
-    ;PrintHexAX
-    ;pop ax
-    ;PrintHexAX
-    ;Dot
     ret
 .out_of_memory:
     Print `[OOM]\n`
@@ -275,11 +265,6 @@ Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the 
     ;;mov ah, 0
     ret
 
-Bare_addr_to_num: ;; called when we see where the Sp is
-    ;; when we have only 15bi nums, we ought to shift/tag this, so we gve answer in #words
-    shr ax, 1
-    ret
-
 ;;; This takes N-bytes to allocate in 2n+1 rep.
 Bare_make_bytes:
     pop bx ;; heap allocation is at SP; so first we save return address.
@@ -345,15 +330,22 @@ Bare_store_sector: ;Ax (Num bytes), Bx (The string to store)
     ret
 
 Bare_unit:
-    dw 42 ;; TODO: does it matter what is here?
+    dw 1 ;; doesn't matter what is here. nothing should look at this
+
+Bare_free_words:
+    mov ax, sp
+    sub ax, bot_of_heap
+    shr ax, 1 ;; shift for #words
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; begin/end
 
-top_of_memory equ 0
+top_of_heap equ 0
+bot_of_heap equ 0x8000 ; half of memory; 16k words
 
 begin:
-    mov sp, top_of_memory
+    mov sp, top_of_heap
     mov cx, final_continuation
     call Bare_clear_screen
     jmp bare_start

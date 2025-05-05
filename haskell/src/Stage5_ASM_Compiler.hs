@@ -359,9 +359,9 @@ compileBuiltinTo builtin = case builtin of
     , OpCall Bare_store_sector
     , setTarget target sUnit
     ]
-  SRC.GetStackPointer -> \target -> oneArg $ \_ -> -- TODO: replace with builtin to discover #live-words
-    [ OpMove Ax (SReg Sp)
-    , OpCall Bare_addr_to_num
+  SRC.FreeWords -> \target -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    , OpCall Bare_free_words
     , OpShiftL1 Ax
     , OpInc Ax
     , setTarget target (SReg Ax)
