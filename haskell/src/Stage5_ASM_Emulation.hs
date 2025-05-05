@@ -64,14 +64,9 @@ data Word
   | WUninitializedCharPair
   deriving (Eq)
 
--- Of the 3 kinds of Addr. Only AHeapSpace and AStatic represent user values
--- The ATempSpace is more like a register, in that it is a location for values.
--- (Perhaps the types could be improved to make this clearer)
-
-data Addr -- memory address
+data Addr -- TODO: inline into Word
   = AHeapSpace HeapAddr
   | AStatic DataLabel Int -- This int is an offset at the data-label
-  | ATempSpace SRC.Temp
   deriving (Eq,Ord)
 
 data HeapAddr = HeapAddr Word16
@@ -84,13 +79,11 @@ deHeapAddr :: Addr -> HeapAddr
 deHeapAddr = \case
   AHeapSpace ha -> ha
   AStatic{} -> error "deHeapAddr/AStatic"
-  ATempSpace{} -> error "deHeapAddr/ATempSpace"
 
 evenAddr :: Addr -> Bool
 evenAddr = \case
   AHeapSpace (HeapAddr n) -> (n `mod` 2) == 0
   AStatic _ offset -> (offset `mod` 2) == 0
-  ATempSpace{} -> True
 
 instance Show Word where
   show = \case
@@ -108,7 +101,6 @@ instance Show Addr where
   show = \case
     AHeapSpace ha -> show ha
     AStatic d offset -> printf "%s+%d" (show d) offset
-    ATempSpace{} -> undefined
 
 ----------------------------------------------------------------------
 -- GC
@@ -162,7 +154,6 @@ addAddr :: Int -> Addr -> M Addr
 addAddr i = \case
   AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
   AStatic lab n -> pure $ AStatic lab (n+i)
-  ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
 
 heapBytesRemaining :: M Int
 heapBytesRemaining = do
@@ -329,7 +320,7 @@ execOp = \case
   OpComment{} -> error "execOp/OpComment"
   OpMany{} -> error "execOp/OpMany"
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
-  OpStore t s -> \cont -> do w <- GetReg s; a <- evalTarget t; SetMem a w; cont
+  OpStore t s -> \cont -> do w <- GetReg s; setTarget t w; cont
   OpCall bare -> \cont -> do execBare bare; cont
   OpPush s -> \cont -> do
     w <- evalSource s
@@ -443,16 +434,19 @@ evalSource :: Source -> M Word
 evalSource = \case
   SReg r -> GetReg r
   SLit l -> pure (fromLit l)
-  STemp temp -> GetMem (ATempSpace temp)
+  STemp temp -> GetTemp temp
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
     a' <- addAddr i a
     GetMem a'
 
-evalTarget :: Target -> M Addr
-evalTarget = \case
-  TTemp temp -> pure (ATempSpace temp)
-  TReg r -> deAddr <$> GetReg r
+setTarget :: Target -> Word -> M ()
+setTarget = \case
+  TTemp temp -> \w ->
+    SetTemp temp w
+  TReg r -> \w -> do
+    a <- deAddr <$> GetReg r
+    SetMem a w
 
 execBare :: BareBios -> M ()
 execBare = \case
@@ -616,6 +610,8 @@ data M a where
   GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Word -> M () -- TODO: SetReg/GetReg will operate on Val
   GetReg :: Reg -> M Word
+  SetTemp :: SRC.Temp -> Word -> M ()
+  GetTemp :: SRC.Temp -> M Word
   SetMem :: Addr -> Word -> M ()
   GetMem :: Addr -> M Word
   SetFlagZ :: Bool -> M ()
@@ -663,7 +659,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
             } ()
 
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
-    loop s@State{rmap,mem,flagZ,flagN} m k = case m of
+    loop s@State{rmap,tmap,mem,flagZ,flagN} m k = case m of
 
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
@@ -706,11 +702,16 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
         where err = error (show ("runM/GetCode",lab))
 
       SetReg r w -> do
-        checkAlignedSp r w $
-          k s { rmap = Map.insert r w rmap } ()
+        k s { rmap = Map.insert r w rmap } ()
 
       GetReg r -> k s (maybe err id $ Map.lookup r rmap)
         where err = WUninitialized $ show ("GetReg/uninitialized",r)
+
+      SetTemp t w -> do
+        k s { tmap = Map.insert t w tmap } ()
+
+      GetTemp t -> k s (maybe err id $ Map.lookup t tmap)
+        where err = WUninitialized $ show ("GetTemp/uninitialized",t)
 
       SetMem a w -> do
         if not (evenAddr a) then error (printf "SetMem(odd): %s" (show a)) else
@@ -738,19 +739,9 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
         let State{hemi} = s
         k s hemi
 
-checkAlignedSp :: Reg -> Word -> Interaction -> Interaction
-checkAlignedSp = \case
-  Sp -> \case
-    -- TODO: subsume with check that all heap addresses are aligned
-    WAddr (AHeapSpace (HeapAddr n)) ->
-      if n `mod` 2 == 1 then error (show ("unaligned Sp",n)) else
-        \i -> i
-    w -> error (show ("trying to set Sp to a non address",w))
-  _ ->
-    \_ i -> i
-
 data State = State
   { rmap :: Map Reg Word
+  , tmap :: Map SRC.Temp Word
   , mem :: Map Addr Word
   , flagZ :: Bool
   , flagN :: Bool
@@ -768,6 +759,7 @@ state0 :: Map DataLabel [DataSpec] -> State
 state0 dmap = State
   { mem
   , rmap
+  , tmap = Map.empty
   , flagZ = error "flagZ/uninitialized"
   , flagN = error "flagN/uninitialized"
   , countOps = 0
