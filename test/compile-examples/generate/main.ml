@@ -13,7 +13,7 @@ let select_versions_for_example = function
   | "put_int" -> [5]
   | "read3" -> [1;2;5]
   | "readline" -> [5]
-  | "sex" -> [5]
+  | "secex" -> [5]
   | "sham" -> [5]
   | "shammy" -> [5]
   | "shell" -> [5]
