@@ -39,6 +39,266 @@ twoE16 :: Int
 twoE16 = 256 * 256
 
 ----------------------------------------------------------------------
+-- Runtime values...
+
+-- Word is a structured type for the contents of a memory location
+-- We use a variant type to help catch compiler bugs during dev.
+-- On a real system, the representations will overlap.
+-- Tagging will distinguish pointer from non-pointer.
+
+-- WChar, VNum, VAddr -- Representation of user Values. Things that user code can compute with.
+-- WCodeLabel -- Found only in slot 0 of a continuation/closure frame.
+-- WBlockDescriptor -- Found only in slot -1 of all heap block.
+
+-- TODO: distinuish type for "Val" (what a register can hold) from "Word" (what can be in a memory cell)
+
+data Word
+  = WChar Char
+  | WNum Number -- number with 2n+1
+  | WAddr Addr
+  | WCodeLabel CodeLabel
+  | WCharPair (Char,Char)
+  | WBlockDescriptor BlockDescriptor
+  | WBrokenHeart
+  | WUninitialized String
+  | WUninitializedCharPair
+  deriving (Eq)
+
+-- Of the 3 kinds of Addr. Only AHeapSpace and AStatic represent user values
+-- The ATempSpace is more like a register, in that it is a location for values.
+-- (Perhaps the types could be improved to make this clearer)
+
+data Addr -- memory address
+  = AHeapSpace HeapAddr
+  | AStatic DataLabel Int -- This int is an offset at the data-label
+  | ATempSpace SRC.Temp
+  deriving (Eq,Ord)
+
+data HeapAddr = HeapAddr Word16
+  deriving (Eq,Ord)
+
+instance Show HeapAddr where
+  show (HeapAddr x) = "#" ++ show x
+
+deHeapAddr :: Addr -> HeapAddr
+deHeapAddr = \case
+  AHeapSpace ha -> ha
+  AStatic{} -> error "deHeapAddr/AStatic"
+  ATempSpace{} -> error "deHeapAddr/ATempSpace"
+
+evenAddr :: Addr -> Bool
+evenAddr = \case
+  AHeapSpace (HeapAddr n) -> (n `mod` 2) == 0
+  AStatic _ offset -> (offset `mod` 2) == 0
+  ATempSpace{} -> True
+
+instance Show Word where
+  show = \case
+    WChar c -> show c
+    WNum n -> show n
+    WAddr a -> show a
+    WCodeLabel lab -> show lab
+    WCharPair p -> show p
+    WBlockDescriptor d -> show d
+    WBrokenHeart -> "[broken-heart]"
+    WUninitialized s -> printf "[uninialized:%s]" s
+    WUninitializedCharPair -> "[uninialized-char-pair]"
+
+instance Show Addr where
+  show = \case
+    AHeapSpace ha -> show ha
+    AStatic d offset -> printf "%s+%d" (show d) offset
+    ATempSpace{} -> undefined
+
+----------------------------------------------------------------------
+-- GC
+
+data Hemi = HemiA | HemiB deriving (Eq)
+
+instance Show Hemi where show = \case HemiA -> "A"; HemiB -> "B"
+
+otherHemi :: Hemi -> Hemi
+otherHemi = \case HemiA -> HemiB; HemiB -> HemiA
+
+topOfHemi :: Hemi -> Int
+topOfHemi = \case HemiA -> topA; HemiB -> topB
+
+botOfHemi :: Hemi -> Int
+botOfHemi = \case HemiA -> botA; HemiB -> botB
+
+inA,inB :: Int -> Bool
+inA n = n <= topA && n >= botA
+inB n = n <= topB && n >= botB
+
+inHemi :: Int -> Hemi -> Bool
+inHemi n = \case HemiA -> inA n; HemiB -> inB n
+
+-- Invariant: The Sp will always be a HeapAddr
+getSP :: M HeapAddr
+getSP = (deHeapAddr . deAddr) <$> GetReg Sp
+
+-- Check heap-address is in the hemi-space in which we are ALLOCATING.
+mkHeapAddr :: Int -> M HeapAddr
+mkHeapAddr n = do
+  hemi <- WhatHemi
+  if not (n `inHemi` hemi) then error (printf "mkHeapAddr: %d" n) else
+    pure $ HeapAddr (fromIntegral n)
+
+-- Check heap-address is in the hemi-space from which we are EVACUATING.
+-- This version is used during GC when evacuating the old space.
+mkHeapAddr_OTHER :: Int -> M HeapAddr
+mkHeapAddr_OTHER n = do
+  hemi <- WhatHemi
+  if not (n `inHemi` otherHemi hemi) then error (printf "mkHeapAddr_OTHER: %d" n) else
+    pure $ HeapAddr (fromIntegral n)
+
+addHeapAddr :: Int -> HeapAddr -> M HeapAddr
+addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
+
+addHeapAddr_OTHER :: Int -> HeapAddr -> M HeapAddr
+addHeapAddr_OTHER i (HeapAddr n) = mkHeapAddr_OTHER (fromIntegral (n + fromIntegral i))
+
+addAddr :: Int -> Addr -> M Addr
+addAddr i = \case
+  AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
+  AStatic lab n -> pure $ AStatic lab (n+i)
+  ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
+
+heapBytesRemaining :: M Int
+heapBytesRemaining = do
+  HeapAddr sp <- getSP
+  hemi <- WhatHemi
+  pure (fromIntegral sp - botOfHemi hemi)
+
+setStackPointerToTopOfHemi :: Hemi -> M ()
+setStackPointerToTopOfHemi hemi = do
+  ha <- mkHeapAddr (topOfHemi hemi)
+  SetReg Sp (WAddr (AHeapSpace ha))
+
+gcTop :: M ()
+gcTop = do
+  fromSpace <- WhatHemi
+  gcNum <- BumpGC
+  toSpace <- WhatHemi
+  if gcLiveWordsTrace then Print "[" else pure ()
+  Debug (printf "GC(%d) starting: %s --> %s\n" gcNum (show fromSpace) (show toSpace))
+  setStackPointerToTopOfHemi toSpace
+
+  let roots = [frameReg,argReg,contReg]
+  watermark0 <- getSP
+  mapM_ evacuateReg roots
+  loop 1 watermark0
+
+  HeapAddr sp <- getSP
+  let liveBytes = topOfHemi toSpace - fromIntegral sp
+  Debug (printf "GC(%d) finished: liveBytes=%d\n" gcNum liveBytes)
+  if gcLiveWordsTrace then  Print (printf "%d]" liveBytes) else pure ()
+
+  where
+    loop :: Int -> HeapAddr -> M ()
+    loop step watermark = do
+      sp <- getSP
+      --Debug (printf "loop(%d.%d): SP=%s < WM=%s\n" gcNum step (show sp) (show watermark))
+      let finished = assert (sp <= watermark) (sp == watermark)
+      case finished of
+        True -> pure ()
+        False -> do
+          nextWM <- getSP
+          scanLoop 1 nextWM
+          loop (step+1) nextWM
+
+          where
+            scanLoop :: Int -> HeapAddr -> M ()
+            scanLoop substep scanPointer = do
+              --Debug (printf "inner(%d.%d.%d): scan=%s < watermark=%s\n" gcNum step substep (show scanPointer) (show watermark))
+              let finishedScan = assert (scanPointer <= watermark) (scanPointer == watermark)
+              case finishedScan of
+                True -> do
+                  pure ()
+                False -> do
+                  nextScanPointer <- scavenge scanPointer
+                  scanLoop (substep+1) nextScanPointer
+
+evacuateReg :: Reg -> M ()
+evacuateReg reg = do
+  --Print (printf "evacuateReg: %s\n" (show reg))
+  w <- GetReg reg
+  evacuate w >>= \case
+    Just w' -> SetReg reg w'
+    Nothing -> pure ()
+
+scavenge :: HeapAddr -> M HeapAddr
+scavenge scanPointer = do
+  descOpt <- getBlockDescriptor scanPointer
+  let desc = case descOpt of Just d -> d; Nothing -> error "scavenge/BrokenHeart"
+  let BlockDescriptor{sizeInBytes,scanMode} = desc
+  let sizeWords = sizeInBytes `div` 2
+  case scanMode of
+    Scanned -> do
+      -- 1..size because we are pointing at descriptor
+      xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
+      mapM_ scavengeHA xs
+      pure ()
+    RawData -> pure ()
+
+  addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
+
+scavengeHA :: HeapAddr -> M ()
+scavengeHA ha = do
+  w <- GetMem (AHeapSpace ha)
+  evacuate w >>= \case
+    Just w' -> SetMem (AHeapSpace ha) w'
+      --Debug (printf "scavengeHA: %s : %s --> %s\n" (show ha) (show w) (show w'))
+    Nothing -> do
+      --Debug (printf "scavengeHA: %s : unmoved\n" (show ha))
+      pure ()
+
+evacuate :: Word -> M (Maybe Word)
+evacuate w = do
+  --Debug (printf "evacuate: %s\n" (show w))
+  case w of
+    WAddr (AHeapSpace ha) -> (Just . WAddr . AHeapSpace) <$> evacuateHA ha
+    _ -> pure Nothing
+
+evacuateHA :: HeapAddr -> M HeapAddr
+evacuateHA objectA = do
+  descA <- addHeapAddr_OTHER (-bytesPerWord) objectA
+  --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
+  descOpt <- getBlockDescriptor descA
+  case descOpt of
+    Just desc -> do
+      let BlockDescriptor{sizeInBytes} = desc
+      let sizeWords = sizeInBytes `div` 2
+      xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
+      mapM_ copyAlloc xs
+      sp <- getSP
+      relocatedA <- addHeapAddr bytesPerWord sp -- point one word past the new desc
+      -- overwrite original object with broken Heart; which points tothe relocated object
+      SetMem (AHeapSpace descA) WBrokenHeart
+      SetMem (AHeapSpace objectA) (WAddr (AHeapSpace relocatedA))
+      pure relocatedA
+
+    Nothing -> do -- BrokenHeart
+      -- return the indirected previously copied object
+      (deHeapAddr . deAddr)  <$> GetMem (AHeapSpace objectA)
+
+copyAlloc :: HeapAddr -> M ()
+copyAlloc ha = do
+  w <- GetMem (AHeapSpace ha)
+  execPushAlloc AllocForGC w
+  --_newAddress <- getSP
+  --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
+  pure ()
+
+getBlockDescriptor :: HeapAddr -> M (Maybe BlockDescriptor) -- TODO: inline is cleaner
+getBlockDescriptor ha = do
+  w <- GetMem (AHeapSpace ha)
+  case w of
+    WBlockDescriptor d -> pure (Just d)
+    WBrokenHeart -> pure Nothing
+    w -> error (printf "getBlockDescriptor: not a block-descriptor: %s at %s" (show w) (show ha))
+
+----------------------------------------------------------------------
 -- Execute
 
 type Transformed = Image
@@ -58,7 +318,7 @@ execCode = \case
   Do (OpMany []) code -> execCode code
   Do (OpMany (op:ops)) code -> execCode $ Do op (Do (OpMany ops) code)
   Do op code -> do
-    TraceOp op -- TODO: move to compile time to allow debug on qemu/real-hardware
+    TraceOp op
     execOp op (execCode code)
   Done jump -> do
     TraceJump jump
@@ -129,8 +389,7 @@ execOp = \case
         cont
 
 -- this is called from user code which does OpPush & also from GC when copying
--- it records #bytes allocated (why am I recording in #bytes not #words?)
--- and it does sanity checks for the pushed block-descriptor
+-- performs sanity checking when a block-descriptor is pushed
 execPushAlloc :: AllocMode -> Word -> M ()
 execPushAlloc mode w = do
   a <- deAddr <$> GetReg Sp
@@ -140,6 +399,13 @@ execPushAlloc mode w = do
   Debug (printf "Alloc: %s = %s\n" (show a') (show w))
   sequence_ (replicate bytesPerWord (TraceAlloc mode))
   checkPushBlockDescriptor w
+
+checkPushBlockDescriptor :: Word -> M ()
+checkPushBlockDescriptor = \case
+  WBlockDescriptor (BlockDescriptor {sizeInBytes}) -> do
+    CheckRecentAlloc (sizeInBytes + 2) -- 2 for the block descriptor itself
+  _ ->
+    pure ()
 
 execPushSAVE :: Word -> M ()
 execPushSAVE w = do -- pre decrement
@@ -154,13 +420,6 @@ execPopRESTORE reg = do -- post increment
   GetMem a >>= SetReg reg
   a' <- addAddr (bytesPerWord) a
   SetReg Sp (WAddr a')
-
-checkPushBlockDescriptor :: Word -> M ()
-checkPushBlockDescriptor = \case
-  WBlockDescriptor (BlockDescriptor {sizeInBytes}) -> do
-    CheckRecentAlloc (sizeInBytes + 2) -- 2 for the block descriptor itself
-  _ ->
-    pure ()
 
 slideStackPointer :: AllocMode -> Int -> M ()
 slideStackPointer mode nBytes = do
@@ -210,9 +469,6 @@ execBare = \case
     b <- GetFlagN
     SetReg Ax (WAddr (if b then aTrue else aFalse))
 
-  -- On real hardware Num/Char will have overlapping representations
-  -- such that ord/chr have null implementations. maybe not quite. the high byte of a char will be zero
-  -- always numbers will be 2n+1 tagged. but untagged will happen before call to num->char
   Bare_num_to_char -> do
     n <- deNum <$> GetReg Ax
     SetReg Ax (WChar (Char.chr (fromIntegral n)))
@@ -370,7 +626,6 @@ data M a where
   GetChar :: M Char
   BumpGC :: M Int
   WhatHemi :: M Hemi -- in which we are allocating
-
 
 data AllocMode = AllocForUser | AllocForGC
 
@@ -584,262 +839,3 @@ dUnit = DataLabelR "Bare_unit"
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
-
-----------------------------------------------------------------------
-
--- Word is a structured type for the contents of a memory location
--- We use a variant type to help catch compiler bugs during dev.
--- On a real system, the representations will overlap.
--- Tagging will distinguish pointer from non-pointer.
-
--- WChar, VNum, VAddr -- Representation of user Values. Things that user code can compute with.
--- WCodeLabel -- Found only in slot 0 of a continuation/closure frame.
--- WBlockDescriptor -- Found only in slot -1 of all heap block.
-
--- TODO: distinuish type for "Val" (what a register can hold) from "Word" (what can be in a memory cell)
-
-data Word -- TODO: reorder the file so this is at the top
-  = WChar Char
-  | WCharPair (Char,Char)
-  | WNum Number -- number with 2n+1
-  | WAddr Addr
-  | WCodeLabel CodeLabel
-  | WUninitialized String
-  | WBlockDescriptor BlockDescriptor
-  | WUninitializedCharPair
-  | WBrokenHeart
-  deriving (Eq)
-
--- Of the 3 kinds of Addr. Only AHeapSpace and AStatic represent user values
--- The ATempSpace is more like a register, in that it is a location for values.
--- (Perhaps the types could be improved to make this clearer)
-
-data Addr -- memory address
-  = AHeapSpace HeapAddr
-  | AStatic DataLabel Int -- This int is an offset at the data-label
-  | ATempSpace SRC.Temp
-  deriving (Eq,Ord)
-
-data HeapAddr = HeapAddr Word16
-  deriving (Eq,Ord)
-
-instance Show HeapAddr where
-  show (HeapAddr x) = "#" ++ show x
-
-deHeapAddr :: Addr -> HeapAddr
-deHeapAddr = \case
-  AHeapSpace ha -> ha
-  AStatic{} -> error "deHeapAddr/AStatic"
-  ATempSpace{} -> error "deHeapAddr/ATempSpace"
-
-evenAddr :: Addr -> Bool
-evenAddr = \case
-  AHeapSpace (HeapAddr n) -> (n `mod` 2) == 0
-  AStatic _ offset -> (offset `mod` 2) == 0
-  ATempSpace{} -> True
-
-instance Show Word where
-  show = \case
-    WChar c -> show c
-    WNum n -> "T:"++show n -- TODO: remove the T: ?
-    WAddr a -> show a
-    WCodeLabel lab -> show lab
-    WBlockDescriptor d -> show d
-    WUninitialized s -> printf "[uninialized:%s]" s
-    WUninitializedCharPair -> "[uninialized-char-pair]"
-    WCharPair p -> show p
-    WBrokenHeart -> "[broken-heart]"
-
-instance Show Addr where
-  show = \case
-    AHeapSpace ha -> show ha
-    AStatic d offset -> printf "%s+%d" (show d) offset
-    ATempSpace{} -> undefined
-
-----------------------------------------------------------------------
--- GC
-
-data Hemi = HemiA | HemiB deriving (Eq)
-
-instance Show Hemi where show = \case HemiA -> "A"; HemiB -> "B"
-
-otherHemi :: Hemi -> Hemi
-otherHemi = \case HemiA -> HemiB; HemiB -> HemiA
-
-topOfHemi :: Hemi -> Int
-topOfHemi = \case HemiA -> topA; HemiB -> topB
-
-botOfHemi :: Hemi -> Int
-botOfHemi = \case HemiA -> botA; HemiB -> botB
-
-inA,inB :: Int -> Bool
-inA n = n <= topA && n >= botA
-inB n = n <= topB && n >= botB
-
-inHemi :: Int -> Hemi -> Bool
-inHemi n = \case HemiA -> inA n; HemiB -> inB n
-
--- Invariant: The Sp will always be a HeapAddr
-getSP :: M HeapAddr
-getSP = (deHeapAddr . deAddr) <$> GetReg Sp
-
--- Check heap-address is in the hemi-space in which we are ALLOCATING.
-mkHeapAddr :: Int -> M HeapAddr
-mkHeapAddr n = do
-  hemi <- WhatHemi
-  if not (n `inHemi` hemi) then error (printf "mkHeapAddr: %d" n) else
-    pure $ HeapAddr (fromIntegral n)
-
--- Check heap-address is in the hemi-space from which we are EVACUATING.
--- This version is used during GC when evacuating the old space.
-mkHeapAddr_OTHER :: Int -> M HeapAddr
-mkHeapAddr_OTHER n = do
-  hemi <- WhatHemi
-  if not (n `inHemi` otherHemi hemi) then error (printf "mkHeapAddr_OTHER: %d" n) else
-    pure $ HeapAddr (fromIntegral n)
-
-addHeapAddr :: Int -> HeapAddr -> M HeapAddr
-addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
-
-addHeapAddr_OTHER :: Int -> HeapAddr -> M HeapAddr
-addHeapAddr_OTHER i (HeapAddr n) = mkHeapAddr_OTHER (fromIntegral (n + fromIntegral i))
-
-addAddr :: Int -> Addr -> M Addr
-addAddr i = \case
-  AHeapSpace ha  -> AHeapSpace <$> addHeapAddr i ha
-  AStatic lab n -> pure $ AStatic lab (n+i)
-  ATempSpace{} -> undefined -- TODO: this can not happen. more refined rep will fix this
-
-heapBytesRemaining :: M Int
-heapBytesRemaining = do
-  HeapAddr sp <- getSP
-  hemi <- WhatHemi
-  pure (fromIntegral sp - botOfHemi hemi)
-
-setStackPointerToTopOfHemi :: Hemi -> M ()
-setStackPointerToTopOfHemi hemi = do
-  ha <- mkHeapAddr (topOfHemi hemi)
-  SetReg Sp (WAddr (AHeapSpace ha))
-
-gcTop :: M ()
-gcTop = do
-  fromSpace <- WhatHemi
-  gcNum <- BumpGC
-  toSpace <- WhatHemi
-  if gcLiveWordsTrace then Print "[" else pure ()
-  Debug (printf "GC(%d) starting: %s --> %s\n" gcNum (show fromSpace) (show toSpace))
-  setStackPointerToTopOfHemi toSpace
-
-  let roots = [frameReg,argReg,contReg]
-  watermark0 <- getSP
-  mapM_ evacuateReg roots
-  loop 1 watermark0
-
-  HeapAddr sp <- getSP
-  let liveBytes = topOfHemi toSpace - fromIntegral sp
-  Debug (printf "GC(%d) finished: liveBytes=%d\n" gcNum liveBytes)
-  if gcLiveWordsTrace then  Print (printf "%d]" liveBytes) else pure ()
-
-  where
-    loop :: Int -> HeapAddr -> M ()
-    loop step watermark = do
-      sp <- getSP
-      --Debug (printf "loop(%d.%d): SP=%s < WM=%s\n" gcNum step (show sp) (show watermark))
-      let finished = assert (sp <= watermark) (sp == watermark)
-      case finished of
-        True -> pure ()
-        False -> do
-          nextWM <- getSP
-          scanLoop 1 nextWM
-          loop (step+1) nextWM
-
-          where
-            scanLoop :: Int -> HeapAddr -> M ()
-            scanLoop substep scanPointer = do
-              --Debug (printf "inner(%d.%d.%d): scan=%s < watermark=%s\n" gcNum step substep (show scanPointer) (show watermark))
-              let finishedScan = assert (scanPointer <= watermark) (scanPointer == watermark)
-              case finishedScan of
-                True -> do
-                  pure ()
-                False -> do
-                  nextScanPointer <- scavenge scanPointer
-                  scanLoop (substep+1) nextScanPointer
-
-evacuateReg :: Reg -> M ()
-evacuateReg reg = do
-  --Print (printf "evacuateReg: %s\n" (show reg))
-  w <- GetReg reg
-  evacuate w >>= \case
-    Just w' -> SetReg reg w'
-    Nothing -> pure ()
-
-scavenge :: HeapAddr -> M HeapAddr
-scavenge scanPointer = do
-  descOpt <- getBlockDescriptor scanPointer
-  let desc = case descOpt of Just d -> d; Nothing -> error "scavenge/BrokenHeart"
-  let BlockDescriptor{sizeInBytes,scanMode} = desc
-  let sizeWords = sizeInBytes `div` 2
-  case scanMode of
-    Scanned -> do
-      -- 1..size because we are pointing at descriptor
-      xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
-      mapM_ scavengeHA xs
-      pure ()
-    RawData -> pure ()
-
-  addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
-
-scavengeHA :: HeapAddr -> M ()
-scavengeHA ha = do
-  w <- GetMem (AHeapSpace ha)
-  evacuate w >>= \case
-    Just w' -> SetMem (AHeapSpace ha) w'
-      --Debug (printf "scavengeHA: %s : %s --> %s\n" (show ha) (show w) (show w'))
-    Nothing -> do
-      --Debug (printf "scavengeHA: %s : unmoved\n" (show ha))
-      pure ()
-
-evacuate :: Word -> M (Maybe Word)
-evacuate w = do
-  --Debug (printf "evacuate: %s\n" (show w))
-  case w of
-    WAddr (AHeapSpace ha) -> (Just . WAddr . AHeapSpace) <$> evacuateHA ha
-    _ -> pure Nothing
-
-evacuateHA :: HeapAddr -> M HeapAddr
-evacuateHA objectA = do
-  descA <- addHeapAddr_OTHER (-bytesPerWord) objectA
-  --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
-  descOpt <- getBlockDescriptor descA
-  case descOpt of
-    Just desc -> do
-      let BlockDescriptor{sizeInBytes} = desc
-      let sizeWords = sizeInBytes `div` 2
-      xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
-      mapM_ copyAlloc xs
-      sp <- getSP
-      relocatedA <- addHeapAddr bytesPerWord sp -- point one word past the new desc
-      -- overwrite original object with broken Heart; which points tothe relocated object
-      SetMem (AHeapSpace descA) WBrokenHeart
-      SetMem (AHeapSpace objectA) (WAddr (AHeapSpace relocatedA))
-      pure relocatedA
-
-    Nothing -> do -- BrokenHeart
-      -- return the indirected previously copied object
-      (deHeapAddr . deAddr)  <$> GetMem (AHeapSpace objectA)
-
-copyAlloc :: HeapAddr -> M ()
-copyAlloc ha = do
-  w <- GetMem (AHeapSpace ha)
-  execPushAlloc AllocForGC w
-  --_newAddress <- getSP
-  --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
-  pure ()
-
-getBlockDescriptor :: HeapAddr -> M (Maybe BlockDescriptor) -- TODO: inline is cleaner
-getBlockDescriptor ha = do
-  w <- GetMem (AHeapSpace ha)
-  case w of
-    WBlockDescriptor d -> pure (Just d)
-    WBrokenHeart -> pure Nothing
-    w -> error (printf "getBlockDescriptor: not a block-descriptor: %s at %s" (show w) (show ha))
