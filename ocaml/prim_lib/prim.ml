@@ -81,11 +81,33 @@ end = struct
   let string_length = String.length
   let string_index s i = s.[i]
 
-  let load_sector n _ =
-    Printf.printf "[load_sector:%d]\n" n
+  let n_sectors = 32
+  let sector_size = 512
 
-  let store_sector n _ =
-    Printf.printf "[store_sector:%d]\n" n
+  let open_fs_image() =
+    let fd = Unix.openfile "/tmp/fs.image" [O_RDWR;O_CREAT] 0o640 in
+    Unix.ftruncate fd (sector_size * n_sectors);
+    fd
+
+  let load_sector n buf =
+    Printf.printf "[load_sector:%d]\n" n;
+    if n < 0 then Printf.printf "[load_sector:%d]: too small\n" n else
+      if n >= n_sectors then Printf.printf "[load_sector:%d]: too big\n" n else
+        let fd = open_fs_image() in
+        let pos = n * sector_size in
+        let (_:int) = Unix.lseek fd pos SEEK_SET in
+        let (_:int) = Unix.read fd buf 0 sector_size in
+        ()
+
+  let store_sector n s =
+    Printf.printf "[store_sector:%d]\n" n;
+    if n < 0 then Printf.printf "[store_sector:%d]: too small\n" n else
+      if n >= n_sectors then Printf.printf "[store_sector:%d]: too big\n" n else
+        let fd = open_fs_image() in
+        let pos = n * sector_size in
+        let (_:int) = Unix.lseek fd pos SEEK_SET in
+        let (_:int) = Unix.write fd (Bytes.of_string s) 0 sector_size in
+        ()
 
   let free_words () =
     0 (* return some dummy value *)

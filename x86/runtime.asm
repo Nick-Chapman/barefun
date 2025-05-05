@@ -342,7 +342,8 @@ Bare_free_words:
 ;; begin/end
 
 top_of_heap equ 0
-bot_of_heap equ 0x8000 ; half of memory; 16k words
+;bot_of_heap equ 0x8000 ; half of memory; 16k words
+bot_of_heap equ end_of_code
 
 begin:
     mov sp, top_of_heap
@@ -363,9 +364,10 @@ final_code:
 %include CODE
 
     align 512
-    times 512 db '5'
     times 512 db '6'
     times 512 db '7'
+    times 512 db '8'
+    times 512 db '9'
 
 end_of_code:
 

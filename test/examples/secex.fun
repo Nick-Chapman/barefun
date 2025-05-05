@@ -9,7 +9,7 @@ let not b =
 
 let (>=) a b = not (a < b)
 
-let _put_string s =
+let put_string s =
   let n = string_length s in
   let rec loop i =
     if i >= n then () else
@@ -18,22 +18,17 @@ let _put_string s =
   in
   loop 0
 
-let _put_int i =
-  let ord0 = ord '0' in
-  let char_of_digit c = chr (ord0 + c) in
-  let rec loop i =
-    if i = 0 then () else
-      loop (i/10);
-      put_char (char_of_digit (i%10))
-  in
-  if i = 0 then put_char '0' else loop i
-
 let newline () = put_char '\n'
 
-let read_sector : int -> string = fun n ->
-  let bs = make_bytes 512 in
-  load_sector n bs;
-  freeze_bytes bs
+let echoing_get_char () =
+  let c = get_char () in
+  put_char c;
+  c
+
+let get_num () =
+  let c = echoing_get_char () in
+  let n = ord c - ord '0' in
+  n
 
 let is_printable c =
   let n = ord c in
@@ -49,39 +44,39 @@ let put_sector_string s =
   in
   loop 0
 
-(*let _dump = noinline (fun n ->
-  put_string "sector:"; put_int n;
-  let s = read_sector n in
-  put_sector_string s;
-  (*put_string "(space="; put_int (get_sp()); put_string ")";*)
-  newline())*)
+(*let buf = make_bytes 512*) (* TODO: share a common buffer *)
 
-(*let main () =
-  let rec loop i =
-    dump i;
-    let _ : char = get_char () in
-    loop (i+1)
-  in
-  loop 5 (* sectors start from 1 *)*)
-
-let _make_sector = noinline (fun c ->
-  let b = make_bytes 512 in
+let make_sector = noinline (fun c ->
+  let buf = make_bytes 512 in
   let rec loop i =
     if i >= 512 then () else
-      (set_bytes b i c; loop (i+1))
+      (set_bytes buf i c; loop (i+1))
   in
   loop 0;
-  freeze_bytes b)
+  freeze_bytes buf)
+
+let do_read () =
+  let n = get_num () in
+  newline();
+  let buf = make_bytes 512 in
+  load_sector n buf;
+  let s = freeze_bytes buf in
+  put_sector_string s
+
+let do_write () =
+  let n = get_num () in
+  let c = echoing_get_char () in
+  let s = make_sector c in
+  newline();
+  store_sector n s
+
+let rec xloop () =
+  put_char '>';
+  let c = echoing_get_char () in
+  if eq_char c 'r' then (do_read (); xloop ()) else
+    if eq_char c 'w' then (do_write (); xloop ()) else
+      (put_string ": unknown command\n"; xloop())
 
 let main () =
-
-  let sA = read_sector 6 in
-  put_sector_string sA ;
-
-  let sB = read_sector 7 in
-  put_sector_string sB ;
-
-  store_sector 6 sB;
-  store_sector 7 sA;
-
-  ()
+  put_string "type r<num> or w<num><char>\n";
+  xloop()
