@@ -216,19 +216,20 @@ evacuateReg reg = do
 
 scavenge :: HeapAddr -> M HeapAddr
 scavenge scanPointer = do
-  descOpt <- getBlockDescriptor scanPointer
-  let desc = case descOpt of Just d -> d; Nothing -> error "scavenge/BrokenHeart"
-  let BlockDescriptor{sizeInBytes,scanMode} = desc
-  let sizeWords = sizeInBytes `div` 2
-  case scanMode of
-    Scanned -> do
-      -- 1..size because we are pointing at descriptor
-      xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
-      mapM_ scavengeHA xs
-      pure ()
-    RawData -> pure ()
-
-  addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
+  GetMem (AHeap scanPointer) >>= \case
+    WBlockDescriptor desc -> do
+      let BlockDescriptor{sizeInBytes,scanMode} = desc
+      let sizeWords = sizeInBytes `div` 2
+      nextScanPointer <- addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
+      case scanMode of
+        RawData -> pure nextScanPointer
+        Scanned -> do
+          -- 1..size because we are pointing at descriptor
+          xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
+          mapM_ scavengeHA xs
+          pure nextScanPointer
+    w ->
+      error (printf "scavenge: not a block-descriptor: %s at %s" (show w) (show scanPointer))
 
 scavengeHA :: HeapAddr -> M ()
 scavengeHA ha = do
@@ -251,9 +252,8 @@ evacuateHA :: HeapAddr -> M HeapAddr
 evacuateHA objectA = do
   descA <- addHeapAddr_OTHER (-bytesPerWord) objectA
   --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
-  descOpt <- getBlockDescriptor descA
-  case descOpt of
-    Just desc -> do
+  GetMem (AHeap descA) >>= \case
+    WBlockDescriptor desc -> do
       let BlockDescriptor{sizeInBytes} = desc
       let sizeWords = sizeInBytes `div` 2
       xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
@@ -264,10 +264,11 @@ evacuateHA objectA = do
       SetMem (AHeap descA) WBrokenHeart
       SetMem (AHeap objectA) (WAddr (AHeap relocatedA))
       pure relocatedA
-
-    Nothing -> do -- BrokenHeart
+    WBrokenHeart ->
       -- return the indirected previously copied object
       deHeapAddr <$> GetMem (AHeap objectA)
+    w ->
+      error (printf "evacuateHA: not a block-descriptor: %s at %s" (show w) (show objectA))
 
 copyAlloc :: HeapAddr -> M ()
 copyAlloc ha = do
@@ -276,14 +277,6 @@ copyAlloc ha = do
   --_newAddress <- getSP
   --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
   pure ()
-
-getBlockDescriptor :: HeapAddr -> M (Maybe BlockDescriptor) -- TODO: inline is cleaner
-getBlockDescriptor ha = do
-  w <- GetMem (AHeap ha)
-  case w of
-    WBlockDescriptor d -> pure (Just d)
-    WBrokenHeart -> pure Nothing
-    w -> error (printf "getBlockDescriptor: not a block-descriptor: %s at %s" (show w) (show ha))
 
 ----------------------------------------------------------------------
 -- Execute
@@ -604,7 +597,7 @@ data M a where
   TraceJump :: Jump -> M ()
   TraceAlloc :: AllocMode -> M ()
   GetCode :: CodeLabel -> M Code
-  SetReg :: Reg -> Word -> M () -- TODO: SetReg/GetReg will operate on Val
+  SetReg :: Reg -> Word -> M ()
   GetReg :: Reg -> M Word
   SetTemp :: SRC.Temp -> Word -> M ()
   GetTemp :: SRC.Temp -> M Word
