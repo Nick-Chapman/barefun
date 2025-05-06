@@ -1,0 +1,14 @@
+
+(rule
+ (deps try.asm)
+ (action
+  (with-stdout-to try.img
+   (run nasm -Werror -o try.img try.asm))))
+
+(rule
+ (alias try)
+ (deps (universe) try.img)
+ (action
+  (progn
+   (run chmod +w try.img)
+   (run qemu-system-i386 -hda try.img))))
