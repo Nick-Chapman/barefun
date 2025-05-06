@@ -132,7 +132,7 @@ part2:
 ;;; Kernel...
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
-    jmp begin
+    jmp main
 
 hex_data: db "0123456789abcdef"
 
@@ -212,16 +212,34 @@ Bare_put_char: ; al->
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Begin...
 
-begin:
-    call Bare_clear_screen
-    Print `Hand Coded Repl...\n`
-    jmp repl
-
-repl:
-    call Bare_get_char ;; --> ax
-    call Bare_put_char ;; ax -->
-    jmp repl
-
 halt:
+    Print `[HALT]\n`
+.loop:
     call Bare_get_char ;; avoid spinning the fans
-    jmp halt
+    jmp .loop
+
+;;; TODO: non-blocking get_scancode; with try-again loop in main
+;;; TODO: how to avoid spinning fans in qemu?
+;;; TODO: use interrupts to access keyboard
+;;; TODO: decode scancode
+
+main:
+    call Bare_clear_screen
+    Print `[See make/break scancodes from keyboard]\n`
+.loop:
+    call get_scancode
+    call Bare_put_char
+    jmp .loop
+
+keyboard_data_port equ 0x60
+keyboard_status_port equ 0x64
+
+;;; This implements blocking/polling keyboard access
+get_scancode:
+    ;; This wait loop spins my fans in qemu
+.wait:
+    in al, keyboard_status_port
+    test al, 0x01 ;; output buffer has something?
+    jz .wait
+    in al, keyboard_data_port
+    ret
