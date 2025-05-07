@@ -367,7 +367,7 @@ Bare_make_bytes:
 Bare_get_bytes:
     add bx, 2 ; +2 for the length
     add bx, ax
-    mov ax, [bx]
+    mov ax, [bx] ;; TODO: just assign al
     mov ah, 0
     ret
 
