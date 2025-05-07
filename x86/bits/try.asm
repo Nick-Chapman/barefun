@@ -242,7 +242,7 @@ blocking_get_scancode:
 halt:
     Print `[HALT]\n`
 .loop:
-    call Bare_get_char ;; avoid spinning the fans
+    hlt ;; avoid spinning the fans
     jmp .loop
 
 first_irq_slot equ 32 ;must be a multiple of 8 (but 16 doesn't work)
@@ -266,19 +266,16 @@ end_of_interrupt_command equ 0x20
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; main
 
-;;; TODO: halt (until interrupt) -- avoid spinning fans? -- no! why?
-;;; TODO: cli, sti: can I get cursor to stop blinking? (cli: no) -- nothing?!
-;;; TODO: Regardless of sti/cli every works. why?
-
 main:
     call Bare_clear_screen
     Print `[Explore interrupts]\n`
 
+    cli
     mov word [4*slot+0], isr_see_dot
     mov word [4*slot+2], 0
-
     call set_pit_freq ; 20Hz
     call remap_pic ; seems to also enable
+    sti
 
 .loop: ;; see an X interspersed every 4 dots
     call wait_five_ticks
@@ -290,6 +287,7 @@ ticker: db 0
 wait_five_ticks: ; at 20Hz, 5 ticks = 1/4 second
     mov al, [ticker]
 .wait:
+    hlt ; avoid the fans spinning in qemu
     mov bl, [ticker]
     sub bl, al
     cmp bl, 5 ; this constant control how many dots per X
