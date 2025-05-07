@@ -158,7 +158,7 @@ internal_print_string: ; in: DI=string; print null-terminated string.
     ret
 
 halt:
-    call Bare_get_char ;; avoid really spinning the fans
+    hlt ;; avoid spinning the fans
     jmp halt
 
 

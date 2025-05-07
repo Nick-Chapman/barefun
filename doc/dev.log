@@ -73,8 +73,8 @@ Fri 02 May 2025 : cleanup; split stage5 code; GC only when need
 Sat 03 May 2025 : compute needed
 Sun 04 May 2025 : 2n+1 tagging... Think I have it working!
 
-Mon 05 May 2025 :
-Tue 06 May 2025 :
-Wed 07 May 2025 :
+Mon 05 May 2025 : BANK HOL
+Tue 06 May 2025 : DAY OFF
+Wed 07 May 2025 : explore x86 interrups: PIC,PIT, cli/sti/hlt
 Thu 08 May 2025 :
 Fri 09 May 2025 :
