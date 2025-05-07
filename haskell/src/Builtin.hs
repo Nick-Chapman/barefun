@@ -16,7 +16,8 @@ data Builtin
   | LoadSec | StoreSec
   | FreeWords
 
-  | Wait_a_tick
+  | Get_ticks
+  | Wait_for_interrupt -- wrapper for x86 "hlt" opcode
   | Is_keyboard_ready
   | Get_keyboard_last_scancode
   deriving (Show)
@@ -79,16 +80,20 @@ defineBuiltin b =
       let (r,v) = twoArgs deRef id vs
       ISetRef r v (k unit)
 
-    Crash -> Impure $ undefined
-    LoadSec -> Impure $ undefined -- TODO: emulate
-    StoreSec -> Impure $ undefined -- TODO: emulate
     FreeWords -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 0)
 
-    Wait_a_tick -> Impure $ undefined -- TODO: emulate
-    Is_keyboard_ready -> Impure $ undefined -- TODO: emulate
-    Get_keyboard_last_scancode -> Impure $ undefined -- TODO: emulate
+    Crash -> todo
+    LoadSec -> todo
+    StoreSec -> todo
+
+    Get_ticks -> todo
+    Wait_for_interrupt -> todo
+    Is_keyboard_ready -> todo
+    Get_keyboard_last_scancode -> todo
 
   where
+    todo = Impure undefined
+
     unit = VCons tUnit []
     oneArg = \case [v] -> v; _ -> err
     twoArgs c1 c2 = \case [v1,v2] -> (c1 v1, c2 v2); _ -> err

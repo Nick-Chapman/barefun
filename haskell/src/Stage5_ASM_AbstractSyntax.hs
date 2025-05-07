@@ -69,6 +69,7 @@ data Op -- target; source (Intel Syntax style)
   | OpMulIntoAx Reg  -- ax := ax * sourceReg
   | OpDivModIntoAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
   | OpEnterCheck Int -- macro
+  | OpHlt
 
 data Jump
   = JumpDirect CodeLabel
@@ -124,6 +125,7 @@ data BareBios
   | Bare_load_sector
   | Bare_store_sector
   | Bare_free_words
+  | Bare_get_ticks
   | Bare_wait_a_tick
   | Bare_is_keyboard_ready
   | Bare_get_keyboard_last_scancode
@@ -172,6 +174,7 @@ instance Show Op where
     OpMulIntoAx src -> "mul " ++ show src
     OpDivModIntoAxDx src -> "div " ++ show src
     OpEnterCheck need -> printf "Bare_enter_check(%d)" need
+    OpHlt -> "hlt"
 
 instance Show Jump where
   show = \case

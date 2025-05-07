@@ -35,7 +35,9 @@ module X : sig
 
   val free_words : unit -> int
 
-  val wait_a_tick : unit -> unit
+  val get_ticks : unit -> int
+
+  val wait_for_interrupt : unit -> unit
   val is_keyboard_ready : unit -> bool
   val get_keyboard_last_scancode : unit -> char
 
@@ -116,8 +118,10 @@ end = struct
   let free_words () =
     0 (* return some dummy value *)
 
+  let get_ticks () =
+    0 (* return some dummy value *)
 
-  let wait_a_tick : unit -> unit = fun () ->
+  let wait_for_interrupt : unit -> unit = fun () ->
     () (* TODO: really do a pause *)
 
   let is_keyboard_ready : unit -> bool = fun () ->

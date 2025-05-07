@@ -34,16 +34,27 @@ let put_hex_byte c =
   put_hex_nibble hi;
   put_hex_nibble lo
 
+(* TODO: make this work in ocaml/haskell emulation *)
+let sleep nTicks = (* nTicks in milliseconds *)
+  if nTicks < 1 then wait_for_interrupt () else
+    let target = nTicks + get_ticks () in
+    let rec wait () =
+      let () = wait_for_interrupt() in
+      let now = get_ticks () in
+      if now = target then () else wait ()
+    in
+    wait ()
+
 let rec get_scan () =
-  let () = wait_a_tick () in
+  (*let () = put_char '.' in*)
+  let () = sleep 10 in
   if is_keyboard_ready() then get_keyboard_last_scancode () else
-    (*let () = put_char ',' in*)
     get_scan()
 
 (* TODO: convert scan code to ascii char *)
 
 let main () =
-  put_string "Scan test...\n";
+  put_string "[Scan test]\n";
   let rec loop () =
     let c = get_scan() in
     put_hex_byte c;
@@ -51,4 +62,3 @@ let main () =
     loop ()
   in
   loop ()
-

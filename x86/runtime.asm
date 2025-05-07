@@ -142,10 +142,10 @@ part2:
     call setup_timer_interrupt
     jmp begin
 
-;; updated on IRQ-0; watched in regular code
-ticker: db 0
-
 ticker_freq_htz equ 1000
+
+ticker: dw 0 ; 16 bits; at 1KHz this cycles in 65 seconds
+;; but after 2n+1 tagging (the cycling happens in just 32 seconds)
 
 first_irq_slot equ 32 ;must be a multiple of 8 (but 16 doesn't work)
 
@@ -167,7 +167,7 @@ irq0:
     push ax
     push bx
     ;;PrintChar '.' ; no print from here
-    inc byte [ticker]
+    inc word [ticker]
     Out pic1_cmd, end_of_interrupt_command
     ;Out pic2_cmd, end_of_interrupt_command
     pop bx
@@ -422,15 +422,8 @@ Bare_free_words:
     shr ax, 1 ;; shift for #words
     ret
 
-;;; this blocks for 1ms
-Bare_wait_a_tick:
-    mov al, [ticker]
-.wait:
-    hlt ; avoid the fans spinning in qemu
-    mov bl, [ticker]
-    sub bl, al
-    cmp bl, 10
-    jnz .wait
+Bare_get_ticks:
+    mov word ax, [ticker]
     ret
 
 keyboard_data_port equ 0x60

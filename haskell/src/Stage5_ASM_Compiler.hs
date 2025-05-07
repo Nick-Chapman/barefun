@@ -360,15 +360,22 @@ compileBuiltinTo builtin = case builtin of
     , setTarget target sUnit
     ]
   SRC.FreeWords -> \target -> oneArg $ \s1 ->
-    [ OpMove Ax s1
+    [ OpMove Ax s1 -- TODO: no need for this?
     , OpCall Bare_free_words
     , OpShiftL1 Ax
     , OpInc Ax
     , setTarget target (SReg Ax)
     ]
 
-  SRC.Wait_a_tick -> \target -> oneArg $ \_unit ->
-    [ OpCall Bare_wait_a_tick
+  SRC.Get_ticks -> \target -> oneArg $ \_unit ->
+    [ OpCall Bare_get_ticks
+    , OpShiftL1 Ax
+    , OpInc Ax
+    , setTarget target (SReg Ax)
+    ]
+
+  SRC.Wait_for_interrupt -> \target -> oneArg $ \_unit ->
+    [ OpHlt
     , setTarget target sUnit
     ]
   SRC.Is_keyboard_ready -> \target -> oneArg $ \_unit ->

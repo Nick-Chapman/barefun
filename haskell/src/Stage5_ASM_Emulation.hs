@@ -367,6 +367,8 @@ execOp = \case
         Debug (printf "BudgedForAllocation: %d\n" need)
         BudgedForAllocation need
         cont
+  OpHlt -> \cont -> -- TODO: better emulation for this?
+    cont
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- performs sanity checking when a block-descriptor is pushed
@@ -502,10 +504,13 @@ execBare = \case
         let freeWords = fromIntegral ((fromIntegral sp - botOfHemi hemi) `div` 2)
         SetReg Ax (WNum freeWords)
 
+  Bare_get_ticks -> do  -- TODO: really pause
+    SetReg Ax (WNum 0)
+
   Bare_wait_a_tick -> do  -- TODO: really pause
     pure ()
   Bare_is_keyboard_ready -> do -- TODO: really check; dont lie
-    SetFlagZ True
+    SetFlagZ False -- always ready
   Bare_get_keyboard_last_scancode -> do -- TODO: convert back to scancode for better emulation
     c <- GetChar
     SetReg Ax (WChar c)
