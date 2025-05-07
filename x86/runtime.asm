@@ -139,7 +139,13 @@ part2:
 ;;; Kernel...
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
+
+    ;; NOTE: we are currently in a half way house!
+    ;; exiting examples (sham, readline) call Bare_get_char, and dont work with
+    ;; the new timer/keyboard stuff, and so the following line needs to be commented out
     call setup_timer_interrupt
+    ;; The new WIP example (scan) does nee the above line.
+
     jmp begin
 
 ticker_freq_htz equ 1000
