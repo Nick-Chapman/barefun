@@ -25,6 +25,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Macros
 
+%macro Out 2
+    mov al, %2
+    out %1, al
+%endmacro
+
 %macro PrintCharAL 0
     mov ah, 0x0e
     mov bh, 0
@@ -209,8 +214,30 @@ Bare_put_char: ; al->
     PrintHexAX
     ret
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Begin...
+;;; previous keyboard/scancodes play...
+
+;;; TODO: non-blocking get_scancode; with try-again loop in main
+;;; TODO: how to avoid spinning fans in qemu?
+;;; TODO: use interrupts to access keyboard
+;;; TODO: decode scancode
+
+keyboard_data_port equ 0x60
+keyboard_status_port equ 0x64
+
+;;; This implements blocking/polling keyboard access
+blocking_get_scancode:
+    ;; This wait loop spins my fans in qemu
+.wait:
+    in al, keyboard_status_port
+    test al, 0x01 ;; output buffer has something?
+    jz .wait
+    in al, keyboard_data_port
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Misc
 
 halt:
     Print `[HALT]\n`
@@ -218,28 +245,121 @@ halt:
     call Bare_get_char ;; avoid spinning the fans
     jmp .loop
 
-;;; TODO: non-blocking get_scancode; with try-again loop in main
-;;; TODO: how to avoid spinning fans in qemu?
-;;; TODO: use interrupts to access keyboard
-;;; TODO: decode scancode
+first_irq_slot equ 32 ;must be a multiple of 8 (but 16 doesn't work)
+
+slot equ first_irq_slot ; the single ISR slot I am playing with
+
+print_slot:
+    mov ax, [4*slot+3]
+    PrintHexAX
+    mov ax, [4*slot+2]
+    PrintHexAX
+    PrintChar ':'
+    mov ax, [4*slot+1]
+    PrintHexAX
+    mov ax, [4*slot+0]
+    PrintHexAX
+    ret
+
+end_of_interrupt_command equ 0x20
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; main
+
+;;; TODO: halt (until interrupt) -- avoid spinning fans? -- no! why?
+;;; TODO: cli, sti: can I get cursor to stop blinking? (cli: no) -- nothing?!
+;;; TODO: Regardless of sti/cli every works. why?
 
 main:
     call Bare_clear_screen
-    Print `[See make/break scancodes from keyboard]\n`
-.loop:
-    call get_scancode
-    call Bare_put_char
+    Print `[Explore interrupts]\n`
+
+    mov word [4*slot+0], isr_see_dot
+    mov word [4*slot+2], 0
+
+    call set_pit_freq ; 20Hz
+    call remap_pic ; seems to also enable
+
+.loop: ;; see an X interspersed every 4 dots
+    call wait_five_ticks
+    PrintChar 'X'
     jmp .loop
 
-keyboard_data_port equ 0x60
-keyboard_status_port equ 0x64
+ticker: db 0
 
-;;; This implements blocking/polling keyboard access
-get_scancode:
-    ;; This wait loop spins my fans in qemu
+wait_five_ticks: ; at 20Hz, 5 ticks = 1/4 second
+    mov al, [ticker]
 .wait:
-    in al, keyboard_status_port
-    test al, 0x01 ;; output buffer has something?
-    jz .wait
-    in al, keyboard_data_port
+    mov bl, [ticker]
+    sub bl, al
+    cmp bl, 5 ; this constant control how many dots per X
+    jnz .wait
+    ret
+
+;;; every tick (20Hz): print a dot and increment the ticker
+isr_see_dot:
+    push ax
+    push bx
+    PrintChar '.'
+    inc byte [ticker]
+    Out pic1_cmd, end_of_interrupt_command
+    ;Out pic2_cmd, end_of_interrupt_command
+    pop bx
+    pop ax
+    iret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 8259 PIC (Programmable Interrupt Controller)
+
+pic1_cmd equ 0x20
+pic2_cmd equ 0xA0
+
+pic1_data equ 0x21
+pic2_data equ 0xA1
+
+pic1_offset equ first_irq_slot
+pic2_offset equ first_irq_slot+8
+
+remap_pic:
+    Out pic1_cmd, 0x11          ; initialization required; expect ICW4
+    Out pic1_data, pic1_offset  ; ICW2: vector offset
+    Out pic1_data, 4            ; ICW3: tell Master of Slave PIC at IRQ2 (0100)
+    Out pic1_data, 1            ; ICW4: x86 mode
+    Out pic2_cmd, 0x11          ; initialization required; expect ICW4
+    Out pic2_data, pic2_offset  ; ICW2: vector offset
+    Out pic2_data, 2            ; ICW3: tell Slave its cascade identity (0010)
+    Out pic2_data, 1            ; ICW4: x86 mode
+    ret
+
+enable_pics:
+    Out pic1_data, 0x0
+    Out pic2_data, 0x0
+    ret
+
+disable_pics:
+    Out pic1_data, 0xff
+    Out pic2_data, 0xff
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; PIT (Programmable Interval Timer)
+;;; Smallest frequency we can set is 19, or else pit_divisor exceeds a word.
+;;; (we can get 18.2 by setting pit_divisor as 0)
+desired_freq_htz equ 20
+base_freq_htz equ 1193182
+pit_divisor equ base_freq_htz / desired_freq_htz
+pit_channel0 equ 0x40
+pit_command equ 0x43
+set_pit_freq:
+    ;; 0x36 is 00_11_111_0
+    mov al, 0x36
+    out pit_command, al
+    ;; - (00) select channel 0
+    ;; - (11) access mode lo/hi
+    ;; - (111) square wave
+    ;; - (0) 16-bit-binary
+    mov ax, pit_divisor
+    out pit_channel0, al ;lo byte
+    mov al, ah
+    out pit_channel0, al ;hi byte
     ret
