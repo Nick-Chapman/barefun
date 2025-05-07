@@ -1,8 +1,6 @@
 ;;; Testbed for exploring how to do stuff at the asm level.
 ;;; Formed by grabbing bits from ../runtime.asm
 
-;;; TODO: decode scancode -- hmm, will do this in fun!
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Layout
 

@@ -23,6 +23,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Macros
 
+%macro Out 2
+    mov al, %2
+    out %1, al
+%endmacro
+
 %macro PrintCharAL 0
     mov ah, 0x0e
     mov bh, 0
@@ -134,7 +139,85 @@ part2:
 ;;; Kernel...
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
+    call setup_timer_interrupt
     jmp begin
+
+;; updated on IRQ-0; watched in regular code
+ticker: db 0
+
+ticker_freq_htz equ 1000
+
+first_irq_slot equ 32 ;must be a multiple of 8 (but 16 doesn't work)
+
+slot equ first_irq_slot ; the single ISR slot I am playing with
+
+end_of_interrupt_command equ 0x20
+
+setup_timer_interrupt:
+    cli ; disabled interrupts while we set things up.
+    mov word [4*slot+0], irq0
+    mov word [4*slot+2], 0
+    call set_pit_freq
+    call remap_pic ; also unmasks all
+    sti ; re-enable here
+    ret
+
+;;; service timer IRQ-0: bump the ticker byte
+irq0:
+    push ax
+    push bx
+    ;;PrintChar '.' ; no print from here
+    inc byte [ticker]
+    Out pic1_cmd, end_of_interrupt_command
+    ;Out pic2_cmd, end_of_interrupt_command
+    pop bx
+    pop ax
+    iret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 8259 PIC (Programmable Interrupt Controller)
+
+pic1_cmd equ 0x20
+pic2_cmd equ 0xA0
+
+pic1_data equ 0x21
+pic2_data equ 0xA1
+
+pic1_offset equ first_irq_slot
+pic2_offset equ first_irq_slot+8
+
+remap_pic:
+    Out pic1_cmd, 0x11          ; initialization required; expect ICW4
+    Out pic1_data, pic1_offset  ; ICW2: vector offset
+    Out pic1_data, 4            ; ICW3: tell Master of Slave PIC at IRQ2 (0100)
+    Out pic1_data, 1            ; ICW4: x86 mode
+    Out pic2_cmd, 0x11          ; initialization required; expect ICW4
+    Out pic2_data, pic2_offset  ; ICW2: vector offset
+    Out pic2_data, 2            ; ICW3: tell Slave its cascade identity (0010)
+    Out pic2_data, 1            ; ICW4: x86 mode
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; PIT (Programmable Interval Timer)
+;;; Smallest frequency we can set is 19, or else pit_divisor exceeds a word.
+;;; (we can get 18.2 by setting pit_divisor as 0)
+base_freq_htz equ 1193182
+pit_divisor equ base_freq_htz / ticker_freq_htz
+pit_channel0 equ 0x40
+pit_command equ 0x43
+set_pit_freq:
+    ;; 0x36 is 00_11_111_0
+    mov al, 0x36
+    out pit_command, al
+    ;; - (00) select channel 0
+    ;; - (11) access mode lo/hi
+    ;; - (111) square wave
+    ;; - (0) 16-bit-binary
+    mov ax, pit_divisor
+    out pit_channel0, al ;lo byte
+    mov al, ah
+    out pit_channel0, al ;hi byte
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; misc
@@ -234,20 +317,21 @@ Bare_put_char: ; al->
     ret
 
 Bare_make_bool_from_z:
-    jz .yes
-.no:
-    mov ax, False
-    ret
-.yes:
-    mov ax, True
-    ret
+    jz yes
+    jmp no
+
+Bare_make_bool_from_nz:
+    jnz yes
+    jmp no
 
 Bare_make_bool_from_n:
-    jl .yes
-.no:
+    jl yes
+    jmp no
+
+no:
     mov ax, False
     ret
-.yes:
+yes:
     mov ax, True
     ret
 
@@ -336,6 +420,31 @@ Bare_free_words:
     mov ax, sp
     sub ax, bot_of_heap
     shr ax, 1 ;; shift for #words
+    ret
+
+;;; this blocks for 1ms
+Bare_wait_a_tick:
+    mov al, [ticker]
+.wait:
+    hlt ; avoid the fans spinning in qemu
+    mov bl, [ticker]
+    sub bl, al
+    cmp bl, 10
+    jnz .wait
+    ret
+
+keyboard_data_port equ 0x60
+keyboard_status_port equ 0x64
+
+;;; sets Z when not ready
+Bare_is_keyboard_ready: ;; TODO: ripe for inlining
+    in al, keyboard_status_port
+    test al, 0x01 ;; output buffer has something?
+    ret
+
+Bare_get_keyboard_last_scancode: ;; TODO: ripe for inlining
+    in al, keyboard_data_port
+    mov ah, 0
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

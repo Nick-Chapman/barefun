@@ -114,6 +114,7 @@ data BareBios
   | Bare_put_char
   | Bare_get_char
   | Bare_make_bool_from_z
+  | Bare_make_bool_from_nz
   | Bare_make_bool_from_n
   | Bare_num_to_char
   | Bare_char_to_num
@@ -123,6 +124,9 @@ data BareBios
   | Bare_load_sector
   | Bare_store_sector
   | Bare_free_words
+  | Bare_wait_a_tick
+  | Bare_is_keyboard_ready
+  | Bare_get_keyboard_last_scancode
   deriving Show
 
 ----------------------------------------------------------------------

@@ -42,6 +42,11 @@ wrapPreDefs (Prog defs) =
       , ("load_sector"  , prim2 LoadSec)
       , ("store_sector" , prim2 StoreSec)
       , ("free_words"   , prim1 FreeWords)
+
+      , ("wait_a_tick"  , prim1 Wait_a_tick)
+      , ("is_keyboard_ready" , prim1 Is_keyboard_ready)
+      , ("get_keyboard_last_scancode" , prim1 Get_keyboard_last_scancode)
+
       -- When adding new ops, make sure to get the correct arg count!
       ]
       where

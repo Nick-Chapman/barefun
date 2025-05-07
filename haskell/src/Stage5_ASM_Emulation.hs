@@ -448,6 +448,9 @@ execBare = \case
   Bare_make_bool_from_z -> do
     b <- GetFlagZ
     SetReg Ax (WAddr (if b then aTrue else aFalse))
+  Bare_make_bool_from_nz -> do
+    b <- GetFlagZ
+    SetReg Ax (WAddr (if b then aFalse else aTrue))
   Bare_make_bool_from_n -> do
     b <- GetFlagN
     SetReg Ax (WAddr (if b then aTrue else aFalse))
@@ -498,6 +501,14 @@ execBare = \case
         HeapAddr sp <- getSP
         let freeWords = fromIntegral ((fromIntegral sp - botOfHemi hemi) `div` 2)
         SetReg Ax (WNum freeWords)
+
+  Bare_wait_a_tick -> do  -- TODO: really pause
+    pure ()
+  Bare_is_keyboard_ready -> do -- TODO: really check; dont lie
+    SetFlagZ True
+  Bare_get_keyboard_last_scancode -> do -- TODO: convert back to scancode for better emulation
+    c <- GetChar
+    SetReg Ax (WChar c)
 
 setMemByte :: Addr -> Char -> M ()
 setMemByte a x = do

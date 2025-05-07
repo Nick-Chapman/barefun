@@ -195,7 +195,7 @@ compileBuiltinTo builtin = case builtin of
     , OpCall Bare_put_char
     , setTarget target sUnit -- .. so missing this line is a unused ident error.
     ]
-  SRC.GetChar -> \target -> oneArg $ \_ ->
+  SRC.GetChar -> \target -> oneArg $ \_unit ->
     [ OpCall Bare_get_char
     , setTarget target (SReg Ax)
     ]
@@ -364,6 +364,20 @@ compileBuiltinTo builtin = case builtin of
     , OpCall Bare_free_words
     , OpShiftL1 Ax
     , OpInc Ax
+    , setTarget target (SReg Ax)
+    ]
+
+  SRC.Wait_a_tick -> \target -> oneArg $ \_unit ->
+    [ OpCall Bare_wait_a_tick
+    , setTarget target sUnit
+    ]
+  SRC.Is_keyboard_ready -> \target -> oneArg $ \_unit ->
+    [ OpCall Bare_is_keyboard_ready
+    , OpCall Bare_make_bool_from_nz
+    , setTarget target (SReg Ax)
+    ]
+  SRC.Get_keyboard_last_scancode -> \target -> oneArg $ \_unit ->
+    [ OpCall Bare_get_keyboard_last_scancode
     , setTarget target (SReg Ax)
     ]
 

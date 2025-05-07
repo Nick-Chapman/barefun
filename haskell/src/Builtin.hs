@@ -15,6 +15,10 @@ data Builtin
   | FreezeBytes | ThawBytes
   | LoadSec | StoreSec
   | FreeWords
+
+  | Wait_a_tick
+  | Is_keyboard_ready
+  | Get_keyboard_last_scancode
   deriving (Show)
 
 data Semantics
@@ -79,6 +83,10 @@ defineBuiltin b =
     LoadSec -> Impure $ undefined -- TODO: emulate
     StoreSec -> Impure $ undefined -- TODO: emulate
     FreeWords -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 0)
+
+    Wait_a_tick -> Impure $ undefined -- TODO: emulate
+    Is_keyboard_ready -> Impure $ undefined -- TODO: emulate
+    Get_keyboard_last_scancode -> Impure $ undefined -- TODO: emulate
 
   where
     unit = VCons tUnit []
