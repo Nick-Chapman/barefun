@@ -1,6 +1,8 @@
 ;;; Testbed for exploring how to do stuff at the asm level.
 ;;; Formed by grabbing bits from ../runtime.asm
 
+;;; TODO: decode scancode -- hmm, will do this in fun!
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Layout
 
@@ -216,89 +218,73 @@ Bare_put_char: ; al->
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; previous keyboard/scancodes play...
-
-;;; TODO: non-blocking get_scancode; with try-again loop in main
-;;; TODO: how to avoid spinning fans in qemu?
-;;; TODO: use interrupts to access keyboard
-;;; TODO: decode scancode
-
-keyboard_data_port equ 0x60
-keyboard_status_port equ 0x64
-
-;;; This implements blocking/polling keyboard access
-blocking_get_scancode:
-    ;; This wait loop spins my fans in qemu
-.wait:
-    in al, keyboard_status_port
-    test al, 0x01 ;; output buffer has something?
-    jz .wait
-    in al, keyboard_data_port
-    ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc
-
-halt:
-    Print `[HALT]\n`
-.loop:
-    hlt ;; avoid spinning the fans
-    jmp .loop
 
 first_irq_slot equ 32 ;must be a multiple of 8 (but 16 doesn't work)
 
 slot equ first_irq_slot ; the single ISR slot I am playing with
 
-print_slot:
-    mov ax, [4*slot+3]
-    PrintHexAX
-    mov ax, [4*slot+2]
-    PrintHexAX
-    PrintChar ':'
-    mov ax, [4*slot+1]
-    PrintHexAX
-    mov ax, [4*slot+0]
-    PrintHexAX
-    ret
-
 end_of_interrupt_command equ 0x20
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; keyboard stuff...
+
+keyboard_data_port equ 0x60
+keyboard_status_port equ 0x64
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; main
 
 main:
     call Bare_clear_screen
-    Print `[Explore interrupts]\n`
+    Print `[non-blocking keyboard access]\n`
+    call setup_timer_interrupt
+.loop:
+    ;PrintChar '.'
+    call wait_ten_ticks
 
-    cli
-    mov word [4*slot+0], isr_see_dot
-    mov word [4*slot+2], 0
-    call set_pit_freq ; 20Hz
-    call remap_pic ; seems to also enable
-    sti
+    in al, keyboard_status_port
+    test al, 0x01 ;; output buffer has something?
+    jz .loop ; nope
 
-.loop: ;; see an X interspersed every 4 dots
-    call wait_five_ticks
-    PrintChar 'X'
+    in al, keyboard_data_port
+    PrintHexAX
+    PrintChar ' '
+
     jmp .loop
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; timer explore stuff...
+
+;; updated on IRQ-0; watched in regular code
 ticker: db 0
 
-wait_five_ticks: ; at 20Hz, 5 ticks = 1/4 second
+ticker_freq_htz equ 1000
+
+wait_ten_ticks:
     mov al, [ticker]
 .wait:
     hlt ; avoid the fans spinning in qemu
     mov bl, [ticker]
     sub bl, al
-    cmp bl, 5 ; this constant control how many dots per X
+    cmp bl, 10
     jnz .wait
     ret
 
-;;; every tick (20Hz): print a dot and increment the ticker
-isr_see_dot:
+setup_timer_interrupt:
+    cli ; disabled interrupts while we set things up.
+    mov word [4*slot+0], irq0
+    mov word [4*slot+2], 0
+    call set_pit_freq
+    call remap_pic ; also unmasks all
+    sti ; re-enable here
+    ret
+
+;;; service timer IRQ-0: bump the ticker byte
+irq0:
     push ax
     push bx
-    PrintChar '.'
+    ;PrintChar 'o' ; no print from here
     inc byte [ticker]
     Out pic1_cmd, end_of_interrupt_command
     ;Out pic2_cmd, end_of_interrupt_command
@@ -329,23 +315,12 @@ remap_pic:
     Out pic2_data, 1            ; ICW4: x86 mode
     ret
 
-enable_pics:
-    Out pic1_data, 0x0
-    Out pic2_data, 0x0
-    ret
-
-disable_pics:
-    Out pic1_data, 0xff
-    Out pic2_data, 0xff
-    ret
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; PIT (Programmable Interval Timer)
 ;;; Smallest frequency we can set is 19, or else pit_divisor exceeds a word.
 ;;; (we can get 18.2 by setting pit_divisor as 0)
-desired_freq_htz equ 20
 base_freq_htz equ 1193182
-pit_divisor equ base_freq_htz / desired_freq_htz
+pit_divisor equ base_freq_htz / ticker_freq_htz
 pit_channel0 equ 0x40
 pit_command equ 0x43
 set_pit_freq:
