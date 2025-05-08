@@ -127,8 +127,137 @@ end = struct
   let is_keyboard_ready : unit -> bool = fun () ->
     true (* TODO: really check; don't lie *)
 
-  let get_keyboard_last_scancode : unit -> char = fun () ->
-    get_char() (* TODO: convert back to scancode for better emulation *)
+  let normal_press : char -> int = fun c ->
+    match c with
+    | '1' -> 0x02
+    | '2' -> 0x03
+    | '3' -> 0x04
+    | '4' -> 0x05
+    | '5' -> 0x06
+    | '6' -> 0x07
+    | '7' -> 0x08
+    | '8' -> 0x09
+    | '9' -> 0x0a
+    | '0' -> 0x0b
+    | '-' -> 0x0c
+    | '=' -> 0x0d
+    | 'q' -> 0x10
+    | 'w' -> 0x11
+    | 'e' -> 0x12
+    | 'r' -> 0x13
+    | 't' -> 0x14
+    | 'y' -> 0x15
+    | 'u' -> 0x16
+    | 'i' -> 0x17
+    | 'o' -> 0x18
+    | 'p' -> 0x19
+    | '[' -> 0x1a
+    | ']' -> 0x1b
+    | 'a' -> 0x1e
+    | 's' -> 0x1f
+    | 'd' -> 0x20
+    | 'f' -> 0x21
+    | 'g' -> 0x22
+    | 'h' -> 0x23
+    | 'j' -> 0x24
+    | 'k' -> 0x25
+    | 'l' -> 0x26
+    | ';' -> 0x27
+    | '\'' -> 0x28
+    | '`' -> 0x29
+    | '\\' -> 0x2b
+    | 'z' -> 0x2c
+    | 'x' -> 0x2d
+    | 'c' -> 0x2e
+    | 'v' -> 0x2f
+    | 'b' -> 0x30
+    | 'n' -> 0x31
+    | 'm' -> 0x32
+    | ',' -> 0x33
+    | '.' -> 0x34
+    | '/' -> 0x35
+    | ' ' -> 0x39
+    | '\b' -> 0x0E
+    | '\t' -> 0x0F
+    | '\n' -> 0x1C
+
+    | _ -> 0
+
+
+  let shifted_press : char -> int = fun c ->
+    match c with
+    | '!' -> 0x02
+    | '@' -> 0x03
+    | '#' -> 0x04
+    | '$' -> 0x05
+    | '%' -> 0x06
+    | '^' -> 0x07
+    | '&' -> 0x08
+    | '*' -> 0x09
+    | '(' -> 0x0A
+    | ')' -> 0x0B
+    | '_' -> 0x0C
+    | '+' -> 0x0D
+    | 'Q' -> 0x10
+    | 'W' -> 0x11
+    | 'E' -> 0x12
+    | 'R' -> 0x13
+    | 'T' -> 0x14
+    | 'Y' -> 0x15
+    | 'U' -> 0x16
+    | 'I' -> 0x17
+    | 'O' -> 0x18
+    | 'P' -> 0x19
+    | '{' -> 0x1A
+    | '}' -> 0x1B
+    | 'A' -> 0x1E
+    | 'S' -> 0x1F
+    | 'D' -> 0x20
+    | 'F' -> 0x21
+    | 'G' -> 0x22
+    | 'H' -> 0x23
+    | 'J' -> 0x24
+    | 'K' -> 0x25
+    | 'L' -> 0x26
+    | ':' -> 0x27
+    | '"' -> 0x28
+    | '~' -> 0x29
+    | '|' -> 0x2B
+    | 'Z' -> 0x2C
+    | 'X' -> 0x2D
+    | 'C' -> 0x2E
+    | 'V' -> 0x2F
+    | 'B' -> 0x30
+    | 'N' -> 0x31
+    | 'M' -> 0x32
+    | '<' -> 0x33
+    | '>' -> 0x34
+    | '?' -> 0x35
+
+    | _ -> 0
+
+  let press_shift = 0x2A
+  let release_shift = 0xAA
+
+  (* TODO: copy to haskell interpreter *)
+  let code_seq c =
+    let code = normal_press c in
+    if code != 0 then [ code ] else
+      let code = shifted_press c in
+      if code != 0 then [ press_shift; code; release_shift ] else
+        []
+
+  let waiting : int list ref = ref []
+
+  let rec get_keyboard_last_scancode : unit -> char = fun () ->
+    match !waiting with
+    | first::rest ->
+       waiting := rest;
+       chr first
+    | [] ->
+       let c = get_char() in (* this is blocking *)
+       waiting := code_seq c;
+       get_keyboard_last_scancode ()
 
 end
 include X

@@ -114,6 +114,8 @@ gram6 = program where
     alts
       [ do lit '\\'; pure '\\'
       , do lit 'n'; pure '\n'
+      , do lit 'b'; pure '\b'
+      , do lit 't'; pure '\t'
       , do lit '"'; pure '"'
       ]
 
