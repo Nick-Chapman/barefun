@@ -236,4 +236,5 @@ escapeCharForNasm c = do
   let n = ord c
   if c == '\n' then "\\n" else
     if c == '`' then "\\`" else
-      if (n < 32 || n > 126) then printf "\\x%02x" n else [c]
+      if c == '\\' then "\\\\" else
+        if (n < 32 || n > 126) then printf "\\x%02x" n else [c]

@@ -177,7 +177,7 @@ end = struct
     | '.' -> 0x34
     | '/' -> 0x35
     | ' ' -> 0x39
-    | '\b' -> 0x0E
+    | '\127' -> 0x0E (* from backspace key *)
     | '\t' -> 0x0F
     | '\n' -> 0x1C
 
@@ -236,16 +236,20 @@ end = struct
 
     | _ -> 0
 
-  let press_shift = 0x2A
-  let release_shift = 0xAA
+  let press_shift = 42
+  let release_shift = 170
+  let press_control = 29
+  let release_control = 157
 
   (* TODO: copy to haskell interpreter *)
   let code_seq c =
-    let code = normal_press c in
-    if code != 0 then [ code ] else
-      let code = shifted_press c in
-      if code != 0 then [ press_shift; code; release_shift ] else
-        []
+    let n = ord c in
+    if n <= 26 then [ press_control; shifted_press (chr (n + ord '@')); release_control ] else
+      let code = normal_press c in
+      if code != 0 then [ code ] else
+        let code = shifted_press c in
+        if code != 0 then [ press_shift; code; release_shift ] else
+          []
 
   let waiting : int list ref = ref []
 
