@@ -512,7 +512,7 @@ execBare = \case
   Bare_is_keyboard_ready -> do -- TODO: really check; dont lie
     SetFlagZ False -- always ready
 
-  Bare_get_keyboard_last_scancode -> do -- TODO: convert back to scancode for better emulation
+  Bare_get_keyboard_last_scancode -> do
     c <- GetScanCode
     SetReg Ax (WChar c)
 
