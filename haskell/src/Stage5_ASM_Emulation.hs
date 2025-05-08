@@ -511,8 +511,9 @@ execBare = \case
     pure ()
   Bare_is_keyboard_ready -> do -- TODO: really check; dont lie
     SetFlagZ False -- always ready
+
   Bare_get_keyboard_last_scancode -> do -- TODO: convert back to scancode for better emulation
-    c <- GetChar
+    c <- GetScanCode
     SetReg Ax (WChar c)
 
 setMemByte :: Addr -> Char -> M ()
@@ -625,6 +626,7 @@ data M a where
   GetFlagN :: M Bool
   PutChar :: Char -> M ()
   GetChar :: M Char
+  GetScanCode :: M Char
   BumpGC :: M Int
   WhatHemi :: M Hemi -- in which we are allocating
 
@@ -734,6 +736,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
 
       PutChar c -> IPut c (k s ())
       GetChar -> IGet $ \c -> k s c
+      GetScanCode -> IGetScanCode $ \c -> k s c
 
       BumpGC -> do
         let State{hemi,gcNum} = s -- gnNum trackked in M for Debug

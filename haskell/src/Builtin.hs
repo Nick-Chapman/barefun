@@ -1,7 +1,7 @@
 module Builtin ( Builtin(..), executeBuiltin, isPure, evaluatePureBuiltin ) where
 
 import Text.Printf (printf)
-import Value (Value(..),tUnit,mkBool,deUnit,Interaction(..))
+import Value (Value(..),tUnit,tTrue,mkBool,deUnit,Interaction(..))
 import qualified Data.Char as Char (chr,ord)
 
 data Builtin
@@ -87,14 +87,21 @@ defineBuiltin b =
     StoreSec -> todo
 
     Get_ticks -> todo
-    Wait_for_interrupt -> todo
-    Is_keyboard_ready -> todo
-    Get_keyboard_last_scancode -> todo
+
+    Wait_for_interrupt ->  -- TODO: really wait
+      Impure $ \vs k -> case deUnit (oneArg vs) of () -> k unit
+
+    Is_keyboard_ready -> -- TODO: really check; dont lie
+      Impure $ \vs k -> case deUnit (oneArg vs) of () -> k true
+
+    Get_keyboard_last_scancode ->
+      Impure $ \vs k -> case deUnit (oneArg vs) of () -> IGetScanCode (\c -> k (VChar c))
 
   where
     todo = Impure undefined
 
     unit = VCons tUnit []
+    true = VCons tTrue []
     oneArg = \case [v] -> v; _ -> err
     twoArgs c1 c2 = \case [v1,v2] -> (c1 v1, c2 v2); _ -> err
     threeArgs c1 c2 c3 = \case [v1,v2,v3] -> (c1 v1, c2 v2, c3 v3); _ -> err

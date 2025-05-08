@@ -241,8 +241,7 @@ end = struct
   let press_control = 29
   let release_control = 157
 
-  (* TODO: copy to haskell interpreter *)
-  let code_seq c =
+  let scan_code_list_of_ascii : char -> int list = fun c ->
     let n = ord c in
     if n <= 26 then [ press_control; shifted_press (chr (n + ord '@')); release_control ] else
       let code = normal_press c in
@@ -260,7 +259,7 @@ end = struct
        chr first
     | [] ->
        let c = get_char() in (* this is blocking *)
-       waiting := code_seq c;
+       waiting := scan_code_list_of_ascii c;
        get_keyboard_last_scancode ()
 
 end

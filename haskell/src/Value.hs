@@ -6,7 +6,7 @@ module Value
   , Tickable(..)
   ) where
 
-import Data.Char (ord)
+import Data.Char (ord,chr)
 import Data.IORef (IORef,newIORef,readIORef,writeIORef)
 import Data.List (intercalate)
 import Data.Map (Map)
@@ -30,6 +30,7 @@ data Interaction
   | IIO (IO Interaction)
   | IPut Char Interaction
   | IGet (Char -> Interaction)
+  | IGetScanCode (Char -> Interaction)
   | IMakeBytes Int (Bytes -> Interaction)
   | IFreezeBytes Bytes (String -> Interaction)
   | IThawBytes String (Bytes -> Interaction)
@@ -69,6 +70,16 @@ runInteraction measure next = do
         if b then printf "[EOF%s]\n" (if measure then ":"++show state else "") else do
           c <- getChar
           loop state (f c)
+
+      interaction@(IGetScanCode f) -> do
+        let State{pendingScanCodes} = state
+        case pendingScanCodes of
+          x:xs -> loop state { pendingScanCodes = xs } (f (chr x))
+          [] -> do
+            b <- hIsEOF stdin
+            if b then printf "[EOF%s]\n" (if measure then ":"++show state else "") else do
+              c <- getChar
+              loop state { pendingScanCodes = scanCodesFromAscii c } interaction -- try again
 
       IMakeBytes n k -> do
         let State{bm,u} = state
@@ -127,10 +138,11 @@ data State = State
   { tm :: Map Tickable Int
   , bm :: Map Bytes (Int,Map Int Char)
   , u :: Int
+  , pendingScanCodes :: [Int]
   }
 
 state0 :: State
-state0 = State { tm = Map.empty, bm = Map.empty, u = 1 }
+state0 = State { tm = Map.empty, bm = Map.empty, u = 1, pendingScanCodes = [] }
 
 instance Show State where
   show State{tm} =
@@ -214,3 +226,124 @@ deUnit :: Value -> ()
 deUnit =
   \case VCons (Ctag _ tag) [] | tag == n -> (); _ -> error "deUnit"
   where Ctag _ n = tUnit
+
+scanCodesFromAscii :: Char -> [Int]
+scanCodesFromAscii c = do
+  let n = ord c
+  if n <= 26 then [ pressControl, shiftedPress (chr (n + ord '@')), releaseControl ] else do
+    let code = normalPress c
+    if code /= 0 then [ code ] else do
+      let code = shiftedPress c
+      if code /= 0 then [ pressShift, code, releaseShift ] else do
+        []
+  where
+   pressShift = 42
+   releaseShift = 170
+   pressControl = 29
+   releaseControl = 157
+
+normalPress :: Char -> Int
+normalPress = \case
+  '1' -> 0x02
+  '2' -> 0x03
+  '3' -> 0x04
+  '4' -> 0x05
+  '5' -> 0x06
+  '6' -> 0x07
+  '7' -> 0x08
+  '8' -> 0x09
+  '9' -> 0x0a
+  '0' -> 0x0b
+  '-' -> 0x0c
+  '=' -> 0x0d
+  'q' -> 0x10
+  'w' -> 0x11
+  'e' -> 0x12
+  'r' -> 0x13
+  't' -> 0x14
+  'y' -> 0x15
+  'u' -> 0x16
+  'i' -> 0x17
+  'o' -> 0x18
+  'p' -> 0x19
+  '[' -> 0x1a
+  ']' -> 0x1b
+  'a' -> 0x1e
+  's' -> 0x1f
+  'd' -> 0x20
+  'f' -> 0x21
+  'g' -> 0x22
+  'h' -> 0x23
+  'j' -> 0x24
+  'k' -> 0x25
+  'l' -> 0x26
+  ';' -> 0x27
+  '\'' -> 0x28
+  '`' -> 0x29
+  '\\' -> 0x2b
+  'z' -> 0x2c
+  'x' -> 0x2d
+  'c' -> 0x2e
+  'v' -> 0x2f
+  'b' -> 0x30
+  'n' -> 0x31
+  'm' -> 0x32
+  ',' -> 0x33
+  '.' -> 0x34
+  '/' -> 0x35
+  ' ' -> 0x39
+  '\127' -> 0x0E -- from backspace key
+  '\t' -> 0x0F
+  '\n' -> 0x1C
+  _ -> 0
+
+shiftedPress :: Char -> Int
+shiftedPress = \case
+  '!' -> 0x02
+  '@' -> 0x03
+  '#' -> 0x04
+  '$' -> 0x05
+  '%' -> 0x06
+  '^' -> 0x07
+  '&' -> 0x08
+  '*' -> 0x09
+  '(' -> 0x0A
+  ')' -> 0x0B
+  '_' -> 0x0C
+  '+' -> 0x0D
+  'Q' -> 0x10
+  'W' -> 0x11
+  'E' -> 0x12
+  'R' -> 0x13
+  'T' -> 0x14
+  'Y' -> 0x15
+  'U' -> 0x16
+  'I' -> 0x17
+  'O' -> 0x18
+  'P' -> 0x19
+  '{' -> 0x1A
+  '}' -> 0x1B
+  'A' -> 0x1E
+  'S' -> 0x1F
+  'D' -> 0x20
+  'F' -> 0x21
+  'G' -> 0x22
+  'H' -> 0x23
+  'J' -> 0x24
+  'K' -> 0x25
+  'L' -> 0x26
+  ':' -> 0x27
+  '"' -> 0x28
+  '~' -> 0x29
+  '|' -> 0x2B
+  'Z' -> 0x2C
+  'X' -> 0x2D
+  'C' -> 0x2E
+  'V' -> 0x2F
+  'B' -> 0x30
+  'N' -> 0x31
+  'M' -> 0x32
+  '<' -> 0x33
+  '>' -> 0x34
+  '?' -> 0x35
+  _ -> 0
