@@ -35,6 +35,7 @@ x a x b in
 
 let allow = function
   | "secex" -> false
+  | "readline" -> false (*TODO: enable*)
   | _ -> true
 
 let () =
