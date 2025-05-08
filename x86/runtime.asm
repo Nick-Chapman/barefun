@@ -35,8 +35,12 @@
 %endmacro
 
 %macro PrintChar 1
+    push ax
+    push bx
     mov al, %1
     PrintCharAL
+    pop bx
+    pop ax
 %endmacro
 
 %macro Print 1
@@ -144,7 +148,7 @@ part2:
     ;; exiting examples (sham, readline) call Bare_get_char, and dont work with
     ;; the new timer/keyboard stuff, and so the following line needs to be commented out
     call setup_timer_interrupt
-    ;; The new WIP example (scan) does nee the above line.
+    ;; The new WIP example (scan) does need the above line.
 
     jmp begin
 
@@ -153,9 +157,15 @@ ticker_freq_htz equ 1000
 ticker: dw 0 ; 16 bits; at 1KHz this cycles in 65 seconds
 ;; but after 2n+1 tagging (the cycling happens in just 32 seconds)
 
-first_irq_slot equ 32 ;must be a multiple of 8 (but 16 doesn't work)
+;;;pic offsets must be a multiple of 8
+;;; default real mode values: no reason to use these since I can't co-exist with BIOS
+;;;pic1_offset equ 8
+;;;pic2_offset equ 0x70
 
-slot equ first_irq_slot ; the single ISR slot I am playing with
+pic1_offset equ 32
+pic2_offset equ 40
+
+slot equ pic1_offset ; the single ISR slot I am playing with
 
 end_of_interrupt_command equ 0x20
 
@@ -164,20 +174,17 @@ setup_timer_interrupt:
     mov word [4*slot+0], irq0
     mov word [4*slot+2], 0
     call set_pit_freq
-    call remap_pic ; also unmasks all
+    call remap_pic
+    call pic_mask_all_but_timer
     sti ; re-enable here
     ret
 
 ;;; service timer IRQ-0: bump the ticker byte
 irq0:
-    push ax
-    push bx
     ;;PrintChar '.' ; no print from here
     inc word [ticker]
     Out pic1_cmd, end_of_interrupt_command
     ;Out pic2_cmd, end_of_interrupt_command
-    pop bx
-    pop ax
     iret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -189,9 +196,6 @@ pic2_cmd equ 0xA0
 pic1_data equ 0x21
 pic2_data equ 0xA1
 
-pic1_offset equ first_irq_slot
-pic2_offset equ first_irq_slot+8
-
 remap_pic:
     Out pic1_cmd, 0x11          ; initialization required; expect ICW4
     Out pic1_data, pic1_offset  ; ICW2: vector offset
@@ -201,6 +205,11 @@ remap_pic:
     Out pic2_data, pic2_offset  ; ICW2: vector offset
     Out pic2_data, 2            ; ICW3: tell Slave its cascade identity (0010)
     Out pic2_data, 1            ; ICW4: x86 mode
+    ret
+
+pic_mask_all_but_timer:
+    Out pic1_data, 0xfe
+    Out pic2_data, 0xff
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
