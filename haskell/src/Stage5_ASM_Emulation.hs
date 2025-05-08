@@ -507,8 +507,6 @@ execBare = \case
   Bare_get_ticks -> do  -- TODO: really pause
     SetReg Ax (WNum 0)
 
-  Bare_wait_a_tick -> do  -- TODO: really pause
-    pure ()
   Bare_is_keyboard_ready -> do -- TODO: really check; dont lie
     SetFlagZ False -- always ready
 

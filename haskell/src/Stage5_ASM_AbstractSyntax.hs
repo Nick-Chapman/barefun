@@ -126,7 +126,6 @@ data BareBios
   | Bare_store_sector
   | Bare_free_words
   | Bare_get_ticks
-  | Bare_wait_a_tick
   | Bare_is_keyboard_ready
   | Bare_get_keyboard_last_scancode
   deriving Show
