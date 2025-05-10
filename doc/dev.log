@@ -77,4 +77,5 @@ Mon 05 May 2025 : BANK HOL
 Tue 06 May 2025 : DAY OFF
 Wed 07 May 2025 : explore x86 interrups: PIC,PIT, cli/sti/hlt.. + keyboard --> scan.fun
 Thu 08 May 2025 : finish scan-code support; support in haskell; move readline/sham to new get_char
-Fri 09 May 2025 :
+Fri 09 May 2025 : GC in runtime.asm (compare vs haskell) GC every safe point
+Sat 10 May 2025 : GC...sham works. todo: GC only when need.
