@@ -20,8 +20,8 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM_AbstractSyntax
 
-gcLiveWordsTrace :: Bool
-gcLiveWordsTrace = False
+gcAtEverySafePoint :: Bool -- useful for dev/debug
+gcAtEverySafePoint = False
 
 -- During dev, we can have quite small heap spaces
 -- experimentation shows the sham example needs more that 2000; but 3000 seems enough
@@ -29,7 +29,7 @@ hemiSizeInBytes :: Int
 hemiSizeInBytes = 3000
 
 topA,botA,topB,botB :: Int
-topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0
+topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0 -- TODO: dont!
 botA = topA - hemiSizeInBytes
 
 topB = botA
@@ -162,34 +162,40 @@ setStackPointerToTopOfHemi hemi = do
   ha <- mkHeapAddr (topOfHemi hemi)
   SetReg Sp (WAddr (AHeap ha))
 
-gcTop :: M ()
-gcTop = do
-  fromSpace <- WhatHemi
-  gcNum <- BumpGC
+runGC :: M ()
+runGC = do
+  _fromSpace <- WhatHemi
+  _gcNum <- BumpGC
   toSpace <- WhatHemi
-  if gcLiveWordsTrace then Print "[" else pure ()
-  Debug (printf "GC(%d) starting: %s --> %s\n" gcNum (show fromSpace) (show toSpace))
+  Debug (printf "[%d:" _gcNum)
+  --Debug (printf "GC(%d) starting: %s --> %s\n" _gcNum (show _fromSpace) (show toSpace))
   setStackPointerToTopOfHemi toSpace
 
   let roots = [frameReg,argReg,contReg]
   watermark0 <- getSP
   mapM_ evacuateReg roots
+  --Debug "{"
   loop 1 watermark0
+  --Debug "}"
 
   HeapAddr sp <- getSP
-  let liveBytes = topOfHemi toSpace - fromIntegral sp
-  Debug (printf "GC(%d) finished: liveBytes=%d\n" gcNum liveBytes)
-  if gcLiveWordsTrace then  Print (printf "%d]" liveBytes) else pure ()
+  let _liveBytes = topOfHemi toSpace - fromIntegral sp
+  --Debug (printf "GC(%d) finished: liveBytes=%d\n" _gcNum _liveBytes)
+  --Debug (printf "%d]" _liveBytes)
+  Debug (printf "]")
+  --if _gcNum == 30 then Crash else pure ()
+
 
   where
     loop :: Int -> HeapAddr -> M ()
     loop step watermark = do
       sp <- getSP
-      --Debug (printf "loop(%d.%d): SP=%s < WM=%s\n" gcNum step (show sp) (show watermark))
+      --Debug (printf "loop(%d.%d): SP=%s < WM=%s\n" _gcNum step (show sp) (show watermark))
       let finished = assert (sp <= watermark) (sp == watermark)
       case finished of
         True -> pure ()
         False -> do
+          --Debug "s"
           nextWM <- getSP
           scanLoop 1 nextWM
           loop (step+1) nextWM
@@ -197,12 +203,13 @@ gcTop = do
           where
             scanLoop :: Int -> HeapAddr -> M ()
             scanLoop substep scanPointer = do
-              --Debug (printf "inner(%d.%d.%d): scan=%s < watermark=%s\n" gcNum step substep (show scanPointer) (show watermark))
+              --Debug (printf "inner(%d.%d.%d): scan=%s < watermark=%s\n" _gcNum step substep (show scanPointer) (show watermark))
               let finishedScan = assert (scanPointer <= watermark) (scanPointer == watermark)
               case finishedScan of
                 True -> do
                   pure ()
                 False -> do
+                  Debug "-"
                   nextScanPointer <- scavenge scanPointer
                   scanLoop (substep+1) nextScanPointer
 
@@ -222,7 +229,10 @@ scavenge scanPointer = do
       let sizeWords = sizeInBytes `div` 2
       nextScanPointer <- addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
       case scanMode of
-        RawData -> pure nextScanPointer
+        RawData -> do
+          --Print ("\n[raw-data]")
+          --Crash
+          pure nextScanPointer
         Scanned -> do
           -- 1..size because we are pointing at descriptor
           xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
@@ -243,10 +253,13 @@ scavengeHA ha = do
 
 evacuate :: Word -> M (Maybe Word)
 evacuate w = do
+  Debug "E"
   --Debug (printf "evacuate: %s\n" (show w))
   case w of
     WAddr (AHeap ha) -> (Just . WAddr . AHeap) <$> evacuateHA ha
-    _ -> pure Nothing
+    _ -> do
+      Debug "x"
+      pure Nothing
 
 evacuateHA :: HeapAddr -> M HeapAddr
 evacuateHA objectA = do
@@ -254,6 +267,7 @@ evacuateHA objectA = do
   --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
   GetMem (AHeap descA) >>= \case
     WBlockDescriptor desc -> do
+      Debug "("
       let BlockDescriptor{sizeInBytes} = desc
       let sizeWords = sizeInBytes `div` 2
       xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
@@ -263,8 +277,10 @@ evacuateHA objectA = do
       -- overwrite original object with broken Heart; which points tothe relocated object
       SetMem (AHeap descA) WBrokenHeart
       SetMem (AHeap objectA) (WAddr (AHeap relocatedA))
+      Debug ")"
       pure relocatedA
-    WBrokenHeart ->
+    WBrokenHeart -> do
+      Debug "h"
       -- return the indirected previously copied object
       deHeapAddr <$> GetMem (AHeap objectA)
     w ->
@@ -272,6 +288,7 @@ evacuateHA objectA = do
 
 copyAlloc :: HeapAddr -> M ()
 copyAlloc ha = do
+  Debug "c"
   w <- GetMem (AHeap ha)
   execPushAlloc AllocForGC w
   --_newAddress <- getSP
@@ -358,13 +375,13 @@ execOp = \case
     cont
   OpEnterCheck need -> \cont -> do
     n <- heapBytesRemaining
-    if (n < need) then gcTop else pure ()
+    if gcAtEverySafePoint || (n < need) then runGC else pure ()
     n <- heapBytesRemaining
     if (n < need)
       then do Print (printf "[Not enough space recovered by GC: need=%d; have:%d]\n" need n); Crash
       else
       do
-        Debug (printf "BudgedForAllocation: %d\n" need)
+        --Debug (printf "BudgedForAllocation: %d\n" need)
         BudgedForAllocation need
         cont
   OpHlt -> \cont -> -- TODO: better emulation for this?
@@ -378,7 +395,7 @@ execPushAlloc mode w = do
   a' <- addAddr (-(bytesPerWord)) a
   SetMem a' w
   SetReg Sp (WAddr a')
-  Debug (printf "Alloc: %s = %s\n" (show a') (show w))
+  --Debug (printf "Alloc: %s = %s\n" (show a') (show w))
   sequence_ (replicate bytesPerWord (TraceAlloc mode))
   checkPushBlockDescriptor w
 
@@ -405,7 +422,7 @@ execPopRESTORE reg = do -- post increment
 
 slideStackPointer :: AllocMode -> Int -> M ()
 slideStackPointer mode nBytes = do
-  Debug (printf "SLIDE: %d\n" nBytes)
+  --Debug (printf "SLIDE: %d\n" nBytes)
   sequence_ (replicate (nBytes) (TraceAlloc mode))
   a <- deAddr <$> GetReg Sp
   a' <- addAddr (-(nBytes)) a
@@ -498,7 +515,7 @@ execBare = \case
     DoMeasure >>= \case
       False -> SetReg Ax (WNum 0)
       True -> do
-        gcTop -- force a GC before we calculate the #free-words
+        runGC -- force a GC before we calculate the #free-words
         hemi <- WhatHemi
         HeapAddr sp <- getSP
         let freeWords = fromIntegral ((fromIntegral sp - botOfHemi hemi) `div` 2)
@@ -669,7 +686,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       Halt -> IDone
-      Crash -> ITrace "[Crash]\n" $ IDone
+      Crash -> ITrace "\n[Crash]\n" $ IDone
 
       CheckRecentAlloc expect -> do
         let State{allocsSinceLastCheck=actual} = s
@@ -782,6 +799,7 @@ state0 dmap = State
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (Cx, WAddr aFinalCont)
+      -- TODO: should the frameReg(bp) and argReg(dx) be set to known values?
       ]
     mem = Map.fromList (internal ++ user)
 

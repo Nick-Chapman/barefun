@@ -1,3 +1,4 @@
+;;; TODO: je == jz -- pick one or the other!
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Layout
@@ -28,22 +29,58 @@
     out %1, al
 %endmacro
 
-%macro PrintCharAL 0
-    mov ah, 0x0e
-    mov bh, 0
-    int 0x10
-%endmacro
-
-%macro PrintChar 1
+%macro PrintCharLit 1
     push ax
     push bx
     mov al, %1
-    PrintCharAL
+    mov ah, 0x0e
+    mov bh, 0
+    int 0x10
     pop bx
     pop ax
 %endmacro
 
-%macro Print 1
+%macro PrintCharAL 0
+    push ax
+    push bx
+    mov ah, 0x0e
+    mov bh, 0
+    int 0x10
+    pop bx
+    pop ax
+%endmacro
+
+%macro PrintHexNibbleBX 0
+    push ax
+    mov al, [bx + hex_data]
+    PrintCharAL
+    pop ax
+%endmacro
+
+%macro PrintHexAL 0
+    push bx
+    push ax
+    mov bx, ax
+    shr bx, 4
+    and bx, 0xF
+    PrintHexNibbleBX
+    pop bx
+    and bx, 0xF
+    PrintHexNibbleBX
+    pop bx
+%endmacro
+
+%macro PrintHexAX 0
+    PrintCharLit '<'
+    push ax
+    mov al, ah
+    PrintHexAL
+    pop ax
+    PrintHexAL
+    PrintCharLit '>'
+%endmacro
+
+%macro PrintString 1
     push di
     jmp %%after
 %%message: db %1, 0
@@ -53,42 +90,58 @@
     pop di
 %endmacro
 
-%macro Newline 0
-    PrintChar 10
-    PrintChar 13
-%endmacro
-
-%macro Space 0
-    PrintChar ' '
-%endmacro
-
-%macro Dot 0
-    PrintChar '.'
-%endmacro
-
-%macro PrintHexNibbleBX 0
-    mov ax, [bx + hex_data]
-    PrintCharAL
-%endmacro
-
-%macro PrintHexAX 0
-    push ax
-    mov bx, ax
-    shr bx, 4
-    and bx, 0xF
-    PrintHexNibbleBX
-    pop bx
-    and bx, 0xF
-    PrintHexNibbleBX
-%endmacro
-
-%macro Crash 1
-    Print %1
-    jmp final_code
+%macro Stop 1
+    PrintString %1
+    jmp halt
 %endmacro
 
 %macro Bare_enter_check 1 ;; TODO: pay attention to "need" argument
     call Bare_enter_check_function
+%endmacro
+
+
+%macro SeeReg 1
+    push ax
+    mov ax, %1
+    PrintHexAX
+    pop ax
+%endmacro
+
+%macro SeeState 0
+    PrintString `\nsp=`
+    SeeReg sp
+    PrintString " cx="
+    SeeReg cx
+    ;PrintString " bx="
+    ;SeeReg bx
+    PrintString " dx="
+    SeeReg dx
+    PrintString " bp="
+    SeeReg bp
+    PrintString `\n`
+%endmacro
+
+%macro SeeMemLine 0
+    PrintString `fff0 :`
+    push ax
+    push bx
+    mov bx, 0xfff0
+%%loop:
+    PrintCharLit ' '
+    mov word ax, [bx]
+    PrintHexAX
+    inc bx
+    inc bx
+    cmp bx, 0x0000
+    jnz %%loop
+    PrintString `\n`
+    pop bx
+    pop ax
+%endMacro
+
+%macro Dump 0
+    SeeState
+    SeeMemLine
 %endmacro
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -147,10 +200,12 @@ part2:
     ;; NOTE: we are currently in a half way house!
     ;; exiting examples (sham, readline) call Bare_get_char, and dont work with
     ;; the new timer/keyboard stuff, and so the following line needs to be commented out
-    call setup_timer_interrupt
+
+    call setup_timer_interrupt ;; TODO re-enable!!!
+
     ;; The new WIP example (scan) does need the above line.
 
-    jmp begin
+    jmp main
 
 ticker_freq_htz equ 1000
 
@@ -181,7 +236,7 @@ setup_timer_interrupt:
 
 ;;; service timer IRQ-0: bump the ticker byte
 irq0:
-    ;;PrintChar '.' ; no print from here
+    ;;PrintCharLit '.' ; no print from here
     inc word [ticker]
     Out pic1_cmd, end_of_interrupt_command
     ;Out pic2_cmd, end_of_interrupt_command
@@ -269,16 +324,7 @@ Bare_clear_screen: ;; -- TODO expose this as user builtin
     ret
 
 Bare_crash:
-    Print `[Crash]\n`
-    jmp final_code
-
-Bare_enter_check_function:
-    mov ax, sp
-    sub ax, bot_of_heap
-    jb .out_of_memory
-    ret
-.out_of_memory:
-    Print `[OOM]\n`
+    PrintString `[Bare_crash]\n`
     jmp halt
 
 
@@ -328,7 +374,7 @@ Bare_put_char: ; al->
     mov al, `\\`
     PrintCharAL
     pop ax
-    PrintHexAX
+    PrintHexAL
     ret
 
 Bare_make_bool_from_z:
@@ -366,18 +412,32 @@ Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the 
 
 ;;; This takes N-bytes to allocate in 2n+1 rep.
 Bare_make_bytes:
+
     pop bx ;; heap allocation is at SP; so first we save return address.
-    ;; Does not zero the allocated space. User caller code is expected to do this.
 
-    ;; TODO: we should untag the value in ax, or else we slide sp twice as far as intended
-    ;; But I cant see any evidence this bug is causing an issue.
-    sub sp, ax
-    ;; we need to keep the stack word aligned, so we must round-down sp to an even address
-    and sp, 0xFFFE
+    ;; ax -- number of bytes (as tagged number) for user data
 
-    push ax ;; Pushing the tagged size is correct
-    mov ax, sp
+    mov [.si], si ; save si; (need to use as a temp)
+    mov si, ax
+
+    shr si, 1 ; untag, to get number of bytes to..
+    inc si ; round up and..
+    and si, 0xfffe ; .. align to even
+    sub sp, si ; ..slide stack pointer (allocated space is not uninializaed)
+
+    push ax ; tagged length word; part of user data
+
+    mov ax, sp ; grab result (before pushing the descriptor)
+
+    add si, 3 ; add 2 bytes for the length word; +1 to tag as raw data
+    push si ; descriptor/size word; part of GC data
+
+    mov si, [.si] ; restore si
+    ;Stop "Bare_make_bytes"
+
     jmp bx
+.si:
+    dw 0 ; location to save/return si (cant use stack)
 
 Bare_get_bytes:
     add bx, 2 ; +2 for the length
@@ -433,7 +493,7 @@ Bare_unit:
 
 Bare_free_words:
     mov ax, sp
-    sub ax, bot_of_heap
+    ;sub ax, bot_of_heap
     shr ax, 1 ;; shift for #words
     ret
 
@@ -456,23 +516,184 @@ Bare_get_keyboard_last_scancode: ;; TODO: ripe for inlining
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; GC, WIP...
+
+userCaller equ Temps+2
+evacuateCaller equ Temps+4
+tCX equ Temps+6
+tDX equ Temps+8
+tBP equ Temps+10
+tCALLER equ Temps+12
+
+;;;gc_num: db 0
+
+Bare_enter_check_function:
+    pop ax
+    mov [tCALLER], ax
+    ;;inc byte [gc_num]
+    call gc_start
+    ;cmp byte [gc_num], 29 ; 30 is wrong!!
+    ;je .enough
+
+    ;mov ax, sp
+    ;dec ax
+    ;sub ax, botA
+    ;jb .out_of_memory
+    jmp [tCALLER]
+
+;.out_of_memory:
+;    PrintString `[OOM]\n`
+;    jmp halt
+
+;.enough:
+;    Stop `\n[Enough]\n`
+
+bytesPerWord equ 2
+
+;hemi_size equ 5000
+
+topA equ 0x0000
+topB equ 0x8000
+;botA equ topA - hemi_size
+;botB equ topB - hemi_size
+
+hemi: db 0 ; flips every GC: 0,2,0,2,...
+tops: dw topA, topB ; used to index this
+
+
+%macro Debug 1
+    ;PrintCharLit %1
+%endmacro
+
+gc_start:
+
+    Debug '['
+    ;SeeReg sp
+    pop ax
+    mov [userCaller], ax
+    mov [tBP], bp
+    mov [tDX], dx
+    mov [tCX], cx
+
+    ;; switch heap spaces
+    mov bl, [hemi]
+    mov bh, 0
+    ;SeeReg bx
+    inc bx
+    inc bx
+    and bx, 2
+    mov [hemi], bx
+    mov bx, [tops + bx]
+    ;SeeReg bx
+    mov sp, bx
+
+    mov dx, sp ; set scavenge threshold
+    ;; evacuate roots...
+    ;; frame register
+    mov si, [tBP]
+    call evacuate
+    mov [tBP], si
+    ;; arg register
+    mov si, [tDX]
+    call evacuate
+    mov [tDX], si
+    ;; continuation register
+    mov si, [tCX]
+    call evacuate
+    mov [tCX], si
+    ;; Scavenge objects between sp and dx
+    ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
+    cmp dx, sp
+    jz .done_everything
+.outer_loop:
+    mov cx, sp
+    mov bx, sp
+    ;; scavenge objects between cx and dx, using bx as pointer
+.inner_loop:
+    mov di, [bx] ; descriptor (size in bytes; maybe tagged as raw-data)
+    test di, 1
+    jz .scav_payload ; even; payload words must be evacuated
+    ;;Stop "[RawData]"
+    inc di
+    add bx, di
+    jmp .done_object
+.scav_payload:
+    ;Debug '-'
+    add bx, bytesPerWord
+    shr di, 1
+.scav_word:
+    mov si, [bx]
+    call evacuate
+    mov [bx], si
+    add bx, bytesPerWord
+    dec di
+    jne .scav_word
+.done_object:
+    cmp bx, dx
+    jne .inner_loop
+    mov dx, cx
+    cmp sp, cx
+    jne .outer_loop
+.done_everything:
+    mov cx, [tCX]
+    mov dx, [tDX]
+    mov bp, [tBP]
+    Debug ']'
+    jmp [userCaller]
+
+
+evacuate: ;; si --> si (uses: bp)
+    ;Debug 'E'
+    pop bp
+    mov [evacuateCaller], bp
+    cmp si, end_of_code
+    jb .done ; jb for unsigned comparison!
+    test si, 1
+    jnz .done ; odd; tagged-number; so dont evacuate
+    mov bp, si ; save base
+    mov si, [bp - bytesPerWord] ; si has descriptor/size
+    cmp si, 0
+    jz .use_broken_heart
+    ;Debug '('
+    and si, 0xfe ; align to even offset
+.loop:
+    ;Debug 'c'
+    push word [bp + si - bytesPerWord] ;; NOTE: Early Sat buf fix here
+    sub si, bytesPerWord
+    jnz .loop
+    mov si, sp ; si is relocation address
+    ;Debug 'c'
+    push word [bp - bytesPerWord]
+    mov word [bp - bytesPerWord], 0 ; set broken heat
+    mov [bp], si ; and relocation address
+    ;Debug ')'
+    jmp [evacuateCaller]
+.use_broken_heart:
+    ;Debug 'h'
+    mov si, [bp] ; access relocation address from broken heart
+    jmp [evacuateCaller]
+.done:
+    ;Debug 'x'
+    jmp [evacuateCaller]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; begin/end
 
-top_of_heap equ 0
-;bot_of_heap equ 0x8000 ; half of memory; 16k words
-bot_of_heap equ end_of_code
-
-begin:
-    mov sp, top_of_heap
+main:
+    mov sp, topA
     mov cx, final_continuation
+    mov bp, 0
+    mov dx, 0
+
     call Bare_clear_screen
+    ;Dump
     jmp bare_start
 
 final_continuation:
     dw final_code
 
 final_code:
-    Print `[HALT]\n`
+    PrintString `[HALT]\n`
     jmp halt
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
