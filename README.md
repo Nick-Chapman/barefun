@@ -9,6 +9,10 @@ Development of the operating system & compiler are proceeding in tandem!
 
 ## Prerequisites
 
+If you have [Nix](https://nixos.org/) an [direnv](https://direnv.net/), you can
+just run `direnv allow` and be good to go. Otherwise, you'll have to manually
+install the following, and possibly some of their dependencies.
+
 - [haskell](https://www.haskell.org) : To build the Barefun compiler which generates x86 ASM.
 - [nasm](https://www.nasm.us/) : Assembly of the generated x86 and the Barefun runtime.
 - [qemu](https://www.qemu.org/) : Emulation of assembled i386 image.
@@ -18,7 +22,8 @@ Development of the operating system & compiler are proceeding in tandem!
 ## Milestone #1
 
 As of Saturday 26th April 2025, we can compile and run the
-[sham](test/examples/sham.fun) demo -- a toy shell with a fake in-memory filesystem.
+[sham](test/examples/sham.fun) demo -- a toy shell with a fake in-memory
+filesystem -- by running `h run`. Or, if you want to do each step manually:
 
 ```
 dune build @all @runtest
