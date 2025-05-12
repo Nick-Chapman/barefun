@@ -80,7 +80,7 @@ Thu 08 May 2025 : finish scan-code support; support in haskell; move readline/sh
 Fri 09 May 2025 : GC in runtime.asm (compare vs haskell) GC every safe point
 Sat 10 May 2025 : GC...sham works. todo: GC only when need.
 
-Mon 12 May 2025 : codes.fun
+Mon 12 May 2025 : codes.fun; echo.fun. -- runtime.asm: GC only when need
 Tue 13 May 2025 :
 Wed 14 May 2025 :
 Thu 15 May 2025 :

@@ -71,13 +71,13 @@
 %endmacro
 
 %macro PrintHexAX 0
-    PrintCharLit '<'
+    ;PrintCharLit '<'
     push ax
     mov al, ah
     PrintHexAL
     pop ax
     PrintHexAL
-    PrintCharLit '>'
+    ;PrintCharLit '>'
 %endmacro
 
 %macro PrintString 1
@@ -94,11 +94,6 @@
     PrintString %1
     jmp halt
 %endmacro
-
-%macro Bare_enter_check 1 ;; TODO: pay attention to "need" argument
-    call Bare_enter_check_function
-%endmacro
-
 
 %macro SeeReg 1
     push ax
@@ -526,7 +521,20 @@ Bare_get_keyboard_last_scancode: ;; TODO: ripe for inlining
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; GC, WIP...
+;;; GC
+
+hemi_size equ 3000
+redzone_size equ 100 ; needed for save/restore & also for interrupts. how big should thsi be?
+
+topA equ 0x0000
+botA equ topA - hemi_size
+topB equ botA - redzone_size
+botB equ topB - hemi_size
+
+hemi: db 0 ; flips every GC: 0,2,0,2,...
+tops: dw topA, topB ; used to index this
+bots: dw botA, botB ; used to index this
+
 
 userCaller equ Temps+2
 evacuateCaller equ Temps+4
@@ -535,50 +543,73 @@ tDX equ Temps+8
 tBP equ Temps+10
 tCALLER equ Temps+12
 
-;;;gc_num: db 0
+need: dw 0
 
-Bare_enter_check_function:
-    pop ax
-    mov [tCALLER], ax
-    ;;inc byte [gc_num]
-    call gc_start
-    ;cmp byte [gc_num], 29 ; 30 is wrong!!
-    ;je .enough
+%macro Bare_enter_check 1 ;; TODO: pay attention to "need" argument
+    mov word [need], %1
+    jz %%no_need
+    call Bare_enter_check_function
+%%no_need:
+%endmacro
 
-    ;mov ax, sp
-    ;dec ax
-    ;sub ax, botA
-    ;jb .out_of_memory
-    jmp [tCALLER]
 
-;.out_of_memory:
-;    PrintString `[OOM]\n`
-;    jmp halt
-
-;.enough:
-;    Stop `\n[Enough]\n`
-
-bytesPerWord equ 2
-
-;hemi_size equ 5000
-
-topA equ 0x0000
-topB equ 0x8000
-;botA equ topA - hemi_size
-;botB equ topB - hemi_size
-
-hemi: db 0 ; flips every GC: 0,2,0,2,...
-tops: dw topA, topB ; used to index this
-
+gc_num: db 0
 
 %macro Debug 1
     ;PrintCharLit %1
 %endmacro
 
-gc_start:
+Bare_enter_check_function:
+    pop bx
+    mov [tCALLER], bx
 
+    ; remaining before potential GC
+    mov bl, [hemi]
+    mov bh, 0
+    mov ax, sp
+    sub ax, [bots + bx]
+    ;SeeReg ax
+
+    sub ax, [need]
+    cmp ax, 0
+    jl .need_to_gc
+    jmp .return_to_caller
+
+.need_to_gc:
+    ;SeeReg ax
+    inc byte [gc_num]
     Debug '['
+    ;mov al, [gc_num]
+    ;PrintHexAL
+    ;Debug ':'
+    call gc_start
+
+    ; remaining after GC
+    mov bl, [hemi]
+    mov bh, 0
+    mov ax, sp
+    sub ax, [bots + bx]
+    ;SeeReg ax
+    Debug ']'
+
+    sub ax, [need]
+    ;SeeReg ax
+    cmp ax, 0
+    jl .out_of_memory
+
+.return_to_caller:
+    jmp [tCALLER]
+
+.out_of_memory:
+    PrintString `[OOM]\n`
+    jmp halt
+
+
+bytesPerWord equ 2
+
+gc_start:
     ;SeeReg sp
+
     pop ax
     mov [userCaller], ax
     mov [tBP], bp
@@ -648,7 +679,6 @@ gc_start:
     mov cx, [tCX]
     mov dx, [tDX]
     mov bp, [tBP]
-    Debug ']'
     jmp [userCaller]
 
 

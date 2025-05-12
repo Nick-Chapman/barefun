@@ -275,7 +275,7 @@ let execute fs line =
   | command::args -> dispatch fs command args
 
 let rec mainloop fs =
-  put_string "{"; put_int (free_words()); put_string "}";
+  (*put_string "{"; put_int (free_words()); put_string "}";*)
   put_string "% ";
   let single_controlD = implode (chr 4 :: []) in
   let line = read_line () in

@@ -229,12 +229,13 @@ deUnit =
 
 scanCodesFromAscii :: Char -> [Int]
 scanCodesFromAscii c = do
+  let dummyRelease = 222 -- TODO: the correct number please
   let n = ord c
-  if n <= 26 then [ pressControl, shiftedPress (chr (n + ord '@')), releaseControl ] else do
+  if n <= 26 && c /= '\n' then [ pressControl, shiftedPress (chr (n + ord '@')), dummyRelease, releaseControl ] else do
     let code = normalPress c
-    if code /= 0 then [ code ] else do
+    if code /= 0 then [ code, dummyRelease ] else do
       let code = shiftedPress c
-      if code /= 0 then [ pressShift, code, releaseShift ] else do
+      if code /= 0 then [ pressShift, code, dummyRelease, releaseShift ] else do
         []
   where
    pressShift = 42
@@ -297,7 +298,7 @@ normalPress = \case
   '\n' -> 0x1C
   _ -> 0
 
-shiftedPress :: Char -> Int
+shiftedPress :: Char -> Int -- TODO: better to dowc-case and use normalPress
 shiftedPress = \case
   '!' -> 0x02
   '@' -> 0x03

@@ -240,14 +240,15 @@ end = struct
   let release_shift = 170
   let press_control = 29
   let release_control = 157
+  let dummy_release = 222
 
   let scan_code_list_of_ascii : char -> int list = fun c ->
     let n = ord c in
-    if n <= 26 then [ press_control; shifted_press (chr (n + ord '@')); release_control ] else
+    if n <= 26 && c != '\n' then [ press_control; shifted_press (chr (n + ord '@')); dummy_release; release_control ] else
       let code = normal_press c in
-      if code != 0 then [ code ] else
+      if code != 0 then [ code; dummy_release ] else
         let code = shifted_press c in
-        if code != 0 then [ press_shift; code; release_shift ] else
+        if code != 0 then [ press_shift; code; dummy_release; release_shift ] else
           []
 
   let waiting : int list ref = ref []

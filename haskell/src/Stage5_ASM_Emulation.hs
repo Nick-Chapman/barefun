@@ -28,11 +28,14 @@ gcAtEverySafePoint = False
 hemiSizeInBytes :: Int
 hemiSizeInBytes = 3000
 
+sizeRedzone :: Int -- for save/restore on stack by div/mod operation
+sizeRedzone = 2
+
 topA,botA,topB,botB :: Int
 topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0 -- TODO: dont!
 botA = topA - hemiSizeInBytes
 
-topB = botA
+topB = botA - sizeRedzone
 botB = topB - hemiSizeInBytes
 
 twoE16 :: Int
@@ -115,8 +118,8 @@ botOfHemi :: Hemi -> Int
 botOfHemi = \case HemiA -> botA; HemiB -> botB
 
 inA,inB :: Int -> Bool
-inA n = n <= topA && n >= botA
-inB n = n <= topB && n >= botB
+inA n = n <= topA && n >= botA-sizeRedzone
+inB n = n <= topB && n >= botB-sizeRedzone
 
 inHemi :: Int -> Hemi -> Bool
 inHemi n = \case HemiA -> inA n; HemiB -> inB n
@@ -167,24 +170,20 @@ runGC = do
   _fromSpace <- WhatHemi
   _gcNum <- BumpGC
   toSpace <- WhatHemi
-  Debug (printf "[%d:" _gcNum)
-  --Debug (printf "GC(%d) starting: %s --> %s\n" _gcNum (show _fromSpace) (show toSpace))
+  Debug "["
+  Debug (printf "%02d:" _gcNum)
   setStackPointerToTopOfHemi toSpace
 
   let roots = [frameReg,argReg,contReg]
   watermark0 <- getSP
   mapM_ evacuateReg roots
-  --Debug "{"
   loop 1 watermark0
-  --Debug "}"
 
   HeapAddr sp <- getSP
-  let _liveBytes = topOfHemi toSpace - fromIntegral sp
-  --Debug (printf "GC(%d) finished: liveBytes=%d\n" _gcNum _liveBytes)
-  --Debug (printf "%d]" _liveBytes)
-  Debug (printf "]")
-  --if _gcNum == 30 then Crash else pure ()
-
+  let _remainingBytes = fromIntegral sp - botOfHemi toSpace
+  Debug (printf "%04x" _remainingBytes) -- print in hex to match against runtime.asm
+  Debug "]"
+  pure ()
 
   where
     loop :: Int -> HeapAddr -> M ()
@@ -195,7 +194,6 @@ runGC = do
       case finished of
         True -> pure ()
         False -> do
-          --Debug "s"
           nextWM <- getSP
           scanLoop 1 nextWM
           loop (step+1) nextWM
@@ -209,7 +207,7 @@ runGC = do
                 True -> do
                   pure ()
                 False -> do
-                  Debug "-"
+                  --Debug "-"
                   nextScanPointer <- scavenge scanPointer
                   scanLoop (substep+1) nextScanPointer
 
@@ -230,8 +228,6 @@ scavenge scanPointer = do
       nextScanPointer <- addHeapAddr (bytesPerWord * (sizeWords+1)) scanPointer
       case scanMode of
         RawData -> do
-          --Print ("\n[raw-data]")
-          --Crash
           pure nextScanPointer
         Scanned -> do
           -- 1..size because we are pointing at descriptor
@@ -253,12 +249,12 @@ scavengeHA ha = do
 
 evacuate :: Word -> M (Maybe Word)
 evacuate w = do
-  Debug "E"
+  --Debug "E"
   --Debug (printf "evacuate: %s\n" (show w))
   case w of
     WAddr (AHeap ha) -> (Just . WAddr . AHeap) <$> evacuateHA ha
     _ -> do
-      Debug "x"
+      --Debug "x"
       pure Nothing
 
 evacuateHA :: HeapAddr -> M HeapAddr
@@ -267,7 +263,7 @@ evacuateHA objectA = do
   --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
   GetMem (AHeap descA) >>= \case
     WBlockDescriptor desc -> do
-      Debug "("
+      --Debug "("
       let BlockDescriptor{sizeInBytes} = desc
       let sizeWords = sizeInBytes `div` 2
       xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
@@ -277,10 +273,10 @@ evacuateHA objectA = do
       -- overwrite original object with broken Heart; which points tothe relocated object
       SetMem (AHeap descA) WBrokenHeart
       SetMem (AHeap objectA) (WAddr (AHeap relocatedA))
-      Debug ")"
+      --Debug ")"
       pure relocatedA
     WBrokenHeart -> do
-      Debug "h"
+      --Debug "h"
       -- return the indirected previously copied object
       deHeapAddr <$> GetMem (AHeap objectA)
     w ->
@@ -288,7 +284,7 @@ evacuateHA objectA = do
 
 copyAlloc :: HeapAddr -> M ()
 copyAlloc ha = do
-  Debug "c"
+  --Debug "c"
   w <- GetMem (AHeap ha)
   execPushAlloc AllocForGC w
   --_newAddress <- getSP
@@ -373,8 +369,9 @@ execOp = \case
     SetReg Ax (WNum (fromIntegral (dividend `div` divisor)))
     SetReg Dx (WNum (fromIntegral (dividend `mod` divisor)))
     cont
-  OpEnterCheck need -> \cont -> do
+  OpEnterCheck need -> \cont -> if need == 0 then cont else do -- TODO: dont generate OpEnterCheck(0)?
     n <- heapBytesRemaining
+    --Debug (printf "OpEnterCheck: remaining=%d, need=%d\n" n need)
     if gcAtEverySafePoint || (n < need) then runGC else pure ()
     n <- heapBytesRemaining
     if (n < need)
