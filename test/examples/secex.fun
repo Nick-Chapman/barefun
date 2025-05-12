@@ -122,13 +122,16 @@ let make_sector = noinline (fun c ->
   loop 0;
   freeze_bytes buf)
 
-let do_read () =
-  let n = get_num () in
-  newline();
+let do_read_n n =
   let buf = make_bytes 512 in
   load_sector n buf;
   let s = freeze_bytes buf in
   put_sector_string s
+
+let do_read () =
+  let n = get_num () in
+  newline();
+  do_read_n n
 
 let do_write () =
   let n = get_num () in
@@ -146,4 +149,5 @@ let rec xloop () =
 
 let main () =
   put_string "type r<num> or w<num><char>\n";
+  do_read_n 2;
   xloop()
