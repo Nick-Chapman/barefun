@@ -207,7 +207,7 @@ part2:
 
     jmp main
 
-ticker_freq_htz equ 1000
+ticker_freq_htz equ 100
 
 ticker: dw 0 ; 16 bits; at 1KHz this cycles in 65 seconds
 ;; but after 2n+1 tagging (the cycling happens in just 32 seconds)
@@ -220,24 +220,34 @@ ticker: dw 0 ; 16 bits; at 1KHz this cycles in 65 seconds
 pic1_offset equ 32
 pic2_offset equ 40
 
-slot equ pic1_offset ; the single ISR slot I am playing with
-
 end_of_interrupt_command equ 0x20
+
+timer_slot equ pic1_offset
+keyboard_slot equ pic1_offset + 1
 
 setup_timer_interrupt:
     cli ; disabled interrupts while we set things up.
-    mov word [4*slot+0], irq0
-    mov word [4*slot+2], 0
+    mov word [4*timer_slot+0], irq0
+    mov word [4*timer_slot+2], 0
+    mov word [4*keyboard_slot+0], irq1
+    mov word [4*keyboard_slot+2], 0
     call set_pit_freq
     call remap_pic
-    call pic_mask_all_but_timer
+    call pic_mask_all_but_timer_and_keyboard
     sti ; re-enable here
     ret
 
 ;;; service timer IRQ-0: bump the ticker byte
 irq0:
-    ;;PrintCharLit '.' ; no print from here
+    ;;PrintCharLit '+' ; no print from here
     inc word [ticker]
+    Out pic1_cmd, end_of_interrupt_command
+    ;Out pic2_cmd, end_of_interrupt_command
+    iret
+
+;;; service keyboard IRQ-1: just acknowledge
+irq1:
+    ;;PrintCharLit '*' ; no print from here
     Out pic1_cmd, end_of_interrupt_command
     ;Out pic2_cmd, end_of_interrupt_command
     iret
@@ -262,8 +272,8 @@ remap_pic:
     Out pic2_data, 1            ; ICW4: x86 mode
     ret
 
-pic_mask_all_but_timer:
-    Out pic1_data, 0xfe
+pic_mask_all_but_timer_and_keyboard:
+    Out pic1_data, 0xfc
     Out pic2_data, 0xff
     ret
 
