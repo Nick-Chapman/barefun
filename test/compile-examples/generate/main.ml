@@ -1,6 +1,8 @@
 
 let select_versions_for_example = function
   | "bytes" -> [5]
+  | "codes" -> [2;3;4;5]
+  | "echo" -> [5]
   | "evenodd" -> [5]
   | "ff" -> [5]
   | "fib" -> [5]
@@ -13,7 +15,6 @@ let select_versions_for_example = function
   | "sham" -> [5]
   | "thrice" -> [5]
   | "tree" -> [5]
-  | "codes" -> [2;3;4;5]
   | _ -> []
 
 let suffix_of_version v =
