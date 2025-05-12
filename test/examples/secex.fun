@@ -1,3 +1,4 @@
+
 (* Sector explorer *)
 
 let noinline = let rec block f a = let _ = block in f a in block
@@ -7,7 +8,73 @@ let not b =
   | true -> false
   | false -> true
 
+let (>) a b = b < a
 let (>=) a b = not (a < b)
+
+let rec get_scan () =
+  (*let () = put_char '.' in*)
+  let () = wait_for_interrupt () in
+  if is_keyboard_ready() then get_keyboard_last_scancode () else
+    get_scan()
+
+let put_digit n = put_char (chr (n + ord '0'))
+
+let put_scancode xyz =
+  let z = xyz % 10 in
+  let xy = xyz / 10 in
+  let y = xy % 10 in
+  let x = xy / 10 in
+  put_char '{';
+  put_digit x;
+  put_digit y;
+  put_digit z;
+  put_char '}'
+
+(* space are place holders for unknown scancodes *)
+let tableL : string =
+  "  1234567890-= \tqwertyuiop[]\n asdfghjkl;'` \\zxcvbnm,./"
+
+let tableU : string =
+  "  !@#$%^&*()_+ \tQWERTYUIOP{}\n ASDFGHJKL:\"~ |ZXCVBNM<>?"
+
+let tableC : string =
+  "   @            QWERTYUIOP    ASDFGHJKL     ZXCVBNM"
+
+let get_char : unit -> char =
+  let r_shifted = ref false in
+  let r_controlled = ref false in
+  let rec loop shifted controlled =
+    let n = ord (get_scan()) in
+    let shift_pressed = if (n = 42) then true else (n = 54) in
+    let shift_released = if (n = 170) then true else (n = 182) in
+    let _release_scancode = (n > 128) in
+    let control_pressed = (n = 29) in
+    let control_released = (n = 157) in
+    let ok d = (r_shifted := shifted; r_controlled := controlled; d) in
+    let unknown() = (put_scancode n; loop shifted controlled) in
+    (* TODO: work around haskell parser bug error for true/false as args using brakets *)
+    if control_pressed then loop shifted (true) else
+      if control_released then loop shifted (false) else
+        if shift_pressed then loop (true) controlled else
+          if shift_released then loop (false) controlled else
+            if _release_scancode then loop shifted controlled else
+              if n = 14 then ok (chr 127) else
+                if n = 57 then ok ' ' else
+                  let table = if controlled then tableC else if shifted then tableU else tableL in
+                  let max = string_length table in
+                  if n < 0 then unknown() else
+                    if n >= max then unknown() else
+                      let decoded = string_index table n in
+                      if eq_char decoded ' '
+                      then unknown()
+                      else
+                        if controlled
+                        then ok (chr (ord decoded - ord '@'))
+                        else ok decoded
+  in
+  fun () ->
+  loop (!r_shifted) (!r_controlled)
+
 
 let put_string s =
   let n = string_length s in

@@ -334,7 +334,7 @@ CR equ 13
 DEL equ 127
 
 ;;; Read a key press (Converting CR to LF; BS to DEL)
-Bare_get_char: ; -> ax
+NO_Bare_get_char: ; -> ax ;; no longer used by any examples. TODO: remove it
     mov ah, 0
     int 0x16 ; Function
     mov ah, 0
