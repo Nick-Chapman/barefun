@@ -71,13 +71,13 @@
 %endmacro
 
 %macro PrintHexAX 0
-    ;PrintCharLit '<'
+    PrintCharLit '<'
     push ax
     mov al, ah
     PrintHexAL
     pop ax
     PrintHexAL
-    ;PrintCharLit '>'
+    PrintCharLit '>'
 %endmacro
 
 %macro PrintString 1
@@ -651,13 +651,21 @@ gc_start:
     mov bx, sp
     ;; scavenge objects between cx and dx, using bx as pointer
 .inner_loop:
+    cmp bx, dx
+    jg .bad_inner_loop
     mov di, [bx] ; descriptor (size in bytes; maybe tagged as raw-data)
+    cmp di, 0
+    jz .bad_zero_descriptor
     test di, 1
     jz .scav_payload ; even; payload words must be evacuated
+    ;Debug 'R'
     ;;Stop "[RawData]"
     inc di
     add bx, di
     jmp .done_object
+.bad_zero_descriptor:
+    PrintString `[bad_zero_descriptor!]\n`
+    jmp halt
 .scav_payload:
     ;Debug '-'
     add bx, bytesPerWord
@@ -670,6 +678,7 @@ gc_start:
     dec di
     jne .scav_word
 .done_object:
+    ;Debug 'd'
     cmp bx, dx
     jne .inner_loop
     mov dx, cx
@@ -680,6 +689,11 @@ gc_start:
     mov dx, [tDX]
     mov bp, [tBP]
     jmp [userCaller]
+.bad_inner_loop:
+    PrintString `\n[Bad_inner_loop]\n`
+    SeeReg bx
+    SeeReg dx
+    jmp halt
 
 
 evacuate: ;; si --> si (uses: bp)
@@ -695,7 +709,7 @@ evacuate: ;; si --> si (uses: bp)
     cmp si, 0
     jz .use_broken_heart
     ;Debug '('
-    and si, 0xfe ; align to even offset
+    and si, 0xfe ; align to even offset -- THE BUG IS HERE -- literal should be 0xfffe
 .loop:
     ;Debug 'c'
     push word [bp + si - bytesPerWord] ;; NOTE: Early Sat buf fix here
@@ -704,7 +718,7 @@ evacuate: ;; si --> si (uses: bp)
     mov si, sp ; si is relocation address
     ;Debug 'c'
     push word [bp - bytesPerWord]
-    mov word [bp - bytesPerWord], 0 ; set broken heat
+    mov word [bp - bytesPerWord], 0 ; set broken heart
     mov [bp], si ; and relocation address
     ;Debug ')'
     jmp [evacuateCaller]
