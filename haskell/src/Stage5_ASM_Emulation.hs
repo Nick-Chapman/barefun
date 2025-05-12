@@ -89,7 +89,7 @@ instance Show Addr where
     AStatic d offset -> printf "%s+%d" (show d) offset
 
 instance Show HeapAddr where
-  show (HeapAddr x) = "#" ++ show x
+  show (HeapAddr x) = printf "<%04x>" x
 
 deHeapAddr :: Word -> HeapAddr
 deHeapAddr = \case
