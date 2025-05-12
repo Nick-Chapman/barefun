@@ -176,7 +176,7 @@ L15: ; Continuation
   jmp [bp]
 
 L16: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, dx
   call Bare_make_bytes
   mov si, ax
@@ -4067,7 +4067,7 @@ L240: ; Continuation
   jmp [bp]
 
 L241: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, [bp+4]
   shr ax, 1
   mov bx, 1025
@@ -8842,7 +8842,7 @@ L545: ; Continuation
   jmp [bp]
 
 L546: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, [bp+4]
   shr ax, 1
   mov bx, 1025
@@ -13309,7 +13309,7 @@ L829: ; Continuation
   jmp [bp]
 
 L830: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, 129
   call Bare_make_bytes
   mov si, ax
@@ -13873,7 +13873,7 @@ L869: ; Continuation
   jmp [bp]
 
 L870: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, [bp+4]
   shr ax, 1
   mov bx, 1025
@@ -16734,7 +16734,7 @@ L1053: ; Continuation
   jmp [bp]
 
 L1054: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, 1025
   call Bare_make_bytes
   mov si, ax
@@ -17188,7 +17188,7 @@ L1085: ; Continuation
   jmp [bp]
 
 L1086: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, 32769
   call Bare_make_bytes
   mov si, ax

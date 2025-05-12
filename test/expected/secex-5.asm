@@ -105,7 +105,7 @@ L9: ; Continuation
   jmp [bp]
 
 L10: ; Function: (lam,g24)
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, 1025
   call Bare_make_bytes
   mov si, ax
@@ -1151,7 +1151,7 @@ L60: ; Continuation
   jmp [bp]
 
 L61: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, dx
   call Bare_put_char
   mov si, Bare_unit

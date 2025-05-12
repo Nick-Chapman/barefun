@@ -131,7 +131,7 @@ L11: ; Continuation
   jmp [bp]
 
 L12: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, dx
   call Bare_make_bytes
   mov si, ax
@@ -333,7 +333,7 @@ L25: ; Continuation
   jmp [bp]
 
 L26: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, 11
   call Bare_make_bytes
   mov si, ax

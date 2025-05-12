@@ -503,7 +503,7 @@ runAsm asm = finalImage
         -- But there is a snag -- The amount of space needed is dynamic.
         -- One solution is to call this primitive in CPS style & have it do its own GC check.
         -- For now we hack it with a big number.
-        100 -- TODO: remove this hack for Bare_make_bytes allocation budget
+        600 -- TODO: remove this hack for Bare_make_bytes allocation budget
 
       _ -> after
 

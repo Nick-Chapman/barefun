@@ -390,7 +390,7 @@ L34: ; Continuation
   jmp [bp]
 
 L35: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, dx
   call Bare_make_bytes
   mov si, ax
@@ -499,7 +499,7 @@ L42: ; Continuation
   jmp [bp]
 
 L43: ; Continuation
-  Bare_enter_check(100)
+  Bare_enter_check(600)
   mov ax, dx
   call Bare_make_bytes
   mov si, ax
