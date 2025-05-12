@@ -709,7 +709,7 @@ evacuate: ;; si --> si (uses: bp)
     cmp si, 0
     jz .use_broken_heart
     ;Debug '('
-    and si, 0xfe ; align to even offset -- THE BUG IS HERE -- literal should be 0xfffe
+    and si, 0xfffe ; align to even offset
 .loop:
     ;Debug 'c'
     push word [bp + si - bytesPerWord] ;; NOTE: Early Sat buf fix here
