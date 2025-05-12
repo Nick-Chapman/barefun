@@ -29,7 +29,7 @@ hemiSizeInBytes :: Int
 hemiSizeInBytes = 3000
 
 sizeRedzone :: Int -- for save/restore on stack by div/mod operation
-sizeRedzone = 2
+sizeRedzone = 2 -- TODO: 100 to match runtime.asm
 
 topA,botA,topB,botB :: Int
 topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0 -- TODO: dont!
