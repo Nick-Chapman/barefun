@@ -399,6 +399,7 @@ execPushAlloc mode w = do
 checkPushBlockDescriptor :: Word -> M ()
 checkPushBlockDescriptor = \case
   WBlockDescriptor (BlockDescriptor {sizeInBytes}) -> do
+    if sizeInBytes == 0 then error "checkPushBlockDescriptor:0" else pure ()
     CheckRecentAlloc (sizeInBytes + 2) -- 2 for the block descriptor itself
   _ ->
     pure ()
