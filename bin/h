@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
+cd "$DIR/.."
+
+_help() (
+  echo "h [test|build|run]"
+  echo
+  echo "  test   Run tests."
+  echo "  build  Compile the sham.fun example."
+  echo "  run    Compile the sham.fun example, then run it."
+  echo
+  echo
+  echo "This script is not doing any caching; everything gets rebuilt on every"
+  echo "invocation (except for the dune step, which does the usual dune"
+  echo "caching)."
+)
+
+_test() (
+  dune build @all @runtest
+)
+
+_build() (
+  dune build @all
+  dune exec -- haskell/main.exe test/examples/sham.fun -compile > .out/code
+  nasm -Werror -dCODE="'.out/code'" x86/runtime.asm -o .out/image
+)
+
+_run() (
+  _build
+  qemu-system-i386 .out/image
+)
+
+if [ -z "${1:-}" ] || [ -n "${2:-}" ]; then
+  _help
+  exit 1
+fi
+
+log=$(mktemp)
+trap "echo 'Something went wrong. Logs of last step:'; cat $log" EXIT
+
+
+
+case $1 in
+  test|build|run)
+    _$1
+    ;;
+  *)
+    _help
+    exit 1
+    ;;
+esac
+
+trap - EXIT
