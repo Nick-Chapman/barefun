@@ -96,9 +96,9 @@ end = struct
     fd
 
   let load_sector n buf =
-    Printf.printf "[load_sector:%d]\n" n;
-    if n < 0 then Printf.printf "[load_sector:%d]: too small\n" n else
-      if n >= n_sectors then Printf.printf "[load_sector:%d]: too big\n" n else
+    (*Printf.printf "[load_sector:%d]\n" n;*)
+    if n < 0 then Printf.printf "[Prim.load_sector:%d]: too small\n" n else
+      if n >= n_sectors then Printf.printf "[Prim.load_sector:%d]: too big\n" n else
         let fd = open_fs_image() in
         let pos = n * sector_size in
         let (_:int) = Unix.lseek fd pos SEEK_SET in
@@ -106,9 +106,9 @@ end = struct
         ()
 
   let store_sector n s =
-    Printf.printf "[store_sector:%d]\n" n;
-    if n < 0 then Printf.printf "[store_sector:%d]: too small\n" n else
-      if n >= n_sectors then Printf.printf "[store_sector:%d]: too big\n" n else
+    (*Printf.printf "[store_sector:%d]\n" n;*)
+    if n < 0 then Printf.printf "[Prim.store_sector:%d]: too small\n" n else
+      if n >= n_sectors then Printf.printf "[Prim.store_sector:%d]: too big\n" n else
         let fd = open_fs_image() in
         let pos = n * sector_size in
         let (_:int) = Unix.lseek fd pos SEEK_SET in
