@@ -2,8 +2,7 @@
 
 type 'a option = None | Some of 'a
 
-let _get_some o = match o with | None -> crash "get_some" | Some x -> x
-let _is_some o = match o with | None -> false | Some _ -> true
+let is_some o = match o with | None -> false | Some _ -> true
 
 type ('a,'b) pair = Pair of 'a * 'b
 
@@ -16,9 +15,7 @@ let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
-let noinline =
-  let rec block f a = let _ = block in f a in block
-
+let noinline = let rec block f a = let _ = block in f a in block
 
 (* list ops *)
 
@@ -70,6 +67,13 @@ let rec rev_onto acc xs =
 let rev xs = rev_onto [] xs
 
 let (@) xs ys = rev_onto ys (rev xs)
+
+let list_diff : ('a -> 'a -> bool) -> 'a list -> 'a list -> 'a list = fun eq xs ys ->
+  let list_rm xs y =
+    let p x = not (eq x y) in
+    filter p xs
+  in
+  foldl list_rm xs ys
 
 (* string ops *)
 
@@ -150,8 +154,7 @@ let sofi = noinline (fun i -> implode (chars_of_int i))
 
 (* IO *)
 
-(* A prettier put_char for control chars; also aligned with backspacing *)
-let put_char c =
+let put_char c = (* A prettier put_char for control chars *)
   let backspace = 8 in
   let n = ord c in
   if n = backspace then put_char c else
@@ -168,7 +171,7 @@ let put_string s = put_chars (explode s)
 
 let newline () = put_char '\n'
 
-let trace_on = ref true
+let trace_on = ref false
 
 let trace = noinline (fun m -> if !trace_on then put_string ("trace: " ^ m ^ "\n") else ())
 
@@ -178,10 +181,6 @@ let with_no_trace f =
   let res = f () in
   trace_on := old;
   res
-
-
-let todo : string -> 'a = fun m -> crash ("todo: " ^ m)
-let error : string -> 'a = fun m -> crash ("error: " ^ m)
 
 (* inode/fs...*)
 
@@ -235,17 +234,17 @@ let mod_substr : bytes -> int -> string -> unit =
 type bi = BI of int
 let deBI x = match x with | BI y -> y
 
-let ser_bi : bi -> char = fun bi -> chr (deBI bi)
-let par_bi : char -> bi = fun c -> BI (ord c)
+let export_bi : bi -> char = fun bi -> chr (deBI bi)
+let import_bi : char -> bi = fun c -> BI (ord c)
 
-let see_bi : bi -> string = fun bi -> "B" ^ sofi (deBI bi)
+let show_bi : bi -> string = fun bi -> "B" ^ sofi (deBI bi)
 
 let eq_bi : bi -> bi -> bool = fun x y -> deBI x = deBI y
 
 type ii = II of int
 let deII x = match x with | II y -> y
 
-let see_ii : ii -> string = fun ii -> "I" ^ sofi (deII ii)
+let show_ii : ii -> string = fun ii -> "I" ^ sofi (deII ii)
 
 
 type block = Block of string (* always length 64 *)
@@ -297,7 +296,7 @@ let _wipe_everything () =
   in
   loop 0
 
-let dump_everything () = with_no_trace (fun () ->
+let _dump_everything () = with_no_trace (fun () ->
   let rec loop i =
     if i >= num_sectors then () else
       let () = read_sector_show i
@@ -328,7 +327,7 @@ let load_block : bi -> block = fun bi ->
   assert (i >= 0);
   assert (i < num_blocks);
   let seci = i / blocks_per_sector in
-  let () = trace ("read_block " ^ sofi i ^ show_seci seci) in
+  let () = trace ("load_block " ^ sofi i ^ show_seci seci) in
   let sector = read_sector (i / blocks_per_sector) in
   let offset = block_size * (i % blocks_per_sector) in
   Block (substr sector offset block_size)
@@ -342,21 +341,22 @@ let max_file_size = max_blocks_per_inode * block_size
 let () = assert (max_file_size = 384)
 
 
-(* inode: high level rep of inode info, which maps to 8 bytes on disk *)
+(* inode info: size/blocks; exports as 8 bytes on disk *)
 
 type inode = Inode of (int * bi list) (* size and list(max#=6) blocks *)
 
 let ii2bi : ii -> bi = fun ii -> BI (deII ii / inodes_per_block + 1)
 let ii2off : ii -> int = fun ii -> (deII ii % inodes_per_block) * idata_size
 
-let ser_int : int -> (char,char) pair = (* little endian *)
+(* the size int in exported little endian *)
+let export_int : int -> (char,char) pair =
   fun n ->
   assert (n <= max_file_size);
   let i = n / 256 in
   let j = n % 256 in
   Pair (chr j, chr i)
 
-let par_int : (char,char) pair -> int = (* little endian *)
+let import_int : (char,char) pair -> int =
   fun p ->
   match p with
   | Pair(lo,hi) ->
@@ -365,41 +365,39 @@ let par_int : (char,char) pair -> int = (* little endian *)
      assert (i <= max_file_size/256);
      256*i + j
 
-let ser_unallocated_inode : string =
-  match ser_int 0 with
+let export_unallocated_inode : string =
+  match export_int 0 with
   | Pair (lo,hi) ->
      implode [lo;hi]
 
-(* TODO: see and ser are very close in name & have the same type -- use more distinct names! *)
-let see_inode : inode -> string =
+let show_inode : inode -> string =
   fun inode ->
   match inode with
   | Inode (size,bis) ->
-     "Inode: size=" ^ sofi size ^ ", blocks=[" ^ concat "," (map see_bi bis) ^ "]"
+     "Inode: size=" ^ sofi size ^ ", blocks=[" ^ concat "," (map show_bi bis) ^ "]"
 
-let ser_inode : inode -> string =
+let export_inode : inode -> string =
   fun inode ->
   match inode with
   | Inode (size,bis) ->
-     match ser_int (1+size) with (* +1 because 0 means unallocated *)
+     match export_int (1+size) with (* +1 because 0 means unallocated *)
      | Pair (lo,hi) ->
-        implode (lo :: hi :: map ser_bi bis) (* might be short. that's ok *)
+        implode (lo :: hi :: map export_bi bis) (* might be short. that's ok *)
 
 let blocks_for_size : int -> int =
   fun size ->
   if size = 0 then 0 else 1 + (size-1) / block_size (* avoiding -1/n !! (idiv issue) *)
 
-let par_inode : string -> inode option  =
+let import_inode : string -> inode option  =
   fun s ->
   assert (string_length s = idata_size);
-  let ind = string_index in (* nice to have as an infix? *)
-  let n = par_int (Pair (ind s 0, ind s 1)) in
+  let get = string_index in
+  let n = import_int (Pair (get s 0, get s 1)) in
   if n = 0 then None else
     let size = n - 1 in
     let n_blocks = blocks_for_size size in
-    let bis = take n_blocks (map par_bi (explode (substr s 2 6))) in
+    let bis = take n_blocks (map import_bi (explode (substr s 2 max_blocks_per_inode))) in
     Some (Inode (size, bis))
-
 
 (* superblock *)
 
@@ -418,7 +416,7 @@ let make_super a b c =
   assert ((1 + (c-1) / inodes_per_block) = b);
   Super (a,b,c)
 
-let see_super s =
+let show_super s =
   match s with
   | Super(a,b,c) ->
      "[super: " ^ sofi a ^ "-" ^ sofi b ^ "-" ^ sofi c ^ "]"
@@ -427,26 +425,26 @@ let super_block_number = BI 0
 
 let fs_signature = "BARE"
 
-let ser_super : super -> block =
+let export_super : super -> block =
   fun su ->
   match su with
   | Super (a,b,c) -> Block (fs_signature ^ implode [chr a;chr b;chr c])
 
-let par_super : block -> super option =
+let import_super : block -> super option =
   fun b ->
-  let ind = string_index in (* nice to ahve an infix? *)
+  let get = string_index in
   let s = deBlock b in
   let n = string_length fs_signature in
   if not (eq_string (substr s 0 n) fs_signature) then None else
-    Some (Super (ord (ind s n), ord (ind s (n+1)), ord (ind s (n+2))))
+    Some (Super (ord (get s n), ord (get s (n+1)), ord (get s (n+2))))
 
 (* called from format *)
 let store_super : super -> unit =
-  fun su -> store_block super_block_number (ser_super su)
+  fun su -> store_block super_block_number (export_super su)
 
 (* called from mount; fs-signature-string checked *)
 let load_super : unit -> super option =
-  fun () -> par_super (load_block super_block_number)
+  fun () -> import_super (load_block super_block_number)
 
 
 (* filesystem... *)
@@ -471,7 +469,7 @@ let allocBI : fs -> (fs,bi) pair option =
      | [] -> None
      | bi::bis -> Some (Pair (FS (super,iis,bis),bi))
 
-let _freeII : fs -> ii -> fs = (* TODO: call me *)
+let freeII : fs -> ii -> fs =
   fun fs ii ->
   match fs with
   | FS (super,iis,bis) -> FS (super,ii::iis,bis)
@@ -481,6 +479,11 @@ let freeBI : fs -> bi -> fs =
   match fs with
   | FS (super,iis,bis) -> FS (super,iis,bi::bis)
 
+let rec giveup_blocks : fs -> bi list -> fs = fun fs old ->
+  match old with
+  | [] -> fs
+  | bi::bis -> giveup_blocks (freeBI fs bi) bis
+
 
 let storeI : super -> ii -> inode option -> unit =
   fun super ii inode_opt ->
@@ -488,8 +491,8 @@ let storeI : super -> ii -> inode option -> unit =
   let s = deBlock (load_block (ii2bi ii)) in
   let data =
     match inode_opt with
-    | None -> ser_unallocated_inode
-    | Some inode -> ser_inode inode
+    | None -> export_unallocated_inode
+    | Some inode -> export_inode inode
   in
   let data = padR idata_size '*' data in (* not really nesc *)
   assert (string_length data = idata_size);
@@ -499,10 +502,10 @@ let storeI : super -> ii -> inode option -> unit =
   let s = freeze_bytes bytes in
   store_block (ii2bi ii) (Block s)
 
-let seeI : inode option -> string = fun opt ->
+let showI : inode option -> string = fun opt ->
   match opt with
   | None -> "unallocated"
-  | Some inode -> see_inode inode
+  | Some inode -> show_inode inode
 
 let loadI : super -> ii -> inode option =
   fun super ii ->
@@ -511,58 +514,36 @@ let loadI : super -> ii -> inode option =
   let off = ii2off ii in
   let len = idata_size in
   let s = substr s off len in
-  par_inode s
-
-(* format: wipe a disk of all data; creating an empty file-system in place *)
-let _format : unit -> unit =
-  fun () -> with_no_trace (fun () ->
-  let a = num_blocks in
-  let b = (a / 10) + 1 in
-  let c = (a - b) in
-  let super = make_super a b c in
-  trace ("format: " ^ see_super super);
-  store_super super;
-  let f i = storeI super (II i) None in
-  iter f (upto 0 (c-1)))
-
+  import_inode s
 
 let debug_put_fs : fs -> unit =
-  fun fs -> with_no_trace (fun () -> 
+  fun fs -> with_no_trace (fun () ->
   match fs with
   | FS (super,iis,bis) ->
      put_string "File system found:\n";
-     put_string ("- super: " ^ see_super super ^ "\n");
-     put_string ("- free blocks = " ^ concat "," (map see_bi bis) ^ "\n");
-     put_string ("- free inodes = " ^ concat "," (map see_ii iis) ^ "\n");
+     put_string ("- super: " ^ show_super super ^ "\n");
+     put_string ("- free blocks = " ^ concat "," (map show_bi bis) ^ "\n");
+     put_string ("- free inodes = " ^ concat "," (map show_ii iis) ^ "\n");
      put_string "- inodes:\n";
      let super = super_of_fs fs in
      let n = max_inodes super in
      let pr i =
        let ii = II i in
        let opt = loadI super ii in
-       if _is_some opt then put_string ("- " ^ see_ii ii ^ " : " ^ seeI opt ^ "\n") else ()
+       if is_some opt then put_string ("- " ^ show_ii ii ^ " : " ^ showI opt ^ "\n") else ()
      in
      iter pr (upto 0 (n-1)))
 
-
-
-let bis_rm  : bi list -> bi -> bi list = fun xs y ->
-  let p x = not (eq_bi x y) in
-  filter p xs
-
-let bis_diff : bi list -> bi list -> bi list = fun xs ys ->
-  foldl bis_rm xs ys
-
-(* mount: discover the existing filesystem; None means no file system can be found *)
+(* fsck: discover the free block and free inode info *)
 let fsck : unit -> fs option =
   fun () -> with_no_trace (fun () ->
   match load_super () with
   | None -> None
   | Some super ->
      match super with
-     | Super (num_b,_,num_i) ->
+     | Super (num_blocks,num_inode_blocks,num_inodes) ->
         let rec loop accB accI i =
-          if i>=num_i
+          if i=num_inodes
           then Some (FS (super,rev accI,accB))
           else
             let ii = II i in
@@ -570,116 +551,184 @@ let fsck : unit -> fs option =
             | None -> loop accB (ii::accI) (i+1)
             | Some inode ->
                match inode with
-               | Inode (_,bis) -> loop (bis_diff accB bis) accI (i+1)
+               | Inode (_,bis) -> loop (list_diff eq_bi accB bis) accI (i+1)
         in
-        let all_bis = map (fun b -> BI b) (upto 0 (num_b-1)) in
+        let first_datablock = 1 + num_inode_blocks in
+        let all_bis = map (fun b -> BI b) (upto first_datablock (num_blocks-1)) in
         loop all_bis [] 0)
+
+
+let mounted : fs option ref = ref None
+
+
+(* format: wipe a disk of all data; creating an empty file-system in place *)
+let _format : unit -> unit =
+  fun () ->
+  match !mounted with
+  | Some _ -> put_string "** cannot format a mounted filesystem\n"
+  | None ->
+     let a = num_blocks in
+     let b = (a / 10) + 1 in
+     let c = (a - b) in
+     let super = make_super a b c in
+     trace ("format: " ^ show_super super);
+     store_super super;
+     let f i = storeI super (II i) None in
+     iter f (upto 0 (c-1))
+
+(* mount: discover the existing filesystem; None means no fs can be found *)
+let _mount : unit -> unit =
+  fun () ->
+  match !mounted with
+  | Some _ -> put_string "** filesystem already mounted\n"
+  | None ->
+     match fsck () with
+     | None -> put_string "** no filesystem found\n"
+     | Some fs ->
+        mounted := Some fs
+
 
 (* debug: discover the existing filesystem; and print info about it *)
 let _debug : unit -> unit =
   fun () ->
-  match fsck () with
-  | None -> put_string "debug: No filesystem can be found\n"
-  | Some fs -> debug_put_fs fs
+  match !mounted with
+  | None -> put_string "** no filesystem mounted\n"
+  | Some fs ->
+     debug_put_fs fs
 
-
-(* mount: discover the existing filesystem; None means no fs can be found *)
-let _mount : unit -> fs option =
-  fun () ->
-  fsck () (* TODO: stash the fs in a ref *)
 
 (* creat : create a new zero-size inode, returning None means no more inodes *)
-let _creat : fs -> (fs,ii) pair option =
-  fun fs ->
-  match allocII fs with
-  | None -> None (* no more inodes available -- This is a soft user error *)
-  | Some p ->
-     match p with
-     | Pair(fs,ii) ->
-        let inode = Inode (0,[]) in
-        let super = super_of_fs fs in
-        let () = storeI super ii (Some inode) in
-        Some (Pair (fs,ii))
+let _creat : unit -> ii option =
+  fun () ->
+  match !mounted with
+  | None -> (put_string "** no filesystem mounted\n"; None)
+  | Some fs ->
+     match allocII fs with
+     | None -> (put_string "** no available inodes\n"; None)
+     | Some p ->
+        match p with
+        | Pair(fs,ii) ->
+           let inode = Inode (0,[]) in
+           let super = super_of_fs fs in
+           let () = storeI super ii (Some inode) in
+           mounted := Some fs;
+           Some ii
 
+let _remove : ii -> unit =
+  fun ii ->
+  match !mounted with
+  | None -> put_string "** no filesystem mounted\n"
+  | Some fs ->
+     let super = super_of_fs fs in
+     match loadI super ii with
+     | None -> put_string "** inode is not allocated\n"
+     | Some inode ->
+        match inode with
+        | Inode (_,bis) ->
+           let fs = freeII fs ii in
+           let fs = giveup_blocks fs bis in
+           let () = storeI super ii None in
+           mounted := Some fs;
+           ()
 
 (* trunc: expand/truncate an inode to a given size; allocating/freeing blocks as required.
    Returning None means no more blocks available. *)
-let _trunc : fs -> ii -> int -> fs option =
-  fun fs0 ii size ->
-  assert (size <= max_file_size); (* TODO: should be soft error *)
-  let inode =
-    let super = super_of_fs fs0 in
-    match loadI super ii with | None -> error "trunc" | Some x -> x
-  in
-  let rec giveup fs old =
-    match old with
-    | [] -> Some fs
-    | bi::bis -> giveup (freeBI fs bi) bis
-  in
-  let rec loop fs acc old n =
-    if n = 0
-    then
-      let super = super_of_fs fs in
-      let () = storeI super ii (Some (Inode (size,rev acc))) in
-      giveup fs old
-    else
-      match old with
-      | bi::old -> loop fs (bi::acc) old (n-1)
-      | [] ->
-         match allocBI fs with
-         | None -> None (* no more blocks available -- This is a soft user error -- Error type? *)
-         | Some p ->
-            match p with
-            | Pair(fs,bi) -> loop fs (bi::acc) [] (n-1)
-  in
-  match inode with
-  | Inode (_,old_bis) ->
-     let goal_num_blocks = blocks_for_size size in
-     loop fs0 [] old_bis goal_num_blocks
+let _trunc : ii -> int -> unit =
+  fun ii size ->
+  if (size > max_file_size) then put_string "** size too bug for trunc" else
+    match !mounted with
+    | None -> put_string "** no filesystem mounted\n"
+    | Some fs ->
+       let super = super_of_fs fs in
+       match loadI super ii with
+       | None -> put_string "** inode is not allocated\n"
+       | Some inode ->
+          let rec loop fs acc bis n =
+            if n = 0
+            then
+              let super = super_of_fs fs in
+              let () = storeI super ii (Some (Inode (size,rev acc))) in
+              let fs = giveup_blocks fs bis in
+              mounted := Some fs
+            else
+              match bis with
+              | bi::bis -> loop fs (bi::acc) bis (n-1)
+              | [] ->
+                 match allocBI fs with
+                 | None -> put_string "** no available blocks\n"
+                 | Some p ->
+                    match p with
+                    | Pair(fs,bi) ->
+                       (* TODO: dont need to zero fill the enitre block *)
+                       let zero_data = fill_string block_size (chr 0) in
+                       store_block bi (Block zero_data);
+                       loop fs (bi::acc) [] (n-1)
+          in
+          match inode with
+          | Inode (_,bis) ->
+             let goal_num_blocks = blocks_for_size size in
+             loop fs [] bis goal_num_blocks
 
 
-let _remove : fs -> ii -> fs =
+(* TODO : read & wrte -- need to take offset and len *)
+
+let _cat : ii -> string =
+  fun ii ->
+  match !mounted with
+  | None -> (put_string "** no filesystem mounted\n"; "")
+  | Some fs ->
+     let super = super_of_fs fs in
+     match loadI super ii with
+     | None -> (put_string "** inode is not allocated\n"; "")
+     | Some inode ->
+        match inode with
+        | Inode (size,bis) ->
+           (* TODO: do this in a more incremental way *)
+           let str = concat "" (map (fun bi -> deBlock (load_block bi)) bis) in
+           substr str 0 size
+
+let _write : ii -> string -> unit =
+  fun ii text ->
+  _trunc ii (string_length text);
+  match !mounted with
+  | None -> put_string "** no filesystem mounted\n"
+  | Some fs ->
+     let super = super_of_fs fs in
+     match loadI super ii with
+     | None -> put_string "** inode is not allocated\n"
+     | Some inode ->
+        match inode with
+        | Inode (_size,bis) ->
+           (* TODO: This dummy_data is a hack to make substr work *)
+           let dummy_data = fill_string block_size (chr 1) in
+           let text = text ^ dummy_data in
+           let rec loop offset bis =
+             match bis with
+             | [] -> ()
+             | bi::bis ->
+                let sub = substr text offset block_size in
+                let () = store_block bi (Block sub) in
+                loop (offset + block_size) bis
+           in
+           loop 0 bis
+
+let _append : ii -> string -> unit =
   fun _ _ ->
-  todo "remove"
-
-(* TODO : read & wrte -- have the code for this ust about *)
+  (* TODO get existing size & wrte at that offset *)
+  crash "append"
 
 (* TODO: drive from simple command line *)
 
 let main () =
+  let _get_some o = match o with | None -> crash "get_some" | Some x -> x in
   let () = _wipe_everything() in
-  let () = _debug() in
   let () = _format() in
-
-  trace "mount..";
-  let fs = _get_some (_mount ()) in
-  trace "mount..done";
-
-  trace "createA..";
-  match _get_some (_creat fs) with
-  | Pair (fs,a) ->
-     trace "createA..done";
-     let () = put_string ("a=" ^ see_ii a ^ "\n") in
-
-     trace "truncA 50..";
-     let fs = _get_some (_trunc fs a 50 ) in
-     trace "truncA 50..done";
-
-     trace "createB..";
-     match _get_some (_creat fs) with
-     | Pair (fs,b) ->
-        trace "createB..done";
-        let () = put_string ("b=" ^ see_ii b ^ "\n") in
-
-        trace "truncB 150..";
-        let fs = _get_some (_trunc fs b 150 ) in
-        trace "truncB 150..done";
-
-        trace "truncA 100..";
-        let fs = _get_some (_trunc fs a 100 ) in
-        trace "truncA 100..done";
-        let () = dump_everything() in
-        let () = _debug() in
-
-        let _ = fs in
-        ()
+  let () = _mount() in
+  let a = _get_some (_creat()) in
+  let () = _trunc a 1 in
+  let () = _write a (fill_string 88 'x') in
+  let () = _trunc a 62 in
+  let () = _dump_everything() in
+  let () = _debug() in
+  put_string ("a=[" ^ _cat a ^ "]\n");
+  ()
