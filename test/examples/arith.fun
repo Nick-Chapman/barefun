@@ -20,4 +20,7 @@ let main () =
   let () = run_test "5-2" (fun x -> 5 - x) 2 in
   let () = run_test "5/3" (fun x -> 5 / x) 3 in
   let () = run_test "-1/3" (fun x -> (0-1) / x) 3 in
+  put_char 'o';
+  put_char 'k';
+  put_char '\n';
   ()

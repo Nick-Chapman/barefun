@@ -459,7 +459,7 @@ execBare = \case
   Bare_halt -> Halt
 
   Bare_crash -> do
-    a <- deAddr <$> GetReg Ax
+    a <- deAddr <$> GetReg Bx
     mes <- getMemString a
     Crash mes
 

@@ -329,9 +329,15 @@ Bare_clear_screen: ;; -- TODO expose this as user builtin
     ret
 
 Bare_crash:
-    PrintString `[Bare_crash]\n`
+    mov di, bx
+    add di, 2  ; +2 for the length
+    mov bx, [bx]
+    shr bx, 1 ; untag
+    mov byte [di+bx], 0 ; splat with null; very hacky; but were going to stop anyway
+    PrintString `[Bare_crash:`
+    call internal_print_string
+    PrintString `]\n`
     jmp halt
-
 
 BS equ 8
 LF equ 10

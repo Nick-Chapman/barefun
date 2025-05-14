@@ -344,7 +344,7 @@ compileBuiltinTo builtin = case builtin of
     , setTarget target (SMemIndirectOffset Bx 0)
     ]
   SRC.Crash -> \_target -> oneArg $ \s1 ->
-    [ OpMove Ax s1
+    [ OpMove Bx s1
     , OpCall Bare_crash
     -- no need to assign target; we wont return from Bare_crash
     ]
