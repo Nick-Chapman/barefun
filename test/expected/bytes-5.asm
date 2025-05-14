@@ -24,9 +24,9 @@ L3: ; Arm: 7'7
 L4: ; Continuation
   Bare_enter_check(0)
   mov ax, 3
-  shr ax, 1
+  sar ax, 1
   mov bx, dx
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
@@ -75,15 +75,15 @@ L8: ; Function: (lam,t1)
   mov bx, si
   push word si ;; save
   mov si, [bp+4]
-  shr si, 1
+  sar si, 1
   call Bare_set_bytes
   pop word si ;; restore
   mov ax, Bare_unit
   mov [Temps+6], ax
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, 3
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
@@ -169,9 +169,9 @@ L14: ; Arm: 24'13
 L15: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, 3
-  shr bx, 1
+  sar bx, 1
   sub ax, bx
   shl ax, 1
   add ax, 1
@@ -191,7 +191,7 @@ L16: ; Function: (lam,t1)
   jz L14
   mov ax, [bp+2]
   mov bx, dx
-  shr bx, 1
+  sar bx, 1
   call Bare_get_bytes
   mov di, ax
   push word [bp+4]
@@ -224,9 +224,9 @@ L17: ; Function: (explode_loop,t1)
 L18: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, 3
-  shr bx, 1
+  sar bx, 1
   sub ax, bx
   shl ax, 1
   add ax, 1

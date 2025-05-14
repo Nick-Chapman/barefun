@@ -28,45 +28,45 @@ L3: ; Continuation
   add ax, 1
   mov si, ax
   mov ax, si
-  shr ax, 1
+  sar ax, 1
   mov bx, 21
-  shr bx, 1
+  sar bx, 1
   push word dx ;; save
   mov dx, 0
-  div bx
+  Div bx
   shl dx, 1
   add dx, 1
   mov di, dx
   pop word dx ;; restore
   mov ax, si
-  shr ax, 1
+  sar ax, 1
   mov bx, 21
-  shr bx, 1
+  sar bx, 1
   push word dx ;; save
   mov dx, 0
-  div bx
+  Div bx
   pop word dx ;; restore
   shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  shr ax, 1
+  sar ax, 1
   mov bx, 21
-  shr bx, 1
+  sar bx, 1
   push word dx ;; save
   mov dx, 0
-  div bx
+  Div bx
   shl dx, 1
   add dx, 1
   mov [Temps+8], dx
   pop word dx ;; restore
   mov ax, [Temps+6]
-  shr ax, 1
+  sar ax, 1
   mov bx, 21
-  shr bx, 1
+  sar bx, 1
   push word dx ;; save
   mov dx, 0
-  div bx
+  Div bx
   pop word dx ;; restore
   shl ax, 1
   add ax, 1
@@ -76,15 +76,15 @@ L3: ; Continuation
   mov ax, Bare_unit
   mov [Temps+12], ax
   mov ax, [Temps+10]
-  shr ax, 1
+  sar ax, 1
   mov bx, 97
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
   mov [Temps+14], ax
   mov ax, [Temps+14]
-  shr ax, 1
+  sar ax, 1
   call Bare_num_to_char
   mov [Temps+16], ax
   mov ax, [Temps+16]
@@ -92,15 +92,15 @@ L3: ; Continuation
   mov ax, Bare_unit
   mov [Temps+18], ax
   mov ax, [Temps+8]
-  shr ax, 1
+  sar ax, 1
   mov bx, 97
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
   mov [Temps+20], ax
   mov ax, [Temps+20]
-  shr ax, 1
+  sar ax, 1
   call Bare_num_to_char
   mov [Temps+22], ax
   mov ax, [Temps+22]
@@ -108,15 +108,15 @@ L3: ; Continuation
   mov ax, Bare_unit
   mov [Temps+24], ax
   mov ax, di
-  shr ax, 1
+  sar ax, 1
   mov bx, 97
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
   mov [Temps+26], ax
   mov ax, [Temps+26]
-  shr ax, 1
+  sar ax, 1
   call Bare_num_to_char
   mov [Temps+28], ax
   mov ax, [Temps+28]

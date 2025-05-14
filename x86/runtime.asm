@@ -139,6 +139,15 @@
     SeeMemLine
 %endmacro
 
+%macro Div 1
+    ;SeeReg dx
+    ;SeeReg ax
+    idiv %1
+    ;SeeReg dx
+    ;SeeReg ax
+%endmacro
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Bootloader...
 
@@ -332,7 +341,7 @@ Bare_crash:
     mov di, bx
     add di, 2  ; +2 for the length
     mov bx, [bx]
-    shr bx, 1 ; untag
+    sar bx, 1 ; untag
     mov byte [di+bx], 0 ; splat with null; very hacky; but were going to stop anyway
     PrintString `[Bare_crash:`
     call internal_print_string
@@ -557,7 +566,6 @@ need: dw 0
     call Bare_enter_check_function
 %%no_need:
 %endmacro
-
 
 gc_num: db 0
 

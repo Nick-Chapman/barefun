@@ -165,13 +165,13 @@ instance Show Op where
     OpPopRESTORE src -> "pop word " ++ show src ++ " ;; restore"
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "jz " ++ show lab
-    OpShiftR1 r -> "shr " ++ show r ++ ", 1"
+    OpShiftR1 r -> "sar " ++ show r ++ ", 1" -- signed shift
     OpShiftL1 r -> "shl " ++ show r ++ ", 1"
     OpInc r -> "add " ++ show r ++ ", 1"
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulIntoAx src -> "mul " ++ show src
-    OpDivModIntoAxDx src -> "div " ++ show src
+    OpDivModIntoAxDx src -> "Div " ++ show src
     OpEnterCheck need -> printf "Bare_enter_check(%d)" need
     OpHlt -> "hlt"
 

@@ -7,9 +7,9 @@ L1: ; Arm: 9'15
 L2: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, 3
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
@@ -98,7 +98,7 @@ L5: ; Function: (loop,g1)
   cmp word [bx], 3
   jz L4
   mov ax, dx
-  shr ax, 1
+  sar ax, 1
   call Bare_num_to_char
   mov [Temps+10], ax
   mov ax, [Temps+10]

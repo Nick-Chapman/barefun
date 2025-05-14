@@ -20,9 +20,9 @@ L3: ; Function: (is_even,g1)
   cmp word [bx], 3
   jz L1
   mov ax, dx
-  shr ax, 1
+  sar ax, 1
   mov bx, 3
-  shr bx, 1
+  sar bx, 1
   sub ax, bx
   shl ax, 1
   add ax, 1
@@ -35,9 +35,9 @@ L3: ; Function: (is_even,g1)
   cmp word [bx], 3
   jz L2
   mov ax, di
-  shr ax, 1
+  sar ax, 1
   mov bx, 3
-  shr bx, 1
+  sar bx, 1
   sub ax, bx
   shl ax, 1
   add ax, 1

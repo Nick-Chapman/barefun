@@ -7,12 +7,12 @@ L1: ; Arm: 6'13
 L2: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, 21
-  shr bx, 1
+  sar bx, 1
   push word dx ;; save
   mov dx, 0
-  div bx
+  Div bx
   pop word dx ;; restore
   shl ax, 1
   add ax, 1
@@ -31,26 +31,26 @@ L3: ; Function: (lam,t1)
   cmp word [bx], 3
   jz L1
   mov ax, dx
-  shr ax, 1
+  sar ax, 1
   mov bx, 21
-  shr bx, 1
+  sar bx, 1
   push word dx ;; save
   mov dx, 0
-  div bx
+  Div bx
   shl dx, 1
   add dx, 1
   mov di, dx
   pop word dx ;; restore
   mov ax, 97
-  shr ax, 1
+  sar ax, 1
   mov bx, di
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  shr ax, 1
+  sar ax, 1
   call Bare_num_to_char
   mov [Temps+8], ax
   push word [bp+2]
@@ -109,9 +109,9 @@ L7: ; Arm: 22'10
 L8: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, dx
-  shr bx, 1
+  sar bx, 1
   add ax, bx
   shl ax, 1
   add ax, 1
@@ -147,9 +147,9 @@ L10: ; Arm: 23'15
 L11: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, dx
-  shr bx, 1
+  sar bx, 1
   sub ax, bx
   shl ax, 1
   add ax, 1
@@ -185,8 +185,8 @@ L13: ; Arm: 24'15
 L14: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
-  shr dx, 1
+  sar ax, 1
+  sar dx, 1
   mul dx
   shl ax, 1
   add ax, 1

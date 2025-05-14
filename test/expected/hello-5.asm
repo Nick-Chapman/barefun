@@ -28,9 +28,9 @@ L3: ; Arm: 4'13
 L4: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  shr ax, 1
+  sar ax, 1
   mov bx, 3
-  shr bx, 1
+  sar bx, 1
   sub ax, bx
   shl ax, 1
   add ax, 1
@@ -50,7 +50,7 @@ L5: ; Function: (lam,t1)
   jz L3
   mov ax, g4
   mov bx, dx
-  shr bx, 1
+  sar bx, 1
   call Bare_get_bytes
   mov di, ax
   push word [bp+2]
