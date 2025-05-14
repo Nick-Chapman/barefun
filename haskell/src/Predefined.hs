@@ -48,7 +48,9 @@ wrapPreDefs (Prog defs) =
       , ("is_keyboard_ready" , prim1 Is_keyboard_ready)
       , ("get_keyboard_last_scancode" , prim1 Get_keyboard_last_scancode)
 
-      -- When adding new ops, make sure to get the correct arg count!
+      , ("assert", prim1 (Assert noPos))
+
+      -- When Adding New Ops, Make Sure To get the correct arg count!
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])

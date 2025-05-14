@@ -1,6 +1,6 @@
 module X : sig
 
-  val crash : unit -> 'a
+  val crash : string -> 'a
 
   val ( * ) : int -> int -> int
   val (%) : int -> int -> int
@@ -43,8 +43,8 @@ module X : sig
 
 end = struct
 
-  exception CRASH
-  let crash () = raise CRASH
+  exception CRASH of string
+  let crash message = raise (CRASH message)
 
   let (=) = (=)
   let (<) = (<)

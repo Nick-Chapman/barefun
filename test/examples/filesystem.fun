@@ -313,7 +313,7 @@ let () = _my_assert (block_size * blocks_per_sector = sector_size)
 let num_blocks = blocks_per_sector * num_sectors
 (*let () = assert (num_blocks = 256)*)
 
-type block = Block of string
+type block = Block of string (* always length 64 *)
 let deBlock thing = match thing with | Block x -> x
 
 let bad_block_index i = if i < 0 then true else i >= num_blocks

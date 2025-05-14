@@ -1,7 +1,7 @@
 module Value
   ( tUnit, tFalse, tTrue, tNil, tCons, cUnit, cFalse, cTrue, cNil, cCons
   , Value(..), Number, Ctag(..), Cid(..)
-  , mkBool,mkList,deUnit
+  , mkBool,mkList,deUnit,deBool
   , Interaction(..), runInteraction
   , Tickable(..)
   ) where
@@ -226,6 +226,15 @@ deUnit :: Value -> ()
 deUnit =
   \case VCons (Ctag _ tag) [] | tag == n -> (); _ -> error "deUnit"
   where Ctag _ n = tUnit
+
+deBool :: Value -> Bool
+deBool = \case
+  VCons (Ctag _ tag) [] | tag == t -> True
+  VCons (Ctag _ tag) [] | tag == f -> False
+  _ -> error "deBool"
+  where
+    Ctag _ f = tFalse
+    Ctag _ t = tTrue
 
 scanCodesFromAscii :: Char -> [Int]
 scanCodesFromAscii c = do

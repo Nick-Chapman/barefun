@@ -343,8 +343,9 @@ compileBuiltinTo builtin = case builtin of
     [ OpMove Bx s1
     , setTarget target (SMemIndirectOffset Bx 0)
     ]
-  SRC.Crash -> \_target -> oneArg $ \_ ->
-    [ OpCall Bare_crash
+  SRC.Crash -> \_target -> oneArg $ \s1 ->
+    [ OpMove Ax s1
+    , OpCall Bare_crash
     -- no need to assign target; we wont return from Bare_crash
     ]
   SRC.LoadSec -> \target -> twoArgs $ \s1 s2 ->
@@ -386,6 +387,10 @@ compileBuiltinTo builtin = case builtin of
   SRC.Get_keyboard_last_scancode -> \target -> oneArg $ \_unit ->
     [ OpCall Bare_get_keyboard_last_scancode
     , setTarget target (SReg Ax)
+    ]
+
+  SRC.Assert{} -> \target -> oneArg $ \_bool -> -- TODO: gen code to assert this bool
+    [ setTarget target sUnit
     ]
 
   where

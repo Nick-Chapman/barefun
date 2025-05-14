@@ -1,8 +1,9 @@
 module Builtin ( Builtin(..), executeBuiltin, isPure, evaluatePureBuiltin ) where
 
 import Text.Printf (printf)
-import Value (Value(..),tUnit,tTrue,mkBool,deUnit,Interaction(..))
+import Value (Value(..),tUnit,tTrue,mkBool,deUnit,deBool,Interaction(..))
 import qualified Data.Char as Char (chr,ord)
+import Par4 (Position(..))
 
 data Builtin
   = Crash
@@ -20,6 +21,9 @@ data Builtin
   | Wait_for_interrupt -- wrapper for x86 "hlt" opcode
   | Is_keyboard_ready
   | Get_keyboard_last_scancode
+
+  | Assert Position
+
   deriving (Show)
 
 data Semantics
@@ -96,6 +100,9 @@ defineBuiltin b =
 
     Get_keyboard_last_scancode ->
       Impure $ \vs k -> case deUnit (oneArg vs) of () -> IGetScanCode (\c -> k (VChar c))
+
+    Assert pos ->
+      Impure $ \vs k -> case deBool (oneArg vs) of b -> if b then k unit else error ("assert failed: " ++ show pos)
 
   where
     todo = Impure undefined

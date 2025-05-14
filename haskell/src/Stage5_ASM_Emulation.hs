@@ -375,7 +375,7 @@ execOp = \case
     if gcAtEverySafePoint || (n < need) then runGC else pure ()
     n <- heapBytesRemaining
     if (n < need)
-      then do Print (printf "[Not enough space recovered by GC: need=%d; have:%d]\n" need n); Crash
+      then do Crash (printf "[Not enough space recovered by GC: need=%d; have:%d]" need n)
       else
       do
         --Debug (printf "BudgedForAllocation: %d\n" need)
@@ -457,7 +457,11 @@ setTarget = \case
 execBare :: BareBios -> M ()
 execBare = \case
   Bare_halt -> Halt
-  Bare_crash -> Crash
+
+  Bare_crash -> do
+    a <- deAddr <$> GetReg Ax
+    mes <- getMemString a
+    Crash mes
 
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
   Bare_put_char -> do c <- deChar <$> GetReg Ax; PutChar c
@@ -549,6 +553,12 @@ getMemByte a = do
   --Debug (printf "getB: %s -> %s\n" (show a) (show x))
   pure x
 
+getMemString :: Addr -> M String
+getMemString a = do
+  n <- deNum <$> GetMem a
+  let len = n `div` 2 -- untag
+  sequence [ addAddr (fromIntegral i) a >>= getMemByte | i <- [2..len+1] ]
+
 splitWord :: Word -> (Char,Char)
 splitWord = \case
   WCharPair (c,d) -> (c,d)
@@ -617,7 +627,7 @@ data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
   Halt :: M ()
-  Crash :: M ()
+  Crash :: String -> M ()
   CheckRecentAlloc :: Int -> M () -- This is ensure block-descriptors are correct
   BudgedForAllocation :: Int -> M ()
   Debug :: String -> M ()
@@ -684,7 +694,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       Halt -> IDone
-      Crash -> ITrace "\n[Crash]\n" $ IDone
+      Crash mes -> ITrace (printf "\nCrash:%s\n" mes) $ IDone
 
       CheckRecentAlloc expect -> do
         let State{allocsSinceLastCheck=actual} = s

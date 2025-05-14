@@ -30,6 +30,7 @@ let get_ticks = (fun x -> PRIM_Get_ticks(x)) in
 let wait_for_interrupt = (fun x -> PRIM_Wait_for_interrupt(x)) in
 let is_keyboard_ready = (fun x -> PRIM_Is_keyboard_ready(x)) in
 let get_keyboard_last_scancode = (fun x -> PRIM_Get_keyboard_last_scancode(x)) in
+let assert = (fun x -> PRIM_Assert 0'0(x)) in
 let explode =
   (fun s ->
     let explode_loop =
