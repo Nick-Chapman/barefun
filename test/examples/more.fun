@@ -664,8 +664,9 @@ let sys_write : ii -> int -> string -> unit = (* too complicated! *)
         in
         let the_chunks =
           let size1 = block_size - (the_offset % block_size) in
-          match split_text size1 the_text with
-          | Pair (a,b) -> a :: chunk_text block_size b
+          if string_length the_text = 0 then [] else
+            match split_text size1 the_text with
+            | Pair (a,b) -> a :: chunk_text block_size b
         in
         let rec skip_loop n fs acc bis =
           if n = 0
