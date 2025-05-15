@@ -686,6 +686,7 @@ let sys_write : ii -> int -> string -> unit = (* too complicated! *)
         in
         let bis = match inode with | Inode (_,bis) -> bis in
         let nSkip = the_offset / block_size in
+        (* TODO: if the_offset exceeds prev size, we must zero fill the gap *)
         skip_loop nSkip fs [] bis
 
 (* Command infrastructure *)
