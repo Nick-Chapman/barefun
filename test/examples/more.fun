@@ -298,33 +298,10 @@ let read_line () =
 
 (* Filesystem code starts here... *)
 
+(* disk sectors *)
+
 let sector_size = 512
 let num_sectors_on_disk = 3 (* 31 is max here; if 32 we get 8*32=256 blocks, which is too big for a char *)
-
-let block_size = 64
-let blocks_per_sector = 8
-let () = assert (block_size * blocks_per_sector = sector_size)
-
-let num_blocks_on_disk = blocks_per_sector * num_sectors_on_disk
-
-(* block index *)
-
-type bi = BI of int
-let deBI x = match x with | BI y -> y
-let export_bi : bi -> char = fun bi -> chr (deBI bi)
-let import_bi : char -> bi = fun c -> BI (ord c)
-let show_bi : bi -> string = fun bi -> "B" ^ sofi (deBI bi)
-let eq_bi : bi -> bi -> bool = fun x y -> deBI x = deBI y
-
-(* inode index *)
-
-type ii = II of int
-let deII x = match x with | II y -> y
-let show_ii : ii -> string = fun ii -> "I" ^ sofi (deII ii)
-type block = Block of string (* always length 64 *)
-let deBlock x = match x with | Block y -> y
-
-(* disk sectors; size: 512 bytes *)
 
 let load_sector : int -> bytes -> unit = fun seci buf ->
   assert (seci >= 0);
@@ -364,6 +341,23 @@ let read_sector_show : int -> unit =
 
 (* blocks; size: 64 bytes; the smallest unit of access for file-data *)
 
+let block_size = 64
+let blocks_per_sector = 8
+let () = assert (block_size * blocks_per_sector = sector_size)
+let num_blocks_on_disk = blocks_per_sector * num_sectors_on_disk
+
+type block = Block of string
+let deBlock x = match x with | Block y -> y
+
+(* block index *)
+
+type bi = BI of int
+let deBI x = match x with | BI y -> y
+let export_bi : bi -> char = fun bi -> chr (deBI bi)
+let import_bi : char -> bi = fun c -> BI (ord c)
+let show_bi : bi -> string = fun bi -> "B" ^ sofi (deBI bi)
+let eq_bi : bi -> bi -> bool = fun x y -> deBI x = deBI y
+
 let show_seci seci = "[" ^ sofi seci ^ "]"
 
 let store_block : bi -> block -> unit = fun bi block ->
@@ -393,6 +387,8 @@ let update_block : bi -> int -> string -> unit =
   let () = mod_substr buf offset text in
   store_block bi (Block (freeze_bytes buf))
 
+(* inode *)
+
 let idata_size = 8
 let inodes_per_block = block_size / idata_size
 let () = assert (inodes_per_block = 8)
@@ -401,9 +397,6 @@ let max_file_size = max_blocks_per_inode * block_size
 let () = assert (max_file_size = 384)
 
 type inode = Inode of (int * bi list) (* file-size and block-list(#max=6); exports as 8 bytes on disk *)
-
-let ii2bi : ii -> bi = fun ii -> BI (deII ii / inodes_per_block + 1)
-let ii2off : ii -> int = fun ii -> (deII ii % inodes_per_block) * idata_size
 
 let export_int : int -> (char,char) pair = (* little endian *)
   fun n ->
@@ -433,8 +426,12 @@ let show_inode : inode -> string =
   | Inode (size,bis) ->
      "Inode: size=" ^ sofi size ^ ", blocks=[" ^ concat "," (map show_bi bis) ^ "]"
 
-let size_of_inode : inode -> int =
-  fun inode ->
+let showI : inode option -> string = fun opt ->
+  match opt with
+  | None -> "unallocated"
+  | Some inode -> show_inode inode
+
+let size_of_inode : inode -> int = fun inode ->
   match inode with
   | Inode (size,_) -> size
 
@@ -502,11 +499,52 @@ let store_super super = store_block super_block_number (export_super super)
 (* called from fsck; fs-signature-string checked *)
 let load_super () = import_super (load_block super_block_number)
 
+(* inode index *)
+
+type ii = II of int
+let deII x = match x with | II y -> y
+let show_ii : ii -> string = fun ii -> "I" ^ sofi (deII ii)
+
+let ii2bi : ii -> bi = fun ii -> BI (deII ii / inodes_per_block + 1)
+let ii2off : ii -> int = fun ii -> (deII ii % inodes_per_block) * idata_size
+
 (* fs: filesystem: superblock info + free lists *)
 
 type fs = FS of super * ii list * bi list (* free inodes and blocks *)
 
 let super_of_fs fs = match fs with | FS (super,_,_) -> super
+
+let loadI : super -> ii -> inode option =
+  fun super ii ->
+  assert (deII ii < num_inodes super);
+  let s = deBlock (load_block (ii2bi ii)) in
+  let off = ii2off ii in
+  let len = idata_size in
+  let s = substr s off len in
+  import_inode s
+
+(* fsck: discover/compute the free block and free inode info *)
+let fsck : unit -> fs option =
+  fun () ->
+  match load_super () with
+  | None -> None
+  | Some super ->
+     match super with
+     | Super (num_blocks,num_inode_blocks,num_inodes) ->
+        let rec loop accB accI i =
+          if i=num_inodes
+          then Some (FS (super,rev accI,accB))
+          else
+            let ii = II i in
+            match loadI super ii with
+            | None -> loop accB (ii::accI) (i+1)
+            | Some inode ->
+               match inode with
+               | Inode (_,bis) -> loop (list_diff eq_bi accB bis) accI (i+1)
+        in
+        let first_datablock = 1 + num_inode_blocks in
+        let all_bis = map (fun b -> BI b) (upto first_datablock (num_blocks-1)) in
+        loop all_bis [] 0
 
 let allocII : fs -> (fs,ii) pair option =
   fun fs ->
@@ -553,43 +591,6 @@ let storeI : super -> ii -> inode option -> unit =
   let () = mod_substr bytes off data in
   let s = freeze_bytes bytes in
   store_block (ii2bi ii) (Block s)
-
-let showI : inode option -> string = fun opt ->
-  match opt with
-  | None -> "unallocated"
-  | Some inode -> show_inode inode
-
-let loadI : super -> ii -> inode option =
-  fun super ii ->
-  assert (deII ii < num_inodes super);
-  let s = deBlock (load_block (ii2bi ii)) in
-  let off = ii2off ii in
-  let len = idata_size in
-  let s = substr s off len in
-  import_inode s
-
-(* fsck: discover/compute the free block and free inode info *)
-let fsck : unit -> fs option =
-  fun () ->
-  match load_super () with
-  | None -> None
-  | Some super ->
-     match super with
-     | Super (num_blocks,num_inode_blocks,num_inodes) ->
-        let rec loop accB accI i =
-          if i=num_inodes
-          then Some (FS (super,rev accI,accB))
-          else
-            let ii = II i in
-            match loadI super ii with
-            | None -> loop accB (ii::accI) (i+1)
-            | Some inode ->
-               match inode with
-               | Inode (_,bis) -> loop (list_diff eq_bi accB bis) accI (i+1)
-        in
-        let first_datablock = 1 + num_inode_blocks in
-        let all_bis = map (fun b -> BI b) (upto first_datablock (num_blocks-1)) in
-        loop all_bis [] 0
 
 let mounted : fs option ref = ref None
 
