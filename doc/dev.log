@@ -81,7 +81,7 @@ Fri 09 May 2025 : GC in runtime.asm (compare vs haskell) GC every safe point
 Sat 10 May 2025 : GC...sham works. todo: GC only when need.
 
 Mon 12 May 2025 : codes.fun; echo.fun. -- runtime.asm: GC only when need
-Tue 13 May 2025 :
-Wed 14 May 2025 :
-Thu 15 May 2025 :
-Fri 16 May 2025 :
+Tue 13 May 2025 : restart filesystem code (v2_)
+Wed 14 May 2025 : restart again filesystem code (more.fun)
+Thu 15 May 2025 : filesystem (get first complete version for demo to Ellie)
+Fri 16 May 2025 : filesystem.fun
