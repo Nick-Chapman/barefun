@@ -67,8 +67,12 @@ firstGlobalIndex = 1
 
 -- need 29 temps for the thrice example; no reason to not have more; but want to know when required
 -- sham example needs more
+-- filesystem needs 48 -- no, even more! -- 51
+-- haskell laziness means the example can startup, and reach the filesystem explorer prompt
+-- while having not completed the compilation! very counter-intuitive.
+-- maybe it could be fixed with strictness annotation :shrug:
 maxTempIndex :: Int
-maxTempIndex = 39
+maxTempIndex = 55
 
 ----------------------------------------------------------------------
 -- Show
