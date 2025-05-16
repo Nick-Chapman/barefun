@@ -93,7 +93,7 @@ runInteraction measure next = do
       IFreezeBytes r k -> do
         let State{bm} = state
         let (n,m) = maybe err id $ Map.lookup r bm where err = error (show ("IFreezeBytes",r))
-        let string = [ maybe '\0' id $ Map.lookup i m | i <- [0..n-1] ]
+        let string = [ maybe '\^U' id $ Map.lookup i m | i <- [0..n-1] ] -- uninitialized visibility
         loop state (k string)
 
       IThawBytes s k -> do

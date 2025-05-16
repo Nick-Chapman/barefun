@@ -510,6 +510,7 @@ execBare = \case
 
   Bare_load_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
+
   Bare_store_sector -> do -- TODO: emulate in Value/Interaction
     pure ()
 
@@ -562,7 +563,7 @@ getMemString a = do
 splitWord :: Word -> (Char,Char)
 splitWord = \case
   WCharPair (c,d) -> (c,d)
-  WUninitializedCharPair -> ('\0','\0')
+  WUninitializedCharPair -> ('\^U','\^U') -- uninitialized visibility
   w -> error (show ("splitWord",w))
 
 execJump :: Jump -> M ()

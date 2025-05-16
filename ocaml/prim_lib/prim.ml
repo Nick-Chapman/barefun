@@ -81,7 +81,8 @@ end = struct
 
   let make_bytes n =
     (*Printf.printf "[Prim.make_bytes:%d]\n" n;*)
-    Bytes.create n
+    (*Bytes.create n*)
+    Bytes.make n '\021' (* ^U : uninitialized visibility *)
 
   let freeze_bytes = Bytes.(*unsafe_*)to_string
   let thaw_bytes = Bytes.(*unsafe_*)of_string

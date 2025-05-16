@@ -348,13 +348,13 @@ compileBuiltinTo builtin = case builtin of
     , OpCall Bare_crash
     -- no need to assign target; we wont return from Bare_crash
     ]
-  SRC.LoadSec -> \target -> twoArgs $ \s1 s2 -> undefined $
+  SRC.LoadSec -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_load_sector
     , setTarget target sUnit
     ]
-  SRC.StoreSec -> \target -> twoArgs $ \s1 s2 -> undefined $
+  SRC.StoreSec -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
     , OpCall Bare_store_sector
