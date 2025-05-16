@@ -320,9 +320,9 @@ let put_sector : string -> unit = fun s ->
   let rec loop i =
     if i >= 512 then () else
       let c = string_index s i in
-      (if eq_char c '\n' then put_string "\\n" else put_char c;
-       (if i % 64 = 63 then newline() else ());
-       loop (i+1))
+      (if eq_char c '\n' then put_string "\\n" else put_char c);
+      (if i % 64 = 63 then newline() else ());
+      loop (i+1)
   in
   loop 0
 

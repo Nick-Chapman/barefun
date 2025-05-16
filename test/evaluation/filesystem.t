@@ -1,5 +1,5 @@
 
-  $ cat ../inputs/filesystem.input | ../../ocaml/main.exe Filesystem
+  $ cat ../inputs/filesystem.input | ../../haskell/main.exe ../examples/filesystem.fun -0
   Filesystem explorer
   Commands: wipe dump format mount unmount debug ls create append splat rm cat
   1> wipe
