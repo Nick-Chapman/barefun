@@ -1,0 +1,47 @@
+unmount
+format
+mount
+ls
+create
+Hello world!
+
+create
+z
+create
+
+create
+Goodbye.
+
+ls
+cat 0
+cat 1
+cat 2
+cat 3
+append 1
+ero one
+two
+
+cat 1
+splat 1 8
+ two three four
+
+cat 1
+append 1
+five six seven eight nine ten eleven twelve thirteen
+
+cat 1
+ls
+debug
+cat 0
+rm 0
+append 1
+fourteen fifteen sixteen seventeen eighteen nineteen twenty
+
+cat 1
+ls
+debug
+rm 2
+rm 1
+rm 3
+ls
+debug
