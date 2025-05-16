@@ -1,4 +1,4 @@
-unmount
+wipe
 format
 mount
 ls
@@ -45,3 +45,4 @@ rm 1
 rm 3
 ls
 debug
+dump

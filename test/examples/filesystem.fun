@@ -958,6 +958,4 @@ let main () =
   let coms = cmap_keys the_command_map in
   put_string "Filesystem explorer\n";
   put_string ("Commands: " ^ concat " " coms ^ "\n");
-  put_string "Trying to mount existing filesystem\n";
-  command_mount(); (* try to mount any existing fs *)
   repl 1
