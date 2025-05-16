@@ -26,7 +26,7 @@ gcAtEverySafePoint = False
 -- During dev, we can have quite small heap spaces
 -- experimentation shows the sham example needs more that 2000; but 3000 seems enough
 hemiSizeInBytes :: Int
-hemiSizeInBytes = 3000
+hemiSizeInBytes = 10000
 
 sizeRedzone :: Int -- for save/restore on stack by div/mod operation
 sizeRedzone = 2 -- TODO: 100 to match runtime.asm
@@ -459,8 +459,8 @@ execBare = \case
   Bare_halt -> Halt
 
   Bare_crash -> do
-    a <- deAddr <$> GetReg Bx
-    mes <- getMemString a
+    aObj <- deAddr <$> GetReg Bx
+    mes <- getMemString aObj
     Crash mes
 
   Bare_get_char -> do c <- GetChar; SetReg Ax (WChar c)
@@ -499,20 +499,28 @@ execBare = \case
     i <- deNum <$> GetReg Si
     c <- deChar <$> GetReg Bx
     a' <- addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
-    setMemByte a' c
+    setMemChar a' c
 
   Bare_get_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
     a' <- addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
-    c <- getMemByte a'
+    c <- getMemChar a'
     SetReg Ax (WChar c)
 
-  Bare_load_sector -> do -- TODO: emulate in Value/Interaction
+  Bare_load_sector -> do
+    n <- deNum <$> GetReg Ax
+    aObj <- deAddr <$> GetReg Bx
+    aData <- addAddr bytesPerWord aObj  -- +bytesPerWord for the length word
+    text <- ReadSector n
+    setMemString aData text
     pure ()
 
-  Bare_store_sector -> do -- TODO: emulate in Value/Interaction
-    pure ()
+  Bare_store_sector -> do
+    n <- deNum <$> GetReg Ax
+    aObj <- deAddr <$> GetReg Bx
+    text <- getMemString aObj
+    WriteSector n text
 
   Bare_free_words -> do
     DoMeasure >>= \case
@@ -534,8 +542,8 @@ execBare = \case
     c <- GetScanCode
     SetReg Ax (WChar c)
 
-setMemByte :: Addr -> Char -> M ()
-setMemByte a x = do
+setMemChar :: Addr -> Char -> M ()
+setMemChar a x = do
   --Debug (printf "setB: %s = %s\n" (show a) (show x))
   let even = evenAddr a
   aligned <- (if even then pure a else addAddr (-1) a)
@@ -544,8 +552,8 @@ setMemByte a x = do
   let w' = WCharPair (if even then (x,d) else (c,x))
   SetMem aligned w'
 
-getMemByte :: Addr -> M Char
-getMemByte a = do
+getMemChar :: Addr -> M Char
+getMemChar a = do
   let even = evenAddr a
   aligned <- (if even then pure a else addAddr (-1) a)
   w <- GetMem aligned
@@ -554,11 +562,19 @@ getMemByte a = do
   --Debug (printf "getB: %s -> %s\n" (show a) (show x))
   pure x
 
-getMemString :: Addr -> M String
-getMemString a = do
-  n <- deNum <$> GetMem a
+setMemString :: Addr -> String -> M () -- takes address of data
+setMemString aData = \case
+  [] -> pure ()
+  c:s -> do
+    setMemChar aData c
+    aData' <- addAddr 1 aData
+    setMemString aData' s
+
+getMemString :: Addr -> M String -- takes address of object
+getMemString aObj = do
+  n <- deNum <$> GetMem aObj
   let len = n `div` 2 -- untag
-  sequence [ addAddr (fromIntegral i) a >>= getMemByte | i <- [2..len+1] ]
+  sequence [ addAddr (fromIntegral i) aObj >>= getMemChar | i <- [2..len+1] ]
 
 splitWord :: Word -> (Char,Char)
 splitWord = \case
@@ -653,6 +669,8 @@ data M a where
   GetScanCode :: M Char
   BumpGC :: M Int
   WhatHemi :: M Hemi -- in which we are allocating
+  ReadSector :: Number -> M String
+  WriteSector :: Number -> String -> M ()
 
 data AllocMode = AllocForUser | AllocForGC
 
@@ -770,6 +788,12 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       WhatHemi -> do
         let State{hemi} = s
         k s hemi
+
+      ReadSector i -> do
+        IReadSector i $ \text -> k s text
+
+      WriteSector i text -> do
+        IWriteSector i text (k s ())
 
 data State = State
   { rmap :: Map Reg Word

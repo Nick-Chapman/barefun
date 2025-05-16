@@ -35,7 +35,6 @@ x a x b in
 
 let allow = function
   | "secex" -> false
-  | "filesystem" -> false (* TODO: enable this when haskell emulator supports load/store sector *)
   | _ -> true
 
 let () =

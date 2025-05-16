@@ -350,12 +350,14 @@ compileBuiltinTo builtin = case builtin of
     ]
   SRC.LoadSec -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
+    , OpShiftR1 Ax
     , OpMove Bx s2
     , OpCall Bare_load_sector
     , setTarget target sUnit
     ]
   SRC.StoreSec -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
+    , OpShiftR1 Ax
     , OpMove Bx s2
     , OpCall Bare_store_sector
     , setTarget target sUnit
