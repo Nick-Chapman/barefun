@@ -42,15 +42,15 @@ wrapPreDefs (Prog defs) =
       , ("load_sector"  , prim2 LoadSec)
       , ("store_sector" , prim2 StoreSec)
       , ("free_words"   , prim1 FreeWords)
-
       , ("get_ticks"  , prim1 Get_ticks)
       , ("wait_for_interrupt"  , prim1 Wait_for_interrupt)
       , ("is_keyboard_ready" , prim1 Is_keyboard_ready)
       , ("get_keyboard_last_scancode" , prim1 Get_keyboard_last_scancode)
-
       , ("assert", prim1 (Assert noPos))
 
-      -- When Adding New Ops, Make Sure To get the correct arg count!
+      -- The arg-count and types of predefined names which wrap Builtin primitives must match:
+      -- (a) The evaluation semantic defined in Builtin.hs
+      -- (b) The stage5 compilation of the builtin given in Stage5_ASM_Compiler.hs
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])

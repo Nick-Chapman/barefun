@@ -86,11 +86,9 @@ defineBuiltin b =
 
     FreeWords -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 0)
 
-    Crash -> todo
-    LoadSec -> todo
-    StoreSec -> todo
+    Crash -> Impure undefined -- TODO: should the message string
 
-    Get_ticks -> todo
+    Get_ticks -> Impure undefined -- TODO: no reason we can't emulate time in the haskell semantics
 
     Wait_for_interrupt ->  -- TODO: really wait
       Impure $ \vs k -> case deUnit (oneArg vs) of () -> k unit
@@ -104,9 +102,19 @@ defineBuiltin b =
     Assert pos ->
       Impure $ \vs k -> case deBool (oneArg vs) of b -> if b then k unit else error ("assert failed: " ++ show pos)
 
-  where
-    todo = Impure undefined
+    LoadSec ->
+      Impure $ \vs k -> do
+      let (i,b) = twoArgs deNum deBytes vs
+      IReadSector i $ \s -> do
+        ISetBytesFromString b s $ do
+        k unit
 
+    StoreSec ->
+      Impure $ \vs k -> do
+      let (i,s) = twoArgs deNum deString vs
+      IWriteSector i s (k unit)
+
+  where
     unit = VCons tUnit []
     true = VCons tTrue []
     oneArg = \case [v] -> v; _ -> err

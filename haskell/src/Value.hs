@@ -23,7 +23,7 @@ data Value
   | VFunc (Value -> (Value -> Interaction) -> Interaction)
   | VRef (IORef Value)
 
-data Interaction
+data Interaction -- TODO prefer args of Number, rather than Int ?
   = IDone
   | ITick Tickable Interaction
   | ITrace String Interaction
@@ -36,9 +36,12 @@ data Interaction
   | IThawBytes String (Bytes -> Interaction)
   | ISetBytes Bytes Int Char Interaction
   | IGetBytes Bytes Int (Char -> Interaction)
+  | ISetBytesFromString Bytes String Interaction
   | IMakeRef Value (IORef Value -> Interaction)
   | IDeRef (IORef Value) (Value -> Interaction)
   | ISetRef (IORef Value) Value Interaction
+  | IReadSector Number (String -> Interaction)
+  | IWriteSector Number String Interaction
 
 runInteraction :: Bool -> Interaction -> IO ()
 runInteraction measure next = do
@@ -116,6 +119,14 @@ runInteraction measure next = do
             let c = maybe '\0' id $ Map.lookup i m
             loop state (k c)
 
+      ISetBytesFromString r s k -> do
+        loop state (makeCharWiseInteraction 0 s)
+          where
+            makeCharWiseInteraction :: Int -> String -> Interaction
+            makeCharWiseInteraction i = \case
+              [] -> k
+              c:s -> ISetBytes r i c (makeCharWiseInteraction (i+1) s)
+
       IMakeRef v k -> do
         r <- newIORef v
         loop state (k r)
@@ -128,6 +139,18 @@ runInteraction measure next = do
         writeIORef r v
         loop state k
 
+      IReadSector i k -> do
+        let State{diskSectors} = state
+        let text = maybe zeroSector id $ Map.lookup i diskSectors
+        loop state (k text)
+          where
+            zeroSector = replicate sectorSize '\0'
+            sectorSize = 512
+
+      IWriteSector i s k -> do
+        let State{diskSectors} = state
+        loop state { diskSectors = Map.insert i s diskSectors } k
+
 -- An Interaction supports primitives for manipualting mutable "bytes"
 -- We implement functionally, with bytes being a reference into a Map of created bytes.
 -- Without GC, this will leak over time!
@@ -139,10 +162,11 @@ data State = State
   , bm :: Map Bytes (Int,Map Int Char)
   , u :: Int
   , pendingScanCodes :: [Int]
+  , diskSectors :: Map Number String
   }
 
 state0 :: State
-state0 = State { tm = Map.empty, bm = Map.empty, u = 1, pendingScanCodes = [] }
+state0 = State { tm = Map.empty, bm = Map.empty, u = 1, pendingScanCodes = [], diskSectors = Map.empty }
 
 instance Show State where
   show State{tm} =
