@@ -289,6 +289,7 @@ let read_line () =
             | [] -> readloop acc
             | c::tail ->
                (if ord c <= 26 then erase_char () else ()); (* The ^ printed for control chars *)
+               (* TODO: fix erase for all non printable control chars; erase 3 places?? *)
                erase_char();
                readloop tail
           else
