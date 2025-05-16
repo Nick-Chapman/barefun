@@ -261,7 +261,7 @@ mkBind x rhs body = case rhs of
   -- This is demonstrated by the undefined.
   -- And the LetAlias form is removed.
   -- If it turns out this case can occur, then the standard code for Compound will apply just fine.
-  Compound (Return _ (Named _y)) -> undefined -- $ LetAlias x _y body
+  --Compound (Return _ (Named _y)) -> undefined -- $ LetAlias x _y body
   Compound rhs -> mkPushContinuation (x,body) rhs
   Atomic rhs -> LetAtomic x rhs body
 
