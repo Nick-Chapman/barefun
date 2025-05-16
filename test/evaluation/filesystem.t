@@ -1,6 +1,5 @@
 
-  $ cat ../inputs/filesystem.input | ../../haskell/main.exe ../examples/filesystem.fun -measure
-  [Stage5 (ASM); post normalization size: 15317]
+  $ cat ../inputs/filesystem.input | ../../ocaml/main.exe Filesystem
   Filesystem explorer
   Commands: wipe dump format mount unmount debug ls create append splat rm cat
   1> wipe
@@ -135,4 +134,4 @@
   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  42> [EOF:#op=5954896, #alloc=2993518, #gc=341, #copied=344992]
+  42> [EOF]
