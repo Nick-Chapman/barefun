@@ -475,7 +475,7 @@ Bare_set_bytes:
 Bare_load_sector: ;Ax (Num bytes), Bx (The bytes buffer to load into)
     push cx ; save continuation
     push dx ; save arg
-    shr ax, 1
+    add ax, 5 ; index three embedded sectors at 5/6/7 by 0/1/2
     mov cl, al ; start sector number (1 is boot; 2 is kernel)
     mov dl, [drive_number]
     mov ah, 0x02 ; Function: Read Sectors From Drive
@@ -494,7 +494,7 @@ Bare_store_sector: ;Ax (Num bytes), Bx (The string to store)
     push cx ; save continuation
     push dx ; save arg
 
-    shr ax, 1
+    add ax, 5 ; index three embedded sectors at 5/6/7 by 0/1/2
     mov cl, al ; start sector number (1 is boot; 2 is kernel)
     mov dl, [drive_number]
     mov ah, 0x03 ; Function: Write Sectors To Drive
@@ -767,13 +767,12 @@ final_code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; User code
 
-%include CODE
-
     align 512
-    times 512 db '6'
-    times 512 db '7'
-    times 512 db '8'
-    times 512 db '9'
+    times 512 db '0'
+    times 512 db '1'
+    times 512 db '2'
+
+%include CODE
 
 end_of_code:
 

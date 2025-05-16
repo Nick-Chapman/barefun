@@ -26,7 +26,7 @@ let generate_rules x =
 
 let allow_example = function
   | "filesystem" -> false (* TODO: x86 from filesystem.fun is too big *)
-  | "secex" -> false  (* TODO: reinstate when haskell load/store sector works *)
+  | "secex" -> true
   | _ -> true
 
 let () =
