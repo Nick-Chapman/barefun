@@ -137,8 +137,6 @@ let erase_char () =
   put_char ' ';
   put_char backspace
 
-(* get_char VIA get_scan  *)
-
 let rec get_scan () =
   (*let () = put_char '.' in*)
   let () = wait_for_interrupt () in
@@ -167,7 +165,6 @@ let get_char : unit -> char =
     let control_released = (n = 157) in
     let ok d = (r_shifted := shifted; r_controlled := controlled; d) in
     let unknown() = (put_char '{'; put_int n; put_char '}'; loop shifted controlled) in
-    (* TODO: work around haskell parser bug error for true/false as args using brakets *)
     if control_pressed then loop shifted (true) else
       if control_released then loop shifted (false) else
         if shift_pressed then loop (true) controlled else

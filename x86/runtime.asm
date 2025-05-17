@@ -332,7 +332,7 @@ halt:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bare BIOS
 
-Bare_clear_screen: ;; -- TODO expose this as user builtin
+Bare_clear_screen:
     mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
     int 0x10
     ret
@@ -354,7 +354,7 @@ CR equ 13
 DEL equ 127
 
 ;;; Read a key press (Converting CR to LF; BS to DEL)
-Bare_get_char: ; -> ax ;; no longer used by any examples. TODO: remove it
+Bare_get_char: ; -> ax
     mov ah, 0
     int 0x16 ; Function
     mov ah, 0
@@ -560,7 +560,7 @@ tCALLER equ Temps+12
 
 need: dw 0
 
-%macro Bare_enter_check 1 ;; TODO: pay attention to "need" argument
+%macro Bare_enter_check 1
     mov word [need], %1
     jz %%no_need
     call Bare_enter_check_function

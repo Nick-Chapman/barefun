@@ -852,7 +852,7 @@ L53: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L54: ; Arm: 101'33
+L54: ; Arm: 101'32
   push word [bp+12]
   push word cx
   push word L53

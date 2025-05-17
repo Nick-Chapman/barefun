@@ -6,12 +6,12 @@ let select_versions_for_example = function
   | "evenodd" -> [5]
   | "ff" -> [5]
   | "fib" -> [5]
-  | "filesystem" -> []  (* TODO: reinstate when haskell load/store sector works *)
+  | "filesystem" -> [5]
   | "hello" -> [0;1;2;3;4;5]
   | "print_all_chars" -> [5]
   | "put_int" -> [5]
   | "readline" -> [5]
-  | "secex" -> [] (* TODO: reinstate when haskell load/store sector works *)
+  | "secex" -> [5]
   | "sham" -> [5]
   | "thrice" -> [5]
   | "tree" -> [5]

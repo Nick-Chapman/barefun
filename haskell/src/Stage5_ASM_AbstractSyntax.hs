@@ -109,7 +109,6 @@ data ScanMode = Scanned | RawData
 
 -- BareBios; primitive routines available to the compiled code
 data BareBios
-  -- Base_clear_screen -- TODO: expose to user code
   = Bare_halt
   | Bare_crash
   | Bare_put_char

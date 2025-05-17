@@ -331,7 +331,7 @@ normalPress = \case
   '\n' -> 0x1C
   _ -> 0
 
-shiftedPress :: Char -> Int -- TODO: better to dowc-case and use normalPress
+shiftedPress :: Char -> Int -- TODO: better to down-case and use normalPress
 shiftedPress = \case
   '!' -> 0x02
   '@' -> 0x03

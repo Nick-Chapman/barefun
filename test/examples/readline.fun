@@ -88,7 +88,7 @@ let get_char : unit -> char =
     let n = ord (get_scan()) in
     let shift_pressed = if (n = 42) then true else (n = 54) in
     let shift_released = if (n = 170) then true else (n = 182) in
-    let _release_scancode = (n > 128) in
+    let release_scancode = (n > 128) in
     let control_pressed = (n = 29) in
     let control_released = (n = 157) in
     let ok d = (r_shifted := shifted; r_controlled := controlled; d) in
@@ -98,7 +98,7 @@ let get_char : unit -> char =
       if control_released then loop shifted (false) else
         if shift_pressed then loop (true) controlled else
           if shift_released then loop (false) controlled else
-            if _release_scancode then loop shifted controlled else
+            if release_scancode then loop shifted controlled else
               if n = 14 then ok (chr 127) else
                 if n = 57 then ok ' ' else
                   let table = if controlled then tableC else if shifted then tableU else tableL in

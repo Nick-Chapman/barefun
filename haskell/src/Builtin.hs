@@ -86,9 +86,9 @@ defineBuiltin b =
 
     FreeWords -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 0)
 
-    Crash -> Impure undefined -- TODO: should the message string
+    Crash -> Impure undefined -- TODO: report the message string
 
-    Get_ticks -> Impure undefined -- TODO: no reason we can't emulate time in the haskell semantics
+    Get_ticks -> Impure undefined -- TODO: no reason we can't emulate time in the haskell evaluators
 
     Wait_for_interrupt ->  -- TODO: really wait
       Impure $ \vs k -> case deUnit (oneArg vs) of () -> k unit

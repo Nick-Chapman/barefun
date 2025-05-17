@@ -11,12 +11,6 @@ let not b =
 let (>) a b = b < a
 let (>=) a b = not (a < b)
 
-let rec get_scan () =
-  (*let () = put_char '.' in*)
-  let () = wait_for_interrupt () in
-  if is_keyboard_ready() then get_keyboard_last_scancode () else
-    get_scan()
-
 let put_digit n = put_char (chr (n + ord '0'))
 
 let put_scancode xyz =
@@ -29,6 +23,12 @@ let put_scancode xyz =
   put_digit y;
   put_digit z;
   put_char '}'
+
+let rec get_scan () =
+  (*let () = put_char '.' in*)
+  let () = wait_for_interrupt () in
+  if is_keyboard_ready() then get_keyboard_last_scancode () else
+    get_scan()
 
 (* space are place holders for unknown scancodes *)
 let tableL : string =
@@ -47,17 +47,16 @@ let get_char : unit -> char =
     let n = ord (get_scan()) in
     let shift_pressed = if (n = 42) then true else (n = 54) in
     let shift_released = if (n = 170) then true else (n = 182) in
-    let _release_scancode = (n > 128) in
+    let release_scancode = (n > 128) in
     let control_pressed = (n = 29) in
     let control_released = (n = 157) in
     let ok d = (r_shifted := shifted; r_controlled := controlled; d) in
     let unknown() = (put_scancode n; loop shifted controlled) in
-    (* TODO: work around haskell parser bug error for true/false as args using brakets *)
     if control_pressed then loop shifted (true) else
       if control_released then loop shifted (false) else
         if shift_pressed then loop (true) controlled else
           if shift_released then loop (false) controlled else
-            if _release_scancode then loop shifted controlled else
+            if release_scancode then loop shifted controlled else
               if n = 14 then ok (chr 127) else
                 if n = 57 then ok ' ' else
                   let table = if controlled then tableC else if shifted then tableU else tableL in
@@ -110,8 +109,6 @@ let put_sector_string s =
       (put_char c; loop (i+1))
   in
   loop 0
-
-(*let buf = make_bytes 512*) (* TODO: share a common buffer *)
 
 let make_sector = noinline (fun c ->
   let buf = make_bytes 512 in

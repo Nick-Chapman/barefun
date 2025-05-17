@@ -900,7 +900,7 @@ L66: ; Function: (put_chars,g25)
   mov cx, [bp+2]
   jmp [bp]
 
-L67: ; Arm: 145'25
+L67: ; Arm: 143'25
   call Bare_get_keyboard_last_scancode
   mov [Temps+6], ax
   mov dx, [Temps+6]
@@ -1403,7 +1403,7 @@ L92: ; Function: (loop,g61)
   mov cx, [bp+2]
   jmp [bp]
 
-L93: ; Arm: 399'11
+L93: ; Arm: 396'11
   mov dx, dx
   mov bp, cx
   mov cx, [bp+2]
@@ -1481,7 +1481,7 @@ L97: ; Function: (lam,g161)
   mov cx, [bp+2]
   jmp [bp]
 
-L98: ; Arm: 421'9
+L98: ; Arm: 418'9
   push word [bp+2]
   push word 3
   mov [Temps+2], sp
@@ -1491,7 +1491,7 @@ L98: ; Arm: 421'9
   mov cx, [bp+2]
   jmp [bp]
 
-L99: ; Arm: 424'15
+L99: ; Arm: 421'15
   mov dx, g226
   mov bp, cx
   mov cx, [bp+2]
@@ -1536,7 +1536,7 @@ L101: ; Continuation
   mov dx, [Temps+6]
   jmp [bp]
 
-L102: ; Arm: 416'27
+L102: ; Arm: 413'27
   push word [bp+4]
   push word 3
   mov [Temps+2], sp
@@ -1562,7 +1562,7 @@ L104: ; Arm: 8'9
   mov cx, [bp+2]
   jmp [bp]
 
-L105: ; Arm: 416'12
+L105: ; Arm: 413'12
   mov ax, 19
   cmp word ax, [bp+8]
   call Bare_make_bool_from_n
@@ -2389,7 +2389,7 @@ L153: ; Continuation
   mov dx, g37
   jmp [bp]
 
-L154: ; Arm: 171'23
+L154: ; Arm: 168'23
   push word cx
   push word L153
   mov cx, sp
@@ -2404,7 +2404,7 @@ L155: ; Continuation
   mov dx, g38
   jmp [bp]
 
-L156: ; Arm: 172'26
+L156: ; Arm: 169'26
   push word cx
   push word L155
   mov cx, sp
@@ -2420,7 +2420,7 @@ L157: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L158: ; Arm: 173'25
+L158: ; Arm: 170'25
   push word [bp+12]
   push word cx
   push word L157
@@ -2437,7 +2437,7 @@ L159: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L160: ; Arm: 174'28
+L160: ; Arm: 171'28
   push word [bp+12]
   push word cx
   push word L159
@@ -2454,7 +2454,7 @@ L161: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L162: ; Arm: 175'32
+L162: ; Arm: 172'32
   push word [bp+12]
   push word cx
   push word L161
@@ -2464,7 +2464,7 @@ L162: ; Arm: 175'32
   mov bp, [bp+10]
   jmp [bp]
 
-L163: ; Arm: 176'24
+L163: ; Arm: 173'24
   mov bx, [bp+4]
   mov ax, [bp+8]
   mov [bx], ax
@@ -2480,7 +2480,7 @@ L163: ; Arm: 176'24
   mov cx, [bp+2]
   jmp [bp]
 
-L164: ; Arm: 177'26
+L164: ; Arm: 174'26
   mov bx, [bp+4]
   mov ax, [bp+8]
   mov [bx], ax
@@ -2600,7 +2600,7 @@ L173: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L174: ; Arm: 180'27
+L174: ; Arm: 177'27
   mov ax, `{`
   call Bare_put_char
   mov ax, Bare_unit
@@ -2743,7 +2743,7 @@ L183: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L184: ; Arm: 181'32
+L184: ; Arm: 178'32
   mov ax, `{`
   call Bare_put_char
   mov ax, Bare_unit
@@ -2886,7 +2886,7 @@ L193: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L194: ; Arm: 184'22
+L194: ; Arm: 181'22
   mov ax, `{`
   call Bare_put_char
   mov ax, Bare_unit
@@ -2925,7 +2925,7 @@ L194: ; Arm: 184'22
   mov dx, g63
   jmp [bp]
 
-L195: ; Arm: 187'24
+L195: ; Arm: 184'24
   mov ax, [Temps+2]
   call Bare_char_to_num
   shl ax, 1
@@ -3034,13 +3034,13 @@ L198: ; Continuation
   mov cx, [bp+2]
   jmp [bp]
 
-L199: ; Arm: 178'44
+L199: ; Arm: 175'44
   mov dx, g41
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L200: ; Arm: 178'72
+L200: ; Arm: 175'72
   mov dx, g42
   mov bp, cx
   mov cx, [bp+2]
@@ -3110,7 +3110,7 @@ L201: ; Continuation
   mov cx, [bp+2]
   jmp [bp]
 
-L202: ; Arm: 164'38
+L202: ; Arm: 162'38
   mov dx, g36
   mov bp, cx
   mov cx, [bp+2]
@@ -3145,7 +3145,7 @@ L203: ; Continuation
   mov cx, [bp+2]
   jmp [bp]
 
-L204: ; Arm: 163'36
+L204: ; Arm: 161'36
   mov dx, g35
   mov bp, cx
   mov cx, [bp+2]
@@ -3225,7 +3225,7 @@ L208: ; Continuation
   mov cx, [bp+2]
   jmp [bp]
 
-L209: ; Arm: 219'11
+L209: ; Arm: 216'11
   push word [bp+6]
   push word cx
   push word L208
@@ -3258,7 +3258,7 @@ L211: ; Continuation
   mov dx, [Temps+2]
   jmp [bp]
 
-L212: ; Arm: 221'26
+L212: ; Arm: 218'26
   push word [Temps+4]
   push word [bp+6]
   push word [bp+4]
@@ -3349,7 +3349,7 @@ L217: ; Function: (have_letter,t1)
   mov cx, [bp+2]
   jmp [bp]
 
-L218: ; Arm: 226'9
+L218: ; Arm: 223'9
   mov dx, [bp+2]
   mov bp, cx
   mov cx, [bp+2]
@@ -3362,7 +3362,7 @@ L219: ; Continuation
   mov dx, [bx+4]
   jmp [bp]
 
-L220: ; Arm: 228'24
+L220: ; Arm: 225'24
   push word [Temps+4]
   push word cx
   push word L219
@@ -3439,7 +3439,7 @@ L224: ; Function: (at_word_start,t5)
   mov cx, [bp+2]
   jmp [bp]
 
-L225: ; Arm: 200'22
+L225: ; Arm: 197'22
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3448,7 +3448,7 @@ L225: ; Arm: 200'22
   mov bp, [bp+4]
   jmp [bp]
 
-L226: ; Arm: 201'28
+L226: ; Arm: 198'28
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3470,12 +3470,12 @@ L226: ; Arm: 201'28
   mov dx, [Temps+14]
   jmp [bp]
 
-L227: ; Arm: 202'19
+L227: ; Arm: 199'19
   mov dx, [bp+6]
   mov bp, [bp+8]
   jmp [bp]
 
-L228: ; Arm: 205'17
+L228: ; Arm: 202'17
   mov dx, [bp+6]
   mov bp, [bp+8]
   jmp [bp]
@@ -3498,7 +3498,7 @@ L229: ; Continuation
   mov bp, [bp+4]
   jmp [bp]
 
-L230: ; Arm: 207'31
+L230: ; Arm: 204'31
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3538,7 +3538,7 @@ L232: ; Arm: 8'9
   mov cx, [bp+2]
   jmp [bp]
 
-L233: ; Arm: 203'21
+L233: ; Arm: 200'21
   mov bx, [bp+6]
   cmp word [bx], 1
   jz L228
@@ -3744,7 +3744,7 @@ L240: ; Function: (readloop,t1)
   mov dx, [Temps+2]
   jmp [bp]
 
-L241: ; Arm: 282'36
+L241: ; Arm: 279'36
   mov dx, g71
   mov bp, cx
   mov cx, [bp+2]
@@ -3756,19 +3756,19 @@ L242: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L243: ; Arm: 274'7
+L243: ; Arm: 271'7
   mov dx, [bp+10]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L244: ; Arm: 245'9
+L244: ; Arm: 242'9
   mov dx, g74
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L245: ; Arm: 249'35
+L245: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -4246,7 +4246,7 @@ L278: ; Continuation
   mov dx, g76
   jmp [bp]
 
-L279: ; Arm: 266'9
+L279: ; Arm: 263'9
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
@@ -4678,7 +4678,7 @@ L309: ; Continuation
   mov dx, g84
   jmp [bp]
 
-L310: ; Arm: 269'14
+L310: ; Arm: 266'14
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word [bp+10]
@@ -5000,7 +5000,7 @@ L327: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L328: ; Arm: 303'7
+L328: ; Arm: 300'7
   push word [bp+8]
   push word cx
   push word L327
@@ -5010,13 +5010,13 @@ L328: ; Arm: 303'7
   mov dx, g99
   jmp [bp]
 
-L329: ; Arm: 245'9
+L329: ; Arm: 242'9
   mov dx, g100
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L330: ; Arm: 249'35
+L330: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -5075,13 +5075,13 @@ L333: ; Function: (loop,t3)
   mov dx, [Temps+6]
   jmp [bp]
 
-L334: ; Arm: 245'9
+L334: ; Arm: 242'9
   mov dx, g109
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L335: ; Arm: 249'35
+L335: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -5156,7 +5156,7 @@ L340: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L341: ; Arm: 296'11
+L341: ; Arm: 293'11
   push word g113
   push word [bp+8]
   push word 3
@@ -5182,7 +5182,7 @@ L342: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L343: ; Arm: 299'16
+L343: ; Arm: 296'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word cx
@@ -5332,7 +5332,7 @@ L353: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L354: ; Arm: 296'11
+L354: ; Arm: 293'11
   push word g104
   push word [bp+12]
   push word 3
@@ -5358,7 +5358,7 @@ L355: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L356: ; Arm: 299'16
+L356: ; Arm: 296'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word cx
@@ -5508,7 +5508,7 @@ L364: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L365: ; Arm: 340'7
+L365: ; Arm: 337'7
   push word [bp+8]
   push word cx
   push word L364
@@ -5547,7 +5547,7 @@ L368: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L369: ; Arm: 343'10
+L369: ; Arm: 340'10
   push word g124
   push word [Temps+2]
   push word 3
@@ -5586,7 +5586,7 @@ L371: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L372: ; Arm: 346'12
+L372: ; Arm: 343'12
   mov ax, [bx+2]
   mov [Temps+10], ax
   mov ax, [bx+4]
@@ -5600,13 +5600,13 @@ L372: ; Arm: 346'12
   mov dx, g125
   jmp [bp]
 
-L373: ; Arm: 245'9
+L373: ; Arm: 242'9
   mov dx, g126
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L374: ; Arm: 249'35
+L374: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -5694,7 +5694,7 @@ L380: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L381: ; Arm: 349'15
+L381: ; Arm: 346'15
   push word g130
   push word [bp+10]
   push word 3
@@ -5846,7 +5846,7 @@ L388: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L389: ; Arm: 383'7
+L389: ; Arm: 380'7
   push word [bp+18]
   push word cx
   push word L388
@@ -5874,7 +5874,7 @@ L391: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L392: ; Arm: 386'12
+L392: ; Arm: 383'12
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
@@ -5888,7 +5888,7 @@ L392: ; Arm: 386'12
   mov dx, g134
   jmp [bp]
 
-L393: ; Arm: 200'22
+L393: ; Arm: 197'22
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -5897,7 +5897,7 @@ L393: ; Arm: 200'22
   mov bp, [bp+4]
   jmp [bp]
 
-L394: ; Arm: 201'28
+L394: ; Arm: 198'28
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -5919,12 +5919,12 @@ L394: ; Arm: 201'28
   mov dx, [Temps+14]
   jmp [bp]
 
-L395: ; Arm: 202'19
+L395: ; Arm: 199'19
   mov dx, [bp+6]
   mov bp, [bp+8]
   jmp [bp]
 
-L396: ; Arm: 205'17
+L396: ; Arm: 202'17
   mov dx, [bp+6]
   mov bp, [bp+8]
   jmp [bp]
@@ -5947,7 +5947,7 @@ L397: ; Continuation
   mov bp, [bp+4]
   jmp [bp]
 
-L398: ; Arm: 207'31
+L398: ; Arm: 204'31
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -5987,7 +5987,7 @@ L400: ; Arm: 8'9
   mov cx, [bp+2]
   jmp [bp]
 
-L401: ; Arm: 203'21
+L401: ; Arm: 200'21
   mov bx, [bp+6]
   cmp word [bx], 1
   jz L396
@@ -6211,7 +6211,7 @@ L410: ; Continuation
   mov dx, [bx+6]
   jmp [bp]
 
-L411: ; Arm: 392'44
+L411: ; Arm: 389'44
   push word [bp+10]
   push word [bp+8]
   push word cx
@@ -6568,7 +6568,7 @@ L431: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L432: ; Arm: 378'7
+L432: ; Arm: 375'7
   push word [bp+8]
   push word cx
   push word L431
@@ -6578,13 +6578,13 @@ L432: ; Arm: 378'7
   mov dx, g147
   jmp [bp]
 
-L433: ; Arm: 245'9
+L433: ; Arm: 242'9
   mov dx, g148
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L434: ; Arm: 249'35
+L434: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -6659,7 +6659,7 @@ L439: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L440: ; Arm: 371'11
+L440: ; Arm: 368'11
   push word g151
   push word [bp+8]
   push word 3
@@ -6690,7 +6690,7 @@ L442: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L443: ; Arm: 374'16
+L443: ; Arm: 371'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word g154
@@ -6864,7 +6864,7 @@ L454: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L455: ; Arm: 288'9
+L455: ; Arm: 285'9
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -6878,7 +6878,7 @@ L455: ; Arm: 288'9
   mov dx, g160
   jmp [bp]
 
-L456: ; Arm: 256'9
+L456: ; Arm: 253'9
   mov dx, g162
   mov bp, cx
   mov cx, [bp+2]
@@ -6936,7 +6936,7 @@ L460: ; Continuation
   mov cx, [bp+2]
   jmp [bp]
 
-L461: ; Arm: 260'9
+L461: ; Arm: 257'9
   mov dx, g163
   mov bp, cx
   mov cx, [bp+2]
@@ -7062,7 +7062,7 @@ L470: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L471: ; Arm: 317'7
+L471: ; Arm: 314'7
   push word [bp+8]
   push word cx
   push word L470
@@ -7072,13 +7072,13 @@ L471: ; Arm: 317'7
   mov dx, g166
   jmp [bp]
 
-L472: ; Arm: 245'9
+L472: ; Arm: 242'9
   mov dx, g167
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L473: ; Arm: 249'35
+L473: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -7137,13 +7137,13 @@ L476: ; Function: (loop,t3)
   mov dx, [Temps+6]
   jmp [bp]
 
-L477: ; Arm: 245'9
+L477: ; Arm: 242'9
   mov dx, g176
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L478: ; Arm: 249'35
+L478: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -7218,7 +7218,7 @@ L483: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L484: ; Arm: 310'11
+L484: ; Arm: 307'11
   push word g180
   push word [bp+8]
   push word 3
@@ -7254,7 +7254,7 @@ L486: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L487: ; Arm: 313'16
+L487: ; Arm: 310'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word g184
@@ -7394,7 +7394,7 @@ L496: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L497: ; Arm: 310'11
+L497: ; Arm: 307'11
   push word g171
   push word [bp+12]
   push word 3
@@ -7430,7 +7430,7 @@ L499: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L500: ; Arm: 313'16
+L500: ; Arm: 310'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word g175
@@ -7570,7 +7570,7 @@ L507: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L508: ; Arm: 355'7
+L508: ; Arm: 352'7
   push word [bp+8]
   push word cx
   push word L507
@@ -7609,7 +7609,7 @@ L511: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L512: ; Arm: 358'10
+L512: ; Arm: 355'10
   push word g191
   push word [Temps+2]
   push word 3
@@ -7648,7 +7648,7 @@ L514: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L515: ; Arm: 361'12
+L515: ; Arm: 358'12
   mov ax, [bx+2]
   mov [Temps+10], ax
   mov ax, [bx+4]
@@ -7662,13 +7662,13 @@ L515: ; Arm: 361'12
   mov dx, g192
   jmp [bp]
 
-L516: ; Arm: 245'9
+L516: ; Arm: 242'9
   mov dx, g193
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
-L517: ; Arm: 249'35
+L517: ; Arm: 246'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -7756,7 +7756,7 @@ L523: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L524: ; Arm: 364'15
+L524: ; Arm: 361'15
   push word g197
   push word [bp+12]
   push word 3
@@ -7804,7 +7804,7 @@ L527: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L528: ; Arm: 323'9
+L528: ; Arm: 320'9
   push word g201
   push word [bp+8]
   push word 3
@@ -7824,7 +7824,7 @@ L528: ; Arm: 323'9
   mov dx, [Temps+4]
   jmp [bp]
 
-L529: ; Arm: 328'35
+L529: ; Arm: 325'35
   mov dx, [bp+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -8077,7 +8077,7 @@ L542: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L543: ; Arm: 335'7
+L543: ; Arm: 332'7
   push word [bp+8]
   push word cx
   push word L542
@@ -8114,7 +8114,7 @@ L546: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L547: ; Arm: 323'9
+L547: ; Arm: 320'9
   push word g209
   push word [bp+8]
   push word 3
@@ -8134,7 +8134,7 @@ L547: ; Arm: 323'9
   mov dx, [Temps+4]
   jmp [bp]
 
-L548: ; Arm: 328'35
+L548: ; Arm: 325'35
   mov dx, [bp+6]
   mov bp, cx
   mov cx, [bp+2]
@@ -8347,7 +8347,7 @@ L562: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L563: ; Arm: 431'7
+L563: ; Arm: 428'7
   push word [bp+4]
   push word cx
   push word L562
@@ -8375,7 +8375,7 @@ L565: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L566: ; Arm: 434'12
+L566: ; Arm: 431'12
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
@@ -8407,7 +8407,7 @@ L568: ; Continuation
   mov dx, dx
   jmp [bp]
 
-L569: ; Arm: 437'15
+L569: ; Arm: 434'15
   push word [bp+6]
   push word cx
   push word L568
@@ -8417,7 +8417,7 @@ L569: ; Arm: 437'15
   mov dx, g227
   jmp [bp]
 
-L570: ; Arm: 403'13
+L570: ; Arm: 400'13
   mov dx, g228
   mov bp, cx
   mov cx, [bp+2]

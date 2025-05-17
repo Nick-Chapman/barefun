@@ -26,7 +26,6 @@ let generate_rules x =
 
 let allow_example = function
   | "filesystem" -> false (* TODO: x86 from filesystem.fun is too big *)
-  | "secex" -> true
   | _ -> true
 
 let () =
