@@ -43,7 +43,7 @@ main = do
     tagZ = if reachedNormStage then printf "; post normalization size: %d" sizeN else ""
       where sizeN = Stage1.sizeExp e2
 
-  -- flag "-no-measure" suppresses printing the opening whoami banner and the final instumention
+  -- flag "-measure" prints the opening whoami banner and the final instumention
   let whoami = if measure then printf "[%s%s]\n" tag tagZ else ""
   let runInteraction = Value.runInteraction measure
 

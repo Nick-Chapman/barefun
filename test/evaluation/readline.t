@@ -1,6 +1,5 @@
 
-  $ cat ../inputs/readline.input | ../../haskell/main.exe -measure ../examples/readline.fun
-  [Stage5 (ASM); post normalization size: 786]
+  $ cat ../inputs/readline.input | ../../haskell/main.exe ../examples/readline.fun
   Readline: edit with backspace; exit with ^D.
   % Readline testing. Send all chars 0..127...
   Readline testing. Send all chars 0..127...
@@ -10,4 +9,4 @@
   ^E^F^G^I
   % ^K^L^M^N^O^P^Q^R^S^T^U^V^W^X^Y^Z !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ 
   ^K^L^M^N^O^P^Q^R^S^T^U^V^W^X^Y^Z !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}
-  % DONE.[EOF:#op=121935, #alloc=56164, #gc=5, #copied=2410]
+  % DONE.[EOF]

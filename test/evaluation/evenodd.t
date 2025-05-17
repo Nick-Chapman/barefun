@@ -1,4 +1,3 @@
 
-  $ ../../haskell/main.exe -measure ../examples/evenodd.fun
-  [Stage5 (ASM); post normalization size: 42]
-  EO[HALT:#op=1009, #alloc=24]
+  $ ../../haskell/main.exe ../examples/evenodd.fun
+  EO[HALT]

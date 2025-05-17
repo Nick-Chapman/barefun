@@ -1,6 +1,5 @@
 
-  $ cat ../inputs/sham.input | ../../haskell/main.exe -measure ../examples/sham.fun
-  [Stage5 (ASM); post normalization size: 2667]
+  $ cat ../inputs/sham.input | ../../haskell/main.exe ../examples/sham.fun
   Sham: In-memory file-system. Consider typing "ls".
   % ls
   readme cat cp create file ls man mv rm cat fib space
@@ -20,4 +19,4 @@
   And what can be the use of him is more than I can see.
   He is very, very like me from the heels up to the head;
   And I see him jump before me, when I jump into my bed.
-  % [EOF:#op=91042, #alloc=38818, #gc=4, #copied=2026]
+  % [EOF]
