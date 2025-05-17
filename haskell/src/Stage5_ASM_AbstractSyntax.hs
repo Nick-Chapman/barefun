@@ -1,7 +1,7 @@
 -- | Define types for x86 assembly, and printer suitable for nasm
 module Stage5_ASM_AbstractSyntax
   ( bytesPerWord
-  , Reg(..), frameReg,argReg,contReg
+  , Reg(..), frameReg,argReg, geteCurrentCont,setCurrentCont
   , Image(..)
   , Lit(..)
   , Code(..)
@@ -30,11 +30,19 @@ bytesPerWord = 2
 data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
   deriving (Eq,Ord)
 
--- Calling conventions:
-frameReg,argReg,contReg :: Reg
+-- Calling conventions: arg/frame in registers
+frameReg,argReg :: Reg
 frameReg = Bp
 argReg = Si
-contReg = Cx -- TODO: use memory instead of reg for this.
+
+-- current continuation in memory
+setCurrentCont :: Source -> Op
+setCurrentCont = \case
+  SReg reg -> OpStore TCurrentCont reg
+  source -> OpMany [ OpMove Ax source, OpStore TCurrentCont Ax ]
+
+geteCurrentCont :: Source
+geteCurrentCont = SCurrentCont
 
 data Image = Image
   { cmap :: Map CodeLabel Code
@@ -78,12 +86,14 @@ data Jump
 
 data Target
   = TReg Reg
-  | TTemp SRC.Temp
+  | TTemp SRC.Temp -- TODO: unify TTemp/TCurrentCont as just TMem (same for Source)
+  | TCurrentCont
 
 data Source
   = SReg Reg
   | SLit Lit
   | STemp SRC.Temp
+  | SCurrentCont
   | SMemIndirectOffset Reg Int -- byte indexing
 
 data Lit
@@ -184,12 +194,14 @@ instance Show Target where
   show = \case
     TReg r -> show r
     TTemp temp -> ppTemp temp
+    TCurrentCont -> "CurrentCont"
 
 instance Show Source where
   show = \case
     SReg r -> show r
     SLit w -> show w
     STemp temp -> printf "[%s]" (ppTemp temp)
+    SCurrentCont -> "[CurrentCont]"
     SMemIndirectOffset r n ->
       if n == 0 then printf "[%s]" (show r) else
         printf "[%s+%s]" (show r) (show n)

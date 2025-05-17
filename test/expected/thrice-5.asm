@@ -117,8 +117,9 @@ L1: ; Start
   mov ax, Bare_unit
   mov [Temps+58], ax
   mov si, [Temps+58]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 

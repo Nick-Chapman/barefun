@@ -5,7 +5,6 @@
 ;; GC roots; must match stage5 calling convention
 %define Arg si
 %define Frame bp
-%define Cont cx
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Layout
@@ -497,11 +496,10 @@ bots: dw botA, botB ; used to index this
 userCaller equ Temps+2
 evacuateCaller equ Temps+4
 
-tCont equ Temps+6
-tArg equ Temps+8
-tFrame equ Temps+10
+tArg equ Temps+6
+tFrame equ Temps+8
 
-tCALLER equ Temps+12
+tCALLER equ Temps+10
 
 need: dw 0
 
@@ -566,7 +564,6 @@ gc_start:
     mov [userCaller], ax
     mov [tFrame], Frame
     mov [tArg], Arg
-    mov [tCont], Cont
 
     ;; switch heap spaces
     mov bl, [hemi]
@@ -588,10 +585,10 @@ gc_start:
     mov si, [tArg]
     call evacuate
     mov [tArg], si
-    ;; continuation register
-    mov si, [tCont]
+    ;; current continuation
+    mov si, [CurrentCont]
     call evacuate
-    mov [tCont], si
+    mov [CurrentCont], si
     ;; Scavenge objects between sp and dx
     ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
     cmp dx, sp
@@ -633,7 +630,6 @@ gc_start:
     cmp sp, cx
     jne .outer_loop
 .done_everything:
-    mov Cont, [tCont]
     mov Arg, [tArg]
     mov Frame, [tFrame]
     jmp [userCaller]
@@ -680,7 +676,6 @@ evacuate: ;; si --> si (uses: bp)
 
 main:
     mov sp, topA
-    mov cx, final_continuation
     mov bp, 0
     mov dx, 0
 
@@ -693,6 +688,9 @@ final_continuation:
 final_code:
     PrintString `[HALT]\n`
     jmp halt
+
+CurrentCont:
+    dw final_continuation
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Space for three embedded sectors; for WIP filesystem eample

@@ -71,8 +71,8 @@ compileCode = \case
   SRC.Return _pos res -> do
     pure $ doOps
       [ OpMove argReg (compileRef res)
-      , OpMove frameReg (SReg contReg)
-      , OpMove contReg (SMemIndirectOffset frameReg bytesPerWord)
+      , OpMove frameReg geteCurrentCont
+      , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
       ] (Done (JumpIndirect frameReg))
 
   SRC.Tail fun _pos arg -> do
@@ -93,9 +93,9 @@ compileCode = \case
     let
       ops =
         map OpPush (reverse (map compileRef pre)) ++
-        [ OpPush (SReg contReg)
+        [ OpPush geteCurrentCont
         , OpPush (SLit (LCodeLabel lab))
-        , OpMove contReg (SReg Sp)
+        , setCurrentCont (SReg Sp)
         , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
         ]
     doOps ops <$> compileCode first
@@ -148,6 +148,7 @@ needs r2 = \case
   SReg r -> (r==r2)
   SLit{} -> False
   STemp{} -> False
+  SCurrentCont -> False
   SMemIndirectOffset r _ -> (r==r2)
 
 changeRegInSource :: Reg -> Reg -> Source -> Source
@@ -155,6 +156,7 @@ changeRegInSource r1 r2 = \case
   SReg r -> SReg (if r==r1 then r2 else r1)
   s@SLit{} -> s
   s@STemp{} -> s
+  s@SCurrentCont -> s
   SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
 
 compileAtomicTo :: String -> Target -> SRC.Atomic -> Asm [Op]
@@ -402,13 +404,10 @@ compileBuiltinTo builtin = case builtin of
 
 setTarget :: Target -> Source -> Op
 setTarget = \case
-  TReg target -> \source -> OpMove target source
-  TTemp targetTemp -> \case
-    SReg sourceReg -> OpStore (TTemp targetTemp) sourceReg
-    source ->
-      OpMany  [ OpMove Ax source
-              , OpStore (TTemp targetTemp) Ax
-              ]
+  TReg treg -> \source -> OpMove treg source
+  target -> \case
+    SReg sreg -> OpStore target sreg
+    source -> OpMany [ OpMove Ax source, OpStore target Ax]
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
@@ -426,6 +425,7 @@ sourceOfTarget :: Target -> Source
 sourceOfTarget = \case
   TReg r -> SReg r
   TTemp t -> STemp t
+  TCurrentCont -> SCurrentCont
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops

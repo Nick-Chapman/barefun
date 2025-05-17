@@ -1,7 +1,8 @@
 L1: ; Arm: 9'15
   mov si, g2
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Continuation
@@ -40,8 +41,9 @@ L3: ; Arm: 12'17
   mov ax, Bare_unit
   mov [Temps+16], ax
   mov si, [Temps+16]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L4: ; Arm: 13'20
@@ -62,8 +64,9 @@ L4: ; Arm: 13'20
   mov ax, Bare_unit
   mov [Temps+16], ax
   mov si, [Temps+16]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L5: ; Function: (loop,g1)
@@ -84,9 +87,9 @@ L5: ; Function: (loop,g1)
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   push word si
-  push word cx
+  push word [CurrentCont]
   push word L2
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 3
@@ -107,8 +110,9 @@ L5: ; Function: (loop,g1)
   mov ax, Bare_unit
   mov [Temps+12], ax
   mov si, [Temps+12]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L6: ; Continuation
@@ -118,15 +122,16 @@ L6: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov si, [Temps+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L7: ; Start
   Bare_enter_check(6)
-  push word cx
+  push word [CurrentCont]
   push word L6
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g1
   mov si, 1

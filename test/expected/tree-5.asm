@@ -1,7 +1,8 @@
 L1: ; Arm: 6'13
   mov si, [bp+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Continuation
@@ -55,9 +56,9 @@ L3: ; Function: (lam,t1)
   mov [Temps+10], sp
   push word 6 ;; scanned
   push word si
-  push word cx
+  push word [CurrentCont]
   push word L2
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g1
   mov si, [Temps+10]
@@ -70,14 +71,16 @@ L4: ; Function: (loop,g1)
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L5: ; Arm: 13'7
   mov si, g3
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L6: ; Function: (put_chars,g2)
@@ -101,8 +104,9 @@ L7: ; Arm: 22'10
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov si, [Temps+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L8: ; Continuation
@@ -116,16 +120,17 @@ L8: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L9: ; Continuation
   Bare_enter_check(8)
   push word si
-  push word cx
+  push word [CurrentCont]
   push word L8
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov si, [bp+4]
   mov bp, g4
@@ -137,9 +142,9 @@ L10: ; Arm: 23'15
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
-  push word cx
+  push word [CurrentCont]
   push word L9
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g4
   mov si, [Temps+2]
@@ -156,16 +161,17 @@ L11: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L12: ; Continuation
   Bare_enter_check(8)
   push word si
-  push word cx
+  push word [CurrentCont]
   push word L11
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov si, [bp+4]
   mov bp, g4
@@ -177,9 +183,9 @@ L13: ; Arm: 24'15
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
-  push word cx
+  push word [CurrentCont]
   push word L12
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g4
   mov si, [Temps+2]
@@ -195,16 +201,17 @@ L14: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L15: ; Continuation
   Bare_enter_check(8)
   push word si
-  push word cx
+  push word [CurrentCont]
   push word L14
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov si, [bp+4]
   mov bp, g4
@@ -224,9 +231,9 @@ L16: ; Function: (eval,g4)
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+4]
-  push word cx
+  push word [CurrentCont]
   push word L15
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g4
   mov si, [Temps+2]
@@ -245,8 +252,9 @@ L18: ; Arm: 9'20
   mov [Temps+4], sp
   push word 6 ;; scanned
   mov si, [Temps+4]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L19: ; Continuation
@@ -262,17 +270,17 @@ L20: ; Continuation
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+2], ax
-  push word cx
+  push word [CurrentCont]
   push word L17
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L18
   push word si
-  push word cx
+  push word [CurrentCont]
   push word L19
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g1
   mov si, g6
@@ -311,9 +319,9 @@ L21: ; Start
   push word 5
   mov [Temps+14], sp
   push word 6 ;; scanned
-  push word cx
+  push word [CurrentCont]
   push word L20
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g4
   mov si, [Temps+14]

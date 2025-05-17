@@ -171,9 +171,10 @@ runGC = do
   Debug (printf "%02d:" gcNum)
   setStackPointerToTopOfHemi toSpace
 
-  let roots = [frameReg,argReg,contReg]
   watermark0 <- getSP
-  mapM_ evacuateReg roots
+  evacuateReg frameReg
+  evacuateReg argReg
+  evacuateCurrentCont
   loop watermark0
 
   HeapAddr sp <- getSP
@@ -202,6 +203,13 @@ runGC = do
               False -> do
                 nextScanPointer <- scavenge scanPointer
                 innerLoop nextScanPointer
+
+evacuateCurrentCont :: M ()
+evacuateCurrentCont = do
+  w <- GetMem aCurrentCont
+  evacuate w >>= \case
+    Just w' -> SetMem aCurrentCont w'
+    Nothing -> pure ()
 
 evacuateReg :: Reg -> M ()
 evacuateReg reg = do
@@ -439,6 +447,7 @@ evalSource = \case
   SReg r -> GetReg r
   SLit l -> pure (fromLit l)
   STemp temp -> GetTemp temp
+  SCurrentCont -> GetMem aCurrentCont
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
     a' <- addAddr i a
@@ -446,6 +455,8 @@ evalSource = \case
 
 setTarget :: Target -> Word -> M ()
 setTarget = \case
+  TCurrentCont -> \w ->
+    SetMem aCurrentCont w
   TTemp temp -> \w ->
     SetTemp temp w
   TReg r -> \w -> do
@@ -827,7 +838,6 @@ state0 dmap = State
     initialStackPointer = AHeap (HeapAddr (fromIntegral topA))
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
-      , (contReg, WAddr aFinalCont)
       -- initialize in case of very early GC
       , (frameReg, arbitrary)
       , (argReg, arbitrary)
@@ -842,6 +852,7 @@ state0 dmap = State
       , (aTrue, tagging tTrue)
       , (aUnit, tagging tUnit)
       , (aFinalCont, WCodeLabel finalCodeLabel)
+      , (aCurrentCont, WAddr aFinalCont)
       ]
     user =
       concat [ [(AStatic lab i,w) | (i,w) <- specsWords specs ]
@@ -875,6 +886,9 @@ instance Show State where
     intercalate " " [ show k ++ "=" ++ show w | (k,w) <- Map.toList rmap ]
 
 aFalse,aTrue,aUnit,aFinalCont :: Addr
+
+aCurrentCont :: Addr
+aCurrentCont = AStatic (DataLabelR "CurrentCont") 0
 
 -- These three addresses are only used internally by stage5
 aFalse = AStatic (DataLabelR "Bare_false") 0

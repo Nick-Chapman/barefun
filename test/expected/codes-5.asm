@@ -2,8 +2,9 @@ L1: ; Arm: 6'25
   call Bare_get_keyboard_last_scancode
   mov [Temps+6], ax
   mov si, [Temps+6]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Function: (get_scancode,g1)
@@ -130,9 +131,9 @@ L3: ; Continuation
 
 L4: ; Function: (main,g6)
   Bare_enter_check(6)
-  push word cx
+  push word [CurrentCont]
   push word L3
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g1
   mov si, g7

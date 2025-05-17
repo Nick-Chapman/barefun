@@ -1,13 +1,15 @@
 L1: ; Arm: 5'27
   mov si, g2
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Arm: 4'26
   mov si, g3
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L3: ; Function: (is_even,g1)
@@ -53,28 +55,31 @@ L4: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov si, [Temps+2]
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L5: ; Arm: 9'25
   mov si, `E`
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L6: ; Continuation
   Bare_enter_check(6)
-  push word cx
+  push word [CurrentCont]
   push word L4
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, si
   cmp word [bx], 3
   jz L5
   mov si, `O`
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L7: ; Continuation
@@ -83,9 +88,9 @@ L7: ; Continuation
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+2], ax
-  push word cx
+  push word [CurrentCont]
   push word L6
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g1
   mov si, 27
@@ -93,29 +98,31 @@ L7: ; Continuation
 
 L8: ; Arm: 9'25
   mov si, `E`
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L9: ; Continuation
   Bare_enter_check(6)
-  push word cx
+  push word [CurrentCont]
   push word L7
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, si
   cmp word [bx], 3
   jz L8
   mov si, `O`
-  mov bp, cx
-  mov cx, [bp+2]
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
   jmp [bp]
 
 L10: ; Start
   Bare_enter_check(6)
-  push word cx
+  push word [CurrentCont]
   push word L9
-  mov cx, sp
+  mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g1
   mov si, 85
