@@ -398,12 +398,12 @@ Bare_get_bytes:
 
 ;;; val set_bytes : bytes -> int -> char -> unit
 ;;; in: ax (bytes)
-;;; in: di (int)
-;;; in: bl (char)
+;;; in: bx (int)
+;;; in: dl (char)
 Bare_set_bytes:
-    add di, 2 ; length word
-    add di, ax
-    mov byte [di], bl
+    add bx, 2 ; length word
+    add bx, ax
+    mov byte [bx], dl
     ret
 
 ;;; ax: The sector number (0/1/2)

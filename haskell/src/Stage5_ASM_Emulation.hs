@@ -494,8 +494,8 @@ execBare = \case
 
   Bare_set_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Di -- TODO: use Dx instead (once we use si for arg-reg)
-    c <- deChar <$> GetReg Bx
+    i <- deNum <$> GetReg Bx
+    c <- deChar <$> GetReg Dx
     a' <- addAddr (fromIntegral i + bytesPerWord) a
     setMemChar a' c
 

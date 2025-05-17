@@ -50,9 +50,9 @@ L6: ; Continuation
   cmp word [bx], 3
   jz L5
   mov ax, [bp+6]
-  mov bx, [bp+4]
-  mov di, [bp+8]
-  sar di, 1
+  mov bx, [bp+8]
+  mov dx, [bp+4]
+  sar bx, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+2], ax

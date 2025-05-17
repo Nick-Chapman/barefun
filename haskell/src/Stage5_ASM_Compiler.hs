@@ -314,9 +314,9 @@ compileBuiltinTo builtin = case builtin of
     ]
   SRC.SetBytes -> \target -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
-    , OpMove Bx s3
-    , OpMove Di s2 -- TODO: change to Dx (once we switch arg-reg from Dx to Si). Must sync Bare_set_bytes with stage5 emulator AND the real runtime.asm
-    , OpShiftR1 Di
+    , OpMove Bx s2
+    , OpMove Dx s3
+    , OpShiftR1 Bx
     , OpCall Bare_set_bytes -- TODO: remove/inline
     , setTarget target sUnit
     ]

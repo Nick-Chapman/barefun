@@ -76,9 +76,9 @@ L8: ; Function: (lam,t1)
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [bp+2]
-  mov bx, [Temps+2]
-  mov di, [bp+4]
-  sar di, 1
+  mov bx, [bp+4]
+  mov dx, [Temps+2]
+  sar bx, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+6], ax
