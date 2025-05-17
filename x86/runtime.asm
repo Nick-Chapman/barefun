@@ -413,9 +413,6 @@ Bare_set_bytes:
 ;;; ax: The sector number (0/1/2)
 ;;; bx: The bytes buffer to load into
 Bare_load_sector:
-    ;; TODO: avoid preserving cx/dx when calling convention is changed
-    push cx                 ; save continuation1
-    push dx                 ; save arg
     add ax, 5               ; index three embedded sectors at 5/6/7 by 0/1/2
     mov cl, al
     mov dl, [drive_number]
@@ -425,15 +422,11 @@ Bare_load_sector:
     mov al, 1               ; sector count
     add bx, 2               ; dest buffer; skip length word
     int 0x13
-    pop dx
-    pop cx
     ret
 
 ;;; ax: The sector number (0/1/2)
 ;;; bx: The bytes buffer to store from
 Bare_store_sector:
-    push cx                 ; save continuation
-    push dx                 ; save arg
     add ax, 5               ; index three embedded sectors at 5/6/7 by 0/1/2
     mov cl, al
     mov dl, [drive_number]
@@ -443,8 +436,6 @@ Bare_store_sector:
     mov al, 1               ; sector count
     add bx, 2               ; src buffer; skip 2 for the length word
     int 0x13
-    pop dx
-    pop cx
     ret
 
 Bare_unit:
