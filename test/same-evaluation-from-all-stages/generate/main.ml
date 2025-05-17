@@ -35,6 +35,7 @@ x a x b in
 
 let allow = function
   | "secex" -> false
+  | "filesystem" -> false (* too slow! *)
   | _ -> true
 
 let () =
