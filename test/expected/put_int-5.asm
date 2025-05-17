@@ -63,12 +63,9 @@ L5: ; Function: (lam,t1)
   add dx, 1
   mov [Temps+4], dx
   mov ax, 97
-  sar ax, 1
   mov bx, [Temps+4]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
   sar ax, 1

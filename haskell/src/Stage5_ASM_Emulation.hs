@@ -362,6 +362,10 @@ execOp = \case
     x <- deNum <$> GetReg r
     SetReg r (WNum (x + 1)) -- tag step 2
     cont
+  OpDec r -> \cont -> do
+    x <- deNum <$> GetReg r
+    SetReg r (WNum (x - 1))
+    cont
   OpAddInto r s -> execBinaryOpInto (+) r s
   OpSubInto r s -> execBinaryOpInto (-) r s
   OpMulIntoAx s -> execBinaryOpInto (*) Ax (SReg s)

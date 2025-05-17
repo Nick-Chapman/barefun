@@ -26,12 +26,9 @@ L3: ; Arm: 7'7
 L4: ; Continuation
   Bare_enter_check(0)
   mov ax, 3
-  sar ax, 1
   mov bx, si
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]
   mov bp, [CurrentCont]
@@ -87,12 +84,9 @@ L8: ; Function: (lam,t1)
   mov ax, Bare_unit
   mov [Temps+6], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+4]
   push word [CurrentCont]
@@ -179,11 +173,8 @@ L14: ; Arm: 24'13
 L15: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -235,11 +226,8 @@ L17: ; Function: (explode_loop,t1)
 L18: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si

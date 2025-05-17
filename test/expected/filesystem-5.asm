@@ -26,12 +26,9 @@ L3: ; Arm: 25'7
 L4: ; Continuation
   Bare_enter_check(0)
   mov ax, 3
-  sar ax, 1
   mov bx, si
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]
   mov bp, [CurrentCont]
@@ -422,12 +419,9 @@ L36: ; Function: (lam,t1)
   cmp word [bx], 3
   jz L33
   mov ax, [bp+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word si
   push word [bp+2]
@@ -503,11 +497,8 @@ L42: ; Continuation
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   push word [Temps+4]
@@ -619,11 +610,8 @@ L50: ; Arm: 83'13
 L51: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -675,11 +663,8 @@ L53: ; Function: (explode_loop,t1)
 L54: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -735,12 +720,9 @@ L58: ; Function: (lam,t1)
   mov ax, Bare_unit
   mov [Temps+6], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+4]
   push word [CurrentCont]
@@ -858,12 +840,9 @@ L66: ; Function: (lam,t1)
   add dx, 1
   mov [Temps+4], dx
   mov ax, 97
-  sar ax, 1
   mov bx, [Temps+4]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
   sar ax, 1
@@ -936,12 +915,9 @@ L71: ; Continuation
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, [Temps+2]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   push word [bp+6]
   push word [CurrentCont]
@@ -1039,11 +1015,8 @@ L78: ; Function: (lam,t1)
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+8], ax
   mov ax, [Temps+8]
@@ -1169,19 +1142,13 @@ L85: ; Function: (put_chars,g38)
   mov ax, Bare_unit
   mov [Temps+14], ax
   mov ax, 131
-  sar ax, 1
   mov bx, [Temps+6]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+16], ax
   mov ax, [Temps+16]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+18], ax
   mov ax, [Temps+18]
@@ -1229,11 +1196,8 @@ L88: ; Function: (lam,t1)
   mov ax, Bare_unit
   mov [Temps+6], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+8], ax
   push word [Temps+4]
@@ -1291,11 +1255,8 @@ L92: ; Continuation
   mov [Temps+4], sp
   push word 4 ;; scanned
   mov ax, si
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   push word [Temps+2]
@@ -1346,11 +1307,8 @@ L97: ; Continuation
   cmp word [bx], 3
   jz L96
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, [bp+6]
@@ -1413,11 +1371,8 @@ L100: ; Continuation
   mov [Temps+2], sp
   push word 6 ;; scanned
   mov ax, [bp+8]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+4], ax
   mov bp, [Temps+2]
@@ -1484,12 +1439,9 @@ L105: ; Continuation
   cmp word [bx], 3
   jz L104
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, [bp+10]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov ax, [bp+4]
   mov bx, [Temps+2]
@@ -1504,12 +1456,9 @@ L105: ; Continuation
   mov ax, Bare_unit
   mov [Temps+6], ax
   mov ax, [bp+10]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   mov bp, [bp+12]
   mov si, [Temps+8]
@@ -1588,12 +1537,9 @@ L111: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, [bp+8]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov ax, [bp+12]
   cmp word ax, [Temps+4]
@@ -1696,12 +1642,9 @@ L117: ; Continuation
   call Bare_get_bytes
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, [bp+10]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov ax, [bp+4]
   mov bx, [Temps+4]
@@ -1711,12 +1654,9 @@ L117: ; Continuation
   mov ax, Bare_unit
   mov [Temps+6], ax
   mov ax, [bp+10]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   mov bp, [bp+12]
   mov si, [Temps+8]
@@ -1780,12 +1720,9 @@ L122: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, [bp+10]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov ax, [bp+12]
   cmp word ax, [Temps+4]
@@ -2547,11 +2484,8 @@ L174: ; Continuation
 L175: ; Continuation
   Bare_enter_check(6)
   mov ax, 1
-  sar ax, 1
   mov bx, [bp+4]
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word [CurrentCont]
@@ -3602,19 +3536,13 @@ L250: ; Function: (readloop,t1)
   mov ax, Bare_unit
   mov [Temps+22], ax
   mov ax, 131
-  sar ax, 1
   mov bx, [Temps+14]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+26], ax
   mov ax, [Temps+26]
@@ -3641,12 +3569,9 @@ L251: ; Arm: 861'10
 L252: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, [bp+6]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, si
   mov si, [Temps+2]
@@ -4885,12 +4810,9 @@ L325: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word [Temps+4]
   push word 1
@@ -5159,12 +5081,9 @@ L334: ; Arm: 12'9
 L335: ; Continuation
   Bare_enter_check(28)
   mov ax, 3
-  sar ax, 1
   mov bx, [bp+18]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov ax, 769
   cmp word ax, [Temps+2]
@@ -6162,12 +6081,9 @@ L375: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word [Temps+4]
   push word 1
@@ -13959,11 +13875,8 @@ L697: ; Arm: 678'22
   mov ax, [bx+4]
   mov [Temps+6], ax
   mov ax, [bp+18]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+8], ax
   push word [Temps+6]
@@ -14193,12 +14106,9 @@ L715: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+8]
   mov si, [Temps+4]
@@ -14278,11 +14188,8 @@ L721: ; Continuation
   mov ax, Bare_unit
   mov [Temps+4], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   push word [bp+12]
@@ -15522,11 +15429,8 @@ L776: ; Continuation
 L777: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 129
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -15696,11 +15600,8 @@ L788: ; Continuation
 L789: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, [bp+4]
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -15805,11 +15706,8 @@ L796: ; Continuation
   add dx, 1
   mov [Temps+4], dx
   mov ax, 129
-  sar ax, 1
   mov bx, [Temps+4]
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov bx, [bp+22]
@@ -15872,12 +15770,9 @@ L798: ; Continuation
   mov ax, [bx]
   mov [Temps+2], ax
   mov ax, [bp+20]
-  sar ax, 1
   mov bx, [Temps+2]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov ax, si
   cmp word ax, [Temps+4]
@@ -16120,11 +16015,8 @@ L812: ; Continuation
   cmp word [bx], 3
   jz L801
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -16143,11 +16035,8 @@ L812: ; Continuation
   cmp word [bx], 3
   jz L811
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -16160,12 +16049,9 @@ L812: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -16254,12 +16140,9 @@ L814: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -17393,12 +17276,9 @@ L858: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word [Temps+4]
   push word 1
@@ -17571,11 +17451,8 @@ L862: ; Continuation
 L863: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -17736,11 +17613,8 @@ L874: ; Continuation
   cmp word [bx], 3
   jz L873
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, si
@@ -18056,19 +17930,13 @@ L890: ; Function: (readloop,t1)
   mov ax, Bare_unit
   mov [Temps+22], ax
   mov ax, 131
-  sar ax, 1
   mov bx, [Temps+14]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+26], ax
   mov ax, [Temps+26]
@@ -18103,12 +17971,9 @@ L892: ; Arm: 955'36
 L893: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, [bp+6]
   mov si, [Temps+2]
@@ -18588,12 +18453,9 @@ L931: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+8]
   mov si, [Temps+4]
@@ -18647,12 +18509,9 @@ L935: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+8]
   mov si, [Temps+4]
@@ -19117,12 +18976,9 @@ L971: ; Arm: 321'16
 L972: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, [bp+6]
   mov si, [Temps+2]
@@ -19271,19 +19127,13 @@ L980: ; Continuation
   mov ax, Bare_unit
   mov [Temps+14], ax
   mov ax, 131
-  sar ax, 1
   mov bx, [Temps+6]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+16], ax
   mov ax, [Temps+16]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+18], ax
   mov ax, [Temps+18]
@@ -19333,12 +19183,9 @@ L982: ; Function: (loop,t6)
 L983: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, [bp+6]
   mov si, [Temps+2]
@@ -20778,12 +20625,9 @@ L1075: ; Continuation
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   push word [Temps+6]
   push word 1
@@ -21745,12 +21589,9 @@ L1118: ; Function: (lam,t3)
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -23547,12 +23388,9 @@ L1232: ; Arm: 537'10
 L1233: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, si
   mov si, [Temps+2]
@@ -23592,12 +23430,9 @@ L1235: ; Arm: 541'19
 L1236: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, si
   mov si, [Temps+2]
@@ -23849,11 +23684,8 @@ L1254: ; Continuation
   cmp word [bx], 3
   jz L1243
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -23872,11 +23704,8 @@ L1254: ; Continuation
   cmp word [bx], 3
   jz L1253
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -23889,12 +23718,9 @@ L1254: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -23977,12 +23803,9 @@ L1256: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -24917,12 +24740,9 @@ L1299: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -25066,11 +24886,8 @@ L1306: ; Continuation
 L1307: ; Continuation
   Bare_enter_check(10)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word [bp+8]
@@ -25128,12 +24945,9 @@ L1309: ; Continuation
   mov [Temps+10], sp
   push word 16 ;; scanned
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+6]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+12], ax
   push word [Temps+12]
   push word [Temps+10]
@@ -28706,11 +28520,8 @@ L1561: ; Continuation
   cmp word [bx], 3
   jz L1550
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -28729,11 +28540,8 @@ L1561: ; Continuation
   cmp word [bx], 3
   jz L1560
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -28746,12 +28554,9 @@ L1561: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -28834,12 +28639,9 @@ L1563: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -29742,12 +29544,9 @@ L1606: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -29808,11 +29607,8 @@ L1608: ; Continuation
 L1609: ; Continuation
   Bare_enter_check(8)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word [bp+6]
@@ -32705,11 +32501,8 @@ L1797: ; Continuation
   cmp word [bx], 3
   jz L1786
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -32728,11 +32521,8 @@ L1797: ; Continuation
   cmp word [bx], 3
   jz L1796
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -32745,12 +32535,9 @@ L1797: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -32832,12 +32619,9 @@ L1799: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -33700,12 +33484,9 @@ L1842: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -33764,11 +33545,8 @@ L1844: ; Continuation
 L1845: ; Continuation
   Bare_enter_check(8)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word [bp+6]
@@ -35832,12 +35610,9 @@ L1974: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word [Temps+4]
   push word 1
@@ -36960,12 +36735,9 @@ L2022: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word [Temps+4]
   push word 1
@@ -38969,11 +38741,8 @@ L2170: ; Continuation
   cmp word [bx], 3
   jz L2159
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -38992,11 +38761,8 @@ L2170: ; Continuation
   cmp word [bx], 3
   jz L2169
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -39009,12 +38775,9 @@ L2170: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -39094,12 +38857,9 @@ L2172: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -39921,12 +39681,9 @@ L2215: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -45197,12 +44954,9 @@ L2583: ; Continuation
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   push word [Temps+6]
   push word 1
@@ -46246,12 +46000,9 @@ L2626: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -46581,11 +46332,8 @@ L2643: ; Continuation
   cmp word [bx], 3
   jz L2632
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -46604,11 +46352,8 @@ L2643: ; Continuation
   cmp word [bx], 3
   jz L2642
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -46621,12 +46366,9 @@ L2643: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -46714,12 +46456,9 @@ L2645: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -47791,12 +47530,9 @@ L2688: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -50438,11 +50174,8 @@ L2875: ; Continuation
   cmp word [bx], 3
   jz L2864
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -50461,11 +50194,8 @@ L2875: ; Continuation
   cmp word [bx], 3
   jz L2874
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -50478,12 +50208,9 @@ L2875: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -50566,12 +50293,9 @@ L2877: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -51480,12 +51204,9 @@ L2920: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -53098,12 +52819,9 @@ L2998: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+8]
   mov si, [Temps+4]
@@ -53157,12 +52875,9 @@ L3002: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+8]
   mov si, [Temps+4]
@@ -53627,12 +53342,9 @@ L3038: ; Arm: 321'16
 L3039: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, [bp+6]
   mov si, [Temps+2]
@@ -53781,19 +53493,13 @@ L3047: ; Continuation
   mov ax, Bare_unit
   mov [Temps+14], ax
   mov ax, 131
-  sar ax, 1
   mov bx, [Temps+6]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+16], ax
   mov ax, [Temps+16]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+18], ax
   mov ax, [Temps+18]
@@ -53843,12 +53549,9 @@ L3049: ; Function: (loop,t6)
 L3050: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, [bp+6]
   mov si, [Temps+2]
@@ -55288,12 +54991,9 @@ L3142: ; Continuation
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   push word [Temps+6]
   push word 1
@@ -56255,12 +55955,9 @@ L3185: ; Function: (lam,t3)
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -58057,12 +57754,9 @@ L3299: ; Arm: 537'10
 L3300: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, si
   mov si, [Temps+2]
@@ -58102,12 +57796,9 @@ L3302: ; Arm: 541'19
 L3303: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, si
   mov si, [Temps+2]
@@ -58359,11 +58050,8 @@ L3321: ; Continuation
   cmp word [bx], 3
   jz L3310
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -58382,11 +58070,8 @@ L3321: ; Continuation
   cmp word [bx], 3
   jz L3320
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -58399,12 +58084,9 @@ L3321: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -58487,12 +58169,9 @@ L3323: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -59427,12 +59106,9 @@ L3366: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -59576,11 +59252,8 @@ L3373: ; Continuation
 L3374: ; Continuation
   Bare_enter_check(10)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word [bp+8]
@@ -59638,12 +59311,9 @@ L3376: ; Continuation
   mov [Temps+10], sp
   push word 16 ;; scanned
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+6]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+12], ax
   push word [Temps+12]
   push word [Temps+10]
@@ -63216,11 +62886,8 @@ L3628: ; Continuation
   cmp word [bx], 3
   jz L3617
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -63239,11 +62906,8 @@ L3628: ; Continuation
   cmp word [bx], 3
   jz L3627
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -63256,12 +62920,9 @@ L3628: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -63344,12 +63005,9 @@ L3630: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -64252,12 +63910,9 @@ L3673: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -64318,11 +63973,8 @@ L3675: ; Continuation
 L3676: ; Continuation
   Bare_enter_check(8)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word [bp+6]
@@ -67215,11 +66867,8 @@ L3864: ; Continuation
   cmp word [bx], 3
   jz L3853
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -67238,11 +66887,8 @@ L3864: ; Continuation
   cmp word [bx], 3
   jz L3863
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -67255,12 +66901,9 @@ L3864: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -67342,12 +66985,9 @@ L3866: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -68210,12 +67850,9 @@ L3909: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -68274,11 +67911,8 @@ L3911: ; Continuation
 L3912: ; Continuation
   Bare_enter_check(8)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word [bp+6]
@@ -70342,12 +69976,9 @@ L4041: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word [Temps+4]
   push word 1
@@ -71470,12 +71101,9 @@ L4089: ; Continuation
   add ax, 1
   mov [Temps+2], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   push word [Temps+4]
   push word 1
@@ -73479,11 +73107,8 @@ L4237: ; Continuation
   cmp word [bx], 3
   jz L4226
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -73502,11 +73127,8 @@ L4237: ; Continuation
   cmp word [bx], 3
   jz L4236
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -73519,12 +73141,9 @@ L4237: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -73604,12 +73223,9 @@ L4239: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -74431,12 +74047,9 @@ L4282: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -79707,12 +79320,9 @@ L4650: ; Continuation
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   push word [Temps+6]
   push word 1
@@ -80756,12 +80366,9 @@ L4693: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -81091,11 +80698,8 @@ L4710: ; Continuation
   cmp word [bx], 3
   jz L4699
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -81114,11 +80718,8 @@ L4710: ; Continuation
   cmp word [bx], 3
   jz L4709
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -81131,12 +80732,9 @@ L4710: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -81224,12 +80822,9 @@ L4712: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -82301,12 +81896,9 @@ L4755: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1
@@ -84948,11 +84540,8 @@ L4942: ; Continuation
   cmp word [bx], 3
   jz L4931
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
@@ -84971,11 +84560,8 @@ L4942: ; Continuation
   cmp word [bx], 3
   jz L4941
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+10], ax
   mov ax, [Temps+10]
@@ -84988,12 +84574,9 @@ L4942: ; Continuation
   add ax, 1
   mov [Temps+12], ax
   mov ax, 3
-  sar ax, 1
   mov bx, [Temps+12]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov si, [Temps+14]
   mov bp, [CurrentCont]
@@ -85076,12 +84659,9 @@ L4944: ; Continuation
   add ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
-  sar ax, 1
   mov bx, [Temps+20]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   push word [Temps+26]
   push word 3
@@ -85990,12 +85570,9 @@ L4987: ; Continuation
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+8], ax
   push word [Temps+8]
   push word 1

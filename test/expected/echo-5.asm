@@ -195,11 +195,8 @@ L21: ; Arm: 49'24
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 129
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+8], ax
   mov ax, [Temps+8]

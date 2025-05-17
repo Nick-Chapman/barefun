@@ -32,11 +32,8 @@ L3: ; Arm: 4'13
 L4: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si

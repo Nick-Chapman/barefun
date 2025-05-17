@@ -70,12 +70,9 @@ L3: ; Continuation
   mov ax, Bare_unit
   mov [Temps+12], ax
   mov ax, [Temps+10]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+14], ax
   mov ax, [Temps+14]
   sar ax, 1
@@ -86,12 +83,9 @@ L3: ; Continuation
   mov ax, Bare_unit
   mov [Temps+18], ax
   mov ax, [Temps+8]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+20], ax
   mov ax, [Temps+20]
   sar ax, 1
@@ -102,12 +96,9 @@ L3: ; Continuation
   mov ax, Bare_unit
   mov [Temps+24], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+26], ax
   mov ax, [Temps+26]
   sar ax, 1

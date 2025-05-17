@@ -8,12 +8,9 @@ L1: ; Arm: 9'15
 L2: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov bp, g1
   mov si, [Temps+2]

@@ -39,12 +39,9 @@ L3: ; Function: (lam,t1)
   add dx, 1
   mov [Temps+4], dx
   mov ax, 97
-  sar ax, 1
   mov bx, [Temps+4]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
   sar ax, 1
@@ -112,12 +109,9 @@ L7: ; Arm: 22'10
 L8: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, si
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]
   mov bp, [CurrentCont]
@@ -153,11 +147,8 @@ L10: ; Arm: 23'15
 L11: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, si
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]

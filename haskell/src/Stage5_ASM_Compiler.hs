@@ -204,27 +204,21 @@ compileBuiltinTo builtin = case builtin of
     , OpCall Bare_make_bool_from_z
     , setTarget target (SReg Ax)
     ]
-  SRC.AddInt -> \target -> twoArgs $ \s1 s2 -> -- TODO: do addition on tagged values + final OpDec
+  SRC.AddInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
-    , OpShiftR1 Ax
     , OpMove Bx s2
-    , OpShiftR1 Bx
     , OpAddInto Ax (SReg Bx)
-    , OpShiftL1 Ax
-    , OpInc Ax
+    , OpDec Ax
     , setTarget target (SReg Ax)
     ]
   SRC.SubInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
-    , OpShiftR1 Ax
     , OpMove Bx s2
-    , OpShiftR1 Bx
     , OpSubInto Ax (SReg Bx)
-    , OpShiftL1 Ax
     , OpInc Ax
     , setTarget target (SReg Ax)
     ]
-  SRC.MulInt -> \target -> twoArgs $ \s1 s2 ->
+  SRC.MulInt -> \target -> twoArgs $ \s1 s2 -> -- TODO: improve tag manipulation
     [ OpMove Ax s1
     , OpShiftR1 Ax
     ] ++

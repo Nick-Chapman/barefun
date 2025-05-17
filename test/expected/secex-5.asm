@@ -60,12 +60,9 @@ L6: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+8]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+10]
   mov si, [Temps+4]
@@ -152,12 +149,9 @@ L12: ; Continuation
   mov ax, Bare_unit
   mov [Temps+4], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   mov bp, g32
   mov si, [Temps+6]
@@ -212,12 +206,9 @@ L16: ; Continuation
   mov ax, Bare_unit
   mov [Temps+4], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   mov bp, g38
   mov si, [Temps+6]
@@ -414,12 +405,9 @@ L32: ; Arm: 64'27
   mov ax, Bare_unit
   mov [Temps+14], ax
   mov ax, [Temps+12]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+16], ax
   mov ax, [Temps+16]
   sar ax, 1
@@ -430,12 +418,9 @@ L32: ; Arm: 64'27
   mov ax, Bare_unit
   mov [Temps+20], ax
   mov ax, [Temps+10]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+22], ax
   mov ax, [Temps+22]
   sar ax, 1
@@ -446,12 +431,9 @@ L32: ; Arm: 64'27
   mov ax, Bare_unit
   mov [Temps+26], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+28], ax
   mov ax, [Temps+28]
   sar ax, 1
@@ -523,12 +505,9 @@ L34: ; Arm: 65'32
   mov ax, Bare_unit
   mov [Temps+10], ax
   mov ax, [Temps+8]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+12], ax
   mov ax, [Temps+12]
   sar ax, 1
@@ -539,12 +518,9 @@ L34: ; Arm: 65'32
   mov ax, Bare_unit
   mov [Temps+16], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+18], ax
   mov ax, [Temps+18]
   sar ax, 1
@@ -555,12 +531,9 @@ L34: ; Arm: 65'32
   mov ax, Bare_unit
   mov [Temps+22], ax
   mov ax, [Temps+2]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+24], ax
   mov ax, [Temps+24]
   sar ax, 1
@@ -632,12 +605,9 @@ L36: ; Arm: 68'22
   mov ax, Bare_unit
   mov [Temps+14], ax
   mov ax, [Temps+12]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+16], ax
   mov ax, [Temps+16]
   sar ax, 1
@@ -648,12 +618,9 @@ L36: ; Arm: 68'22
   mov ax, Bare_unit
   mov [Temps+20], ax
   mov ax, [Temps+10]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+22], ax
   mov ax, [Temps+22]
   sar ax, 1
@@ -664,12 +631,9 @@ L36: ; Arm: 68'22
   mov ax, Bare_unit
   mov [Temps+26], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+28], ax
   mov ax, [Temps+28]
   sar ax, 1
@@ -699,11 +663,8 @@ L37: ; Arm: 71'24
   add ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
-  sar ax, 1
   mov bx, 129
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+8], ax
   mov ax, [Temps+8]
@@ -1006,12 +967,9 @@ L51: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+6]
   mov si, [Temps+4]
@@ -1176,11 +1134,8 @@ L61: ; Continuation
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov ax, `\n`
@@ -1299,11 +1254,8 @@ L67: ; Continuation
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 97
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+6], ax
   mov bx, [bp+4]
@@ -1445,12 +1397,9 @@ L75: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, [bp+6]
   mov si, [Temps+4]

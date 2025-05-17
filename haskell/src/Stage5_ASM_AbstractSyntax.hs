@@ -72,6 +72,7 @@ data Op -- target; source (Intel Syntax style)
   | OpShiftR1 Reg -- untag
   | OpShiftL1 Reg -- tag-step1
   | OpInc Reg -- tag-step2
+  | OpDec Reg -- TODO: elimi inc/dec special forms and just use add/sub-1
   | OpAddInto Reg Source
   | OpSubInto Reg Source
   | OpMulIntoAx Reg  -- ax := ax * sourceReg
@@ -177,6 +178,7 @@ instance Show Op where
     OpShiftR1 r -> "sar " ++ show r ++ ", 1" -- signed shift
     OpShiftL1 r -> "shl " ++ show r ++ ", 1"
     OpInc r -> "add " ++ show r ++ ", 1"
+    OpDec r -> "sub " ++ show r ++ ", 1"
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
     OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulIntoAx src -> "mul " ++ show src

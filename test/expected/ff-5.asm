@@ -32,12 +32,9 @@ L3: ; Arm: 31'11
 L4: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, si
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+2], ax
   mov si, [Temps+2]
   mov bp, [CurrentCont]
@@ -48,11 +45,8 @@ L4: ; Continuation
 L5: ; Continuation
   Bare_enter_check(8)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 5
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   push word si
@@ -74,11 +68,8 @@ L6: ; Function: (fib,g3)
   cmp word [bx], 3
   jz L3
   mov ax, si
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+4], ax
   push word si
@@ -100,11 +91,8 @@ L7: ; Arm: 5'13
 L8: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -161,11 +149,8 @@ L11: ; Arm: 5'13
 L12: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -253,12 +238,9 @@ L17: ; Function: (lam,t1)
   add dx, 1
   mov [Temps+4], dx
   mov ax, 97
-  sar ax, 1
   mov bx, [Temps+4]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
   sar ax, 1
@@ -300,11 +282,8 @@ L19: ; Arm: 5'13
 L20: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+2], ax
   mov bp, si
@@ -392,12 +371,9 @@ L25: ; Function: (lam,t1)
   add dx, 1
   mov [Temps+4], dx
   mov ax, 97
-  sar ax, 1
   mov bx, [Temps+4]
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+6], ax
   mov ax, [Temps+6]
   sar ax, 1
@@ -436,12 +412,9 @@ L27: ; Continuation
   mov ax, Bare_unit
   mov [Temps+2], ax
   mov ax, [bp+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   add ax, bx
-  shl ax, 1
-  add ax, 1
+  sub ax, 1
   mov [Temps+4], ax
   mov bp, g7
   mov si, [Temps+4]

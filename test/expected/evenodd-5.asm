@@ -22,11 +22,8 @@ L3: ; Function: (is_even,g1)
   cmp word [bx], 3
   jz L1
   mov ax, si
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+4], ax
   mov ax, [Temps+4]
@@ -37,11 +34,8 @@ L3: ; Function: (is_even,g1)
   cmp word [bx], 3
   jz L2
   mov ax, [Temps+4]
-  sar ax, 1
   mov bx, 3
-  sar bx, 1
   sub ax, bx
-  shl ax, 1
   add ax, 1
   mov [Temps+8], ax
   mov bp, g1
