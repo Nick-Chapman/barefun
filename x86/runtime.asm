@@ -373,24 +373,21 @@ Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the 
 
 ;;; in: ax -- number of bytes (as tagged number) for user data
 ;;; out: ax -- new string/bytes object, allocated on the heap (at sp)
+;;; trashes: bx (temp for return), di (temp calculation)
 Bare_make_bytes:
     pop bx          ; save return address.
-    mov [.si], si   ; save si; (used as a temp) -- TODO: switch to cx/dx, avoiding preserve
-    mov si, ax
+    mov di, ax
 
-    shr si, 1       ; untag, to get number of bytes to..
-    inc si          ; round up and..
-    and si, 0xfffe  ; .. align to even
-    sub sp, si      ; slide stack pointer (allocated space is not uninializaed)
+    shr di, 1       ; untag, to get number of bytes to..
+    inc di          ; round up and..
+    and di, 0xfffe  ; .. align to even
+    sub sp, di      ; slide stack pointer (allocated space is not uninializaed)
 
     push ax         ; tagged length word; part of user data
     mov ax, sp      ; grab result (before pushing the descriptor)
-    add si, 3       ; add 2 bytes for the length word; +1 to tag as raw data
-    push si         ; descriptor/size word; part of GC data
-    mov si, [.si]   ; restore si
+    add di, 3       ; add 2 bytes for the length word; +1 to tag as raw data
+    push di         ; descriptor/size word; part of GC data
     jmp bx          ; return
-.si:
-    dw 0
 
 Bare_get_bytes:
     add bx, 2 ; length word
@@ -399,10 +396,14 @@ Bare_get_bytes:
     mov ah, 0
     ret
 
+;;; val set_bytes : bytes -> int -> char -> unit
+;;; in: ax (bytes)
+;;; in: di (int)
+;;; in: bl (char)
 Bare_set_bytes:
-    add si, 2 ; length word
-    add si, ax
-    mov byte [si], bl
+    add di, 2 ; length word
+    add di, ax
+    mov byte [di], bl
     ret
 
 ;;; ax: The sector number (0/1/2)
@@ -475,6 +476,11 @@ Bare_get_keyboard_last_scancode: ; TODO: ripe for inlining
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; GC
 
+;; roots; must match stage5 calling convention
+%define Arg dx
+%define Frame bp
+%define Cont cx
+
 hemi_size equ 5000 ; match stage5 emulator
 redzone_size equ 100 ; needed for save/restore & also for interrupts. how big should this be?
 
@@ -490,9 +496,11 @@ bots: dw botA, botB ; used to index this
 
 userCaller equ Temps+2
 evacuateCaller equ Temps+4
-tCX equ Temps+6
-tDX equ Temps+8
-tBP equ Temps+10
+
+tCont equ Temps+6
+tArg equ Temps+8
+tFrame equ Temps+10
+
 tCALLER equ Temps+12
 
 need: dw 0
@@ -551,15 +559,14 @@ Bare_enter_check_function:
     PrintString `[OOM]\n`
     jmp halt
 
-
 bytesPerWord equ 2
 
 gc_start:
     pop ax
     mov [userCaller], ax
-    mov [tBP], bp
-    mov [tDX], dx
-    mov [tCX], cx
+    mov [tFrame], Frame
+    mov [tArg], Arg
+    mov [tCont], Cont
 
     ;; switch heap spaces
     mov bl, [hemi]
@@ -574,17 +581,17 @@ gc_start:
     mov dx, sp ; set scavenge threshold
     ;; evacuate roots...
     ;; frame register
-    mov si, [tBP]
+    mov si, [tFrame]
     call evacuate
-    mov [tBP], si
+    mov [tFrame], si
     ;; arg register
-    mov si, [tDX]
+    mov si, [tArg]
     call evacuate
-    mov [tDX], si
+    mov [tArg], si
     ;; continuation register
-    mov si, [tCX]
+    mov si, [tCont]
     call evacuate
-    mov [tCX], si
+    mov [tCont], si
     ;; Scavenge objects between sp and dx
     ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
     cmp dx, sp
@@ -626,16 +633,15 @@ gc_start:
     cmp sp, cx
     jne .outer_loop
 .done_everything:
-    mov cx, [tCX]
-    mov dx, [tDX]
-    mov bp, [tBP]
+    mov Cont, [tCont]
+    mov Arg, [tArg]
+    mov Frame, [tFrame]
     jmp [userCaller]
 .bad_inner_loop:
     PrintString `\n[Bad_inner_loop]\n`
     SeeReg bx
     SeeReg dx
     jmp halt
-
 
 evacuate: ;; si --> si (uses: bp)
     pop bp

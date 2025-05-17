@@ -51,8 +51,8 @@ L6: ; Continuation
   jz L5
   mov ax, [bp+6]
   mov bx, [bp+4]
-  mov si, [bp+8]
-  sar si, 1
+  mov di, [bp+8]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+2], ax

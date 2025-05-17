@@ -344,8 +344,8 @@ L31: ; Function: (lam,t1)
   mov [Temps+4], ax
   mov ax, [bp+2]
   mov bx, [Temps+2]
-  mov si, [bp+4]
-  sar si, 1
+  mov di, [bp+4]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+6], ax
@@ -454,8 +454,8 @@ L39: ; Function: (lam,t1)
   mov [Temps+4], ax
   mov ax, [bp+2]
   mov bx, [Temps+2]
-  mov si, [bp+4]
-  sar si, 1
+  mov di, [bp+4]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+6], ax

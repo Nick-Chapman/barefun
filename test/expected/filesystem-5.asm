@@ -701,8 +701,8 @@ L58: ; Function: (lam,t1)
   mov [Temps+4], ax
   mov ax, [bp+2]
   mov bx, [Temps+2]
-  mov si, [bp+4]
-  sar si, 1
+  mov di, [bp+4]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+6], ax
@@ -1179,8 +1179,8 @@ L88: ; Function: (lam,t1)
   mov [Temps+4], ax
   mov ax, [bp+2]
   mov bx, [Temps+2]
-  mov si, [bp+4]
-  sar si, 1
+  mov di, [bp+4]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+6], ax
@@ -1443,8 +1443,8 @@ L105: ; Continuation
   mov [Temps+4], ax
   mov ax, [bp+8]
   mov bx, [Temps+4]
-  mov si, [bp+10]
-  sar si, 1
+  mov di, [bp+10]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+6], ax
@@ -1640,8 +1640,8 @@ L117: ; Continuation
   mov [Temps+4], ax
   mov ax, [bp+4]
   mov bx, [Temps+2]
-  mov si, [Temps+4]
-  sar si, 1
+  mov di, [Temps+4]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+6], ax
@@ -14049,8 +14049,8 @@ L715: ; Continuation
   jz L714
   mov ax, [bp+4]
   mov bx, `\x00`
-  mov si, [bp+6]
-  sar si, 1
+  mov di, [bp+6]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+2], ax
@@ -18408,8 +18408,8 @@ L931: ; Continuation
   jz L930
   mov ax, [bp+4]
   mov bx, `,`
-  mov si, [bp+6]
-  sar si, 1
+  mov di, [bp+6]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+2], ax
@@ -52853,8 +52853,8 @@ L2998: ; Continuation
   jz L2997
   mov ax, [bp+4]
   mov bx, `,`
-  mov si, [bp+6]
-  sar si, 1
+  mov di, [bp+6]
+  sar di, 1
   call Bare_set_bytes
   mov ax, Bare_unit
   mov [Temps+2], ax
