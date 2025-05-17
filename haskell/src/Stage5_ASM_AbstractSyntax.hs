@@ -32,9 +32,9 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
 
 -- Calling conventions:
 frameReg,argReg,contReg :: Reg
-frameReg = Bp
-argReg = Dx
-contReg = Cx
+frameReg = Bp -- TODO: be able to change this! (although I dont want to)
+argReg = Dx -- TODO: change to Si. runtime.asm must be synced.
+contReg = Cx -- TODO: use memory instead of reg for this.
 
 data Image = Image
   { cmap :: Map CodeLabel Code
@@ -120,7 +120,7 @@ data BareBios
   | Bare_num_to_char
   | Bare_char_to_num
   | Bare_make_bytes
-  | Bare_set_bytes
+  | Bare_set_bytes -- TODO: would be nice to have a declarative spec for arg-passing protocol, which is shared between compiler and emulator. And somehow to be used so runtime.asm is also consistent
   | Bare_get_bytes
   | Bare_load_sector
   | Bare_store_sector

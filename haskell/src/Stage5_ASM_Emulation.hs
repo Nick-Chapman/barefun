@@ -496,7 +496,7 @@ execBare = \case
 
   Bare_set_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
-    i <- deNum <$> GetReg Si
+    i <- deNum <$> GetReg Si -- TODO: use Dx instead (freeing up Si for arg-reg)
     c <- deChar <$> GetReg Bx
     a' <- addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
     setMemChar a' c
@@ -831,8 +831,7 @@ state0 dmap = State
     initialStackPointer = AHeap (HeapAddr (fromIntegral topA))
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
-      , (Cx, WAddr aFinalCont)
-      -- TODO: should the frameReg(bp) and argReg(dx) be set to known values?
+      , (contReg, WAddr aFinalCont)
       ]
     mem = Map.fromList (internal ++ user)
 
