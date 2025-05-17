@@ -2229,7 +2229,6 @@ L141: ; Continuation
 
 L142: ; Function: (lam,t1)
   Bare_enter_check(22)
-  mov ax, g245
   call Bare_free_words
   shl ax, 1
   add ax, 1

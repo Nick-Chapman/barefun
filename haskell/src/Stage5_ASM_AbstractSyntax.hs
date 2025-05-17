@@ -59,7 +59,7 @@ data Op -- target; source (Intel Syntax style)
   | OpPush Source
   | OpPushSAVE Source
   | OpPopRESTORE Reg
-  | OpCmp Source Source -- the first source can't be [ax] - but [bx] is ok. what are the x86 rules?
+  | OpCmp Source Source
   | OpBranchFlagZ CodeLabel
   | OpShiftR1 Reg -- untag
   | OpShiftL1 Reg -- tag-step1

@@ -34,7 +34,6 @@ x a x b in
   List.iter f ['X','0'; '0','1'; '1','2'; '2','3'; '3','4'; '4','5';]
 
 let allow = function
-  | "secex" -> false
   | "filesystem" -> false (* too slow! *)
   | _ -> true
 

@@ -511,7 +511,7 @@ Bare_store_sector: ;Ax (Num bytes), Bx (The string to store)
 Bare_unit:
     dw 1 ;; doesn't matter what is here. nothing should look at this
 
-Bare_free_words:
+Bare_free_words: ; TODO this implementation is garbage:
     mov ax, sp
     ;sub ax, bot_of_heap
     shr ax, 1 ;; shift for #words
@@ -538,7 +538,7 @@ Bare_get_keyboard_last_scancode: ;; TODO: ripe for inlining
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; GC
 
-hemi_size equ 3000
+hemi_size equ 5000 ; match stage5 emulator
 redzone_size equ 100 ; needed for save/restore & also for interrupts. how big should thsi be?
 
 topA equ 0x0000
@@ -587,6 +587,7 @@ Bare_enter_check_function:
     sub ax, [need]
     cmp ax, 0
     jl .need_to_gc
+    ;;jmp .need_to_gc ; GC every safe point for extreme testing
     jmp .return_to_caller
 
 .need_to_gc:

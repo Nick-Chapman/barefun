@@ -20,16 +20,14 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM_AbstractSyntax
 
-gcAtEverySafePoint :: Bool -- useful for dev/debug
-gcAtEverySafePoint = True -- slow "dune test" from 4.4s to 8.8s -- but much more likely to pickup bugs in codegen when hacking with calling convention
+gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
+gcAtEverySafePoint = False -- but slows "dune test" from 4.4s to 8.8s
 
--- During dev, we can have quite small heap spaces
--- experimentation shows the sham example needs more that 2000; but 3000 seems enough
 hemiSizeInBytes :: Int
-hemiSizeInBytes = 10000
+hemiSizeInBytes = 5000 -- 3000 was ok for sham; 5000 is needed for filesystem example
 
-sizeRedzone :: Int -- for save/restore on stack by div/mod operation
-sizeRedzone = 2 -- TODO: 100 to match runtime.asm
+sizeRedzone :: Int -- for save/restore on stack by div/mod operation + interrupts in runtime.asm
+sizeRedzone = 100
 
 topA,botA,topB,botB :: Int
 topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0 -- TODO: dont!
@@ -53,7 +51,7 @@ twoE16 = 256 * 256
 
 data Word
   = WChar Char
-  | WNum Number -- number with 2n+1
+  | WNum Number -- number in shifted/tagged "2n+1" representation
   | WAddr Addr
   | WCodeLabel CodeLabel
   | WCharPair (Char,Char)
@@ -381,7 +379,8 @@ execOp = \case
         --Debug (printf "BudgedForAllocation: %d\n" need)
         BudgedForAllocation need
         cont
-  OpHlt -> \cont -> -- TODO: better emulation for this?
+  OpHlt -> \cont ->
+    -- this ops waits for the next interrupt; too detailed for this emulation
     cont
 
 -- this is called from user code which does OpPush & also from GC when copying
@@ -603,9 +602,9 @@ binaryW f w1 w2 =
     (WNum n1,WNum n2) -> WNum (f n1 n2)
     _ -> error (show ("binaryW/unexpected-types",w1,w2))
 
-deNum :: Word -> Number -- giving the 2n+1 rep -- this is the one we want everywhere
+deNum :: Word -> Number -- giving the 2n+1 rep
 deNum = \case
-  WNum x -> x --
+  WNum x -> x
   w -> error (show("deNum",w))
 
 equalW :: Word -> Word -> Bool
@@ -807,7 +806,7 @@ data State = State
   , allocsSinceLastCheck :: Int
   , allocsSinceLastEnter :: Int
   , budgetAlloc :: Int
-  , gcNum :: Int
+  , gcNum :: Int -- TODO: remove?
   , hemi :: Hemi
   }
 

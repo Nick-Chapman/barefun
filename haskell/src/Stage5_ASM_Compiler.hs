@@ -202,7 +202,7 @@ compileBuiltinTo builtin = case builtin of
     , OpCall Bare_make_bool_from_z
     , setTarget target (SReg Ax)
     ]
-  SRC.AddInt -> \target -> twoArgs $ \s1 s2 ->
+  SRC.AddInt -> \target -> twoArgs $ \s1 s2 -> -- TODO: do addition on tagged values + final OpDec
     [ OpMove Ax s1
     , OpShiftR1 Ax
     , OpMove Bx s2
@@ -357,21 +357,18 @@ compileBuiltinTo builtin = case builtin of
     , OpCall Bare_store_sector
     , setTarget target sUnit
     ]
-  SRC.FreeWords -> \target -> oneArg $ \s1 ->
-    [ OpMove Ax s1 -- TODO: no need for this?
-    , OpCall Bare_free_words
+  SRC.FreeWords -> \target -> oneArg $ \_s1 ->
+    [ OpCall Bare_free_words
     , OpShiftL1 Ax
     , OpInc Ax
     , setTarget target (SReg Ax)
     ]
-
   SRC.Get_ticks -> \target -> oneArg $ \_unit ->
     [ OpCall Bare_get_ticks
     , OpShiftL1 Ax
     , OpInc Ax
     , setTarget target (SReg Ax)
     ]
-
   SRC.Wait_for_interrupt -> \target -> oneArg $ \_unit ->
     [ OpHlt
     , setTarget target sUnit
@@ -385,7 +382,6 @@ compileBuiltinTo builtin = case builtin of
     [ OpCall Bare_get_keyboard_last_scancode
     , setTarget target (SReg Ax)
     ]
-
   SRC.Assert{} -> \target -> oneArg $ \_bool -> -- TODO: gen code to assert this bool
     [ setTarget target sUnit
     ]
@@ -479,7 +475,6 @@ runAsm asm = finalImage
       -- Compute bound on allocation needed for Bare_enter_check
       Needed code -> \k -> do
         k s (needC code)
-
 
     Image{cmap=finalCmap} = finalImage
 
