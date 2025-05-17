@@ -2,6 +2,11 @@
 
 ;;; TODO: useful control flags for Debug etc here
 
+;; GC roots; must match stage5 calling convention
+%define Arg si
+%define Frame bp
+%define Cont cx
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Layout
 
@@ -373,20 +378,20 @@ Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the 
 
 ;;; in: ax -- number of bytes (as tagged number) for user data
 ;;; out: ax -- new string/bytes object, allocated on the heap (at sp)
-;;; trashes: bx (temp for return), di (temp calculation)
+;;; trashes: bx (temp for return), dx (temp calculation)
 Bare_make_bytes:
     pop bx          ; save return address.
-    mov di, ax
+    mov dx, ax
 
-    shr di, 1       ; untag, to get number of bytes to..
-    inc di          ; round up and..
-    and di, 0xfffe  ; .. align to even
-    sub sp, di      ; slide stack pointer (allocated space is not uninializaed)
+    shr dx, 1       ; untag, to get number of bytes to..
+    inc dx          ; round up and..
+    and dx, 0xfffe  ; .. align to even
+    sub sp, dx      ; slide stack pointer (allocated space is not uninializaed)
 
     push ax         ; tagged length word; part of user data
     mov ax, sp      ; grab result (before pushing the descriptor)
-    add di, 3       ; add 2 bytes for the length word; +1 to tag as raw data
-    push di         ; descriptor/size word; part of GC data
+    add dx, 3       ; add 2 bytes for the length word; +1 to tag as raw data
+    push dx         ; descriptor/size word; part of GC data
     jmp bx          ; return
 
 Bare_get_bytes:
@@ -475,11 +480,6 @@ Bare_get_keyboard_last_scancode: ; TODO: ripe for inlining
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; GC
-
-;; roots; must match stage5 calling convention
-%define Arg si
-%define Frame bp
-%define Cont cx
 
 hemi_size equ 5000 ; match stage5 emulator
 redzone_size equ 100 ; needed for save/restore & also for interrupts. how big should this be?

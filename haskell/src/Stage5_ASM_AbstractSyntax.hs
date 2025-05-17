@@ -32,7 +32,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
 
 -- Calling conventions:
 frameReg,argReg,contReg :: Reg
-frameReg = Bp -- TODO: be able to change this! (although I dont want to)
+frameReg = Bp
 argReg = Si
 contReg = Cx -- TODO: use memory instead of reg for this.
 
