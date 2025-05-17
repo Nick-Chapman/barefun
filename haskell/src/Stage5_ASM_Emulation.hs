@@ -20,7 +20,7 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM_AbstractSyntax
 
-gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
+gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen -- TODO: command-line flag?
 gcAtEverySafePoint = False -- but slows "dune test" from 4.4s to 8.8s
 
 hemiSizeInBytes :: Int
@@ -165,53 +165,46 @@ setStackPointerToTopOfHemi hemi = do
 
 runGC :: M ()
 runGC = do
-  _fromSpace <- WhatHemi
-  _gcNum <- BumpGC
+  gcNum <- BumpGC
   toSpace <- WhatHemi
   Debug "["
-  Debug (printf "%02d:" _gcNum)
+  Debug (printf "%02d:" gcNum)
   setStackPointerToTopOfHemi toSpace
 
   let roots = [frameReg,argReg,contReg]
   watermark0 <- getSP
   mapM_ evacuateReg roots
-  loop 1 watermark0
+  loop watermark0
 
   HeapAddr sp <- getSP
-  let _remainingBytes = fromIntegral sp - botOfHemi toSpace
-  Debug (printf "%04x" _remainingBytes) -- print in hex to match against runtime.asm
+  let remainingBytes = fromIntegral sp - botOfHemi toSpace
+  Debug (printf "%04x" remainingBytes) -- print in hex to match against runtime.asm
   Debug "]"
-  pure ()
 
   where
-    loop :: Int -> HeapAddr -> M ()
-    loop step watermark = do
+    loop :: HeapAddr -> M ()
+    loop watermark = do
       sp <- getSP
-      --Debug (printf "loop(%d.%d): SP=%s < WM=%s\n" _gcNum step (show sp) (show watermark))
       let finished = assert (sp <= watermark) (sp == watermark)
       case finished of
         True -> pure ()
         False -> do
           nextWM <- getSP
-          scanLoop 1 nextWM
-          loop (step+1) nextWM
+          innerLoop nextWM
+          loop nextWM
 
-          where
-            scanLoop :: Int -> HeapAddr -> M ()
-            scanLoop substep scanPointer = do
-              --Debug (printf "inner(%d.%d.%d): scan=%s < watermark=%s\n" _gcNum step substep (show scanPointer) (show watermark))
-              let finishedScan = assert (scanPointer <= watermark) (scanPointer == watermark)
-              case finishedScan of
-                True -> do
-                  pure ()
-                False -> do
-                  --Debug "-"
-                  nextScanPointer <- scavenge scanPointer
-                  scanLoop (substep+1) nextScanPointer
+        where
+          innerLoop :: HeapAddr -> M ()
+          innerLoop scanPointer = do
+            let finishedScan = assert (scanPointer <= watermark) (scanPointer == watermark)
+            case finishedScan of
+              True -> pure ()
+              False -> do
+                nextScanPointer <- scavenge scanPointer
+                innerLoop nextScanPointer
 
 evacuateReg :: Reg -> M ()
 evacuateReg reg = do
-  --Print (printf "evacuateReg: %s\n" (show reg))
   w <- GetReg reg
   evacuate w >>= \case
     Just w' -> SetReg reg w'
@@ -228,40 +221,51 @@ scavenge scanPointer = do
         RawData -> do
           pure nextScanPointer
         Scanned -> do
-          -- 1..size because we are pointing at descriptor
-          xs <- sequence[ addHeapAddr (bytesPerWord * offset) scanPointer | offset <- [ 1 .. sizeWords ] ]
-          mapM_ scavengeHA xs
+          -- 1..size because we are pointing at the descriptor
+          xs <- sequence [ addHeapAddr (bytesPerWord * offset) scanPointer
+                         | offset <- [ 1 .. sizeWords ]
+                         ]
+          mapM_ scavengeHeapAddr xs
           pure nextScanPointer
     w ->
       error (printf "scavenge: not a block-descriptor: %s at %s" (show w) (show scanPointer))
 
-scavengeHA :: HeapAddr -> M ()
-scavengeHA ha = do
+scavengeHeapAddr :: HeapAddr -> M ()
+scavengeHeapAddr ha = do
   w <- GetMem (AHeap ha)
   evacuate w >>= \case
     Just w' -> SetMem (AHeap ha) w'
-      --Debug (printf "scavengeHA: %s : %s --> %s\n" (show ha) (show w) (show w'))
-    Nothing -> do
-      --Debug (printf "scavengeHA: %s : unmoved\n" (show ha))
-      pure ()
+    Nothing -> pure ()
 
 evacuate :: Word -> M (Maybe Word)
 evacuate w = do
-  --Debug "E"
-  --Debug (printf "evacuate: %s\n" (show w))
   case w of
-    WAddr (AHeap ha) -> (Just . WAddr . AHeap) <$> evacuateHA ha
-    _ -> do
-      --Debug "x"
-      pure Nothing
+    -- We must only evacuate addresses in the heap
+    -- These are distinuished at the bit level as being
+    -- (a) within the bounds of the heaps space
+    -- (b) even valued
+    WAddr (AHeap ha) -> (Just . WAddr . AHeap) <$> evacuateHeapAddr ha
 
-evacuateHA :: HeapAddr -> M HeapAddr
-evacuateHA objectA = do
+    -- Evacuation must not move..
+    WAddr (AStatic{}) -> pure Nothing -- (1) static addresses
+    WCodeLabel{} -> pure Nothing -- (2) including static code
+    WNum{} -> pure Nothing -- (3) tagged numeric values
+    WChar{} -> pure Nothing -- (4) small byte sized values
+
+    -- evacuation should never encounter the following forms
+    WBlockDescriptor{} -> err
+    WBrokenHeart{} -> err
+    WCharPair{} -> err
+    WUninitialized{} -> err
+    WUninitializedCharPair{} -> err
+    where
+      err = error (printf "evacuate: unexpected: %s" (show w))
+
+evacuateHeapAddr :: HeapAddr -> M HeapAddr
+evacuateHeapAddr objectA = do
   descA <- addHeapAddr_OTHER (-bytesPerWord) objectA
-  --Debug (printf "evacuateHA: objectA=%s, descA=%s\n" (show objectA) (show descA))
   GetMem (AHeap descA) >>= \case
     WBlockDescriptor desc -> do
-      --Debug "("
       let BlockDescriptor{sizeInBytes} = desc
       let sizeWords = sizeInBytes `div` 2
       xs <- sequence $ reverse [ addHeapAddr_OTHER (bytesPerWord * offset) objectA | offset <- [ -1 .. sizeWords-1 ] ]
@@ -271,23 +275,17 @@ evacuateHA objectA = do
       -- overwrite original object with broken Heart; which points tothe relocated object
       SetMem (AHeap descA) WBrokenHeart
       SetMem (AHeap objectA) (WAddr (AHeap relocatedA))
-      --Debug ")"
       pure relocatedA
     WBrokenHeart -> do
-      --Debug "h"
-      -- return the indirected previously copied object
+      -- return the indirected previously evacuated object
       deHeapAddr <$> GetMem (AHeap objectA)
     w ->
-      error (printf "evacuateHA: not a block-descriptor: %s at %s" (show w) (show objectA))
+      error (printf "evacuateHeapAddr: not a block-descriptor: %s at %s" (show w) (show objectA))
 
 copyAlloc :: HeapAddr -> M ()
 copyAlloc ha = do
-  --Debug "c"
   w <- GetMem (AHeap ha)
   execPushAlloc AllocForGC w
-  --_newAddress <- getSP
-  --Debug (printf "copyAlloc: %s --> (%s) --> %s\n" (show ha) (show w) (show _newAddress))
-  pure ()
 
 ----------------------------------------------------------------------
 -- Execute
@@ -490,27 +488,27 @@ execBare = \case
     execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
     w <- GetReg Sp
     SetReg Ax w
-    let desc = BlockDescriptor RawData (fromIntegral nBytesAligned + 2) -- 2 for the length word
+    let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
 
   Bare_set_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Si -- TODO: use Dx instead (freeing up Si for arg-reg)
     c <- deChar <$> GetReg Bx
-    a' <- addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
+    a' <- addAddr (fromIntegral i + bytesPerWord) a
     setMemChar a' c
 
   Bare_get_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
-    a' <- addAddr (fromIntegral i + bytesPerWord) a  -- +bytesPerWord for the length word
+    a' <- addAddr (fromIntegral i + bytesPerWord) a
     c <- getMemChar a'
     SetReg Ax (WChar c)
 
   Bare_load_sector -> do
     n <- deNum <$> GetReg Ax
     aObj <- deAddr <$> GetReg Bx
-    aData <- addAddr bytesPerWord aObj  -- +bytesPerWord for the length word
+    aData <- addAddr bytesPerWord aObj
     text <- ReadSector n
     setMemString aData text
     pure ()
@@ -543,7 +541,6 @@ execBare = \case
 
 setMemChar :: Addr -> Char -> M ()
 setMemChar a x = do
-  --Debug (printf "setB: %s = %s\n" (show a) (show x))
   let even = evenAddr a
   aligned <- (if even then pure a else addAddr (-1) a)
   w <- GetMem aligned
@@ -558,7 +555,6 @@ getMemChar a = do
   w <- GetMem aligned
   let (c,d) = splitWord w
   let x = (if even then c else d)
-  --Debug (printf "getB: %s -> %s\n" (show a) (show x))
   pure x
 
 setMemString :: Addr -> String -> M () -- takes address of data
@@ -780,7 +776,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       GetScanCode -> IGetScanCode $ \c -> k s c
 
       BumpGC -> do
-        let State{hemi,gcNum} = s -- gnNum trackked in M for Debug
+        let State{hemi,gcNum} = s -- gnNum tracked in M for Debug
         ITick I.GC $ -- also tracked as a tickable for reporting
           k s { gcNum = gcNum + 1, hemi = otherHemi hemi } gcNum
 
@@ -806,7 +802,7 @@ data State = State
   , allocsSinceLastCheck :: Int
   , allocsSinceLastEnter :: Int
   , budgetAlloc :: Int
-  , gcNum :: Int -- TODO: remove?
+  , gcNum :: Int
   , hemi :: Hemi
   }
 
@@ -831,7 +827,13 @@ state0 dmap = State
     rmap = Map.fromList
       [ (Sp, WAddr initialStackPointer)
       , (contReg, WAddr aFinalCont)
+      -- initialize in case of very early GC
+      , (frameReg, arbitrary)
+      , (argReg, arbitrary)
       ]
+
+    arbitrary = WAddr (AStatic (DataLabelR "arbitrary") 0)
+
     mem = Map.fromList (internal ++ user)
 
     internal =
