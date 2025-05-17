@@ -21,9 +21,6 @@ type Transformed = Image
 targetOfTemp :: SRC.Temp -> Target
 targetOfTemp = \case
   SRC.Temp 0 -> error "targetOfTemp/temps start from 1"
-  -- TODO: dont use Si/Di for temps
-  SRC.Temp 1 -> TReg Si -- TODO: swap order with Di exposes bug if save/restore forgotten in set-bytes
-  SRC.Temp 2 -> TReg Di
   temp -> TTemp temp
 
 -- Ax is the general scratch register
@@ -322,11 +319,9 @@ compileBuiltinTo builtin = case builtin of
   SRC.SetBytes -> \target -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
     , OpMove Bx s3
-    , OpPushSAVE (SReg Si)
     , OpMove Si s2 -- TODO: change this to Dx (once we are no longer using that for the arg-reg. Must ensure the protocol for Bare_set_bytes is consistent between here, the stage5 emulator AND the real runtime.asm
     , OpShiftR1 Si
     , OpCall Bare_set_bytes -- TODO: remove/inline
-    , OpPopRESTORE Si
     , setTarget target sUnit
     ]
   SRC.GetBytes -> codeForGetBytes

@@ -9,11 +9,12 @@ L1: ; Arm: 6'25
 L2: ; Function: (get_scancode,g1)
   Bare_enter_check(0)
   hlt
-  mov si, Bare_unit
+  mov ax, Bare_unit
+  mov [Temps+2], ax
   call Bare_is_keyboard_ready
   call Bare_make_bool_from_nz
-  mov di, ax
-  mov bx, di
+  mov [Temps+4], ax
+  mov bx, [Temps+4]
   cmp word [bx], 3
   jz L1
   mov bp, g1
@@ -26,8 +27,8 @@ L3: ; Continuation
   call Bare_char_to_num
   shl ax, 1
   add ax, 1
-  mov si, ax
-  mov ax, si
+  mov [Temps+2], ax
+  mov ax, [Temps+2]
   sar ax, 1
   mov bx, 21
   sar bx, 1
@@ -36,9 +37,9 @@ L3: ; Continuation
   Div bx
   shl dx, 1
   add dx, 1
-  mov di, dx
+  mov [Temps+4], dx
   pop word dx ;; restore
-  mov ax, si
+  mov ax, [Temps+2]
   sar ax, 1
   mov bx, 21
   sar bx, 1
@@ -107,7 +108,7 @@ L3: ; Continuation
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+24], ax
-  mov ax, di
+  mov ax, [Temps+4]
   sar ax, 1
   mov bx, 97
   sar bx, 1

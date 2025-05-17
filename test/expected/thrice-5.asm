@@ -2,10 +2,12 @@ L1: ; Start
   Bare_enter_check(0)
   mov ax, `@`
   call Bare_put_char
-  mov si, Bare_unit
+  mov ax, Bare_unit
+  mov [Temps+2], ax
   mov ax, `A`
   call Bare_put_char
-  mov di, Bare_unit
+  mov ax, Bare_unit
+  mov [Temps+4], ax
   mov ax, `B`
   call Bare_put_char
   mov ax, Bare_unit

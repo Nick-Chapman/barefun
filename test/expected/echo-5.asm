@@ -9,11 +9,12 @@ L1: ; Arm: 6'25
 L2: ; Function: (get_scancode,g1)
   Bare_enter_check(0)
   hlt
-  mov si, Bare_unit
+  mov ax, Bare_unit
+  mov [Temps+2], ax
   call Bare_is_keyboard_ready
   call Bare_make_bool_from_nz
-  mov di, ax
-  mov bx, di
+  mov [Temps+4], ax
+  mov bx, [Temps+4]
   cmp word [bx], 3
   jz L1
   mov bp, g1
@@ -185,7 +186,7 @@ L20: ; Arm: 46'22
   jmp [bp]
 
 L21: ; Arm: 49'24
-  mov ax, si
+  mov ax, [Temps+2]
   call Bare_char_to_num
   shl ax, 1
   add ax, 1
@@ -226,12 +227,12 @@ L22: ; Continuation
   mov bx, [bp+14]
   sar bx, 1
   call Bare_get_bytes
-  mov si, ax
-  mov ax, si
+  mov [Temps+2], ax
+  mov ax, [Temps+2]
   cmp word ax, ` `
   call Bare_make_bool_from_z
-  mov di, ax
-  mov bx, di
+  mov [Temps+4], ax
+  mov bx, [Temps+4]
   cmp word [bx], 3
   jz L20
   mov bx, [bp+12]
@@ -247,7 +248,7 @@ L22: ; Continuation
   mov [bx], ax
   mov ax, Bare_unit
   mov [Temps+8], ax
-  mov dx, si
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -261,16 +262,17 @@ L23: ; Arm: 11'9
 L24: ; Continuation
   Bare_enter_check(20)
   mov bx, dx
-  mov si, [bx]
+  mov ax, [bx]
+  mov [Temps+2], ax
   mov ax, [bp+14]
   cmp word ax, 1
   call Bare_make_bool_from_n
-  mov di, ax
-  mov bx, di
+  mov [Temps+4], ax
+  mov bx, [Temps+4]
   cmp word [bx], 3
   jz L16
   mov ax, [bp+14]
-  cmp word ax, si
+  cmp word ax, [Temps+2]
   call Bare_make_bool_from_n
   mov [Temps+6], ax
   push word dx
@@ -309,16 +311,16 @@ L27: ; Continuation
   mov ax, 257
   cmp word ax, [bp+14]
   call Bare_make_bool_from_n
-  mov si, ax
+  mov [Temps+2], ax
   mov ax, [bp+14]
   cmp word ax, 59
   call Bare_make_bool_from_z
-  mov di, ax
+  mov [Temps+4], ax
   mov ax, [bp+14]
   cmp word ax, 315
   call Bare_make_bool_from_z
   mov [Temps+6], ax
-  mov bx, di
+  mov bx, [Temps+4]
   cmp word [bx], 3
   jz L4
   mov bx, [Temps+6]
@@ -330,7 +332,7 @@ L27: ; Continuation
   mov bx, dx
   cmp word [bx], 3
   jz L10
-  mov bx, si
+  mov bx, [Temps+2]
   cmp word [bx], 3
   jz L12
   mov ax, [bp+14]
@@ -379,7 +381,7 @@ L29: ; Continuation
   mov ax, [bp+14]
   cmp word ax, 341
   call Bare_make_bool_from_z
-  mov si, ax
+  mov [Temps+2], ax
   push word dx
   push word [bp+14]
   push word [bp+12]
@@ -391,14 +393,14 @@ L29: ; Continuation
   push word L27
   mov cx, sp
   push word 18 ;; scanned
-  mov bx, si
+  mov bx, [Temps+2]
   cmp word [bx], 3
   jz L28
   mov ax, [bp+14]
   cmp word ax, 365
   call Bare_make_bool_from_z
-  mov di, ax
-  mov dx, di
+  mov [Temps+4], ax
+  mov dx, [Temps+4]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -415,12 +417,12 @@ L31: ; Continuation
   call Bare_char_to_num
   shl ax, 1
   add ax, 1
-  mov si, ax
-  mov ax, si
+  mov [Temps+2], ax
+  mov ax, [Temps+2]
   cmp word ax, 85
   call Bare_make_bool_from_z
-  mov di, ax
-  push word si
+  mov [Temps+4], ax
+  push word [Temps+2]
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
@@ -430,10 +432,10 @@ L31: ; Continuation
   push word L29
   mov cx, sp
   push word 16 ;; scanned
-  mov bx, di
+  mov bx, [Temps+4]
   cmp word [bx], 3
   jz L30
-  mov ax, si
+  mov ax, [Temps+2]
   cmp word ax, 109
   call Bare_make_bool_from_z
   mov [Temps+6], ax
@@ -464,9 +466,9 @@ L33: ; Function: (loop,t3)
   push word [bp+4]
   push word [bp+2]
   push word L32
-  mov si, sp
+  mov [Temps+2], sp
   push word 10 ;; scanned
-  mov dx, si
+  mov dx, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -475,7 +477,8 @@ L34: ; Continuation
   Bare_enter_check(0)
   mov ax, dx
   call Bare_put_char
-  mov si, Bare_unit
+  mov ax, Bare_unit
+  mov [Temps+2], ax
   mov bp, [bp+4]
   mov dx, g20
   jmp [bp]
@@ -483,20 +486,22 @@ L34: ; Continuation
 L35: ; Continuation
   Bare_enter_check(8)
   mov bx, [bp+4]
-  mov si, [bx]
+  mov ax, [bx]
+  mov [Temps+2], ax
   push word [bp+6]
   push word cx
   push word L34
   mov cx, sp
   push word 6 ;; scanned
   mov bp, dx
-  mov dx, si
+  mov dx, [Temps+2]
   jmp [bp]
 
 L36: ; Function: (main,t4)
   Bare_enter_check(10)
   mov bx, [bp+2]
-  mov si, [bx]
+  mov ax, [bx]
+  mov [Temps+2], ax
   push word bp
   push word [bp+4]
   push word cx
@@ -504,25 +509,25 @@ L36: ; Function: (main,t4)
   mov cx, sp
   push word 8 ;; scanned
   mov bp, [bp+6]
-  mov dx, si
+  mov dx, [Temps+2]
   jmp [bp]
 
 L37: ; Start
   Bare_enter_check(26)
   push word g6
-  mov si, sp
+  mov [Temps+2], sp
   push word 2 ;; scanned
   push word g7
-  mov di, sp
+  mov [Temps+4], sp
   push word 2 ;; scanned
-  push word di
-  push word si
+  push word [Temps+4]
+  push word [Temps+2]
   push word L33
   mov [Temps+6], sp
   push word 6 ;; scanned
   push word [Temps+6]
-  push word di
-  push word si
+  push word [Temps+4]
+  push word [Temps+2]
   push word L36
   mov [Temps+8], sp
   push word 8 ;; scanned

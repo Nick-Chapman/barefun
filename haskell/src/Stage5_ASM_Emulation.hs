@@ -21,7 +21,7 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 import Stage5_ASM_AbstractSyntax
 
 gcAtEverySafePoint :: Bool -- useful for dev/debug
-gcAtEverySafePoint = False
+gcAtEverySafePoint = True -- slow "dune test" from 4.4s to 8.8s -- but much more likely to pickup bugs in codegen when hacking with calling convention
 
 -- During dev, we can have quite small heap spaces
 -- experimentation shows the sham example needs more that 2000; but 3000 seems enough
