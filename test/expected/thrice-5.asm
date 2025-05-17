@@ -116,7 +116,7 @@ L1: ; Start
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+58], ax
-  mov dx, [Temps+58]
+  mov si, [Temps+58]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]

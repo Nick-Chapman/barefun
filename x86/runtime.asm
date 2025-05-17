@@ -477,7 +477,7 @@ Bare_get_keyboard_last_scancode: ; TODO: ripe for inlining
 ;;; GC
 
 ;; roots; must match stage5 calling convention
-%define Arg dx
+%define Arg si
 %define Frame bp
 %define Cont cx
 
@@ -531,7 +531,7 @@ Bare_enter_check_function:
     sub ax, [need]
     cmp ax, 0
     jl .need_to_gc
-    jmp .need_to_gc ; GC every safe point for extreme testing -- TODO: enable with flag
+    ;jmp .need_to_gc ; GC every safe point for extreme testing ; TODO: enable with flag
     jmp .return_to_caller
 
 .need_to_gc:

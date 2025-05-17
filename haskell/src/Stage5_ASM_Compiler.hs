@@ -247,11 +247,9 @@ compileBuiltinTo builtin = case builtin of
     , OpShiftR1 Ax
     , OpMove Bx s2
     , OpShiftR1 Bx
-    , OpPushSAVE (SReg Dx)
     , OpMove Dx (SLit (LNum 0))
     , OpDivModIntoAxDx Bx
     -- quotiant already in Ax
-    , OpPopRESTORE Dx
     , OpShiftL1 Ax
     , OpInc Ax
     , setTarget target (SReg Ax)
@@ -261,14 +259,12 @@ compileBuiltinTo builtin = case builtin of
     , OpShiftR1 Ax
     , OpMove Bx s2
     , OpShiftR1 Bx
-    , OpPushSAVE (SReg Dx)
     , OpMove Dx (SLit (LNum 0))
     , OpDivModIntoAxDx Bx
     -- remainder in Dx
     , OpShiftL1 Dx
     , OpInc Dx
     , setTarget target (SReg Dx)
-    , OpPopRESTORE Dx
     ]
   SRC.EqInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1

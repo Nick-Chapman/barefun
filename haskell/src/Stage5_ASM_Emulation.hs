@@ -365,6 +365,7 @@ execOp = \case
     SetReg Ax (WNum (fromIntegral (dividend `div` divisor)))
     SetReg Dx (WNum (fromIntegral (dividend `mod` divisor)))
     cont
+  -- TODO: have seperate macros for CodeEntry and CheckHeap
   OpEnterCheck need -> \cont -> if need == 0 then cont else do -- TODO: dont generate OpEnterCheck(0)?
     n <- heapBytesRemaining
     --Debug (printf "OpEnterCheck: remaining=%d, need=%d\n" n need)

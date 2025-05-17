@@ -1,12 +1,12 @@
 L1: ; Arm: 13'7
-  mov dx, g2
+  mov si, g2
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
 
 L2: ; Function: (put_chars,g1)
   Bare_enter_check(0)
-  mov bx, dx
+  mov bx, si
   cmp word [bx], 1
   jz L1
   mov ax, [bx+2]
@@ -18,11 +18,11 @@ L2: ; Function: (put_chars,g1)
   mov ax, Bare_unit
   mov [Temps+6], ax
   mov bp, g1
-  mov dx, [Temps+4]
+  mov si, [Temps+4]
   jmp [bp]
 
 L3: ; Arm: 6'13
-  mov dx, [bp+2]
+  mov si, [bp+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -33,37 +33,33 @@ L4: ; Continuation
   sar ax, 1
   mov bx, 21
   sar bx, 1
-  push word dx ;; save
   mov dx, 0
   Div bx
-  pop word dx ;; restore
   shl ax, 1
   add ax, 1
   mov [Temps+2], ax
-  mov bp, dx
-  mov dx, [Temps+2]
+  mov bp, si
+  mov si, [Temps+2]
   jmp [bp]
 
 L5: ; Function: (lam,t1)
   Bare_enter_check(16)
-  mov ax, dx
+  mov ax, si
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L3
-  mov ax, dx
+  mov ax, si
   sar ax, 1
   mov bx, 21
   sar bx, 1
-  push word dx ;; save
   mov dx, 0
   Div bx
   shl dx, 1
   add dx, 1
   mov [Temps+4], dx
-  pop word dx ;; restore
   mov ax, 97
   sar ax, 1
   mov bx, [Temps+4]
@@ -81,22 +77,22 @@ L5: ; Function: (lam,t1)
   push word 3
   mov [Temps+10], sp
   push word 6 ;; scanned
-  push word dx
+  push word si
   push word cx
   push word L4
   mov cx, sp
   push word 6 ;; scanned
   mov bp, g3
-  mov dx, [Temps+10]
+  mov si, [Temps+10]
   jmp [bp]
 
 L6: ; Function: (loop,g3)
   Bare_enter_check(6)
-  push word dx
+  push word si
   push word L5
   mov [Temps+2], sp
   push word 4 ;; scanned
-  mov dx, [Temps+2]
+  mov si, [Temps+2]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -104,7 +100,7 @@ L6: ; Function: (loop,g3)
 L7: ; Continuation
   Bare_enter_check(0)
   mov bp, g1
-  mov dx, dx
+  mov si, si
   jmp [bp]
 
 L8: ; Continuation
@@ -113,8 +109,8 @@ L8: ; Continuation
   push word L7
   mov cx, sp
   push word 4 ;; scanned
-  mov bp, dx
-  mov dx, 85
+  mov bp, si
+  mov si, 85
   jmp [bp]
 
 L9: ; Start
@@ -124,7 +120,7 @@ L9: ; Start
   mov cx, sp
   push word 4 ;; scanned
   mov bp, g3
-  mov dx, g4
+  mov si, g4
   jmp [bp]
 
 g1:

@@ -33,7 +33,7 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
 -- Calling conventions:
 frameReg,argReg,contReg :: Reg
 frameReg = Bp -- TODO: be able to change this! (although I dont want to)
-argReg = Dx -- TODO: change to Si. runtime.asm must be synced.
+argReg = Si
 contReg = Cx -- TODO: use memory instead of reg for this.
 
 data Image = Image

@@ -1,7 +1,7 @@
 L1: ; Arm: 6'25
   call Bare_get_keyboard_last_scancode
   mov [Temps+6], ax
-  mov dx, [Temps+6]
+  mov si, [Temps+6]
   mov bp, cx
   mov cx, [bp+2]
   jmp [bp]
@@ -18,12 +18,12 @@ L2: ; Function: (get_scancode,g1)
   cmp word [bx], 3
   jz L1
   mov bp, g1
-  mov dx, g5
+  mov si, g5
   jmp [bp]
 
 L3: ; Continuation
   Bare_enter_check(0)
-  mov ax, dx
+  mov ax, si
   call Bare_char_to_num
   shl ax, 1
   add ax, 1
@@ -32,21 +32,17 @@ L3: ; Continuation
   sar ax, 1
   mov bx, 21
   sar bx, 1
-  push word dx ;; save
   mov dx, 0
   Div bx
   shl dx, 1
   add dx, 1
   mov [Temps+4], dx
-  pop word dx ;; restore
   mov ax, [Temps+2]
   sar ax, 1
   mov bx, 21
   sar bx, 1
-  push word dx ;; save
   mov dx, 0
   Div bx
-  pop word dx ;; restore
   shl ax, 1
   add ax, 1
   mov [Temps+6], ax
@@ -54,21 +50,17 @@ L3: ; Continuation
   sar ax, 1
   mov bx, 21
   sar bx, 1
-  push word dx ;; save
   mov dx, 0
   Div bx
   shl dx, 1
   add dx, 1
   mov [Temps+8], dx
-  pop word dx ;; restore
   mov ax, [Temps+6]
   sar ax, 1
   mov bx, 21
   sar bx, 1
-  push word dx ;; save
   mov dx, 0
   Div bx
-  pop word dx ;; restore
   shl ax, 1
   add ax, 1
   mov [Temps+10], ax
@@ -133,7 +125,7 @@ L3: ; Continuation
   mov ax, Bare_unit
   mov [Temps+34], ax
   mov bp, g6
-  mov dx, g8
+  mov si, g8
   jmp [bp]
 
 L4: ; Function: (main,g6)
@@ -143,13 +135,13 @@ L4: ; Function: (main,g6)
   mov cx, sp
   push word 4 ;; scanned
   mov bp, g1
-  mov dx, g7
+  mov si, g7
   jmp [bp]
 
 L5: ; Start
   Bare_enter_check(0)
   mov bp, g6
-  mov dx, g9
+  mov si, g9
   jmp [bp]
 
 g1:
