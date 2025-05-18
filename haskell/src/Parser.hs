@@ -332,7 +332,7 @@ gram6 = program where
     t <- exp
     posElse <- position
     key "else"
-    e <- exp
+    e <- exp_no_semi
     pure (AST.Match pos i [AST.Arm posThen cTrue [] t, AST.Arm posElse cFalse [] e ])
 
   abstraction = do
@@ -370,6 +370,13 @@ gram6 = program where
               pure (AST.Let pos (Bid pos underscore) e1 e2)
          , pure e1
          ]
+
+  exp_no_semi = alts
+    [ expITE
+    , abstraction
+    , match_
+    , let_
+    ]
 
   exp = alts
     [ expSEQ
