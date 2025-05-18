@@ -165,10 +165,10 @@ let get_char : unit -> char =
     let control_released = (n = 157) in
     let ok d = (r_shifted := shifted; r_controlled := controlled; d) in
     let unknown() = (put_char '{'; put_int n; put_char '}'; loop shifted controlled) in
-    if control_pressed then loop shifted (true) else
-      if control_released then loop shifted (false) else
-        if shift_pressed then loop (true) controlled else
-          if shift_released then loop (false) controlled else
+    if control_pressed then loop shifted true else
+      if control_released then loop shifted false else
+        if shift_pressed then loop true controlled else
+          if shift_released then loop false controlled else
             if release_scancode then loop shifted controlled else
               if n = 14 then ok (chr 127) else
                 if n = 57 then ok ' ' else

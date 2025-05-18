@@ -227,7 +227,12 @@ gram6 = program where
       , pure (AST.Con pos c [])
       ]
 
-  atom0 = alts [literal,var,listExp,bracketed exp,consApp]
+  cons0 = do
+    pos <- position
+    c <- constructor
+    pure (AST.Con pos c [])
+
+  atom0 = alts [literal,var,listExp,bracketed exp,cons0]
 
   prefixNames = ["!"]
 
@@ -279,7 +284,7 @@ gram6 = program where
 
   infixNames = concat (map snd [infixGroup1,infixGroup2,infixGroup3,infixGroup4,infixGroup5,infixGroup6])
 
-  infix0 = application
+  infix0 = alts [consApp, application]
   infix1 = infixOp infixGroup1 infix0
   infix2 = infixOp infixGroup2 infix1
   infix3 = infixOp infixGroup3 infix2

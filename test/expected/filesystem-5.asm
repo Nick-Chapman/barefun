@@ -18984,7 +18984,7 @@ L972: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L973: ; Arm: 324'22
+L973: ; Arm: 324'21
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -19031,7 +19031,7 @@ L975: ; Continuation
   mov si, si
   jmp [bp]
 
-L976: ; Arm: 323'25
+L976: ; Arm: 323'24
   push word [CurrentCont]
   push word L975
   mov [CurrentCont], sp
@@ -53350,7 +53350,7 @@ L3039: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L3040: ; Arm: 324'22
+L3040: ; Arm: 324'21
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -53397,7 +53397,7 @@ L3042: ; Continuation
   mov si, si
   jmp [bp]
 
-L3043: ; Arm: 323'25
+L3043: ; Arm: 323'24
   push word [CurrentCont]
   push word L3042
   mov [CurrentCont], sp
