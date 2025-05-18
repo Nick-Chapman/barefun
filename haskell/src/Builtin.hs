@@ -64,13 +64,13 @@ defineBuiltin b =
     CharOrd -> Pure (\vs -> VNum ((fromIntegral . Char.ord) (deChar (oneArg vs))))
     CharChr -> Pure (\vs -> VChar ((Char.chr . fromIntegral) (deNum (oneArg vs))))
 
-    MakeBytes -> Impure $ \vs k -> IMakeBytes (fromIntegral $ deNum (oneArg vs)) (\b -> k (VBytes b))
+    MakeBytes -> Impure $ \vs k -> IMakeBytes (deNum (oneArg vs)) (\b -> k (VBytes b))
     SetBytes -> Impure $ \vs k -> do
       let (b,n,c) = threeArgs deBytes deNum deChar vs
-      ISetBytes b (fromIntegral n) c (k unit)
+      ISetBytes b n c (k unit)
     GetBytes -> Impure $ \vs k -> do
       let (b,n) = twoArgs deBytes deNum vs
-      IGetBytes b (fromIntegral n) $ \c -> k (VChar c)
+      IGetBytes b n $ \c -> k (VChar c)
 
     FreezeBytes -> Impure $ \vs k -> IFreezeBytes (deBytes (oneArg vs)) (\s -> k (VString s))
     ThawBytes -> Impure $ \vs k -> IThawBytes (deString (oneArg vs)) (\b -> k (VBytes b))

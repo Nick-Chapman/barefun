@@ -23,7 +23,7 @@ data Value
   | VFunc (Value -> (Value -> Interaction) -> Interaction)
   | VRef (IORef Value)
 
-data Interaction -- TODO prefer args of Number, rather than Int ?
+data Interaction
   = IDone
   | ITick Tickable Interaction
   | ITrace String Interaction
@@ -31,11 +31,11 @@ data Interaction -- TODO prefer args of Number, rather than Int ?
   | IPut Char Interaction
   | IGet (Char -> Interaction)
   | IGetScanCode (Char -> Interaction)
-  | IMakeBytes Int (Bytes -> Interaction)
+  | IMakeBytes Number (Bytes -> Interaction)
   | IFreezeBytes Bytes (String -> Interaction)
   | IThawBytes String (Bytes -> Interaction)
-  | ISetBytes Bytes Int Char Interaction
-  | IGetBytes Bytes Int (Char -> Interaction)
+  | ISetBytes Bytes Number Char Interaction
+  | IGetBytes Bytes Number (Char -> Interaction)
   | ISetBytesFromString Bytes String Interaction
   | IMakeRef Value (IORef Value -> Interaction)
   | IDeRef (IORef Value) (Value -> Interaction)
@@ -100,7 +100,7 @@ runInteraction measure next = do
         let State{bm,u} = state
         let r = BytesRef u
         let m = Map.fromList [ (i,c) | (i,c) <- zip [0..] s ]
-        let n = length s
+        let n = fromIntegral $ length s
         loop state { u = 1 + u, bm = Map.insert r (n,m) bm } (k (BytesRef u))
 
       ISetBytes r i c k -> do
@@ -122,7 +122,7 @@ runInteraction measure next = do
       ISetBytesFromString r s k -> do
         loop state (makeCharWiseInteraction 0 s)
           where
-            makeCharWiseInteraction :: Int -> String -> Interaction
+            makeCharWiseInteraction :: Number -> String -> Interaction
             makeCharWiseInteraction i = \case
               [] -> k
               c:s -> ISetBytes r i c (makeCharWiseInteraction (i+1) s)
@@ -159,7 +159,7 @@ data Bytes = BytesRef Int deriving (Eq,Ord,Show)
 
 data State = State
   { tm :: Map Tickable Int
-  , bm :: Map Bytes (Int,Map Int Char)
+  , bm :: Map Bytes (Number,Map Number Char)
   , u :: Int
   , pendingScanCodes :: [Int]
   , diskSectors :: Map Number String

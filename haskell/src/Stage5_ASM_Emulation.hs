@@ -370,12 +370,13 @@ execOp = \case
   OpSubInto r s -> execBinaryOpInto (-) r s
   OpMulIntoAx s -> execBinaryOpInto (*) Ax (SReg s)
   OpDivModIntoAxDx divisorReg -> \cont -> do
-    ax <- (fromIntegral . deNum) <$> GetReg Ax
-    dx <- (fromIntegral . deNum) <$> GetReg Dx
+    ax <- deNum <$> GetReg Ax
+    dx <- deNum <$> GetReg Dx
+    let twoE16 = 256 * 256
     let dividend = (dx * twoE16 + ax)
-    divisor <- (fromIntegral . deNum) <$> GetReg divisorReg
-    SetReg Ax (WNum (fromIntegral (dividend `div` divisor)))
-    SetReg Dx (WNum (fromIntegral (dividend `mod` divisor)))
+    divisor <- deNum <$> GetReg divisorReg
+    SetReg Ax (WNum (dividend `div` divisor))
+    SetReg Dx (WNum (dividend `mod` divisor))
     cont
   -- TODO: have seperate macros for CodeEntry and CheckHeap
   OpEnterCheck need -> \cont -> if need == 0 then cont else do -- TODO: dont generate OpEnterCheck(0)?
