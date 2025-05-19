@@ -381,7 +381,7 @@ compileBuiltinTo builtin = case builtin of
     [ OpCall Bare_get_keyboard_last_scancode
     , setTarget target (SReg Ax)
     ]
-  SRC.Assert{} -> \target -> oneArg $ \_bool -> -- TODO: gen code to assert this bool
+  SRC.Assert{} -> \target -> oneArg $ \_bool ->
     [ setTarget target sUnit
     ]
 

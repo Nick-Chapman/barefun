@@ -24,7 +24,7 @@ data Builtin
   | Is_keyboard_ready
   | Get_keyboard_last_scancode
 
-  | Assert Position
+  | Assert Position -- TODO: remove this
 
   deriving (Show)
 

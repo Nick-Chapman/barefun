@@ -20,7 +20,7 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM
 
-gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen -- TODO: command-line flag?
+gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
 gcAtEverySafePoint = False -- but slows "dune test" from 4.4s to 8.8s
 
 hemiSizeInBytes :: Int
@@ -358,8 +358,8 @@ execOp = \case
     SetReg Ax (WNum (dividend `div` divisor))
     SetReg Dx (WNum (dividend `mod` divisor))
     cont
-  -- TODO: have seperate macros for CodeEntry and CheckHeap
-  OpEnterCheck need -> \cont -> if need == 0 then cont else do -- TODO: dont generate OpEnterCheck(0)?
+  -- when support multi lam, we can have seperate macros for CodeEntry and CheckHeap
+  OpEnterCheck need -> \cont -> if need == 0 then cont else do
     n <- heapBytesRemaining
     --Debug (printf "OpEnterCheck: remaining=%d, need=%d\n" n need)
     if gcAtEverySafePoint || (n < need) then runGC else pure ()
@@ -515,10 +515,10 @@ execBare = \case
   Bare_init_interrupt_mode -> do
     pure ()
 
-  Bare_get_ticks -> do  -- TODO: really pause
+  Bare_get_ticks -> do
     SetReg Ax (WNum 0)
 
-  Bare_is_keyboard_ready -> do -- TODO: really check; dont lie
+  Bare_is_keyboard_ready -> do
     SetFlagZ False -- always ready
 
   Bare_get_keyboard_last_scancode -> do

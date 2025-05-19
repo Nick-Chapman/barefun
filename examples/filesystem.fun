@@ -312,7 +312,7 @@ let num_sectors_on_disk = 3 (* 31 is max here; if 32 we get 8*32=256 blocks, whi
 let load_sector : int -> bytes -> unit = fun seci buf ->
   assertF (fun () -> seci >= 0);
   assertF (fun () -> seci < num_sectors_on_disk);
-  (*let () = traceF (fun () ->"(SLOW) load_sector " ^ sofi seci) in*) (* TODO: enable *)
+  (*let () = traceF (fun () ->"(SLOW) load_sector " ^ sofi seci) in*)
   load_sector seci buf
 
 let read_sector : int -> string =
@@ -915,7 +915,7 @@ let command_cat i =
      | Some inode ->
         match inode with
         | Inode (size,bis) ->
-           (* TODO: do this in a more incremental way *)
+           (* TODO: do this in a more incremental way; via a sys_read method *)
            let str = concat "" (map (fun bi -> deBlock (load_block bi)) bis) in
            let contents = substr str 0 size in
            put_string contents

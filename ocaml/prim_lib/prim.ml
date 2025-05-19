@@ -135,10 +135,10 @@ end = struct
     0 (* return some dummy value *)
 
   let wait_for_interrupt : unit -> unit = fun () ->
-    () (* TODO: really do a pause *)
+    ()
 
   let is_keyboard_ready : unit -> bool = fun () ->
-    true (* TODO: really check; don't lie *)
+    true
 
   let normal_press : char -> int = fun c ->
     match c with

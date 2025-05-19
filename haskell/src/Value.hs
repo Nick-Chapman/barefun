@@ -263,7 +263,7 @@ deBool = \case
 
 scanCodesFromAscii :: Char -> [Int]
 scanCodesFromAscii c = do
-  let dummyRelease = 222 -- TODO: the correct number please
+  let dummyRelease = 222 -- the correct number please!
   let n = ord c
   if n <= 26 && c /= '\n' then [ pressControl, shiftedPress (chr (n + ord '@')), dummyRelease, releaseControl ] else do
     let code = normalPress c
@@ -332,7 +332,7 @@ normalPress = \case
   '\n' -> 0x1C
   _ -> 0
 
-shiftedPress :: Char -> Int -- TODO: better to down-case and use normalPress
+shiftedPress :: Char -> Int -- maybe better to down-case and use normalPress
 shiftedPress = \case
   '!' -> 0x02
   '@' -> 0x03
