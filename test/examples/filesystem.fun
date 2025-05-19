@@ -1,6 +1,9 @@
 
 (* Prelude stuff... *)
 
+(*let assertF f = assert (f())*)
+let assertF _f = ()
+
 type 'a option = None | Some of 'a
 
 let is_some o = match o with | None -> false | Some _ -> true
@@ -93,8 +96,8 @@ let implode = noinline (fun xs ->
   loop 0 xs;
   freeze_bytes b)
 
-let (^) s1 s2 =
-  implode (explode s1 @ explode s2)
+let (^) = noinline (fun s1 s2 ->
+  implode (explode s1 @ explode s2))
 
 (* int ops *)
 
@@ -143,14 +146,16 @@ let rec put_chars xs =
   | [] -> ()
   | x::xs -> put_char x; put_chars xs
 
-let put_string s = put_chars (explode s)
+let put_string = (fun s -> put_chars (explode s))
 
 let newline () = put_char '\n'
 
 (* trace *)
 
 let trace_on = ref false
-let trace = noinline (fun m -> if !trace_on then put_string ("trace: " ^ m ^ "\n") else ())
+let _trace = noinline (fun m -> if !trace_on then put_string ("trace: " ^ m ^ "\n") else ())
+(*let traceF f = _trace (f ())*)
+let traceF _f = ()
 
 (* complex string ops *)
 
@@ -218,11 +223,10 @@ let split_words =
 
 let substr : string -> int -> int -> string =
   noinline (fun source offset len ->
-  (*trace ("substr" ^ " source=[" ^ source ^ "], offset=" ^ sofi offset ^ " ,len=" ^ sofi len);*)
+  (*traceF (fun () ->"substr" ^ " source=[" ^ source ^ "], offset=" ^ sofi offset ^ " ,len=" ^ sofi len);*)
   let target = make_bytes len in
-  let slen = string_length source in
-  assert (offset >= 0);
-  assert (offset+len <= slen);
+  assertF (fun () -> offset >= 0);
+  assertF (fun () -> offset+len <= string_length source);
   let rec loop i =
     if i >= len then () else
       let char = string_index source (offset+i) in
@@ -235,9 +239,8 @@ let substr : string -> int -> int -> string =
 let mod_substr : bytes -> int -> string -> unit =
   noinline (fun target offset source ->
   let slen = string_length source in
-  let tlen = string_length (freeze_bytes target) in
-  assert (offset >= 0);
-  assert (offset+slen <= tlen);
+  assertF (fun () -> offset >= 0);
+  assertF (fun () -> offset+slen <= string_length (freeze_bytes target));
   let rec loop i =
     if i >= slen then () else
       let char = string_index source i in
@@ -275,7 +278,7 @@ let erase_char () =
 let controlD = chr 4
 let single_controlD = implode [controlD]
 
-let read_line () =
+let read_line = noinline (fun () ->
   let rec readloop acc =
     let c = get_char () in
     let n = ord c in
@@ -297,7 +300,7 @@ let read_line () =
           else
             (put_char c; readloop (c :: acc))
   in
-  readloop []
+  readloop [])
 
 (* Filesystem code starts here... *)
 
@@ -307,9 +310,9 @@ let sector_size = 512
 let num_sectors_on_disk = 3 (* 31 is max here; if 32 we get 8*32=256 blocks, which is too big for a char *)
 
 let load_sector : int -> bytes -> unit = fun seci buf ->
-  assert (seci >= 0);
-  assert (seci < num_sectors_on_disk);
-  (*let () = trace ("(SLOW) load_sector " ^ sofi seci) in*) (* TODO: enable *)
+  assertF (fun () -> seci >= 0);
+  assertF (fun () -> seci < num_sectors_on_disk);
+  (*let () = traceF (fun () ->"(SLOW) load_sector " ^ sofi seci) in*) (* TODO: enable *)
   load_sector seci buf
 
 let read_sector : int -> string =
@@ -333,8 +336,7 @@ let update_sector : int -> int -> string -> unit =
   let buf = make_bytes sector_size in
   let () = load_sector seci buf in
   let () = mod_substr buf offset text in
-  let () = store_sector seci (freeze_bytes buf) in
-  ()
+  store_sector seci (freeze_bytes buf)
 
 let read_sector_show : int -> unit =
   fun seci ->
@@ -346,7 +348,7 @@ let read_sector_show : int -> unit =
 
 let block_size = 64
 let blocks_per_sector = 8
-let () = assert (block_size * blocks_per_sector = sector_size)
+let () = assertF (fun () -> block_size * blocks_per_sector = sector_size)
 let num_blocks_on_disk = blocks_per_sector * num_sectors_on_disk
 
 type block = Block of string
@@ -361,49 +363,49 @@ let import_bi : char -> bi = fun c -> BI (ord c)
 let show_bi : bi -> string = fun bi -> "B" ^ sofi (deBI bi)
 let eq_bi : bi -> bi -> bool = fun x y -> deBI x = deBI y
 
-let show_seci seci = "[" ^ sofi seci ^ "]"
+let show_seci = noinline (fun seci -> "[" ^ sofi seci ^ "]")
 
-let store_block : bi -> block -> unit = fun bi block ->
+let store_block : bi -> block -> unit = noinline (fun bi block ->
   let i = deBI bi in
-  assert (i >= 0);
-  assert (i < num_blocks_on_disk);
+  assertF (fun () -> i >= 0);
+  assertF (fun () -> i < num_blocks_on_disk);
   let seci = i / blocks_per_sector in
-  let () = trace ("store_block " ^ sofi i ^ show_seci seci) in
+  let () = traceF (fun () -> "store_block " ^ sofi i ^ show_seci seci) in
   let offset = block_size * (i % blocks_per_sector) in
-  update_sector seci offset (deBlock block)
+  update_sector seci offset (deBlock block))
 
-let load_block : bi -> block = fun bi ->
+let load_block : bi -> block = noinline (fun bi ->
   let i = deBI bi in
-  assert (i >= 0);
-  assert (i < num_blocks_on_disk);
+  assertF (fun () -> i >= 0);
+  assertF (fun () -> i < num_blocks_on_disk);
   let seci = i / blocks_per_sector in
-  let () = trace ("load_block " ^ sofi i ^ show_seci seci) in
+  let () = traceF (fun () -> "load_block " ^ sofi i ^ show_seci seci) in
   let sector = read_sector (i / blocks_per_sector) in
   let offset = block_size * (i % blocks_per_sector) in
-  Block (substr sector offset block_size)
+  Block (substr sector offset block_size))
 
 let update_block : bi -> int -> string -> unit =
-  fun bi offset text ->
-  let () = trace ("update_block, bi=" ^ show_bi bi ^ ", offset=" ^ sofi offset ^ " text=[" ^ text ^ "]") in
+  noinline (fun bi offset text ->
+  let () = traceF (fun () -> "update_block, bi=" ^ show_bi bi ^ ", offset=" ^ sofi offset ^ " text=[" ^ text ^ "]") in
   let block = load_block bi in
   let buf = thaw_bytes (deBlock block) in
   let () = mod_substr buf offset text in
-  store_block bi (Block (freeze_bytes buf))
+  store_block bi (Block (freeze_bytes buf)))
 
 (* inode *)
 
 let idata_size = 8
 let inodes_per_block = block_size / idata_size
-let () = assert (inodes_per_block = 8)
+let () = assertF (fun () -> inodes_per_block = 8)
 let max_blocks_per_inode = 6
 let max_file_size = max_blocks_per_inode * block_size
-let () = assert (max_file_size = 384)
+let () = assertF (fun () -> max_file_size = 384)
 
 type inode = Inode of (int * bi list) (* file-size and block-list(#max=6); exports as 8 bytes on disk *)
 
 let export_int : int -> (char,char) pair = (* little endian *)
   fun n ->
-  assert (n <= max_file_size);
+  assertF (fun () -> n <= max_file_size);
   let i = n / 256 in
   let j = n % 256 in
   Pair (chr j, chr i)
@@ -452,7 +454,7 @@ let blocks_for_size : int -> int =
 
 let import_inode : string -> inode option  =
   fun s ->
-  assert (string_length s = idata_size);
+  assertF (fun () -> string_length s = idata_size);
   let get = string_index in
   match import_int (Pair (get s 0, get s 1)) with
   | None -> None (* corrupt; treat as unallocated; probably better to unmount *)
@@ -518,13 +520,13 @@ type fs = FS of super * ii list * bi list (* free inodes and blocks *)
 let super_of_fs fs = match fs with | FS (super,_,_) -> super
 
 let loadI : super -> ii -> inode option =
-  fun super ii ->
-  assert (deII ii < num_inodes super);
+  noinline (fun super ii ->
+  assertF (fun () -> deII ii < num_inodes super);
   let s = deBlock (load_block (ii2bi ii)) in
   let off = ii2off ii in
   let len = idata_size in
   let s = substr s off len in
-  import_inode s
+  import_inode s)
 
 (* fsck: discover/compute the free block and free inode info *)
 let fsck : unit -> fs option =
@@ -582,8 +584,8 @@ let rec giveup_blocks fs old =
   | bi::bis -> giveup_blocks (freeBI fs bi) bis
 
 let storeI : super -> ii -> inode option -> unit =
-  fun super ii inode_opt ->
-  assert (deII ii < num_inodes super);
+  noinline (fun super ii inode_opt ->
+  assertF (fun () -> deII ii < num_inodes super);
   let s = deBlock (load_block (ii2bi ii)) in
   let data =
     match inode_opt with
@@ -594,7 +596,7 @@ let storeI : super -> ii -> inode option -> unit =
   let bytes = thaw_bytes s in
   let () = mod_substr bytes off data in
   let s = freeze_bytes bytes in
-  store_block (ii2bi ii) (Block s)
+  store_block (ii2bi ii) (Block s))
 
 let mounted : fs option ref = ref None
 
@@ -722,16 +724,16 @@ let cmap_lookup : string -> cmap -> command option = fun sought ->
   fun cmap -> loop (deCmap cmap)
 
 let mk_com0 : string -> (unit -> unit) -> (string,command) pair =
-  fun name f ->
+  noinline (fun name f ->
   let err() = error ("usage: " ^ name ^ " [no args]") in
   Pair (name,
         Command (fun args ->
             match args with
             | _ :: _ -> err()
-            | [] -> f()))
+            | [] -> f())))
 
 let mk_comI : string -> (int -> unit) -> (string,command) pair =
-  fun name f ->
+  noinline (fun name f ->
   let err() = error ("usage: " ^ name ^ " [int]") in
   Pair (name,
         Command (fun args ->
@@ -743,10 +745,10 @@ let mk_comI : string -> (int -> unit) -> (string,command) pair =
                | [] ->
                   match parse_num arg1 with
                   | None -> err()
-                  | Some i -> f i))
+                  | Some i -> f i)))
 
 let mk_comII : string -> (int -> int -> unit) -> (string,command) pair =
-  fun name f ->
+  noinline (fun name f ->
   let err() = error ("usage: " ^ name ^ " [int] [int]") in
   Pair (name,
         Command (fun args ->
@@ -764,8 +766,7 @@ let mk_comII : string -> (int -> int -> unit) -> (string,command) pair =
                      | Some i ->
                         match parse_num arg2 with
                         | None -> err()
-                        | Some j ->
-                           f i j))
+                        | Some j -> f i j)))
 
 (* specific commands... *)
 

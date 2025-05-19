@@ -6,7 +6,7 @@ let select_versions_for_example = function
   | "evenodd" -> [5]
   | "ff" -> [5]
   | "fib" -> [5]
-  | "filesystem" -> [5]
+  | "filesystem" -> [4;5]
   | "hello" -> [0;1;2;3;4;5]
   | "print_all_chars" -> [5]
   | "put_int" -> [5]
