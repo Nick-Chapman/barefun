@@ -65,8 +65,6 @@ data Op -- target; source (Intel Syntax style)
   | OpStore Target Reg
   | OpCall BareBios
   | OpPush Source
-  | OpPushSAVE Source
-  | OpPopRESTORE Reg
   | OpCmp Source Source
   | OpBranchFlagZ CodeLabel
   | OpShiftL Reg Source
@@ -170,8 +168,6 @@ instance Show Op where
     OpStore target src -> "mov [" ++ show target ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare
     OpPush src -> "push word " ++ show src
-    OpPushSAVE src -> "push word " ++ show src ++ " ;; save"
-    OpPopRESTORE src -> "pop word " ++ show src ++ " ;; restore"
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "jz " ++ show lab
     OpShiftL r s -> "shl " ++ show r ++ ", " ++ show s

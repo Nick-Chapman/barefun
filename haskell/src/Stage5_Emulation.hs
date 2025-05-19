@@ -26,7 +26,7 @@ gcAtEverySafePoint = False -- but slows "dune test" from 4.4s to 8.8s
 hemiSizeInBytes :: Int
 hemiSizeInBytes = 5000 -- 3000 was ok for sham; 5000 is needed for filesystem example
 
-sizeRedzone :: Int -- for save/restore on stack by div/mod operation + interrupts in runtime.asm
+sizeRedzone :: Int -- interrupts in runtime.asm
 sizeRedzone = 100
 
 topA,botA,topB,botB :: Int
@@ -333,13 +333,6 @@ execOp = \case
     w <- evalSource s
     execPushAlloc AllocForUser w
     cont
-  OpPushSAVE s -> \cont -> do
-    w <- evalSource s
-    execPushSAVE w
-    cont
-  OpPopRESTORE reg -> \cont -> do
-    execPopRESTORE reg
-    cont
   OpCmp s1 s2 -> \cont -> do
     w1 <- evalSource s1
     w2 <- evalSource s2
@@ -401,20 +394,6 @@ checkPushBlockDescriptor = \case
     CheckRecentAlloc (sizeInBytes + 2) -- 2 for the block descriptor itself
   _ ->
     pure ()
-
-execPushSAVE :: Word -> M ()
-execPushSAVE w = do -- pre decrement
-  a <- deAddr <$> GetReg Sp
-  a' <- addAddr (-(bytesPerWord)) a
-  SetReg Sp (WAddr a')
-  SetMem a' w
-
-execPopRESTORE :: Reg -> M ()
-execPopRESTORE reg = do -- post increment
-  a <- deAddr <$> GetReg Sp
-  GetMem a >>= SetReg reg
-  a' <- addAddr (bytesPerWord) a
-  SetReg Sp (WAddr a')
 
 slideStackPointer :: AllocMode -> Int -> M ()
 slideStackPointer mode nBytes = do
