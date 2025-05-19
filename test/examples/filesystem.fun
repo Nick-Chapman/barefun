@@ -288,9 +288,13 @@ let read_line () =
             match acc with
             | [] -> readloop acc
             | c::tail ->
-               (if ord c <= 26 then erase_char () else ()); (* The ^ printed for control chars *)
-               (* TODO: fix erase for all non printable control chars; erase 3 places?? *)
-               erase_char();
+               let n = ord c in
+               let () =
+                 if n <= 26 then (erase_char(); erase_char()) else (* The ^ printed for control chars *)
+                   if n < 32 then (erase_char(); erase_char(); erase_char()) else
+                     if n > 126 then (erase_char(); erase_char(); erase_char()) else
+                       erase_char()
+               in
                readloop tail
           else
             (put_char c; readloop (c :: acc))

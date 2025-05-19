@@ -130,6 +130,8 @@ let put_int i =
 
 let newline () = put_char '\n'
 
+(* read_line *)
+
 let erase_char () =
   let backspace = chr 8 in
   (* erase the previously echoed char on the terminal *)
@@ -137,13 +139,13 @@ let erase_char () =
   put_char ' ';
   put_char backspace
 
-(* read_line *)
+let controlD = chr 4
+let single_controlD = implode [controlD]
 
 let read_line () =
   let rec readloop acc =
     let c = get_char () in
     let n = ord c in
-    let controlD = chr 4 in
     if eq_char c '\n' then (newline(); rev_implode acc) else
       if eq_char c controlD then (put_char controlD; newline(); rev_implode (controlD :: acc)) else
         if n > 127 then readloop acc else
@@ -151,8 +153,13 @@ let read_line () =
             match acc with
             | [] -> readloop acc
             | c::tail ->
-               (if ord c <= 26 then erase_char () else ()); (* The ^ printed for control chars *)
-               erase_char();
+               let n = ord c in
+               let () =
+                 if n <= 26 then (erase_char(); erase_char()) else (* The ^ printed for control chars *)
+                   if n < 32 then (erase_char(); erase_char(); erase_char()) else
+                     if n > 126 then (erase_char(); erase_char(); erase_char()) else
+                       erase_char()
+               in
                readloop tail
           else
             (put_char c; readloop (c :: acc))
@@ -333,7 +340,6 @@ let create_behaviour fs args =
      | _::_ -> (put_string "create: unexpected extra operands\n"; fs)
      | [] ->
         put_string "(to finish type ^D on a new line)\n";
-        let single_controlD = implode [chr 4] in
         let rec loop acc =
           let line = read_line () in
           if eq_string line single_controlD then concat (rev acc) else
