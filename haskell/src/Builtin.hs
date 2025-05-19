@@ -98,10 +98,10 @@ defineBuiltin b =
 
     Get_ticks -> Impure undefined -- TODO: no reason we can't emulate time in the haskell evaluators
 
-    Wait_for_interrupt ->  -- TODO: really wait
+    Wait_for_interrupt ->
       Impure $ \vs k -> case deUnit (oneArg vs) of () -> k unit
 
-    Is_keyboard_ready -> -- TODO: really check; dont lie
+    Is_keyboard_ready ->
       Impure $ \vs k -> case deUnit (oneArg vs) of () -> k true
 
     Get_keyboard_last_scancode ->
