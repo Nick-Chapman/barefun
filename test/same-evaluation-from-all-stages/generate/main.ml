@@ -4,7 +4,7 @@ let generate_rules x =
 
   Printf.printf
 {|
- (rule (deps ../../../test/inputs/%s.input ../../examples/%s.fun ../../../ocaml/main.exe)
+ (rule (deps ../../../test/inputs/%s.input ../../../examples/%s.fun ../../../ocaml/main.exe)
   (action
    (with-stdin-from ../../../test/inputs/%s.input
     (with-stdout-to %s.out%c
@@ -14,11 +14,11 @@ x x x x 'X' capX;
 
   let f v = Printf.printf
 {|
- (rule (deps ../../../test/inputs/%s.input ../../examples/%s.fun ../../../haskell/main.exe)
+ (rule (deps ../../../test/inputs/%s.input ../../../examples/%s.fun ../../../haskell/main.exe)
   (action
    (with-stdin-from ../../../test/inputs/%s.input
     (with-stdout-to %s.out%c
-     (run ../../../haskell/main.exe ../../examples/%s.fun -%c)))))
+     (run ../../../haskell/main.exe ../../../examples/%s.fun -%c)))))
 |}
 x x x x v x v
   in

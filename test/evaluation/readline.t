@@ -1,5 +1,5 @@
 
-  $ cat ../inputs/readline.input | ../../haskell/main.exe ../examples/readline.fun
+  $ cat ../inputs/readline.input | ../../haskell/main.exe ../../examples/readline.fun
   Readline: edit with backspace; exit with ^D.
   % Readline testing. Send all chars 0..127...
   Readline testing. Send all chars 0..127...

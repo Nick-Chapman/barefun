@@ -4,7 +4,7 @@
 
 Notes:
 - The [compiler](../haskell/README.md) for the `.fun` language is written in haskell.
-- Examples of `.fun` code can be found [here](examples/README.md).
+- Examples of `.fun` code can be found [here](../examples/README.md).
 - Since `.fun` is a subset of ocaml, we can leverage [ocaml](../ocaml/README.md) as our development environment.
 - We test evaluation of the examples [here](evaluation/README.md), expecting identical results from the haskell interpreter(s) and direct ocaml execution.
 - The generated ASM is embedded in the [runtime](../x86/runtime.asm) and compiled with `nasm`.

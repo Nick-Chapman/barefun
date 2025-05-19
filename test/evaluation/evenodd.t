@@ -1,3 +1,3 @@
 
-  $ ../../haskell/main.exe ../examples/evenodd.fun
+  $ ../../haskell/main.exe ../../examples/evenodd.fun
   EO[HALT]

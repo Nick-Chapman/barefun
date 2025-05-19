@@ -1,3 +1,3 @@
 
-  $ ../../haskell/main.exe ../examples/tree.fun
+  $ ../../haskell/main.exe ../../examples/tree.fun
   779[HALT]

@@ -1,6 +1,6 @@
 ## Barefun development environment
 
-- All [examples](../test/examples) are wrapped as ocaml `.ml` files, and compiled.
+- All [examples](../examples) are wrapped as ocaml `.ml` files, and compiled.
 - Interactive type-checking: `dune build -w`
 - Examples can be run: `dune exec -- main.exe <Example>`
 - Where `Example` is the upper case name of the example file, i.e. `Sham` for `sham.fun`.

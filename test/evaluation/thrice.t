@@ -1,4 +1,4 @@
 
-  $ cat ../inputs/thrice.input | ../../haskell/main.exe ../examples/thrice.fun
+  $ cat ../inputs/thrice.input | ../../haskell/main.exe ../../examples/thrice.fun
   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[
   [HALT]

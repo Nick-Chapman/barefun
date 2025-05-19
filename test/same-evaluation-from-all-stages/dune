@@ -3,7 +3,7 @@
 
 (rule
  (target dune.inc)
- (deps (glob_files ../examples/*.fun) (glob_files ../inputs/*.input))
+ (deps (glob_files ../../examples/*.fun) (glob_files ../inputs/*.input))
  (action (with-stdout-to dune.inc (run generate/main.exe))))
 
 (subdir gen (dynamic_include ../dune.inc))

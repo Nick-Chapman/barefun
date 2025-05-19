@@ -3,10 +3,10 @@ let generate_rules x =
   Printf.printf
 {|
  (rule
-  (deps ../../../haskell/main.exe ../../examples/%s.fun)
+  (deps ../../../haskell/main.exe ../../../examples/%s.fun)
   (action
    (with-stdout-to %s.asm
-    (run ../../../haskell/main.exe ../../examples/%s.fun -compile))))
+    (run ../../../haskell/main.exe ../../../examples/%s.fun -compile))))
 
  (rule
   (deps ../../../x86/runtime.asm %s.asm)
@@ -29,7 +29,7 @@ let allow_example = function
   | _ -> true
 
 let () =
-  Sys.readdir "../examples"
+  Sys.readdir "../../examples"
   |> Array.to_list
   |> List.sort String.compare
   |> List.filter_map (Filename.chop_suffix_opt ~suffix:".fun")

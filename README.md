@@ -18,11 +18,11 @@ Development of the operating system & compiler are proceeding in tandem!
 ## Milestone #1
 
 As of Saturday 26th April 2025, we can compile and run the
-[sham](test/examples/sham.fun) demo -- a toy shell with a fake in-memory filesystem.
+[sham](examples/sham.fun) demo -- a toy shell with a fake in-memory filesystem.
 
 ```
 dune build @all @runtest
-dune exec -- haskell/main.exe test/examples/sham.fun -compile > code
+dune exec -- haskell/main.exe examples/sham.fun -compile > code
 nasm -Werror -dCODE="'code'" x86/runtime.asm -o image
 qemu-system-i386 image
 ```
@@ -31,13 +31,15 @@ qemu-system-i386 image
 
 - The full pipeline (build;compile;nasm;qemu) is automated as `dune build @sham`. (The image ends up here: `_build/default/test/images/gen/sham.img`)
 
-- Any example in [test/examples](test/examples) can be run this way. Perhaps [hello.fun](test/examples/hello.fun) by `dune build @hello -w`. Here we add the `-w` flag for interactive rebuild.
+- Any example in [examples](examples) can be run this way. Perhaps [hello.fun](examples/hello.fun) by `dune build @hello -w`. Here we add the `-w` flag for interactive rebuild.
 
 - Alternatively, the Barefun compiler can be build and run using just the haskell tool chain; avoiding `ocaml`/`dune`. The `nasm` and `qemu` steps are unchanged.
 
 ```
 (cd haskell; stack build)
-(cd haskell; stack run -- main.exe ../test/examples/sham.fun -compile) > code
+(cd haskell; stack run -- main.exe ../examples/sham.fun -compile) > code
+nasm -Werror -dCODE="'code'" x86/runtime.asm -o image
+qemu-system-i386 image
 ```
 
 More info available in subdirectory `README`s:

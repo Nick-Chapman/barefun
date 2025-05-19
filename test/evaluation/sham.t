@@ -1,5 +1,5 @@
 
-  $ cat ../inputs/sham.input | ../../haskell/main.exe ../examples/sham.fun
+  $ cat ../inputs/sham.input | ../../haskell/main.exe ../../examples/sham.fun
   Sham: In-memory file-system. Consider typing "ls".
   % ls
   readme cat cp create file ls man mv rm cat fib space

@@ -1,4 +1,4 @@
 
-  $ ../../haskell/main.exe ../examples/hello.fun
+  $ ../../haskell/main.exe ../../examples/hello.fun
   Hello, world!
   [HALT]
