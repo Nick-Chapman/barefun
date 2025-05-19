@@ -558,6 +558,7 @@ Bare_enter_check_function:
     mov bh, 0
     mov ax, sp
     sub ax, [bots + bx]
+    ;SeeReg ax
     Debug ']'
     sub ax, [need]
     cmp ax, 0
@@ -690,7 +691,7 @@ evacuate: ;; si --> si (uses: bp)
 main:
     mov sp, topA
     mov bp, 0
-    mov dx, 0
+    mov si, 0
 
     call clear_screen
     jmp bare_start
