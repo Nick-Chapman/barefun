@@ -11,12 +11,15 @@ let with_terminal_no_buffering f =
     f()
 
 let () =
-  (*Printf.printf "[ocaml]\n";*)
   match Array.to_list Sys.argv with
   | [_;name] ->
      let (module M:Select.S) = Select.select name in (* select.ml is generated code *)
-     with_terminal_no_buffering @@ fun () ->
-     M.main();
-     Printf.printf "[HALT]\n"
-  | _ ->
-     failwith (Printf.sprintf "%s: expected single arg on command line" __FILE__)
+     with_terminal_no_buffering (fun () ->
+         let () =
+           try M.main();
+           with Prim_lib.Prim.CRASH message -> Printf.printf "%s" message
+         in
+         Printf.printf "[HALT]\n"
+       )
+    | _ ->
+       failwith (Printf.sprintf "%s: expected single arg on command line" __FILE__)

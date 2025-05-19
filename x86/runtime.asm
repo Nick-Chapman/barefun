@@ -436,10 +436,8 @@ Bare_crash:
     mov bx, [bx]
     sar bx, 1 ; untag
     mov byte [di+bx], 0 ; splat with null; very hacky; but were going to stop anyway
-    PrintString `[Bare_crash:`
     call print_string
-    PrintString `]\n`
-    jmp halt
+    jmp final_code
 
 BS equ 8
 LF equ 10

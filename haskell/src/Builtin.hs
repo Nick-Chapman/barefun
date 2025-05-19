@@ -89,7 +89,9 @@ defineBuiltin b =
 
     FreeWords -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 0)
 
-    Crash -> Impure undefined -- TODO: report the message string
+    Crash -> Impure $ \vs _k -> do
+      let s = deString (oneArg vs)
+      iPut s IDone
 
     Init_interrupt_mode ->
       Impure $ \vs k -> case deUnit (oneArg vs) of () -> k unit
@@ -133,3 +135,11 @@ defineBuiltin b =
     deRef = \case VRef x -> x; _ -> err
     err :: a
     err = error (printf "Builtin.hs: error: %s" (show b))
+
+
+iPut :: String -> Interaction -> Interaction
+iPut s k = loop s
+  where
+    loop = \case
+      [] -> k
+      c:s -> IPut c (loop s)

@@ -694,7 +694,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
       Halt -> IDone
-      Crash mes -> ITrace (printf "\nCrash:%s\n" mes) $ IDone
+      Crash mes -> ITrace mes IDone
 
       CheckRecentAlloc expect -> do
         let State{allocsSinceLastCheck=actual} = s

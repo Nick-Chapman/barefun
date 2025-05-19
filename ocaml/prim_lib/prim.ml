@@ -1,3 +1,6 @@
+
+exception CRASH of string
+
 module X : sig
 
   val crash : string -> 'a
@@ -45,7 +48,6 @@ module X : sig
 
 end = struct
 
-  exception CRASH of string
   let crash message = raise (CRASH message)
 
   let noinline x = x
