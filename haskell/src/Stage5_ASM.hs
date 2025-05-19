@@ -77,8 +77,7 @@ data Op -- target; source (Intel Syntax style)
   | OpHlt
 
 data Jump
-  = JumpDirect CodeLabel
-  | JumpReg Reg
+  = JumpReg Reg
   | JumpIndirect Reg
 
 data Target
@@ -181,7 +180,6 @@ instance Show Op where
 
 instance Show Jump where
   show = \case
-    JumpDirect c -> "jmp "  ++ show c
     JumpReg r -> "jmp "  ++ show r
     JumpIndirect r -> "jmp ["  ++ show r ++ "]"
 

@@ -565,7 +565,6 @@ splitWord = \case
 
 execJump :: Jump -> M ()
 execJump = \case
-  JumpDirect{} -> undefined GetCode -- TODO: remove this if we dont need it
   JumpReg r -> do
     w <- GetReg r
     let lab = deCodeLabel w
