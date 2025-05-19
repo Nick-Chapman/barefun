@@ -771,14 +771,14 @@ let mk_comII : string -> (int -> int -> unit) -> (string,command) pair =
 (* specific commands... *)
 
 (* wipe: Wipe a disk; fill it with commas! *)
-(*let command_wipe_disk () =
+let command_wipe_disk () =
   let commas = fill_string sector_size ',' in
   let rec loop i =
     if i >= num_sectors_on_disk then () else
       let () = store_sector i commas
       in loop (i+1)
   in
-  loop 0*)
+  loop 0
 
 (* dump: Display the raw data on the disk. *)
 let command_dump_disk () =
@@ -922,8 +922,8 @@ let command_cat i =
 
 let the_command_map : cmap =
   Cmap
-    [ mk_com0 "dump" command_dump_disk
-    (*; mk_com0 "wipe" command_wipe_disk*)
+    [ mk_com0 "wipe" command_wipe_disk
+    ; mk_com0 "dump" command_dump_disk
     ; mk_com0 "format" command_format
     ; mk_com0 "mount" command_mount
     ; mk_com0 "unmount" command_unmount
@@ -963,6 +963,4 @@ let main () =
   let coms = cmap_keys the_command_map in
   put_string "Filesystem explorer\n";
   put_string ("Commands: " ^ concat " " coms ^ "\n");
-  put_string "Trying to mount existing filesystem\n";
-  command_mount(); (* try to mount any existing fs *)
   repl 1
