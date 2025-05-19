@@ -517,14 +517,11 @@ yes:
 False: dw 1
 True: dw 3
 
-Bare_num_to_char: ;; TODO: zero out high byte. Make test to provoke the need.
-    ;; this is meant to do nothing!
-    ;;mov ah, 0
+Bare_num_to_char:
+    mov ah, 0 ; mod 256
     ret
 
-Bare_char_to_num: ;; TODO: fill in the zero high byte. Make test to provoke the need
-    ;; this is meant to do nothing!
-    ;;mov ah, 0
+Bare_char_to_num:
     ret
 
 ;;; in: ax -- number of bytes (as tagged number) for user data

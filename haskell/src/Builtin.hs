@@ -65,7 +65,7 @@ defineBuiltin b =
     EqInt -> Pure (\vs -> mkBool (uncurry (==) (twoArgs deNum deNum vs)))
     EqChar -> Pure (\vs -> mkBool (uncurry (==) (twoArgs deChar deChar vs)))
     CharOrd -> Pure (\vs -> VNum ((fromIntegral . Char.ord) (deChar (oneArg vs))))
-    CharChr -> Pure (\vs -> VChar ((Char.chr . fromIntegral) (deNum (oneArg vs))))
+    CharChr -> Pure (\vs -> VChar ((Char.chr . (`mod` 256) . fromIntegral) (deNum (oneArg vs))))
 
     MakeBytes -> Impure $ \vs k -> IMakeBytes (deNum (oneArg vs)) (\b -> k (VBytes b))
     SetBytes -> Impure $ \vs k -> do

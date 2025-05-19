@@ -458,7 +458,7 @@ execBare = \case
 
   Bare_num_to_char -> do
     n <- deNum <$> GetReg Ax
-    SetReg Ax (WChar (Char.chr (fromIntegral n)))
+    SetReg Ax (WChar (Char.chr ((`mod` 256) $ fromIntegral n)))
   Bare_char_to_num -> do
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))

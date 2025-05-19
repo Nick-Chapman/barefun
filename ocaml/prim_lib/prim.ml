@@ -59,7 +59,7 @@ end = struct
   let (/) = (/)
 
   let ord = Char.code
-  let chr = Char.chr
+  let chr n = Char.chr (n % 256)
 
   let eq_char = (=)
   let get_char () =
