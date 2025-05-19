@@ -1,5 +1,5 @@
 -- | Compile Stage4(CCF) to Stage5(ASM)
-module Stage5_ASM_Compiler ( compile ) where
+module Stage5_Compilation ( compile ) where
 
 import Builtin (Builtin)
 import Control.Monad (ap,liftM)
@@ -11,7 +11,7 @@ import qualified Builtin as SRC (Builtin(..))
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 
-import Stage5_ASM_AbstractSyntax
+import Stage5_ASM
 
 ----------------------------------------------------------------------
 -- Compile

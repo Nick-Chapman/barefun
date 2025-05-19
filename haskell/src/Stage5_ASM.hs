@@ -1,5 +1,5 @@
 -- | Define types for x86 assembly, and printer suitable for nasm
-module Stage5_ASM_AbstractSyntax
+module Stage5_ASM
   ( bytesPerWord
   , Reg(..), frameReg,argReg, geteCurrentCont,setCurrentCont
   , Image(..)

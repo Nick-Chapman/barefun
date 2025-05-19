@@ -1,5 +1,5 @@
 -- | Emulate Stage5(ASM) as x86
-module Stage5_ASM_Emulation
+module Stage5_Emulation
   ( execute, TraceFlag(..), DebugFlag(..)
   ) where
 
@@ -18,7 +18,7 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
-import Stage5_ASM_AbstractSyntax
+import Stage5_ASM
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen -- TODO: command-line flag?
 gcAtEverySafePoint = False -- but slows "dune test" from 4.4s to 8.8s
