@@ -5,6 +5,7 @@ module Stage5_ASM_Emulation
 
 import Control.Exception (assert)
 import Control.Monad (ap,liftM)
+import Data.Bits (shiftL,shiftR)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Word (Word16)
@@ -350,14 +351,8 @@ execOp = \case
     case b of
       False -> cont -- branch not taken
       True -> GetCode lab >>= execCode -- branch taken; ignore the continuation
-  OpShiftR1 r -> \cont -> do
-    x <- deNum <$> GetReg r
-    SetReg r (WNum (x `div` 2)) -- unatg
-    cont
-  OpShiftL1 r -> \cont -> do
-    x <- deNum <$> GetReg r
-    SetReg r (WNum (2 * x)) -- tag step 1
-    cont
+  OpShiftL r s -> execBinaryOpInto (\x y -> shiftL x (fromIntegral y)) r s
+  OpShiftR r s -> execBinaryOpInto (\x y -> shiftR x (fromIntegral y)) r s
   OpInc r -> \cont -> do
     x <- deNum <$> GetReg r
     SetReg r (WNum (x + 1)) -- tag step 2

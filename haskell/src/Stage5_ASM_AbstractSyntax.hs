@@ -69,9 +69,9 @@ data Op -- target; source (Intel Syntax style)
   | OpPopRESTORE Reg
   | OpCmp Source Source
   | OpBranchFlagZ CodeLabel
-  | OpShiftR1 Reg -- untag
-  | OpShiftL1 Reg -- tag-step1
-  | OpInc Reg -- tag-step2
+  | OpShiftL Reg Source
+  | OpShiftR Reg Source
+  | OpInc Reg
   | OpDec Reg -- TODO: elimi inc/dec special forms and just use add/sub-1
   | OpAddInto Reg Source
   | OpSubInto Reg Source
@@ -176,8 +176,8 @@ instance Show Op where
     OpPopRESTORE src -> "pop word " ++ show src ++ " ;; restore"
     OpCmp r src -> "cmp word " ++ show r ++ ", " ++ show src
     OpBranchFlagZ lab ->  "jz " ++ show lab
-    OpShiftR1 r -> "sar " ++ show r ++ ", 1" -- signed shift
-    OpShiftL1 r -> "shl " ++ show r ++ ", 1"
+    OpShiftL r s -> "shl " ++ show r ++ ", " ++ show s
+    OpShiftR r s -> "sar " ++ show r ++ ", " ++ show s
     OpInc r -> "add " ++ show r ++ ", 1"
     OpDec r -> "sub " ++ show r ++ ", 1"
     OpAddInto r src -> "add " ++ show r ++ ", " ++ show src

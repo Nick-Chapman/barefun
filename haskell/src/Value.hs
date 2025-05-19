@@ -6,6 +6,7 @@ module Value
   , Tickable(..)
   ) where
 
+import Data.Bits (Bits)
 import Data.Char (ord,chr)
 import Data.IORef (IORef,newIORef,readIORef,writeIORef)
 import Data.List (intercalate)
@@ -196,7 +197,7 @@ instance Show Tickable where
     GC -> "gc"
     Copied -> "copied"
 
-newtype Number = Number Int deriving (Eq,Ord,Num,Integral,Real,Enum)
+newtype Number = Number Int deriving (Eq,Ord,Num,Integral,Real,Enum,Bits)
 
 data Ctag = Ctag Cid Number deriving (Eq)
 data Cid = Cid String deriving (Eq,Ord)
