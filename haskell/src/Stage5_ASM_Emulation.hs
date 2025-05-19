@@ -351,20 +351,12 @@ execOp = \case
     case b of
       False -> cont -- branch not taken
       True -> GetCode lab >>= execCode -- branch taken; ignore the continuation
-  OpShiftL r s -> execBinaryOpInto (\x y -> shiftL x (fromIntegral y)) r s
-  OpShiftR r s -> execBinaryOpInto (\x y -> shiftR x (fromIntegral y)) r s
-  OpInc r -> \cont -> do
-    x <- deNum <$> GetReg r
-    SetReg r (WNum (x + 1)) -- tag step 2
-    cont
-  OpDec r -> \cont -> do
-    x <- deNum <$> GetReg r
-    SetReg r (WNum (x - 1))
-    cont
-  OpAddInto r s -> execBinaryOpInto (+) r s
-  OpSubInto r s -> execBinaryOpInto (-) r s
-  OpMulIntoAx s -> execBinaryOpInto (*) Ax (SReg s)
-  OpDivModIntoAxDx divisorReg -> \cont -> do
+  OpShiftL r s -> execBinaryOp (\x y -> shiftL x (fromIntegral y)) r s
+  OpShiftR r s -> execBinaryOp (\x y -> shiftR x (fromIntegral y)) r s
+  OpAdd r s -> execBinaryOp (+) r s
+  OpSub r s -> execBinaryOp (-) r s
+  OpMulAx s -> execBinaryOp (*) Ax (SReg s)
+  OpDivModAxDx divisorReg -> \cont -> do
     ax <- deNum <$> GetReg Ax
     dx <- deNum <$> GetReg Dx
     let twoE16 = 256 * 256
@@ -435,8 +427,8 @@ slideStackPointer mode nBytes = do
   xs <- sequence [ addAddr (bytesPerWord * offset) a' | offset <- [ 0.. nWords -1 ] ]
   sequence_ [ SetMem x WUninitializedCharPair | x <- xs ]
 
-execBinaryOpInto :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
-execBinaryOpInto f r s = \cont -> do
+execBinaryOp :: (Number -> Number -> Number) -> Reg -> Source -> M () -> M ()
+execBinaryOp f r s = \cont -> do
     w1 <- GetReg r
     w2 <- evalSource s
     SetReg r (binaryW f w1 w2)

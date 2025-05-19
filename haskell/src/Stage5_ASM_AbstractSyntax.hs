@@ -71,12 +71,10 @@ data Op -- target; source (Intel Syntax style)
   | OpBranchFlagZ CodeLabel
   | OpShiftL Reg Source
   | OpShiftR Reg Source
-  | OpInc Reg
-  | OpDec Reg -- TODO: elimi inc/dec special forms and just use add/sub-1
-  | OpAddInto Reg Source
-  | OpSubInto Reg Source
-  | OpMulIntoAx Reg  -- ax := ax * sourceReg
-  | OpDivModIntoAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
+  | OpAdd Reg Source
+  | OpSub Reg Source
+  | OpMulAx Reg  -- ax := ax * sourceReg
+  | OpDivModAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
   | OpEnterCheck Int -- macro
   | OpHlt
 
@@ -178,12 +176,10 @@ instance Show Op where
     OpBranchFlagZ lab ->  "jz " ++ show lab
     OpShiftL r s -> "shl " ++ show r ++ ", " ++ show s
     OpShiftR r s -> "sar " ++ show r ++ ", " ++ show s
-    OpInc r -> "add " ++ show r ++ ", 1"
-    OpDec r -> "sub " ++ show r ++ ", 1"
-    OpAddInto r src -> "add " ++ show r ++ ", " ++ show src
-    OpSubInto r src -> "sub " ++ show r ++ ", " ++ show src
-    OpMulIntoAx src -> "mul " ++ show src
-    OpDivModIntoAxDx src -> "Div " ++ show src
+    OpAdd r src -> "add " ++ show r ++ ", " ++ show src
+    OpSub r src -> "sub " ++ show r ++ ", " ++ show src
+    OpMulAx src -> "mul " ++ show src
+    OpDivModAxDx src -> "Div " ++ show src
     OpEnterCheck need -> printf "Bare_enter_check(%d)" need
     OpHlt -> "hlt"
 

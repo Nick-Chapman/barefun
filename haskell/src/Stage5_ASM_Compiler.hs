@@ -207,15 +207,15 @@ compileBuiltinTo builtin = case builtin of
   SRC.AddInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpAddInto Ax (SReg Bx)
-    , OpDec Ax
+    , OpAdd Ax (SReg Bx)
+    , opDec Ax
     , setTarget target (SReg Ax)
     ]
   SRC.SubInt -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Ax s1
     , OpMove Bx s2
-    , OpSubInto Ax (SReg Bx)
-    , OpInc Ax
+    , OpSub Ax (SReg Bx)
+    , opInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.MulInt -> \target -> twoArgs $ \s1 s2 -> -- TODO: improve tag manipulation
@@ -225,17 +225,17 @@ compileBuiltinTo builtin = case builtin of
     case s2 of
       SReg s2Reg ->
         [ opShiftR1 s2Reg
-        , OpMulIntoAx s2Reg
+        , OpMulAx s2Reg
         , opShiftL1 Ax
-        , OpInc Ax
+        , opInc Ax
         , setTarget target (SReg Ax)
         ]
       _ ->
         [ OpMove Bx s2
         , opShiftR1 Bx
-        , OpMulIntoAx Bx
+        , OpMulAx Bx
         , opShiftL1 Ax
-        , OpInc Ax
+        , opInc Ax
         , setTarget target (SReg Ax)
         ]
   SRC.DivInt -> \target -> twoArgs $ \s1 s2 ->
@@ -244,10 +244,10 @@ compileBuiltinTo builtin = case builtin of
     , OpMove Bx s2
     , opShiftR1 Bx
     , OpMove Dx (SLit (LNum 0))
-    , OpDivModIntoAxDx Bx
+    , OpDivModAxDx Bx
     -- quotiant already in Ax
     , opShiftL1 Ax
-    , OpInc Ax
+    , opInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.ModInt -> \target -> twoArgs $ \s1 s2 ->
@@ -256,10 +256,10 @@ compileBuiltinTo builtin = case builtin of
     , OpMove Bx s2
     , opShiftR1 Bx
     , OpMove Dx (SLit (LNum 0))
-    , OpDivModIntoAxDx Bx
+    , OpDivModAxDx Bx
     -- remainder in Dx
     , opShiftL1 Dx
-    , OpInc Dx
+    , opInc Dx
     , setTarget target (SReg Dx)
     ]
   SRC.EqInt -> \target -> twoArgs $ \s1 s2 ->
@@ -284,7 +284,7 @@ compileBuiltinTo builtin = case builtin of
     [ OpMove Ax s1
     , OpCall Bare_char_to_num -- TODO: remove/inline
     , opShiftL1 Ax
-    , OpInc Ax
+    , opInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.MakeRef -> \target -> oneArg $ \s1 ->
@@ -352,7 +352,7 @@ compileBuiltinTo builtin = case builtin of
   SRC.FreeWords -> \target -> oneArg $ \_s1 ->
     [ OpCall Bare_free_words
     , opShiftL1 Ax
-    , OpInc Ax
+    , opInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.Init_interrupt_mode -> \target -> oneArg $ \_unit ->
@@ -362,7 +362,7 @@ compileBuiltinTo builtin = case builtin of
   SRC.Get_ticks -> \target -> oneArg $ \_unit ->
     [ OpCall Bare_get_ticks
     , opShiftL1 Ax
-    , OpInc Ax
+    , opInc Ax
     , setTarget target (SReg Ax)
     ]
   SRC.Wait_for_interrupt -> \target -> oneArg $ \_unit ->
@@ -383,8 +383,11 @@ compileBuiltinTo builtin = case builtin of
     ]
 
   where
-    opShiftL1 r = OpShiftL r (SLit (LNum 1))
-    opShiftR1 r = OpShiftR r (SLit (LNum 1))
+    opInc r = OpAdd r one
+    opDec r = OpSub r one
+    opShiftL1 r = OpShiftL r one
+    opShiftR1 r = OpShiftR r one
+    one = SLit (LNum 1)
 
     codeForGetBytes = \target -> twoArgs $ \s1 s2 ->
       [ OpMove Ax s1
