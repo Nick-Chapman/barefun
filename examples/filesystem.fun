@@ -1,9 +1,6 @@
 
 (* Prelude stuff... *)
 
-let assertF f = assert (f())
-(*let assertF _f = ()*)
-
 type 'a option = None | Some of 'a
 
 let is_some o = match o with | None -> false | Some _ -> true
@@ -225,8 +222,8 @@ let substr : string -> int -> int -> string =
   noinline (fun source offset len ->
   (*traceF (fun () ->"substr" ^ " source=[" ^ source ^ "], offset=" ^ sofi offset ^ " ,len=" ^ sofi len);*)
   let target = make_bytes len in
-  assertF (fun () -> offset >= 0);
-  assertF (fun () -> offset+len <= string_length source);
+  assert (offset >= 0);
+  assert (offset+len <= string_length source);
   let rec loop i =
     if i >= len then () else
       let char = string_index source (offset+i) in
@@ -239,8 +236,8 @@ let substr : string -> int -> int -> string =
 let mod_substr : bytes -> int -> string -> unit =
   noinline (fun target offset source ->
   let slen = string_length source in
-  assertF (fun () -> offset >= 0);
-  assertF (fun () -> offset+slen <= string_length (freeze_bytes target));
+  assert (offset >= 0);
+  assert (offset+slen <= string_length (freeze_bytes target));
   let rec loop i =
     if i >= slen then () else
       let char = string_index source i in
@@ -310,8 +307,8 @@ let sector_size = 512
 let num_sectors_on_disk = 3 (* 31 is max here; if 32 we get 8*32=256 blocks, which is too big for a char *)
 
 let load_sector : int -> bytes -> unit = fun seci buf ->
-  assertF (fun () -> seci >= 0);
-  assertF (fun () -> seci < num_sectors_on_disk);
+  assert (seci >= 0);
+  assert (seci < num_sectors_on_disk);
   (*let () = traceF (fun () ->"(SLOW) load_sector " ^ sofi seci) in*)
   load_sector seci buf
 
@@ -348,7 +345,7 @@ let read_sector_show : int -> unit =
 
 let block_size = 64
 let blocks_per_sector = 8
-let () = assertF (fun () -> block_size * blocks_per_sector = sector_size)
+let () = assert (block_size * blocks_per_sector = sector_size)
 let num_blocks_on_disk = blocks_per_sector * num_sectors_on_disk
 
 type block = Block of string
@@ -367,8 +364,8 @@ let show_seci = noinline (fun seci -> "[" ^ sofi seci ^ "]")
 
 let store_block : bi -> block -> unit = noinline (fun bi block ->
   let i = deBI bi in
-  assertF (fun () -> i >= 0);
-  assertF (fun () -> i < num_blocks_on_disk);
+  assert (i >= 0);
+  assert (i < num_blocks_on_disk);
   let seci = i / blocks_per_sector in
   let () = traceF (fun () -> "store_block " ^ sofi i ^ show_seci seci) in
   let offset = block_size * (i % blocks_per_sector) in
@@ -376,8 +373,8 @@ let store_block : bi -> block -> unit = noinline (fun bi block ->
 
 let load_block : bi -> block = noinline (fun bi ->
   let i = deBI bi in
-  assertF (fun () -> i >= 0);
-  assertF (fun () -> i < num_blocks_on_disk);
+  assert (i >= 0);
+  assert (i < num_blocks_on_disk);
   let seci = i / blocks_per_sector in
   let () = traceF (fun () -> "load_block " ^ sofi i ^ show_seci seci) in
   let sector = read_sector (i / blocks_per_sector) in
@@ -396,16 +393,16 @@ let update_block : bi -> int -> string -> unit =
 
 let idata_size = 8
 let inodes_per_block = block_size / idata_size
-let () = assertF (fun () -> inodes_per_block = 8)
+let () = assert (inodes_per_block = 8)
 let max_blocks_per_inode = 6
 let max_file_size = max_blocks_per_inode * block_size
-let () = assertF (fun () -> max_file_size = 384)
+let () = assert (max_file_size = 384)
 
 type inode = Inode of (int * bi list) (* file-size and block-list(#max=6); exports as 8 bytes on disk *)
 
 let export_int : int -> (char,char) pair = (* little endian *)
   fun n ->
-  assertF (fun () -> n <= max_file_size);
+  assert (n <= max_file_size);
   let i = n / 256 in
   let j = n % 256 in
   Pair (chr j, chr i)
@@ -454,7 +451,7 @@ let blocks_for_size : int -> int =
 
 let import_inode : string -> inode option  =
   fun s ->
-  assertF (fun () -> string_length s = idata_size);
+  assert (string_length s = idata_size);
   let get = string_index in
   match import_int (Pair (get s 0, get s 1)) with
   | None -> None (* corrupt; treat as unallocated; probably better to unmount *)
@@ -521,7 +518,7 @@ let super_of_fs fs = match fs with | FS (super,_,_) -> super
 
 let loadI : super -> ii -> inode option =
   noinline (fun super ii ->
-  assertF (fun () -> deII ii < num_inodes super);
+  assert (deII ii < num_inodes super);
   let s = deBlock (load_block (ii2bi ii)) in
   let off = ii2off ii in
   let len = idata_size in
@@ -585,7 +582,7 @@ let rec giveup_blocks fs old =
 
 let storeI : super -> ii -> inode option -> unit =
   noinline (fun super ii inode_opt ->
-  assertF (fun () -> deII ii < num_inodes super);
+  assert (deII ii < num_inodes super);
   let s = deBlock (load_block (ii2bi ii)) in
   let data =
     match inode_opt with

@@ -1,4 +1,4 @@
-L1: ; Arm: 26'7
+L1: ; Arm: 23'7
   mov si, 1
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -35,7 +35,7 @@ L3: ; Function: (length,g1)
   mov si, [Temps+4]
   jmp [bp]
 
-L4: ; Arm: 31'7
+L4: ; Arm: 28'7
   mov si, g3
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -110,7 +110,7 @@ L9: ; Function: (map,g2)
   mov [CurrentCont], ax
   jmp [bp]
 
-L10: ; Arm: 36'7
+L10: ; Arm: 33'7
   mov si, g5
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -142,7 +142,7 @@ L12: ; Continuation
   mov si, [bx+6]
   jmp [bp]
 
-L13: ; Arm: 37'20
+L13: ; Arm: 34'20
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
@@ -206,7 +206,7 @@ L17: ; Function: (filter,g4)
   mov [CurrentCont], ax
   jmp [bp]
 
-L18: ; Arm: 41'7
+L18: ; Arm: 38'7
   mov si, [bp+4]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -303,7 +303,7 @@ L25: ; Function: (foldl,g6)
   mov [CurrentCont], ax
   jmp [bp]
 
-L26: ; Arm: 46'7
+L26: ; Arm: 43'7
   mov si, g8
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -359,7 +359,7 @@ L30: ; Function: (iter,g7)
   mov [CurrentCont], ax
   jmp [bp]
 
-L31: ; Arm: 50'11
+L31: ; Arm: 47'11
   mov si, g10
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -427,14 +427,14 @@ L35: ; Function: (upto,g9)
   mov [CurrentCont], ax
   jmp [bp]
 
-L36: ; Arm: 53'12
+L36: ; Arm: 50'12
   mov si, g14
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L37: ; Arm: 55'9
+L37: ; Arm: 52'9
   mov si, g15
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -493,7 +493,7 @@ L40: ; Continuation
   mov si, [Temps+6]
   jmp [bp]
 
-L41: ; Arm: 15'9
+L41: ; Arm: 12'9
   mov si, g12
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -533,7 +533,7 @@ L43: ; Function: (take,g11)
   mov [CurrentCont], ax
   jmp [bp]
 
-L44: ; Arm: 66'7
+L44: ; Arm: 63'7
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -582,7 +582,7 @@ L47: ; Function: (rev_onto,g20)
   mov [CurrentCont], ax
   jmp [bp]
 
-L48: ; Arm: 84'13
+L48: ; Arm: 81'13
   mov si, [bp+4]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -671,7 +671,7 @@ L53: ; Function: (lam,g22)
   mov si, g21
   jmp [bp]
 
-L54: ; Arm: 93'9
+L54: ; Arm: 90'9
   mov si, g23
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -781,7 +781,7 @@ L61: ; Function: (lam,g24)
   mov si, si
   jmp [bp]
 
-L62: ; Arm: 110'13
+L62: ; Arm: 107'13
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -856,7 +856,7 @@ L65: ; Function: (loop,g26)
   mov [CurrentCont], ax
   jmp [bp]
 
-L66: ; Arm: 126'9
+L66: ; Arm: 123'9
   push word [bp+2]
   push word 3
   mov [Temps+2], sp
@@ -867,7 +867,7 @@ L66: ; Arm: 126'9
   mov [CurrentCont], ax
   jmp [bp]
 
-L67: ; Arm: 129'15
+L67: ; Arm: 126'15
   mov si, g37
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -910,7 +910,7 @@ L69: ; Continuation
   mov si, [Temps+6]
   jmp [bp]
 
-L70: ; Arm: 121'27
+L70: ; Arm: 118'27
   push word [bp+4]
   push word 3
   mov [Temps+2], sp
@@ -932,14 +932,14 @@ L71: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L72: ; Arm: 15'9
+L72: ; Arm: 12'9
   mov si, g33
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L73: ; Arm: 121'12
+L73: ; Arm: 118'12
   mov ax, 19
   cmp word ax, [bp+8]
   call Bare_make_bool_from_n
@@ -975,7 +975,7 @@ L74: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L75: ; Arm: 15'9
+L75: ; Arm: 12'9
   mov si, g31
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1033,7 +1033,7 @@ L77: ; Function: (loop,g30)
   mov [CurrentCont], ax
   jmp [bp]
 
-L78: ; Arm: 146'7
+L78: ; Arm: 143'7
   mov si, g39
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1046,7 +1046,7 @@ L79: ; Continuation
   mov bp, g38
   jmp [bp]
 
-L80: ; Arm: 139'19
+L80: ; Arm: 136'19
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -1057,7 +1057,7 @@ L80: ; Arm: 139'19
   mov [CurrentCont], ax
   jmp [bp]
 
-L81: ; Arm: 140'22
+L81: ; Arm: 137'22
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -1068,7 +1068,7 @@ L81: ; Arm: 140'22
   mov [CurrentCont], ax
   jmp [bp]
 
-L82: ; Arm: 141'16
+L82: ; Arm: 138'16
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -1147,7 +1147,7 @@ L83: ; Function: (put_chars,g38)
   mov [CurrentCont], ax
   jmp [bp]
 
-L84: ; Arm: 167'9
+L84: ; Arm: 164'9
   mov si, g44
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1262,21 +1262,21 @@ L91: ; Function: (lam,g45)
   mov si, si
   jmp [bp]
 
-L92: ; Arm: 176'19
+L92: ; Arm: 173'19
   mov si, g48
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L93: ; Arm: 178'15
+L93: ; Arm: 175'15
   mov si, g49
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L94: ; Arm: 181'31
+L94: ; Arm: 178'31
   mov si, g52
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1297,7 +1297,7 @@ L95: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L96: ; Arm: 15'9
+L96: ; Arm: 12'9
   mov si, g50
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1361,7 +1361,7 @@ L98: ; Continuation
   mov si, [Temps+4]
   jmp [bp]
 
-L99: ; Arm: 15'9
+L99: ; Arm: 12'9
   mov si, g46
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1408,7 +1408,7 @@ L101: ; Function: (lam,g53)
   mov [CurrentCont], ax
   jmp [bp]
 
-L102: ; Arm: 231'16
+L102: ; Arm: 228'16
   mov si, g61
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1446,7 +1446,7 @@ L103: ; Continuation
   mov si, [Temps+8]
   jmp [bp]
 
-L104: ; Arm: 15'9
+L104: ; Arm: 12'9
   mov si, g59
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1533,7 +1533,7 @@ L109: ; Function: (lam,g62)
   mov [CurrentCont], ax
   jmp [bp]
 
-L110: ; Arm: 245'17
+L110: ; Arm: 242'17
   mov si, g65
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1571,7 +1571,7 @@ L111: ; Continuation
   mov si, [Temps+8]
   jmp [bp]
 
-L112: ; Arm: 15'9
+L112: ; Arm: 12'9
   mov si, g63
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1660,7 +1660,7 @@ L117: ; Function: (lam,g78)
   mov [CurrentCont], ax
   jmp [bp]
 
-L118: ; Arm: 583'7
+L118: ; Arm: 580'7
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1769,7 +1769,7 @@ L125: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L126: ; Arm: 708'9
+L126: ; Arm: 705'9
   push word [bp+2]
   push word [CurrentCont]
   push word L125
@@ -1826,7 +1826,7 @@ L129: ; Function: (loop,g82)
   mov [CurrentCont], ax
   jmp [bp]
 
-L130: ; Arm: 200'14
+L130: ; Arm: 197'14
   mov si, g155
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1854,7 +1854,7 @@ L131: ; Continuation
   mov si, [Temps+4]
   jmp [bp]
 
-L132: ; Arm: 15'9
+L132: ; Arm: 12'9
   mov si, g153
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1883,7 +1883,7 @@ L133: ; Function: (loop,t2)
   mov [CurrentCont], ax
   jmp [bp]
 
-L134: ; Arm: 777'32
+L134: ; Arm: 774'32
   mov si, g158
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1910,7 +1910,7 @@ L135: ; Continuation
   mov si, [Temps+4]
   jmp [bp]
 
-L136: ; Arm: 15'9
+L136: ; Arm: 12'9
   mov si, g156
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -1969,7 +1969,7 @@ L139: ; Function: (lam,g159)
   mov si, 1
   jmp [bp]
 
-L140: ; Arm: 15'9
+L140: ; Arm: 12'9
   mov si, g186
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -2169,7 +2169,7 @@ L156: ; Continuation
   mov si, si
   jmp [bp]
 
-L157: ; Arm: 113'11
+L157: ; Arm: 110'11
   push word g27
   push word `0`
   push word 3
@@ -2209,7 +2209,7 @@ L159: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L160: ; Arm: 114'13
+L160: ; Arm: 111'13
   push word si
   push word [CurrentCont]
   push word L159
@@ -2336,7 +2336,7 @@ L170: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L171: ; Arm: 156'45
+L171: ; Arm: 153'45
   push word si
   push word [bp+4]
   push word [bp+2]
@@ -2362,7 +2362,7 @@ L172: ; Function: (lam,t10)
   mov [CurrentCont], ax
   jmp [bp]
 
-L173: ; Arm: 189'9
+L173: ; Arm: 186'9
   mov si, [bp+8]
   mov bp, [bp+4]
   jmp [bp]
@@ -2532,7 +2532,7 @@ L185: ; Function: (collect,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L186: ; Arm: 194'7
+L186: ; Arm: 191'7
   mov si, g57
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -2646,7 +2646,7 @@ L194: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L195: ; Arm: 210'11
+L195: ; Arm: 207'11
   push word [bp+6]
   push word [CurrentCont]
   push word L194
@@ -2679,7 +2679,7 @@ L197: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L198: ; Arm: 212'26
+L198: ; Arm: 209'26
   push word [Temps+4]
   push word [bp+6]
   push word [bp+4]
@@ -2772,7 +2772,7 @@ L203: ; Function: (have_letter,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L204: ; Arm: 217'9
+L204: ; Arm: 214'9
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -2786,7 +2786,7 @@ L205: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L206: ; Arm: 219'24
+L206: ; Arm: 216'24
   push word [Temps+4]
   push word [CurrentCont]
   push word L205
@@ -2864,7 +2864,7 @@ L210: ; Function: (at_word_start,t16)
   mov [CurrentCont], ax
   jmp [bp]
 
-L211: ; Arm: 285'22
+L211: ; Arm: 282'22
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -2873,7 +2873,7 @@ L211: ; Arm: 285'22
   mov si, si
   jmp [bp]
 
-L212: ; Arm: 286'28
+L212: ; Arm: 283'28
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -2895,12 +2895,12 @@ L212: ; Arm: 286'28
   mov si, [Temps+16]
   jmp [bp]
 
-L213: ; Arm: 287'19
+L213: ; Arm: 284'19
   mov bp, bp
   mov si, si
   jmp [bp]
 
-L214: ; Arm: 290'17
+L214: ; Arm: 287'17
   mov bp, bp
   mov si, si
   jmp [bp]
@@ -2911,7 +2911,7 @@ L215: ; Continuation
   mov bp, [bp+4]
   jmp [bp]
 
-L216: ; Arm: 294'28
+L216: ; Arm: 291'28
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -2942,7 +2942,7 @@ L216: ; Arm: 294'28
   mov [CurrentCont], ax
   jmp [bp]
 
-L217: ; Arm: 295'29
+L217: ; Arm: 292'29
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -2985,7 +2985,7 @@ L217: ; Arm: 295'29
   mov [CurrentCont], ax
   jmp [bp]
 
-L218: ; Arm: 296'32
+L218: ; Arm: 293'32
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3071,14 +3071,14 @@ L219: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L220: ; Arm: 15'9
+L220: ; Arm: 12'9
   mov si, g69
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L221: ; Arm: 288'21
+L221: ; Arm: 285'21
   mov bx, si
   cmp word [bx], 1
   jz L214
@@ -3122,7 +3122,7 @@ L222: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L223: ; Arm: 139'19
+L223: ; Arm: 136'19
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -3133,7 +3133,7 @@ L223: ; Arm: 139'19
   mov [CurrentCont], ax
   jmp [bp]
 
-L224: ; Arm: 140'22
+L224: ; Arm: 137'22
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -3144,7 +3144,7 @@ L224: ; Arm: 140'22
   mov [CurrentCont], ax
   jmp [bp]
 
-L225: ; Arm: 141'16
+L225: ; Arm: 138'16
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -3696,14 +3696,14 @@ L253: ; Function: (lam,t9)
   mov [CurrentCont], ax
   jmp [bp]
 
-L254: ; Arm: 460'9
+L254: ; Arm: 457'9
   mov si, g76
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L255: ; Arm: 462'14
+L255: ; Arm: 459'14
   mov si, g77
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -3834,7 +3834,7 @@ L264: ; Continuation
   mov si, si
   jmp [bp]
 
-L265: ; Arm: 453'14
+L265: ; Arm: 450'14
   mov si, 1
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -3900,7 +3900,7 @@ L266: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L267: ; Arm: 419'32
+L267: ; Arm: 416'32
   mov si, g75
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -4272,7 +4272,7 @@ L283: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L284: ; Arm: 592'11
+L284: ; Arm: 589'11
   mov si, [bp+10]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -4584,7 +4584,7 @@ L301: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L302: ; Arm: 732'21
+L302: ; Arm: 729'21
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -4749,7 +4749,7 @@ L314: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L315: ; Arm: 741'17
+L315: ; Arm: 738'17
   push word [bp+8]
   push word [bp+4]
   push word [bp+2]
@@ -4863,7 +4863,7 @@ L324: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L325: ; Arm: 744'24
+L325: ; Arm: 741'24
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
@@ -4981,7 +4981,7 @@ L334: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L335: ; Arm: 747'25
+L335: ; Arm: 744'25
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -5170,7 +5170,7 @@ L348: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L349: ; Arm: 756'17
+L349: ; Arm: 753'17
   push word [bp+8]
   push word [bp+4]
   push word [bp+2]
@@ -5284,7 +5284,7 @@ L358: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L359: ; Arm: 759'20
+L359: ; Arm: 756'20
   push word [bp+8]
   push word [bp+4]
   push word [bp+2]
@@ -5398,7 +5398,7 @@ L368: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L369: ; Arm: 762'27
+L369: ; Arm: 759'27
   mov ax, [bx+2]
   mov [Temps+10], ax
   mov ax, [bx+4]
@@ -5516,7 +5516,7 @@ L378: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L379: ; Arm: 765'28
+L379: ; Arm: 762'28
   push word [bp+10]
   push word [bp+6]
   push word [bp+4]
@@ -5630,7 +5630,7 @@ L388: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L389: ; Arm: 768'31
+L389: ; Arm: 765'31
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
@@ -5758,7 +5758,7 @@ L395: ; Function: (lam,t10)
   mov [CurrentCont], ax
   jmp [bp]
 
-L396: ; Arm: 864'10
+L396: ; Arm: 861'10
   mov si, g151
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -5845,7 +5845,7 @@ L403: ; Continuation
   mov si, g125
   jmp [bp]
 
-L404: ; Arm: 640'9
+L404: ; Arm: 637'9
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -5907,7 +5907,7 @@ L409: ; Continuation
   mov si, g128
   jmp [bp]
 
-L410: ; Arm: 644'12
+L410: ; Arm: 641'12
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -6073,7 +6073,7 @@ L419: ; Continuation
   mov si, [bx+16]
   jmp [bp]
 
-L420: ; Arm: 653'15
+L420: ; Arm: 650'15
   push word [bp+24]
   push word [bp+22]
   push word [bp+18]
@@ -6186,7 +6186,7 @@ L427: ; Continuation
   mov si, [bx+10]
   jmp [bp]
 
-L428: ; Arm: 659'22
+L428: ; Arm: 656'22
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
@@ -6258,7 +6258,7 @@ L433: ; Continuation
   mov si, g134
   jmp [bp]
 
-L434: ; Arm: 664'22
+L434: ; Arm: 661'22
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -6387,7 +6387,7 @@ L442: ; Continuation
   mov si, [Temps+6]
   jmp [bp]
 
-L443: ; Arm: 567'10
+L443: ; Arm: 564'10
   mov si, g132
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -6597,7 +6597,7 @@ L452: ; Continuation
   mov si, [bx+8]
   jmp [bp]
 
-L453: ; Arm: 679'10
+L453: ; Arm: 676'10
   push word si
   push word [bp+20]
   push word [bp+12]
@@ -6647,7 +6647,7 @@ L456: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L457: ; Arm: 682'22
+L457: ; Arm: 679'22
   mov ax, [bx+2]
   mov [Temps+4], ax
   mov ax, [bx+4]
@@ -6720,7 +6720,7 @@ L462: ; Continuation
   mov si, g144
   jmp [bp]
 
-L463: ; Arm: 685'22
+L463: ; Arm: 682'22
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -6731,7 +6731,7 @@ L463: ; Arm: 685'22
   mov si, g143
   jmp [bp]
 
-L464: ; Arm: 200'14
+L464: ; Arm: 197'14
   mov si, g148
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -6759,7 +6759,7 @@ L465: ; Continuation
   mov si, [Temps+4]
   jmp [bp]
 
-L466: ; Arm: 15'9
+L466: ; Arm: 12'9
   mov si, g146
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -6911,7 +6911,7 @@ L474: ; Continuation
   mov si, 1
   jmp [bp]
 
-L475: ; Arm: 567'10
+L475: ; Arm: 564'10
   mov si, g142
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -7115,7 +7115,7 @@ L484: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L485: ; Arm: 673'40
+L485: ; Arm: 670'40
   mov si, g137
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -7129,7 +7129,7 @@ L486: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L487: ; Arm: 262'27
+L487: ; Arm: 259'27
   push word [bp+4]
   push word [CurrentCont]
   push word L486
@@ -7184,7 +7184,7 @@ L491: ; Continuation
   mov si, 129
   jmp [bp]
 
-L492: ; Arm: 256'21
+L492: ; Arm: 253'21
   push word [bp+12]
   push word [CurrentCont]
   push word L491
@@ -7232,7 +7232,7 @@ L495: ; Continuation
   mov si, 1
   jmp [bp]
 
-L496: ; Arm: 255'21
+L496: ; Arm: 252'21
   push word [CurrentCont]
   push word L495
   mov [CurrentCont], sp
@@ -7357,7 +7357,7 @@ L503: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L504: ; Arm: 256'21
+L504: ; Arm: 253'21
   push word [bp+10]
   push word [bp+8]
   push word [CurrentCont]
@@ -7407,7 +7407,7 @@ L507: ; Continuation
   mov si, 1
   jmp [bp]
 
-L508: ; Arm: 255'21
+L508: ; Arm: 252'21
   push word [Temps+6]
   push word [CurrentCont]
   push word L507
@@ -7489,7 +7489,7 @@ L509: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L510: ; Arm: 104'23
+L510: ; Arm: 101'23
   mov si, [Temps+4]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -7686,7 +7686,7 @@ L517: ; Continuation
   mov si, 1
   jmp [bp]
 
-L518: ; Arm: 862'21
+L518: ; Arm: 859'21
   push word [bp+28]
   push word [CurrentCont]
   push word L517
@@ -7731,7 +7731,7 @@ L520: ; Continuation
   mov bp, [bp+6]
   jmp [bp]
 
-L521: ; Arm: 861'22
+L521: ; Arm: 858'22
   mov si, g122
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -7830,14 +7830,14 @@ L524: ; Function: (write_to_file,t12)
   mov [CurrentCont], ax
   jmp [bp]
 
-L525: ; Arm: 786'32
+L525: ; Arm: 783'32
   mov si, g163
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L526: ; Arm: 326'16
+L526: ; Arm: 323'16
   mov si, g166
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -7855,7 +7855,7 @@ L527: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L528: ; Arm: 329'21
+L528: ; Arm: 326'21
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -7902,7 +7902,7 @@ L530: ; Continuation
   mov si, si
   jmp [bp]
 
-L531: ; Arm: 328'24
+L531: ; Arm: 325'24
   push word [CurrentCont]
   push word L530
   mov [CurrentCont], sp
@@ -7911,7 +7911,7 @@ L531: ; Arm: 328'24
   mov si, g167
   jmp [bp]
 
-L532: ; Arm: 139'19
+L532: ; Arm: 136'19
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -7922,7 +7922,7 @@ L532: ; Arm: 139'19
   mov [CurrentCont], ax
   jmp [bp]
 
-L533: ; Arm: 140'22
+L533: ; Arm: 137'22
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -7933,7 +7933,7 @@ L533: ; Arm: 140'22
   mov [CurrentCont], ax
   jmp [bp]
 
-L534: ; Arm: 141'16
+L534: ; Arm: 138'16
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -8021,7 +8021,7 @@ L535: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L536: ; Arm: 15'9
+L536: ; Arm: 12'9
   mov si, g164
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -8093,7 +8093,7 @@ L539: ; Continuation
   mov si, 1
   jmp [bp]
 
-L540: ; Arm: 15'9
+L540: ; Arm: 12'9
   mov si, g161
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -8183,7 +8183,7 @@ L547: ; Continuation
   mov si, g171
   jmp [bp]
 
-L548: ; Arm: 795'11
+L548: ; Arm: 792'11
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word [bp+6]
@@ -8417,7 +8417,7 @@ L565: ; Continuation
   mov si, g178
   jmp [bp]
 
-L566: ; Arm: 806'11
+L566: ; Arm: 803'11
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word [bp+4]
@@ -8481,7 +8481,7 @@ L571: ; Continuation
   mov si, g192
   jmp [bp]
 
-L572: ; Arm: 809'12
+L572: ; Arm: 806'12
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -8514,7 +8514,7 @@ L573: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L574: ; Arm: 535'9
+L574: ; Arm: 532'9
   mov si, g184
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -8552,7 +8552,7 @@ L576: ; Continuation
   mov si, [bx+8]
   jmp [bp]
 
-L577: ; Arm: 541'10
+L577: ; Arm: 538'10
   push word [bp+12]
   push word [bp+8]
   push word [bp+4]
@@ -8595,7 +8595,7 @@ L579: ; Continuation
   mov si, [Temps+4]
   jmp [bp]
 
-L580: ; Arm: 545'19
+L580: ; Arm: 542'19
   push word [bp+10]
   push word [bp+8]
   push word [CurrentCont]
@@ -8877,7 +8877,7 @@ L597: ; Continuation
   mov si, g189
   jmp [bp]
 
-L598: ; Arm: 498'49
+L598: ; Arm: 495'49
   mov si, g183
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -8943,7 +8943,7 @@ L599: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L600: ; Arm: 15'9
+L600: ; Arm: 12'9
   mov si, g181
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -9146,7 +9146,7 @@ L613: ; Continuation
   mov si, g196
   jmp [bp]
 
-L614: ; Arm: 816'9
+L614: ; Arm: 813'9
   push word [bp+4]
   push word [bp+2]
   push word [CurrentCont]
@@ -9229,7 +9229,7 @@ L620: ; Continuation
   mov si, g201
   jmp [bp]
 
-L621: ; Arm: 822'9
+L621: ; Arm: 819'9
   push word [bp+4]
   push word [bp+2]
   push word [CurrentCont]
@@ -9412,7 +9412,7 @@ L636: ; Continuation
   mov si, si
   jmp [bp]
 
-L637: ; Arm: 436'9
+L637: ; Arm: 433'9
   mov si, g222
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -9750,7 +9750,7 @@ L659: ; Continuation
   mov si, g220
   jmp [bp]
 
-L660: ; Arm: 836'25
+L660: ; Arm: 833'25
   push word [bp+14]
   push word [bp+12]
   push word [bp+10]
@@ -9776,7 +9776,7 @@ L661: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L662: ; Arm: 9'36
+L662: ; Arm: 6'36
   mov si, g217
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -10718,7 +10718,7 @@ L717: ; Continuation
   mov si, g232
   jmp [bp]
 
-L718: ; Arm: 843'9
+L718: ; Arm: 840'9
   push word [bp+4]
   push word [bp+2]
   push word [CurrentCont]
@@ -10729,7 +10729,7 @@ L718: ; Arm: 843'9
   mov si, g231
   jmp [bp]
 
-L719: ; Arm: 852'17
+L719: ; Arm: 849'17
   mov si, g234
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -11067,7 +11067,7 @@ L740: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L741: ; Arm: 869'9
+L741: ; Arm: 866'9
   mov si, g249
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -11274,7 +11274,7 @@ L757: ; Continuation
   mov si, g240
   jmp [bp]
 
-L758: ; Arm: 613'9
+L758: ; Arm: 610'9
   push word [bp+4]
   push word [bp+2]
   push word [CurrentCont]
@@ -11348,7 +11348,7 @@ L764: ; Continuation
   mov si, g245
   jmp [bp]
 
-L765: ; Arm: 616'12
+L765: ; Arm: 613'12
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -11462,7 +11462,7 @@ L770: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L771: ; Arm: 559'10
+L771: ; Arm: 556'10
   mov si, g243
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -11530,7 +11530,7 @@ L772: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L773: ; Arm: 879'9
+L773: ; Arm: 876'9
   mov si, g263
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -11644,7 +11644,7 @@ L782: ; Continuation
   mov si, g256
   jmp [bp]
 
-L783: ; Arm: 629'9
+L783: ; Arm: 626'9
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -11718,7 +11718,7 @@ L789: ; Continuation
   mov si, g260
   jmp [bp]
 
-L790: ; Arm: 633'12
+L790: ; Arm: 630'12
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -12208,7 +12208,7 @@ L821: ; Continuation
   mov si, g270
   jmp [bp]
 
-L822: ; Arm: 892'9
+L822: ; Arm: 889'9
   push word [bp+4]
   push word [bp+2]
   push word [CurrentCont]
@@ -12270,7 +12270,7 @@ L827: ; Continuation
   mov si, g273
   jmp [bp]
 
-L828: ; Arm: 896'12
+L828: ; Arm: 893'12
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -12541,7 +12541,7 @@ L843: ; Continuation
   mov si, g279
   jmp [bp]
 
-L844: ; Arm: 910'9
+L844: ; Arm: 907'9
   push word [bp+4]
   push word [bp+2]
   push word [CurrentCont]
@@ -12603,7 +12603,7 @@ L849: ; Continuation
   mov si, g282
   jmp [bp]
 
-L850: ; Arm: 914'12
+L850: ; Arm: 911'12
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
@@ -12834,7 +12834,7 @@ L865: ; Continuation
   mov si, si
   jmp [bp]
 
-L866: ; Arm: 958'36
+L866: ; Arm: 955'36
   push word [CurrentCont]
   push word L865
   mov [CurrentCont], sp
@@ -12854,21 +12854,21 @@ L867: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L868: ; Arm: 942'7
+L868: ; Arm: 939'7
   mov si, g291
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L869: ; Arm: 718'9
+L869: ; Arm: 715'9
   mov si, g292
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L870: ; Arm: 722'35
+L870: ; Arm: 719'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -13004,7 +13004,7 @@ L880: ; Continuation
   mov si, g293
   jmp [bp]
 
-L881: ; Arm: 945'12
+L881: ; Arm: 942'12
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
