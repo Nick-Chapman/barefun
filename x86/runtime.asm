@@ -1,13 +1,29 @@
-;;; TODO: overall description + contents to the rest of the file
-
-;;; TODO: useful control flags for Debug etc here
-
-;; GC roots; must match stage5 calling convention
-%define Arg si
-%define Frame bp
+;;; This file provides runtime support for a compiled barefun program.
+;;; Assemble using nasm:
+;;;   $ nasm -Werror -dCODE="'code.asm'" x86/runtime.asm -o image
+;;;
+;;; [code.asm] is the output file from the barefun compiler.
+;;; It must provide a definition for the label "baree_start".
+;;;
+;;; The resulting image can be run using qemu:
+;;;   $ qemu-system-i386 image
+;;;
+;;; Sections in This file:
+;;; - (1) Layout
+;;; - (2) Bootloader: entry
+;;; - (3) Bootloader: relocated
+;;; - (4) Kernel entry: "main"
+;;; - (4) Macros: Out, Print*, and other debug helpers
+;;; - (5) Miscellaneous defs: clear_screen; print_string; final_code; halt, etc
+;;; - (6) Garbage Collection
+;;; - (7) "Bare_" routines (called from embedded user code)
+;;; - (8) Interrupt support (only for scancode based keyboard access)
+;;; - (9) Space for three embedded sectors. Used for persistence in filesystem example
+;;; - (10) Embedded User code. Must provide "bare_start"
+;;; - (11) Size checks
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Layout
+;;;; (1) Layout
 
 ;;; A page = 256 bytes; 16 bit address space is 64k or 256 pages
 ;;; A disk sector is 512 bytes
@@ -28,7 +44,74 @@
     Temps equ 0x500 ; temps are stored at Temps+2, Temps+4 etc.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Macros
+;;;; (2) Bootloader: entry
+
+    org bootloader_relocation_address
+    section BOOTSECTOR start=bootloader_relocation_address
+
+    jmp start
+    times 0x3e - ($ - $$) db 0x00 ; skip FAT headers
+
+start:
+    mov ax, 0
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov sp, 0
+
+    ;; Relocate the bootloader sector (256 words = 512 bytes)
+    mov cx, 0x100
+    mov si, bootloader_address
+    mov di, bootloader_relocation_address
+    rep movsw
+    jmp 0:part2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (3) Bootloader: relocated
+
+part2:
+    ;; Sectors are numbered from 1. The bootloader is in the 1st sector.
+    ;; Kernel starts at sector 2
+    first_non_boot_sector equ 2
+
+    mov [drive_number], dl
+    mov ah, 0x02 ; Function: Read Sectors From Drive
+    mov ch, 0 ; cylinder
+    mov dh, 0 ; head
+    mov al, kernel_size_in_sectors ; sector count
+    mov cl, first_non_boot_sector ; start sector
+    mov bx, kernel_load_address ; dest
+    int 0x13
+
+    jmp 0:kernel_load_address
+
+    times 446 - ($ - $$) db 0xff
+    ;; PMBR partition table, from byte 446
+    db 0, 0, 2, 0, 0xee, 0xff, 0xff, 0xff, 1, 0, 0, 0, 1, 0, 0, 0
+    times 510 - ($ - $$) db 0x00
+    dw 0xaa55
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (4) Kernel entry: "main"
+
+    section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
+
+main:
+    mov sp, topA
+    mov bp, 0
+    mov si, 0
+
+    call clear_screen
+    jmp bare_start
+
+CurrentCont:
+    dw final_continuation
+
+final_continuation:
+    dw final_code
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (4) Macros: Out, Print*, and other debug helpers
 
 %macro Out 2
     mov al, %2
@@ -92,7 +175,7 @@
 %%message: db %1, 0
 %%after:
     mov di, %%message
-    call internal_print_string
+    call print_string
     pop di
 %endmacro
 
@@ -112,142 +195,17 @@
     idiv %1
 %endmacro
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Bootloader...
+;;; (5) Miscellaneous defs: clear_screen; print_string; final_code; halt, etc
 
-    org bootloader_relocation_address
-    section BOOTSECTOR start=bootloader_relocation_address
-
-    jmp start
-    times 0x3e - ($ - $$) db 0x00 ; skip FAT headers
-
-start:
-    mov ax, 0
-    mov ds, ax
-    mov es, ax
-    mov ss, ax
-    mov sp, 0
-
-    ;; Relocate the bootloader sector (256 words = 512 bytes)
-    mov cx, 0x100
-    mov si, bootloader_address
-    mov di, bootloader_relocation_address
-    rep movsw
-    jmp 0:part2
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Relocated bootloader...
-
-part2:
-    ;; Sectors are numbered from 1. The bootloader is in the 1st sector.
-    ;; Kernel starts at sector 2
-    first_non_boot_sector equ 2
-
-    mov [drive_number], dl
-    mov ah, 0x02 ; Function: Read Sectors From Drive
-    mov ch, 0 ; cylinder
-    mov dh, 0 ; head
-    mov al, kernel_size_in_sectors ; sector count
-    mov cl, first_non_boot_sector ; start sector
-    mov bx, kernel_load_address ; dest
-    int 0x13
-
-    jmp 0:kernel_load_address
-
-    times 446 - ($ - $$) db 0xff
-    ;; PMBR partition table, from byte 446
-    db 0, 0, 2, 0, 0xee, 0xff, 0xff, 0xff, 1, 0, 0, 0, 1, 0, 0, 0
-    times 510 - ($ - $$) db 0x00
-    dw 0xaa55
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Kernel...
-
-    section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
-    jmp main
-
-ticker_freq_htz equ 100
-
-;;;pic offsets must be a multiple of 8
-pic1_offset equ 32
-pic2_offset equ 40
-
-end_of_interrupt_command equ 0x20
-
-timer_slot equ pic1_offset
-
-setup_timer_interrupt:
-    cli ; disable interrupts while we set things up.
-    mov word [4*timer_slot+0], irq0
-    mov word [4*timer_slot+2], 0
-    call set_pit_freq
-    call remap_pic
-    call pic_mask_all_but_timer
-    sti ; re-enable here
+clear_screen:
+    mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
+    int 0x10
     ret
-
-ticker: dw 0 ; 16 bits; at 1KHz this cycles in 65 seconds
-
-irq0:
-    ;;PrintCharLit '+' ; no print from here
-    inc word [ticker]
-    Out pic1_cmd, end_of_interrupt_command
-    iret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; 8259 PIC (Programmable Interrupt Controller)
-
-pic1_cmd equ 0x20
-pic2_cmd equ 0xA0
-
-pic1_data equ 0x21
-pic2_data equ 0xA1
-
-remap_pic:
-    Out pic1_cmd, 0x11          ; initialization required; expect ICW4
-    Out pic1_data, pic1_offset  ; ICW2: vector offset
-    Out pic1_data, 4            ; ICW3: tell Master of Slave PIC at IRQ2 (0100)
-    Out pic1_data, 1            ; ICW4: x86 mode
-    Out pic2_cmd, 0x11          ; initialization required; expect ICW4
-    Out pic2_data, pic2_offset  ; ICW2: vector offset
-    Out pic2_data, 2            ; ICW3: tell Slave its cascade identity (0010)
-    Out pic2_data, 1            ; ICW4: x86 mode
-    ret
-
-pic_mask_all_but_timer:
-    Out pic1_data, 0xfe
-    Out pic2_data, 0xff
-    ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; PIT (Programmable Interval Timer)
-;;; Smallest frequency we can set is 19, or else pit_divisor exceeds a word.
-;;; (we can get 18.2 by setting pit_divisor as 0)
-base_freq_htz equ 1193182
-pit_divisor equ base_freq_htz / ticker_freq_htz
-pit_channel0 equ 0x40
-pit_command equ 0x43
-set_pit_freq:
-    ;; 0x36 is 00_11_111_0
-    mov al, 0x36
-    out pit_command, al
-    ;; - (00) select channel 0
-    ;; - (11) access mode lo/hi
-    ;; - (111) square wave
-    ;; - (0) 16-bit-binary
-    mov ax, pit_divisor
-    out pit_channel0, al ;lo byte
-    mov al, ah
-    out pit_channel0, al ;hi byte
-    ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; misc
 
 hex_data: db "0123456789abcdef"
 
-internal_print_string: ; in: DI=string; print null-terminated string.
+print_string: ; in: DI=string; print null-terminated string.
     push ax
     push di
 .loop:
@@ -263,17 +221,214 @@ internal_print_string: ; in: DI=string; print null-terminated string.
     pop ax
     ret
 
+final_code:
+    PrintString `[HALT]\n`
+    jmp halt
+
 halt:
     hlt ;; avoid spinning the fans
     jmp halt
 
-clear_screen:
-    mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
-    int 0x10
-    ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (6) Garbage Collection
+
+;; GC roots; must match stage5 calling conventions
+%define ArgReg si
+%define FrameReg bp
+
+%macro Bare_enter_check 1
+    mov word [need], %1
+    jz %%no_need
+    call Bare_enter_check_function
+%%no_need:
+%endmacro
+
+need: dw 0
+
+hemi_size equ 5000 ; match stage5 emulator
+redzone_size equ 100 ; needed for save/restore & also for interrupts. how big should this be?
+
+topA equ 0x0000
+botA equ topA - hemi_size
+topB equ botA - redzone_size
+botB equ topB - hemi_size
+
+which_hemi: db 0 ; flips every GC: 0,2,0,2,... indexes: top_of_hemi/bottom_of_hemi
+top_of_hemi: dw topA, topB
+bottom_of_hemi: dw botA, botB
+
+gc_num: db 0
+
+%macro Debug 1
+    ;PrintCharLit %1 ; uncomment for GC debug
+%endmacro
+
+Bare_enter_check_function:
+    pop bx
+    mov [tCALLER], bx
+
+    ; space remaining before potential GC
+    mov bl, [which_hemi]
+    mov bh, 0
+    mov ax, sp
+    sub ax, [bottom_of_hemi + bx]
+
+    sub ax, [need]
+    cmp ax, 0
+    jl .need_to_gc
+    ;jmp .need_to_gc ; uncomment to GC every safe point; extreme testing!
+    jmp .return_to_caller
+
+.need_to_gc:
+    inc byte [gc_num]
+    Debug '['
+    ;mov al, [gc_num]
+    ;PrintHexAL
+    ;Debug ':'
+    call gc_start
+
+    ; space remaining after GC
+    mov bl, [which_hemi]
+    mov bh, 0
+    mov ax, sp
+    sub ax, [bottom_of_hemi + bx]
+    ;SeeReg ax
+    Debug ']'
+    sub ax, [need]
+    cmp ax, 0
+    jl .out_of_memory
+
+.return_to_caller:
+    jmp [tCALLER]
+
+.out_of_memory:
+    PrintString `[OOM]\n`
+    jmp halt
+
+bytesPerWord equ 2
+
+tArg: dw 0
+tFrame dw 0
+tCALLER dw 0
+
+gc_start:
+    pop ax
+    mov [.caller], ax
+    mov [tFrame], FrameReg
+    mov [tArg], ArgReg
+
+    ;; switch heap spaces
+    mov bl, [which_hemi]
+    mov bh, 0
+    inc bx
+    inc bx
+    and bx, 2
+    mov [which_hemi], bx
+    mov bx, [top_of_hemi + bx]
+    mov sp, bx
+
+    mov dx, sp ; set scavenge threshold
+    ;; evacuate roots...
+    ;; frame register
+    mov si, [tFrame]
+    call evacuate
+    mov [tFrame], si
+    ;; arg register
+    mov si, [tArg]
+    call evacuate
+    mov [tArg], si
+    ;; current continuation
+    mov si, [CurrentCont]
+    call evacuate
+    mov [CurrentCont], si
+    ;; Scavenge objects between sp and dx
+    ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
+    cmp dx, sp
+    jz .done_everything
+.outer_loop:
+    mov cx, sp
+    mov bx, sp
+    ;; scavenge objects between cx and dx, using bx as pointer
+.inner_loop:
+    cmp bx, dx
+    jg .bad_inner_loop
+    mov di, [bx] ; descriptor (size in bytes; maybe tagged as raw-data)
+    cmp di, 0
+    jz .bad_zero_descriptor
+    test di, 1
+    jz .scav_payload ; even; payload words must be evacuated
+    ;; skip over raw data objects
+    inc di
+    add bx, di
+    jmp .done_object
+.bad_zero_descriptor:
+    PrintString `[bad_zero_descriptor!]\n`
+    jmp halt
+.scav_payload:
+    ;Debug '-'
+    add bx, bytesPerWord
+    shr di, 1
+.scav_word:
+    mov si, [bx]
+    call evacuate
+    mov [bx], si
+    add bx, bytesPerWord
+    dec di
+    jne .scav_word
+.done_object:
+    cmp bx, dx
+    jne .inner_loop
+    mov dx, cx
+    cmp sp, cx
+    jne .outer_loop
+.done_everything:
+    mov ArgReg, [tArg]
+    mov FrameReg, [tFrame]
+    jmp [.caller]
+.bad_inner_loop:
+    PrintString `\n[Bad_inner_loop]\n`
+    SeeReg bx
+    SeeReg dx
+    jmp halt
+.caller:
+    dw 0
+
+evacuate: ;; si --> si (uses: bp)
+    pop bp
+    mov [.caller], bp
+    cmp si, end_of_code
+    jb .done ; jb for unsigned comparison!
+    test si, 1
+    jnz .done ; odd; tagged-number; so dont evacuate
+    mov bp, si ; save base
+    mov si, [bp - bytesPerWord] ; si has descriptor/size
+    cmp si, 0
+    jz .use_broken_heart
+    ;Debug '('
+    and si, 0xfffe ; align to even offset
+.loop:
+    ;Debug 'c'
+    push word [bp + si - bytesPerWord]
+    sub si, bytesPerWord
+    jnz .loop
+    mov si, sp ; si is relocation address
+    ;Debug 'c'
+    push word [bp - bytesPerWord]
+    mov word [bp - bytesPerWord], 0 ; set broken heart
+    mov [bp], si ; and relocation address
+    ;Debug ')'
+    jmp [.caller]
+.use_broken_heart:
+    ;Debug 'h'
+    mov si, [bp] ; access relocation address from broken heart
+    jmp [.caller]
+.done:
+    jmp [.caller]
+.caller:
+    dw 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Bare BIOS
+;;;; (7) "Bare_" routines (called from embedded user code)
 
 Bare_crash:
     mov di, bx
@@ -282,7 +437,7 @@ Bare_crash:
     sar bx, 1 ; untag
     mov byte [di+bx], 0 ; splat with null; very hacky; but were going to stop anyway
     PrintString `[Bare_crash:`
-    call internal_print_string
+    call print_string
     PrintString `]\n`
     jmp halt
 
@@ -440,22 +595,50 @@ Bare_unit:
 
 ;;; --> ax (Number of words available in Heap; as untagged number)
 Bare_free_words:
-    mov bl, [hemi]
+    mov bl, [which_hemi]
     mov bh, 0
     mov ax, sp
-    sub ax, [bots + bx]     ; compute difference between sp and heap base
-    shr ax, 1               ; shift for #words
+    sub ax, [bottom_of_hemi + bx] ; compute difference between sp and heap base
+    shr ax, 1                     ; shift for #words
     ret
 
 Bare_get_ticks:
     mov word ax, [ticker]
     ret
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (8) Interrupt support (only for scancode based keyboard access)
+
+ticker_freq_htz equ 100
+
+;;;pic offsets must be a multiple of 8
+pic1_offset equ 32
+pic2_offset equ 40
+
+end_of_interrupt_command equ 0x20
+
+timer_slot equ pic1_offset
+
+setup_timer_interrupt:
+    cli ; disable interrupts while we set things up.
+    mov word [4*timer_slot+0], irq0
+    mov word [4*timer_slot+2], 0
+    call set_pit_freq
+    call remap_pic
+    call pic_mask_all_but_timer
+    sti ; re-enable here
+    ret
+
+ticker: dw 0 ; 16 bits; at 1KHz this cycles in 65 seconds
+
+irq0:
+    ;;PrintCharLit '+' ; no print from here
+    inc word [ticker]
+    Out pic1_cmd, end_of_interrupt_command
+    iret
+
 keyboard_data_port equ 0x60
 keyboard_status_port equ 0x64
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; scancode
 
 interrupt_mode: db 0
 
@@ -472,7 +655,7 @@ Bare_init_interrupt_mode:
     ret
 
 ;;; sets Z when not ready
-Bare_is_keyboard_ready: ; TODO: ripe for inlining
+Bare_is_keyboard_ready: ; ripe for inlining
     cmp byte [interrupt_mode], 0
     jz .err
     in al, keyboard_status_port
@@ -481,7 +664,7 @@ Bare_is_keyboard_ready: ; TODO: ripe for inlining
 .err:
     Stop `[Bare_is_keyboard_ready: must be in interrupt_mode]\n`
 
-Bare_get_keyboard_last_scancode: ; TODO: ripe for inlining
+Bare_get_keyboard_last_scancode: ; ripe for inlining
     cmp byte [interrupt_mode], 0
     jz .err
     in al, keyboard_data_port
@@ -490,224 +673,53 @@ Bare_get_keyboard_last_scancode: ; TODO: ripe for inlining
 .err:
     Stop `[Bare_get_keyboard_last_scancode: must be in interrupt_mode]\n`
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; GC
+;;; 8259 PIC (Programmable Interrupt Controller)
 
-hemi_size equ 5000 ; match stage5 emulator
-redzone_size equ 100 ; needed for save/restore & also for interrupts. how big should this be?
+pic1_cmd equ 0x20
+pic2_cmd equ 0xA0
 
-;;; TODO: more descriptive names here...
-topA equ 0x0000
-botA equ topA - hemi_size
-topB equ botA - redzone_size
-botB equ topB - hemi_size
+pic1_data equ 0x21
+pic2_data equ 0xA1
 
-hemi: db 0 ; flips every GC: 0,2,0,2,...
-tops: dw topA, topB ; used to index this
-bots: dw botA, botB ; used to index this
+remap_pic:
+    Out pic1_cmd, 0x11          ; initialization required; expect ICW4
+    Out pic1_data, pic1_offset  ; ICW2: vector offset
+    Out pic1_data, 4            ; ICW3: tell Master of Slave PIC at IRQ2 (0100)
+    Out pic1_data, 1            ; ICW4: x86 mode
+    Out pic2_cmd, 0x11          ; initialization required; expect ICW4
+    Out pic2_data, pic2_offset  ; ICW2: vector offset
+    Out pic2_data, 2            ; ICW3: tell Slave its cascade identity (0010)
+    Out pic2_data, 1            ; ICW4: x86 mode
+    ret
 
-userCaller equ Temps+2
-evacuateCaller equ Temps+4
+pic_mask_all_but_timer:
+    Out pic1_data, 0xfe
+    Out pic2_data, 0xff
+    ret
 
-tArg equ Temps+6
-tFrame equ Temps+8
-
-tCALLER equ Temps+10
-
-need: dw 0
-
-%macro Bare_enter_check 1
-    mov word [need], %1
-    jz %%no_need
-    call Bare_enter_check_function
-%%no_need:
-%endmacro
-
-gc_num: db 0
-
-%macro Debug 1
-    ;PrintCharLit %1 ; TODO: enable with flag
-%endmacro
-
-Bare_enter_check_function:
-    pop bx
-    mov [tCALLER], bx
-
-    ; space remaining before potential GC
-    mov bl, [hemi]
-    mov bh, 0
-    mov ax, sp
-    sub ax, [bots + bx]
-
-    sub ax, [need]
-    cmp ax, 0
-    jl .need_to_gc
-    ;jmp .need_to_gc ; GC every safe point for extreme testing ; TODO: enable with flag
-    jmp .return_to_caller
-
-.need_to_gc:
-    inc byte [gc_num]
-    Debug '['
-    ;mov al, [gc_num]
-    ;PrintHexAL
-    ;Debug ':'
-    call gc_start
-
-    ; space remaining after GC
-    mov bl, [hemi]
-    mov bh, 0
-    mov ax, sp
-    sub ax, [bots + bx]
-    ;SeeReg ax
-    Debug ']'
-    sub ax, [need]
-    cmp ax, 0
-    jl .out_of_memory
-
-.return_to_caller:
-    jmp [tCALLER]
-
-.out_of_memory:
-    PrintString `[OOM]\n`
-    jmp halt
-
-bytesPerWord equ 2
-
-gc_start:
-    pop ax
-    mov [userCaller], ax
-    mov [tFrame], Frame
-    mov [tArg], Arg
-
-    ;; switch heap spaces
-    mov bl, [hemi]
-    mov bh, 0
-    inc bx
-    inc bx
-    and bx, 2
-    mov [hemi], bx
-    mov bx, [tops + bx]
-    mov sp, bx
-
-    mov dx, sp ; set scavenge threshold
-    ;; evacuate roots...
-    ;; frame register
-    mov si, [tFrame]
-    call evacuate
-    mov [tFrame], si
-    ;; arg register
-    mov si, [tArg]
-    call evacuate
-    mov [tArg], si
-    ;; current continuation
-    mov si, [CurrentCont]
-    call evacuate
-    mov [CurrentCont], si
-    ;; Scavenge objects between sp and dx
-    ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
-    cmp dx, sp
-    jz .done_everything
-.outer_loop:
-    mov cx, sp
-    mov bx, sp
-    ;; scavenge objects between cx and dx, using bx as pointer
-.inner_loop:
-    cmp bx, dx
-    jg .bad_inner_loop
-    mov di, [bx] ; descriptor (size in bytes; maybe tagged as raw-data)
-    cmp di, 0
-    jz .bad_zero_descriptor
-    test di, 1
-    jz .scav_payload ; even; payload words must be evacuated
-    ;; skip over raw data objects
-    inc di
-    add bx, di
-    jmp .done_object
-.bad_zero_descriptor:
-    PrintString `[bad_zero_descriptor!]\n`
-    jmp halt
-.scav_payload:
-    ;Debug '-'
-    add bx, bytesPerWord
-    shr di, 1
-.scav_word:
-    mov si, [bx]
-    call evacuate
-    mov [bx], si
-    add bx, bytesPerWord
-    dec di
-    jne .scav_word
-.done_object:
-    cmp bx, dx
-    jne .inner_loop
-    mov dx, cx
-    cmp sp, cx
-    jne .outer_loop
-.done_everything:
-    mov Arg, [tArg]
-    mov Frame, [tFrame]
-    jmp [userCaller]
-.bad_inner_loop:
-    PrintString `\n[Bad_inner_loop]\n`
-    SeeReg bx
-    SeeReg dx
-    jmp halt
-
-evacuate: ;; si --> si (uses: bp)
-    pop bp
-    mov [evacuateCaller], bp
-    cmp si, end_of_code
-    jb .done ; jb for unsigned comparison!
-    test si, 1
-    jnz .done ; odd; tagged-number; so dont evacuate
-    mov bp, si ; save base
-    mov si, [bp - bytesPerWord] ; si has descriptor/size
-    cmp si, 0
-    jz .use_broken_heart
-    ;Debug '('
-    and si, 0xfffe ; align to even offset
-.loop:
-    ;Debug 'c'
-    push word [bp + si - bytesPerWord]
-    sub si, bytesPerWord
-    jnz .loop
-    mov si, sp ; si is relocation address
-    ;Debug 'c'
-    push word [bp - bytesPerWord]
-    mov word [bp - bytesPerWord], 0 ; set broken heart
-    mov [bp], si ; and relocation address
-    ;Debug ')'
-    jmp [evacuateCaller]
-.use_broken_heart:
-    ;Debug 'h'
-    mov si, [bp] ; access relocation address from broken heart
-    jmp [evacuateCaller]
-.done:
-    jmp [evacuateCaller]
+;;; PIT (Programmable Interval Timer)
+;;; Smallest frequency we can set is 19, or else pit_divisor exceeds a word.
+;;; (we can get 18.2 by setting pit_divisor as 0)
+base_freq_htz equ 1193182
+pit_divisor equ base_freq_htz / ticker_freq_htz
+pit_channel0 equ 0x40
+pit_command equ 0x43
+set_pit_freq:
+    ;; 0x36 is 00_11_111_0
+    mov al, 0x36
+    out pit_command, al
+    ;; - (00) select channel 0
+    ;; - (11) access mode lo/hi
+    ;; - (111) square wave
+    ;; - (0) 16-bit-binary
+    mov ax, pit_divisor
+    out pit_channel0, al ;lo byte
+    mov al, ah
+    out pit_channel0, al ;hi byte
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; main
-
-main:
-    mov sp, topA
-    mov bp, 0
-    mov si, 0
-
-    call clear_screen
-    jmp bare_start
-
-final_continuation:
-    dw final_code
-
-final_code:
-    PrintString `[HALT]\n`
-    jmp halt
-
-CurrentCont:
-    dw final_continuation
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Space for three embedded sectors; for WIP filesystem eample
+;;;; (9) Space for three embedded sectors; used by filesystem example
 
     align 512
     times 512 db '0'
@@ -715,14 +727,14 @@ CurrentCont:
     times 512 db '2'
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; User code
+;;;; (10) Embedded User code. Must provide "bare_start"
 
 %include CODE
 
 end_of_code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Check Size
+;;;; (11) Size checks
 
 ;; Size allocated in layout.asm:
 %assign As kernel_size_in_sectors       ; in sectors
