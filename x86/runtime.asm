@@ -170,7 +170,7 @@ part2:
     ;; Any example which wants to use the Bare_get_char, which calls BIOS "int 0x16'
     ;; must disable the new interrupt by commenting the following line...
 
-    call setup_timer_interrupt
+    ;;call setup_timer_interrupt ;; TODO: need this for codes & echo examples -- place under user control
 
     jmp main
 
@@ -299,7 +299,7 @@ CR equ 13
 DEL equ 127
 
 ;;; Read a key press (Converting CR to LF; BS to DEL)
-NO_Bare_get_char: ; -> ax
+Bare_get_char: ; -> ax
     mov ah, 0
     int 0x16
     mov ah, 0

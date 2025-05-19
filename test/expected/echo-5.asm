@@ -1,4 +1,4 @@
-L1: ; Arm: 6'25
+L1: ; Arm: 27'25
   call Bare_get_keyboard_last_scancode
   mov [Temps+6], ax
   mov si, [Temps+6]
@@ -28,7 +28,7 @@ L3: ; Continuation
   mov si, g11
   jmp [bp]
 
-L4: ; Arm: 33'23
+L4: ; Arm: 52'23
   push word [CurrentCont]
   push word L3
   mov [CurrentCont], sp
@@ -43,7 +43,7 @@ L5: ; Continuation
   mov si, g12
   jmp [bp]
 
-L6: ; Arm: 34'26
+L6: ; Arm: 53'26
   push word [CurrentCont]
   push word L5
   mov [CurrentCont], sp
@@ -59,7 +59,7 @@ L7: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L8: ; Arm: 35'25
+L8: ; Arm: 54'25
   push word [bp+12]
   push word [CurrentCont]
   push word L7
@@ -76,7 +76,7 @@ L9: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L10: ; Arm: 36'28
+L10: ; Arm: 55'28
   push word [bp+12]
   push word [CurrentCont]
   push word L9
@@ -93,7 +93,7 @@ L11: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L12: ; Arm: 37'32
+L12: ; Arm: 56'32
   push word [bp+12]
   push word [CurrentCont]
   push word L11
@@ -103,7 +103,7 @@ L12: ; Arm: 37'32
   mov bp, [bp+10]
   jmp [bp]
 
-L13: ; Arm: 38'24
+L13: ; Arm: 57'24
   mov bx, [bp+4]
   mov ax, [bp+8]
   mov [bx], ax
@@ -120,7 +120,7 @@ L13: ; Arm: 38'24
   mov [CurrentCont], ax
   jmp [bp]
 
-L14: ; Arm: 39'26
+L14: ; Arm: 58'26
   mov bx, [bp+4]
   mov ax, [bp+8]
   mov [bx], ax
@@ -144,7 +144,90 @@ L15: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L16: ; Arm: 42'27
+L16: ; Arm: 61'27
+  mov ax, [bp+14]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl dx, 1
+  add dx, 1
+  mov [Temps+6], dx
+  mov ax, [bp+14]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl ax, 1
+  add ax, 1
+  mov [Temps+8], ax
+  mov ax, [Temps+8]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl dx, 1
+  add dx, 1
+  mov [Temps+10], dx
+  mov ax, [Temps+8]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl ax, 1
+  add ax, 1
+  mov [Temps+12], ax
+  mov ax, `{`
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
+  mov ax, [Temps+12]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+16], ax
+  mov ax, [Temps+16]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+18], ax
+  mov ax, [Temps+18]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+20], ax
+  mov ax, [Temps+10]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+22], ax
+  mov ax, [Temps+22]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+24], ax
+  mov ax, [Temps+24]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+26], ax
+  mov ax, [Temps+6]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+28], ax
+  mov ax, [Temps+28]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+30], ax
+  mov ax, [Temps+30]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+32], ax
+  mov ax, `}`
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+34], ax
   push word [bp+12]
   push word [CurrentCont]
   push word L15
@@ -161,7 +244,90 @@ L17: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L18: ; Arm: 43'32
+L18: ; Arm: 62'32
+  mov ax, [bp+14]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl dx, 1
+  add dx, 1
+  mov [Temps+2], dx
+  mov ax, [bp+14]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl ax, 1
+  add ax, 1
+  mov [Temps+4], ax
+  mov ax, [Temps+4]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl dx, 1
+  add dx, 1
+  mov [Temps+6], dx
+  mov ax, [Temps+4]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl ax, 1
+  add ax, 1
+  mov [Temps+8], ax
+  mov ax, `{`
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+10], ax
+  mov ax, [Temps+8]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+12], ax
+  mov ax, [Temps+12]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+14], ax
+  mov ax, [Temps+14]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+16], ax
+  mov ax, [Temps+6]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+18], ax
+  mov ax, [Temps+18]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+20], ax
+  mov ax, [Temps+20]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+22], ax
+  mov ax, [Temps+2]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+24], ax
+  mov ax, [Temps+24]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+26], ax
+  mov ax, [Temps+26]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+28], ax
+  mov ax, `}`
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+30], ax
   push word [bp+12]
   push word [CurrentCont]
   push word L17
@@ -178,7 +344,90 @@ L19: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L20: ; Arm: 46'22
+L20: ; Arm: 65'22
+  mov ax, [bp+14]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl dx, 1
+  add dx, 1
+  mov [Temps+6], dx
+  mov ax, [bp+14]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl ax, 1
+  add ax, 1
+  mov [Temps+8], ax
+  mov ax, [Temps+8]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl dx, 1
+  add dx, 1
+  mov [Temps+10], dx
+  mov ax, [Temps+8]
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl ax, 1
+  add ax, 1
+  mov [Temps+12], ax
+  mov ax, `{`
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+14], ax
+  mov ax, [Temps+12]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+16], ax
+  mov ax, [Temps+16]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+18], ax
+  mov ax, [Temps+18]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+20], ax
+  mov ax, [Temps+10]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+22], ax
+  mov ax, [Temps+22]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+24], ax
+  mov ax, [Temps+24]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+26], ax
+  mov ax, [Temps+6]
+  mov bx, 97
+  add ax, bx
+  sub ax, 1
+  mov [Temps+28], ax
+  mov ax, [Temps+28]
+  sar ax, 1
+  call Bare_num_to_char
+  mov [Temps+30], ax
+  mov ax, [Temps+30]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+32], ax
+  mov ax, `}`
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+34], ax
   push word [bp+12]
   push word [CurrentCont]
   push word L19
@@ -188,7 +437,7 @@ L20: ; Arm: 46'22
   mov bp, [bp+10]
   jmp [bp]
 
-L21: ; Arm: 49'24
+L21: ; Arm: 68'24
   mov ax, [Temps+2]
   call Bare_char_to_num
   shl ax, 1
@@ -255,7 +504,7 @@ L22: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L23: ; Arm: 11'9
+L23: ; Arm: 6'9
   mov si, g18
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -298,14 +547,14 @@ L24: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L25: ; Arm: 40'44
+L25: ; Arm: 59'44
   mov si, g15
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L26: ; Arm: 40'72
+L26: ; Arm: 59'72
   mov si, g16
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -377,7 +626,7 @@ L27: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L28: ; Arm: 27'38
+L28: ; Arm: 46'38
   mov si, g10
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -414,7 +663,7 @@ L29: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L30: ; Arm: 26'36
+L30: ; Arm: 45'36
   mov si, g9
   mov bp, [CurrentCont]
   mov ax, [bp+2]

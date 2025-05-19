@@ -1,11 +1,6 @@
 
 (* Convert scancodes to ascii codes; defining basic echo loop. *)
 
-let rec get_scancode () =
-  let () = wait_for_interrupt () in
-  if is_keyboard_ready() then get_keyboard_last_scancode () else
-    get_scancode()
-
 let not b =
   match b with
   | true -> false
@@ -14,9 +9,33 @@ let not b =
 let (>) a b = b < a
 let (>=) a b = not (a < b)
 
-let tableL = "  1234567890-= \tqwertyuiop[]\n asdfghjkl;'` \\zxcvbnm,./"
-let tableU = "  !@#$%^&*()_+ \tQWERTYUIOP{}\n ASDFGHJKL:\"~ |ZXCVBNM<>?"
-let tableC = "   @            QWERTYUIOP    ASDFGHJKL     ZXCVBNM"
+let put_digit n = put_char (chr (n + ord '0'))
+
+let put_scancode xyz =
+  let z = xyz % 10 in
+  let xy = xyz / 10 in
+  let y = xy % 10 in
+  let x = xy / 10 in
+  put_char '{';
+  put_digit x;
+  put_digit y;
+  put_digit z;
+  put_char '}'
+
+let rec get_scancode () =
+  let () = wait_for_interrupt () in
+  if is_keyboard_ready() then get_keyboard_last_scancode () else
+    get_scancode()
+
+(* space are place holders for unknown scancodes *)
+let tableL : string =
+  "  1234567890-= \tqwertyuiop[]\n asdfghjkl;'` \\zxcvbnm,./"
+
+let tableU : string =
+  "  !@#$%^&*()_+ \tQWERTYUIOP{}\n ASDFGHJKL:\"~ |ZXCVBNM<>?"
+
+let tableC : string =
+  "   @            QWERTYUIOP    ASDFGHJKL     ZXCVBNM"
 
 let get_char : unit -> char =
   let r_shifted = ref false in
@@ -29,7 +48,7 @@ let get_char : unit -> char =
     let control_pressed = (n = 29) in
     let control_released = (n = 157) in
     let ok d = (r_shifted := shifted; r_controlled := controlled; d) in
-    let ignore() = loop shifted controlled in
+    let unknown() = (put_scancode n; loop shifted controlled) in
     if control_pressed then loop shifted true else
       if control_released then loop shifted false else
         if shift_pressed then loop true controlled else
@@ -39,11 +58,11 @@ let get_char : unit -> char =
                 if n = 57 then ok ' ' else
                   let table = if controlled then tableC else if shifted then tableU else tableL in
                   let max = string_length table in
-                  if n < 0 then ignore() else
-                    if n >= max then ignore() else
+                  if n < 0 then unknown() else
+                    if n >= max then unknown() else
                       let decoded = string_index table n in
                       if eq_char decoded ' '
-                      then ignore()
+                      then unknown()
                       else
                         if controlled
                         then ok (chr (ord decoded - ord '@'))
@@ -51,7 +70,6 @@ let get_char : unit -> char =
   in
   fun () ->
   loop (!r_shifted) (!r_controlled)
-
 
 let rec main () =
   let char = get_char() in
