@@ -31,7 +31,7 @@ data Precedence = L | R
 gram6 :: Par Prog
 gram6 = program where
 
-  keywords = ["let","in","if","then","else","fun","match","with","rec","true","false","type","of"]
+  keywords = ["let","in","if","then","else","fun","match","with","rec","true","false","type","of","assert"]
 
   fail = alts []
 
@@ -197,6 +197,12 @@ gram6 = program where
     openClose
     pure (AST.Con pos cUnit [])
 
+  ignored_assert = do
+    pos <- position
+    key "assert"
+    _ <- atom
+    pure (AST.Con pos cUnit [])
+
   literal = alts [positionedLit,unit]
 
   tupleExp :: Par [Exp] =
@@ -284,7 +290,7 @@ gram6 = program where
 
   infixNames = concat (map snd [infixGroup1,infixGroup2,infixGroup3,infixGroup4,infixGroup5,infixGroup6])
 
-  infix0 = alts [consApp, application]
+  infix0 = alts [consApp, application, ignored_assert]
   infix1 = infixOp infixGroup1 infix0
   infix2 = infixOp infixGroup2 infix1
   infix3 = infixOp infixGroup3 infix2
