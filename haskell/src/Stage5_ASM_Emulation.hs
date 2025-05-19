@@ -3,7 +3,6 @@ module Stage5_ASM_Emulation
   ( execute, TraceFlag(..), DebugFlag(..)
   ) where
 
-import Control.Exception (assert)
 import Control.Monad (ap,liftM)
 import Data.Bits (shiftL,shiftR)
 import Data.List (intercalate)
@@ -31,7 +30,7 @@ sizeRedzone :: Int -- for save/restore on stack by div/mod operation + interrupt
 sizeRedzone = 100
 
 topA,botA,topB,botB :: Int
-topA = twoE16 - 2 -- waste two bytes at the top of memory to avoid topA from being 0 -- TODO: dont!
+topA = twoE16
 botA = topA - hemiSizeInBytes
 
 topB = botA - sizeRedzone
@@ -129,7 +128,8 @@ getSP = deHeapAddr <$> GetReg Sp
 
 -- Check heap-address is in the hemi-space in which we are ALLOCATING.
 mkHeapAddr :: Int -> M HeapAddr
-mkHeapAddr n = do
+mkHeapAddr n0 = do
+  let n = if n0 <= 0 then n0 + twoE16 else n0
   hemi <- WhatHemi
   if not (n `inHemi` hemi) then error (printf "mkHeapAddr: %d" n) else
     pure $ HeapAddr (fromIntegral n)
@@ -143,7 +143,7 @@ mkHeapAddr_OTHER n = do
     pure $ HeapAddr (fromIntegral n)
 
 addHeapAddr :: Int -> HeapAddr -> M HeapAddr
-addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral (n + fromIntegral i))
+addHeapAddr i (HeapAddr n) = mkHeapAddr (fromIntegral n + fromIntegral i)
 
 addHeapAddr_OTHER :: Int -> HeapAddr -> M HeapAddr
 addHeapAddr_OTHER i (HeapAddr n) = mkHeapAddr_OTHER (fromIntegral (n + fromIntegral i))
@@ -187,7 +187,7 @@ runGC = do
     loop :: HeapAddr -> M ()
     loop watermark = do
       sp <- getSP
-      let finished = assert (sp <= watermark) (sp == watermark)
+      let finished = (sp == watermark)
       case finished of
         True -> pure ()
         False -> do
@@ -198,7 +198,7 @@ runGC = do
         where
           innerLoop :: HeapAddr -> M ()
           innerLoop scanPointer = do
-            let finishedScan = assert (scanPointer <= watermark) (scanPointer == watermark)
+            let finishedScan = (scanPointer == watermark)
             case finishedScan of
               True -> pure ()
               False -> do
