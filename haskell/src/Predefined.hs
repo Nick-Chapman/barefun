@@ -43,6 +43,7 @@ wrapPreDefs (Prog defs) =
       , ("store_sector" , prim2 StoreSec)
       , ("free_words"   , prim1 FreeWords)
       , ("get_ticks"  , prim1 Get_ticks)
+      , ("init_interrupt_mode"  , prim1 Init_interrupt_mode)
       , ("wait_for_interrupt"  , prim1 Wait_for_interrupt)
       , ("is_keyboard_ready" , prim1 Is_keyboard_ready)
       , ("get_keyboard_last_scancode" , prim1 Get_keyboard_last_scancode)

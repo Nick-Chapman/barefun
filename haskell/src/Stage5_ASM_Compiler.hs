@@ -355,6 +355,10 @@ compileBuiltinTo builtin = case builtin of
     , OpInc Ax
     , setTarget target (SReg Ax)
     ]
+  SRC.Init_interrupt_mode -> \target -> oneArg $ \_unit ->
+    [ OpCall Bare_init_interrupt_mode
+    , setTarget target (SReg Ax)
+    ]
   SRC.Get_ticks -> \target -> oneArg $ \_unit ->
     [ OpCall Bare_get_ticks
     , OpShiftL1 Ax

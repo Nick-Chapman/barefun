@@ -1,6 +1,11 @@
 
 (* Convert scancodes to ascii codes; defining basic echo loop. *)
 
+let put_string s =
+  let n = string_length s in
+  let rec loop i = if i < n then (put_char (string_index s i); loop (i+1)) else () in
+  loop 0
+
 let not b =
   match b with
   | true -> false
@@ -71,7 +76,9 @@ let get_char : unit -> char =
   fun () ->
   loop (!r_shifted) (!r_controlled)
 
-let rec main () =
-  let char = get_char() in
-  put_char char;
-  main ()
+let rec loop () = put_char (get_char()); loop ()
+
+let main () =
+  put_string "See scan codes converted to ASCII...\n";
+  init_interrupt_mode();
+  loop ()

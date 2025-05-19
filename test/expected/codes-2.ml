@@ -5,8 +5,8 @@ let get_scancode =
     match PRIM_Is_keyboard_ready(Unit0) with
     | true1 -> PRIM_Get_keyboard_last_scancode(Unit0)
     | false0 -> (get_scancode Unit0)) in
-let main =
-  fix (fun main _ ->
+let loop =
+  fix (fun loop _ ->
     let char = (get_scancode Unit0) in
     let n = PRIM_CharOrd(char) in
     let z = PRIM_ModInt(n,10) in
@@ -25,5 +25,15 @@ let main =
     let _ = PRIM_PutChar(x) in
     let _ = PRIM_PutChar('}') in
     let _ = PRIM_PutChar(' ') in
-    (main Unit0)) in
-(main Unit0)
+    (loop Unit0)) in
+let loop =
+  fix (fun loop i ->
+    match PRIM_LessInt(i,42) with
+    | true1 ->
+      let x = PRIM_StringIndex("Press/release keys; see the scan codes...\n",i) in
+      let _ = PRIM_PutChar(x) in
+      (loop PRIM_AddInt(i,1))
+    | false0 -> Unit0) in
+let _ = (loop 0) in
+let _ = PRIM_Init_interrupt_mode(Unit0) in
+(loop Unit0)

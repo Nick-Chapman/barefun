@@ -546,6 +546,9 @@ execBare = \case
         let freeWords = fromIntegral ((fromIntegral sp - botOfHemi hemi) `div` 2)
         SetReg Ax (WNum freeWords)
 
+  Bare_init_interrupt_mode -> do
+    pure ()
+
   Bare_get_ticks -> do  -- TODO: really pause
     SetReg Ax (WNum 0)
 

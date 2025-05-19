@@ -135,6 +135,7 @@ data BareBios
   | Bare_load_sector
   | Bare_store_sector
   | Bare_free_words
+  | Bare_init_interrupt_mode
   | Bare_get_ticks
   | Bare_is_keyboard_ready
   | Bare_get_keyboard_last_scancode

@@ -35,5 +35,20 @@ let g6 = fun arg k ->
     let t17 = PRIM_PutChar(' ') in
     g6 g8 k in
   g1 g7 k in
-let g9 = Unit0 in
-g6 g9 k
+let g10 = "Press/release keys; see the scan codes...\n" in
+let g11 = Unit0 in
+let g9 = fun arg k ->
+  let t1 = PRIM_LessInt(arg,42) in
+  match t1 with
+  | true1 ->
+    let t2 = PRIM_StringIndex(g10,arg) in
+    let t3 = PRIM_PutChar(t2) in
+    let t4 = PRIM_AddInt(arg,1) in
+    g9 t4 k
+  | false0 -> k g11 in
+let g12 = Unit0 in
+let g13 = Unit0 in
+let k = [], fun [] arg ->
+  let t1 = PRIM_Init_interrupt_mode(g12) in
+  g6 g13 k in
+g9 0 k

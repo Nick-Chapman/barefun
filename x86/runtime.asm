@@ -165,13 +165,6 @@ part2:
 ;;; Kernel...
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
-
-    ;; NOTE: we are currently in a half way house!
-    ;; Any example which wants to use the Bare_get_char, which calls BIOS "int 0x16'
-    ;; must disable the new interrupt by commenting the following line...
-
-    ;;call setup_timer_interrupt ;; TODO: need this for codes & echo examples -- place under user control
-
     jmp main
 
 ticker_freq_htz equ 100
@@ -300,6 +293,8 @@ DEL equ 127
 
 ;;; Read a key press (Converting CR to LF; BS to DEL)
 Bare_get_char: ; -> ax
+    cmp byte [interrupt_mode], 1
+    jz .err
     mov ah, 0
     int 0x16
     mov ah, 0
@@ -314,6 +309,8 @@ Bare_get_char: ; -> ax
 .bs:
     mov ax, DEL
     ret
+.err:
+    Stop `[Bare_get_char:does not work in interrupt_mode]\n`
 
 ;;; Print to the screen (Converting LF to CR/LF; showing unprintable chars as escaped hex)
 Bare_put_char: ; al->
@@ -457,16 +454,41 @@ Bare_get_ticks:
 keyboard_data_port equ 0x60
 keyboard_status_port equ 0x64
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; scancode
+
+interrupt_mode: db 0
+
+;;; Examples which require access to keyboard scan-codes must call Bare_init_scancode_mode
+;;; This enables:
+;;; -- Bare_is_keyboard_ready
+;;; -- Bare_get_keyboard_last_scancode
+;;; And disables:
+;;; -- Bare_get_char
+
+Bare_init_interrupt_mode:
+    mov byte [interrupt_mode], 1
+    call setup_timer_interrupt
+    ret
+
 ;;; sets Z when not ready
 Bare_is_keyboard_ready: ; TODO: ripe for inlining
+    cmp byte [interrupt_mode], 0
+    jz .err
     in al, keyboard_status_port
     test al, 0x01 ; output buffer has something?
     ret
+.err:
+    Stop `[Bare_is_keyboard_ready: must be in interrupt_mode]\n`
 
 Bare_get_keyboard_last_scancode: ; TODO: ripe for inlining
+    cmp byte [interrupt_mode], 0
+    jz .err
     in al, keyboard_data_port
     mov ah, 0
     ret
+.err:
+    Stop `[Bare_get_keyboard_last_scancode: must be in interrupt_mode]\n`
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; GC

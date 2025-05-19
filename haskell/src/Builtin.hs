@@ -18,6 +18,7 @@ data Builtin
   | FreeWords
 
   | Get_ticks
+  | Init_interrupt_mode
   | Wait_for_interrupt -- wrapper for x86 "hlt" opcode
   | Is_keyboard_ready
   | Get_keyboard_last_scancode
@@ -87,6 +88,9 @@ defineBuiltin b =
     FreeWords -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> k (VNum 0)
 
     Crash -> Impure undefined -- TODO: report the message string
+
+    Init_interrupt_mode ->
+      Impure $ \vs k -> case deUnit (oneArg vs) of () -> k unit
 
     Get_ticks -> Impure undefined -- TODO: no reason we can't emulate time in the haskell evaluators
 

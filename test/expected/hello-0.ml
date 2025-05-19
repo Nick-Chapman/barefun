@@ -27,6 +27,7 @@ let load_sector = (fun x -> (fun y -> PRIM_LoadSec(x,y))) in
 let store_sector = (fun x -> (fun y -> PRIM_StoreSec(x,y))) in
 let free_words = (fun x -> PRIM_FreeWords(x)) in
 let get_ticks = (fun x -> PRIM_Get_ticks(x)) in
+let init_interrupt_mode = (fun x -> PRIM_Init_interrupt_mode(x)) in
 let wait_for_interrupt = (fun x -> PRIM_Wait_for_interrupt(x)) in
 let is_keyboard_ready = (fun x -> PRIM_Is_keyboard_ready(x)) in
 let get_keyboard_last_scancode = (fun x -> PRIM_Get_keyboard_last_scancode(x)) in

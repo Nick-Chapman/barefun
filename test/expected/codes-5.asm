@@ -1,4 +1,4 @@
-L1: ; Arm: 6'25
+L1: ; Arm: 11'25
   call Bare_get_keyboard_last_scancode
   mov [Temps+6], ax
   mov si, [Temps+6]
@@ -120,7 +120,7 @@ L3: ; Continuation
   mov si, g8
   jmp [bp]
 
-L4: ; Function: (main,g6)
+L4: ; Function: (loop,g6)
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L3
@@ -130,10 +130,56 @@ L4: ; Function: (main,g6)
   mov si, g7
   jmp [bp]
 
-L5: ; Start
+L5: ; Arm: 6'28
+  mov ax, g10
+  mov bx, si
+  sar bx, 1
+  call Bare_get_bytes
+  mov [Temps+4], ax
+  mov ax, [Temps+4]
+  call Bare_put_char
+  mov ax, Bare_unit
+  mov [Temps+6], ax
+  mov ax, si
+  mov bx, 3
+  add ax, bx
+  sub ax, 1
+  mov [Temps+8], ax
+  mov bp, g9
+  mov si, [Temps+8]
+  jmp [bp]
+
+L6: ; Function: (loop,g9)
   Bare_enter_check(0)
+  mov ax, si
+  cmp word ax, 85
+  call Bare_make_bool_from_n
+  mov [Temps+2], ax
+  mov bx, [Temps+2]
+  cmp word [bx], 3
+  jz L5
+  mov si, g11
+  mov bp, [CurrentCont]
+  mov ax, [bp+2]
+  mov [CurrentCont], ax
+  jmp [bp]
+
+L7: ; Continuation
+  Bare_enter_check(0)
+  call Bare_init_interrupt_mode
+  mov [Temps+2], ax
   mov bp, g6
-  mov si, g9
+  mov si, g13
+  jmp [bp]
+
+L8: ; Start
+  Bare_enter_check(6)
+  push word [CurrentCont]
+  push word L7
+  mov [CurrentCont], sp
+  push word 4 ;; scanned
+  mov bp, g9
+  mov si, 1
   jmp [bp]
 
 g1:
@@ -153,6 +199,15 @@ g7:
 g8:
   dw 1
 g9:
+  dw L6
+g10:
+  dw 85
+  db `Press/release keys; see the scan codes...\n`
+g11:
+  dw 1
+g12:
+  dw 1
+g13:
   dw 1
 
-bare_start: jmp L5
+bare_start: jmp L8
