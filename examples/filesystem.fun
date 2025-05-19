@@ -1,8 +1,8 @@
 
 (* Prelude stuff... *)
 
-(*let assertF f = assert (f())*)
-let assertF _f = ()
+let assertF f = assert (f())
+(*let assertF _f = ()*)
 
 type 'a option = None | Some of 'a
 
