@@ -1,8 +1,6 @@
 
 (* sham: shell with a fake in-memory file-system *)
 
-let (@@) f x = f x
-
 let not b =
   match b with
   | true -> false
@@ -11,9 +9,6 @@ let not b =
 let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
-
-(* TODO: have a noinline pimitive *)
-let noinline = let rec block f a = let _ = block in f a in block
 
 (* list ops *)
 
@@ -48,7 +43,7 @@ let (@) xs ys = rev_onto ys (rev xs)
 
 (* string ops *)
 
-let implode = noinline @@ (fun xs -> (* TODO: fix parser to avoid need for paren after @@ *)
+let implode = noinline (fun xs ->
   let b = make_bytes (length xs) in
   let rec loop i xs =
     match xs with

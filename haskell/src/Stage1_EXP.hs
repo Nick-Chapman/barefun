@@ -103,7 +103,7 @@ prettyTop control = pretty
       Lit _ x -> [show x]
       ConTag _ tag [] -> [show tag]
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
-      Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (xs >>= pretty))]
+      Prim _ b xs -> onHead (printf "PRIM_%s" (show b) ++) (bracket (foldl1 juxComma (map pretty xs)))
       Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
       RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
       App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)

@@ -16,8 +16,6 @@ let (>) a b = b < a
 let (<=) a b = not (b < a)
 let (>=) a b = not (a < b)
 
-let noinline = let rec block f a = let _ = block in f a in block
-
 (* list ops *)
 
 let rec length xs =

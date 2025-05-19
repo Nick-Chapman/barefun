@@ -189,6 +189,9 @@ compileFunctionTo who target freeVars body = do
 -- So we don't forget, w take "Target" after "Builtin"; and push the lambda into each branch...
 compileBuiltinTo :: Builtin -> Target -> [Source] -> [Op]
 compileBuiltinTo builtin = case builtin of
+  SRC.Noinline -> \target -> oneArg $ \s1 ->
+    [ setTarget target s1
+    ]
   SRC.PutChar -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_put_char

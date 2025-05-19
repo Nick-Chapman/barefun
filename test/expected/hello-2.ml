@@ -9,9 +9,9 @@ let put_chars =
 let explode_loop =
   fix (fun explode_loop acc ->
     (fun i ->
-      match PRIM_LessInt(i,0) with
+      match PRIM_LessInt(i, 0) with
       | true1 -> acc
       | false0 ->
-        let x = PRIM_StringIndex("Hello, world!\n",i) in
-        ((explode_loop Cons1(x, acc)) PRIM_SubInt(i,1)))) in
+        let x = PRIM_StringIndex("Hello, world!\n", i) in
+        ((explode_loop Cons1(x, acc)) PRIM_SubInt(i, 1)))) in
 (put_chars ((explode_loop Nil0) 13))

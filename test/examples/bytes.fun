@@ -1,13 +1,11 @@
 (* Build strings using the builtin "bytes" ops. *)
 
-let noinline = let rec block f a = let _ = block in f a in block
-
 let rec length xs =
   match xs with
   | [] -> 0
   | _::xs -> (+) 1 (length xs)
 
-let implode xs =
+let implode = noinline (fun xs ->
   let b = make_bytes (length xs) in
   let rec loop i xs =
     match xs with
@@ -15,18 +13,14 @@ let implode xs =
     | x::xs -> set_bytes b i x; loop (i+1) xs
   in
   loop 0 xs;
-  freeze_bytes b
+  freeze_bytes b)
 
-let implode = noinline implode
-
-let explode s =
+let explode = noinline (fun s ->
   let rec explode_loop acc i =
     if i < 0 then acc else
       explode_loop (string_index s i :: acc) (i-1)
   in
-  explode_loop [] (string_length s - 1)
-
-let explode = noinline explode
+  explode_loop [] (string_length s - 1))
 
 let rec put_chars xs =
   match xs with

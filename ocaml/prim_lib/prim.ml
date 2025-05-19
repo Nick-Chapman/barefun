@@ -2,6 +2,8 @@ module X : sig
 
   val crash : string -> 'a
 
+  val noinline : 'a -> 'a
+
   val ( * ) : int -> int -> int
   val (%) : int -> int -> int
   val (+) : int -> int -> int
@@ -45,6 +47,8 @@ end = struct
 
   exception CRASH of string
   let crash message = raise (CRASH message)
+
+  let noinline x = x
 
   let (=) = (=)
   let (<) = (<)

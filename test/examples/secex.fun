@@ -1,8 +1,6 @@
 
 (* Sector explorer *)
 
-let noinline = let rec block f a = let _ = block in f a in block
-
 let not b =
   match b with
   | true -> false

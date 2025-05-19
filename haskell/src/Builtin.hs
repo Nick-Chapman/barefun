@@ -7,6 +7,7 @@ import Par4 (Position(..))
 
 data Builtin
   = Crash
+  | Noinline
   | PutChar | GetChar
   | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
   | EqChar | CharOrd | CharChr
@@ -52,6 +53,7 @@ executeBuiltin b args =
 defineBuiltin :: Builtin -> Semantics
 defineBuiltin b =
   case b of
+    Noinline -> Impure $ \vs k -> k (oneArg vs)
     PutChar -> Impure $ \vs k -> IPut (deChar (oneArg vs)) (k unit)
     GetChar -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> IGet (\c -> k (VChar c))
     AddInt -> Pure (\vs -> VNum (uncurry (+) (twoArgs deNum deNum vs)))

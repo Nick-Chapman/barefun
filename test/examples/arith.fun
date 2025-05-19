@@ -4,8 +4,6 @@
 let () = assert (1 + 2 = 3)
 let () = assert (5 - 3 = 2)
 
-let noinline = let rec block f a = let _ = block in f a in block
-
 let my_assert name b = if b then () else crash name
 
 (* check the result from runtime execution matches the result from compiletime inlining *)

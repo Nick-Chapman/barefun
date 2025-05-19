@@ -47,6 +47,7 @@ wrapPreDefs (Prog defs) =
       , ("is_keyboard_ready" , prim1 Is_keyboard_ready)
       , ("get_keyboard_last_scancode" , prim1 Get_keyboard_last_scancode)
       , ("assert", prim1 (Assert noPos))
+      , ("noinline", prim1 Noinline)
 
       -- The arg-count and types of predefined names which wrap Builtin primitives must match:
       -- (a) The evaluation semantic defined in Builtin.hs
