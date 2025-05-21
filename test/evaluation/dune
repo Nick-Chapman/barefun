@@ -4,4 +4,5 @@
   ../../ocaml/main.exe
   (glob_files ../../examples/*.fun)
   (glob_files ../inputs/*.input)
+  (glob_files ../inputs/*.short-input)
 ))

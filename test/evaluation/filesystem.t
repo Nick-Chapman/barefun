@@ -1,4 +1,4 @@
-
+Using ocaml for the big filesystem test. Haskell emulators are too slow.
   $ cat ../inputs/filesystem.input | ../../ocaml/main.exe Filesystem
   Filesystem explorer
   Commands: wipe dump format mount unmount debug ls create append splat rm cat

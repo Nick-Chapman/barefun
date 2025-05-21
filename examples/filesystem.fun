@@ -276,7 +276,7 @@ let controlD = chr 4
 let single_controlD = implode [controlD]
 
 let read_line = noinline (fun () ->
-  let rec readloop acc =
+  let rec readloop acc = (* TODO: have max length to avoid chance of OOOM *)
     let c = get_char () in
     let n = ord c in
     if eq_char c '\n' then (newline(); rev_implode acc) else
@@ -912,7 +912,7 @@ let command_cat i =
      | Some inode ->
         match inode with
         | Inode (size,bis) ->
-           (* TODO: do this in a more incremental way; via a sys_read method *)
+           (* TODO: do this in a more incremental way; via a sys_read method -- or else OOM *)
            let str = concat "" (map (fun bi -> deBlock (load_block bi)) bis) in
            let contents = substr str 0 size in
            put_string contents
