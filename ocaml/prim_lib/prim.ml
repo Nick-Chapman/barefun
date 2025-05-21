@@ -35,7 +35,7 @@ module X : sig
   val string_index : string -> int -> char
   val string_length : string -> int
 
-  val load_sector : int -> bytes -> unit (* TODO: functional style primitive would be nicer; returning a string instead of mutating bytes *)
+  val load_sector : int -> bytes -> unit
   val store_sector : int -> string -> unit
 
   val free_words : unit -> int
