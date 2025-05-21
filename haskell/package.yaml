@@ -21,6 +21,7 @@ dependencies:
 - text
 - time
 - transformers
+- unix
 - word8
 
 default-extensions:

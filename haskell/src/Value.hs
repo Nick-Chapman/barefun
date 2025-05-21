@@ -11,8 +11,14 @@ import Data.Char (ord,chr)
 import Data.IORef (IORef,newIORef,readIORef,writeIORef)
 import Data.List (intercalate)
 import Data.Map (Map)
+import GHC.IO.Device (SeekMode(AbsoluteSeek))
 import System.IO (stdin,stdout,hIsEOF,hFlush,hSetBuffering,hSetEcho,BufferMode(NoBuffering))
+import System.Posix.Types (Fd,ByteCount,FileOffset)
+import System.Posix.Files (setFdSize)
+import System.Posix.IO.ByteString (OpenMode(..),OpenFileFlags(..)
+                                  ,defaultFileFlags,openFd,closeFd,fdSeek,fdRead,fdWrite)
 import Text.Printf (printf)
+import qualified Data.ByteString as BS (fromFilePath,pack,unpack)
 import qualified Data.Map as Map
 
 data Value
@@ -141,16 +147,39 @@ runInteraction measure next = do
         loop state k
 
       IReadSector i k -> do
-        let State{diskSectors} = state
-        let text = maybe zeroSector id $ Map.lookup i diskSectors
+        text <- readSector i
         loop state (k text)
-          where
-            zeroSector = replicate sectorSize '\0'
-            sectorSize = 512
 
       IWriteSector i s k -> do
-        let State{diskSectors} = state
-        loop state { diskSectors = Map.insert i s diskSectors } k
+        writeSector i s
+        loop state k
+
+readSector :: Number -> IO String
+readSector i = do
+  withSectorSeek i $ \fd -> do
+    unpack <$> fdRead fd (fromIntegral sectorSize)
+      where unpack bs = map (chr . fromIntegral) (BS.unpack bs)
+
+writeSector :: Number -> String -> IO ()
+writeSector i s = do
+  withSectorSeek i $ \fd -> do
+    _::ByteCount <- fdWrite fd (pack s)
+    pure ()
+      where pack string = BS.pack (map (fromIntegral . ord) string)
+
+sectorSize,numSectors :: Int
+sectorSize = 512
+numSectors = 3
+
+withSectorSeek :: Number -> (Fd -> IO a) -> IO a
+withSectorSeek i f = do
+  path <- BS.fromFilePath "fs.image"
+  fd <- openFd path ReadWrite defaultFileFlags { creat = Just 0o640 }
+  setFdSize fd (fromIntegral (sectorSize * numSectors))
+  _::FileOffset <- fdSeek fd AbsoluteSeek (fromIntegral i * fromIntegral sectorSize)
+  res <- f fd
+  closeFd fd
+  pure res
 
 -- An Interaction supports primitives for manipualting mutable "bytes"
 -- We implement functionally, with bytes being a reference into a Map of created bytes.
@@ -163,11 +192,10 @@ data State = State
   , bm :: Map Bytes (Number,Map Number Char)
   , u :: Int
   , pendingScanCodes :: [Int]
-  , diskSectors :: Map Number String
   }
 
 state0 :: State
-state0 = State { tm = Map.empty, bm = Map.empty, u = 1, pendingScanCodes = [], diskSectors = Map.empty }
+state0 = State { tm = Map.empty, bm = Map.empty, u = 1, pendingScanCodes = [] }
 
 instance Show State where
   show State{tm} =
