@@ -98,11 +98,11 @@ end = struct
   let string_length = String.length
   let string_index s i = s.[i]
 
-  let n_sectors = 32
+  let n_sectors = 3
   let sector_size = 512
 
   let with_open_fs_image f =
-    let fd = Unix.openfile "/tmp/fs.image" [O_RDWR;O_CREAT] 0o640 in
+    let fd = Unix.openfile "fs.image" [O_RDWR;O_CREAT] 0o640 in
     Unix.ftruncate fd (sector_size * n_sectors);
     f fd;
     Unix.close fd

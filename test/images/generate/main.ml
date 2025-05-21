@@ -9,10 +9,10 @@ let generate_rules x =
     (run ../../../haskell/main.exe ../../../examples/%s.fun -compile))))
 
  (rule
-  (deps ../../../x86/runtime.asm %s.asm)
+  (deps ../../../x86/runtime.asm ../../../x86/fs.image %s.asm)
   (action
    (with-stdout-to %s.img
-    (run nasm -Werror -o %s.img -dCODE='%s.asm' ../../../x86/runtime.asm))))
+    (run nasm -Werror -i ../../../x86 -o %s.img -dCODE='%s.asm' ../../../x86/runtime.asm))))
 
  (rule
   (alias %s)

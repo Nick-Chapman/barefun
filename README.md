@@ -22,9 +22,9 @@ As of Saturday 26th April 2025, we can compile and run the
 
 ```
 dune build @all @runtest
-dune exec -- haskell/main.exe examples/sham.fun -compile > code
-nasm -Werror -dCODE="'code'" x86/runtime.asm -o image
-qemu-system-i386 image
+dune exec -- haskell/main.exe examples/sham.fun -compile > sham.asm
+nasm -Werror -i x86 -dCODE="'sham.asm'" x86/runtime.asm -o sham.image
+qemu-system-i386 sham.image
 ```
 
 - To boot on real hardware, `image` can be written to USB: `dd if=image of=/dev/sda`.
@@ -37,9 +37,9 @@ qemu-system-i386 image
 
 ```
 (cd haskell; stack build)
-(cd haskell; stack run -- main.exe ../examples/sham.fun -compile) > code
-nasm -Werror -dCODE="'code'" x86/runtime.asm -o image
-qemu-system-i386 image
+(cd haskell; stack run -- main.exe ../examples/sham.fun -compile) > sham.asm
+nasm -Werror -i x86 -dCODE="'sham.asm'" x86/runtime.asm -o sham.image
+qemu-system-i386 sham.image
 ```
 
 More info available in subdirectory `README`s:
