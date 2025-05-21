@@ -134,7 +134,7 @@ L10: ; Continuation
   mov si, 1
   jmp [bp]
 
-L11: ; Function: (lam,g3)
+L11: ; Function: (implode,g3)
   Bare_enter_check(8)
   push word si
   push word [CurrentCont]
@@ -216,7 +216,7 @@ L16: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L17: ; Function: (lam,g5)
+L17: ; Function: (explode,g5)
   Bare_enter_check(14)
   push word si
   push word L15
@@ -270,12 +270,12 @@ L21: ; Continuation
   push word L20
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov bp, [bp+4]
+  mov bp, g5
   mov si, si
   jmp [bp]
 
 L22: ; Continuation
-  Bare_enter_check(40)
+  Bare_enter_check(38)
   push word g9
   push word `\n`
   push word 3
@@ -296,23 +296,20 @@ L22: ; Continuation
   push word 3
   mov [Temps+8], sp
   push word 6 ;; scanned
-  push word [bp+6]
   push word [CurrentCont]
   push word L21
   mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, [bp+4]
+  push word 4 ;; scanned
+  mov bp, g3
   mov si, [Temps+8]
   jmp [bp]
 
 L23: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
-  push word [bp+4]
+  Bare_enter_check(6)
   push word [CurrentCont]
   push word L22
   mov [CurrentCont], sp
-  push word 8 ;; scanned
+  push word 4 ;; scanned
   mov bp, g6
   mov si, si
   jmp [bp]
@@ -324,41 +321,31 @@ L24: ; Continuation
   mov [Temps+2], ax
   mov ax, [Temps+2]
   mov [Temps+4], ax
-  push word [bp+6]
-  push word [bp+4]
   push word [CurrentCont]
   push word L23
   mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, [bp+6]
+  push word 4 ;; scanned
+  mov bp, g5
   mov si, [Temps+4]
   jmp [bp]
 
 L25: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
-  push word [bp+4]
+  Bare_enter_check(6)
   push word [CurrentCont]
   push word L24
   mov [CurrentCont], sp
-  push word 8 ;; scanned
+  push word 4 ;; scanned
   mov bp, g6
   mov si, si
   jmp [bp]
 
 L26: ; Start
-  Bare_enter_check(10)
-  mov ax, g3
-  mov [Temps+2], ax
-  mov ax, g5
-  mov [Temps+4], ax
-  push word [Temps+4]
-  push word [Temps+2]
+  Bare_enter_check(6)
   push word [CurrentCont]
   push word L25
   mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, [Temps+4]
+  push word 4 ;; scanned
+  mov bp, g5
   mov si, g8
   jmp [bp]
 

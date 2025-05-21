@@ -1,7 +1,7 @@
 -- | Normalize using "Normalization by Evaluation" (Inlining & Constant Folding).
 module Stage2_NBE (compile,execute) where
 
-import Builtin (Builtin,isPure,evaluatePureBuiltin)
+import Builtin (Builtin(Noinline),isPure,evaluatePureBuiltin)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Par4 (Position(..))
@@ -150,6 +150,9 @@ reflect env = \case
   ConTag pos tag args -> do
     args <- mapM (reflect env) args
     pure $ Constructed pos tag args
+  Prim _ Noinline [e] -> do
+    -- The noinline primitive has blocked inlining; now we throw it away
+    Syntax <$> norm env e
   Prim p b es -> do
     es <- mapM (reflect env) es
     reflectBuiltin p b es

@@ -40,7 +40,7 @@ compileImage = \case
 
 compileTopDef :: String -> SRC.Top -> Asm [DataSpec]
 compileTopDef who = \case
-  SRC.TopPrim b xs -> undefined b xs -- TODO: provoke or remove
+  SRC.TopPrim b xs -> error (show ("Unexpected TopPrim (a Pure builtin not get inlined)",b,xs))
   SRC.TopLitS string -> pure (DW [ lnumTagging (fromIntegral $ length string) ] : [ DS string ])
 
   SRC.TopLam _x body -> do
