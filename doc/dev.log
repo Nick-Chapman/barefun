@@ -87,8 +87,8 @@ Thu 15 May 2025 : filesystem (get first complete version for demo to Ellie)
 Fri 16 May 2025 : filesystem.fun ; haskell emulation of load/store sector ; GC bug discovered?
 Sat 17 May 2025 : calling conventions.
 
-Mon 19 May 2025 :
-Tue 20 May 2025 :
-Wed 21 May 2025 :
+Mon 19 May 2025 : cleanup; get filesystem example working in qemu
+Tue 20 May 2025 : blog: Why Two Languages?
+Wed 21 May 2025 : persistent fs.image in haskell emu & embed in nasme image
 Thu 22 May 2025 :
 Fri 23 May 2025 :

@@ -98,6 +98,7 @@ let (^) = noinline (fun s1 s2 ->
 
 (* int ops *)
 
+let min x y = if x < y then x else y
 let max x y = if x < y then y else x
 
 let chars_of_int i =
@@ -631,6 +632,37 @@ let sys_get_inode : ii -> inode option =
      | Some inode ->
         Some inode
 
+let sys_read : ii -> int -> int -> bytes -> int =
+  fun ii offset len_wanted buffer ->
+  match !mounted with
+  | None -> (error mes_no_filesystem_mounted; 0)
+  | Some fs ->
+     let super = super_of_fs fs in
+     match loadI super ii with
+     | None -> (error mes_inode_index_not_allocated; 0)
+     | Some inode ->
+        let rec loop bis file_remaining offset =
+          assert (offset>=0);
+          if file_remaining <= 0 then 0 else
+            match bis with
+            | [] -> 0
+            | bi::bis ->
+               if offset >= block_size
+               then loop bis file_remaining (offset - block_size)
+               else
+                 let block_remining = block_size - offset in
+                 let len = min len_wanted (min block_remining file_remaining) in
+                 assert (len>=1);
+                 let str = deBlock (load_block bi) in
+                 let data = substr str offset len in
+                 let () = mod_substr buffer 0 data in
+                 len
+        in
+        if len_wanted = 0 then 0 else
+          let bis = match inode with | Inode (_,bis) -> bis in
+          let size = match inode with | Inode (n,_) -> n in
+          loop bis (size - offset) offset
+
 let sys_write : ii -> int -> string -> unit = (* too complicated! *)
   fun ii the_offset the_text ->
   match !mounted with
@@ -903,19 +935,18 @@ let command_remove i =
 (* cat : Display the contents of a file (selected by index) from a mounted filesystem. *)
 let command_cat i =
   let ii = II i in
-  match !mounted with
-  | None -> error mes_no_filesystem_mounted
-  | Some fs ->
-     let super = super_of_fs fs in
-     match loadI super ii with
-     | None -> error mes_inode_index_not_allocated
-     | Some inode ->
-        match inode with
-        | Inode (size,bis) ->
-           (* TODO: do this in a more incremental way; via a sys_read method -- or else OOM *)
-           let str = concat "" (map (fun bi -> deBlock (load_block bi)) bis) in
-           let contents = substr str 0 size in
-           put_string contents
+  let buf_size = block_size in (* can be any size >=1, but block_size is best *)
+  let buf = make_bytes buf_size in
+  let rec loop offset =
+    let n_read = sys_read ii offset buf_size buf in
+    if n_read = 0 then () else
+      let str = freeze_bytes buf in
+      if n_read = buf_size
+      then put_string str
+      else put_string (substr str 0 n_read);
+      loop (offset + n_read)
+  in
+  loop 0
 
 let the_command_map : cmap =
   Cmap
