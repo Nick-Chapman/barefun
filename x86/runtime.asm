@@ -18,9 +18,9 @@
 ;;; - (6) Garbage Collection
 ;;; - (7) "Bare_" routines (called from embedded user code)
 ;;; - (8) Interrupt support (only for scancode based keyboard access)
-;;; - (9) Space for three embedded sectors. Used for persistence in filesystem example
-;;; - (10) Embedded User code. Must provide "bare_start"
-;;; - (11) Size checks
+;;; - (9) Embedded User code. Must provide "bare_start"
+;;; - (10) Size checks
+;;; - (11) Embedded disk image
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (1) Layout
@@ -753,22 +753,14 @@ set_pit_freq:
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (9) Space for three embedded sectors; used by filesystem example
-
-embedded_sector_offset equ 4 ; TODO: compute this?
-
-    align 512
-    incbin "disk.image"
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (10) Embedded User code. Must provide "bare_start"
+;;;; (9) Embedded User code. Must provide "bare_start"
 
 %include CODE
 
 end_of_code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (11) Size checks
+;;;; (10) Size checks
 
 ;; Size allocated in layout.asm:
 %assign As kernel_size_in_sectors       ; in sectors
@@ -781,3 +773,12 @@ end_of_code:
 %if Rb>Ab
 %error Kernel sectors allocated: As, required: Rs
 %endif
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (11) Embedded disk image
+
+embedded_sector_offset equ kernel_size_in_sectors + 1 ;;; 1 for bootloader
+
+times (512 * kernel_size_in_sectors - ($ - $$)) db 0
+
+incbin "disk.image"
