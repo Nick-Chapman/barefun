@@ -173,7 +173,7 @@ numSectors = 3
 
 withSectorSeek :: Number -> (Fd -> IO a) -> IO a
 withSectorSeek i f = do
-  path <- BS.fromFilePath "fs.image"
+  path <- BS.fromFilePath "disk.image"
   fd <- openFd path ReadWrite defaultFileFlags { creat = Just 0o640 }
   setFdSize fd (fromIntegral (sectorSize * numSectors))
   _::FileOffset <- fdSeek fd AbsoluteSeek (fromIntegral i * fromIntegral sectorSize)

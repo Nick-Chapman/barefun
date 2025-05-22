@@ -743,7 +743,7 @@ set_pit_freq:
 ;;;; (9) Space for three embedded sectors; used by filesystem example
 
     align 512
-    incbin "fs.image"
+    incbin "disk.image"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (10) Embedded User code. Must provide "bare_start"

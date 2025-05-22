@@ -101,8 +101,8 @@ end = struct
   let n_sectors = 3
   let sector_size = 512
 
-  let with_open_fs_image f =
-    let fd = Unix.openfile "fs.image" [O_RDWR;O_CREAT] 0o640 in
+  let with_open_disk f =
+    let fd = Unix.openfile "disk.image" [O_RDWR;O_CREAT] 0o640 in
     Unix.ftruncate fd (sector_size * n_sectors);
     f fd;
     Unix.close fd
@@ -111,7 +111,7 @@ end = struct
     (*Printf.printf "[load_sector:%d]\n" n;*)
     if n < 0 then Printf.printf "[Prim.load_sector:%d]: too small\n" n else
       if n >= n_sectors then Printf.printf "[Prim.load_sector:%d]: too big\n" n else
-        with_open_fs_image (fun fd ->
+        with_open_disk (fun fd ->
             let pos = n * sector_size in
             let (_:int) = Unix.lseek fd pos SEEK_SET in
             let (_:int) = Unix.read fd buf 0 sector_size in
@@ -121,7 +121,7 @@ end = struct
     (*Printf.printf "[store_sector:%d]\n" n;*)
     if n < 0 then Printf.printf "[Prim.store_sector:%d]: too small\n" n else
       if n >= n_sectors then Printf.printf "[Prim.store_sector:%d]: too big\n" n else
-        with_open_fs_image (fun fd ->
+        with_open_disk (fun fd ->
             let pos = n * sector_size in
             let (_:int) = Unix.lseek fd pos SEEK_SET in
             let (_:int) = Unix.write fd (Bytes.of_string s) 0 sector_size in

@@ -89,6 +89,6 @@ Sat 17 May 2025 : calling conventions.
 
 Mon 19 May 2025 : (MILESTONE-3) cleanup; get filesystem example working in qemu
 Tue 20 May 2025 : blog: Why Two Languages?
-Wed 21 May 2025 : persistent fs.image in haskell emu & embed in nasm image
+Wed 21 May 2025 : persistent disk.image in haskell emu & embed in nasm image
 Thu 22 May 2025 :
 Fri 23 May 2025 :
