@@ -2,7 +2,7 @@ Use the haskell emulator for a smaller filesystem test
 
   $ cat ../inputs/fs.short-input | ../../haskell/main.exe ../../examples/filesystem.fun
   Filesystem explorer
-  Try: help dump wipe format mount unmount debug ls cat rm create append splat
+  Try: help dump sector format mount unmount debug ls stat cat rm create append splat wipe
   1> format
   2> mount
   3> ls

@@ -1,7 +1,7 @@
 Using ocaml for the big filesystem test. Haskell emulators are too slow.
   $ cat ../inputs/filesystem.input | ../../ocaml/main.exe Filesystem
   Filesystem explorer
-  Try: help dump wipe format mount unmount debug ls cat rm create append splat
+  Try: help dump sector format mount unmount debug ls stat cat rm create append splat wipe
   1> wipe
   2> format
   3> mount
@@ -66,14 +66,9 @@ Using ocaml for the big filesystem test. Haskell emulators are too slow.
   file 3 : 9
   28> debug
   Filesystem found:
-  - super: 24/3/24
-  - free blocks = B8,B9,B10,B11,B12,B13,B14,B15,B16,B17,B18,B19,B20,B21,B22,B23
-  - free inodes = I4,I5,I6,I7,I8,I9,I10,I11,I12,I13,I14,I15,I16,I17,I18,I19,I20,I21,I22,I23
-  - inodes:
-  - I0 : Inode: size=13, blocks=[B4]
-  - I1 : Inode: size=77, blocks=[B5,B7]
-  - I2 : Inode: size=0, blocks=[]
-  - I3 : Inode: size=9, blocks=[B6]
+  - superblock: #blocks=24, #admin-blocks=1+3, #inodes=24
+  - #free-blocks = 16
+  - #free-inodes = 20
   29> cat 0
   Hello world!
   30> rm 0
@@ -92,13 +87,9 @@ Using ocaml for the big filesystem test. Haskell emulators are too slow.
   file 3 : 9
   35> debug
   Filesystem found:
-  - super: 24/3/24
-  - free blocks = B8,B9,B10,B11,B12,B13,B14,B15,B16,B17,B18,B19,B20,B21,B22,B23
-  - free inodes = I0,I4,I5,I6,I7,I8,I9,I10,I11,I12,I13,I14,I15,I16,I17,I18,I19,I20,I21,I22,I23
-  - inodes:
-  - I1 : Inode: size=137, blocks=[B5,B7,B4]
-  - I2 : Inode: size=0, blocks=[]
-  - I3 : Inode: size=9, blocks=[B6]
+  - superblock: #blocks=24, #admin-blocks=1+3, #inodes=24
+  - #free-blocks = 16
+  - #free-inodes = 21
   36> dump
   BARE^X^C^X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
   ^@^@^D,,,,,\8a^@^E^G^D,,,^A^@,,,,,,\n^@^F,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,

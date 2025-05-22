@@ -98,7 +98,7 @@ end = struct
   let string_length = String.length
   let string_index s i = s.[i]
 
-  let n_sectors = 3
+  let n_sectors = 32
   let sector_size = 512
 
   let with_open_disk f =

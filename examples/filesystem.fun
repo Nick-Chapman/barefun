@@ -3,8 +3,6 @@
 
 type 'a option = None | Some of 'a
 
-let is_some o = match o with | None -> false | Some _ -> true
-
 type ('a,'b) pair = Pair of 'a * 'b
 
 let not b =
@@ -148,7 +146,7 @@ let put_string = (fun s -> put_chars (explode s))
 
 let newline () = put_char '\n'
 
-let put_string_newline s  = put_string s; newline ()
+let put_string_nl s  = put_string s; newline ()
 
 (* trace *)
 
@@ -307,13 +305,11 @@ let read_line = noinline (fun () ->
 (* disk sectors *)
 
 let sector_size = 512
-let num_sectors_on_disk = 3 (* 31 is max here; if 32 we get 8*32=256 blocks, which is too big for a char *)
+let num_sectors_on_disk = 3 (* 31 is max here; if 32 we get 8*32=256 blocks, which is too big for a #blocks char in super block info *)
+let block_size = 64 (* blocks; the smallest unit of access for file-data *)
 
-let load_sector : int -> bytes -> unit = fun seci buf ->
-  assert (seci >= 0);
-  assert (seci < num_sectors_on_disk);
-  (*let () = traceF (fun () ->"(SLOW) load_sector " ^ sofi seci) in*)
-  load_sector seci buf
+let blocks_per_sector = sector_size / block_size
+let num_blocks_on_disk = blocks_per_sector * num_sectors_on_disk
 
 let read_sector : int -> string =
   fun seci ->
@@ -323,10 +319,10 @@ let read_sector : int -> string =
 
 let put_sector : string -> unit = fun s ->
   let rec loop i =
-    if i >= 512 then () else
+    if i >= sector_size then () else
       let c = string_index s i in
       if eq_char c '\n' then put_string "\\n" else put_char c;
-      if i % 64 = 63 then newline() else ();
+      if (i+1) % block_size = 0 then newline() else ();
       loop (i+1)
   in
   loop 0
@@ -343,13 +339,6 @@ let read_sector_show : int -> unit =
   put_sector (read_sector seci)
 
 (* TODO: last sector caching! -- have old code for this *)
-
-(* blocks; size: 64 bytes; the smallest unit of access for file-data *)
-
-let block_size = 64
-let blocks_per_sector = 8
-let () = assert (block_size * blocks_per_sector = sector_size)
-let num_blocks_on_disk = blocks_per_sector * num_sectors_on_disk
 
 type block = Block of string
 let deBlock x = match x with | Block y -> y
@@ -395,11 +384,12 @@ let update_block : bi -> int -> string -> unit =
 (* inode *)
 
 let idata_size = 8
-let inodes_per_block = block_size / idata_size
-let () = assert (inodes_per_block = 8)
-let max_blocks_per_inode = 6
-let max_file_size = max_blocks_per_inode * block_size
-let () = assert (max_file_size = 384)
+let bytes_for_size = 2
+
+let max_blocks_per_file = idata_size - bytes_for_size
+let max_file_size = max_blocks_per_file * block_size
+
+let inodes_per_admin_block = block_size / idata_size
 
 type inode = Inode of (int * bi list) (* file-size and block-list(#max=6); exports as 8 bytes on disk *)
 
@@ -462,7 +452,7 @@ let import_inode : string -> inode option  =
      if n = 0 then None else
        let size = n - 1 in
        let n_blocks = blocks_for_size size in
-       let bis = take n_blocks (map import_bi (explode (substr s 2 max_blocks_per_inode))) in
+       let bis = take n_blocks (map import_bi (explode (substr s 2 max_blocks_per_file))) in
        Some (Inode (size, bis))
 
 (* superblock *)
@@ -474,12 +464,13 @@ let num_inodes super = match super with | Super(_,_,c) -> c
 let make_super_10percent () =
   let a = num_blocks_on_disk in
   let b = (a / 10) + 1 in (* reserve 10% of blocks for inodes *)
-  let c = inodes_per_block * b in
+  let c = inodes_per_admin_block * b in
   Super (a,b,c)
 
 let show_super s =
   match s with
-  | Super(a,b,c) -> sofi a ^ "/" ^ sofi b ^ "/" ^ sofi c
+  | Super(a,b,c) ->
+     "#blocks=" ^ sofi a ^ ", #admin-blocks=1+" ^ sofi b ^ ", #inodes=" ^ sofi c
 
 let super_block_number = BI 0
 
@@ -504,14 +495,23 @@ let store_super super = store_block super_block_number (export_super super)
 (* called from fsck; fs-signature-string checked *)
 let load_super () = import_super (load_block super_block_number)
 
+(* errors *)
+
+let error mes = put_string ("Error: " ^ mes ^ "\n")
+
+let mes_no_filesystem_mounted = "no filesystem mounted; try mount"
+let mes_inode_index_not_allocated = "inode is not allocated (no such file)"
+let mes_no_blocks_available = "no blocks available (disk is full)"
+let mes_no_inodes_available = "no inodes available (too many files)"
+
 (* inode index *)
 
 type ii = II of int
 let deII x = match x with | II y -> y
 let show_ii : ii -> string = fun ii -> "I" ^ sofi (deII ii)
 
-let ii2bi : ii -> bi = fun ii -> BI (deII ii / inodes_per_block + 1)
-let ii2off : ii -> int = fun ii -> (deII ii % inodes_per_block) * idata_size
+let ii2bi : ii -> bi = fun ii -> BI (deII ii / inodes_per_admin_block + 1)
+let ii2off : ii -> int = fun ii -> (deII ii % inodes_per_admin_block) * idata_size
 
 (* fs: filesystem: superblock info + free lists *)
 
@@ -521,12 +521,14 @@ let super_of_fs fs = match fs with | FS (super,_,_) -> super
 
 let loadI : super -> ii -> inode option =
   noinline (fun super ii ->
-  assert (deII ii < num_inodes super);
-  let s = deBlock (load_block (ii2bi ii)) in
-  let off = ii2off ii in
-  let len = idata_size in
-  let s = substr s off len in
-  import_inode s)
+  if deII ii >= num_inodes super
+  then (error "no such inode"; None)
+  else
+    let s = deBlock (load_block (ii2bi ii)) in
+    let off = ii2off ii in
+    let len = idata_size in
+    let s = substr s off len in
+    import_inode s)
 
 (* fsck: discover/compute the free block and free inode info *)
 let fsck : unit -> fs option =
@@ -599,13 +601,6 @@ let storeI : super -> ii -> inode option -> unit =
   store_block (ii2bi ii) (Block s))
 
 let mounted : fs option ref = ref None
-
-let error mes = put_string ("Error: " ^ mes ^ "\n")
-
-let mes_no_filesystem_mounted = "no filesystem mounted; try mount"
-let mes_inode_index_not_allocated = "inode is not allocated (no such file)"
-let mes_no_blocks_available = "no blocks available (disk is full)"
-let mes_no_inodes_available = "no inodes available (too many files)"
 
 let sys_creat : unit -> ii option =
   fun () ->
@@ -855,18 +850,19 @@ let command_debug () =
      match fs with
      | FS (super,iis,bis) ->
         put_string "Filesystem found:\n";
-        put_string ("- super: " ^ show_super super ^ "\n");
-        put_string ("- free blocks = " ^ concat "," (map show_bi bis) ^ "\n");
-        put_string ("- free inodes = " ^ concat "," (map show_ii iis) ^ "\n");
-        put_string "- inodes:\n";
-        let super = super_of_fs fs in
-        let n = num_inodes super in
-        let pr i =
-          let ii = II i in
-          let opt = loadI super ii in
-          if is_some opt then put_string ("- " ^ show_ii ii ^ " : " ^ showI opt ^ "\n") else ()
-        in
-        iter pr (upto 0 (n-1))
+        put_string ("- superblock: " ^ show_super super ^ "\n");
+        put_string ("- #free-blocks = " ^ sofi (length bis) ^ "\n");
+        put_string ("- #free-inodes = " ^ sofi (length iis) ^ "\n")
+
+(* stat: Display internal information about an inode. *)
+let command_stat i =
+  match !mounted with
+  | None -> error mes_no_filesystem_mounted
+  | Some fs ->
+     let super = super_of_fs fs in
+     let ii = II i in
+     let opt = loadI super ii in
+     put_string (show_ii ii ^ " : " ^ showI opt ^ "\n")
 
 (* list: List all file/sizes of a mounted filesystem. *)
 let command_list () =
@@ -952,37 +948,41 @@ let command_cat i =
 
 let help_lines =
 [ "dump      : Display the raw data on disk."
-; "wipe      : Wipe disk; fill it with commas."
+; "sector I  : Display the raw data in disk sector I."
 ; "format    : Prepare disk with an empty filesystem; trashing existing contents."
 ; "mount     : Discover an existing filesystem; allow files to be accessed."
 ; "unmount   : Unmount the existing filesystem; required before format."
 ; "debug     : Display internal information about a mounted filesystem."
 ; "ls        : List all files together with their sizes."
-; "cat F     : Display the contents of file F."
-; "rm F      : Remove file F; returning resources for reuse."
+; "stat I    : Display internal information about inode(file) I."
+; "cat I     : Display the contents of file I."
+; "rm I      : Remove file F; returning resources for reuse."
 ; "create    : Create new file; lines read from input."
-; "append F  : Append to existing file F; lines read from input."
-; "splat F N : Overwrite existing file F from offset N; lines read from input."
+; "append I  : Append to existing file I; lines read from input."
+; "splat I N : Overwrite existing file I from offset N; lines read from input."
+; "wipe      : Wipe disk; fill it with commas."
 ]
 
 let command_help () =
-  iter put_string_newline help_lines
+  iter put_string_nl help_lines
 
 let the_command_map : cmap =
   Cmap
     [ mk_com0 "help" command_help
     ; mk_com0 "dump" command_dump_disk
-    ; mk_com0 "wipe" command_wipe_disk
+    ; mk_comI "sector" read_sector_show
     ; mk_com0 "format" command_format
     ; mk_com0 "mount" command_mount
     ; mk_com0 "unmount" command_unmount
     ; mk_com0 "debug" command_debug
     ; mk_com0 "ls" command_list
+    ; mk_comI "stat" command_stat
     ; mk_comI "cat" command_cat
     ; mk_comI "rm" command_remove
     ; mk_com0 "create" command_create
     ; mk_comI "append" command_append
     ; mk_comII "splat" command_overwrite
+    ; mk_com0 "wipe" command_wipe_disk
     (* TODO: trunc *)
     ]
 
@@ -1008,8 +1008,25 @@ let rec repl i =
     let () = execute line in
     repl (i+1)
 
+let auto_mount() = (* useful during development *)
+  command_mount();
+  command_format();
+  command_mount();
+  command_debug()
+
+let print_size_info() =
+  put_string_nl ("- sector_size: " ^ sofi sector_size);
+  put_string_nl ("- #sectors_on_disk: " ^ sofi num_sectors_on_disk);
+  put_string_nl ("- addressable disk: " ^ sofi (num_sectors_on_disk * sector_size));
+  put_string_nl ("- block_size: " ^ sofi block_size);
+  put_string_nl ("- #blocks_on_disk: " ^ sofi num_blocks_on_disk);
+  put_string_nl ("- max_file_size (6 blocks): " ^ sofi max_file_size);
+  ()
+
 let main () =
   let coms = cmap_keys the_command_map in
-  put_string "Filesystem explorer\n";
+  put_string_nl "Filesystem explorer";
+  let _no () = print_size_info() in
   put_string ("Try: " ^ concat " " coms ^ "\n");
+  let _no () = auto_mount() in
   repl 1
