@@ -305,8 +305,8 @@ let read_line = noinline (fun () ->
 (* disk sectors *)
 
 let sector_size = 512
-let num_sectors_on_disk = 3 (* 31 is max here; if 32 we get 8*32=256 blocks, which is too big for a #blocks char in super block info *)
-let block_size = 64 (* blocks; the smallest unit of access for file-data *)
+let num_sectors_on_disk = 10 (* 31 is max here; if 32 we get 8*32=256 blocks, which is too big for a #blocks char in super block info *)
+let block_size = 128 (* blocks; the smallest unit of access for file-data *)
 
 let blocks_per_sector = sector_size / block_size
 let num_blocks_on_disk = blocks_per_sector * num_sectors_on_disk
@@ -1008,11 +1008,11 @@ let rec repl i =
     let () = execute line in
     repl (i+1)
 
-let auto_mount() = (* useful during development *)
+(*let auto_mount() = (* useful during development *)
   command_mount();
   command_format();
   command_mount();
-  command_debug()
+  command_debug()*)
 
 let print_size_info() =
   put_string_nl ("- sector_size: " ^ sofi sector_size);
@@ -1026,7 +1026,6 @@ let print_size_info() =
 let main () =
   let coms = cmap_keys the_command_map in
   put_string_nl "Filesystem explorer";
-  let _no () = print_size_info() in
+  print_size_info();
   put_string ("Try: " ^ concat " " coms ^ "\n");
-  let _no () = auto_mount() in
   repl 1

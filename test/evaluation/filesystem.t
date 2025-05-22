@@ -1,6 +1,12 @@
 Using ocaml for the big filesystem test. Haskell emulators are too slow.
   $ cat ../inputs/filesystem.input | ../../ocaml/main.exe Filesystem
   Filesystem explorer
+  - sector_size: 512
+  - #sectors_on_disk: 10
+  - addressable disk: 5120
+  - block_size: 128
+  - #blocks_on_disk: 40
+  - max_file_size (6 blocks): 768
   Try: help dump sector format mount unmount debug ls stat cat rm create append splat wipe
   1> wipe
   2> format
@@ -66,9 +72,9 @@ Using ocaml for the big filesystem test. Haskell emulators are too slow.
   file 3 : 9
   28> debug
   Filesystem found:
-  - superblock: #blocks=24, #admin-blocks=1+3, #inodes=24
-  - #free-blocks = 16
-  - #free-inodes = 20
+  - superblock: #blocks=40, #admin-blocks=1+5, #inodes=80
+  - #free-blocks = 31
+  - #free-inodes = 76
   29> cat 0
   Hello world!
   30> rm 0
@@ -87,32 +93,7 @@ Using ocaml for the big filesystem test. Haskell emulators are too slow.
   file 3 : 9
   35> debug
   Filesystem found:
-  - superblock: #blocks=24, #admin-blocks=1+3, #inodes=24
-  - #free-blocks = 16
-  - #free-inodes = 21
-  36> dump
-  BARE^X^C^X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ^@^@^D,,,,,\8a^@^E^G^D,,,^A^@,,,,,,\n^@^F,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,
-  ^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,
-  ^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,^@^@,,,,,,
-  n twenty\nld!\n,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  zero one two three four\nfive six seven eight nine ten eleven twe
-  Goodbye.\n,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  lve thirteen\nfourteen fifteen sixteen seventeen eighteen ninetee
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  37> [EOF]
+  - superblock: #blocks=40, #admin-blocks=1+5, #inodes=80
+  - #free-blocks = 31
+  - #free-inodes = 77
+  36> [EOF]

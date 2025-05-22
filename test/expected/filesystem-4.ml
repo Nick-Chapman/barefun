@@ -620,9 +620,9 @@ let g81 = "]" in
 let g83 = fun arg k ->
   let t1 = [arg], fun [f1] arg k ->
     let k = [arg], fun [f2] arg ->
-      let t1 = PRIM_DivInt(arg,8) in
-      let t2 = PRIM_ModInt(arg,8) in
-      let t3 = PRIM_MulInt(64,t2) in
+      let t1 = PRIM_DivInt(arg,4) in
+      let t2 = PRIM_ModInt(arg,4) in
+      let t3 = PRIM_MulInt(128,t2) in
       let k = [t1,t3], fun [f2,f3] arg ->
         let t1 = PRIM_MakeBytes(512) in
         let t2 = PRIM_LoadSec(f2,t1) in
@@ -642,19 +642,19 @@ let g83 = fun arg k ->
   k t1 in
 let g84 = fun arg k ->
   let k = [], fun [] arg ->
-    let t1 = PRIM_DivInt(arg,8) in
-    let t2 = PRIM_DivInt(arg,8) in
+    let t1 = PRIM_DivInt(arg,4) in
+    let t2 = PRIM_DivInt(arg,4) in
     let t3 = PRIM_MakeBytes(512) in
     let t4 = PRIM_LoadSec(t2,t3) in
     let t5 = PRIM_FreezeBytes(t3) in
-    let t6 = PRIM_ModInt(arg,8) in
-    let t7 = PRIM_MulInt(64,t6) in
+    let t6 = PRIM_ModInt(arg,4) in
+    let t7 = PRIM_MulInt(128,t6) in
     let k = [t7], fun [f2] arg ->
       let k = [], fun [] arg ->
         let k = [], fun [] arg ->
           let t1 = Block0[arg] in
           k t1 in
-        arg 64 k in
+        arg 128 k in
       arg f2 k in
     g68 t5 k in
   match arg with
@@ -717,13 +717,13 @@ let g97 = fun arg k ->
             g26 g89 k
           | false0 ->
             let k = [f2], fun [f2] arg ->
-              let t1 = PRIM_DivInt(arg,8) in
+              let t1 = PRIM_DivInt(arg,16) in
               let t2 = PRIM_AddInt(t1,1) in
               let t3 = BI0[t2] in
               let k = [f2], fun [f2] arg ->
                 let k = [f2], fun [f2] arg ->
                   let k = [arg], fun [f2] arg ->
-                    let t1 = PRIM_ModInt(arg,8) in
+                    let t1 = PRIM_ModInt(arg,16) in
                     let t2 = PRIM_MulInt(t1,8) in
                     let k = [t2], fun [f2] arg ->
                       let k = [], fun [] arg ->
@@ -765,14 +765,14 @@ let g97 = fun arg k ->
                                 | true1 -> k 0
                                 | false0 ->
                                   let t5 = PRIM_SubInt(t3,1) in
-                                  let t6 = PRIM_DivInt(t5,64) in
+                                  let t6 = PRIM_DivInt(t5,128) in
                                   let t7 = PRIM_AddInt(1,t6) in
                                   k t7 in
                           match t3 with
                           | Pair0(t4,t5) ->
                             let t6 = PRIM_CharOrd(t5) in
                             let t7 = PRIM_CharOrd(t4) in
-                            let t8 = PRIM_LessInt(1,t6) in
+                            let t8 = PRIM_LessInt(3,t6) in
                             match t8 with
                             | true1 -> k g93
                             | false0 ->
@@ -1118,9 +1118,9 @@ let g161 = fun arg k ->
       g20 g162 k
     | false0 ->
       let t3 = PRIM_StringLength(arg) in
-      let t4 = PRIM_LessInt(64,t3) in
+      let t4 = PRIM_LessInt(128,t3) in
       let k = [f1,arg,t3], fun [f2,f3,f4] arg ->
-        let t1 = PRIM_LessInt(64,f4) in
+        let t1 = PRIM_LessInt(128,f4) in
         let k = [f2,arg], fun [f2,f3] arg ->
           let t1 = Cons1[f3,f2] in
           let k = [arg], fun [f2] arg -> arg f2 k in
@@ -1129,15 +1129,15 @@ let g161 = fun arg k ->
         | true1 ->
           let k = [f4], fun [f2] arg ->
             let k = [f2], fun [f2] arg ->
-              let t1 = PRIM_SubInt(f2,64) in
+              let t1 = PRIM_SubInt(f2,128) in
               arg t1 k in
-            arg 64 k in
+            arg 128 k in
           g68 f3 k
         | false0 -> k g163 in
       match t4 with
       | true1 ->
         let k = [], fun [] arg ->
-          let k = [], fun [] arg -> arg 64 k in
+          let k = [], fun [] arg -> arg 128 k in
           arg 0 k in
         g68 arg k
       | false0 -> k arg in
@@ -1203,7 +1203,7 @@ let g214 = Unit0 in
 let g215 = "\\n" in
 let g216 = Unit0 in
 let g208 = fun arg k ->
-  let t1 = PRIM_LessInt(arg,3) in
+  let t1 = PRIM_LessInt(arg,10) in
   let k = [arg], fun [f2] arg ->
     match arg with
     | true1 -> k g211
@@ -1221,7 +1221,7 @@ let g208 = fun arg k ->
             let t2 = PRIM_EqChar(t1,'\n') in
             let k = [f3,f4], fun [f2,f3] arg ->
               let t1 = PRIM_AddInt(f2,1) in
-              let t2 = PRIM_ModInt(t1,64) in
+              let t2 = PRIM_ModInt(t1,128) in
               let t3 = PRIM_EqInt(t2,0) in
               let k = [f2,f3], fun [f2,f3] arg ->
                 let t1 = PRIM_AddInt(f2,1) in
@@ -1292,7 +1292,7 @@ let g224 = fun arg k ->
         let t2 = PRIM_EqChar(t1,'\n') in
         let k = [f3,f4], fun [f2,f3] arg ->
           let t1 = PRIM_AddInt(f2,1) in
-          let t2 = PRIM_ModInt(t1,64) in
+          let t2 = PRIM_ModInt(t1,128) in
           let t3 = PRIM_EqInt(t2,0) in
           let k = [f2,f3], fun [f2,f3] arg ->
             let t1 = PRIM_AddInt(f2,1) in
@@ -1501,7 +1501,7 @@ let g349 = fun arg k ->
   let k = [t1], fun [f2] arg ->
     let t1 = PRIM_FreezeBytes(f2) in
     let t2 = [t1], fun [f1] me arg k ->
-      let t1 = PRIM_LessInt(arg,3) in
+      let t1 = PRIM_LessInt(arg,10) in
       let k = [f1,arg,me], fun [f2,f3,f4] arg ->
         match arg with
         | true1 -> k g348
@@ -1527,9 +1527,15 @@ let g359 = "Error: " in
 let g360 = "\n" in
 let g361 = Nil0 in
 let g362 = "Filesystem explorer" in
-let g363 = "Try: " in
-let g364 = " " in
-let g365 = "\n" in
+let g363 = "- sector_size: " in
+let g364 = "- #sectors_on_disk: " in
+let g365 = "- addressable disk: " in
+let g366 = "- block_size: " in
+let g367 = "- #blocks_on_disk: " in
+let g368 = "- max_file_size (6 blocks): " in
+let g369 = "Try: " in
+let g370 = " " in
+let g371 = "\n" in
 let t1 = PRIM_MakeRef(g43) in
 let t2 = [t1], fun [f1] arg k ->
   let t1 = PRIM_DeRef(f1) in
@@ -1555,14 +1561,14 @@ let k = [], fun [] arg ->
       let t1 = [f1], fun [f1] arg k ->
         let t1 = [f1,arg], fun [f1,f2] arg k ->
           let k = [f1,f2,arg], fun [f2,f3,f4] arg ->
-            let t1 = PRIM_DivInt(arg,8) in
+            let t1 = PRIM_DivInt(arg,16) in
             let t2 = PRIM_AddInt(t1,1) in
             let t3 = BI0[t2] in
             let k = [f2,f3,f4], fun [f2,f3,f4] arg ->
               let k = [f2,f3,f4], fun [f2,f3,f4] arg ->
                 let k = [f3,arg], fun [f2,f3] arg ->
                   let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
-                    let t1 = PRIM_ModInt(arg,8) in
+                    let t1 = PRIM_ModInt(arg,16) in
                     let t2 = PRIM_MulInt(t1,8) in
                     let t3 = PRIM_ThawBytes(f3) in
                     let k = [f2,f4,t2,t3], fun [f2,f3,f4,f5] arg ->
@@ -1570,7 +1576,7 @@ let k = [], fun [] arg ->
                         let k = [f2,f4], fun [f2,f3] arg ->
                           let t1 = PRIM_FreezeBytes(f3) in
                           let k = [t1], fun [f2] arg ->
-                            let t1 = PRIM_DivInt(arg,8) in
+                            let t1 = PRIM_DivInt(arg,16) in
                             let t2 = PRIM_AddInt(t1,1) in
                             let t3 = BI0[t2] in
                             let k = [f2], fun [f2] arg ->
@@ -1753,8 +1759,8 @@ let k = [], fun [] arg ->
                                   k t1 in
                                 k t1 in
                               k t1 in
-                            let t2 = PRIM_ModInt(f5,64) in
-                            let t3 = PRIM_SubInt(64,t2) in
+                            let t2 = PRIM_ModInt(f5,128) in
+                            let t3 = PRIM_SubInt(128,t2) in
                             let t4 = PRIM_StringLength(f6) in
                             let t5 = PRIM_EqInt(t4,0) in
                             let k = [f5,f7,f9,t1], fun [f2,f3,f4,f5] arg ->
@@ -1768,7 +1774,7 @@ let k = [], fun [] arg ->
                                         let k = [f1,f3,f7,arg], fun [f2,f3,f4,f5] arg ->
                                           let k = [f2,f3,f5], fun [f2,f3,f4] arg ->
                                             let k = [f2,f3], fun [f2,f3] arg ->
-                                              let t1 = PRIM_ModInt(f2,64) in
+                                              let t1 = PRIM_ModInt(f2,128) in
                                               let k = [f3], fun [f2] arg -> arg f2 k in
                                               arg t1 k in
                                             arg f4 k in
@@ -1802,9 +1808,9 @@ let k = [], fun [] arg ->
                                             | Some1(t1) ->
                                               match t1 with
                                               | Pair0(t2,t3) ->
-                                                let t4 = PRIM_MakeBytes(64) in
+                                                let t4 = PRIM_MakeBytes(128) in
                                                 let t5 = [t4], fun [f1] me arg k ->
-                                                  let t1 = PRIM_LessInt(arg,64) in
+                                                  let t1 = PRIM_LessInt(arg,128) in
                                                   let k = [f1,arg,me], fun [f2,f3,f4] arg ->
                                                     match arg with
                                                     | true1 -> k g171
@@ -1844,7 +1850,7 @@ let k = [], fun [] arg ->
                                   k t1 in
                                 k t1 in
                               let k = [f2,f3,t1], fun [f2,f3,f4] arg ->
-                                let t1 = PRIM_DivInt(f2,64) in
+                                let t1 = PRIM_DivInt(f2,128) in
                                 let k = [f3,arg], fun [f2,f3] arg ->
                                   let k = [f3], fun [f2] arg ->
                                     let k = [f2], fun [f2] arg -> arg f2 k in
@@ -1937,15 +1943,15 @@ let k = [], fun [] arg ->
                       let t2 = BI0[0] in
                       let k = [f1], fun [f2] arg ->
                         let k = [f2,arg], fun [f2,f3] arg ->
-                          let t1 = Cons1['\CAN',g230] in
-                          let t2 = Cons1['\ETX',t1] in
-                          let t3 = Cons1['\CAN',t2] in
+                          let t1 = Cons1['P',g230] in
+                          let t2 = Cons1['\ENQ',t1] in
+                          let t3 = Cons1['(',t2] in
                           let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
                             let k = [f2,f3], fun [f2,f3] arg ->
                               let t1 = Block0[arg] in
                               let k = [f2], fun [f2] arg ->
                                 let t1 = [f2], fun [f1] arg k ->
-                                  let t1 = Super0[24,3,24] in
+                                  let t1 = Super0[40,5,80] in
                                   let k = [arg], fun [f2] arg ->
                                     let t1 = II0[f2] in
                                     let k = [], fun [] arg -> arg g231 k in
@@ -1954,7 +1960,7 @@ let k = [], fun [] arg ->
                                 let k = [], fun [] arg ->
                                   let k = [arg], fun [f2] arg ->
                                     let k = [f2], fun [f2] arg -> f2 arg k in
-                                    arg 23 k in
+                                    arg 79 k in
                                   g9 0 k in
                                 g7 t1 k in
                               f3 t1 k in
@@ -2349,7 +2355,7 @@ let k = [], fun [] arg ->
                                       let k = [f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13], fun [f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13] arg ->
                                         let k = [f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,arg], fun [f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14] arg ->
                                           let t1 = [f4], fun [f1] arg k ->
-                                            let t1 = PRIM_MakeBytes(64) in
+                                            let t1 = PRIM_MakeBytes(128) in
                                             let t2 = [f1,arg,t1], fun [f1,f2,f3] me arg k ->
                                               let t1 = PRIM_DeRef(f1) in
                                               let k = [f3,arg,me], fun [f2,f3,f4] arg ->
@@ -2358,7 +2364,7 @@ let k = [], fun [] arg ->
                                                 | true1 -> k g302
                                                 | false0 ->
                                                   let t2 = PRIM_FreezeBytes(f2) in
-                                                  let t3 = PRIM_EqInt(arg,64) in
+                                                  let t3 = PRIM_EqInt(arg,128) in
                                                   let k = [f3,f4,arg], fun [f2,f3,f4] arg ->
                                                     let t1 = PRIM_AddInt(f2,f4) in
                                                     f3 t1 k in
@@ -2420,21 +2426,21 @@ let k = [], fun [] arg ->
                                                                   match f3 with
                                                                   | Nil0 -> k 0
                                                                   | Cons1(t1,t2) ->
-                                                                    let t3 = PRIM_LessInt(f6,64) in
+                                                                    let t3 = PRIM_LessInt(f6,128) in
                                                                     let k = [f2,f4,f5,f6,t1,t2], fun [f2,f3,f4,f5,f6,f7] arg ->
                                                                       match arg with
                                                                       | true1 ->
                                                                         let k = [f4,f5], fun [f2,f3] arg ->
                                                                           let k = [f3], fun [f2] arg ->
-                                                                            let t1 = PRIM_SubInt(f2,64) in
+                                                                            let t1 = PRIM_SubInt(f2,128) in
                                                                             arg t1 k in
                                                                           arg f2 k in
                                                                         f3 f7 k
                                                                       | false0 ->
-                                                                        let t1 = PRIM_SubInt(64,f5) in
+                                                                        let t1 = PRIM_SubInt(128,f5) in
                                                                         let t2 = PRIM_LessInt(t1,f4) in
                                                                         let k = [f2,f5,f6], fun [f2,f3,f4] arg ->
-                                                                          let t1 = PRIM_LessInt(64,arg) in
+                                                                          let t1 = PRIM_LessInt(128,arg) in
                                                                           let k = [f2,f3,f4], fun [f2,f3,f4] arg ->
                                                                             let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
                                                                               let k = [f2,f3,f4], fun [f2,f3,f4] arg ->
@@ -2454,7 +2460,7 @@ let k = [], fun [] arg ->
                                                                               | Block0(t1) -> k t1 in
                                                                             g84 f4 k in
                                                                           match t1 with
-                                                                          | true1 -> k 64
+                                                                          | true1 -> k 128
                                                                           | false0 -> k arg in
                                                                         match t2 with
                                                                         | true1 -> k t1
@@ -2832,19 +2838,85 @@ let k = [], fun [] arg ->
                                                                           let t1 = PRIM_PutChar('\n') in
                                                                           let k = [f2,f3], fun [f2,f3] arg ->
                                                                             let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
-                                                                              let k = [f2,f4], fun [f2,f3] arg ->
+                                                                              let k = [f2,f3], fun [f2,f3] arg ->
                                                                                 let k = [f2,f3], fun [f2,f3] arg ->
                                                                                   let k = [f2,f3], fun [f2,f3] arg ->
-                                                                                    let k = [f2], fun [f2] arg ->
-                                                                                      let k = [f2], fun [f2] arg ->
-                                                                                        let k = [f2], fun [f2] arg -> f2 1 k in
-                                                                                        g41 arg k in
-                                                                                      g22 arg k in
-                                                                                    f3 arg k in
-                                                                                  arg g365 k in
-                                                                                g26 arg k in
-                                                                              arg f3 k in
-                                                                            g61 g364 k in
+                                                                                    let t1 = PRIM_PutChar('\n') in
+                                                                                    let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                      let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
+                                                                                        let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                          let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                            let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                              let t1 = PRIM_PutChar('\n') in
+                                                                                              let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
+                                                                                                  let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                    let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                      let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                        let t1 = PRIM_PutChar('\n') in
+                                                                                                        let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                          let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
+                                                                                                            let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                              let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                  let t1 = PRIM_PutChar('\n') in
+                                                                                                                  let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                    let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
+                                                                                                                      let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                        let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                          let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                            let t1 = PRIM_PutChar('\n') in
+                                                                                                                            let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                              let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
+                                                                                                                                let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                                  let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                                    let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                                      let t1 = PRIM_PutChar('\n') in
+                                                                                                                                      let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                                        let k = [f2,f3,arg], fun [f2,f3,f4] arg ->
+                                                                                                                                          let k = [f2,f4], fun [f2,f3] arg ->
+                                                                                                                                            let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                                              let k = [f2,f3], fun [f2,f3] arg ->
+                                                                                                                                                let k = [f2], fun [f2] arg ->
+                                                                                                                                                  let k = [f2], fun [f2] arg ->
+                                                                                                                                                    let k = [f2], fun [f2] arg -> f2 1 k in
+                                                                                                                                                    g41 arg k in
+                                                                                                                                                  g22 arg k in
+                                                                                                                                                f3 arg k in
+                                                                                                                                              arg g371 k in
+                                                                                                                                            g26 arg k in
+                                                                                                                                          arg f3 k in
+                                                                                                                                        g61 g370 k in
+                                                                                                                                      g26 g369 k in
+                                                                                                                                    g41 arg k in
+                                                                                                                                  g22 arg k in
+                                                                                                                                f4 arg k in
+                                                                                                                              g31 768 k in
+                                                                                                                            g26 g368 k in
+                                                                                                                          g41 arg k in
+                                                                                                                        g22 arg k in
+                                                                                                                      f4 arg k in
+                                                                                                                    g31 40 k in
+                                                                                                                  g26 g367 k in
+                                                                                                                g41 arg k in
+                                                                                                              g22 arg k in
+                                                                                                            f4 arg k in
+                                                                                                          g31 128 k in
+                                                                                                        g26 g366 k in
+                                                                                                      g41 arg k in
+                                                                                                    g22 arg k in
+                                                                                                  f4 arg k in
+                                                                                                g31 5120 k in
+                                                                                              g26 g365 k in
+                                                                                            g41 arg k in
+                                                                                          g22 arg k in
+                                                                                        f4 arg k in
+                                                                                      g31 10 k in
+                                                                                    g26 g364 k in
+                                                                                  g41 arg k in
+                                                                                g22 arg k in
+                                                                              f4 arg k in
+                                                                            g31 512 k in
                                                                           g26 g363 k in
                                                                         g41 arg k in
                                                                       g22 g362 k in

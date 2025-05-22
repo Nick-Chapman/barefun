@@ -169,7 +169,7 @@ writeSector i s = do
 
 sectorSize,numSectors :: Int
 sectorSize = 512
-numSectors = 3
+numSectors = 32
 
 withSectorSeek :: Number -> (Fd -> IO a) -> IO a
 withSectorSeek i f = do

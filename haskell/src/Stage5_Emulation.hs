@@ -24,7 +24,7 @@ gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
 gcAtEverySafePoint = False -- but slows "dune test" from 4.4s to 8.8s
 
 hemiSizeInBytes :: Int
-hemiSizeInBytes = 5000 -- 3000 was ok for sham; 5000 is needed for filesystem example
+hemiSizeInBytes = 10000 -- 3000 was ok for sham; 5000 is needed for filesystem example
 
 sizeRedzone :: Int -- interrupts in runtime.asm
 sizeRedzone = 100
