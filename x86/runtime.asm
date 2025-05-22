@@ -583,33 +583,46 @@ Bare_set_bytes:
     mov byte [bx], dl
     ret
 
-;;; ax: The sector number (0/1/2)
+;;; ax: The sector number
 ;;; bx: The bytes buffer to load into
 Bare_load_sector:
-    add ax, 5               ; index three embedded sectors at 5/6/7 by 0/1/2
-    mov cl, al
-    mov dl, [drive_number]
-    mov ah, 0x02            ; Function: Read Sectors From Drive
-    mov ch, 0               ; cylinder
-    mov dh, 0               ; head
-    mov al, 1               ; sector count
-    add bx, 2               ; dest buffer; skip length word
-    int 0x13
-    ret
+    mov dx, ax
+    mov ah, 0x42
+    jmp load_or_store_sector
 
-;;; ax: The sector number (0/1/2)
+;;; ax: The sector number
 ;;; bx: The bytes buffer to store from
 Bare_store_sector:
-    add ax, 5               ; index three embedded sectors at 5/6/7 by 0/1/2
-    mov cl, al
+    mov dx, ax
+    mov ah, 0x43
+    jmp load_or_store_sector
+
+;;; ah: 0x42(load) or 0x43(store)
+;;; dx: The sector number
+;;; bx: The bytes buffer to store from
+load_or_store_sector:
+    add dx, embedded_sector_offset
+    add bx, 2 ; dest buffer; skip length word
+    mov [dap.LBA_start_lo], dx
+    mov [dap.transfer_buffer], bx
+    push si
+    mov si, dap
     mov dl, [drive_number]
-    mov ah, 0x03            ; Function: Write Sectors To Drive
-    mov ch, 0               ; cylinder
-    mov dh, 0               ; head
-    mov al, 1               ; sector count
-    add bx, 2               ; src buffer; skip 2 for the length word
     int 0x13
+    pop si
     ret
+dap:
+.packet_size db 16
+.always_zero db 0
+.number_of_sectors dw 1
+.transfer_buffer dw 0,0
+.LBA_start_lo dw 0,0
+.LBA_start_hi dw 0,0
+%assign DapSize ($ - dap)
+%if DapSize != 16
+%error Expected Dap size of 16, but got DapSize
+%endif
+
 
 Bare_unit:
     dw 1 ; doesn't matter what is here. nothing should look at this
@@ -741,6 +754,8 @@ set_pit_freq:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (9) Space for three embedded sectors; used by filesystem example
+
+embedded_sector_offset equ 4 ; TODO: compute this?
 
     align 512
     incbin "disk.image"
