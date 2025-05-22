@@ -148,6 +148,8 @@ let put_string = (fun s -> put_chars (explode s))
 
 let newline () = put_char '\n'
 
+let put_string_newline s  = put_string s; newline ()
+
 (* trace *)
 
 let trace_on = ref false
@@ -880,7 +882,7 @@ let command_list () =
           match loadI super ii with
           | None -> ()
           | Some inode ->
-             put_string ("file#" ^ sofi (deII ii) ^ " : " ^ sofi (size_of_inode inode) ^ "\n")
+             put_string ("file " ^ sofi (deII ii) ^ " : " ^ sofi (size_of_inode inode) ^ "\n")
         in
         iter pr (upto 0 (n-1))
 
@@ -897,13 +899,13 @@ let command_create () =
   match sys_creat() with
   | None -> () (* no inodes; we already wrote an error *)
   | Some ii ->
-     put_string ("Creating file#" ^ sofi (deII ii) ^ "; (to finish type ^D)\n");
+     put_string ("Creating file " ^ sofi (deII ii) ^ "; (to finish type ^D)\n");
      write_to_file ii 0
 
 (* append: Append to an existing file (selected by indexed) in a mounted filesystem. *)
 let command_append i =
   let ii = II i in
-  put_string ("Appending to file#" ^ sofi (deII ii) ^ "; (to finish type ^D)\n");
+  put_string ("Appending to file " ^ sofi (deII ii) ^ "; (to finish type ^D)\n");
   match sys_get_inode ii with
   | None -> ()
   | Some inode -> write_to_file ii (size_of_inode inode)
@@ -911,7 +913,7 @@ let command_append i =
 (* overwrite: Overwrite an existing file at a given offset (selected by indexed) in a mounted filesystem. *)
 let command_overwrite i offset =
   let ii = II i in
-  put_string ("Overwriting file#" ^ sofi (deII ii) ^ " from offset " ^ sofi offset ^ "; (to finish type ^D)\n");
+  put_string ("Overwriting file " ^ sofi (deII ii) ^ " from offset " ^ sofi offset ^ "; (to finish type ^D)\n");
   write_to_file ii offset
 
 (* remove: Remove a file (selected by index) from a mounted filesystem; returning resources for reuse. *)
@@ -948,20 +950,39 @@ let command_cat i =
   in
   loop 0
 
+let help_lines =
+[ "dump      : Display the raw data on disk."
+; "wipe      : Wipe disk; fill it with commas."
+; "format    : Prepare disk with an empty filesystem; trashing existing contents."
+; "mount     : Discover an existing filesystem; allow files to be accessed."
+; "unmount   : Unmount the existing filesystem; required before format."
+; "debug     : Display internal information about a mounted filesystem."
+; "ls        : List all files together with their sizes."
+; "cat F     : Display the contents of file F."
+; "rm F      : Remove file F; returning resources for reuse."
+; "create    : Create new file; lines read from input."
+; "append F  : Append to existing file F; lines read from input."
+; "splat F N : Overwrite existing file F from offset N; lines read from input."
+]
+
+let command_help () =
+  iter put_string_newline help_lines
+
 let the_command_map : cmap =
   Cmap
-    [ mk_com0 "wipe" command_wipe_disk
+    [ mk_com0 "help" command_help
     ; mk_com0 "dump" command_dump_disk
+    ; mk_com0 "wipe" command_wipe_disk
     ; mk_com0 "format" command_format
     ; mk_com0 "mount" command_mount
     ; mk_com0 "unmount" command_unmount
     ; mk_com0 "debug" command_debug
     ; mk_com0 "ls" command_list
+    ; mk_comI "cat" command_cat
+    ; mk_comI "rm" command_remove
     ; mk_com0 "create" command_create
     ; mk_comI "append" command_append
     ; mk_comII "splat" command_overwrite
-    ; mk_comI "rm" command_remove
-    ; mk_comI "cat" command_cat
     (* TODO: trunc *)
     ]
 
@@ -990,5 +1011,5 @@ let rec repl i =
 let main () =
   let coms = cmap_keys the_command_map in
   put_string "Filesystem explorer\n";
-  put_string ("Commands: " ^ concat " " coms ^ "\n");
+  put_string ("Try: " ^ concat " " coms ^ "\n");
   repl 1

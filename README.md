@@ -80,19 +80,19 @@ qemu-system-i386 filesystem.image
 Interact with the filesystem explorer:
 ```
 Filesystem explorer
-Commands: wipe dump format mount unmount debug ls create append splat rm cat
+Try: help dump wipe format mount unmount debug ls cat rm create append splat
 1> mount
 2> ls
-file#0 : 75
-file#1 : 112
-file#2 : 131
-file#3 : 145
-file#4 : 95
+file 0 : 75
+file 1 : 112
+file 2 : 131
+file 3 : 145
+file 4 : 95
 3> cat 0
 Here are some poems and aphorisms.
 Please add some more if there is space.
 4> create
-Creating file#5; (to finish type ^D)
+Creating file 5; (to finish type ^D)
 If it was hard to write it should be hard to understand.
 ^D
 5> cat 5
@@ -105,10 +105,11 @@ exiting
 Restart the filesystem explorer `qemu-system-i386 filesystem.image`; see the file:
 ```
 Filesystem explorer
-Commands: wipe dump format mount unmount debug ls create append splat rm cat
+Try: help dump wipe format mount unmount debug ls cat rm create append splat
 1> mount
 2> cat 5
 If it was hard to write it should be hard to understand.
+3> ^D
 ```
 
 ## More
