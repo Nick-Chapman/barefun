@@ -160,13 +160,13 @@ final_continuation:
 %endmacro
 
 %macro PrintHexAX 0
-    PrintCharLit '<'
+    PrintCharLit '('
     push ax
     mov al, ah
     PrintHexAL
     pop ax
     PrintHexAL
-    PrintCharLit '>'
+    PrintCharLit ')'
 %endmacro
 
 %macro PrintString 1
@@ -263,6 +263,10 @@ gc_num: db 0
     ;PrintCharLit %1 ; uncomment for GC debug
 %endmacro
 
+%macro DebugSeeReg 1
+    ;SeeReg %1 ; uncomment for GC debug
+%endmacro
+
 Bare_enter_check_function:
     pop bx
     mov [tCALLER], bx
@@ -352,7 +356,9 @@ gc_start:
 .inner_loop:
     cmp bx, dx
     jg .bad_inner_loop
+    DebugSeeReg bx
     mov di, [bx] ; descriptor (size in bytes; maybe tagged as raw-data)
+    DebugSeeReg di
     cmp di, 0
     jz .bad_zero_descriptor
     test di, 1
@@ -365,10 +371,11 @@ gc_start:
     PrintString `[bad_zero_descriptor!]\n`
     jmp halt
 .scav_payload:
-    ;Debug '-'
+    Debug '-'
     add bx, bytesPerWord
     shr di, 1
 .scav_word:
+    Debug ','
     mov si, [bx]
     call evacuate
     mov [bx], si
@@ -393,7 +400,11 @@ gc_start:
 .caller:
     dw 0
 
+toobig:
+    Stop `[Bad descriptor]\n`
+
 evacuate: ;; si --> si (uses: bp)
+    Debug 'e'
     pop bp
     mov [.caller], bp
     cmp si, end_of_code
@@ -402,24 +413,39 @@ evacuate: ;; si --> si (uses: bp)
     jnz .done ; odd; tagged-number; so dont evacuate
     mov bp, si ; save base
     mov si, [bp - bytesPerWord] ; si has descriptor/size
+    test si, 0xf000
+    jnz toobig
     cmp si, 0
     jz .use_broken_heart
-    ;Debug '('
+    Debug '('
     and si, 0xfffe ; align to even offset
+
+    DebugSeeReg bp
+    mov ax, [bp - bytesPerWord]
+    DebugSeeReg ax
 .loop:
-    ;Debug 'c'
+    Debug 'c'
     push word [bp + si - bytesPerWord]
     sub si, bytesPerWord
     jnz .loop
+
     mov si, sp ; si is relocation address
-    ;Debug 'c'
+    Debug 'd'
+
+    DebugSeeReg bp
+    mov ax, [bp - bytesPerWord]
+    DebugSeeReg ax
+    test ax, 0xf000
+    jnz toobig
+
     push word [bp - bytesPerWord]
     mov word [bp - bytesPerWord], 0 ; set broken heart
     mov [bp], si ; and relocation address
-    ;Debug ')'
+
+    Debug ')'
     jmp [.caller]
 .use_broken_heart:
-    ;Debug 'h'
+    Debug 'h'
     mov si, [bp] ; access relocation address from broken heart
     jmp [.caller]
 .done:
