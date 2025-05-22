@@ -246,7 +246,7 @@ halt:
 need: dw 0
 
 hemi_size equ 5000 ; match stage5 emulator
-redzone_size equ 100 ; needed for save/restore & also for interrupts. how big should this be?
+redzone_size equ 300 ; needed for save/restore & also for interrupts. how big should this be?
 
 topA equ 0x0000
 botA equ topA - hemi_size
