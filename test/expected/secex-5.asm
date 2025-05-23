@@ -67,7 +67,7 @@ L5: ; Continuation
   jmp [bp]
 
 L6: ; Function: (make_sector,g4)
-  Bare_enter_check(600)
+  Bare_enter_check(532)
   mov ax, 1025
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -410,7 +410,7 @@ L25: ; Continuation
   jmp [bp]
 
 L26: ; Function: (xloop,g5)
-  Bare_enter_check(600)
+  Bare_enter_check(528)
   mov ax, `>`
   call Bare_put_char
   mov ax, Bare_unit
@@ -670,7 +670,7 @@ L41: ; Continuation
   jmp [bp]
 
 L42: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(528)
   mov ax, 1025
   call Bare_make_bytes
   mov [Temps+2], ax

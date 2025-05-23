@@ -116,7 +116,7 @@ L9: ; Continuation
   jmp [bp]
 
 L10: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(532)
   mov ax, si
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -315,7 +315,7 @@ L23: ; Continuation
   jmp [bp]
 
 L24: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(522)
   mov ax, 11
   call Bare_make_bytes
   mov [Temps+2], ax

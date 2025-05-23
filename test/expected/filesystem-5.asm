@@ -752,7 +752,7 @@ L59: ; Continuation
   jmp [bp]
 
 L60: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(532)
   mov ax, si
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -1433,7 +1433,7 @@ L107: ; Continuation
   jmp [bp]
 
 L108: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(532)
   mov ax, si
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -2172,7 +2172,7 @@ L162: ; Continuation
   jmp [bp]
 
 L163: ; Function: (lam,t1)
-  Bare_enter_check(600)
+  Bare_enter_check(536)
   mov ax, si
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -2763,7 +2763,7 @@ L192: ; Continuation
   jmp [bp]
 
 L193: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(530)
   mov ax, 1025
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -2890,7 +2890,7 @@ L199: ; Continuation
   jmp [bp]
 
 L200: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(524)
   mov ax, si
   sar ax, 1
   mov bx, 9
@@ -5395,7 +5395,7 @@ L392: ; Continuation
   jmp [bp]
 
 L393: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(530)
   mov bx, si
   cmp word [bx], 3
   jz L379
@@ -5675,7 +5675,7 @@ L408: ; Function: (loop,t4)
   jmp [bp]
 
 L409: ; Function: (lam,g224)
-  Bare_enter_check(600)
+  Bare_enter_check(522)
   mov ax, 1025
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -5965,7 +5965,7 @@ L430: ; Continuation
   jmp [bp]
 
 L431: ; Function: (lam,g349)
-  Bare_enter_check(600)
+  Bare_enter_check(530)
   mov ax, 1025
   call Bare_make_bytes
   mov [Temps+2], ax
@@ -7462,7 +7462,7 @@ L532: ; Continuation
   jmp [bp]
 
 L533: ; Continuation
-  Bare_enter_check(600)
+  Bare_enter_check(540)
   mov bx, si
   cmp word [bx], 1
   jz L522
@@ -11170,7 +11170,7 @@ L803: ; Function: (loop,t2)
   jmp [bp]
 
 L804: ; Function: (lam,t1)
-  Bare_enter_check(600)
+  Bare_enter_check(526)
   mov ax, 257
   call Bare_make_bytes
   mov [Temps+2], ax

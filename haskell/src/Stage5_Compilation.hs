@@ -499,8 +499,8 @@ runAsm asm = finalImage
         -- We need to budget for the allocation made by Bare_make_bytes.
         -- But there is a snag -- The amount of space needed is dynamic.
         -- One solution is to call this primitive in CPS style & have it do its own GC check.
-        -- For now we hack it with a big number.
-        600 -- TODO: remove this hack for Bare_make_bytes allocation budget
+        -- For now, hack it with the size we need for disk sectors strings of size 512
+        (512+2+2) + after -- TODO: remove this hack for Bare_make_bytes allocation budget
 
       _ -> after
 
