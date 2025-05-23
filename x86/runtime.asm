@@ -557,10 +557,43 @@ Bare_char_to_num:
     EnsureZeroAH `[Bare_char_to_num]]\n`
     ret
 
+
 ;;; in: ax -- number of bytes (as tagged number) for user data
 ;;; out: ax -- new string/bytes object, allocated on the heap (at sp)
 ;;; trashes: bx (temp for return), dx (temp calculation)
-Bare_make_bytes:
+Bare_make_bytes_jump:
+    ;;Stop `[Bare_make_bytes_jump]\n` ;; TODO
+    mov ArgReg, ax
+
+    shr ax, 1 ; untag
+    mov word [need], ax
+    call Bare_enter_check_function
+
+    mov ax, ArgReg
+    mov dx, ArgReg
+
+    shr dx, 1       ; untag, to get number of bytes to..
+    inc dx          ; round up and..
+    and dx, 0xfffe  ; .. align to even
+    sub sp, dx      ; slide stack pointer (allocated space is not uninializaed)
+
+    push ax         ; tagged length word; part of user data
+    mov ax, sp      ; grab result (before pushing the descriptor)
+    add dx, 3       ; add 2 bytes for the length word; +1 to tag as raw data
+    push dx         ; descriptor/size word; part of GC data
+
+    mov ArgReg, ax  ; TODO: just assign directly
+
+    ;; return: (code copied from gen code) -- TODO: can we not do better?
+    mov bp, [CurrentCont]
+    mov ax, [bp+2]
+    mov [CurrentCont], ax
+    jmp [bp]
+
+;;; in: ax -- number of bytes (as tagged number) for user data
+;;; out: ax -- new string/bytes object, allocated on the heap (at sp)
+;;; trashes: bx (temp for return), dx (temp calculation)
+Bare_make_bytes: ;; TODO: kill
     pop bx          ; save return address.
     mov dx, ax
 

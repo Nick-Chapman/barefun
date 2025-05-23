@@ -69,16 +69,20 @@ cutEntryCode name code = do
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return _pos res -> do
-    pure $ doOps
-      [ OpMove argReg (compileRef res)
-      , OpMove frameReg geteCurrentCont
-      , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
-      ] (Done (JumpIndirect frameReg))
+    pure $ doOps [ OpMove argReg (compileRef res)] codeReturn
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps (
       simultaneousMove (frameReg,compileRef fun) (argReg,compileRef arg)
       ) (Done (JumpIndirect frameReg))
+
+  SRC.TailPrim SRC.MakeBytes _pos arg -> do
+    pure $ doOps
+      [ OpMove Ax (compileRef arg) -- TODO: use standard argReg?
+      ] (Done (JumpBare Bare_make_bytes_jump))
+
+  SRC.TailPrim prim _pos _arg ->
+    error (printf "Stage5.compileCode/TailPrim: unexpected primitive: %s" (show prim))
 
   SRC.LetAtomic (id,temp) rhs body -> do
     let who = show (id,temp)
@@ -308,7 +312,7 @@ compileBuiltinTo builtin = case builtin of
     ]
   SRC.MakeBytes -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
-    , OpCall Bare_make_bytes
+    , OpCall Bare_make_bytes -- TODO: deprecated! -- REMOVE
     , setTarget target (SReg Ax)
     ]
   SRC.SetBytes -> \target -> threeArgs $ \s1 s2 s3 ->
@@ -431,9 +435,6 @@ sourceOfTarget = \case
   TTemp t -> STemp t
   TCurrentCont -> SCurrentCont
 
-doOps :: [Op] -> Code -> Code
-doOps ops c = foldr Do c ops
-
 lnumTagging :: Number -> Lit
 lnumTagging n = LNum (2 * n + 1)
 
@@ -495,7 +496,7 @@ runAsm asm = finalImage
       OpPush{} -> 2 + after
       OpBranchFlagZ lab -> max after (needL lab)
 
-      OpCall Bare_make_bytes -> do
+      OpCall Bare_make_bytes -> do -- TODO: this will be removed real soon
         -- We need to budget for the allocation made by Bare_make_bytes.
         -- But there is a snag -- The amount of space needed is dynamic.
         -- One solution is to call this primitive in CPS style & have it do its own GC check.

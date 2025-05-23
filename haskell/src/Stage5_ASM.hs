@@ -4,8 +4,8 @@ module Stage5_ASM
   , Reg(..), frameReg,argReg, geteCurrentCont,setCurrentCont
   , Image(..)
   , Lit(..)
-  , Code(..)
-  , Op(..)
+  , Code(..), codeReturn
+  , Op(..), doOps
   , Jump(..)
   , BlockDescriptor(..), ScanMode(..)
   , Source(..)
@@ -44,6 +44,16 @@ setCurrentCont = \case
 geteCurrentCont :: Source
 geteCurrentCont = SCurrentCont
 
+-- this is the calling convention to "return" to the continuation
+codeReturn :: Code
+codeReturn =
+  doOps [ OpMove frameReg geteCurrentCont
+        , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
+        ] (Done (JumpIndirect frameReg))
+
+doOps :: [Op] -> Code -> Code -- TODO: not really necessary now we have OpMany
+doOps ops c = foldr Do c ops
+
 data Image = Image
   { cmap :: Map CodeLabel Code
   , dmap :: Map DataLabel [DataSpec]
@@ -79,6 +89,7 @@ data Op -- target; source (Intel Syntax style)
 data Jump
   = JumpReg Reg
   | JumpIndirect Reg
+  | JumpBare BareBios -- TODO: make sep type for only one possible
 
 data Target
   = TReg Reg
@@ -124,7 +135,10 @@ data BareBios
   | Bare_make_bool_from_n
   | Bare_num_to_char
   | Bare_char_to_num
-  | Bare_make_bytes
+
+  | Bare_make_bytes -- TODO: remove this
+  | Bare_make_bytes_jump -- TODO: have different types for this
+
   | Bare_set_bytes -- TODO: would be nice to have a declarative spec for arg-passing protocol, which is shared between compiler and emulator. And somehow to be used so runtime.asm is also consistent
   | Bare_get_bytes
   | Bare_load_sector
@@ -182,6 +196,7 @@ instance Show Jump where
   show = \case
     JumpReg r -> "jmp "  ++ show r
     JumpIndirect r -> "jmp ["  ++ show r ++ "]"
+    JumpBare bare -> "jmp " ++ show bare
 
 instance Show Target where
   show = \case

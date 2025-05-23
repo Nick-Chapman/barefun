@@ -5,7 +5,7 @@ module Stage3_ANF
   , compile
   ) where
 
-import Builtin (Builtin,executeBuiltin)
+import Builtin (Builtin(MakeBytes),executeBuiltin)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
@@ -23,11 +23,15 @@ import qualified Stage0_AST as SRC (Literal(..))
 import qualified Stage1_EXP as SRC
 import qualified Value as I (Tickable(..))
 
+enableTailPrim :: Bool
+enableTailPrim = True -- TODO: kill this control once it is working
+
 type Transformed = Code
 
 data Code
   = Return Position Val
   | Tail Val Position Val
+  | TailPrim Builtin Position Val
   | LetAtomic Id Atomic Code
   | PushContinuation Fvs (Id,Code) Code
   | Match Val [Arm]
@@ -70,6 +74,7 @@ pretty :: Code -> Lines
 pretty = \case
   Return _ x -> ["k " ++ show x]
   Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
+  TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ pretty body
   PushContinuation fvs (x,later) first -> indented ("let k " ++ show fvs ++ " " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
   Match scrut arms -> (onHead ("match "++) . onTail (++ " with")) [show scrut] ++ concat (map prettyArm arms)
@@ -113,6 +118,8 @@ evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env = \case
   Return _ v -> \k -> ITick I.Return $ k (evalV v)
   Tail fun pos arg -> \k -> ITick I.Enter $ apply (evalV fun) pos (evalV arg) k
+  TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ do
+    executeBuiltin prim [evalV arg] k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode (insert x v1 env) c2 k
@@ -207,19 +214,30 @@ compileExp = \case
   SRC.ConTag pos tag es -> \k -> do
     compileAsIds es $ \xs ->
       k $ Atomic $ ConTag pos tag xs
-  SRC.Prim pos b es -> \k -> do
-    compileAsIds es $ \xs ->
-      k $ Atomic $ Prim pos b xs
+
+  SRC.Prim pos prim es -> \k -> do
+    case (enableTailPrim,prim,es) of
+      -- A call to MakeBytes cannot be treated as an Atomic, because it
+      -- allocates a statically unknowable amount of memory, and so the
+      -- need-computation in stage 5 is not possible.
+      -- Therefore, we must tail call it (pushing a continuation if necessary)
+      (True,MakeBytes,[e]) -> do
+        compileAsId e $ \x -> do
+          k $ Compound $ TailPrim prim pos x
+      _ ->
+        compileAsIds es $ \xs ->
+        k $ Atomic $ Prim pos prim xs
+
   SRC.Lam pos x body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkLam pos x body
   SRC.RecLam pos f x body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkRecLam pos f x body
-  SRC.App e1 p e2 -> \k -> do
+  SRC.App e1 pos e2 -> \k -> do
     compileAsId e1 $ \x1 -> do
       compileAsId e2 $ \x2 -> do
-        k $ Compound $ Tail x1 p x2
+        k $ Compound $ Tail x1 pos x2
   SRC.Let _pos x rhs body -> \k -> do
     compileExp rhs $ \rhs -> do
       body <- compileExp body k >>= nameAtomic
@@ -305,6 +323,7 @@ fvs :: Code -> Set Id
 fvs = \case
   Return _ x -> fvsV x
   Tail x1 _ x2 -> Set.unions [fvsV x1,fvsV x2]
+  TailPrim _ _ x -> fvsV x
   LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
   PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame
   Match scrut arms -> fvsV scrut `union` Set.unions (map fvsArm arms)

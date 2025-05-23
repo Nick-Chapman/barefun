@@ -37,6 +37,7 @@ data Top
 data Code
   = Return Position Ref
   | Tail Ref Position Ref
+  | TailPrim Builtin Position Ref
   | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Match Ref [Arm]
@@ -99,7 +100,8 @@ prettyT = \case
 prettyC :: Code -> Lines
 prettyC = \case
   Return _ x -> ["k " ++ show x]
-  Tail x1 _pos x2 -> [printf "%s %s k" (show x1) (show x2)]
+  Tail func _pos arg -> [printf "%s %s k" (show func) (show arg)]
+  TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic (_,t) rhs body ->
     ("let " ++ show t ++ " = ") <++ prettyA rhs ++> " in"
     ++ prettyC body
@@ -194,7 +196,8 @@ evalT genv = \case
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return _ x -> \k -> ITick I.Return $ k (look env x)
-  Tail x1 pos x2 -> \k -> ITick I.Enter $ apply (look env x1) pos (look env x2) k
+  Tail func pos arg -> \k -> ITick I.Enter $ apply (look env func) pos (look env arg) k
+  TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ executeBuiltin prim [look env arg] k
   LetAtomic (x,t) a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode genv (insert (Ref x (InTemp t)) v1 env) c2 k
@@ -265,7 +268,8 @@ compileCtop = compileC firstTempIndex
     compileC :: Int -> Cenv -> SRC.Code -> M Code
     compileC nextTemp cenv = \case
       SRC.Return pos v -> pure $ Return pos (compileV cenv v)
-      SRC.Tail x1 pos x2 -> pure $ Tail (compileV cenv x1) pos (compileV cenv x2)
+      SRC.Tail func pos arg -> pure $ Tail (compileV cenv func) pos (compileV cenv arg)
+      SRC.TailPrim prim pos arg-> pure $ TailPrim prim pos (compileV cenv arg)
 
       SRC.LetAtomic x rhs body -> do
         compileA cenv rhs >>= \case

@@ -91,4 +91,4 @@ Mon 19 May 2025 : (MILESTONE-3) cleanup; get filesystem example working in qemu
 Tue 20 May 2025 : blog: Why Two Languages?
 Wed 21 May 2025 : persistent disk.image in haskell emu & embed in nasm image
 Thu 22 May 2025 : INT 0x13 ah=0x42/43 ; increase filesystem sizes
-Fri 23 May 2025 :
+Fri 23 May 2025 : Tail-call Bare_make_bytes; avoid impossible static (allocation)need calculation.

@@ -463,7 +463,7 @@ execBare = \case
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
-  Bare_make_bytes -> do
+  Bare_make_bytes -> do -- TODO: I must be killed
     n <- deNum <$> GetReg Ax
     let nBytes = n `div` 2
     let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
@@ -473,6 +473,33 @@ execBare = \case
     SetReg Ax w
     let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
+
+  Bare_make_bytes_jump -> do
+    n <- deNum <$> GetReg Ax
+    let nBytes = n `div` 2
+    let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
+    let need = nBytesAligned + 2 + 2
+
+    do -- TODO: this is cut and pasted from Entry check. share!
+      n <- heapBytesRemaining
+      if gcAtEverySafePoint || (n < need) then runGC else pure ()
+      n <- heapBytesRemaining
+      if (n < need)
+        then do Crash (printf "[Not enough space recovered by GC: need=%d; have:%d]" need n)
+        else
+        do
+          --Debug (printf "BudgedForAllocation: %d\n" need)
+          BudgedForAllocation need
+
+    --Debug (printf "Setting budget for Bare_make_bytes_jump: %d\n" need)
+    BudgedForAllocation need
+    slideStackPointer AllocForUser nBytesAligned
+    execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
+    w <- GetReg Sp
+    SetReg argReg w
+    let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
+    execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
+    execCode codeReturn -- TODO: is this a hack?
 
   Bare_set_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
@@ -576,6 +603,8 @@ execJump = \case
     let lab = deCodeLabel w
     code <- GetCode lab
     execCode code
+  JumpBare bare -> do
+    execBare bare
 
 binaryW :: (Number -> Number -> Number) -> Word -> Word -> Word
 binaryW f w1 w2 =
@@ -785,7 +814,7 @@ data State = State
   , lastCodeLabel :: CodeLabel
   , offsetFromLastLabel :: Int
   , allocsSinceLastCheck :: Int
-  , allocsSinceLastEnter :: Int
+  , allocsSinceLastEnter :: Int -- TODO: rename allocsSinceLastBudget
   , budgetAlloc :: Int
   , gcNum :: Int
   , hemi :: Hemi

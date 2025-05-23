@@ -1,5 +1,5 @@
 Using ocaml for the big filesystem test. Haskell emulators are too slow.
-  $ cat ../inputs/filesystem.input | ../../ocaml/main.exe Filesystem
+  $ cat ../inputs/filesystem.input | ../../haskell/main.exe ../../examples/filesystem.fun
   Filesystem explorer
   - sector_size: 512
   - #sectors_on_disk: 10

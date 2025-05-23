@@ -207,6 +207,7 @@ data Tickable
   = App
   | PushContinuation | Enter | Return
   | Prim
+  | TailPrim
   | Op
   | Alloc -- counting bytes allocated on the heap
   | GC
@@ -220,6 +221,7 @@ instance Show Tickable where
     Enter -> "enter"
     Return -> "return"
     Prim -> "prim"
+    TailPrim -> "tail-prim"
     Op -> "op"
     Alloc -> "alloc"
     GC -> "gc"

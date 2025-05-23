@@ -356,7 +356,7 @@ L29: ; Function: (lam,t1)
   mov si, [Temps+8]
   jmp [bp]
 
-L30: ; Function: (loop,t2)
+L30: ; Function: (loop,t1)
   Bare_enter_check(10)
   push word bp
   push word si
@@ -393,54 +393,61 @@ L32: ; Continuation
   jmp [bp]
 
 L33: ; Continuation
-  Bare_enter_check(532)
-  mov ax, si
-  call Bare_make_bytes
-  mov [Temps+2], ax
-  push word [Temps+2]
+  Bare_enter_check(16)
+  push word si
   push word L30
-  mov [Temps+4], sp
+  mov [Temps+2], sp
   push word 4 ;; scanned
-  push word [Temps+2]
+  push word si
   push word [bp+4]
   push word [CurrentCont]
   push word L32
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov bp, [Temps+4]
+  mov bp, [Temps+2]
   mov si, 1
   jmp [bp]
 
-L34: ; Function: (implode,g9)
+L34: ; Continuation
+  Bare_enter_check(8)
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L33
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov ax, si
+  jmp Bare_make_bytes_jump
+
+L35: ; Function: (implode,g9)
   Bare_enter_check(8)
   push word si
   push word [CurrentCont]
-  push word L33
+  push word L34
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g1
   mov si, si
   jmp [bp]
 
-L35: ; Arm: 61'9
+L36: ; Arm: 61'9
   mov si, g10
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L36: ; Continuation
+L37: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L37: ; Function: (lam,t1)
+L38: ; Function: (lam,t1)
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 1
-  jz L35
+  jz L36
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -459,19 +466,19 @@ L37: ; Function: (lam,t1)
   mov [Temps+8], ax
   push word [Temps+4]
   push word [CurrentCont]
-  push word L36
+  push word L37
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [bp+6]
   mov si, [Temps+8]
   jmp [bp]
 
-L38: ; Function: (loop,t2)
+L39: ; Function: (loop,t1)
   Bare_enter_check(10)
   push word bp
   push word si
   push word [bp+2]
-  push word L37
+  push word L38
   mov [Temps+2], sp
   push word 8 ;; scanned
   mov si, [Temps+2]
@@ -480,7 +487,7 @@ L38: ; Function: (loop,t2)
   mov [CurrentCont], ax
   jmp [bp]
 
-L39: ; Continuation
+L40: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   mov [Temps+2], ax
@@ -490,11 +497,11 @@ L39: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L40: ; Continuation
+L41: ; Continuation
   Bare_enter_check(8)
   push word [bp+6]
   push word [CurrentCont]
-  push word L39
+  push word L40
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, bp
@@ -502,49 +509,57 @@ L40: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L41: ; Continuation
-  Bare_enter_check(532)
-  mov ax, si
-  call Bare_make_bytes
-  mov [Temps+2], ax
-  push word [Temps+2]
-  push word L38
-  mov [Temps+4], sp
+L42: ; Continuation
+  Bare_enter_check(16)
+  push word si
+  push word L39
+  mov [Temps+2], sp
   push word 4 ;; scanned
-  mov ax, si
+  mov ax, [bp+6]
   mov bx, 3
   sub ax, bx
   add ax, 1
-  mov [Temps+6], ax
-  push word [Temps+2]
+  mov [Temps+4], ax
+  push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L40
+  push word L41
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov bp, [Temps+4]
-  mov si, [Temps+6]
+  mov bp, [Temps+2]
+  mov si, [Temps+4]
   jmp [bp]
 
-L42: ; Function: (rev_implode,g11)
+L43: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L42
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov ax, si
+  jmp Bare_make_bytes_jump
+
+L44: ; Function: (rev_implode,g11)
   Bare_enter_check(8)
   push word si
   push word [CurrentCont]
-  push word L41
+  push word L43
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g1
   mov si, si
   jmp [bp]
 
-L43: ; Arm: 69'13
+L45: ; Arm: 69'13
   mov si, [bp+4]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L44: ; Continuation
+L46: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   mov bx, 3
@@ -555,7 +570,7 @@ L44: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L45: ; Function: (lam,t1)
+L47: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov ax, si
   cmp word ax, 1
@@ -563,7 +578,7 @@ L45: ; Function: (lam,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L43
+  jz L45
   mov ax, [bp+2]
   mov bx, si
   sar bx, 1
@@ -576,19 +591,19 @@ L45: ; Function: (lam,t1)
   push word 6 ;; scanned
   push word si
   push word [CurrentCont]
-  push word L44
+  push word L46
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [bp+6]
   mov si, [Temps+6]
   jmp [bp]
 
-L46: ; Function: (explode_loop,t1)
+L48: ; Function: (explode_loop,t1)
   Bare_enter_check(10)
   push word bp
   push word si
   push word [bp+2]
-  push word L45
+  push word L47
   mov [Temps+2], sp
   push word 8 ;; scanned
   mov si, [Temps+2]
@@ -597,7 +612,7 @@ L46: ; Function: (explode_loop,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L47: ; Continuation
+L49: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   mov bx, 3
@@ -608,10 +623,10 @@ L47: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L48: ; Function: (explode,g13)
+L50: ; Function: (explode,g13)
   Bare_enter_check(14)
   push word si
-  push word L46
+  push word L48
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov bx, si
@@ -619,39 +634,39 @@ L48: ; Function: (explode,g13)
   mov [Temps+4], ax
   push word [Temps+4]
   push word [CurrentCont]
-  push word L47
+  push word L49
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [Temps+2]
   mov si, g12
   jmp [bp]
 
-L49: ; Arm: 77'19
+L51: ; Arm: 77'19
   mov si, g16
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L50: ; Arm: 79'15
+L52: ; Arm: 79'15
   mov si, g17
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L51: ; Arm: 82'31
+L53: ; Arm: 82'31
   mov si, g20
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L52: ; Continuation
+L54: ; Continuation
   Bare_enter_check(0)
   mov bx, si
   cmp word [bx], 3
-  jz L51
+  jz L53
   mov ax, [bp+4]
   mov bx, 3
   sub ax, bx
@@ -661,14 +676,14 @@ L52: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L53: ; Arm: 6'9
+L55: ; Arm: 6'9
   mov si, g18
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L54: ; Function: (loop,t1)
+L56: ; Function: (loop,t1)
   Bare_enter_check(10)
   mov ax, si
   cmp word ax, 1
@@ -676,7 +691,7 @@ L54: ; Function: (loop,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L50
+  jz L52
   mov ax, [bp+2]
   mov bx, si
   sar bx, 1
@@ -694,26 +709,26 @@ L54: ; Function: (loop,t1)
   push word bp
   push word si
   push word [CurrentCont]
-  push word L52
+  push word L54
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [Temps+8]
   cmp word [bx], 3
-  jz L53
+  jz L55
   mov si, g19
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L55: ; Continuation
+L57: ; Continuation
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 3
-  jz L49
+  jz L51
   push word [bp+6]
   push word [bp+4]
-  push word L54
+  push word L56
   mov [Temps+2], sp
   push word 6 ;; scanned
   mov ax, [bp+8]
@@ -725,14 +740,14 @@ L55: ; Continuation
   mov si, [Temps+4]
   jmp [bp]
 
-L56: ; Arm: 6'9
+L58: ; Arm: 6'9
   mov si, g14
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L57: ; Function: (lam,t1)
+L59: ; Function: (lam,t1)
   Bare_enter_check(12)
   mov bx, [bp+2]
   mov ax, [bx]
@@ -748,22 +763,22 @@ L57: ; Function: (lam,t1)
   push word si
   push word [bp+2]
   push word [CurrentCont]
-  push word L55
+  push word L57
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L56
+  jz L58
   mov si, g15
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L58: ; Function: (eq_string,g21)
+L60: ; Function: (eq_string,g21)
   Bare_enter_check(6)
   push word si
-  push word L57
+  push word L59
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -772,51 +787,27 @@ L58: ; Function: (eq_string,g21)
   mov [CurrentCont], ax
   jmp [bp]
 
-L59: ; Arm: 91'7
+L61: ; Arm: 91'7
   mov si, g23
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L60: ; Continuation
+L62: ; Continuation
   Bare_enter_check(0)
   mov bp, g9
   mov si, si
   jmp [bp]
 
-L61: ; Continuation
+L63: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L60
+  push word L62
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, [bp+4]
   mov si, si
-  jmp [bp]
-
-L62: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L61
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+6]
-  jmp [bp]
-
-L63: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+4]
-  push word si
-  push word [CurrentCont]
-  push word L62
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, g7
-  mov si, g24
   jmp [bp]
 
 L64: ; Continuation
@@ -826,64 +817,88 @@ L64: ; Continuation
   push word L63
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov bp, g7
-  mov si, si
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+6]
   jmp [bp]
 
 L65: ; Continuation
-  Bare_enter_check(8)
+  Bare_enter_check(10)
+  push word [bp+4]
   push word si
   push word [CurrentCont]
   push word L64
   mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov si, [bp+4]
-  mov bp, g13
+  push word 8 ;; scanned
+  mov bp, g7
+  mov si, g24
   jmp [bp]
 
 L66: ; Continuation
   Bare_enter_check(8)
-  push word si
+  push word [bp+4]
   push word [CurrentCont]
   push word L65
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L67: ; Continuation
+  Bare_enter_check(8)
+  push word si
+  push word [CurrentCont]
+  push word L66
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov si, [bp+4]
   mov bp, g13
   jmp [bp]
 
-L67: ; Function: (concat,g22)
+L68: ; Continuation
+  Bare_enter_check(8)
+  push word si
+  push word [CurrentCont]
+  push word L67
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov si, [bp+4]
+  mov bp, g13
+  jmp [bp]
+
+L69: ; Function: (concat,g22)
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 1
-  jz L59
+  jz L61
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+2]
   push word [CurrentCont]
-  push word L66
+  push word L68
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
-L68: ; Arm: 107'7
+L70: ; Arm: 107'7
   mov si, g26
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L69: ; Continuation
+L71: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, g25
   jmp [bp]
 
-L70: ; Arm: 100'19
+L72: ; Arm: 100'19
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -894,7 +909,7 @@ L70: ; Arm: 100'19
   mov [CurrentCont], ax
   jmp [bp]
 
-L71: ; Arm: 101'22
+L73: ; Arm: 101'22
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -905,7 +920,7 @@ L71: ; Arm: 101'22
   mov [CurrentCont], ax
   jmp [bp]
 
-L72: ; Arm: 102'16
+L74: ; Arm: 102'16
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -916,11 +931,11 @@ L72: ; Arm: 102'16
   mov [CurrentCont], ax
   jmp [bp]
 
-L73: ; Function: (put_chars,g25)
+L75: ; Function: (put_chars,g25)
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 1
-  jz L68
+  jz L70
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -936,26 +951,26 @@ L73: ; Function: (put_chars,g25)
   mov [Temps+8], ax
   push word [Temps+4]
   push word [CurrentCont]
-  push word L69
+  push word L71
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, [Temps+8]
   cmp word [bx], 3
-  jz L70
+  jz L72
   mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
   mov [Temps+10], ax
   mov bx, [Temps+10]
   cmp word [bx], 3
-  jz L71
+  jz L73
   mov ax, 53
   cmp word ax, [Temps+6]
   call Bare_make_bool_from_n
   mov [Temps+12], ax
   mov bx, [Temps+12]
   cmp word [bx], 3
-  jz L72
+  jz L74
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -984,7 +999,7 @@ L73: ; Function: (put_chars,g25)
   mov [CurrentCont], ax
   jmp [bp]
 
-L74: ; Continuation
+L76: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word si
@@ -997,24 +1012,24 @@ L74: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L75: ; Arm: 168'11
+L77: ; Arm: 168'11
   push word [bp+2]
   push word [CurrentCont]
-  push word L74
+  push word L76
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov si, [bp+4]
   mov bp, g11
   jmp [bp]
 
-L76: ; Continuation
+L78: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L77: ; Continuation
+L79: ; Continuation
   Bare_enter_check(16)
   push word [bp+4]
   push word si
@@ -1023,32 +1038,32 @@ L77: ; Continuation
   push word 6 ;; scanned
   push word [bp+6]
   push word [CurrentCont]
-  push word L76
+  push word L78
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g28
   mov si, [Temps+2]
   jmp [bp]
 
-L78: ; Arm: 170'26
+L80: ; Arm: 170'26
   push word [Temps+4]
   push word [bp+2]
   push word [CurrentCont]
-  push word L77
+  push word L79
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+4]
   mov bp, g11
   jmp [bp]
 
-L79: ; Continuation
+L81: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L80: ; Continuation
+L82: ; Continuation
   Bare_enter_check(16)
   push word [bp+4]
   push word [bp+6]
@@ -1057,18 +1072,18 @@ L80: ; Continuation
   push word 6 ;; scanned
   push word [bp+8]
   push word [CurrentCont]
-  push word L79
+  push word L81
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, si
   mov si, [Temps+2]
   jmp [bp]
 
-L81: ; Function: (lam,t1)
+L83: ; Function: (lam,t1)
   Bare_enter_check(12)
   mov bx, si
   cmp word [bx], 1
-  jz L75
+  jz L77
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -1079,23 +1094,23 @@ L81: ; Function: (lam,t1)
   mov [Temps+6], ax
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L78
+  jz L80
   push word [Temps+4]
   push word [Temps+2]
   push word [bp+4]
   push word [CurrentCont]
-  push word L80
+  push word L82
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov si, [bp+2]
   mov bp, g29
   jmp [bp]
 
-L82: ; Function: (lam,t1)
+L84: ; Function: (lam,t1)
   Bare_enter_check(8)
   push word si
   push word [bp+2]
-  push word L81
+  push word L83
   mov [Temps+2], sp
   push word 6 ;; scanned
   mov si, [Temps+2]
@@ -1104,10 +1119,10 @@ L82: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L83: ; Function: (have_letter,g29)
+L85: ; Function: (have_letter,g29)
   Bare_enter_check(6)
   push word si
-  push word L82
+  push word L84
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -1116,28 +1131,11 @@ L83: ; Function: (have_letter,g29)
   mov [CurrentCont], ax
   jmp [bp]
 
-L84: ; Arm: 175'9
+L86: ; Arm: 175'9
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
-  jmp [bp]
-
-L85: ; Continuation
-  Bare_enter_check(0)
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+4]
-  jmp [bp]
-
-L86: ; Arm: 177'24
-  push word [Temps+4]
-  push word [CurrentCont]
-  push word L85
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov si, [bp+2]
-  mov bp, g28
   jmp [bp]
 
 L87: ; Continuation
@@ -1147,7 +1145,24 @@ L87: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L88: ; Continuation
+L88: ; Arm: 177'24
+  push word [Temps+4]
+  push word [CurrentCont]
+  push word L87
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov si, [bp+2]
+  mov bp, g28
+  jmp [bp]
+
+L89: ; Continuation
+  Bare_enter_check(0)
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+4]
+  jmp [bp]
+
+L90: ; Continuation
   Bare_enter_check(16)
   push word g30
   push word [bp+4]
@@ -1156,18 +1171,18 @@ L88: ; Continuation
   push word 6 ;; scanned
   push word [bp+6]
   push word [CurrentCont]
-  push word L87
+  push word L89
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, si
   mov si, [Temps+2]
   jmp [bp]
 
-L89: ; Function: (lam,t1)
+L91: ; Function: (lam,t1)
   Bare_enter_check(10)
   mov bx, si
   cmp word [bx], 1
-  jz L84
+  jz L86
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -1178,21 +1193,21 @@ L89: ; Function: (lam,t1)
   mov [Temps+6], ax
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L86
+  jz L88
   push word [Temps+4]
   push word [Temps+2]
   push word [CurrentCont]
-  push word L88
+  push word L90
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+2]
   mov bp, g29
   jmp [bp]
 
-L90: ; Function: (at_word_start,g28)
+L92: ; Function: (at_word_start,g28)
   Bare_enter_check(6)
   push word si
-  push word L89
+  push word L91
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -1201,7 +1216,7 @@ L90: ; Function: (at_word_start,g28)
   mov [CurrentCont], ax
   jmp [bp]
 
-L91: ; Arm: 144'22
+L93: ; Arm: 144'22
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -1210,7 +1225,7 @@ L91: ; Arm: 144'22
   mov si, si
   jmp [bp]
 
-L92: ; Arm: 145'28
+L94: ; Arm: 145'28
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -1232,23 +1247,23 @@ L92: ; Arm: 145'28
   mov si, [Temps+16]
   jmp [bp]
 
-L93: ; Arm: 146'19
+L95: ; Arm: 146'19
   mov bp, g34
   mov si, si
   jmp [bp]
 
-L94: ; Arm: 149'17
+L96: ; Arm: 149'17
   mov bp, g34
   mov si, si
   jmp [bp]
 
-L95: ; Continuation
+L97: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, g34
   jmp [bp]
 
-L96: ; Arm: 153'28
+L98: ; Arm: 153'28
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -1279,7 +1294,7 @@ L96: ; Arm: 153'28
   mov [CurrentCont], ax
   jmp [bp]
 
-L97: ; Arm: 154'29
+L99: ; Arm: 154'29
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -1322,7 +1337,7 @@ L97: ; Arm: 154'29
   mov [CurrentCont], ax
   jmp [bp]
 
-L98: ; Arm: 155'32
+L100: ; Arm: 155'32
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -1365,30 +1380,30 @@ L98: ; Arm: 155'32
   mov [CurrentCont], ax
   jmp [bp]
 
-L99: ; Continuation
+L101: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L95
+  push word L97
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, si
   cmp word [bx], 3
-  jz L96
+  jz L98
   mov ax, [bp+6]
   cmp word ax, 65
   call Bare_make_bool_from_n
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L97
+  jz L99
   mov ax, 253
   cmp word ax, [bp+6]
   call Bare_make_bool_from_n
   mov [Temps+4], ax
   mov bx, [Temps+4]
   cmp word [bx], 3
-  jz L98
+  jz L100
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -1407,17 +1422,17 @@ L99: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L100: ; Arm: 6'9
+L102: ; Arm: 6'9
   mov si, g36
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L101: ; Arm: 147'21
+L103: ; Arm: 147'21
   mov bx, si
   cmp word [bx], 1
-  jz L94
+  jz L96
   mov ax, [bx+2]
   mov [Temps+14], ax
   mov ax, [bx+4]
@@ -1434,19 +1449,19 @@ L101: ; Arm: 147'21
   push word [Temps+18]
   push word [Temps+16]
   push word [CurrentCont]
-  push word L99
+  push word L101
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [Temps+20]
   cmp word [bx], 3
-  jz L100
+  jz L102
   mov si, g37
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L102: ; Continuation
+L104: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [bp+6]
@@ -1457,7 +1472,7 @@ L102: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L103: ; Arm: 100'19
+L105: ; Arm: 100'19
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -1468,7 +1483,7 @@ L103: ; Arm: 100'19
   mov [CurrentCont], ax
   jmp [bp]
 
-L104: ; Arm: 101'22
+L106: ; Arm: 101'22
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -1479,7 +1494,7 @@ L104: ; Arm: 101'22
   mov [CurrentCont], ax
   jmp [bp]
 
-L105: ; Arm: 102'16
+L107: ; Arm: 102'16
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -1490,7 +1505,7 @@ L105: ; Arm: 102'16
   mov [CurrentCont], ax
   jmp [bp]
 
-L106: ; Function: (readloop,g34)
+L108: ; Function: (readloop,g34)
   Bare_enter_check(10)
   call Bare_get_char
   mov [Temps+2], ax
@@ -1505,28 +1520,28 @@ L106: ; Function: (readloop,g34)
   mov [Temps+6], ax
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L91
+  jz L93
   mov ax, [Temps+2]
   cmp word ax, `\x04`
   call Bare_make_bool_from_z
   mov [Temps+8], ax
   mov bx, [Temps+8]
   cmp word [bx], 3
-  jz L92
+  jz L94
   mov ax, 255
   cmp word ax, [Temps+4]
   call Bare_make_bool_from_n
   mov [Temps+10], ax
   mov bx, [Temps+10]
   cmp word [bx], 3
-  jz L93
+  jz L95
   mov ax, [Temps+4]
   cmp word ax, 255
   call Bare_make_bool_from_z
   mov [Temps+12], ax
   mov bx, [Temps+12]
   cmp word [bx], 3
-  jz L101
+  jz L103
   mov ax, [Temps+2]
   call Bare_char_to_num
   shl ax, 1
@@ -1539,26 +1554,26 @@ L106: ; Function: (readloop,g34)
   push word [Temps+2]
   push word si
   push word [CurrentCont]
-  push word L102
+  push word L104
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [Temps+16]
   cmp word [bx], 3
-  jz L103
+  jz L105
   mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
   mov [Temps+18], ax
   mov bx, [Temps+18]
   cmp word [bx], 3
-  jz L104
+  jz L106
   mov ax, 53
   cmp word ax, [Temps+14]
   call Bare_make_bool_from_n
   mov [Temps+20], ax
   mov bx, [Temps+20]
   cmp word [bx], 3
-  jz L105
+  jz L107
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -1587,34 +1602,34 @@ L106: ; Function: (readloop,g34)
   mov [CurrentCont], ax
   jmp [bp]
 
-L107: ; Arm: 231'36
+L109: ; Arm: 231'36
   mov si, g39
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L108: ; Continuation
+L110: ; Continuation
   Bare_enter_check(0)
   mov bp, g31
   mov si, si
   jmp [bp]
 
-L109: ; Arm: 223'7
+L111: ; Arm: 223'7
   mov si, [bp+4]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L110: ; Arm: 194'9
+L112: ; Arm: 194'9
   mov si, g42
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L111: ; Arm: 198'35
+L113: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -1625,22 +1640,22 @@ L111: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L112: ; Continuation
+L114: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L111
+  jz L113
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L113: ; Continuation
+L115: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L112
+  push word L114
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -1648,11 +1663,11 @@ L113: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L114: ; Function: (loop,t3)
+L116: ; Function: (loop,t3)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L110
+  jz L112
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -1667,41 +1682,19 @@ L114: ; Function: (loop,t3)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L113
+  push word L115
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L115: ; Continuation
+L117: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
-  jmp [bp]
-
-L116: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L115
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, g25
-  mov si, si
-  jmp [bp]
-
-L117: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L116
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, g13
-  mov si, si
   jmp [bp]
 
 L118: ; Continuation
@@ -1711,7 +1704,7 @@ L118: ; Continuation
   push word L117
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov bp, g9
+  mov bp, g25
   mov si, si
   jmp [bp]
 
@@ -1722,34 +1715,30 @@ L119: ; Continuation
   push word L118
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov bp, [bp+6]
+  mov bp, g13
   mov si, si
   jmp [bp]
 
 L120: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
+  Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
   push word L119
   mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+8]
+  push word 6 ;; scanned
+  mov bp, g9
+  mov si, si
   jmp [bp]
 
 L121: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+6]
-  push word si
+  Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
   push word L120
   mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bp, g7
-  mov si, g50
+  push word 6 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
   jmp [bp]
 
 L122: ; Continuation
@@ -1760,80 +1749,80 @@ L122: ; Continuation
   push word L121
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov bp, g7
-  mov si, si
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+8]
   jmp [bp]
 
 L123: ; Continuation
-  Bare_enter_check(10)
+  Bare_enter_check(12)
+  push word [bp+6]
   push word si
   push word [bp+4]
   push word [CurrentCont]
   push word L122
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov bp, g7
+  mov si, g50
+  jmp [bp]
+
+L124: ; Continuation
+  Bare_enter_check(10)
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L123
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L125: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L124
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+6]
   mov bp, g13
   jmp [bp]
 
-L124: ; Continuation
+L126: ; Continuation
   Bare_enter_check(10)
   push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L123
+  push word L125
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g13
   mov si, g49
   jmp [bp]
 
-L125: ; Continuation
+L127: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L124
+  push word L126
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g9
   mov si, si
   jmp [bp]
 
-L126: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L125
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, [bp+6]
-  mov si, si
-  jmp [bp]
-
-L127: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L126
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+8]
-  jmp [bp]
-
 L128: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+6]
-  push word si
+  Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
   push word L127
   mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bp, g7
-  mov si, g48
+  push word 6 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
   jmp [bp]
 
 L129: ; Continuation
@@ -1844,84 +1833,82 @@ L129: ; Continuation
   push word L128
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov bp, g7
-  mov si, si
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+8]
   jmp [bp]
 
 L130: ; Continuation
-  Bare_enter_check(10)
+  Bare_enter_check(12)
+  push word [bp+6]
   push word si
   push word [bp+4]
   push word [CurrentCont]
   push word L129
   mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov si, [bp+6]
-  mov bp, g13
+  push word 10 ;; scanned
+  mov bp, g7
+  mov si, g48
   jmp [bp]
 
 L131: ; Continuation
   Bare_enter_check(10)
-  push word si
+  push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
   push word L130
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L132: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L131
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+6]
   mov bp, g13
   jmp [bp]
 
-L132: ; Continuation
+L133: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L132
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov si, [bp+6]
+  mov bp, g13
+  jmp [bp]
+
+L134: ; Continuation
   Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L131
+  push word L133
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g9
   mov si, si
   jmp [bp]
 
-L133: ; Continuation
+L135: ; Continuation
   Bare_enter_check(10)
   push word [bp+8]
   push word [bp+4]
   push word [CurrentCont]
-  push word L132
+  push word L134
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, [bp+6]
   mov si, si
-  jmp [bp]
-
-L134: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+8]
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L133
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+10]
-  jmp [bp]
-
-L135: ; Continuation
-  Bare_enter_check(14)
-  push word [bp+8]
-  push word [bp+6]
-  push word si
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L134
-  mov [CurrentCont], sp
-  push word 12 ;; scanned
-  mov bp, g7
-  mov si, g47
   jmp [bp]
 
 L136: ; Continuation
@@ -1933,86 +1920,86 @@ L136: ; Continuation
   push word L135
   mov [CurrentCont], sp
   push word 10 ;; scanned
-  mov bp, g7
-  mov si, si
-  jmp [bp]
-
-L137: ; Continuation
-  Bare_enter_check(12)
-  push word si
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L136
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov si, [bp+8]
-  mov bp, g13
-  jmp [bp]
-
-L138: ; Continuation
-  Bare_enter_check(12)
-  push word si
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L137
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bp, g13
-  mov si, g46
-  jmp [bp]
-
-L139: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L138
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, g9
-  mov si, si
-  jmp [bp]
-
-L140: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+8]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L139
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, [bp+6]
-  mov si, si
-  jmp [bp]
-
-L141: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+8]
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L140
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
   mov bx, bp
   mov bp, si
   mov si, [bx+10]
   jmp [bp]
 
-L142: ; Continuation
+L137: ; Continuation
   Bare_enter_check(14)
   push word [bp+8]
   push word [bp+6]
   push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L141
+  push word L136
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g7
-  mov si, g45
+  mov si, g47
+  jmp [bp]
+
+L138: ; Continuation
+  Bare_enter_check(12)
+  push word [bp+8]
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L137
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L139: ; Continuation
+  Bare_enter_check(12)
+  push word si
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L138
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov si, [bp+8]
+  mov bp, g13
+  jmp [bp]
+
+L140: ; Continuation
+  Bare_enter_check(12)
+  push word si
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L139
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov bp, g13
+  mov si, g46
+  jmp [bp]
+
+L141: ; Continuation
+  Bare_enter_check(10)
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L140
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, g9
+  mov si, si
+  jmp [bp]
+
+L142: ; Continuation
+  Bare_enter_check(10)
+  push word [bp+8]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L141
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
   jmp [bp]
 
 L143: ; Continuation
@@ -2024,62 +2011,68 @@ L143: ; Continuation
   push word L142
   mov [CurrentCont], sp
   push word 10 ;; scanned
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+10]
+  jmp [bp]
+
+L144: ; Continuation
+  Bare_enter_check(14)
+  push word [bp+8]
+  push word [bp+6]
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L143
+  mov [CurrentCont], sp
+  push word 12 ;; scanned
+  mov bp, g7
+  mov si, g45
+  jmp [bp]
+
+L145: ; Continuation
+  Bare_enter_check(12)
+  push word [bp+8]
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L144
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
   mov bp, g7
   mov si, si
   jmp [bp]
 
-L144: ; Continuation
+L146: ; Continuation
   Bare_enter_check(12)
   push word si
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L143
+  push word L145
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g13
   mov si, g44
   jmp [bp]
 
-L145: ; Arm: 215'9
+L147: ; Arm: 215'9
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L144
+  push word L146
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g13
   mov si, g43
   jmp [bp]
 
-L146: ; Continuation
+L148: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
-  jmp [bp]
-
-L147: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L146
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, g25
-  mov si, si
-  jmp [bp]
-
-L148: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L147
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, g13
-  mov si, si
   jmp [bp]
 
 L149: ; Continuation
@@ -2089,7 +2082,7 @@ L149: ; Continuation
   push word L148
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov bp, g9
+  mov bp, g25
   mov si, si
   jmp [bp]
 
@@ -2100,34 +2093,30 @@ L150: ; Continuation
   push word L149
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov bp, [bp+6]
+  mov bp, g13
   mov si, si
   jmp [bp]
 
 L151: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
+  Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
   push word L150
   mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+8]
+  push word 6 ;; scanned
+  mov bp, g9
+  mov si, si
   jmp [bp]
 
 L152: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+6]
-  push word si
+  Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
   push word L151
   mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bp, g7
-  mov si, g58
+  push word 6 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
   jmp [bp]
 
 L153: ; Continuation
@@ -2138,80 +2127,80 @@ L153: ; Continuation
   push word L152
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov bp, g7
-  mov si, si
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+8]
   jmp [bp]
 
 L154: ; Continuation
-  Bare_enter_check(10)
+  Bare_enter_check(12)
+  push word [bp+6]
   push word si
   push word [bp+4]
   push word [CurrentCont]
   push word L153
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov bp, g7
+  mov si, g58
+  jmp [bp]
+
+L155: ; Continuation
+  Bare_enter_check(10)
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L154
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L156: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L155
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+6]
   mov bp, g13
   jmp [bp]
 
-L155: ; Continuation
+L157: ; Continuation
   Bare_enter_check(10)
   push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L154
+  push word L156
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g13
   mov si, g57
   jmp [bp]
 
-L156: ; Continuation
+L158: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L155
+  push word L157
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g9
   mov si, si
   jmp [bp]
 
-L157: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L156
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, [bp+6]
-  mov si, si
-  jmp [bp]
-
-L158: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L157
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+8]
-  jmp [bp]
-
 L159: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+6]
-  push word si
+  Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
   push word L158
   mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bp, g7
-  mov si, g56
+  push word 6 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
   jmp [bp]
 
 L160: ; Continuation
@@ -2222,84 +2211,82 @@ L160: ; Continuation
   push word L159
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov bp, g7
-  mov si, si
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+8]
   jmp [bp]
 
 L161: ; Continuation
-  Bare_enter_check(10)
+  Bare_enter_check(12)
+  push word [bp+6]
   push word si
   push word [bp+4]
   push word [CurrentCont]
   push word L160
   mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov si, [bp+6]
-  mov bp, g13
+  push word 10 ;; scanned
+  mov bp, g7
+  mov si, g56
   jmp [bp]
 
 L162: ; Continuation
   Bare_enter_check(10)
-  push word si
+  push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
   push word L161
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L163: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L162
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+6]
   mov bp, g13
   jmp [bp]
 
-L163: ; Continuation
+L164: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L163
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov si, [bp+6]
+  mov bp, g13
+  jmp [bp]
+
+L165: ; Continuation
   Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L162
+  push word L164
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g9
   mov si, si
   jmp [bp]
 
-L164: ; Continuation
+L166: ; Continuation
   Bare_enter_check(10)
   push word [bp+8]
   push word [bp+4]
   push word [CurrentCont]
-  push word L163
+  push word L165
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, [bp+6]
   mov si, si
-  jmp [bp]
-
-L165: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+8]
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L164
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+10]
-  jmp [bp]
-
-L166: ; Continuation
-  Bare_enter_check(14)
-  push word [bp+8]
-  push word [bp+6]
-  push word si
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L165
-  mov [CurrentCont], sp
-  push word 12 ;; scanned
-  mov bp, g7
-  mov si, g55
   jmp [bp]
 
 L167: ; Continuation
@@ -2311,86 +2298,86 @@ L167: ; Continuation
   push word L166
   mov [CurrentCont], sp
   push word 10 ;; scanned
-  mov bp, g7
-  mov si, si
-  jmp [bp]
-
-L168: ; Continuation
-  Bare_enter_check(12)
-  push word si
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L167
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov si, [bp+8]
-  mov bp, g13
-  jmp [bp]
-
-L169: ; Continuation
-  Bare_enter_check(12)
-  push word si
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L168
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bp, g13
-  mov si, g54
-  jmp [bp]
-
-L170: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L169
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, g9
-  mov si, si
-  jmp [bp]
-
-L171: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+8]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L170
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, [bp+6]
-  mov si, si
-  jmp [bp]
-
-L172: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+8]
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L171
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
   mov bx, bp
   mov bp, si
   mov si, [bx+10]
   jmp [bp]
 
-L173: ; Continuation
+L168: ; Continuation
   Bare_enter_check(14)
   push word [bp+8]
   push word [bp+6]
   push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L172
+  push word L167
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g7
-  mov si, g53
+  mov si, g55
+  jmp [bp]
+
+L169: ; Continuation
+  Bare_enter_check(12)
+  push word [bp+8]
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L168
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L170: ; Continuation
+  Bare_enter_check(12)
+  push word si
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L169
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov si, [bp+8]
+  mov bp, g13
+  jmp [bp]
+
+L171: ; Continuation
+  Bare_enter_check(12)
+  push word si
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L170
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov bp, g13
+  mov si, g54
+  jmp [bp]
+
+L172: ; Continuation
+  Bare_enter_check(10)
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L171
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, g9
+  mov si, si
+  jmp [bp]
+
+L173: ; Continuation
+  Bare_enter_check(10)
+  push word [bp+8]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L172
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
   jmp [bp]
 
 L174: ; Continuation
@@ -2402,94 +2389,122 @@ L174: ; Continuation
   push word L173
   mov [CurrentCont], sp
   push word 10 ;; scanned
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+10]
+  jmp [bp]
+
+L175: ; Continuation
+  Bare_enter_check(14)
+  push word [bp+8]
+  push word [bp+6]
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L174
+  mov [CurrentCont], sp
+  push word 12 ;; scanned
+  mov bp, g7
+  mov si, g53
+  jmp [bp]
+
+L176: ; Continuation
+  Bare_enter_check(12)
+  push word [bp+8]
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L175
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
   mov bp, g7
   mov si, si
   jmp [bp]
 
-L175: ; Continuation
+L177: ; Continuation
   Bare_enter_check(12)
   push word si
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L174
+  push word L176
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g13
   mov si, g52
   jmp [bp]
 
-L176: ; Arm: 218'14
+L178: ; Arm: 218'14
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L175
+  push word L177
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g13
   mov si, g51
   jmp [bp]
 
-L177: ; Continuation
+L179: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L178: ; Continuation
+L180: ; Continuation
   Bare_enter_check(10)
   mov bx, si
   cmp word [bx], 1
-  jz L145
+  jz L147
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 1
-  jz L176
+  jz L178
   mov ax, [bx+2]
   mov [Temps+4], ax
   mov ax, [bx+4]
   mov [Temps+6], ax
   push word [bp+8]
   push word [CurrentCont]
-  push word L177
+  push word L179
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov si, [bp+4]
   mov bp, [Temps+6]
   jmp [bp]
 
-L179: ; Continuation
+L181: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L178
+  push word L180
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, [bp+10]
   mov si, si
   jmp [bp]
 
-L180: ; Continuation
+L182: ; Continuation
   Bare_enter_check(26)
   push word [CurrentCont]
-  push word L108
+  push word L110
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, si
   cmp word [bx], 1
-  jz L109
+  jz L111
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+2]
-  push word L114
+  push word L116
   mov [Temps+6], sp
   push word 4 ;; scanned
   push word [Temps+6]
@@ -2497,7 +2512,7 @@ L180: ; Continuation
   push word [Temps+2]
   push word [bp+4]
   push word [CurrentCont]
-  push word L179
+  push word L181
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bx, [bp+4]
@@ -2509,30 +2524,6 @@ L180: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L181: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L180
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+6]
-  jmp [bp]
-
-L182: ; Continuation
-  Bare_enter_check(10)
-  push word si
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L181
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, g7
-  mov si, g41
-  jmp [bp]
-
 L183: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
@@ -2540,8 +2531,9 @@ L183: ; Continuation
   push word L182
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov bp, [bp+6]
-  mov si, si
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+6]
   jmp [bp]
 
 L184: ; Continuation
@@ -2552,31 +2544,54 @@ L184: ; Continuation
   push word L183
   mov [CurrentCont], sp
   push word 8 ;; scanned
+  mov bp, g7
+  mov si, g41
+  jmp [bp]
+
+L185: ; Continuation
+  Bare_enter_check(8)
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L184
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
+  jmp [bp]
+
+L186: ; Continuation
+  Bare_enter_check(10)
+  push word si
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L185
+  mov [CurrentCont], sp
+  push word 8 ;; scanned
   mov si, [bp+6]
   mov bp, g13
   jmp [bp]
 
-L185: ; Continuation
+L187: ; Continuation
   Bare_enter_check(10)
   mov bx, si
   cmp word [bx], 3
-  jz L107
+  jz L109
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L184
+  push word L186
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g28
   mov si, g40
   jmp [bp]
 
-L186: ; Continuation
+L188: ; Continuation
   Bare_enter_check(10)
   push word [bp+8]
   push word [bp+4]
   push word [CurrentCont]
-  push word L185
+  push word L187
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, bp
@@ -2584,32 +2599,32 @@ L186: ; Continuation
   mov si, [bx+6]
   jmp [bp]
 
-L187: ; Continuation
+L189: ; Continuation
   Bare_enter_check(12)
   push word si
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L186
+  push word L188
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g21
   mov si, si
   jmp [bp]
 
-L188: ; Continuation
+L190: ; Continuation
   Bare_enter_check(10)
   push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L187
+  push word L189
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g34
   mov si, g38
   jmp [bp]
 
-L189: ; Continuation
+L191: ; Continuation
   Bare_enter_check(16)
   push word g33
   push word `\x04`
@@ -2618,43 +2633,43 @@ L189: ; Continuation
   push word 6 ;; scanned
   push word [bp+4]
   push word [CurrentCont]
-  push word L188
+  push word L190
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g9
   mov si, [Temps+2]
   jmp [bp]
 
-L190: ; Continuation
+L192: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L189
+  push word L191
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L191: ; Function: (mainloop,g31)
+L193: ; Function: (mainloop,g31)
   Bare_enter_check(8)
   push word si
   push word [CurrentCont]
-  push word L190
+  push word L192
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g32
   jmp [bp]
 
-L192: ; Arm: 347'11
+L194: ; Arm: 347'11
   mov si, si
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L193: ; Continuation
+L195: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   mov bx, si
@@ -2667,7 +2682,7 @@ L193: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L194: ; Continuation
+L196: ; Continuation
   Bare_enter_check(8)
   mov ax, [bp+4]
   mov bx, 5
@@ -2676,14 +2691,14 @@ L194: ; Continuation
   mov [Temps+2], ax
   push word si
   push word [CurrentCont]
-  push word L193
+  push word L195
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g59
   mov si, [Temps+2]
   jmp [bp]
 
-L195: ; Function: (fib,g59)
+L197: ; Function: (fib,g59)
   Bare_enter_check(8)
   mov ax, si
   cmp word ax, 5
@@ -2691,7 +2706,7 @@ L195: ; Function: (fib,g59)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L192
+  jz L194
   mov ax, si
   mov bx, 3
   sub ax, bx
@@ -2699,14 +2714,14 @@ L195: ; Function: (fib,g59)
   mov [Temps+4], ax
   push word si
   push word [CurrentCont]
-  push word L194
+  push word L196
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g59
   mov si, [Temps+4]
   jmp [bp]
 
-L196: ; Continuation
+L198: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -2714,35 +2729,35 @@ L196: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L197: ; Continuation
+L199: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L196
+  push word L198
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L198: ; Arm: 252'7
+L200: ; Arm: 252'7
   push word [bp+2]
   push word [CurrentCont]
-  push word L197
+  push word L199
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g67
   jmp [bp]
 
-L199: ; Arm: 194'9
+L201: ; Arm: 194'9
   mov si, g68
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L200: ; Arm: 198'35
+L202: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -2753,22 +2768,22 @@ L200: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L201: ; Continuation
+L203: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L200
+  jz L202
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L202: ; Continuation
+L204: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L201
+  push word L203
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -2776,11 +2791,11 @@ L202: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L203: ; Function: (loop,t3)
+L205: ; Function: (loop,t3)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L199
+  jz L201
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -2795,21 +2810,21 @@ L203: ; Function: (loop,t3)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L202
+  push word L204
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L204: ; Arm: 194'9
+L206: ; Arm: 194'9
   mov si, g77
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L205: ; Arm: 198'35
+L207: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -2820,22 +2835,22 @@ L205: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L206: ; Continuation
+L208: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L205
+  jz L207
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L207: ; Continuation
+L209: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L206
+  push word L208
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -2843,11 +2858,11 @@ L207: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L208: ; Function: (loop,t1)
+L210: ; Function: (loop,t1)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L204
+  jz L206
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -2862,30 +2877,30 @@ L208: ; Function: (loop,t1)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L207
+  push word L209
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L209: ; Continuation
+L211: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L210: ; Continuation
+L212: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L209
+  push word L211
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L211: ; Arm: 245'11
+L213: ; Arm: 245'11
   push word g81
   push word [bp+4]
   push word 3
@@ -2897,27 +2912,10 @@ L211: ; Arm: 245'11
   mov [Temps+4], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L210
-  mov [CurrentCont], sp
-  push word 4 ;; scanned
-  mov bp, g22
-  mov si, [Temps+4]
-  jmp [bp]
-
-L212: ; Continuation
-  Bare_enter_check(0)
-  mov bp, g25
-  mov si, si
-  jmp [bp]
-
-L213: ; Arm: 248'16
-  mov ax, [bx+2]
-  mov [Temps+4], ax
-  push word [CurrentCont]
   push word L212
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov bp, g13
+  mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
@@ -2927,26 +2925,43 @@ L214: ; Continuation
   mov si, si
   jmp [bp]
 
-L215: ; Continuation
-  Bare_enter_check(6)
+L215: ; Arm: 248'16
+  mov ax, [bx+2]
+  mov [Temps+4], ax
   push word [CurrentCont]
   push word L214
+  mov [CurrentCont], sp
+  push word 4 ;; scanned
+  mov bp, g13
+  mov si, [Temps+4]
+  jmp [bp]
+
+L216: ; Continuation
+  Bare_enter_check(0)
+  mov bp, g25
+  mov si, si
+  jmp [bp]
+
+L217: ; Continuation
+  Bare_enter_check(6)
+  push word [CurrentCont]
+  push word L216
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L216: ; Continuation
+L218: ; Continuation
   Bare_enter_check(22)
   mov bx, si
   cmp word [bx], 1
-  jz L211
+  jz L213
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 1
-  jz L213
+  jz L215
   mov ax, [bx+2]
   mov [Temps+4], ax
   mov ax, [bx+4]
@@ -2962,34 +2977,34 @@ L216: ; Continuation
   mov [Temps+10], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L215
+  push word L217
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+10]
   jmp [bp]
 
-L217: ; Continuation
+L219: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L216
+  push word L218
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [bp+6]
   mov si, si
   jmp [bp]
 
-L218: ; Function: (lam,t1)
+L220: ; Function: (lam,t1)
   Bare_enter_check(16)
   push word si
-  push word L208
+  push word L210
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [Temps+2]
   push word si
   push word [CurrentCont]
-  push word L217
+  push word L219
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [bp+2]
@@ -3001,7 +3016,7 @@ L218: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L219: ; Continuation
+L221: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -3009,11 +3024,11 @@ L219: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L220: ; Continuation
+L222: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L219
+  push word L221
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, bp
@@ -3021,39 +3036,39 @@ L220: ; Continuation
   mov si, [bx+6]
   jmp [bp]
 
-L221: ; Continuation
+L223: ; Continuation
   Bare_enter_check(16)
   push word [bp+4]
-  push word L218
+  push word L220
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L220
+  push word L222
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g4
   mov si, [Temps+2]
   jmp [bp]
 
-L222: ; Continuation
+L224: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L223: ; Continuation
+L225: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L222
+  push word L224
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L224: ; Arm: 245'11
+L226: ; Arm: 245'11
   push word g72
   push word [bp+6]
   push word 3
@@ -3065,27 +3080,10 @@ L224: ; Arm: 245'11
   mov [Temps+4], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L223
-  mov [CurrentCont], sp
-  push word 4 ;; scanned
-  mov bp, g22
-  mov si, [Temps+4]
-  jmp [bp]
-
-L225: ; Continuation
-  Bare_enter_check(0)
-  mov bp, g25
-  mov si, si
-  jmp [bp]
-
-L226: ; Arm: 248'16
-  mov ax, [bx+2]
-  mov [Temps+4], ax
-  push word [CurrentCont]
   push word L225
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov bp, g13
+  mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
@@ -3095,32 +3093,49 @@ L227: ; Continuation
   mov si, si
   jmp [bp]
 
-L228: ; Continuation
-  Bare_enter_check(6)
+L228: ; Arm: 248'16
+  mov ax, [bx+2]
+  mov [Temps+4], ax
   push word [CurrentCont]
   push word L227
+  mov [CurrentCont], sp
+  push word 4 ;; scanned
+  mov bp, g13
+  mov si, [Temps+4]
+  jmp [bp]
+
+L229: ; Continuation
+  Bare_enter_check(0)
+  mov bp, g25
+  mov si, si
+  jmp [bp]
+
+L230: ; Continuation
+  Bare_enter_check(6)
+  push word [CurrentCont]
+  push word L229
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L229: ; Continuation
+L231: ; Continuation
   Bare_enter_check(32)
   push word [bp+8]
   push word [bp+4]
   push word [CurrentCont]
-  push word L221
+  push word L223
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, si
   cmp word [bx], 1
-  jz L224
+  jz L226
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 1
-  jz L226
+  jz L228
   mov ax, [bx+2]
   mov [Temps+4], ax
   mov ax, [bx+4]
@@ -3136,37 +3151,37 @@ L229: ; Continuation
   mov [Temps+10], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L228
+  push word L230
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+10]
   jmp [bp]
 
-L230: ; Continuation
+L232: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L229
+  push word L231
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, [bp+10]
   mov si, si
   jmp [bp]
 
-L231: ; Function: (lam,t1)
+L233: ; Function: (lam,t1)
   Bare_enter_check(20)
   mov bx, si
   cmp word [bx], 1
-  jz L198
+  jz L200
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+2]
-  push word L203
+  push word L205
   mov [Temps+6], sp
   push word 4 ;; scanned
   push word [Temps+6]
@@ -3174,7 +3189,7 @@ L231: ; Function: (lam,t1)
   push word [Temps+2]
   push word [bp+2]
   push word [CurrentCont]
-  push word L230
+  push word L232
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bx, [bp+2]
@@ -3186,10 +3201,10 @@ L231: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L232: ; Function: (lam,g86)
+L234: ; Function: (lam,g86)
   Bare_enter_check(6)
   push word si
-  push word L231
+  push word L233
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -3198,7 +3213,7 @@ L232: ; Function: (lam,g86)
   mov [CurrentCont], ax
   jmp [bp]
 
-L233: ; Continuation
+L235: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -3206,28 +3221,28 @@ L233: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L234: ; Continuation
+L236: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L233
+  push word L235
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L235: ; Arm: 289'7
+L237: ; Arm: 289'7
   push word [bp+2]
   push word [CurrentCont]
-  push word L234
+  push word L236
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g91
   jmp [bp]
 
-L236: ; Continuation
+L238: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -3235,29 +3250,29 @@ L236: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L237: ; Continuation
+L239: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L236
+  push word L238
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L238: ; Continuation
+L240: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L237
+  push word L239
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L239: ; Arm: 292'10
+L241: ; Arm: 292'10
   push word g95
   push word [Temps+2]
   push word 3
@@ -3270,14 +3285,14 @@ L239: ; Arm: 292'10
   push word 6 ;; scanned
   push word [bp+2]
   push word [CurrentCont]
-  push word L238
+  push word L240
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g22
   mov si, [Temps+8]
   jmp [bp]
 
-L240: ; Continuation
+L242: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -3285,39 +3300,39 @@ L240: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L241: ; Continuation
+L243: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L240
+  push word L242
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L242: ; Arm: 295'12
+L244: ; Arm: 295'12
   mov ax, [bx+2]
   mov [Temps+10], ax
   mov ax, [bx+4]
   mov [Temps+12], ax
   push word [bp+2]
   push word [CurrentCont]
-  push word L241
+  push word L243
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g96
   jmp [bp]
 
-L243: ; Arm: 194'9
+L245: ; Arm: 194'9
   mov si, g97
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L244: ; Arm: 198'35
+L246: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -3328,22 +3343,22 @@ L244: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L245: ; Continuation
+L247: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L244
+  jz L246
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L246: ; Continuation
+L248: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L245
+  push word L247
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -3351,11 +3366,11 @@ L246: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L247: ; Function: (loop,t5)
+L249: ; Function: (loop,t5)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L243
+  jz L245
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -3370,14 +3385,14 @@ L247: ; Function: (loop,t5)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L246
+  push word L248
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L248: ; Continuation
+L250: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -3385,29 +3400,29 @@ L248: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L249: ; Continuation
+L251: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L248
+  push word L250
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L250: ; Continuation
+L252: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L249
+  push word L251
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L251: ; Arm: 298'15
+L253: ; Arm: 298'15
   push word g101
   push word [bp+6]
   push word 3
@@ -3420,14 +3435,14 @@ L251: ; Arm: 298'15
   push word 6 ;; scanned
   push word [bp+4]
   push word [CurrentCont]
-  push word L250
+  push word L252
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
-L252: ; Continuation
+L254: ; Continuation
   Bare_enter_check(22)
   push word [bp+6]
   push word [bp+4]
@@ -3449,17 +3464,17 @@ L252: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L253: ; Continuation
+L255: ; Continuation
   Bare_enter_check(24)
   mov bx, si
   cmp word [bx], 1
-  jz L251
+  jz L253
   mov ax, [bx+2]
   mov [Temps+2], ax
   push word [Temps+2]
   push word [bp+8]
   push word [CurrentCont]
-  push word L252
+  push word L254
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [bp+4]
@@ -3471,40 +3486,40 @@ L253: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L254: ; Continuation
+L256: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L253
+  push word L255
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, [bp+10]
   mov si, si
   jmp [bp]
 
-L255: ; Function: (lam,t1)
+L257: ; Function: (lam,t1)
   Bare_enter_check(24)
   mov bx, si
   cmp word [bx], 1
-  jz L235
+  jz L237
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
   cmp word [bx], 1
-  jz L239
+  jz L241
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
   mov [Temps+8], ax
   mov bx, [Temps+8]
   cmp word [bx], 3
-  jz L242
+  jz L244
   push word [Temps+2]
-  push word L247
+  push word L249
   mov [Temps+10], sp
   push word 4 ;; scanned
   push word [Temps+10]
@@ -3512,7 +3527,7 @@ L255: ; Function: (lam,t1)
   push word [Temps+2]
   push word [bp+2]
   push word [CurrentCont]
-  push word L254
+  push word L256
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bx, [bp+2]
@@ -3524,10 +3539,10 @@ L255: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L256: ; Function: (lam,g102)
+L258: ; Function: (lam,g102)
   Bare_enter_check(6)
   push word si
-  push word L255
+  push word L257
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -3536,7 +3551,7 @@ L256: ; Function: (lam,g102)
   mov [CurrentCont], ax
   jmp [bp]
 
-L257: ; Arm: 144'22
+L259: ; Arm: 144'22
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3545,7 +3560,7 @@ L257: ; Arm: 144'22
   mov si, si
   jmp [bp]
 
-L258: ; Arm: 145'28
+L260: ; Arm: 145'28
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3567,23 +3582,23 @@ L258: ; Arm: 145'28
   mov si, [Temps+16]
   jmp [bp]
 
-L259: ; Arm: 146'19
+L261: ; Arm: 146'19
   mov bp, g110
   mov si, si
   jmp [bp]
 
-L260: ; Arm: 149'17
+L262: ; Arm: 149'17
   mov bp, g110
   mov si, si
   jmp [bp]
 
-L261: ; Continuation
+L263: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, g110
   jmp [bp]
 
-L262: ; Arm: 153'28
+L264: ; Arm: 153'28
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3614,7 +3629,7 @@ L262: ; Arm: 153'28
   mov [CurrentCont], ax
   jmp [bp]
 
-L263: ; Arm: 154'29
+L265: ; Arm: 154'29
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3657,7 +3672,7 @@ L263: ; Arm: 154'29
   mov [CurrentCont], ax
   jmp [bp]
 
-L264: ; Arm: 155'32
+L266: ; Arm: 155'32
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3700,30 +3715,30 @@ L264: ; Arm: 155'32
   mov [CurrentCont], ax
   jmp [bp]
 
-L265: ; Continuation
+L267: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L261
+  push word L263
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, si
   cmp word [bx], 3
-  jz L262
+  jz L264
   mov ax, [bp+6]
   cmp word ax, 65
   call Bare_make_bool_from_n
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L263
+  jz L265
   mov ax, 253
   cmp word ax, [bp+6]
   call Bare_make_bool_from_n
   mov [Temps+4], ax
   mov bx, [Temps+4]
   cmp word [bx], 3
-  jz L264
+  jz L266
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3742,17 +3757,17 @@ L265: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L266: ; Arm: 6'9
+L268: ; Arm: 6'9
   mov si, g112
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L267: ; Arm: 147'21
+L269: ; Arm: 147'21
   mov bx, si
   cmp word [bx], 1
-  jz L260
+  jz L262
   mov ax, [bx+2]
   mov [Temps+14], ax
   mov ax, [bx+4]
@@ -3769,19 +3784,19 @@ L267: ; Arm: 147'21
   push word [Temps+18]
   push word [Temps+16]
   push word [CurrentCont]
-  push word L265
+  push word L267
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [Temps+20]
   cmp word [bx], 3
-  jz L266
+  jz L268
   mov si, g113
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L268: ; Continuation
+L270: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [bp+6]
@@ -3792,7 +3807,7 @@ L268: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L269: ; Arm: 100'19
+L271: ; Arm: 100'19
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -3803,7 +3818,7 @@ L269: ; Arm: 100'19
   mov [CurrentCont], ax
   jmp [bp]
 
-L270: ; Arm: 101'22
+L272: ; Arm: 101'22
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -3814,7 +3829,7 @@ L270: ; Arm: 101'22
   mov [CurrentCont], ax
   jmp [bp]
 
-L271: ; Arm: 102'16
+L273: ; Arm: 102'16
   mov ax, [Temps+2]
   call Bare_put_char
   mov ax, Bare_unit
@@ -3825,7 +3840,7 @@ L271: ; Arm: 102'16
   mov [CurrentCont], ax
   jmp [bp]
 
-L272: ; Function: (readloop,g110)
+L274: ; Function: (readloop,g110)
   Bare_enter_check(10)
   call Bare_get_char
   mov [Temps+2], ax
@@ -3840,28 +3855,28 @@ L272: ; Function: (readloop,g110)
   mov [Temps+6], ax
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L257
+  jz L259
   mov ax, [Temps+2]
   cmp word ax, `\x04`
   call Bare_make_bool_from_z
   mov [Temps+8], ax
   mov bx, [Temps+8]
   cmp word [bx], 3
-  jz L258
+  jz L260
   mov ax, 255
   cmp word ax, [Temps+4]
   call Bare_make_bool_from_n
   mov [Temps+10], ax
   mov bx, [Temps+10]
   cmp word [bx], 3
-  jz L259
+  jz L261
   mov ax, [Temps+4]
   cmp word ax, 255
   call Bare_make_bool_from_z
   mov [Temps+12], ax
   mov bx, [Temps+12]
   cmp word [bx], 3
-  jz L267
+  jz L269
   mov ax, [Temps+2]
   call Bare_char_to_num
   shl ax, 1
@@ -3874,26 +3889,26 @@ L272: ; Function: (readloop,g110)
   push word [Temps+2]
   push word si
   push word [CurrentCont]
-  push word L268
+  push word L270
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [Temps+16]
   cmp word [bx], 3
-  jz L269
+  jz L271
   mov ax, [Temps+2]
   cmp word ax, `\n`
   call Bare_make_bool_from_z
   mov [Temps+18], ax
   mov bx, [Temps+18]
   cmp word [bx], 3
-  jz L270
+  jz L272
   mov ax, 53
   cmp word ax, [Temps+14]
   call Bare_make_bool_from_n
   mov [Temps+20], ax
   mov bx, [Temps+20]
   cmp word [bx], 3
-  jz L271
+  jz L273
   mov ax, `^`
   call Bare_put_char
   mov ax, Bare_unit
@@ -3922,7 +3937,7 @@ L272: ; Function: (readloop,g110)
   mov [CurrentCont], ax
   jmp [bp]
 
-L273: ; Continuation
+L275: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -3930,35 +3945,35 @@ L273: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L274: ; Continuation
+L276: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L273
+  push word L275
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L275: ; Arm: 327'7
+L277: ; Arm: 327'7
   push word [bp+2]
   push word [CurrentCont]
-  push word L274
+  push word L276
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g121
   jmp [bp]
 
-L276: ; Arm: 194'9
+L278: ; Arm: 194'9
   mov si, g122
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L277: ; Arm: 198'35
+L279: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -3969,22 +3984,22 @@ L277: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L278: ; Continuation
+L280: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L277
+  jz L279
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L279: ; Continuation
+L281: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L278
+  push word L280
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -3992,11 +4007,11 @@ L279: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L280: ; Function: (loop,t1)
+L282: ; Function: (loop,t1)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L276
+  jz L278
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -4011,60 +4026,60 @@ L280: ; Function: (loop,t1)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L279
+  push word L281
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L281: ; Continuation
+L283: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L282: ; Continuation
+L284: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L281
+  push word L283
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L283: ; Arm: 320'11
+L285: ; Arm: 320'11
   push word g125
   push word [bp+4]
   push word 3
   mov [Temps+2], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L282
+  push word L284
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+2]
   jmp [bp]
 
-L284: ; Continuation
+L286: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L285: ; Continuation
+L287: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L284
+  push word L286
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L286: ; Arm: 323'16
+L288: ; Arm: 323'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word g128
@@ -4073,39 +4088,39 @@ L286: ; Arm: 323'16
   mov [Temps+6], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L285
+  push word L287
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+6]
   jmp [bp]
 
-L287: ; Continuation
+L289: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L288: ; Continuation
+L290: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L287
+  push word L289
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L289: ; Continuation
+L291: ; Continuation
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L283
+  jz L285
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 1
-  jz L286
+  jz L288
   mov ax, [bx+2]
   mov [Temps+4], ax
   mov ax, [bx+4]
@@ -4116,34 +4131,34 @@ L289: ; Continuation
   mov [Temps+8], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L288
+  push word L290
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+8]
   jmp [bp]
 
-L290: ; Continuation
+L292: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L289
+  push word L291
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [bp+6]
   mov si, si
   jmp [bp]
 
-L291: ; Function: (lam,t3)
+L293: ; Function: (lam,t3)
   Bare_enter_check(16)
   push word si
-  push word L280
+  push word L282
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [Temps+2]
   push word si
   push word [CurrentCont]
-  push word L290
+  push word L292
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [bp+2]
@@ -4155,7 +4170,7 @@ L291: ; Function: (lam,t3)
   mov [CurrentCont], ax
   jmp [bp]
 
-L292: ; Continuation
+L294: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -4163,11 +4178,11 @@ L292: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L293: ; Continuation
+L295: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L292
+  push word L294
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, bp
@@ -4175,33 +4190,33 @@ L293: ; Continuation
   mov si, [bx+6]
   jmp [bp]
 
-L294: ; Function: (lam,t1)
+L296: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov bx, si
   cmp word [bx], 1
-  jz L275
+  jz L277
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [bp+2]
-  push word L291
+  push word L293
   mov [Temps+6], sp
   push word 4 ;; scanned
   push word si
   push word [bp+2]
   push word [CurrentCont]
-  push word L293
+  push word L295
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g4
   mov si, [Temps+6]
   jmp [bp]
 
-L295: ; Function: (lam,g132)
+L297: ; Function: (lam,g132)
   Bare_enter_check(6)
   push word si
-  push word L294
+  push word L296
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -4210,7 +4225,7 @@ L295: ; Function: (lam,g132)
   mov [CurrentCont], ax
   jmp [bp]
 
-L296: ; Function: (lam,g138)
+L298: ; Function: (lam,g138)
   Bare_enter_check(0)
   mov bx, si
   mov ax, [bx+2]
@@ -4223,35 +4238,35 @@ L296: ; Function: (lam,g138)
   mov [CurrentCont], ax
   jmp [bp]
 
-L297: ; Arm: 205'9
+L299: ; Arm: 205'9
   mov si, g140
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L298: ; Continuation
+L300: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, g139
   jmp [bp]
 
-L299: ; Continuation
+L301: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L298
+  push word L300
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L300: ; Function: (loop,g139)
+L302: ; Function: (loop,g139)
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 1
-  jz L297
+  jz L299
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -4262,14 +4277,14 @@ L300: ; Function: (loop,g139)
   mov [Temps+6], ax
   push word [Temps+4]
   push word [CurrentCont]
-  push word L299
+  push word L301
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, [Temps+2]
   jmp [bp]
 
-L301: ; Continuation
+L303: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -4277,32 +4292,32 @@ L301: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L302: ; Continuation
+L304: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L301
+  push word L303
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L303: ; Arm: 237'9
+L305: ; Arm: 237'9
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [bp+2]
   push word [CurrentCont]
-  push word L302
+  push word L304
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g137
   jmp [bp]
 
-L304: ; Continuation
+L306: ; Continuation
   Bare_enter_check(0)
   mov ax, `\n`
   call Bare_put_char
@@ -4314,51 +4329,17 @@ L304: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L305: ; Arm: 209'9
+L307: ; Arm: 209'9
   mov si, g141
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L306: ; Continuation
+L308: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, g139
-  jmp [bp]
-
-L307: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L306
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, g25
-  mov si, si
-  jmp [bp]
-
-L308: ; Continuation
-  Bare_enter_check(16)
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L304
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bx, si
-  cmp word [bx], 1
-  jz L305
-  mov ax, [bx+2]
-  mov [Temps+2], ax
-  mov ax, [bx+4]
-  mov [Temps+4], ax
-  push word [Temps+4]
-  push word [CurrentCont]
-  push word L307
-  mov [CurrentCont], sp
-  push word 6 ;; scanned
-  mov bp, g13
-  mov si, [Temps+2]
   jmp [bp]
 
 L309: ; Continuation
@@ -4368,16 +4349,50 @@ L309: ; Continuation
   push word L308
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov bp, [bp+6]
+  mov bp, g25
   mov si, si
   jmp [bp]
 
 L310: ; Continuation
+  Bare_enter_check(16)
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L306
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov bx, si
+  cmp word [bx], 1
+  jz L307
+  mov ax, [bx+2]
+  mov [Temps+2], ax
+  mov ax, [bx+4]
+  mov [Temps+4], ax
+  push word [Temps+4]
+  push word [CurrentCont]
+  push word L309
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov bp, g13
+  mov si, [Temps+2]
+  jmp [bp]
+
+L311: ; Continuation
+  Bare_enter_check(8)
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L310
+  mov [CurrentCont], sp
+  push word 6 ;; scanned
+  mov bp, [bp+6]
+  mov si, si
+  jmp [bp]
+
+L312: ; Continuation
   Bare_enter_check(10)
   push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L309
+  push word L311
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [bp+4]
@@ -4389,24 +4404,24 @@ L310: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L311: ; Function: (lam,t1)
+L313: ; Function: (lam,t1)
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 3
-  jz L303
+  jz L305
   push word [bp+2]
   push word [CurrentCont]
-  push word L310
+  push word L312
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g2
   mov si, g138
   jmp [bp]
 
-L312: ; Function: (lam,g142)
+L314: ; Function: (lam,g142)
   Bare_enter_check(6)
   push word si
-  push word L311
+  push word L313
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -4415,7 +4430,7 @@ L312: ; Function: (lam,g142)
   mov [CurrentCont], ax
   jmp [bp]
 
-L313: ; Continuation
+L315: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -4423,35 +4438,35 @@ L313: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L314: ; Continuation
+L316: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L313
+  push word L315
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L315: ; Arm: 266'7
+L317: ; Arm: 266'7
   push word [bp+2]
   push word [CurrentCont]
-  push word L314
+  push word L316
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g147
   jmp [bp]
 
-L316: ; Arm: 194'9
+L318: ; Arm: 194'9
   mov si, g148
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L317: ; Arm: 198'35
+L319: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -4462,22 +4477,22 @@ L317: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L318: ; Continuation
+L320: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L317
+  jz L319
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L319: ; Continuation
+L321: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L318
+  push word L320
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -4485,11 +4500,11 @@ L319: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L320: ; Function: (loop,t3)
+L322: ; Function: (loop,t3)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L316
+  jz L318
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -4504,21 +4519,21 @@ L320: ; Function: (loop,t3)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L319
+  push word L321
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L321: ; Arm: 194'9
+L323: ; Arm: 194'9
   mov si, g157
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L322: ; Arm: 198'35
+L324: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -4529,22 +4544,22 @@ L322: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L323: ; Continuation
+L325: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L322
+  jz L324
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L324: ; Continuation
+L326: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L323
+  push word L325
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -4552,11 +4567,11 @@ L324: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L325: ; Function: (loop,t1)
+L327: ; Function: (loop,t1)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L321
+  jz L323
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -4571,30 +4586,30 @@ L325: ; Function: (loop,t1)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L324
+  push word L326
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L326: ; Continuation
+L328: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L327: ; Continuation
+L329: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L326
+  push word L328
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L328: ; Arm: 259'11
+L330: ; Arm: 259'11
   push word g161
   push word [bp+4]
   push word 3
@@ -4606,30 +4621,30 @@ L328: ; Arm: 259'11
   mov [Temps+4], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L327
+  push word L329
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
-L329: ; Continuation
+L331: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L330: ; Continuation
+L332: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L329
+  push word L331
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L331: ; Arm: 262'16
+L333: ; Arm: 262'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word g165
@@ -4643,62 +4658,62 @@ L331: ; Arm: 262'16
   mov [Temps+8], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L330
+  push word L332
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+8]
   jmp [bp]
 
-L332: ; Continuation
+L334: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L333: ; Continuation
+L335: ; Continuation
   Bare_enter_check(22)
   mov bx, si
   cmp word [bx], 1
-  jz L328
+  jz L330
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 1
-  jz L331
+  jz L333
   mov ax, [bx+2]
   mov [Temps+4], ax
   mov ax, [bx+4]
   mov [Temps+6], ax
   push word [CurrentCont]
-  push word L332
+  push word L334
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, [Temps+4]
   jmp [bp]
 
-L334: ; Continuation
+L336: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L333
+  push word L335
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [bp+6]
   mov si, si
   jmp [bp]
 
-L335: ; Function: (lam,t1)
+L337: ; Function: (lam,t1)
   Bare_enter_check(16)
   push word si
-  push word L325
+  push word L327
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [Temps+2]
   push word si
   push word [CurrentCont]
-  push word L334
+  push word L336
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [bp+2]
@@ -4710,7 +4725,7 @@ L335: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L336: ; Continuation
+L338: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -4718,11 +4733,11 @@ L336: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L337: ; Continuation
+L339: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L336
+  push word L338
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, bp
@@ -4730,39 +4745,39 @@ L337: ; Continuation
   mov si, [bx+6]
   jmp [bp]
 
-L338: ; Continuation
+L340: ; Continuation
   Bare_enter_check(16)
   push word [bp+4]
-  push word L335
+  push word L337
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L337
+  push word L339
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g4
   mov si, [Temps+2]
   jmp [bp]
 
-L339: ; Continuation
+L341: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L340: ; Continuation
+L342: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L339
+  push word L341
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L341: ; Arm: 259'11
+L343: ; Arm: 259'11
   push word g152
   push word [bp+6]
   push word 3
@@ -4774,30 +4789,30 @@ L341: ; Arm: 259'11
   mov [Temps+4], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L340
+  push word L342
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
-L342: ; Continuation
+L344: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L343: ; Continuation
+L345: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L342
+  push word L344
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L344: ; Arm: 262'16
+L346: ; Arm: 262'16
   mov ax, [bx+2]
   mov [Temps+4], ax
   push word g156
@@ -4811,71 +4826,71 @@ L344: ; Arm: 262'16
   mov [Temps+8], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L343
+  push word L345
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+8]
   jmp [bp]
 
-L345: ; Continuation
+L347: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L346: ; Continuation
+L348: ; Continuation
   Bare_enter_check(32)
   push word [bp+8]
   push word [bp+4]
   push word [CurrentCont]
-  push word L338
+  push word L340
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, si
   cmp word [bx], 1
-  jz L341
+  jz L343
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 1
-  jz L344
+  jz L346
   mov ax, [bx+2]
   mov [Temps+4], ax
   mov ax, [bx+4]
   mov [Temps+6], ax
   push word [CurrentCont]
-  push word L345
+  push word L347
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, [Temps+4]
   jmp [bp]
 
-L347: ; Continuation
+L349: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L346
+  push word L348
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, [bp+10]
   mov si, si
   jmp [bp]
 
-L348: ; Function: (lam,t1)
+L350: ; Function: (lam,t1)
   Bare_enter_check(20)
   mov bx, si
   cmp word [bx], 1
-  jz L315
+  jz L317
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   push word [Temps+2]
-  push word L320
+  push word L322
   mov [Temps+6], sp
   push word 4 ;; scanned
   push word [Temps+6]
@@ -4883,7 +4898,7 @@ L348: ; Function: (lam,t1)
   push word [Temps+2]
   push word [bp+2]
   push word [CurrentCont]
-  push word L347
+  push word L349
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bx, [bp+2]
@@ -4895,10 +4910,10 @@ L348: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L349: ; Function: (lam,g166)
+L351: ; Function: (lam,g166)
   Bare_enter_check(6)
   push word si
-  push word L348
+  push word L350
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -4907,7 +4922,7 @@ L349: ; Function: (lam,g166)
   mov [CurrentCont], ax
   jmp [bp]
 
-L350: ; Continuation
+L352: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -4915,28 +4930,28 @@ L350: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L351: ; Continuation
+L353: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L350
+  push word L352
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L352: ; Arm: 304'7
+L354: ; Arm: 304'7
   push word [bp+2]
   push word [CurrentCont]
-  push word L351
+  push word L353
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g171
   jmp [bp]
 
-L353: ; Continuation
+L355: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -4944,29 +4959,29 @@ L353: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L354: ; Continuation
+L356: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L353
+  push word L355
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L355: ; Continuation
+L357: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L354
+  push word L356
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L356: ; Arm: 307'10
+L358: ; Arm: 307'10
   push word g175
   push word [Temps+2]
   push word 3
@@ -4979,14 +4994,14 @@ L356: ; Arm: 307'10
   push word 6 ;; scanned
   push word [bp+2]
   push word [CurrentCont]
-  push word L355
+  push word L357
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g22
   mov si, [Temps+8]
   jmp [bp]
 
-L357: ; Continuation
+L359: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -4994,39 +5009,39 @@ L357: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L358: ; Continuation
+L360: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L357
+  push word L359
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L359: ; Arm: 310'12
+L361: ; Arm: 310'12
   mov ax, [bx+2]
   mov [Temps+10], ax
   mov ax, [bx+4]
   mov [Temps+12], ax
   push word [bp+2]
   push word [CurrentCont]
-  push word L358
+  push word L360
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g176
   jmp [bp]
 
-L360: ; Arm: 194'9
+L362: ; Arm: 194'9
   mov si, g177
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L361: ; Arm: 198'35
+L363: ; Arm: 198'35
   push word [bp+8]
   push word 3
   mov [Temps+2], sp
@@ -5037,22 +5052,22 @@ L361: ; Arm: 198'35
   mov [CurrentCont], ax
   jmp [bp]
 
-L362: ; Continuation
+L364: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L361
+  jz L363
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L363: ; Continuation
+L365: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L362
+  push word L364
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -5060,11 +5075,11 @@ L363: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L364: ; Function: (loop,t5)
+L366: ; Function: (loop,t5)
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L360
+  jz L362
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -5079,14 +5094,14 @@ L364: ; Function: (loop,t5)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L363
+  push word L365
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L365: ; Continuation
+L367: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -5094,29 +5109,29 @@ L365: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L366: ; Continuation
+L368: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L365
+  push word L367
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L367: ; Continuation
+L369: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L366
+  push word L368
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L368: ; Arm: 313'15
+L370: ; Arm: 313'15
   push word g181
   push word [bp+6]
   push word 3
@@ -5129,14 +5144,14 @@ L368: ; Arm: 313'15
   push word 6 ;; scanned
   push word [bp+4]
   push word [CurrentCont]
-  push word L367
+  push word L369
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
-L369: ; Continuation
+L371: ; Continuation
   Bare_enter_check(0)
   mov si, g186
   mov bp, [CurrentCont]
@@ -5144,27 +5159,27 @@ L369: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L370: ; Continuation
+L372: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L369
+  push word L371
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L371: ; Continuation
+L373: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L370
+  push word L372
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L372: ; Arm: 272'9
+L374: ; Arm: 272'9
   push word g185
   push word [bp+2]
   push word 3
@@ -5176,21 +5191,21 @@ L372: ; Arm: 272'9
   mov [Temps+4], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L371
+  push word L373
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
-L373: ; Arm: 277'35
+L375: ; Arm: 277'35
   mov si, [bp+6]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L374: ; Continuation
+L376: ; Continuation
   Bare_enter_check(16)
   push word [bp+6]
   push word [bp+4]
@@ -5208,29 +5223,29 @@ L374: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L375: ; Continuation
+L377: ; Continuation
   Bare_enter_check(10)
   mov bx, si
   cmp word [bx], 3
-  jz L373
+  jz L375
   push word [bp+10]
   push word [bp+8]
   push word [CurrentCont]
-  push word L374
+  push word L376
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L376: ; Continuation
+L378: ; Continuation
   Bare_enter_check(14)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L375
+  push word L377
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bx, bp
@@ -5238,11 +5253,11 @@ L376: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L377: ; Function: (loop,t2)
+L379: ; Function: (loop,t2)
   Bare_enter_check(22)
   mov bx, si
   cmp word [bx], 1
-  jz L372
+  jz L374
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -5258,14 +5273,14 @@ L377: ; Function: (loop,t2)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L376
+  push word L378
   mov [CurrentCont], sp
   push word 14 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L378: ; Continuation
+L380: ; Continuation
   Bare_enter_check(22)
   push word [bp+6]
   push word [bp+4]
@@ -5287,7 +5302,7 @@ L378: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L379: ; Continuation
+L381: ; Continuation
   Bare_enter_check(16)
   push word si
   push word 1
@@ -5296,7 +5311,7 @@ L379: ; Continuation
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L378
+  push word L380
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [Temps+2]
@@ -5308,34 +5323,34 @@ L379: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L380: ; Continuation
+L382: ; Continuation
   Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L379
+  push word L381
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, [bp+8]
   mov si, si
   jmp [bp]
 
-L381: ; Continuation
+L383: ; Continuation
   Bare_enter_check(24)
   mov bx, si
   cmp word [bx], 1
-  jz L368
+  jz L370
   mov ax, [bx+2]
   mov [Temps+2], ax
   push word [bp+6]
-  push word L377
+  push word L379
   mov [Temps+4], sp
   push word 4 ;; scanned
   push word [Temps+4]
   push word [Temps+2]
   push word [bp+8]
   push word [CurrentCont]
-  push word L380
+  push word L382
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, [bp+4]
@@ -5347,40 +5362,40 @@ L381: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L382: ; Continuation
+L384: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L381
+  push word L383
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, [bp+10]
   mov si, si
   jmp [bp]
 
-L383: ; Function: (lam,t1)
+L385: ; Function: (lam,t1)
   Bare_enter_check(24)
   mov bx, si
   cmp word [bx], 1
-  jz L352
+  jz L354
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
   cmp word [bx], 1
-  jz L356
+  jz L358
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
   mov [Temps+8], ax
   mov bx, [Temps+8]
   cmp word [bx], 3
-  jz L359
+  jz L361
   push word [Temps+2]
-  push word L364
+  push word L366
   mov [Temps+10], sp
   push word 4 ;; scanned
   push word [Temps+10]
@@ -5388,7 +5403,7 @@ L383: ; Function: (lam,t1)
   push word [Temps+2]
   push word [bp+2]
   push word [CurrentCont]
-  push word L382
+  push word L384
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bx, [bp+2]
@@ -5400,10 +5415,10 @@ L383: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L384: ; Function: (lam,g187)
+L386: ; Function: (lam,g187)
   Bare_enter_check(6)
   push word si
-  push word L383
+  push word L385
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -5412,7 +5427,7 @@ L384: ; Function: (lam,g187)
   mov [CurrentCont], ax
   jmp [bp]
 
-L385: ; Continuation
+L387: ; Continuation
   Bare_enter_check(0)
   mov si, g197
   mov bp, [CurrentCont]
@@ -5420,27 +5435,27 @@ L385: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L386: ; Continuation
+L388: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L385
+  push word L387
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L387: ; Continuation
+L389: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L386
+  push word L388
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g13
   mov si, si
   jmp [bp]
 
-L388: ; Arm: 272'9
+L390: ; Arm: 272'9
   push word g196
   push word [bp+2]
   push word 3
@@ -5452,21 +5467,21 @@ L388: ; Arm: 272'9
   mov [Temps+4], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L387
+  push word L389
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g22
   mov si, [Temps+4]
   jmp [bp]
 
-L389: ; Arm: 277'35
+L391: ; Arm: 277'35
   mov si, [bp+6]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L390: ; Continuation
+L392: ; Continuation
   Bare_enter_check(16)
   push word [bp+6]
   push word [bp+4]
@@ -5484,29 +5499,29 @@ L390: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L391: ; Continuation
+L393: ; Continuation
   Bare_enter_check(10)
   mov bx, si
   cmp word [bx], 3
-  jz L389
+  jz L391
   push word [bp+10]
   push word [bp+8]
   push word [CurrentCont]
-  push word L390
+  push word L392
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+6]
   mov bp, [bp+4]
   jmp [bp]
 
-L392: ; Continuation
+L394: ; Continuation
   Bare_enter_check(14)
   push word [bp+12]
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L391
+  push word L393
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bx, bp
@@ -5514,11 +5529,11 @@ L392: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L393: ; Function: (loop,t1)
+L395: ; Function: (loop,t1)
   Bare_enter_check(22)
   mov bx, si
   cmp word [bx], 1
-  jz L388
+  jz L390
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -5534,14 +5549,14 @@ L393: ; Function: (loop,t1)
   push word bp
   push word [bp+2]
   push word [CurrentCont]
-  push word L392
+  push word L394
   mov [CurrentCont], sp
   push word 14 ;; scanned
   mov bp, g21
   mov si, [Temps+6]
   jmp [bp]
 
-L394: ; Continuation
+L396: ; Continuation
   Bare_enter_check(6)
   push word si
   push word 1
@@ -5553,25 +5568,25 @@ L394: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L395: ; Continuation
+L397: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L394
+  push word L396
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, [bp+4]
   mov si, si
   jmp [bp]
 
-L396: ; Function: (lam,t1)
+L398: ; Function: (lam,t1)
   Bare_enter_check(14)
   push word si
-  push word L393
+  push word L395
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [Temps+2]
   push word [CurrentCont]
-  push word L395
+  push word L397
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, [bp+2]
@@ -5583,10 +5598,10 @@ L396: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L397: ; Function: (lam,g198)
+L399: ; Function: (lam,g198)
   Bare_enter_check(6)
   push word si
-  push word L396
+  push word L398
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -5595,7 +5610,7 @@ L397: ; Function: (lam,g198)
   mov [CurrentCont], ax
   jmp [bp]
 
-L398: ; Continuation
+L400: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -5603,39 +5618,39 @@ L398: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L399: ; Continuation
+L401: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L398
+  push word L400
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L400: ; Arm: 284'7
+L402: ; Arm: 284'7
   push word [bp+2]
   push word [CurrentCont]
-  push word L399
+  push word L401
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g192
   jmp [bp]
 
-L401: ; Continuation
+L403: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L402: ; Continuation
+L404: ; Continuation
   Bare_enter_check(8)
   push word [bp+6]
   push word [CurrentCont]
-  push word L401
+  push word L403
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, bp
@@ -5643,11 +5658,11 @@ L402: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L403: ; Function: (lam,t1)
+L405: ; Function: (lam,t1)
   Bare_enter_check(10)
   mov bx, si
   cmp word [bx], 1
-  jz L400
+  jz L402
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -5655,17 +5670,17 @@ L403: ; Function: (lam,t1)
   push word si
   push word [bp+2]
   push word [CurrentCont]
-  push word L402
+  push word L404
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g6
   mov si, g198
   jmp [bp]
 
-L404: ; Function: (lam,g199)
+L406: ; Function: (lam,g199)
   Bare_enter_check(6)
   push word si
-  push word L403
+  push word L405
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -5674,7 +5689,7 @@ L404: ; Function: (lam,g199)
   mov [CurrentCont], ax
   jmp [bp]
 
-L405: ; Arm: 369'9
+L407: ; Arm: 369'9
   push word [bp+2]
   push word 3
   mov [Temps+2], sp
@@ -5685,25 +5700,25 @@ L405: ; Arm: 369'9
   mov [CurrentCont], ax
   jmp [bp]
 
-L406: ; Arm: 372'15
+L408: ; Arm: 372'15
   mov si, g217
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L407: ; Continuation
+L409: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L408: ; Continuation
+L410: ; Continuation
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 1
-  jz L406
+  jz L408
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, 21
@@ -5721,14 +5736,14 @@ L408: ; Continuation
   mov [Temps+6], ax
   push word [bp+6]
   push word [CurrentCont]
-  push word L407
+  push word L409
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g210
   mov si, [Temps+6]
   jmp [bp]
 
-L409: ; Arm: 364'27
+L411: ; Arm: 364'27
   push word [bp+4]
   push word 3
   mov [Temps+2], sp
@@ -5739,72 +5754,72 @@ L409: ; Arm: 364'27
   mov [CurrentCont], ax
   jmp [bp]
 
-L410: ; Continuation
+L412: ; Continuation
   Bare_enter_check(6)
   mov bx, si
   cmp word [bx], 3
-  jz L409
+  jz L411
   mov si, g215
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L411: ; Arm: 6'9
+L413: ; Arm: 6'9
   mov si, g213
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L412: ; Arm: 364'12
+L414: ; Arm: 364'12
   mov ax, 19
   cmp word ax, [bp+8]
   call Bare_make_bool_from_n
   mov [Temps+2], ax
   push word [bp+8]
   push word [CurrentCont]
-  push word L410
+  push word L412
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L411
+  jz L413
   mov si, g214
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L413: ; Continuation
+L415: ; Continuation
   Bare_enter_check(18)
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L408
+  push word L410
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, si
   cmp word [bx], 3
-  jz L412
+  jz L414
   mov si, g216
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L414: ; Arm: 6'9
+L416: ; Arm: 6'9
   mov si, g211
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L415: ; Function: (lam,t1)
+L417: ; Function: (lam,t1)
   Bare_enter_check(12)
   mov bx, si
   cmp word [bx], 1
-  jz L405
+  jz L407
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
@@ -5827,22 +5842,22 @@ L415: ; Function: (lam,t1)
   push word [Temps+4]
   push word [bp+2]
   push word [CurrentCont]
-  push word L413
+  push word L415
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, [Temps+10]
   cmp word [bx], 3
-  jz L414
+  jz L416
   mov si, g212
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L416: ; Function: (loop,g210)
+L418: ; Function: (loop,g210)
   Bare_enter_check(6)
   push word si
-  push word L415
+  push word L417
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -5851,14 +5866,14 @@ L416: ; Function: (loop,g210)
   mov [CurrentCont], ax
   jmp [bp]
 
-L417: ; Arm: 116'13
+L419: ; Arm: 116'13
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L418: ; Continuation
+L420: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   sar ax, 1
@@ -5873,7 +5888,7 @@ L418: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L419: ; Function: (lam,t1)
+L421: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov ax, si
   cmp word ax, 1
@@ -5881,7 +5896,7 @@ L419: ; Function: (lam,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L417
+  jz L419
   mov ax, si
   sar ax, 1
   mov bx, 21
@@ -5907,17 +5922,17 @@ L419: ; Function: (lam,t1)
   push word 6 ;; scanned
   push word si
   push word [CurrentCont]
-  push word L418
+  push word L420
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g221
   mov si, [Temps+10]
   jmp [bp]
 
-L420: ; Function: (loop,g221)
+L422: ; Function: (loop,g221)
   Bare_enter_check(6)
   push word si
-  push word L419
+  push word L421
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -5926,14 +5941,14 @@ L420: ; Function: (loop,g221)
   mov [CurrentCont], ax
   jmp [bp]
 
-L421: ; Arm: 116'13
+L423: ; Arm: 116'13
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L422: ; Continuation
+L424: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   sar ax, 1
@@ -5948,7 +5963,7 @@ L422: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L423: ; Function: (lam,t1)
+L425: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov ax, si
   cmp word ax, 1
@@ -5956,7 +5971,7 @@ L423: ; Function: (lam,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L421
+  jz L423
   mov ax, si
   sar ax, 1
   mov bx, 21
@@ -5982,17 +5997,17 @@ L423: ; Function: (lam,t1)
   push word 6 ;; scanned
   push word si
   push word [CurrentCont]
-  push word L422
+  push word L424
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g224
   mov si, [Temps+10]
   jmp [bp]
 
-L424: ; Function: (loop,g224)
+L426: ; Function: (loop,g224)
   Bare_enter_check(6)
   push word si
-  push word L423
+  push word L425
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -6001,14 +6016,14 @@ L424: ; Function: (loop,g224)
   mov [CurrentCont], ax
   jmp [bp]
 
-L425: ; Arm: 116'13
+L427: ; Arm: 116'13
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L426: ; Continuation
+L428: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   sar ax, 1
@@ -6023,7 +6038,7 @@ L426: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L427: ; Function: (lam,t1)
+L429: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov ax, si
   cmp word ax, 1
@@ -6031,7 +6046,7 @@ L427: ; Function: (lam,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L425
+  jz L427
   mov ax, si
   sar ax, 1
   mov bx, 21
@@ -6057,17 +6072,17 @@ L427: ; Function: (lam,t1)
   push word 6 ;; scanned
   push word si
   push word [CurrentCont]
-  push word L426
+  push word L428
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g228
   mov si, [Temps+10]
   jmp [bp]
 
-L428: ; Function: (loop,g228)
+L430: ; Function: (loop,g228)
   Bare_enter_check(6)
   push word si
-  push word L427
+  push word L429
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -6076,14 +6091,14 @@ L428: ; Function: (loop,g228)
   mov [CurrentCont], ax
   jmp [bp]
 
-L429: ; Arm: 116'13
+L431: ; Arm: 116'13
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L430: ; Continuation
+L432: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   sar ax, 1
@@ -6098,7 +6113,7 @@ L430: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L431: ; Function: (lam,t1)
+L433: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov ax, si
   cmp word ax, 1
@@ -6106,7 +6121,7 @@ L431: ; Function: (lam,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L429
+  jz L431
   mov ax, si
   sar ax, 1
   mov bx, 21
@@ -6132,17 +6147,17 @@ L431: ; Function: (lam,t1)
   push word 6 ;; scanned
   push word si
   push word [CurrentCont]
-  push word L430
+  push word L432
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g231
   mov si, [Temps+10]
   jmp [bp]
 
-L432: ; Function: (loop,g231)
+L434: ; Function: (loop,g231)
   Bare_enter_check(6)
   push word si
-  push word L431
+  push word L433
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -6151,7 +6166,7 @@ L432: ; Function: (loop,g231)
   mov [CurrentCont], ax
   jmp [bp]
 
-L433: ; Continuation
+L435: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -6159,28 +6174,28 @@ L433: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L434: ; Continuation
+L436: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L433
+  push word L435
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L435: ; Arm: 379'7
+L437: ; Arm: 379'7
   push word [bp+2]
   push word [CurrentCont]
-  push word L434
+  push word L436
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g208
   jmp [bp]
 
-L436: ; Continuation
+L438: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -6188,32 +6203,32 @@ L436: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L437: ; Continuation
+L439: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L436
+  push word L438
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L438: ; Arm: 382'12
+L440: ; Arm: 382'12
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
   mov [Temps+8], ax
   push word [bp+2]
   push word [CurrentCont]
-  push word L437
+  push word L439
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g209
   jmp [bp]
 
-L439: ; Continuation
+L441: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -6221,35 +6236,35 @@ L439: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L440: ; Continuation
+L442: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L439
+  push word L441
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L441: ; Arm: 385'15
+L443: ; Arm: 385'15
   push word [bp+4]
   push word [CurrentCont]
-  push word L440
+  push word L442
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g218
   jmp [bp]
 
-L442: ; Arm: 351'13
+L444: ; Arm: 351'13
   mov si, g219
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L443: ; Continuation
+L445: ; Continuation
   Bare_enter_check(0)
   mov ax, `\n`
   call Bare_put_char
@@ -6264,7 +6279,7 @@ L443: ; Continuation
   mov si, [Temps+4]
   jmp [bp]
 
-L444: ; Continuation
+L446: ; Continuation
   Bare_enter_check(8)
   push word si
   push word `-`
@@ -6275,7 +6290,7 @@ L444: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L445: ; Arm: 119'11
+L447: ; Arm: 119'11
   push word g229
   push word `0`
   push word 3
@@ -6287,14 +6302,14 @@ L445: ; Arm: 119'11
   mov [CurrentCont], ax
   jmp [bp]
 
-L446: ; Continuation
+L448: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L447: ; Arm: 123'2
+L449: ; Arm: 123'2
   mov ax, 1
   mov bx, [bp+8]
   sub ax, bx
@@ -6305,28 +6320,28 @@ L447: ; Arm: 123'2
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   push word [CurrentCont]
-  push word L444
+  push word L446
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L445
+  jz L447
   push word [Temps+4]
   push word [CurrentCont]
-  push word L446
+  push word L448
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g228
   mov si, g230
   jmp [bp]
 
-L448: ; Continuation
+L450: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L449: ; Arm: 119'11
+L451: ; Arm: 119'11
   push word g232
   push word `0`
   push word 3
@@ -6338,14 +6353,14 @@ L449: ; Arm: 119'11
   mov [CurrentCont], ax
   jmp [bp]
 
-L450: ; Continuation
+L452: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L451: ; Continuation
+L453: ; Continuation
   Bare_enter_check(24)
   mov ax, [bp+8]
   cmp word ax, 1
@@ -6354,59 +6369,59 @@ L451: ; Continuation
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L443
+  push word L445
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L447
+  jz L449
   mov ax, [bp+8]
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+4], ax
   push word [CurrentCont]
-  push word L448
+  push word L450
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, [Temps+4]
   cmp word [bx], 3
-  jz L449
+  jz L451
   push word [bp+8]
   push word [CurrentCont]
-  push word L450
+  push word L452
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g231
   mov si, g233
   jmp [bp]
 
-L452: ; Continuation
+L454: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L451
+  push word L453
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L453: ; Continuation
+L455: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L452
+  push word L454
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g13
   mov si, g227
   jmp [bp]
 
-L454: ; Continuation
+L456: ; Continuation
   Bare_enter_check(8)
   push word si
   push word `-`
@@ -6417,7 +6432,7 @@ L454: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L455: ; Arm: 119'11
+L457: ; Arm: 119'11
   push word g222
   push word `0`
   push word 3
@@ -6429,14 +6444,14 @@ L455: ; Arm: 119'11
   mov [CurrentCont], ax
   jmp [bp]
 
-L456: ; Continuation
+L458: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L457: ; Arm: 123'2
+L459: ; Arm: 123'2
   mov ax, 1
   mov bx, [bp+4]
   sub ax, bx
@@ -6447,28 +6462,28 @@ L457: ; Arm: 123'2
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   push word [CurrentCont]
-  push word L454
+  push word L456
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L455
+  jz L457
   push word [Temps+4]
   push word [CurrentCont]
-  push word L456
+  push word L458
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g221
   mov si, g223
   jmp [bp]
 
-L458: ; Continuation
+L460: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L459: ; Arm: 119'11
+L461: ; Arm: 119'11
   push word g225
   push word `0`
   push word 3
@@ -6480,14 +6495,14 @@ L459: ; Arm: 119'11
   mov [CurrentCont], ax
   jmp [bp]
 
-L460: ; Continuation
+L462: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L461: ; Continuation
+L463: ; Continuation
   Bare_enter_check(26)
   mov ax, [bp+4]
   cmp word ax, 1
@@ -6497,59 +6512,59 @@ L461: ; Continuation
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L453
+  push word L455
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L457
+  jz L459
   mov ax, [bp+4]
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+4], ax
   push word [CurrentCont]
-  push word L458
+  push word L460
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, [Temps+4]
   cmp word [bx], 3
-  jz L459
+  jz L461
   push word [bp+4]
   push word [CurrentCont]
-  push word L460
+  push word L462
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g224
   mov si, g226
   jmp [bp]
 
-L462: ; Continuation
+L464: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L461
+  push word L463
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L463: ; Continuation
+L465: ; Continuation
   Bare_enter_check(12)
   push word si
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L462
+  push word L464
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g13
   mov si, g220
   jmp [bp]
 
-L464: ; Function: (loop,t2)
+L466: ; Function: (loop,t2)
   Bare_enter_check(10)
   mov ax, [bp+2]
   cmp word ax, si
@@ -6557,18 +6572,18 @@ L464: ; Function: (loop,t2)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L442
+  jz L444
   push word bp
   push word si
   push word [CurrentCont]
-  push word L463
+  push word L465
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g59
   mov si, si
   jmp [bp]
 
-L465: ; Continuation
+L467: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -6576,31 +6591,31 @@ L465: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L466: ; Continuation
+L468: ; Continuation
   Bare_enter_check(14)
   mov bx, si
   cmp word [bx], 1
-  jz L441
+  jz L443
   mov ax, [bx+2]
   mov [Temps+2], ax
   push word [Temps+2]
-  push word L464
+  push word L466
   mov [Temps+4], sp
   push word 4 ;; scanned
   push word [bp+4]
   push word [CurrentCont]
-  push word L465
+  push word L467
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [Temps+4]
   mov si, 1
   jmp [bp]
 
-L467: ; Continuation
+L469: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L466
+  push word L468
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, bp
@@ -6608,43 +6623,43 @@ L467: ; Continuation
   mov si, [bx+6]
   jmp [bp]
 
-L468: ; Continuation
+L470: ; Continuation
   Bare_enter_check(10)
   push word si
   push word [bp+4]
   push word [CurrentCont]
-  push word L467
+  push word L469
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g210
   mov si, 1
   jmp [bp]
 
-L469: ; Function: (lam,t1)
+L471: ; Function: (lam,t1)
   Bare_enter_check(8)
   mov bx, si
   cmp word [bx], 1
-  jz L435
+  jz L437
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
   cmp word [bx], 3
-  jz L438
+  jz L440
   push word [bp+2]
   push word [CurrentCont]
-  push word L468
+  push word L470
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, [Temps+2]
   jmp [bp]
 
-L470: ; Function: (lam,g234)
+L472: ; Function: (lam,g234)
   Bare_enter_check(6)
   push word si
-  push word L469
+  push word L471
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -6653,14 +6668,14 @@ L470: ; Function: (lam,g234)
   mov [CurrentCont], ax
   jmp [bp]
 
-L471: ; Arm: 116'13
+L473: ; Arm: 116'13
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L472: ; Continuation
+L474: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   sar ax, 1
@@ -6675,7 +6690,7 @@ L472: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L473: ; Function: (lam,t1)
+L475: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov ax, si
   cmp word ax, 1
@@ -6683,7 +6698,7 @@ L473: ; Function: (lam,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L471
+  jz L473
   mov ax, si
   sar ax, 1
   mov bx, 21
@@ -6709,17 +6724,17 @@ L473: ; Function: (lam,t1)
   push word 6 ;; scanned
   push word si
   push word [CurrentCont]
-  push word L472
+  push word L474
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g240
   mov si, [Temps+10]
   jmp [bp]
 
-L474: ; Function: (loop,g240)
+L476: ; Function: (loop,g240)
   Bare_enter_check(6)
   push word si
-  push word L473
+  push word L475
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -6728,14 +6743,14 @@ L474: ; Function: (loop,g240)
   mov [CurrentCont], ax
   jmp [bp]
 
-L475: ; Arm: 116'13
+L477: ; Arm: 116'13
   mov si, [bp+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
-L476: ; Continuation
+L478: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+4]
   sar ax, 1
@@ -6750,7 +6765,7 @@ L476: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L477: ; Function: (lam,t1)
+L479: ; Function: (lam,t1)
   Bare_enter_check(16)
   mov ax, si
   cmp word ax, 1
@@ -6758,7 +6773,7 @@ L477: ; Function: (lam,t1)
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
-  jz L475
+  jz L477
   mov ax, si
   sar ax, 1
   mov bx, 21
@@ -6784,17 +6799,17 @@ L477: ; Function: (lam,t1)
   push word 6 ;; scanned
   push word si
   push word [CurrentCont]
-  push word L476
+  push word L478
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g243
   mov si, [Temps+10]
   jmp [bp]
 
-L478: ; Function: (loop,g243)
+L480: ; Function: (loop,g243)
   Bare_enter_check(6)
   push word si
-  push word L477
+  push word L479
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -6803,7 +6818,7 @@ L478: ; Function: (loop,g243)
   mov [CurrentCont], ax
   jmp [bp]
 
-L479: ; Continuation
+L481: ; Continuation
   Bare_enter_check(0)
   mov ax, `\n`
   call Bare_put_char
@@ -6815,7 +6830,7 @@ L479: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L480: ; Continuation
+L482: ; Continuation
   Bare_enter_check(8)
   push word si
   push word `-`
@@ -6826,7 +6841,7 @@ L480: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L481: ; Arm: 119'11
+L483: ; Arm: 119'11
   push word g241
   push word `0`
   push word 3
@@ -6838,14 +6853,14 @@ L481: ; Arm: 119'11
   mov [CurrentCont], ax
   jmp [bp]
 
-L482: ; Continuation
+L484: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L483: ; Arm: 123'2
+L485: ; Arm: 123'2
   mov ax, 1
   mov bx, [Temps+2]
   sub ax, bx
@@ -6856,28 +6871,28 @@ L483: ; Arm: 123'2
   call Bare_make_bool_from_z
   mov [Temps+8], ax
   push word [CurrentCont]
-  push word L480
+  push word L482
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, [Temps+8]
   cmp word [bx], 3
-  jz L481
+  jz L483
   push word [Temps+6]
   push word [CurrentCont]
-  push word L482
+  push word L484
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g240
   mov si, g242
   jmp [bp]
 
-L484: ; Continuation
+L486: ; Continuation
   Bare_enter_check(0)
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L485: ; Arm: 119'11
+L487: ; Arm: 119'11
   push word g244
   push word `0`
   push word 3
@@ -6889,14 +6904,14 @@ L485: ; Arm: 119'11
   mov [CurrentCont], ax
   jmp [bp]
 
-L486: ; Continuation
+L488: ; Continuation
   Bare_enter_check(0)
   mov bx, bp
   mov bp, si
   mov si, [bx+4]
   jmp [bp]
 
-L487: ; Function: (lam,t1)
+L489: ; Function: (lam,t1)
   Bare_enter_check(22)
   call Bare_free_words
   shl ax, 1
@@ -6908,36 +6923,36 @@ L487: ; Function: (lam,t1)
   mov [Temps+4], ax
   push word [bp+2]
   push word [CurrentCont]
-  push word L479
+  push word L481
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bx, [Temps+4]
   cmp word [bx], 3
-  jz L483
+  jz L485
   mov ax, [Temps+2]
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+6], ax
   push word [CurrentCont]
-  push word L484
+  push word L486
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, [Temps+6]
   cmp word [bx], 3
-  jz L485
+  jz L487
   push word [Temps+2]
   push word [CurrentCont]
-  push word L486
+  push word L488
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g243
   mov si, g245
   jmp [bp]
 
-L488: ; Function: (lam,g246)
+L490: ; Function: (lam,g246)
   Bare_enter_check(6)
   push word si
-  push word L487
+  push word L489
   mov [Temps+2], sp
   push word 4 ;; scanned
   mov si, [Temps+2]
@@ -6946,7 +6961,7 @@ L488: ; Function: (lam,g246)
   mov [CurrentCont], ax
   jmp [bp]
 
-L489: ; Continuation
+L491: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -6954,28 +6969,28 @@ L489: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L490: ; Continuation
+L492: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L489
+  push word L491
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L491: ; Arm: 332'7
+L493: ; Arm: 332'7
   push word [bp+4]
   push word [CurrentCont]
-  push word L490
+  push word L492
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g107
   jmp [bp]
 
-L492: ; Continuation
+L494: ; Continuation
   Bare_enter_check(0)
   mov si, [bp+4]
   mov bp, [CurrentCont]
@@ -6983,41 +6998,41 @@ L492: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L493: ; Continuation
+L495: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L492
+  push word L494
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L494: ; Arm: 335'12
+L496: ; Arm: 335'12
   mov ax, [bx+2]
   mov [Temps+6], ax
   mov ax, [bx+4]
   mov [Temps+8], ax
   push word [bp+4]
   push word [CurrentCont]
-  push word L493
+  push word L495
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g108
   jmp [bp]
 
-L495: ; Continuation
+L497: ; Continuation
   Bare_enter_check(0)
   mov bp, g22
   mov si, si
   jmp [bp]
 
-L496: ; Continuation
+L498: ; Continuation
   Bare_enter_check(6)
   push word [CurrentCont]
-  push word L495
+  push word L497
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bx, bp
@@ -7025,17 +7040,17 @@ L496: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L497: ; Arm: 340'44
+L499: ; Arm: 340'44
   push word [bp+4]
   push word [CurrentCont]
-  push word L496
+  push word L498
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g7
   mov si, g115
   jmp [bp]
 
-L498: ; Continuation
+L500: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word si
@@ -7046,56 +7061,28 @@ L498: ; Continuation
   mov si, [Temps+2]
   jmp [bp]
 
-L499: ; Continuation
+L501: ; Continuation
   Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L498
+  push word L500
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, g9
   mov si, si
   jmp [bp]
 
-L500: ; Continuation
-  Bare_enter_check(10)
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L499
-  mov [CurrentCont], sp
-  push word 8 ;; scanned
-  mov bp, [bp+8]
-  mov si, si
-  jmp [bp]
-
-L501: ; Continuation
-  Bare_enter_check(12)
-  push word [bp+8]
-  push word [bp+6]
-  push word [bp+4]
-  push word [CurrentCont]
-  push word L500
-  mov [CurrentCont], sp
-  push word 10 ;; scanned
-  mov bx, bp
-  mov bp, si
-  mov si, [bx+10]
-  jmp [bp]
-
 L502: ; Continuation
-  Bare_enter_check(14)
-  push word [bp+8]
-  push word si
+  Bare_enter_check(10)
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
   push word L501
   mov [CurrentCont], sp
-  push word 12 ;; scanned
-  mov bp, g7
-  mov si, g117
+  push word 8 ;; scanned
+  mov bp, [bp+8]
+  mov si, si
   jmp [bp]
 
 L503: ; Continuation
@@ -7107,45 +7094,73 @@ L503: ; Continuation
   push word L502
   mov [CurrentCont], sp
   push word 10 ;; scanned
-  mov bp, g7
-  mov si, si
+  mov bx, bp
+  mov bp, si
+  mov si, [bx+10]
   jmp [bp]
 
 L504: ; Continuation
-  Bare_enter_check(12)
+  Bare_enter_check(14)
+  push word [bp+8]
   push word si
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
   push word L503
   mov [CurrentCont], sp
+  push word 12 ;; scanned
+  mov bp, g7
+  mov si, g117
+  jmp [bp]
+
+L505: ; Continuation
+  Bare_enter_check(12)
+  push word [bp+8]
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L504
+  mov [CurrentCont], sp
+  push word 10 ;; scanned
+  mov bp, g7
+  mov si, si
+  jmp [bp]
+
+L506: ; Continuation
+  Bare_enter_check(12)
+  push word si
+  push word [bp+6]
+  push word [bp+4]
+  push word [CurrentCont]
+  push word L505
+  mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g13
   mov si, g116
   jmp [bp]
 
-L505: ; Continuation
+L507: ; Continuation
   Bare_enter_check(10)
   mov bx, si
   cmp word [bx], 3
-  jz L497
+  jz L499
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L504
+  push word L506
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov si, [bp+8]
   mov bp, g13
   jmp [bp]
 
-L506: ; Continuation
+L508: ; Continuation
   Bare_enter_check(12)
   push word [bp+10]
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L505
+  push word L507
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bx, bp
@@ -7153,34 +7168,34 @@ L506: ; Continuation
   mov si, [bx+4]
   jmp [bp]
 
-L507: ; Continuation
+L509: ; Continuation
   Bare_enter_check(14)
   push word si
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L506
+  push word L508
   mov [CurrentCont], sp
   push word 12 ;; scanned
   mov bp, g21
   mov si, si
   jmp [bp]
 
-L508: ; Function: (loop,t1)
+L510: ; Function: (loop,t1)
   Bare_enter_check(12)
   push word bp
   push word si
   push word [bp+2]
   push word [CurrentCont]
-  push word L507
+  push word L509
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g110
   mov si, g114
   jmp [bp]
 
-L509: ; Continuation
+L511: ; Continuation
   Bare_enter_check(28)
   push word [bp+6]
   push word 1
@@ -7206,12 +7221,12 @@ L509: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L510: ; Continuation
+L512: ; Continuation
   Bare_enter_check(10)
   push word si
   push word [bp+6]
   push word [CurrentCont]
-  push word L509
+  push word L511
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bx, [bp+4]
@@ -7223,63 +7238,63 @@ L510: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L511: ; Continuation
+L513: ; Continuation
   Bare_enter_check(16)
   push word [bp+4]
-  push word L508
+  push word L510
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [bp+8]
   push word [bp+6]
   push word [CurrentCont]
-  push word L510
+  push word L512
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, [Temps+2]
   mov si, g118
   jmp [bp]
 
-L512: ; Continuation
+L514: ; Continuation
   Bare_enter_check(12)
   push word [bp+8]
   push word [bp+6]
   push word [bp+4]
   push word [CurrentCont]
-  push word L511
+  push word L513
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L513: ; Function: (lam,t1)
+L515: ; Function: (lam,t1)
   Bare_enter_check(12)
   mov bx, si
   cmp word [bx], 1
-  jz L491
+  jz L493
   mov ax, [bx+2]
   mov [Temps+2], ax
   mov ax, [bx+4]
   mov [Temps+4], ax
   mov bx, [Temps+4]
   cmp word [bx], 3
-  jz L494
+  jz L496
   push word [Temps+2]
   push word [bp+4]
   push word [bp+2]
   push word [CurrentCont]
-  push word L512
+  push word L514
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov bp, g13
   mov si, g109
   jmp [bp]
 
-L514: ; Function: (lam,t1)
+L516: ; Function: (lam,t1)
   Bare_enter_check(8)
   push word si
   push word [bp+2]
-  push word L513
+  push word L515
   mov [Temps+2], sp
   push word 6 ;; scanned
   mov si, [Temps+2]
@@ -7288,10 +7303,10 @@ L514: ; Function: (lam,t1)
   mov [CurrentCont], ax
   jmp [bp]
 
-L515: ; Continuation
+L517: ; Continuation
   Bare_enter_check(60)
   push word [bp+4]
-  push word L514
+  push word L516
   mov [Temps+2], sp
   push word 4 ;; scanned
   push word [Temps+2]
@@ -7332,29 +7347,29 @@ L515: ; Continuation
   mov si, [Temps+16]
   jmp [bp]
 
-L516: ; Continuation
+L518: ; Continuation
   Bare_enter_check(8)
   push word [bp+4]
   push word [CurrentCont]
-  push word L515
+  push word L517
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g25
   mov si, si
   jmp [bp]
 
-L517: ; Continuation
+L519: ; Continuation
   Bare_enter_check(8)
   push word si
   push word [CurrentCont]
-  push word L516
+  push word L518
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g13
   mov si, g60
   jmp [bp]
 
-L518: ; Start
+L520: ; Start
   Bare_enter_check(14)
   push word g27
   push word `\x04`
@@ -7362,7 +7377,7 @@ L518: ; Start
   mov [Temps+2], sp
   push word 6 ;; scanned
   push word [CurrentCont]
-  push word L517
+  push word L519
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov bp, g9
@@ -7386,15 +7401,15 @@ g7:
 g8:
   dw 1
 g9:
-  dw L34
+  dw L35
 g10:
   dw 1
 g11:
-  dw L42
+  dw L44
 g12:
   dw 1
 g13:
-  dw L48
+  dw L50
 g14:
   dw 1
 g15:
@@ -7410,35 +7425,35 @@ g19:
 g20:
   dw 1
 g21:
-  dw L58
+  dw L60
 g22:
-  dw L67
+  dw L69
 g23:
   dw 1
   db ``
 g24:
   dw 1
 g25:
-  dw L73
+  dw L75
 g26:
   dw 1
 g27:
   dw 1
 g28:
-  dw L90
+  dw L92
 g29:
-  dw L83
+  dw L85
 g30:
   dw 1
 g31:
-  dw L191
+  dw L193
 g32:
   dw 5
   db `% `
 g33:
   dw 1
 g34:
-  dw L106
+  dw L108
 g35:
   dw 1
 g36:
@@ -7496,7 +7511,7 @@ g57:
 g58:
   dw 1
 g59:
-  dw L195
+  dw L197
 g60:
   dw 103
   db `Sham: In-memory file-system. Consider typing "ls".\n`
@@ -7564,7 +7579,7 @@ g84:
 g85:
   dw 3, g83, g84
 g86:
-  dw L232
+  dw L234
 g87:
   dw 3, g66, g86
 g88:
@@ -7604,7 +7619,7 @@ g100:
 g101:
   dw 3, g99, g100
 g102:
-  dw L256
+  dw L258
 g103:
   dw 3, g90, g102
 g104:
@@ -7625,7 +7640,7 @@ g109:
   dw 69
   db `(to finish type ^D on a new line)\n`
 g110:
-  dw L272
+  dw L274
 g111:
   dw 1
 g112:
@@ -7676,7 +7691,7 @@ g130:
 g131:
   dw 3, g129, g130
 g132:
-  dw L295
+  dw L297
 g133:
   dw 3, g120, g132
 g134:
@@ -7691,15 +7706,15 @@ g137:
   dw 47
   db `ls: takes no arguments\n`
 g138:
-  dw L296
+  dw L298
 g139:
-  dw L300
+  dw L302
 g140:
   dw 1
 g141:
   dw 1
 g142:
-  dw L312
+  dw L314
 g143:
   dw 3, g136, g142
 g144:
@@ -7758,7 +7773,7 @@ g164:
 g165:
   dw 3, g163, g164
 g166:
-  dw L349
+  dw L351
 g167:
   dw 3, g146, g166
 g168:
@@ -7810,7 +7825,7 @@ g185:
 g186:
   dw 1
 g187:
-  dw L384
+  dw L386
 g188:
   dw 3, g170, g187
 g189:
@@ -7837,9 +7852,9 @@ g196:
 g197:
   dw 1
 g198:
-  dw L397
+  dw L399
 g199:
-  dw L404
+  dw L406
 g200:
   dw 3, g191, g199
 g201:
@@ -7867,7 +7882,7 @@ g209:
   dw 69
   db `create: unexpected extra argument\n`
 g210:
-  dw L416
+  dw L418
 g211:
   dw 1
 g212:
@@ -7891,13 +7906,13 @@ g220:
   dw 9
   db `fib `
 g221:
-  dw L420
+  dw L422
 g222:
   dw 1
 g223:
   dw 1
 g224:
-  dw L424
+  dw L426
 g225:
   dw 1
 g226:
@@ -7906,19 +7921,19 @@ g227:
   dw 11
   db ` --> `
 g228:
-  dw L428
+  dw L430
 g229:
   dw 1
 g230:
   dw 1
 g231:
-  dw L432
+  dw L434
 g232:
   dw 1
 g233:
   dw 1
 g234:
-  dw L470
+  dw L472
 g235:
   dw 3, g207, g234
 g236:
@@ -7932,19 +7947,19 @@ g238:
 g239:
   dw 1
 g240:
-  dw L474
+  dw L476
 g241:
   dw 1
 g242:
   dw 1
 g243:
-  dw L478
+  dw L480
 g244:
   dw 1
 g245:
   dw 1
 g246:
-  dw L488
+  dw L490
 g247:
   dw 3, g238, g246
 g248:
@@ -7968,4 +7983,4 @@ g256:
 g257:
   dw 3, g134, g256
 
-bare_start: jmp L518
+bare_start: jmp L520
