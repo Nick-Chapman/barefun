@@ -541,11 +541,20 @@ yes:
 False: dw 1
 True: dw 3
 
+%macro EnsureZeroAH 1
+    cmp ah, 0
+    jz %%ok
+    Stop %1
+%%ok:
+%endmacro
+
 Bare_num_to_char:
     mov ah, 0 ; mod 256
+    EnsureZeroAH `[Bare_num_to_char]]\n`
     ret
 
 Bare_char_to_num:
+    EnsureZeroAH `[Bare_char_to_num]]\n`
     ret
 
 ;;; in: ax -- number of bytes (as tagged number) for user data
