@@ -64,12 +64,12 @@ cutEntryCode :: String -> Code -> Asm CodeLabel
 cutEntryCode name code = do
   need <- Needed code
   CutCode name $ do
-    doOps [ OpEnterCheck need ] code
+    Do (OpEnterCheck need) code
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return _pos res -> do
-    pure $ doOps [ OpMove argReg (compileRef res)] codeReturn
+    pure $ Do (OpMove argReg (compileRef res)) codeReturn
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps (
@@ -129,6 +129,9 @@ compileArmTaken scrutReg arm =  do
     [ setTarget (targetOfTemp temp) (SMemIndirectOffset scrutReg (bytesPerWord * i))
     | (i,(_,temp)) <- zip [1..] xs
     ] <$> compileCode rhs
+
+doOps :: [Op] -> Code -> Code
+doOps ops c = foldr Do c ops
 
 simultaneousMove :: (Reg,Source) -> (Reg,Source) -> [Op]
 simultaneousMove (r1,s1) (r2,s2) = do
@@ -489,6 +492,7 @@ runAsm asm = finalImage
 
     needOp :: Int -> Op -> Int
     needOp after = \case
+      OpMany ops -> foldr (flip needOp) after ops
       OpPush{} -> 2 + after
       OpBranchFlagZ lab -> max after (needL lab)
       _ -> after

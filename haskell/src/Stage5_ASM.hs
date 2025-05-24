@@ -5,7 +5,7 @@ module Stage5_ASM
   , Image(..)
   , Lit(..)
   , Code(..), codeReturn
-  , Op(..), doOps
+  , Op(..)
   , Jump(..)
   , BlockDescriptor(..), ScanMode(..)
   , Source(..)
@@ -48,12 +48,9 @@ geteCurrentCont = SCurrentCont
 -- this is the calling convention to "return" to the current continuation
 codeReturn :: Code
 codeReturn =
-  doOps [ OpMove frameReg geteCurrentCont
-        , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
-        ] (Done (JumpIndirect frameReg))
-
-doOps :: [Op] -> Code -> Code -- TODO: not really necessary now we have OpMany
-doOps ops c = foldr Do c ops
+  Do (OpMany [ OpMove frameReg geteCurrentCont
+             , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
+             ]) (Done (JumpIndirect frameReg))
 
 data Image = Image
   { cmap :: Map CodeLabel Code
