@@ -5,7 +5,7 @@ module Stage0_AST
   , execute,evalLit,apply
   ) where
 
-import Builtin (Builtin,executeBuiltin)
+import Primitive (Primitive,executePrimitive)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
@@ -24,7 +24,7 @@ data Exp
   = Var Position Id
   | Lit Position Literal
   | Con Position Cid [Exp]
-  | Prim Position Builtin [Exp]
+  | Prim Position Primitive [Exp]
   | Lam Position Bid Exp
   | RecLam Position Bid Bid Exp
   | App Exp Position Exp
@@ -72,7 +72,7 @@ pretty = \case
   Lit _ x -> [show x]
   Con _ c [] -> [show c]
   Con _ c es -> onHead (show c ++) (bracket (foldl1 juxComma (map pretty es)))
-  Prim _ b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
+  Prim _ p xs -> [printf "PRIM_%s(%s)" (show p) (intercalate "," (map show xs))]
   Lam _ x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
   RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
@@ -136,9 +136,9 @@ eval env@Env{venv,cenv} = \case
     let tag = maybe err id $ Map.lookup cid cenv
           where err = error (show ("cenv-lookup",cid))
     k (VCons tag vs)
-  Prim _ b es -> \k -> do
+  Prim _ prim es -> \k -> do
     evals env es $ \vs -> ITick I.Prim $ do
-      executeBuiltin b vs k
+      executePrimitive prim vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval (insert x arg env) body k))
   RecLam _ f x body -> \k -> do

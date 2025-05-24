@@ -5,7 +5,7 @@ module Stage3_ANF
   , compile
   ) where
 
-import Builtin (Builtin(MakeBytes),executeBuiltin)
+import Primitive (Primitive(MakeBytes),executePrimitive)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
@@ -28,7 +28,7 @@ type Transformed = Code
 data Code
   = Return Position Val
   | Tail Val Position Val
-  | TailPrim Builtin Position Val
+  | TailPrim Primitive Position Val
   | LetAtomic Id Atomic Code
   | PushContinuation Fvs (Id,Code) Code
   | Match Val [Arm]
@@ -38,7 +38,7 @@ data Arm = ArmTag Position Ctag [Id] Code
 -- Atomic expressions cause only bounded evaluation.
 data Atomic
   = LitS Position String
-  | Prim Position Builtin [Val]
+  | Prim Position Primitive [Val]
   | ConTag Position Ctag [Val]
   | Lam Position Fvs Id Code
   | RecLam Position Fvs Id Id Code
@@ -79,7 +79,7 @@ pretty = \case
 prettyA :: Atomic -> Lines
 prettyA = \case
   LitS _ x -> [show x]
-  Prim _ b xs -> do [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
+  Prim _ prim xs -> do [printf "PRIM_%s(%s)" (show prim) (intercalate "," (map show xs))]
   ConTag _ tag [] -> [show tag]
   ConTag _ tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam _ fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
@@ -116,7 +116,7 @@ evalCode env = \case
   Return _ v -> \k -> ITick I.Return $ k (evalV v)
   Tail fun pos arg -> \k -> ITick I.Enter $ apply (evalV fun) pos (evalV arg) k
   TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ do
-    executeBuiltin prim [evalV arg] k
+    executePrimitive prim [evalV arg] k
   LetAtomic x a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode (insert x v1 env) c2 k
@@ -143,7 +143,7 @@ evalCode env = \case
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
       LitS _ s -> \k -> k (VString s)
-      Prim _ b vs -> \k -> ITick I.Prim $ executeBuiltin b (map evalV vs) k
+      Prim _ prim vs -> \k -> ITick I.Prim $ executePrimitive prim (map evalV vs) k
       ConTag _ tag vs -> \k -> k (VCons tag (map evalV vs))
       Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))

@@ -1,13 +1,13 @@
 -- | Compile Stage4(CCF) to Stage5(ASM)
 module Stage5_Compilation ( compile ) where
 
-import Builtin (Builtin)
+import Primitive (Primitive)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Stage1_EXP (Ctag(..))
 import Text.Printf (printf)
 import Value (Number)
-import qualified Builtin as SRC (Builtin(..))
+import qualified Primitive as SRC (Primitive(..))
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 
@@ -40,7 +40,7 @@ compileImage = \case
 
 compileTopDef :: String -> SRC.Top -> Asm [DataSpec]
 compileTopDef who = \case
-  SRC.TopPrim b xs -> error (show ("Unexpected TopPrim (a Pure builtin not get inlined)",b,xs))
+  SRC.TopPrim prim xs -> error (show ("Unexpected TopPrim (a Pure Primitive did not get inlined)",prim,xs))
   SRC.TopLitS string -> pure (DW [ lnumTagging (fromIntegral $ length string) ] : [ DS string ])
 
   SRC.TopLam _x body -> do
@@ -165,7 +165,7 @@ changeRegInSource r1 r2 = \case
 
 compileAtomicTo :: String -> Target -> SRC.Atomic -> Asm [Op]
 compileAtomicTo who target = \case
-  SRC.Prim builtin xs -> pure (compileBuiltinTo builtin target (map compileRef xs))
+  SRC.Prim prim xs -> pure (compilePrimitiveTo prim target (map compileRef xs))
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
   SRC.Lam pre _post _x body -> compileFunctionTo who target pre body
   SRC.RecLam pre _post _f _x body -> compileFunctionTo who target pre body
@@ -190,9 +190,9 @@ compileFunctionTo who target freeVars body = do
     ])
 
 -- The target must always be assigned to satisfy GC invariants. Even when the resul is just unit "()"
--- So we don't forget, w take "Target" after "Builtin"; and push the lambda into each branch...
-compileBuiltinTo :: Builtin -> Target -> [Source] -> [Op]
-compileBuiltinTo builtin = case builtin of
+-- So we don't forget, w take "Target" after "Primitive"; and push the lambda into each branch...
+compilePrimitiveTo :: Primitive -> Target -> [Source] -> [Op]
+compilePrimitiveTo prim = case prim of
   SRC.Noinline -> \target -> oneArg $ \s1 ->
     [ setTarget target s1
     ]
@@ -401,7 +401,7 @@ compileBuiltinTo builtin = case builtin of
     twoArgs f = \case [v1,v2] -> f v1 v2; _ -> err
     threeArgs f = \case [v1,v2,v3] -> f v1 v2 v3; _ -> err
 
-    err = error (printf "Stage5.compileBuiltin: error: %s" (show builtin))
+    err = error (printf "Stage5.compilePrimitive: error: %s" (show prim))
 
     sUnit = SLit (LStatic dUnit)
     dUnit = DataLabelR "Bare_unit"

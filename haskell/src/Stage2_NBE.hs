@@ -1,7 +1,7 @@
 -- | Normalize using "Normalization by Evaluation" (Inlining & Constant Folding).
 module Stage2_NBE (compile,execute) where
 
-import Builtin (Builtin(Noinline),isPure,evaluatePureBuiltin)
+import Primitive (Primitive(Noinline),isPure,evaluatePurePrimitive)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Par4 (Position(..))
@@ -69,7 +69,7 @@ toBV = \case
   VNum n -> BVNum n
   VChar n -> BVChar n
   VCons tag vs -> BVCons tag (map toBV vs)
-  -- A Pure builtin should never return a non base value
+  -- A Pure primitive should never return a non base value
   v -> error (show ("toBV",v))
 
 posOfId :: Id -> Position
@@ -125,15 +125,15 @@ maybeAllConstant svs = do
   let vs = [ v | Constant _ v <- svs ]
   if length vs == length svs then Just vs else Nothing
 
-reflectBuiltin :: Position -> Builtin -> [SemValue] -> M SemValue
-reflectBuiltin pos b es = do
-  case (enabled && isPure b, maybeAllConstant es) of
+reflectPrimitive :: Position -> Primitive -> [SemValue] -> M SemValue
+reflectPrimitive pos prim es = do
+  case (enabled && isPure prim, maybeAllConstant es) of
     -- (2) Normalize: Constant Propogation
     (True, Just bvs) -> do
-      pure $ Constant pos (toBV (evaluatePureBuiltin b (map ofBV bvs)))
+      pure $ Constant pos (toBV (evaluatePurePrimitive prim (map ofBV bvs)))
     _ -> do
       es <- mapM reify es
-      pure $ Syntax $ Prim pos b es
+      pure $ Syntax $ Prim pos prim es
 
 reflectLit :: Literal -> BaseValue
 reflectLit = \case
@@ -153,9 +153,9 @@ reflect env = \case
   Prim _ Noinline [e] -> do
     -- The noinline primitive has blocked inlining; now we throw it away
     Syntax <$> norm env e
-  Prim p b es -> do
+  Prim pos prim es -> do
     es <- mapM (reflect env) es
-    reflectBuiltin p b es
+    reflectPrimitive pos prim es
   Lam _pos x body -> do
     pure $ Macro x $ \arg -> do
       let env' = Map.insert x arg env

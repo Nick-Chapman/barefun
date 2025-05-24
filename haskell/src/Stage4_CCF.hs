@@ -5,7 +5,7 @@ module Stage4_CCF
   , compile
   ) where
 
-import Builtin (Builtin,executeBuiltin,isPure,evaluatePureBuiltin)
+import Primitive (Primitive,executePrimitive,isPure,evaluatePurePrimitive)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
@@ -30,14 +30,14 @@ data Image
 -- A top level expression corresponds to global/static data
 data Top
   = TopLitS String
-  | TopPrim Builtin [Ref]
+  | TopPrim Primitive [Ref]
   | TopLam Ref Code -- All top function defs allow recursion. We dont even have an unrecursive form.
   | TopConApp Ctag [Ref]
 
 data Code
   = Return Position Ref
   | Tail Ref Position Ref
-  | TailPrim Builtin Position Ref
+  | TailPrim Primitive Position Ref
   | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Match Ref [Arm]
@@ -45,7 +45,7 @@ data Code
 data Arm = ArmTag Position Ctag [(Id,Temp)] Code
 
 data Atomic
-  = Prim Builtin [Ref]
+  = Prim Primitive [Ref]
   | ConApp Ctag [Ref]
   | Lam [Ref] [Ref] Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code
@@ -90,7 +90,7 @@ prettyL = \case
 prettyT :: Top -> Lines
 prettyT = \case
   TopLitS x -> [show x]
-  TopPrim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
+  TopPrim prim xs -> [printf "PRIM_%s(%s)" (show prim) (intercalate "," (map show xs))]
   TopLam x body ->
     ("fun " ++ show x ++ " k ->")
     >>> prettyC body
@@ -115,7 +115,7 @@ prettyC = \case
 
 prettyA :: Atomic -> Lines
 prettyA = \case
-  Prim b xs -> [printf "PRIM_%s(%s)" (show b) (intercalate "," (map show xs))]
+  Prim prim xs -> [printf "PRIM_%s(%s)" (show prim) (intercalate "," (map show xs))]
   ConApp tag [] -> [show tag]
   ConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam pre post x body ->
@@ -189,7 +189,7 @@ look Env{venv} = \case
 evalT :: Env -> Top -> Value
 evalT genv = \case
   TopLitS string -> VString string
-  TopPrim b xs -> evaluatePureBuiltin b (map (look genv) xs)
+  TopPrim prim xs -> evaluatePurePrimitive prim (map (look genv) xs)
   TopLam x body -> VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
   TopConApp tag xs -> VCons tag (map (look genv) xs)
 
@@ -197,7 +197,7 @@ evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return _ x -> \k -> ITick I.Return $ k (look env x)
   Tail func pos arg -> \k -> ITick I.Enter $ apply (look env func) pos (look env arg) k
-  TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ executeBuiltin prim [look env arg] k
+  TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ executePrimitive prim [look env arg] k
   LetAtomic (x,t) a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
       evalCode genv (insert (Ref x (InTemp t)) v1 env) c2 k
@@ -224,7 +224,7 @@ evalCode genv env = \case
   where
     evalA :: Atomic -> (Value -> Interaction) -> Interaction
     evalA = \case
-      Prim b xs -> \k -> ITick I.Prim $ executeBuiltin b (map (look env) xs) k
+      Prim prim xs -> \k -> ITick I.Prim $ executePrimitive prim (map (look env) xs) k
       ConApp tag xs -> \k -> k (VCons tag (map (look env) xs))
 
       Lam pre _ x body -> \k -> do
@@ -311,14 +311,14 @@ compileA cenv = \case
     g <- GlobalRef
     pure $ Right (g, TopLitS string)
 
-  SRC.Prim _ b xs -> do
+  SRC.Prim _ prim xs -> do
     let xs' = map (compileV cenv) xs
-    if isPure b && all isGlobal xs' then
+    if isPure prim && all isGlobal xs' then
       do
         g <- GlobalRef
-        pure $ Right (g, TopPrim b xs')
+        pure $ Right (g, TopPrim prim xs')
       else do
-        pure $ Left $ Prim b xs'
+        pure $ Left $ Prim prim xs'
 
   SRC.ConTag _ c xs -> do
     let xs' = map (compileV cenv) xs

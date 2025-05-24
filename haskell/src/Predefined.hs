@@ -2,7 +2,7 @@ module Predefined
   ( wrapPreDefs
   ) where
 
-import Builtin (Builtin(..))
+import Primitive (Primitive(..))
 import Par4 (Position(..))
 import Stage0_AST (Prog(..),Def(..),Exp(..),mkUserId,Bid(..))
 import Value (cCons)
@@ -48,9 +48,9 @@ wrapPreDefs (Prog defs) =
       , ("get_keyboard_last_scancode" , prim1 Get_keyboard_last_scancode)
       , ("noinline", prim1 Noinline)
 
-      -- The arg-count and types of predefined names which wrap Builtin primitives must match:
-      -- (a) The evaluation semantic defined in Builtin.hs
-      -- (b) The stage5 compilation of the builtin given in Stage5_ASM_Compiler.hs
+      -- The arg-count and types of predefined names which wrap Primitive primitives must match:
+      -- (a) The evaluation semantic defined in Primitive.hs
+      -- (b) The stage5 compilation of the primitive given in Stage5_ASM_Compiler.hs
       ]
       where
         prim1 p1 = Lam noPos x (Prim noPos p1 [ex])

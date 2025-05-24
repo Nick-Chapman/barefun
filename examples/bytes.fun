@@ -1,4 +1,4 @@
-(* Build strings using the builtin "bytes" ops. *)
+(* Build strings using the "bytes" primitives *)
 
 let rec length xs =
   match xs with

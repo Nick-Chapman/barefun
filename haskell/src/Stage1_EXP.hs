@@ -6,7 +6,7 @@ module Stage1_EXP
   , PPControl(..),PPPosFlag(..), PPUniqueFlag(..), pp
   ) where
 
-import Builtin (Builtin,executeBuiltin)
+import Primitive (Primitive,executePrimitive)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
@@ -26,7 +26,7 @@ data Exp
   = Var Position Id
   | Lit Position Literal
   | ConTag Position Ctag [Exp]
-  | Prim Position Builtin [Exp]
+  | Prim Position Primitive [Exp]
   | Lam Position Id Exp
   | RecLam Position Id Id Exp
   | App Exp Position Exp
@@ -103,7 +103,7 @@ prettyTop control = pretty
       Lit _ x -> [show x]
       ConTag _ tag [] -> [show tag]
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
-      Prim _ b xs -> onHead (printf "PRIM_%s" (show b) ++) (bracket (foldl1 juxComma (map pretty xs)))
+      Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
       Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
       RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
       App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
@@ -165,9 +165,9 @@ eval env@Env{venv} = \case
   ConTag _ tag es -> \k -> do
     evals env es $ \vs -> do
       k (VCons tag vs)
-  Prim _ b es -> \k -> do
+  Prim _ prim es -> \k -> do
     evals env es $ \vs -> ITick I.Prim $ do
-      executeBuiltin b vs k
+      executePrimitive prim vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
   RecLam _ f x body -> \k -> do
@@ -235,7 +235,7 @@ trans cenv = \case
   SRC.Var p x -> Var p (transId cenv x)
   SRC.Lit p x -> Lit p x
   SRC.Con p cid es -> ConTag p (transCid cenv cid) (map (trans cenv) es)
-  SRC.Prim pos b xs -> Prim pos b (map (trans cenv) xs)
+  SRC.Prim pos prim xs -> Prim pos prim (map (trans cenv) xs)
   SRC.Lam p x body -> do
     let (x',cenv1) = posProp x cenv
     Lam p x' (trans cenv1 body)

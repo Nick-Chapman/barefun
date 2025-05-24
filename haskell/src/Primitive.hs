@@ -1,10 +1,10 @@
-module Builtin ( Builtin(..), executeBuiltin, isPure, evaluatePureBuiltin ) where
+module Primitive ( Primitive(..), executePrimitive, isPure, evaluatePurePrimitive ) where
 
 import Text.Printf (printf)
 import Value (Value(..),tUnit,tTrue,mkBool,deUnit,Interaction(..))
 import qualified Data.Char as Char (chr,ord)
 
-data Builtin
+data Primitive
   = Crash
   | Noinline
   | PutChar | GetChar
@@ -28,26 +28,26 @@ data Semantics
   = Pure ([Value] -> Value)
   | Impure ([Value] -> (Value -> Interaction) -> Interaction)
 
-isPure :: Builtin -> Bool
+isPure :: Primitive -> Bool
 isPure b =
-  case defineBuiltin b of
+  case definePrimitive b of
     Pure{} -> True
     Impure{} -> False
 
-evaluatePureBuiltin :: Builtin -> [Value] -> Value
-evaluatePureBuiltin b args =
-  case defineBuiltin b of
-    Impure{} -> error "evaluatePureBuiltin/Impure"
+evaluatePurePrimitive :: Primitive -> [Value] -> Value
+evaluatePurePrimitive b args =
+  case definePrimitive b of
+    Impure{} -> error "evaluatePurePrimitive/Impure"
     Pure f -> f args
 
-executeBuiltin :: Builtin -> [Value] -> (Value -> Interaction) -> Interaction
-executeBuiltin b args =
-  case defineBuiltin b of
+executePrimitive :: Primitive -> [Value] -> (Value -> Interaction) -> Interaction
+executePrimitive b args =
+  case definePrimitive b of
     Impure f -> f args
     Pure f -> \k -> k (f args)
 
-defineBuiltin :: Builtin -> Semantics
-defineBuiltin b =
+definePrimitive :: Primitive -> Semantics
+definePrimitive b =
   case b of
     Noinline -> Impure $ \vs k -> k (oneArg vs)
     PutChar -> Impure $ \vs k -> IPut (deChar (oneArg vs)) (k unit)
@@ -127,7 +127,7 @@ defineBuiltin b =
     deString = \case VString x -> x; _ -> err
     deRef = \case VRef x -> x; _ -> err
     err :: a
-    err = error (printf "Builtin.hs: error: %s" (show b))
+    err = error (printf "Primitive.hs: error: %s" (show b))
 
 
 iPut :: String -> Interaction -> Interaction
