@@ -1,0 +1,26 @@
+wipe
+format
+mount
+create
+Here are some poems and aphorisms.
+Please add some more if there is space.
+
+create
+Any fool can write code that a computer can understand.
+Good programmers write code that humans can understand.
+
+create
+UNIX is user-friendly - it's just choosy about who its friends are.
+Anonymous, in the "Art of unix Programming" by Eric S. Raymond
+
+create
+GIT
+It is easy to shoot your foot off with git, but also easy to revert to a previous foot and merge it with your current leg.
+Jack William Bell
+
+create
+Emacs
+While any text editor can save your files, only Emacs can save your soul.
+Per Abrahamsen
+
+cat 0

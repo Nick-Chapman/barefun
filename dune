@@ -1,0 +1,11 @@
+
+;; Build the sample disk.image as described in README.md from poems.input
+;; Use the ocaml simulator for speed
+
+(rule
+ (target disk.image)
+ (deps poems.input examples/filesystem.fun ocaml/main.exe)
+ (action
+  (ignore-stdout
+   (with-stdin-from poems.input
+    (run ocaml/main.exe Filesystem)))))
