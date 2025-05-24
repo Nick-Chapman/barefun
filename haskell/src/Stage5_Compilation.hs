@@ -78,7 +78,7 @@ compileCode = \case
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
-      [ OpMove Ax (compileRef arg) -- TODO: use standard argReg?
+      [ OpMove argReg (compileRef arg)
       ] (Done (JumpBare AllocBare_make_bytes))
 
   SRC.TailPrim prim _pos _arg ->
@@ -339,15 +339,15 @@ compileBuiltinTo builtin = case builtin of
     -- no need to assign target; we wont return from Bare_crash
     ]
   SRC.LoadSec -> \target -> twoArgs $ \s1 s2 ->
-    [ OpMove Ax s1
-    , opShiftR1 Ax
+    [ OpMove Dx s1
+    , opShiftR1 Dx
     , OpMove Bx s2
     , OpCall Bare_load_sector
     , setTarget target sUnit
     ]
   SRC.StoreSec -> \target -> twoArgs $ \s1 s2 ->
-    [ OpMove Ax s1
-    , opShiftR1 Ax
+    [ OpMove Dx s1
+    , opShiftR1 Dx
     , OpMove Bx s2
     , OpCall Bare_store_sector
     , setTarget target sUnit

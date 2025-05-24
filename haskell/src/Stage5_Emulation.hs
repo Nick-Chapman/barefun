@@ -478,7 +478,7 @@ execBare = \case
     SetReg Ax (WChar c)
 
   Bare_load_sector -> do
-    n <- deNum <$> GetReg Ax
+    n <- deNum <$> GetReg Dx
     aObj <- deAddr <$> GetReg Bx
     aData <- addAddr bytesPerWord aObj
     text <- ReadSector n
@@ -486,7 +486,7 @@ execBare = \case
     pure ()
 
   Bare_store_sector -> do
-    n <- deNum <$> GetReg Ax
+    n <- deNum <$> GetReg Dx
     aObj <- deAddr <$> GetReg Bx
     text <- getMemString aObj
     WriteSector n text
@@ -518,7 +518,7 @@ execBare = \case
 jumpBare :: AllocBareBios -> M ()
 jumpBare = \case
   AllocBare_make_bytes -> do
-    n <- deNum <$> GetReg Ax
+    n <- deNum <$> GetReg argReg
     let nBytes = n `div` 2
     let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
     let need = nBytesAligned + 2 + 2

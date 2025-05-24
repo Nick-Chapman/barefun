@@ -774,7 +774,7 @@ L61: ; Continuation
   push word L60
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov ax, si
+  mov si, si
   jmp AllocBare_make_bytes
 
 L62: ; Function: (implode,g24)
@@ -1468,7 +1468,7 @@ L110: ; Continuation
   push word L109
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov ax, si
+  mov si, si
   jmp AllocBare_make_bytes
 
 L111: ; Function: (rev_implode,g48)
@@ -2213,7 +2213,7 @@ L166: ; Function: (lam,t1)
   push word L165
   mov [CurrentCont], sp
   push word 10 ;; scanned
-  mov ax, si
+  mov si, si
   jmp AllocBare_make_bytes
 
 L167: ; Function: (lam,t1)
@@ -2747,8 +2747,8 @@ L193: ; Continuation
   Bare_enter_check(0)
   mov ax, [bp+6]
   mov [Temps+2], ax
-  mov ax, [bp+4]
-  sar ax, 1
+  mov dx, [bp+4]
+  sar dx, 1
   mov bx, [Temps+2]
   call Bare_store_sector
   mov ax, Bare_unit
@@ -2788,8 +2788,8 @@ L195: ; Continuation
 
 L196: ; Continuation
   Bare_enter_check(14)
-  mov ax, [bp+4]
-  sar ax, 1
+  mov dx, [bp+4]
+  sar dx, 1
   mov bx, si
   call Bare_load_sector
   mov ax, Bare_unit
@@ -2815,7 +2815,7 @@ L197: ; Continuation
   push word L196
   mov [CurrentCont], sp
   push word 10 ;; scanned
-  mov ax, 1025
+  mov si, 1025
   jmp AllocBare_make_bytes
 
 L198: ; Continuation
@@ -2924,8 +2924,8 @@ L203: ; Continuation
 
 L204: ; Continuation
   Bare_enter_check(8)
-  mov ax, [bp+6]
-  sar ax, 1
+  mov dx, [bp+6]
+  sar dx, 1
   mov bx, si
   call Bare_load_sector
   mov ax, Bare_unit
@@ -2983,7 +2983,7 @@ L205: ; Continuation
   push word L204
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov ax, 1025
+  mov si, 1025
   jmp AllocBare_make_bytes
 
 L206: ; Function: (load_block,g84)
@@ -5436,8 +5436,8 @@ L397: ; Continuation
 
 L398: ; Continuation
   Bare_enter_check(14)
-  mov ax, [bp+4]
-  sar ax, 1
+  mov dx, [bp+4]
+  sar dx, 1
   mov bx, si
   call Bare_load_sector
   mov ax, Bare_unit
@@ -5466,7 +5466,7 @@ L399: ; Continuation
   push word L398
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov ax, 1025
+  mov si, 1025
   jmp AllocBare_make_bytes
 
 L400: ; Arm: 10'9
@@ -5722,8 +5722,8 @@ L414: ; Function: (loop,t3)
 
 L415: ; Continuation
   Bare_enter_check(6)
-  mov ax, [bp+4]
-  sar ax, 1
+  mov dx, [bp+4]
+  sar dx, 1
   mov bx, si
   call Bare_load_sector
   mov ax, Bare_unit
@@ -5744,7 +5744,7 @@ L416: ; Function: (lam,g224)
   push word L415
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov ax, 1025
+  mov si, 1025
   jmp AllocBare_make_bytes
 
 L417: ; Arm: 10'9
@@ -5960,8 +5960,8 @@ L434: ; Continuation
   mov bx, si
   cmp word [bx], 3
   jz L433
-  mov ax, [bp+6]
-  sar ax, 1
+  mov dx, [bp+6]
+  sar dx, 1
   mov bx, [bp+4]
   call Bare_store_sector
   mov ax, Bare_unit
@@ -6037,7 +6037,7 @@ L439: ; Function: (lam,g349)
   push word L438
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov ax, 1025
+  mov si, 1025
   jmp AllocBare_make_bytes
 
 L440: ; Continuation
@@ -7560,7 +7560,7 @@ L542: ; Continuation
   push word L541
   mov [CurrentCont], sp
   push word 14 ;; scanned
-  mov ax, 257
+  mov si, 257
   jmp AllocBare_make_bytes
 
 L543: ; Arm: 569'10
@@ -11258,7 +11258,7 @@ L814: ; Function: (lam,t1)
   push word L813
   mov [CurrentCont], sp
   push word 8 ;; scanned
-  mov ax, 257
+  mov si, 257
   jmp AllocBare_make_bytes
 
 L815: ; Continuation
