@@ -11,6 +11,7 @@ module Stage5_ASM
   , Source(..)
   , Target(..)
   , BareBios(..)
+  , AllocBareBios(..)
   , CodeLabel(..)
   , DataLabel(..)
   , DataSpec(..)
@@ -44,7 +45,7 @@ setCurrentCont = \case
 geteCurrentCont :: Source
 geteCurrentCont = SCurrentCont
 
--- this is the calling convention to "return" to the continuation
+-- this is the calling convention to "return" to the current continuation
 codeReturn :: Code
 codeReturn =
   doOps [ OpMove frameReg geteCurrentCont
@@ -89,7 +90,7 @@ data Op -- target; source (Intel Syntax style)
 data Jump
   = JumpReg Reg
   | JumpIndirect Reg
-  | JumpBare BareBios -- TODO: make sep type for only one possible
+  | JumpBare AllocBareBios
 
 data Target
   = TReg Reg
@@ -135,10 +136,6 @@ data BareBios
   | Bare_make_bool_from_n
   | Bare_num_to_char
   | Bare_char_to_num
-
-  | Bare_make_bytes -- TODO: remove this
-  | Bare_make_bytes_jump -- TODO: have different types for this
-
   | Bare_set_bytes -- TODO: would be nice to have a declarative spec for arg-passing protocol, which is shared between compiler and emulator. And somehow to be used so runtime.asm is also consistent
   | Bare_get_bytes
   | Bare_load_sector
@@ -148,6 +145,11 @@ data BareBios
   | Bare_get_ticks
   | Bare_is_keyboard_ready
   | Bare_get_keyboard_last_scancode
+  deriving Show
+
+-- AllocBareBios; primitive routines which may allocate, and must do their own heap-check
+data AllocBareBios
+  = AllocBare_make_bytes
   deriving Show
 
 ----------------------------------------------------------------------

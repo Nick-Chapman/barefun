@@ -90,7 +90,7 @@ L7: ; Function: (make_sector,g4)
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L8: ; Arm: 14'14
   mov si, g20
@@ -366,7 +366,7 @@ L24: ; Arm: 76'19
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L25: ; Continuation
   Bare_enter_check(0)
@@ -710,7 +710,7 @@ L45: ; Continuation
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L46: ; Start
   Bare_enter_check(6)

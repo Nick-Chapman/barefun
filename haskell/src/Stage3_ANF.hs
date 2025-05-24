@@ -23,9 +23,6 @@ import qualified Stage0_AST as SRC (Literal(..))
 import qualified Stage1_EXP as SRC
 import qualified Value as I (Tickable(..))
 
-enableTailPrim :: Bool
-enableTailPrim = True -- TODO: kill this control once it is working
-
 type Transformed = Code
 
 data Code
@@ -216,12 +213,11 @@ compileExp = \case
       k $ Atomic $ ConTag pos tag xs
 
   SRC.Prim pos prim es -> \k -> do
-    case (enableTailPrim,prim,es) of
-      -- A call to MakeBytes cannot be treated as an Atomic, because it
-      -- allocates a statically unknowable amount of memory, and so the
-      -- need-computation in stage 5 is not possible.
-      -- Therefore, we must tail call it (pushing a continuation if necessary)
-      (True,MakeBytes,[e]) -> do
+    case (prim,es) of
+      -- A call to MakeBytes cannot be treated as an Atomic, because it allocates a statically
+      -- unknowable amount of memory; the need-computation in stage 5 is not possible.
+      -- We therefore tail call the primitive, which can perform its own heapcheck.
+      (MakeBytes,[e]) -> do
         compileAsId e $ \x -> do
           k $ Compound $ TailPrim prim pos x
       _ ->

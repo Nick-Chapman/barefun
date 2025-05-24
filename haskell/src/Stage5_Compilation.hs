@@ -79,7 +79,7 @@ compileCode = \case
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
       [ OpMove Ax (compileRef arg) -- TODO: use standard argReg?
-      ] (Done (JumpBare Bare_make_bytes_jump))
+      ] (Done (JumpBare AllocBare_make_bytes))
 
   SRC.TailPrim prim _pos _arg ->
     error (printf "Stage5.compileCode/TailPrim: unexpected primitive: %s" (show prim))
@@ -310,11 +310,7 @@ compileBuiltinTo builtin = case builtin of
     , OpStore (TReg Bx) Ax
     , setTarget target sUnit
     ]
-  SRC.MakeBytes -> \target -> oneArg $ \s1 ->
-    [ OpMove Ax s1
-    , OpCall Bare_make_bytes -- TODO: deprecated! -- REMOVE
-    , setTarget target (SReg Ax)
-    ]
+  SRC.MakeBytes -> error "stage5: MakeBytes can only be tail-called "
   SRC.SetBytes -> \target -> threeArgs $ \s1 s2 s3 ->
     [ OpMove Ax s1
     , OpMove Bx s2
@@ -495,14 +491,6 @@ runAsm asm = finalImage
     needOp after = \case
       OpPush{} -> 2 + after
       OpBranchFlagZ lab -> max after (needL lab)
-
-      OpCall Bare_make_bytes -> do -- TODO: this will be removed real soon
-        -- We need to budget for the allocation made by Bare_make_bytes.
-        -- But there is a snag -- The amount of space needed is dynamic.
-        -- One solution is to call this primitive in CPS style & have it do its own GC check.
-        -- For now, hack it with the size we need for disk sectors strings of size 512
-        (512+2+2) + after -- TODO: remove this hack for Bare_make_bytes allocation budget
-
       _ -> after
 
 data AsmState = AsmState { u :: Int }

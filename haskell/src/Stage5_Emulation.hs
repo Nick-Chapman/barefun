@@ -164,6 +164,15 @@ setStackPointerToTopOfHemi hemi = do
   ha <- mkHeapAddr (topOfHemi hemi)
   SetReg Sp (WAddr (AHeap ha))
 
+heapCheck :: Int -> M ()
+heapCheck need = do
+  n <- heapBytesRemaining
+  if gcAtEverySafePoint || (n < need) then runGC else pure ()
+  n <- heapBytesRemaining
+  if (n < need)
+    then Crash (printf "[Not enough space recovered by GC: need=%d; have:%d]" need n)
+    else BudgedForAllocation need
+
 runGC :: M ()
 runGC = do
   gcNum <- BumpGC
@@ -359,18 +368,9 @@ execOp = \case
     SetReg Dx (WNum (dividend `mod` divisor))
     cont
   -- when support multi lam, we can have seperate macros for CodeEntry and CheckHeap
-  OpEnterCheck need -> \cont -> if need == 0 then cont else do
-    n <- heapBytesRemaining
-    --Debug (printf "OpEnterCheck: remaining=%d, need=%d\n" n need)
-    if gcAtEverySafePoint || (n < need) then runGC else pure ()
-    n <- heapBytesRemaining
-    if (n < need)
-      then do Crash (printf "[Not enough space recovered by GC: need=%d; have:%d]" need n)
-      else
-      do
-        --Debug (printf "BudgedForAllocation: %d\n" need)
-        BudgedForAllocation need
-        cont
+  OpEnterCheck need -> \cont -> do
+    heapCheck need
+    cont
   OpHlt -> \cont ->
     -- this ops waits for the next interrupt; too detailed for this emulation
     cont
@@ -463,44 +463,6 @@ execBare = \case
     c <- deChar <$> GetReg Ax
     SetReg Ax (WNum (fromIntegral $ Char.ord c))
 
-  Bare_make_bytes -> do -- TODO: I must be killed
-    n <- deNum <$> GetReg Ax
-    let nBytes = n `div` 2
-    let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
-    slideStackPointer AllocForUser nBytesAligned
-    execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
-    w <- GetReg Sp
-    SetReg Ax w
-    let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
-    execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
-
-  Bare_make_bytes_jump -> do
-    n <- deNum <$> GetReg Ax
-    let nBytes = n `div` 2
-    let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
-    let need = nBytesAligned + 2 + 2
-
-    do -- TODO: this is cut and pasted from Entry check. share!
-      n <- heapBytesRemaining
-      if gcAtEverySafePoint || (n < need) then runGC else pure ()
-      n <- heapBytesRemaining
-      if (n < need)
-        then do Crash (printf "[Not enough space recovered by GC: need=%d; have:%d]" need n)
-        else
-        do
-          --Debug (printf "BudgedForAllocation: %d\n" need)
-          BudgedForAllocation need
-
-    --Debug (printf "Setting budget for Bare_make_bytes_jump: %d\n" need)
-    BudgedForAllocation need
-    slideStackPointer AllocForUser nBytesAligned
-    execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
-    w <- GetReg Sp
-    SetReg argReg w
-    let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
-    execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
-    execCode codeReturn -- TODO: is this a hack?
-
   Bare_set_bytes -> do -- TODO: no need for Bare
     a <- deAddr <$> GetReg Ax
     i <- deNum <$> GetReg Bx
@@ -551,6 +513,24 @@ execBare = \case
   Bare_get_keyboard_last_scancode -> do
     c <- GetScanCode
     SetReg Ax (WChar c)
+
+
+jumpBare :: AllocBareBios -> M ()
+jumpBare = \case
+  AllocBare_make_bytes -> do
+    n <- deNum <$> GetReg Ax
+    let nBytes = n `div` 2
+    let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
+    let need = nBytesAligned + 2 + 2
+    heapCheck need
+    BudgedForAllocation need
+    slideStackPointer AllocForUser nBytesAligned
+    execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
+    w <- GetReg Sp
+    SetReg argReg w
+    let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
+    execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
+    execCode codeReturn
 
 setMemChar :: Addr -> Char -> M ()
 setMemChar a x = do
@@ -604,7 +584,7 @@ execJump = \case
     code <- GetCode lab
     execCode code
   JumpBare bare -> do
-    execBare bare
+    jumpBare bare
 
 binaryW :: (Number -> Number -> Number) -> Word -> Word -> Word
 binaryW f w1 w2 =
@@ -732,7 +712,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
           k s { allocsSinceLastCheck = 0 } ()
 
       BudgedForAllocation n -> do
-        k s { budgetAlloc = n, allocsSinceLastEnter = 0 } ()
+        k s { budgetAlloc = n, allocsSinceLastBudget = 0 } ()
 
       Debug m -> debug m $ k s ()
       Print m -> ITrace m $ k s ()
@@ -743,11 +723,11 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       TraceJump jump -> traceOpOJump (show jump) s k
 
       TraceAlloc AllocForUser -> do
-        let State{allocsSinceLastCheck,allocsSinceLastEnter,budgetAlloc} = s
+        let State{allocsSinceLastCheck,allocsSinceLastBudget,budgetAlloc} = s
         let die = ITrace (printf "alloc-budget-exceeded: %d\n" budgetAlloc) IDone
-        if allocsSinceLastEnter == budgetAlloc then die else do
+        if allocsSinceLastBudget == budgetAlloc then die else do
           ITick I.Alloc $ k s { allocsSinceLastCheck = 1 + allocsSinceLastCheck
-                             , allocsSinceLastEnter = 1 + allocsSinceLastEnter
+                             , allocsSinceLastBudget = 1 + allocsSinceLastBudget
                              } ()
 
       TraceAlloc AllocForGC -> do -- no budget checking
@@ -814,7 +794,7 @@ data State = State
   , lastCodeLabel :: CodeLabel
   , offsetFromLastLabel :: Int
   , allocsSinceLastCheck :: Int
-  , allocsSinceLastEnter :: Int -- TODO: rename allocsSinceLastBudget
+  , allocsSinceLastBudget :: Int
   , budgetAlloc :: Int
   , gcNum :: Int
   , hemi :: Hemi
@@ -831,7 +811,7 @@ state0 dmap = State
   , lastCodeLabel = error "lastCodeLabel"
   , offsetFromLastLabel = error "offsetFromLastLabel"
   , allocsSinceLastCheck = 0
-  , allocsSinceLastEnter = 0
+  , allocsSinceLastBudget = 0
   , budgetAlloc = 0
   , gcNum = 1
   , hemi = HemiA

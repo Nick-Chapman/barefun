@@ -775,7 +775,7 @@ L61: ; Continuation
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov ax, si
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L62: ; Function: (implode,g24)
   Bare_enter_check(8)
@@ -1469,7 +1469,7 @@ L110: ; Continuation
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov ax, si
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L111: ; Function: (rev_implode,g48)
   Bare_enter_check(8)
@@ -2214,7 +2214,7 @@ L166: ; Function: (lam,t1)
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov ax, si
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L167: ; Function: (lam,t1)
   Bare_enter_check(8)
@@ -2816,7 +2816,7 @@ L197: ; Continuation
   mov [CurrentCont], sp
   push word 10 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L198: ; Continuation
   Bare_enter_check(10)
@@ -2984,7 +2984,7 @@ L205: ; Continuation
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L206: ; Function: (load_block,g84)
   Bare_enter_check(6)
@@ -5467,7 +5467,7 @@ L399: ; Continuation
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L400: ; Arm: 10'9
   mov si, g209
@@ -5745,7 +5745,7 @@ L416: ; Function: (lam,g224)
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L417: ; Arm: 10'9
   mov si, g242
@@ -6038,7 +6038,7 @@ L439: ; Function: (lam,g349)
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov ax, 1025
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L440: ; Continuation
   Bare_enter_check(0)
@@ -7561,7 +7561,7 @@ L542: ; Continuation
   mov [CurrentCont], sp
   push word 14 ;; scanned
   mov ax, 257
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L543: ; Arm: 569'10
   mov si, g165
@@ -11259,7 +11259,7 @@ L814: ; Function: (lam,t1)
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov ax, 257
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L815: ; Continuation
   Bare_enter_check(0)

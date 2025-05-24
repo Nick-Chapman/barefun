@@ -139,7 +139,7 @@ L11: ; Continuation
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov ax, si
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L12: ; Function: (implode,g3)
   Bare_enter_check(8)
@@ -339,7 +339,7 @@ L26: ; Continuation
   mov [CurrentCont], sp
   push word 4 ;; scanned
   mov ax, 11
-  jmp Bare_make_bytes_jump
+  jmp AllocBare_make_bytes
 
 L27: ; Continuation
   Bare_enter_check(6)
