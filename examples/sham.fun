@@ -183,10 +183,8 @@ let split_words =
 type 'a option = None | Some of 'a
 
 type ('a,'b) pair = Pair of 'a * 'b
-type 'file fs = Bindings of (string, 'file) pair list (* TODO: remove Bindings when parser can handle/ignore type aliases *)
+type 'file fs = (string, 'file) pair list
 type file = Data of string | Executable of string * (file fs -> string list -> file fs)
-
-let bindings fs = match fs with | Bindings(ps) -> ps
 
 let lookup = fun sought ->
   let rec loop ps =
@@ -197,7 +195,7 @@ let lookup = fun sought ->
        | Pair (name,file) ->
           if eq_string name sought then Some file else loop ps
   in
-  fun fs -> loop (bindings fs)
+  loop
 
 let put_space_sep_strings xs =
   let rec loop xs =
@@ -237,7 +235,7 @@ let ls_behaviour fs args =
   | _::_ -> put_string "ls: takes no arguments\n";fs
   | [] ->
      let just_name p = match p with | Pair (name,_) -> name in
-     (put_space_sep_strings (map just_name (bindings fs)); newline(); fs)
+     (put_space_sep_strings (map just_name fs); newline(); fs)
 
 let cat_behaviour fs args =
   let cat1 x =
@@ -276,7 +274,7 @@ let rm1 fs sought =
        | Pair (name,file) ->
           if eq_string name sought then ps else Pair (name,file) :: loop ps
   in
-  Bindings (loop (bindings fs))
+  loop fs
 
 let rm_behaviour =
   fun fs args ->
@@ -297,7 +295,7 @@ let cp_behaviour fs args =
         match lookup source fs with
         | None -> (put_string (concat ["cp: cannot stat '";source;"': No such file or directory\n"]);fs)
         | Some file ->
-           Bindings (Pair (target,file) :: bindings fs)
+           Pair (target,file) :: fs
 
 let mv_behaviour fs args =
   match args with
@@ -312,7 +310,7 @@ let mv_behaviour fs args =
         match lookup source fs with
         | None -> (put_string (concat ["mv: cannot stat '";source;"': No such file or directory\n"]);fs)
         | Some file ->
-           Bindings (Pair (target,file) :: bindings (rm1 fs source))
+           Pair (target,file) :: rm1 fs source
 
 let file_behaviour fs args =
   let file1 x =
@@ -341,7 +339,7 @@ let create_behaviour fs args =
             loop ((line ^ "\n") :: acc)
         in
         let contents = loop [] in
-        Bindings (Pair (filename,Data contents) :: bindings fs)
+        Pair (filename,Data contents) :: fs
 
 let rec fib n =
   if n < 2 then n else fib (n-1) + fib (n-2)
@@ -405,7 +403,7 @@ let man_space = "space - where is the stack-pointer? (in words)\n"
 let shadow =
   "I have a little shadow that goes in and out with me,\nAnd what can be the use of him is more than I can see.\nHe is very, very like me from the heels up to the head;\nAnd I see him jump before me, when I jump into my bed.\n"
 
-let fs0() = Bindings(
+let fs0() =
   [ Pair ("readme", Data (readme))
   ; Pair ("cat", Executable (man_cat, cat_behaviour))
   ; Pair ("cp", Executable (man_cp, cp_behaviour))
@@ -418,7 +416,7 @@ let fs0() = Bindings(
   ; Pair ("cat", Data shadow)
   ; Pair ("fib", Executable (man_fib, fib_behaviour))
   ; Pair ("space", Executable (man_space, space_behaviour))
-  ])
+  ]
 
 let main () =
   put_string "Sham: In-memory file-system. Consider typing \"ls\".\n";

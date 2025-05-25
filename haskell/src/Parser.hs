@@ -436,17 +436,31 @@ gram6 = program where
     _ <- opt of_type
     pure cid
 
-  type_def = do
+  type_def_or_skip_alias = do
     key "type"
     maybe_tvar_seq
     type_constructor
     key "="
-    cids <- separated (key "|") type_def_arm
-    pure (AST.TypeDef cids)
+    alts [ do
+             cids <- separated (key "|") type_def_arm
+             pure (Just (AST.TypeDef cids))
+         , do
+             _ <- type_
+             pure Nothing
+         ]
 
-  definition = alts [value_def,type_def]
+  many_defs = loop []
+    where
+      loop acc =
+        alts
+        [ pure (reverse acc)
+        , do d <- value_def; loop (d:acc)
+        , type_def_or_skip_alias >>= \case
+            Just d -> loop (d:acc)
+            Nothing -> loop acc
+        ]
 
   program = do
     whitespace
-    ds <- many definition
+    ds <- many_defs
     pure $ AST.Prog ds
