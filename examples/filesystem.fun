@@ -579,8 +579,7 @@ let freeBI : fs -> bi -> fs =
   match fs with
   | FS (super,iis,bis) -> FS (super,iis,bi::bis)
 
-(*let rec giveup_blocks : fs -> bi list -> fs = fun fs old ->*) (* TODO: support in haskell parser *)
-let rec giveup_blocks fs old =
+let rec giveup_blocks : fs -> bi list -> fs = fun fs old ->
   match old with
   | [] -> fs
   | bi::bis -> giveup_blocks (freeBI fs bi) bis

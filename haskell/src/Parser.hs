@@ -315,15 +315,15 @@ gram6 = program where
   binding :: Par (Bid,Exp) = do
     key "let"
     pos <- position
-    alts [do key "rec"; pure True, pure False] >>= \case
+    isRec <- alts [do key "rec"; pure True, pure False]
+    f <- bound $ alts [identOrUnit,bracketedOperatorName]
+    _ <- opt type_annotation
+    case isRec of
       True -> do
-        f <- bound $ alts [identifier,bracketedOperatorName]
-        x1 <- bound identOrUnit
-        rhs <- bindingAbstraction
-        pure (f, AST.RecLam pos f x1 rhs)
+        bindingAbstraction >>= \case
+          AST.Lam _ x1 rhs -> pure (f, AST.RecLam pos f x1 rhs)
+          _ -> fail
       False -> do
-        f <- bound $ alts [identOrUnit,bracketedOperatorName]
-        _ <- opt type_annotation
         rhs <- bindingAbstraction
         pure (f,rhs)
 
