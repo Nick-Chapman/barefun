@@ -341,12 +341,12 @@ let read_sector_show : int -> unit =
 (* TODO: last sector caching! -- have old code for this *)
 
 type block = Block of string
-let deBlock x = match x with | Block y -> y
+let deBlock x = match x with Block y -> y
 
 (* block index *)
 
 type bi = BI of int
-let deBI x = match x with | BI y -> y
+let deBI x = match x with BI y -> y
 let export_bi : bi -> char = fun bi -> chr (deBI bi)
 let import_bi : char -> bi = fun c -> BI (ord c)
 let show_bi : bi -> string = fun bi -> "B" ^ sofi (deBI bi)
@@ -459,7 +459,7 @@ let import_inode : string -> inode option  =
 
 type super = Super of (int * int * int) (* #blocks; #inode-blocks; #inodes *)
 
-let num_inodes super = match super with | Super(_,_,c) -> c
+let num_inodes super = match super with Super(_,_,c) -> c
 
 let make_super_10percent () =
   let a = num_blocks_on_disk in
@@ -507,7 +507,7 @@ let mes_no_inodes_available = "no inodes available (too many files)"
 (* inode index *)
 
 type ii = II of int
-let deII x = match x with | II y -> y
+let deII x = match x with II y -> y
 let show_ii : ii -> string = fun ii -> "I" ^ sofi (deII ii)
 
 let ii2bi : ii -> bi = fun ii -> BI (deII ii / inodes_per_admin_block + 1)
@@ -517,7 +517,7 @@ let ii2off : ii -> int = fun ii -> (deII ii % inodes_per_admin_block) * idata_si
 
 type fs = FS of super * ii list * bi list (* free inodes and blocks *)
 
-let super_of_fs fs = match fs with | FS (super,_,_) -> super
+let super_of_fs fs = match fs with FS (super,_,_) -> super
 
 let loadI : super -> ii -> inode option =
   noinline (fun super ii ->
@@ -656,8 +656,8 @@ let sys_read : ii -> int -> int -> bytes -> int =
                  len
         in
         if len_wanted = 0 then 0 else
-          let bis = match inode with | Inode (_,bis) -> bis in
-          let size = match inode with | Inode (n,_) -> n in
+          let bis = match inode with Inode (_,bis) -> bis in
+          let size = match inode with Inode (n,_) -> n in
           loop bis (size - offset) offset
 
 let sys_write : ii -> int -> string -> unit = (* too complicated! *)
@@ -670,7 +670,7 @@ let sys_write : ii -> int -> string -> unit = (* too complicated! *)
      | None -> error mes_inode_index_not_allocated
      | Some inode ->
         let size =
-          let old_size = match inode with | Inode (n,_) -> n in
+          let old_size = match inode with Inode (n,_) -> n in
           let new_size = the_offset + string_length the_text in
           max old_size new_size
         in
@@ -716,7 +716,7 @@ let sys_write : ii -> int -> string -> unit = (* too complicated! *)
                      store_block bi (Block zero_data);
                      skip_loop (n-1) fs (bi::acc) []
         in
-        let bis = match inode with | Inode (_,bis) -> bis in
+        let bis = match inode with Inode (_,bis) -> bis in
         let nSkip = the_offset / block_size in
         (* TODO: if the_offset exceeds prev size, we must zero fill the gap *)
         skip_loop nSkip fs [] bis
@@ -726,7 +726,7 @@ let sys_write : ii -> int -> string -> unit = (* too complicated! *)
 type command = Command of (string list -> unit)
 
 type cmap = Cmap of (string,command) pair list
-let deCmap thing = match thing with | Cmap x -> x
+let deCmap thing = match thing with Cmap x -> x
 
 let cmap_keys : cmap -> string list =
   let rec loop acc ps =

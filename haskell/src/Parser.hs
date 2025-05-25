@@ -354,7 +354,6 @@ gram6 = program where
     pure (mkAbstraction xs e)
 
   arm :: Par Arm = do
-    key "|"
     (c,xs) <- pat
     pos <- position
     key "->"
@@ -366,7 +365,8 @@ gram6 = program where
     key "match"
     e <- exp
     key "with"
-    as <- many arm
+    _ <- opt (key "|")
+    as <- separated (key "|") arm
     pure (AST.Match pos e as)
 
   expITE = alts
