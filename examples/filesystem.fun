@@ -884,7 +884,7 @@ let command_list () =
 let rec write_to_file ii offset =
   let text = read_line () in
   let n = string_length text in
-  let stop = if n < 1 then false else eq_char (string_index text (n - 1)) controlD in
+  let stop = n > 0 && eq_char (string_index text (n - 1)) controlD in
   let text = if stop then substr text 0 (n-1) else text ^ "\n" in
   let () = sys_write ii offset text in
   if stop then () else write_to_file ii (offset + string_length text)

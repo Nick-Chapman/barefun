@@ -47,8 +47,8 @@ let get_char : unit -> char =
   let r_controlled = ref false in
   let rec loop shifted controlled =
     let n = ord (get_scancode()) in
-    let shift_pressed = if (n = 42) then true else (n = 54) in
-    let shift_released = if (n = 170) then true else (n = 182) in
+    let shift_pressed = (n = 42) || (n = 54) in
+    let shift_released = (n = 170) || (n = 182) in
     let release_scancode = (n > 128) in
     let control_pressed = (n = 29) in
     let control_released = (n = 157) in

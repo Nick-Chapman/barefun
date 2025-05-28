@@ -1627,7 +1627,7 @@ let k = [], fun [] arg ->
       let t1 = [f1,f2,arg,me], fun [f1,f2,f3,f4] arg k ->
         let k = [f1,f2,f3,f4,arg], fun [f2,f3,f4,f5,f6] arg ->
           let t1 = PRIM_StringLength(arg) in
-          let t2 = PRIM_LessInt(t1,1) in
+          let t2 = PRIM_LessInt(0,t1) in
           let k = [f2,f3,f4,f5,f6,arg,t1], fun [f2,f3,f4,f5,f6,f7,f8] arg ->
             let k = [f2,f3,f4,f5,f6,arg], fun [f2,f3,f4,f5,f6,f7] arg ->
               let t1 = PRIM_DeRef(f3) in
@@ -1919,12 +1919,12 @@ let k = [], fun [] arg ->
               let k = [], fun [] arg -> arg g145 k in
               g26 f7 k in
           match t2 with
-          | true1 -> k g144
-          | false0 ->
+          | true1 ->
             let t3 = PRIM_SubInt(t1,1) in
             let t4 = PRIM_StringIndex(arg,t3) in
             let t5 = PRIM_EqChar(t4,'\EOT') in
-            k t5 in
+            k t5
+          | false0 -> k g144 in
         g79 g143 k in
       k t1 in
     let k = [f2,t1,t2,t3], fun [f2,f3,f4,f5] arg ->

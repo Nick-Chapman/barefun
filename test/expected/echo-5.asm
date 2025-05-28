@@ -660,7 +660,7 @@ L29: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L30: ; Arm: 51'38
+L30: ; Arm: 51'35
   mov si, g10
   mov bp, [CurrentCont]
   mov ax, [bp+2]
@@ -697,7 +697,7 @@ L31: ; Continuation
   mov [CurrentCont], ax
   jmp [bp]
 
-L32: ; Arm: 50'36
+L32: ; Arm: 50'33
   mov si, g9
   mov bp, [CurrentCont]
   mov ax, [bp+2]

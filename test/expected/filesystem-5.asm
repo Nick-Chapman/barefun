@@ -8155,7 +8155,21 @@ L575: ; Continuation
   jmp [bp]
 
 L576: ; Arm: 887'22
-  mov si, g144
+  mov ax, [Temps+2]
+  mov bx, 3
+  sub ax, bx
+  add ax, 1
+  mov [Temps+6], ax
+  mov ax, si
+  mov bx, [Temps+6]
+  sar bx, 1
+  call Bare_get_bytes
+  mov [Temps+8], ax
+  mov ax, [Temps+8]
+  cmp word ax, `\x04`
+  call Bare_make_bool_from_z
+  mov [Temps+10], ax
+  mov si, [Temps+10]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -8166,8 +8180,8 @@ L577: ; Continuation
   mov bx, si
   mov ax, [bx]
   mov [Temps+2], ax
-  mov ax, [Temps+2]
-  cmp word ax, 3
+  mov ax, 1
+  cmp word ax, [Temps+2]
   call Bare_make_bool_from_n
   mov [Temps+4], ax
   push word [Temps+2]
@@ -8184,21 +8198,7 @@ L577: ; Continuation
   mov bx, [Temps+4]
   cmp word [bx], 3
   jz L576
-  mov ax, [Temps+2]
-  mov bx, 3
-  sub ax, bx
-  add ax, 1
-  mov [Temps+6], ax
-  mov ax, si
-  mov bx, [Temps+6]
-  sar bx, 1
-  call Bare_get_bytes
-  mov [Temps+8], ax
-  mov ax, [Temps+8]
-  cmp word ax, `\x04`
-  call Bare_make_bool_from_z
-  mov [Temps+10], ax
-  mov si, [Temps+10]
+  mov si, g144
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax

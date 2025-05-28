@@ -15,6 +15,9 @@ module X : sig
   val (<) : int -> int -> bool
   val (=) : int -> int -> bool
 
+  val (||) : bool -> bool -> bool
+  val (&&) : bool -> bool -> bool
+
   val chr : int -> char
   val eq_char : char -> char -> bool
   val get_char : unit -> char
@@ -59,6 +62,9 @@ end = struct
   let (-) = (-)
   let (%) = (mod)
   let (/) = (/)
+
+  let (||) = (||)
+  let (&&) = (&&)
 
   let ord = Char.code
   let chr n = Char.chr (n % 256)

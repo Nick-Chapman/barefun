@@ -17,6 +17,10 @@ mkAbstraction xs e = case xs of [] -> e; x@(Bid pos _):xs -> AST.Lam pos x (mkAb
 mkApps :: Exp -> [(Position,Exp)] -> Exp
 mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 
+mkIte :: Position -> Exp -> Position -> Exp -> Position -> Exp -> Exp
+mkIte pos i posThen t posElse e =
+  AST.Match pos i [AST.Arm posThen cTrue [] t, AST.Arm posElse cFalse [] e ]
+
 underscore :: Id
 underscore = mkUserId "_"
 
@@ -255,6 +259,16 @@ gram6 = program where
     let loop f = alts [ pure f , do p <- position; e <- atom; loop (AST.App f p e)]
     atom >>= loop
 
+  mkBinApp p1 p2 name x1 x2 =
+    case name of
+      "||" -> mkIte p1 x1 p1 (eTrue p1) p2 x2
+      "&&" -> mkIte p1 x1 p2 x2 p2 (eFalse p2)
+
+      _ -> mkApps (AST.Var p1 (mkUserId name)) [(p1,x1),(p2,x2)]
+
+  eTrue pos = AST.Con pos cTrue []
+  eFalse pos = AST.Con pos cFalse []
+
   infixOpL names sub = sub >>= loop where
     loop acc =
       alts [ pure acc
@@ -263,7 +277,7 @@ gram6 = program where
                name <- alts [ do key x; pure x | x <- names ]
                p2 <- position
                x <- sub
-               loop (mkApps (AST.Var p1 (mkUserId name)) [(p1,acc),(p2,x)])
+               loop (mkBinApp p1 p2 name acc x)
            ]
 
   infixOpR names sub = do
@@ -274,7 +288,7 @@ gram6 = program where
              name <- alts [ do key x; pure x | x <- names ]
              p2 <- position
              y <- infixOpR names sub
-             pure (mkApps (AST.Var p1 (mkUserId name)) [(p1,x),(p2,y)])
+             pure (mkBinApp p1 p2 name x y)
          ]
 
   infixOp :: (Precedence,[String]) -> Par Exp -> Par Exp
@@ -286,9 +300,12 @@ gram6 = program where
   infixGroup3 = (R,["::"])
   infixGroup4 = (R,["^","@@","@"])
   infixGroup5 = (L,["=","<=","<",">=",">"])
-  infixGroup6 = (R,[":="])
+  infixGroup6 = (R,["&&"])
+  infixGroup7 = (R,["||"])
+  infixGroup8 = (R,[":="])
 
-  infixNames = concat (map snd [infixGroup1,infixGroup2,infixGroup3,infixGroup4,infixGroup5,infixGroup6])
+  infixNames = concat (map snd [infixGroup1,infixGroup2,infixGroup3,infixGroup4
+                               ,infixGroup5,infixGroup6,infixGroup7,infixGroup8])
 
   infix0 = alts [consApp, application, ignored_assert]
   infix1 = infixOp infixGroup1 infix0
@@ -297,8 +314,10 @@ gram6 = program where
   infix4 = infixOp infixGroup4 infix3
   infix5 = infixOp infixGroup5 infix4
   infix6 = infixOp infixGroup6 infix5
+  infix7 = infixOp infixGroup7 infix6
+  infix8 = infixOp infixGroup8 infix7
 
-  infixWeakestPrecendence = infix6
+  infixWeakestPrecendence = infix8
 
   bound :: Par Id -> Par Bid
   bound identPar = do
@@ -344,7 +363,7 @@ gram6 = program where
     posElse <- position
     key "else"
     e <- exp_no_semi
-    pure (AST.Match pos i [AST.Arm posThen cTrue [] t, AST.Arm posElse cFalse [] e ])
+    pure (mkIte pos i posThen t posElse e)
 
   abstraction = do
     key "fun"
