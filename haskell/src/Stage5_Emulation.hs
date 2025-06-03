@@ -21,7 +21,7 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 import Stage5_ASM
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
-gcAtEverySafePoint = False -- but slows "dune test" from 4.4s to 8.8s
+gcAtEverySafePoint = False -- but slows "dune test"
 
 hemiSizeInBytes :: Int
 hemiSizeInBytes = 10000 -- 3000 was ok for sham; 5000 is needed for filesystem example
@@ -156,8 +156,10 @@ addAddr i = \case
 heapBytesRemaining :: M Int
 heapBytesRemaining = do
   HeapAddr sp <- getSP
+  let n0 = fromIntegral sp
+  let n = if n0 <= 0 then n0 + twoE16 else n0
   hemi <- WhatHemi
-  pure (fromIntegral sp - botOfHemi hemi)
+  pure (n - botOfHemi hemi)
 
 setStackPointerToTopOfHemi :: Hemi -> M ()
 setStackPointerToTopOfHemi hemi = do

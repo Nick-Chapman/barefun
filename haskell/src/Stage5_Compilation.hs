@@ -24,7 +24,10 @@ targetOfTemp = \case
   temp -> TTemp temp
 
 -- Ax is the general scratch register
--- Bx is used for case-scrutinee and temp for simultaneousMove
+-- Bx is used for case-scrutinee
+
+argRegOut :: Reg
+argRegOut = Di
 
 compile :: SRC.Image -> Transformed
 compile x = runAsm (compileImage x >>= cutEntryCode "Start")
@@ -69,7 +72,7 @@ cutEntryCode :: String -> Code -> Asm CodeLabel
 cutEntryCode name code = do
   need <- Needed code
   CutCode name $ do
-    Do (OpEnterCheck need) code
+    doOps [ OpEnterCheck need ] code
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -77,9 +80,11 @@ compileCode = \case
     pure $ Do (OpMove argReg (compileRef res)) codeReturn
 
   SRC.Tail fun _pos arg -> do
-    pure $ doOps (
-      simultaneousMove (frameReg,compileRef fun) (argReg,compileRef arg)
-      ) (Done (JumpIndirect frameReg))
+    pure $ doOps
+      [ OpMove argRegOut (compileRef arg)
+      , OpMove frameReg (compileRef fun)
+      , OpMove argReg (SReg argRegOut)
+      ] (Done (JumpIndirect frameReg))
 
   SRC.Tail2{} -> do
     undefined
@@ -105,7 +110,7 @@ compileCode = \case
     let
       ops =
         map OpPush (reverse (map compileRef pre)) ++
-        [ OpPush geteCurrentCont
+        [ OpPush getCurrentCont
         , OpPush (SLit (LCodeLabel lab))
         , setCurrentCont (SReg Sp)
         , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
@@ -140,39 +145,6 @@ compileArmTaken scrutReg arm =  do
 
 doOps :: [Op] -> Code -> Code
 doOps ops c = foldr Do c ops
-
-simultaneousMove :: (Reg,Source) -> (Reg,Source) -> [Op]
-simultaneousMove (r1,s1) (r2,s2) = do
-  let tempReg = Bx
-  let op1 = OpMove r1 s1
-  let op2 = OpMove r2 s2
-  let oneTwo = needs r2 s1
-  let twoOne = needs r1 s2
-  case (oneTwo,twoOne) of
-    (True,True) ->
-      [ OpMove tempReg (SReg r1)
-      , OpMove r1 s1
-      , OpMove r2 (changeRegInSource r1 tempReg s2)
-      ]
-    (True,_) -> [op1,op2]
-    (_,True) -> [op2,op1]
-    (False,False) -> [op1,op2] -- either order will do
-
-needs :: Reg -> Source -> Bool
-needs r2 = \case
-  SReg r -> (r==r2)
-  SLit{} -> False
-  STemp{} -> False
-  SCurrentCont -> False
-  SMemIndirectOffset r _ -> (r==r2)
-
-changeRegInSource :: Reg -> Reg -> Source -> Source
-changeRegInSource r1 r2 = \case
-  SReg r -> SReg (if r==r1 then r2 else r1)
-  s@SLit{} -> s
-  s@STemp{} -> s
-  s@SCurrentCont -> s
-  SMemIndirectOffset r i -> SMemIndirectOffset (if r==r1 then r2 else r1) i
 
 compileAtomicTo :: String -> Target -> SRC.Atomic -> Asm [Op]
 compileAtomicTo who target = \case

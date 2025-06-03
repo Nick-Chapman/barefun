@@ -38,8 +38,9 @@ L3: ; Function: (is_even,g1)
   sub ax, bx
   add ax, 1
   mov [Temps+8], ax
+  mov di, [Temps+8]
   mov bp, g1
-  mov si, [Temps+8]
+  mov si, di
   jmp [bp]
 
 L4: ; Continuation
@@ -86,8 +87,9 @@ L7: ; Continuation
   push word L6
   mov [CurrentCont], sp
   push word 4 ;; scanned
+  mov di, 27
   mov bp, g1
-  mov si, 27
+  mov si, di
   jmp [bp]
 
 L8: ; Arm: 9'25
@@ -118,8 +120,9 @@ L10: ; Start
   push word L9
   mov [CurrentCont], sp
   push word 4 ;; scanned
+  mov di, 85
   mov bp, g1
-  mov si, 85
+  mov si, di
   jmp [bp]
 
 g1:

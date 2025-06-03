@@ -1,7 +1,7 @@
 -- | Define types for x86 assembly, and printer suitable for nasm
 module Stage5_ASM
   ( bytesPerWord
-  , Reg(..), frameReg,argReg, geteCurrentCont,setCurrentCont
+  , Reg(..), frameReg,argReg, getCurrentCont,setCurrentCont
   , Image(..)
   , Lit(..)
   , Code(..), codeReturn
@@ -42,13 +42,13 @@ setCurrentCont = \case
   SReg reg -> OpStore TCurrentCont reg
   source -> OpMany [ OpMove Ax source, OpStore TCurrentCont Ax ]
 
-geteCurrentCont :: Source
-geteCurrentCont = SCurrentCont
+getCurrentCont :: Source
+getCurrentCont = SCurrentCont
 
 -- this is the calling convention to "return" to the current continuation
 codeReturn :: Code
 codeReturn =
-  Do (OpMany [ OpMove frameReg geteCurrentCont
+  Do (OpMany [ OpMove frameReg getCurrentCont
              , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
              ]) (Done (JumpIndirect frameReg))
 

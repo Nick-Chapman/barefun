@@ -12,8 +12,9 @@ L2: ; Continuation
   add ax, bx
   sub ax, 1
   mov [Temps+2], ax
+  mov di, [Temps+2]
   mov bp, g1
-  mov si, [Temps+2]
+  mov si, di
   jmp [bp]
 
 L3: ; Arm: 12'17
@@ -130,8 +131,9 @@ L7: ; Start
   push word L6
   mov [CurrentCont], sp
   push word 4 ;; scanned
+  mov di, 1
   mov bp, g1
-  mov si, 1
+  mov si, di
   jmp [bp]
 
 g1:
