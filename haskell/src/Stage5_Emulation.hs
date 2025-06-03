@@ -419,8 +419,7 @@ evalSource :: Source -> M Word
 evalSource = \case
   SReg r -> GetReg r
   SLit l -> pure (fromLit l)
-  STemp temp -> GetTemp temp
-  SCurrentCont -> GetMem aCurrentCont
+  SMemOffset lab n -> GetMem (AStatic lab n)
   SMemIndirectOffset r i -> do
     a <- deAddr  <$> GetReg r
     a' <- addAddr i a
@@ -428,13 +427,10 @@ evalSource = \case
 
 setTarget :: Target -> Word -> M ()
 setTarget = \case
-  TCurrentCont -> \w ->
-    SetMem aCurrentCont w
-  TTemp temp -> \w ->
-    SetTemp temp w
   TReg r -> \w -> do
     a <- deAddr <$> GetReg r
     SetMem a w
+  TMemOffset lab n -> \w -> SetMem (AStatic lab n) w
 
 execBare :: BareBios -> M ()
 execBare = \case

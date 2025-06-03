@@ -13,7 +13,7 @@ module Stage5_ASM
   , BareBios(..)
   , AllocBareBios(..)
   , CodeLabel(..)
-  , DataLabel(..)
+  , DataLabel(..), labelTemps
   , DataSpec(..)
   ) where
 
@@ -39,11 +39,18 @@ argReg = Si
 -- current continuation in memory
 setCurrentCont :: Source -> Op
 setCurrentCont = \case
-  SReg reg -> OpStore TCurrentCont reg
-  source -> OpMany [ OpMove Ax source, OpStore TCurrentCont Ax ]
+  SReg reg -> OpStore cc reg
+  source -> OpMany [ OpMove Ax source, OpStore cc Ax ]
+  where cc = TMemOffset labelCC 0
 
 getCurrentCont :: Source
-getCurrentCont = SCurrentCont
+getCurrentCont = SMemOffset labelCC 0
+
+labelTemps :: DataLabel
+labelTemps = DataLabelR "Temps"
+
+labelCC :: DataLabel
+labelCC = DataLabelR "CurrentCont"
 
 -- this is the calling convention to "return" to the current continuation
 codeReturn :: Code
@@ -91,14 +98,12 @@ data Jump
 
 data Target
   = TReg Reg
-  | TTemp SRC.Temp -- TODO: unify TTemp/TCurrentCont as just TMem (same for Source)
-  | TCurrentCont
+  | TMemOffset DataLabel Int
 
 data Source
   = SReg Reg
   | SLit Lit
-  | STemp SRC.Temp
-  | SCurrentCont
+  | SMemOffset DataLabel Int -- byte indexing
   | SMemIndirectOffset Reg Int -- byte indexing
 
 data Lit
@@ -200,15 +205,13 @@ instance Show Jump where
 instance Show Target where
   show = \case
     TReg r -> show r
-    TTemp temp -> ppTemp temp
-    TCurrentCont -> "CurrentCont"
+    TMemOffset lab n -> ppLabelOffset lab n
 
 instance Show Source where
   show = \case
     SReg r -> show r
     SLit w -> show w
-    STemp temp -> printf "[%s]" (ppTemp temp)
-    SCurrentCont -> "[CurrentCont]"
+    SMemOffset lab n -> printf "[%s]" (ppLabelOffset lab n)
     SMemIndirectOffset r n ->
       if n == 0 then printf "[%s]" (show r) else
         printf "[%s+%s]" (show r) (show n)
@@ -245,8 +248,10 @@ instance Show Reg where
     Si -> "si"
     Di -> "di"
 
-ppTemp :: SRC.Temp -> String
-ppTemp (SRC.Temp n) = printf "Temps+%d" (bytesPerWord * n)
+ppLabelOffset :: DataLabel -> Int -> String
+ppLabelOffset lab = \case
+  0 -> show lab
+  n -> printf "%s+%d" (show lab) n
 
 escapeCharForNasm :: Char -> String
 escapeCharForNasm c = do

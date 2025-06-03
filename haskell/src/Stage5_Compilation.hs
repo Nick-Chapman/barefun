@@ -21,7 +21,7 @@ type Transformed = Image
 targetOfTemp :: SRC.Temp -> Target
 targetOfTemp = \case
   SRC.Temp 0 -> error "targetOfTemp/temps start from 1"
-  temp -> TTemp temp
+  SRC.Temp n -> TMemOffset labelTemps (bytesPerWord * n)
 
 -- Ax is the general scratch register
 -- Bx is used for case-scrutinee
@@ -413,8 +413,7 @@ compileRef = \case
 sourceOfTarget :: Target -> Source
 sourceOfTarget = \case
   TReg r -> SReg r
-  TTemp t -> STemp t
-  TCurrentCont -> SCurrentCont
+  TMemOffset lab n -> SMemOffset lab n
 
 lnumTagging :: Number -> Lit
 lnumTagging n = LNum (2 * n + 1)
