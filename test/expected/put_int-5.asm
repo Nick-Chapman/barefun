@@ -31,17 +31,9 @@ L3: ; Arm: 6'13
 
 L4: ; Continuation
   Bare_enter_check(0)
-  mov ax, [bp+4]
-  sar ax, 1
-  mov bx, 21
-  sar bx, 1
-  mov dx, 0
-  Div bx
-  shl ax, 1
-  add ax, 1
-  mov [Temps+2], ax
+  mov bx, bp
   mov bp, si
-  mov si, [Temps+2]
+  mov si, [bx+4]
   jmp [bp]
 
 L5: ; Function: (lam,t1)
@@ -71,18 +63,27 @@ L5: ; Function: (lam,t1)
   sar ax, 1
   call Bare_num_to_char
   mov [Temps+8], ax
+  mov ax, si
+  sar ax, 1
+  mov bx, 21
+  sar bx, 1
+  mov dx, 0
+  Div bx
+  shl ax, 1
+  add ax, 1
+  mov [Temps+10], ax
   push word [bp+2]
   push word [Temps+8]
   push word 3
-  mov [Temps+10], sp
+  mov [Temps+12], sp
   push word 6 ;; scanned
-  push word si
+  push word [Temps+10]
   push word [CurrentCont]
   push word L4
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g3
-  mov si, [Temps+10]
+  mov si, [Temps+12]
   jmp [bp]
 
 L6: ; Function: (loop,g3)

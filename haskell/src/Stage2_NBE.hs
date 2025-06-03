@@ -12,7 +12,27 @@ import Value (Value(..),Number)
 import qualified Data.Map as Map
 import qualified Stage1_EXP as SRC
 
+----------------------------------------------------------------------
+-- The NBE compilation stage constructs multi-lam/app
+
+enabledMulti :: Bool
+enabledMulti = False
+
+mkLam :: Position -> Id -> Exp -> Exp
+mkLam p x1 body =
+  case (enabledMulti, body) of
+    (True, Lam _ x2 e) -> Lam2 p x1 x2 e
+    (_, e) -> Lam p x1 e
+
+mkApp :: Exp -> Position -> Exp -> Exp
+mkApp f p a2 =
+  case (enabledMulti, f) of
+    (True, App f p a1) -> App2 f p a1 a2
+    (_, _) -> App f p a2
+
+----------------------------------------------------------------------
 -- The NBE compilation stage does not change the representation
+
 type Transformed = SRC.Exp
 
 compile :: SRC.Exp -> Transformed
@@ -99,7 +119,7 @@ reify = \case
       res :: SemValue <- f arg
       res :: Exp <- reify res
       pure res
-    pure $ Lam (posOfId x) x body
+    pure $ mkLam (posOfId x) x body
 
 share :: Id -> SemValue -> M SemValue
 share x sv = do
@@ -118,7 +138,7 @@ apply fun p arg = do
     _ -> do
       fun <- reify fun
       arg <- reify arg
-      pure $ Syntax (App fun p arg)
+      pure $ Syntax (mkApp fun p arg)
 
 maybeAllConstant :: [SemValue] -> Maybe [BaseValue]
 maybeAllConstant svs = do
@@ -143,6 +163,11 @@ reflectLit = \case
 
 reflect :: Env -> Exp -> M SemValue
 reflect env = \case
+  Lam2{} ->
+    undefined
+  App2{} ->
+    undefined
+
   Var _pos x -> do
     pure (look env x)
   Lit pos x -> do

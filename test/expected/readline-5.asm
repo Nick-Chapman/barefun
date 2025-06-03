@@ -170,13 +170,9 @@ L11: ; Arm: 21'13
 
 L12: ; Continuation
   Bare_enter_check(0)
-  mov ax, [bp+4]
-  mov bx, 3
-  sub ax, bx
-  add ax, 1
-  mov [Temps+2], ax
+  mov bx, bp
   mov bp, si
-  mov si, [Temps+2]
+  mov si, [bx+4]
   jmp [bp]
 
 L13: ; Function: (lam,t1)
@@ -193,18 +189,23 @@ L13: ; Function: (lam,t1)
   sar bx, 1
   call Bare_get_bytes
   mov [Temps+4], ax
+  mov ax, si
+  mov bx, 3
+  sub ax, bx
+  add ax, 1
+  mov [Temps+6], ax
   push word [bp+2]
   push word [Temps+4]
   push word 3
-  mov [Temps+6], sp
+  mov [Temps+8], sp
   push word 6 ;; scanned
-  push word si
+  push word [Temps+6]
   push word [CurrentCont]
   push word L12
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g5
-  mov si, [Temps+6]
+  mov si, [Temps+8]
   jmp [bp]
 
 L14: ; Function: (explode_loop,g5)
@@ -241,14 +242,10 @@ L16: ; Arm: 56'22
   jmp [bp]
 
 L17: ; Continuation
-  Bare_enter_check(8)
-  push word [bp+4]
-  push word `\x04`
-  push word 3
-  mov [Temps+2], sp
-  push word 6 ;; scanned
+  Bare_enter_check(0)
+  mov bx, bp
   mov bp, si
-  mov si, [Temps+2]
+  mov si, [bx+4]
   jmp [bp]
 
 L18: ; Arm: 57'28
@@ -265,6 +262,11 @@ L18: ; Arm: 57'28
   mov ax, Bare_unit
   mov [Temps+14], ax
   push word si
+  push word `\x04`
+  push word 3
+  mov [Temps+16], sp
+  push word 6 ;; scanned
+  push word [Temps+16]
   push word [CurrentCont]
   push word L17
   mov [CurrentCont], sp
@@ -419,7 +421,7 @@ L29: ; Arm: 32'16
   jmp [bp]
 
 L30: ; Function: (readloop,g8)
-  Bare_enter_check(10)
+  Bare_enter_check(16)
   call Bare_get_char
   mov [Temps+2], ax
   mov ax, [Temps+2]
@@ -625,13 +627,9 @@ L40: ; Arm: 21'13
 
 L41: ; Continuation
   Bare_enter_check(0)
-  mov ax, [bp+4]
-  mov bx, 3
-  sub ax, bx
-  add ax, 1
-  mov [Temps+2], ax
+  mov bx, bp
   mov bp, si
-  mov si, [Temps+2]
+  mov si, [bx+4]
   jmp [bp]
 
 L42: ; Function: (lam,t1)
@@ -648,18 +646,23 @@ L42: ; Function: (lam,t1)
   sar bx, 1
   call Bare_get_bytes
   mov [Temps+4], ax
+  mov ax, si
+  mov bx, 3
+  sub ax, bx
+  add ax, 1
+  mov [Temps+6], ax
   push word [bp+2]
   push word [Temps+4]
   push word 3
-  mov [Temps+6], sp
+  mov [Temps+8], sp
   push word 6 ;; scanned
-  push word si
+  push word [Temps+6]
   push word [CurrentCont]
   push word L41
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, g19
-  mov si, [Temps+6]
+  mov si, [Temps+8]
   jmp [bp]
 
 L43: ; Function: (explode_loop,g19)

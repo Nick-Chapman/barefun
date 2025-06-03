@@ -12,7 +12,7 @@ import Data.Map (Map)
 import Data.Set (notMember)
 import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
-import Stage0_AST (apply)
+import Stage0_AST (apply,apply2)
 import Stage1_EXP (Id(..),Ctag(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
@@ -32,11 +32,13 @@ data Top
   = TopLitS String
   | TopPrim Primitive [Ref]
   | TopLam Ref Code -- All top function defs allow recursion. We dont even have an unrecursive form.
+  | TopLam2 Ref Ref Code
   | TopConApp Ctag [Ref]
 
 data Code
   = Return Position Ref
   | Tail Ref Position Ref
+  | Tail2 Ref Position Ref Ref
   | TailPrim Primitive Position Ref
   | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
@@ -48,9 +50,10 @@ data Atomic
   = Prim Primitive [Ref]
   | ConApp Ctag [Ref]
   | Lam [Ref] [Ref] Ref Code
+  | Lam2 [Ref] [Ref] Ref Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code
 
-data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg deriving (Eq,Ord)
+data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg | TheArg2 deriving (Eq,Ord)
 
 data Ref
   = Ref Id Location
@@ -91,9 +94,8 @@ prettyT :: Top -> Lines
 prettyT = \case
   TopLitS x -> [show x]
   TopPrim prim xs -> [printf "PRIM_%s(%s)" (show prim) (intercalate "," (map show xs))]
-  TopLam x body ->
-    ("fun " ++ show x ++ " k ->")
-    >>> prettyC body
+  TopLam x body -> ("fun " ++ show x ++ " k ->") >>> prettyC body
+  TopLam2 x1 x2 body -> ("fun " ++ show [x1,x2] ++ " k ->") >>> prettyC body
   TopConApp tag [] -> [show tag]
   TopConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
 
@@ -101,6 +103,7 @@ prettyC :: Code -> Lines
 prettyC = \case
   Return _ x -> ["k " ++ show x]
   Tail func _pos arg -> [printf "%s %s k" (show func) (show arg)]
+  Tail2 func _pos arg1 arg2 -> [printf "%s %s k" (show func) (show [arg1,arg2])]
   TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic (_,t) rhs body ->
     ("let " ++ show t ++ " = ") <++ prettyA rhs ++> " in"
@@ -118,9 +121,8 @@ prettyA = \case
   Prim prim xs -> [printf "PRIM_%s(%s)" (show prim) (intercalate "," (map show xs))]
   ConApp tag [] -> [show tag]
   ConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
-  Lam pre post x body ->
-    (show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " k ->")
-    >>> prettyC body
+  Lam pre post x body -> (show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " k ->") >>> prettyC body
+  Lam2{} -> undefined
   RecLam pre post f x body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show x ++ " k ->")
     >>> prettyC body
@@ -151,6 +153,7 @@ instance Show Location where
     InFrame n -> "f" ++ show n
     InTemp t -> show t
     TheArg -> "arg"
+    TheArg2 -> "arg2"
     TheFrame -> "me"
 
 instance Show Global where
@@ -190,13 +193,15 @@ evalT :: Env -> Top -> Value
 evalT genv = \case
   TopLitS string -> VString string
   TopPrim prim xs -> evaluatePurePrimitive prim (map (look genv) xs)
-  TopLam x body -> VFunc (\arg k -> evalCode genv (insert x arg genv) body k)
+  TopLam x body -> VFunc $ \arg k -> evalCode genv (insert x arg genv) body k
+  TopLam2 x1 x2 body -> VFunc $ \arg1 k -> k $ VFunc $ \arg2 k -> do evalCode genv (insert x1 arg1 $ insert x2 arg2 genv) body k
   TopConApp tag xs -> VCons tag (map (look genv) xs)
 
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return _ x -> \k -> ITick I.Return $ k (look env x)
   Tail func pos arg -> \k -> ITick I.Enter $ apply (look env func) pos (look env arg) k
+  Tail2 func pos arg1 arg2 -> \k -> ITick I.Enter $ ITick I.Enter $ apply2 (look env func) pos (look env arg1) (look env arg2) k
   TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ executePrimitive prim [look env arg] k
   LetAtomic (x,t) a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
@@ -230,6 +235,8 @@ evalCode genv env = \case
       Lam pre _ x body -> \k -> do
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         k (VFunc (\arg k -> evalCode genv (insert x arg env') body k))
+
+      Lam2{} -> undefined
 
       RecLam pre _ f x body -> \k -> do
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
@@ -269,6 +276,7 @@ compileCtop = compileC firstTempIndex
     compileC nextTemp cenv = \case
       SRC.Return pos v -> pure $ Return pos (compileV cenv v)
       SRC.Tail func pos arg -> pure $ Tail (compileV cenv func) pos (compileV cenv arg)
+      SRC.Tail2 func pos arg1 arg2 -> pure $ Tail2 (compileV cenv func) pos (compileV cenv arg1) (compileV cenv arg2)
       SRC.TailPrim prim pos arg-> pure $ TailPrim prim pos (compileV cenv arg)
 
       SRC.LetAtomic x rhs body -> do
@@ -330,15 +338,27 @@ compileA cenv = \case
         pure $ Left (ConApp c xs')
 
   SRC.Lam _ fvs x body -> do
-    let xRef = Ref x TheArg
+    let argRef = Ref x TheArg
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
-    body <- compileCtop (Map.insert x xRef cenv) body
+    body <- compileCtop (Map.insert x argRef cenv) body
     case (pre,post) of
       ([],[]) -> do
         g <- GlobalRef
-        pure $ Right (g, TopLam xRef body)
+        pure $ Right (g, TopLam argRef body)
       _ ->
-        pure $ Left (Lam pre post xRef body)
+        pure $ Left (Lam pre post argRef body)
+
+  SRC.Lam2 _ fvs x1 x2 body -> do
+    let argRef1 = Ref x1 TheArg
+    let argRef2 = Ref x2 TheArg2
+    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
+    body <- compileCtop (Map.insert x1 argRef1 $ Map.insert x2 argRef2 cenv) body
+    case (pre,post) of
+      ([],[]) -> do
+        g <- GlobalRef
+        pure $ Right (g, TopLam2 argRef1 argRef2 body)
+      _ ->
+        pure $ Left (Lam2 pre post argRef1 argRef2 body)
 
   SRC.RecLam _ fvs f x body -> do
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs

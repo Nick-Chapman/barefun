@@ -780,31 +780,32 @@ L36: ; Continuation
 
 L37: ; Continuation
   Bare_enter_check(8)
-  mov bx, [bp+4]
-  mov ax, [bx]
-  mov [Temps+2], ax
   push word [bp+6]
   push word [CurrentCont]
   push word L36
   mov [CurrentCont], sp
   push word 6 ;; scanned
+  mov bx, bp
   mov bp, si
-  mov si, [Temps+2]
+  mov si, [bx+4]
   jmp [bp]
 
 L38: ; Function: (loop,t4)
   Bare_enter_check(10)
-  mov bx, [bp+2]
+  mov bx, [bp+4]
   mov ax, [bx]
   mov [Temps+2], ax
+  mov bx, [bp+2]
+  mov ax, [bx]
+  mov [Temps+4], ax
   push word bp
-  push word [bp+4]
+  push word [Temps+2]
   push word [CurrentCont]
   push word L37
   mov [CurrentCont], sp
   push word 8 ;; scanned
   mov bp, [bp+6]
-  mov si, [Temps+2]
+  mov si, [Temps+4]
   jmp [bp]
 
 L39: ; Continuation

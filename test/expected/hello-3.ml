@@ -16,10 +16,9 @@ let explode_loop = fix (fun [] explode_loop acc k ->
     | false0 ->
       let lit = "Hello, world!\n" in
       let x = PRIM_StringIndex(lit,i) in
+      let prim = PRIM_SubInt(i,1) in
       let con = Cons1[x,acc] in
-      let k [i] app =
-        let prim = PRIM_SubInt(i,1) in
-        app prim k in
+      let k [prim] app = app prim k in
       explode_loop con k in
   k lam) in
 let con = Nil0 in

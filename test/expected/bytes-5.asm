@@ -161,13 +161,9 @@ L13: ; Arm: 20'13
 
 L14: ; Continuation
   Bare_enter_check(0)
-  mov ax, [bp+4]
-  mov bx, 3
-  sub ax, bx
-  add ax, 1
-  mov [Temps+2], ax
+  mov bx, bp
   mov bp, si
-  mov si, [Temps+2]
+  mov si, [bx+4]
   jmp [bp]
 
 L15: ; Function: (lam,t1)
@@ -184,18 +180,23 @@ L15: ; Function: (lam,t1)
   sar bx, 1
   call Bare_get_bytes
   mov [Temps+4], ax
+  mov ax, si
+  mov bx, 3
+  sub ax, bx
+  add ax, 1
+  mov [Temps+6], ax
   push word [bp+4]
   push word [Temps+4]
   push word 3
-  mov [Temps+6], sp
+  mov [Temps+8], sp
   push word 6 ;; scanned
-  push word si
+  push word [Temps+6]
   push word [CurrentCont]
   push word L14
   mov [CurrentCont], sp
   push word 6 ;; scanned
   mov bp, [bp+6]
-  mov si, [Temps+6]
+  mov si, [Temps+8]
   jmp [bp]
 
 L16: ; Function: (explode_loop,t1)
@@ -214,13 +215,9 @@ L16: ; Function: (explode_loop,t1)
 
 L17: ; Continuation
   Bare_enter_check(0)
-  mov ax, [bp+4]
-  mov bx, 3
-  sub ax, bx
-  add ax, 1
-  mov [Temps+2], ax
+  mov bx, bp
   mov bp, si
-  mov si, [Temps+2]
+  mov si, [bx+4]
   jmp [bp]
 
 L18: ; Function: (explode,g5)
@@ -232,7 +229,12 @@ L18: ; Function: (explode,g5)
   mov bx, si
   mov ax, [bx]
   mov [Temps+4], ax
-  push word [Temps+4]
+  mov ax, [Temps+4]
+  mov bx, 3
+  sub ax, bx
+  add ax, 1
+  mov [Temps+6], ax
+  push word [Temps+6]
   push word [CurrentCont]
   push word L17
   mov [CurrentCont], sp

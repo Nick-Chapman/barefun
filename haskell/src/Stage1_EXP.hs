@@ -11,7 +11,7 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0_AST (evalLit,apply,Literal,Cid,Bid(..))
+import Stage0_AST (evalLit,apply,apply2,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
 import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..))
@@ -28,8 +28,10 @@ data Exp
   | ConTag Position Ctag [Exp]
   | Prim Position Primitive [Exp]
   | Lam Position Id Exp
+  | Lam2 Position Id Id Exp
   | RecLam Position Id Id Exp
   | App Exp Position Exp
+  | App2 Exp Position Exp Exp
   | Let Position Id Exp Exp
   | Match Position Exp [Arm]
 
@@ -53,8 +55,10 @@ sizeExp = \case
   ConTag _ _ es -> 1 + sum (map sizeExp es)
   Prim _ _ es -> 1 + sum (map sizeExp es)
   Lam _ _ body -> 1 + sizeExp body
+  Lam2{} -> undefined -- _ _ body -> 1 + sizeExp body
   RecLam _ _ _ body -> 2 + sizeExp body
   App e1 _ e2 -> sizeExp e1 + sizeExp e2
+  App2{} -> undefined --  e1 _ e2 -> sizeExp e1 + sizeExp e2
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
   Match _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
 
@@ -65,9 +69,11 @@ provenanceExp :: Exp -> (String,Position)
 provenanceExp = \case
   Var{} -> error "provenanceExp/Var" -- we never call on a Var
   App _ pos _ -> ("app", pos)
+  App2{} -> undefined -- _ pos _ -> ("app", pos)
   Lit pos _ -> ("lit",pos)
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ -> ("lam",pos)
+  Lam2{} -> undefined -- pos _ _ -> ("lam",pos)
 
   Let pos _ _ _ -> ("uLET", pos)
   Prim pos _ _ -> ("prim", pos)
@@ -105,8 +111,11 @@ prettyTop control = pretty
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
       Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
       Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
+      Lam2 _ x1 x2 body -> bracket $ indented ("fun [" ++ prettyId x1 ++ "," ++ prettyId x2 ++ "] ->") (pretty body)
+
       RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
-      App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
+      App func _ arg -> bracket $ jux (pretty func) (pretty arg)
+      App2 func _ arg1 arg2 -> bracket $ jux (pretty func) (jux (pretty arg1) (pretty arg2))
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
       Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
@@ -170,13 +179,21 @@ eval env@Env{venv} = \case
       executePrimitive prim vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
+  Lam2 _ x1 x2 body -> \k -> do
+    k (VFunc (\arg1 k -> k $ VFunc (\arg2 k -> eval env { venv = Map.insert x1 arg1 (Map.insert x2 arg2 venv) } body k)))
+
   RecLam _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
-  App e1 pos e2 -> \k -> do
-    eval env e1 $ \v1 -> do
-      eval env e2 $ \v2 -> do
-        ITick I.App $ apply v1 pos v2 k
+  App2 eFunc pos eArg1 eArg2 -> \k -> do -- right->left eval order
+    eval env eArg2 $ \arg2 -> do
+      eval env eArg1 $ \arg1 -> do
+        eval env eFunc $ \func -> do
+          ITick I.App $ ITick I.App $ apply2 func pos arg1 arg2 k
+  App eFunc pos eArg -> \k -> do
+    eval env eArg $ \arg -> do
+      eval env eFunc $ \func -> do
+        ITick I.App $ apply func pos arg k
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k

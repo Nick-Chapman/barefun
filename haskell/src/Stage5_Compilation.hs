@@ -48,6 +48,11 @@ compileTopDef who = \case
     let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
 
+  SRC.TopLam2 x1 x2 body -> do
+    codeLabel <- compileCode body >>= cutEntryCode ("Function: " ++ who ++ show [x1,x2])
+    let w1 = LCodeLabel codeLabel
+    pure [DW [w1]]
+
   SRC.TopConApp (Ctag _ tag) xs -> do
     pure [DW (lnumTagging tag : map compileTopRef xs)]
 
@@ -75,6 +80,9 @@ compileCode = \case
     pure $ doOps (
       simultaneousMove (frameReg,compileRef fun) (argReg,compileRef arg)
       ) (Done (JumpIndirect frameReg))
+
+  SRC.Tail2{} -> do
+    undefined
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
@@ -171,6 +179,7 @@ compileAtomicTo who target = \case
   SRC.Prim prim xs -> pure (compilePrimitiveTo prim target (map compileRef xs))
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
   SRC.Lam pre _post _x body -> compileFunctionTo who target pre body
+  SRC.Lam2{} -> undefined
   SRC.RecLam pre _post _f _x body -> compileFunctionTo who target pre body
 
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
@@ -426,6 +435,7 @@ compileRef = \case
       SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
       SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
       SRC.TheArg -> SReg argReg
+      SRC.TheArg2{} -> undefined
       SRC.TheFrame -> SReg frameReg
 
 sourceOfTarget :: Target -> Source
