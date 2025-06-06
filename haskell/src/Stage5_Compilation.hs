@@ -79,10 +79,11 @@ flipRegs a b =
   ]
 
 setArgOut :: Source -> Op
-setArgOut =
+setArgOut source =
   if enableArgIndirection
-  then undefined $ setTarget (TMemOffset labelArgs 0)
-  else setTarget (TReg argOut)
+  --then undefined $ setTarget (TMemOffset labelArgs 0)
+  then OpMany [OpMove Ax source, OpStore (TReg argOut) Ax]
+  else setTarget (TReg argOut) source
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -91,7 +92,8 @@ compileCode = \case
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps
-      [ OpMove argOut (compileRef arg)
+--      [ OpMove argOut (compileRef arg) -- NOW: should go via setArgOut
+      [ setArgOut (compileRef arg) -- NOW: should go via setArgOut
       , OpMove frameReg (compileRef fun)
       ] (Done (JumpIndirect frameReg))
 
@@ -417,7 +419,8 @@ compileRef = \case
       SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
       SRC.TheArg ->
         if enableArgIndirection
-        then SMemOffset labelArgs 0
+        --then undefined $ SMemOffset labelArgs 0
+        then SMemIndirectOffset argReg 0
         else SReg argReg
       SRC.TheArg2{} -> undefined
       SRC.TheFrame -> SReg frameReg

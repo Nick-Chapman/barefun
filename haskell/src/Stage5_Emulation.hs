@@ -35,13 +35,13 @@ setArg = do
 getArgOut :: M Word
 getArgOut =
   if enableArgIndirection
-  then undefined $ GetMem aArgs
+  then GetMem aActuals
   else GetReg argOut
 
 setArgOut :: Word -> M ()
 setArgOut = do
   if enableArgIndirection
-  then undefined $ SetMem aArgs
+  then SetMem aActuals
   else SetReg argOut
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
@@ -248,7 +248,7 @@ evacuateArgs = do
       evacuate w >>= \case
         Just w' -> SetReg argReg w'
         Nothing -> pure ()
-    True -> do
+    True -> undefined $ do -- TODO NOW me
       w <- GetMem aArgs
       evacuate w >>= \case
         Just w' -> SetMem aArgs w'
@@ -861,10 +861,14 @@ state0 dmap = State
       [ (Sp, WAddr initialStackPointer)
       -- initialize in case of very early GC
       , (frameReg, arbitrary)
-      , (argReg, arbitrary)
+      , (argReg, argSpace)
+      , (argOut, actualSpace)
       ]
 
     arbitrary = WAddr (AStatic (DataLabelR "arbitrary") 0)
+
+    argSpace = WAddr (AStatic (labelArgs) 0)
+    actualSpace = WAddr (AStatic (labelActuals) 0)
 
     mem = Map.fromList (internal ++ user)
 
@@ -914,6 +918,9 @@ aCurrentCont = AStatic labelCurrentCont 0
 
 aArgs :: Addr
 aArgs = AStatic labelArgs 0
+
+aActuals :: Addr
+aActuals = AStatic labelActuals 0
 
 -- These three addresses are only used internally by stage5
 aFalse = AStatic (DataLabelR "Bare_false") 0

@@ -13,7 +13,7 @@ module Stage5_ASM
   , BareBios(..)
   , AllocBareBios(..)
   , CodeLabel(..)
-  , DataLabel(..), labelTemps, labelArgs, labelCurrentCont
+  , DataLabel(..), labelTemps, labelArgs, labelActuals, labelCurrentCont
   , DataSpec(..)
   , enableArgIndirection
   ) where
@@ -60,6 +60,9 @@ labelCurrentCont = DataLabelR "CurrentCont"
 labelArgs :: DataLabel
 labelArgs = DataLabelR "Args"
 
+labelActuals :: DataLabel
+labelActuals = DataLabelR "Actuals"
+
 -- this is the calling convention to "return" to the current continuation
 codeReturn :: Code
 codeReturn =
@@ -105,14 +108,16 @@ data Jump
   | JumpBare AllocBareBios
 
 data Target
-  = TReg Reg
+  = TReg Reg -- this already means indirection. TODO: add offset for multi args
   | TMemOffset DataLabel Int
 
 data Source
   = SReg Reg
   | SLit Lit
-  | SMemOffset DataLabel Int -- byte indexing
-  | SMemIndirectOffset Reg Int -- byte indexing
+  | SMemOffset DataLabel Int
+  | SMemIndirectOffset Reg Int
+
+-- In Source/Target, offsets always use byte indexing
 
 data Lit
   = LChar Char
