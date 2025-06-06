@@ -26,9 +26,6 @@ targetOfTemp = \case
 -- Ax is the general scratch register
 -- Bx is used for case-scrutinee
 
-argRegOut :: Reg
-argRegOut = Di
-
 compile :: SRC.Image -> Transformed
 compile x = runAsm (compileImage x >>= cutEntryCode "Start")
 
@@ -72,24 +69,30 @@ cutEntryCode :: String -> Code -> Asm CodeLabel
 cutEntryCode name code = do
   need <- Needed code
   CutCode name $ do
-    doOps [ OpEnterCheck need ] code
+    doOps (flipRegs argReg argOut ++ [OpEnterCheck need]) code
 
-setArg :: Source -> Op
-setArg =
+flipRegs :: Reg -> Reg -> [Op] --using Ax
+flipRegs a b =
+  [ OpMove Ax (SReg b)
+  , OpMove b (SReg a)
+  , OpMove a (SReg Ax)
+  ]
+
+setArgOut :: Source -> Op
+setArgOut =
   if enableArgIndirection
-  then setTarget (TMemOffset labelArgs 0)
-  else setTarget (TReg argReg)
+  then undefined $ setTarget (TMemOffset labelArgs 0)
+  else setTarget (TReg argOut)
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return _pos res -> do
-    pure $ Do (setArg (compileRef res)) codeReturn
+    pure $ Do (setArgOut (compileRef res)) codeReturn
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps
-      [ OpMove argRegOut (compileRef arg)
+      [ OpMove argOut (compileRef arg)
       , OpMove frameReg (compileRef fun)
-      , setArg (SReg argRegOut)
       ] (Done (JumpIndirect frameReg))
 
   SRC.Tail2{} -> do
@@ -97,7 +100,7 @@ compileCode = \case
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
-      [ setArg (compileRef arg)
+      [ setArgOut (compileRef arg)
       ] (Done (JumpBare AllocBare_make_bytes))
 
   SRC.TailPrim prim _pos _arg ->

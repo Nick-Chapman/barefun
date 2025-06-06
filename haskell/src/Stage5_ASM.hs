@@ -1,7 +1,7 @@
 -- | Define types for x86 assembly, and printer suitable for nasm
 module Stage5_ASM
   ( bytesPerWord
-  , Reg(..), frameReg,argReg, getCurrentCont,setCurrentCont
+  , Reg(..), frameReg,argReg,argOut, getCurrentCont,setCurrentCont
   , Image(..)
   , Lit(..)
   , Code(..), codeReturn
@@ -36,9 +36,10 @@ data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
   deriving (Eq,Ord)
 
 -- Calling conventions: arg/frame in registers
-frameReg,argReg :: Reg
+frameReg,argReg,argOut :: Reg
 frameReg = Bp
 argReg = Si
+argOut = Di
 
 -- current continuation in memory
 setCurrentCont :: Source -> Op

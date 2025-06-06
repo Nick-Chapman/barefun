@@ -1,18 +1,21 @@
 L1: ; Arm: 5'27
-  mov si, g2
+  mov di, g2
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Arm: 4'26
-  mov si, g3
+  mov di, g3
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L3: ; Function: (is_even,g1)
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   mov ax, si
   cmp word ax, 1
@@ -40,29 +43,34 @@ L3: ; Function: (is_even,g1)
   mov [Temps+8], ax
   mov di, [Temps+8]
   mov bp, g1
-  mov si, di
   jmp [bp]
 
 L4: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   mov ax, si
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+2], ax
-  mov si, [Temps+2]
+  mov di, [Temps+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L5: ; Arm: 9'25
-  mov si, `E`
+  mov di, `E`
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L6: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L4
@@ -71,13 +79,16 @@ L6: ; Continuation
   mov bx, si
   cmp word [bx], 3
   jz L5
-  mov si, `O`
+  mov di, `O`
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L7: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(6)
   mov ax, si
   call Bare_put_char
@@ -89,17 +100,19 @@ L7: ; Continuation
   push word 4 ;; scanned
   mov di, 27
   mov bp, g1
-  mov si, di
   jmp [bp]
 
 L8: ; Arm: 9'25
-  mov si, `E`
+  mov di, `E`
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L9: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L7
@@ -108,13 +121,16 @@ L9: ; Continuation
   mov bx, si
   cmp word [bx], 3
   jz L8
-  mov si, `O`
+  mov di, `O`
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L10: ; Start
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L9
@@ -122,7 +138,6 @@ L10: ; Start
   push word 4 ;; scanned
   mov di, 85
   mov bp, g1
-  mov si, di
   jmp [bp]
 
 g1:

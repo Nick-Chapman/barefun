@@ -32,6 +32,18 @@ setArg = do
   then SetMem aArgs
   else SetReg argReg
 
+getArgOut :: M Word
+getArgOut =
+  if enableArgIndirection
+  then undefined $ GetMem aArgs
+  else GetReg argOut
+
+setArgOut :: Word -> M ()
+setArgOut = do
+  if enableArgIndirection
+  then undefined $ SetMem aArgs
+  else SetReg argOut
+
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
 gcAtEverySafePoint = False -- but slows "dune test"
 
@@ -542,6 +554,9 @@ execBare = \case
 jumpBare :: AllocBareBios -> M ()
 jumpBare = \case
   AllocBare_make_bytes -> do
+    -- flip si/di
+    getArgOut >>= setArg
+
     n <- deNum <$> getArg
     let nBytes = n `div` 2
     let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
@@ -551,7 +566,7 @@ jumpBare = \case
     slideStackPointer AllocForUser nBytesAligned
     execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
     w <- GetReg Sp
-    setArg w
+    setArgOut w
     let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
     execCode codeReturn

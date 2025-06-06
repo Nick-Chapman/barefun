@@ -1,11 +1,14 @@
 L1: ; Arm: 9'15
-  mov si, g2
+  mov di, g2
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   mov ax, [bp+4]
   mov bx, 3
@@ -14,7 +17,6 @@ L2: ; Continuation
   mov [Temps+2], ax
   mov di, [Temps+2]
   mov bp, g1
-  mov si, di
   jmp [bp]
 
 L3: ; Arm: 12'17
@@ -38,7 +40,7 @@ L3: ; Arm: 12'17
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+16], ax
-  mov si, [Temps+16]
+  mov di, [Temps+16]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -61,13 +63,16 @@ L4: ; Arm: 13'20
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+16], ax
-  mov si, [Temps+16]
+  mov di, [Temps+16]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L5: ; Function: (loop,g1)
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(8)
   mov ax, 511
   cmp word ax, si
@@ -107,25 +112,31 @@ L5: ; Function: (loop,g1)
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+12], ax
-  mov si, [Temps+12]
+  mov di, [Temps+12]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L6: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+2], ax
-  mov si, [Temps+2]
+  mov di, [Temps+2]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L7: ; Start
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L6
@@ -133,7 +144,6 @@ L7: ; Start
   push word 4 ;; scanned
   mov di, 1
   mov bp, g1
-  mov si, di
   jmp [bp]
 
 g1:

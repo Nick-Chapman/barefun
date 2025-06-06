@@ -236,6 +236,7 @@ halt:
 
 ;; GC roots; must match stage5 calling conventions
 %define ArgReg si
+%define ArgOut di
 %define FrameReg bp
 
 %macro Bare_enter_check 1
@@ -562,6 +563,10 @@ Bare_char_to_num:
 ;;; in: ArgReg -- number of bytes (as tagged number) for user data
 ;;; return-to-CC: ArgReg -- new string/bytes object, allocated on the heap (at sp)
 AllocBare_make_bytes:
+    ;; flip si/di
+    mov ax, ArgOut
+    mov ArgOut, ArgReg
+    mov ArgReg, ax
 
     mov ax, ArgReg
     shr ax, 1 ; untag
@@ -575,7 +580,7 @@ AllocBare_make_bytes:
     sub sp, dx      ; slide stack pointer (allocated space is not uninializaed)
 
     push ArgReg     ; tagged length word; part of user data
-    mov ArgReg, sp  ; grab result (before pushing the descriptor)
+    mov ArgOut, sp  ; grab result (before pushing the descriptor)
     add dx, 3       ; add 2 bytes for the length word; +1 to tag as raw data
     push dx         ; descriptor/size word; part of GC data
 

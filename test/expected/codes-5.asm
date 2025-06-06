@@ -1,13 +1,16 @@
 L1: ; Arm: 11'25
   call Bare_get_keyboard_last_scancode
   mov [Temps+6], ax
-  mov si, [Temps+6]
+  mov di, [Temps+6]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Function: (get_scancode,g1)
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   hlt
   mov ax, Bare_unit
@@ -20,10 +23,12 @@ L2: ; Function: (get_scancode,g1)
   jz L1
   mov di, g5
   mov bp, g1
-  mov si, di
   jmp [bp]
 
 L3: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   mov ax, si
   call Bare_char_to_num
@@ -119,10 +124,12 @@ L3: ; Continuation
   mov [Temps+34], ax
   mov di, g8
   mov bp, g6
-  mov si, di
   jmp [bp]
 
 L4: ; Function: (loop,g6)
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L3
@@ -130,7 +137,6 @@ L4: ; Function: (loop,g6)
   push word 4 ;; scanned
   mov di, g7
   mov bp, g1
-  mov si, di
   jmp [bp]
 
 L5: ; Arm: 6'28
@@ -150,10 +156,12 @@ L5: ; Arm: 6'28
   mov [Temps+8], ax
   mov di, [Temps+8]
   mov bp, g9
-  mov si, di
   jmp [bp]
 
 L6: ; Function: (loop,g9)
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   mov ax, si
   cmp word ax, 85
@@ -162,22 +170,27 @@ L6: ; Function: (loop,g9)
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L5
-  mov si, g11
+  mov di, g11
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L7: ; Continuation
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   call Bare_init_interrupt_mode
   mov [Temps+2], ax
   mov di, g13
   mov bp, g6
-  mov si, di
   jmp [bp]
 
 L8: ; Start
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L7
@@ -185,7 +198,6 @@ L8: ; Start
   push word 4 ;; scanned
   mov di, 1
   mov bp, g9
-  mov si, di
   jmp [bp]
 
 g1:

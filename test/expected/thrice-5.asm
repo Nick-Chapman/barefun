@@ -1,4 +1,7 @@
 L1: ; Start
+  mov ax, di
+  mov di, si
+  mov si, ax
   Bare_enter_check(0)
   mov ax, `@`
   call Bare_put_char
@@ -116,7 +119,7 @@ L1: ; Start
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+58], ax
-  mov si, [Temps+58]
+  mov di, [Temps+58]
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
