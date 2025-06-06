@@ -27,10 +27,11 @@ import Stage5_Compilation
   )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
-gcAtEverySafePoint = True -- but slows "dune test" -- TODO: back to False
+gcAtEverySafePoint = False -- but slows "dune test" -- TODO: back to False
 
 hemiSizeInBytes :: Int
-hemiSizeInBytes = 10000 -- 3000 was ok for sham; 5000 is needed for filesystem example
+--hemiSizeInBytes = 3600 -- 0x1000 -- 10000 -- 3000 was ok for sham; 5000 is needed for filesystem example
+hemiSizeInBytes = 3600
 
 sizeRedzone :: Int -- interrupts in runtime.asm
 sizeRedzone = 100
@@ -196,8 +197,10 @@ runGC = do
   loop watermark0
 
   HeapAddr sp <- getSP
-  let remainingBytes = fromIntegral sp - botOfHemi toSpace
-  Debug (printf "%04x" remainingBytes) -- print in hex to match against runtime.asm
+  --let remainingBytes = fromIntegral sp - botOfHemi toSpace
+  let liveBytes = topOfHemi toSpace - fromIntegral sp
+  Debug (printf "%04x" liveBytes) -- print in hex to match against runtime.asm
+  WatchLive liveBytes
   Debug "]"
 
   where
@@ -701,6 +704,7 @@ data M a where
   WhatHemi :: M Hemi -- in which we are allocating
   ReadSector :: Number -> M String
   WriteSector :: Number -> String -> M ()
+  WatchLive :: Int -> M ()
 
 data AllocMode = AllocForUser | AllocForGC
 
@@ -742,7 +746,12 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
 
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
-      Halt -> IDone
+
+      Halt -> do
+        --let State{maxLiveSeen} = s
+        --ITrace (printf "[max-live-seen:%d]" maxLiveSeen) $ do
+        IDone
+
       Crash mes -> ITrace mes IDone
 
       CheckRecentAlloc expect -> do
@@ -825,6 +834,13 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       WriteSector i text -> do
         IWriteSector i text (k s ())
 
+      WatchLive n -> do
+        let State{maxLiveSeen} = s
+        if n <= maxLiveSeen then k s () else do
+          --ITrace (printf "[live:%d]" n) $ do
+          k s { maxLiveSeen = n } ()
+
+
 data State = State
   { rmap :: Map Reg Word
   , tmap :: Map SRC.Temp Word
@@ -839,6 +855,7 @@ data State = State
   , budgetAlloc :: Int
   , gcNum :: Int
   , hemi :: Hemi
+  , maxLiveSeen :: Int
   }
 
 state0 :: Map DataLabel [DataSpec] -> State
@@ -856,6 +873,7 @@ state0 dmap = State
   , budgetAlloc = 0
   , gcNum = 1
   , hemi = HemiA
+  , maxLiveSeen = 0
   }
   where
     initialStackPointer = AHeap (HeapAddr (fromIntegral topA))

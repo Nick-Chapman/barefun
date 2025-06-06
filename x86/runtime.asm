@@ -36,7 +36,11 @@
     bootloader_relocation_address equ 0xfe00
 
     kernel_load_address equ 0x600
+;%assign kernel_load_address 0x600 ;; TODO: what's the difference
+
     kernel_size_in_sectors equ 124 ;; max before relocated bootloader
+    ;; TODO: relocate bootloader at 500. so when load kernel at 600, we have max 125 sectors
+    ;; then the reloacted kernel in 500-600 will be reused as mem space for temps/args
 
     bits 16
 
@@ -259,13 +263,10 @@ halt:
 
 need: dw 0
 
-hemi_size equ 5000 ; match stage5 emulator
-redzone_size equ 300 ; needed for save/restore & also for interrupts. how big should this be?
-
 topA equ 0x0000
-botA equ topA - hemi_size
-topB equ botA - redzone_size
-botB equ topB - hemi_size
+botA equ topA - HemiSize
+topB equ botA - RedzoneSize
+botB equ topB - HemiSize
 
 which_hemi: db 0 ; flips every GC: 0,2,0,2,... indexes: top_of_hemi/bottom_of_hemi
 top_of_hemi: dw topA, topB
@@ -273,8 +274,8 @@ bottom_of_hemi: dw botA, botB
 
 gc_num: db 0
 
-%macro Debug1 1
-    ;PrintCharLit %1 ; uncomment for GC debug
+%macro DebugX 1
+    PrintCharLit %1 ; uncomment for GC debug
 %endmacro
 
 %macro Debug 1
@@ -306,9 +307,13 @@ Bare_enter_check_function:
     jmp .return_to_caller
 
 .need_to_gc:
+
+    ;mov bx, [tCALLER]
+    ;SeeReg bx
+
     inc byte [gc_num]
-    ;PrintCharLit '=' ;; DEV! uncomment for smallest indication that GC is happenning
-    Debug1 '['
+    ;DebugX '=' ;; DEV! uncomment for smallest indication that GC is happenning
+    Debug '['
     ;mov al, [gc_num]
     ;PrintHexAL
     ;Debug ':'
@@ -320,20 +325,23 @@ Bare_enter_check_function:
     mov ax, sp
     sub ax, [bottom_of_hemi + bx]
     ;SeeReg ax
-    Debug1 ']'
+    Debug ']'
     sub ax, [need]
     cmp ax, 0
-    Debug 'x'
+    ;DebugX 'x'
     jl .out_of_memory
-    Debug 'y'
+    ;DebugX 'y'
+
+    ;mov ax, [tCALLER]
+    ;SeeReg ax
 
 .return_to_caller:
     jmp [tCALLER]
 
 .out_of_memory:
-    Debug 'z'
+    DebugX 'O'
     PrintString `[OOM]\n`
-    Debug 'w'
+    DebugX 'M'
     jmp halt
 
 bytesPerWord equ 2
@@ -436,8 +444,8 @@ gc_start:
     jmp [.caller]
 .bad_inner_loop:
     PrintString `\n[Bad_inner_loop]\n`
-    SeeReg bx
-    SeeReg dx
+    ;SeeReg bx
+    ;SeeReg dx
     jmp halt
 .caller:
     dw 0
@@ -660,6 +668,8 @@ Bare_store_sector:
     mov ah, 0x43
     jmp load_or_store_sector
 
+embedded_sector_offset equ kernel_size_in_sectors + 1 ;;; 1 for bootloader
+
 ;;; ah: 0x42(load) or 0x43(store)
 ;;; dx: The sector number
 ;;; bx: The bytes buffer to store from
@@ -822,6 +832,9 @@ set_pit_freq:
 
 end_of_code:
 
+;%assign X ($ - $$)
+;%error X
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (10) Size checks
 
@@ -840,8 +853,31 @@ end_of_code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (11) Embedded disk image
 
-embedded_sector_offset equ kernel_size_in_sectors + 1 ;;; 1 for bootloader
 
-times (512 * kernel_size_in_sectors - ($ - $$)) db 0
+HemiSize equ 3600 ; match stage5 emulator
+RedzoneSize equ 300 ; needed for save/restore & also for interrupts. how big should this be?
+
+%assign HeapSize (2*(HemiSize+RedzoneSize))
+
+%assign Avail (512 * kernel_size_in_sectors) - ($-$$)
+
+;%assign Avail0 (65536 - ((128 - kernel_size_in_sectors) * sector_size + ($-$$)))
+;%if Avail0 != Avail
+;%error "Expected Avail = Avail" Avail0 Avail
+;%endif
+
+%if HeapSize > Avail
+%error "HeapSize > Avail" HeapSize Avail
+%endif
+
+times Avail db 0
+
+%assign ImageSizeBeforeDisk sector_size + ($-$$)
+%assign TwoE16 (128 - kernel_size_in_sectors) *sector_size + ($-$$)
+
+;%error "Avail" Avail
+;%error "HeapSize" HeapSize
+;%error "ImageSizeBeforeDisk" ImageSizeBeforeDisk
+;%error "TwoE16" TwoE16
 
 incbin "disk.image"
