@@ -41,7 +41,9 @@
     bits 16
 
     drive_number equ 0x500 ; Space is available here because
-    Temps equ 0x500 ; temps are stored at Temps+2, Temps+4 etc.
+
+    Args equ 0x510
+    Temps equ 0x520 ; temps are stored at Temps+2, Temps+4 etc.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (2) Bootloader: entry

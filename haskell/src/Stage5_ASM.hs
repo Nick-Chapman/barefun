@@ -13,8 +13,9 @@ module Stage5_ASM
   , BareBios(..)
   , AllocBareBios(..)
   , CodeLabel(..)
-  , DataLabel(..), labelTemps
+  , DataLabel(..), labelTemps, labelArgs, labelCurrentCont
   , DataSpec(..)
+  , enableArgIndirection
   ) where
 
 import Data.Char (ord)
@@ -24,6 +25,9 @@ import Text.Printf (printf)
 import Value (Number)
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
+
+enableArgIndirection :: Bool
+enableArgIndirection = False -- TODO: this is what I am trying to enable
 
 bytesPerWord :: Int
 bytesPerWord = 2
@@ -41,16 +45,19 @@ setCurrentCont :: Source -> Op
 setCurrentCont = \case
   SReg reg -> OpStore cc reg
   source -> OpMany [ OpMove Ax source, OpStore cc Ax ]
-  where cc = TMemOffset labelCC 0
+  where cc = TMemOffset labelCurrentCont 0
 
 getCurrentCont :: Source
-getCurrentCont = SMemOffset labelCC 0
+getCurrentCont = SMemOffset labelCurrentCont 0
 
 labelTemps :: DataLabel
 labelTemps = DataLabelR "Temps"
 
-labelCC :: DataLabel
-labelCC = DataLabelR "CurrentCont"
+labelCurrentCont :: DataLabel
+labelCurrentCont = DataLabelR "CurrentCont"
+
+labelArgs :: DataLabel
+labelArgs = DataLabelR "Args"
 
 -- this is the calling convention to "return" to the current continuation
 codeReturn :: Code

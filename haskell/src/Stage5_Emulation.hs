@@ -20,6 +20,18 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM
 
+getArg :: M Word
+getArg =
+  if enableArgIndirection
+  then GetMem aArgs
+  else GetReg argReg
+
+setArg :: Word -> M ()
+setArg = do
+  if enableArgIndirection
+  then SetMem aArgs
+  else SetReg argReg
+
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
 gcAtEverySafePoint = False -- but slows "dune test"
 
@@ -185,7 +197,7 @@ runGC = do
 
   watermark0 <- getSP
   evacuateReg frameReg
-  evacuateReg argReg
+  evacuateArgs
   evacuateCurrentCont
   loop watermark0
 
@@ -215,6 +227,20 @@ runGC = do
               False -> do
                 nextScanPointer <- scavenge scanPointer
                 innerLoop nextScanPointer
+
+evacuateArgs :: M ()
+evacuateArgs = do
+  case enableArgIndirection of
+    False -> do
+      w <- GetReg argReg
+      evacuate w >>= \case
+        Just w' -> SetReg argReg w'
+        Nothing -> pure ()
+    True -> do
+      w <- GetMem aArgs
+      evacuate w >>= \case
+        Just w' -> SetMem aArgs w'
+        Nothing -> pure ()
 
 evacuateCurrentCont :: M ()
 evacuateCurrentCont = do
@@ -516,7 +542,7 @@ execBare = \case
 jumpBare :: AllocBareBios -> M ()
 jumpBare = \case
   AllocBare_make_bytes -> do
-    n <- deNum <$> GetReg argReg
+    n <- deNum <$> getArg
     let nBytes = n `div` 2
     let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
     let need = nBytesAligned + 2 + 2
@@ -525,7 +551,7 @@ jumpBare = \case
     slideStackPointer AllocForUser nBytesAligned
     execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
     w <- GetReg Sp
-    SetReg argReg w
+    setArg w
     let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
     execCode codeReturn
@@ -833,6 +859,7 @@ state0 dmap = State
       , (aUnit, tagging tUnit)
       , (aFinalCont, WCodeLabel finalCodeLabel)
       , (aCurrentCont, WAddr aFinalCont)
+--      , (aArgs, arbitrary) -- TODO: need me?
       ]
     user =
       concat [ [(AStatic lab i,w) | (i,w) <- specsWords specs ]
@@ -868,7 +895,10 @@ instance Show State where
 aFalse,aTrue,aUnit,aFinalCont :: Addr
 
 aCurrentCont :: Addr
-aCurrentCont = AStatic (DataLabelR "CurrentCont") 0
+aCurrentCont = AStatic labelCurrentCont 0
+
+aArgs :: Addr
+aArgs = AStatic labelArgs 0
 
 -- These three addresses are only used internally by stage5
 aFalse = AStatic (DataLabelR "Bare_false") 0

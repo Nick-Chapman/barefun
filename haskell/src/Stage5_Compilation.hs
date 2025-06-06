@@ -74,16 +74,22 @@ cutEntryCode name code = do
   CutCode name $ do
     doOps [ OpEnterCheck need ] code
 
+setArg :: Source -> Op
+setArg =
+  if enableArgIndirection
+  then setTarget (TMemOffset labelArgs 0)
+  else setTarget (TReg argReg)
+
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return _pos res -> do
-    pure $ Do (OpMove argReg (compileRef res)) codeReturn
+    pure $ Do (setArg (compileRef res)) codeReturn
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps
       [ OpMove argRegOut (compileRef arg)
       , OpMove frameReg (compileRef fun)
-      , OpMove argReg (SReg argRegOut)
+      , setArg (SReg argRegOut)
       ] (Done (JumpIndirect frameReg))
 
   SRC.Tail2{} -> do
@@ -91,7 +97,7 @@ compileCode = \case
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
-      [ OpMove argReg (compileRef arg)
+      [ setArg (compileRef arg)
       ] (Done (JumpBare AllocBare_make_bytes))
 
   SRC.TailPrim prim _pos _arg ->
@@ -406,7 +412,10 @@ compileRef = \case
       SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
       SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
       SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
-      SRC.TheArg -> SReg argReg
+      SRC.TheArg ->
+        if enableArgIndirection
+        then SMemOffset labelArgs 0
+        else SReg argReg
       SRC.TheArg2{} -> undefined
       SRC.TheFrame -> SReg frameReg
 
