@@ -4,7 +4,7 @@ module Stage5_ASM
   , Reg(..), frameReg,argReg,argOut, getCurrentCont,setCurrentCont
   , Image(..)
   , Lit(..)
-  , Code(..), codeReturn
+  , Code(..), codeReturn, flipArgSpace
   , Op(..)
   , Jump(..)
   , BlockDescriptor(..), ScanMode(..)
@@ -13,7 +13,7 @@ module Stage5_ASM
   , BareBios(..)
   , AllocBareBios(..)
   , CodeLabel(..)
-  , DataLabel(..), labelTemps, labelArgs, labelActuals, labelCurrentCont
+  , DataLabel(..), labelTemps, labelCurrentCont
   , DataSpec(..)
   , enableArgIndirection
   ) where
@@ -27,7 +27,7 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 
 enableArgIndirection :: Bool
-enableArgIndirection = False -- TODO: this is what I am trying to enable
+enableArgIndirection = False -- TODO: make changes to runtime.asm so this can be flipped
 
 bytesPerWord :: Int
 bytesPerWord = 2
@@ -57,18 +57,24 @@ labelTemps = DataLabelR "Temps"
 labelCurrentCont :: DataLabel
 labelCurrentCont = DataLabelR "CurrentCont"
 
-labelArgs :: DataLabel
-labelArgs = DataLabelR "Args"
-
-labelActuals :: DataLabel
-labelActuals = DataLabelR "Actuals"
-
 -- this is the calling convention to "return" to the current continuation
 codeReturn :: Code
 codeReturn =
   Do (OpMany [ OpMove frameReg getCurrentCont
              , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
              ]) (Done (JumpIndirect frameReg))
+
+-- this is the calling convention to flip the arg-spaces when entering a code block
+flipArgSpace :: Op
+flipArgSpace = OpMany (flipRegs argReg argOut)
+
+flipRegs :: Reg -> Reg -> [Op] --using Ax
+flipRegs a b =
+  [ OpMove Ax (SReg b)
+  , OpMove b (SReg a)
+  , OpMove a (SReg Ax)
+  ]
+
 
 data Image = Image
   { cmap :: Map CodeLabel Code
@@ -108,7 +114,7 @@ data Jump
   | JumpBare AllocBareBios
 
 data Target
-  = TReg Reg -- this already means indirection. TODO: add offset for multi args
+  = TRegIndirect Reg -- TODO: extend to take offset
   | TMemOffset DataLabel Int
 
 data Source
@@ -217,7 +223,7 @@ instance Show Jump where
 
 instance Show Target where
   show = \case
-    TReg r -> show r
+    TRegIndirect r -> show r
     TMemOffset lab n -> ppLabelOffset lab n
 
 instance Show Source where

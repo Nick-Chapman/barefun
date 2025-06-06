@@ -20,32 +20,8 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM
 
-getArg :: M Word
-getArg =
-  if enableArgIndirection
-  then GetMem aArgs
-  else GetReg argReg
-
-setArg :: Word -> M ()
-setArg = do
-  if enableArgIndirection
-  then SetMem aArgs
-  else SetReg argReg
-
-getArgOut :: M Word
-getArgOut =
-  if enableArgIndirection
-  then GetMem aActuals
-  else GetReg argOut
-
-setArgOut :: Word -> M ()
-setArgOut = do
-  if enableArgIndirection
-  then SetMem aActuals
-  else SetReg argOut
-
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
-gcAtEverySafePoint = False -- but slows "dune test"
+gcAtEverySafePoint = True -- but slows "dune test" -- TODO: back to False
 
 hemiSizeInBytes :: Int
 hemiSizeInBytes = 10000 -- 3000 was ok for sham; 5000 is needed for filesystem example
@@ -248,10 +224,10 @@ evacuateArgs = do
       evacuate w >>= \case
         Just w' -> SetReg argReg w'
         Nothing -> pure ()
-    True -> undefined $ do -- TODO NOW me
-      w <- GetMem aArgs
+    True -> do
+      w <- getMemIndirect Si
       evacuate w >>= \case
-        Just w' -> SetMem aArgs w'
+        Just w' -> setMemIndirect Si w'
         Nothing -> pure ()
 
 evacuateCurrentCont :: M ()
@@ -361,9 +337,6 @@ execImage Image{start} = GetCode start >>= execCode
 
 execCode :: Code -> M ()
 execCode = \case
-  Do (OpComment{}) code -> execCode code
-  Do (OpMany []) code -> execCode code
-  Do (OpMany (op:ops)) code -> execCode $ Do op (Do (OpMany ops) code)
   Do op code -> do
     TraceOp op
     execOp op (execCode code)
@@ -373,8 +346,9 @@ execCode = \case
 
 execOp :: Op -> M () -> M ()
 execOp = \case
-  OpComment{} -> error "execOp/OpComment"
-  OpMany{} -> error "execOp/OpMany"
+  OpComment{} -> \cont -> cont
+  OpMany [] -> \cont -> cont
+  OpMany (op:ops) -> \cont -> execOp op (execOp (OpMany ops) cont)
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
   OpStore t s -> \cont -> do w <- GetReg s; setTarget t w; cont
   OpCall bare -> \cont -> do execBare bare; cont
@@ -465,10 +439,20 @@ evalSource = \case
 
 setTarget :: Target -> Word -> M ()
 setTarget = \case
-  TReg r -> \w -> do
+  TRegIndirect r -> \w -> do
     a <- deAddr <$> GetReg r
     SetMem a w
   TMemOffset lab n -> \w -> SetMem (AStatic lab n) w
+
+getMemIndirect :: Reg -> M Word
+getMemIndirect r = do
+  a <- deAddr <$> GetReg r
+  GetMem a
+
+setMemIndirect :: Reg -> Word -> M ()
+setMemIndirect r w = do
+  a <- deAddr <$> GetReg r
+  SetMem a w
 
 execBare :: BareBios -> M ()
 execBare = \case
@@ -553,10 +537,10 @@ execBare = \case
 
 jumpBare :: AllocBareBios -> M ()
 jumpBare = \case
+  -- TODO: write this as op-code instead of behaviour
   AllocBare_make_bytes -> do
     -- flip si/di
-    getArgOut >>= setArg
-
+    execOp flipArgSpace $ do
     n <- deNum <$> getArg
     let nBytes = n `div` 2
     let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
@@ -570,6 +554,18 @@ jumpBare = \case
     let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
     execCode codeReturn
+
+getArg :: M Word
+getArg =
+  if enableArgIndirection
+  then getMemIndirect Si
+  else GetReg argReg
+
+setArgOut :: Word -> M ()
+setArgOut w = do
+  if enableArgIndirection
+  then setMemIndirect Di w
+  else SetReg argOut w
 
 setMemChar :: Addr -> Char -> M ()
 setMemChar a x = do
@@ -861,29 +857,38 @@ state0 dmap = State
       [ (Sp, WAddr initialStackPointer)
       -- initialize in case of very early GC
       , (frameReg, arbitrary)
-      , (argReg, argSpace)
-      , (argOut, actualSpace)
+      , (argReg, argsA)
+      , (argOut, argsB)
       ]
 
     arbitrary = WAddr (AStatic (DataLabelR "arbitrary") 0)
 
-    argSpace = WAddr (AStatic (labelArgs) 0)
-    actualSpace = WAddr (AStatic (labelActuals) 0)
+    argsA = WAddr (AStatic (labelArgsA) 0)
+    argsB = WAddr (AStatic (labelArgsB) 0)
+
+    labelArgsA = DataLabelR "ArgSpaceA"
+    labelArgsB = DataLabelR "ArgSpaceB"
 
     mem = Map.fromList (internal ++ user)
 
-    internal =
+    internal :: [(Addr,Word)] =
       [ (aFalse, tagging tFalse)
       , (aTrue, tagging tTrue)
       , (aUnit, tagging tUnit)
       , (aFinalCont, WCodeLabel finalCodeLabel)
       , (aCurrentCont, WAddr aFinalCont)
---      , (aArgs, arbitrary) -- TODO: need me?
+      -- at the moment, every entry-code acts as a single-arg function
+      -- if we are testing with gcAtEverySafePoint, this include the jump "Start" code
+      -- and so when this initaitedteh GC, then we need for there to a valid first-arg
+      -- when we make multi-args work, then every call will need to communicate the #actuals passed (in ax?)
+      -- and so then we can set that to be 0, and the following wont be necesary
+      , (AStatic labelArgsB 0, arbitrary)
       ]
     user =
       concat [ [(AStatic lab i,w) | (i,w) <- specsWords specs ]
              | (lab,specs) <- Map.toList dmap
              ]
+
 
 tagging :: Ctag -> Word
 tagging (Ctag _ n) = WNum (2 * n + 1)
@@ -915,12 +920,6 @@ aFalse,aTrue,aUnit,aFinalCont :: Addr
 
 aCurrentCont :: Addr
 aCurrentCont = AStatic labelCurrentCont 0
-
-aArgs :: Addr
-aArgs = AStatic labelArgs 0
-
-aActuals :: Addr
-aActuals = AStatic labelActuals 0
 
 -- These three addresses are only used internally by stage5
 aFalse = AStatic (DataLabelR "Bare_false") 0

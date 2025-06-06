@@ -27,7 +27,9 @@ targetOfTemp = \case
 -- Bx is used for case-scrutinee
 
 compile :: SRC.Image -> Transformed
-compile x = runAsm (compileImage x >>= cutEntryCode "Start")
+compile x =
+  -- not entry code. no args are being passed. TODO: avoid even cutting coded here?
+  runAsm (compileImage x >>= cutEntryCode "Start")
 
 compileImage :: SRC.Image -> Asm Code
 compileImage = \case
@@ -69,21 +71,14 @@ cutEntryCode :: String -> Code -> Asm CodeLabel
 cutEntryCode name code = do
   need <- Needed code
   CutCode name $ do
-    doOps (flipRegs argReg argOut ++ [OpEnterCheck need]) code
+    doOps ([flipArgSpace] ++ [OpEnterCheck need]) code
 
-flipRegs :: Reg -> Reg -> [Op] --using Ax
-flipRegs a b =
-  [ OpMove Ax (SReg b)
-  , OpMove b (SReg a)
-  , OpMove a (SReg Ax)
-  ]
 
 setArgOut :: Source -> Op
 setArgOut source =
   if enableArgIndirection
-  --then undefined $ setTarget (TMemOffset labelArgs 0)
-  then OpMany [OpMove Ax source, OpStore (TReg argOut) Ax]
-  else setTarget (TReg argOut) source
+  then setTarget (TRegIndirect argOut) source
+  else OpMove argOut source
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -92,8 +87,7 @@ compileCode = \case
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps
---      [ OpMove argOut (compileRef arg) -- NOW: should go via setArgOut
-      [ setArgOut (compileRef arg) -- NOW: should go via setArgOut
+      [ setArgOut (compileRef arg)
       , OpMove frameReg (compileRef fun)
       ] (Done (JumpIndirect frameReg))
 
@@ -302,7 +296,7 @@ compilePrimitiveTo prim = case prim of
   SRC.SetRef -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Bx s1
     , OpMove Ax s2
-    , OpStore (TReg Bx) Ax
+    , OpStore (TRegIndirect Bx) Ax
     , setTarget target sUnit
     ]
   SRC.MakeBytes -> error "stage5: MakeBytes can only be tail-called "
@@ -402,11 +396,10 @@ compilePrimitiveTo prim = case prim of
     dUnit = DataLabelR "Bare_unit"
 
 setTarget :: Target -> Source -> Op
-setTarget = \case
-  TReg treg -> \source -> OpMove treg source
-  target -> \case
-    SReg sreg -> OpStore target sreg
-    source -> OpMany [ OpMove Ax source, OpStore target Ax]
+setTarget target = \case
+  SReg sreg -> OpStore target sreg
+  -- TODO: can we also avoid use of Ax when storing literals?
+  source -> OpMany [ OpMove Ax source, OpStore target Ax]
 
 compileRef :: SRC.Ref -> Source
 compileRef = \case
@@ -419,7 +412,6 @@ compileRef = \case
       SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
       SRC.TheArg ->
         if enableArgIndirection
-        --then undefined $ SMemOffset labelArgs 0
         then SMemIndirectOffset argReg 0
         else SReg argReg
       SRC.TheArg2{} -> undefined
@@ -427,7 +419,7 @@ compileRef = \case
 
 sourceOfTarget :: Target -> Source
 sourceOfTarget = \case
-  TReg r -> SReg r
+  TRegIndirect{} -> undefined -- TODO: why not triggered?
   TMemOffset lab n -> SMemOffset lab n
 
 lnumTagging :: Number -> Lit

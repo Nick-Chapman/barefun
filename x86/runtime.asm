@@ -288,6 +288,7 @@ Bare_enter_check_function:
 
 .need_to_gc:
     inc byte [gc_num]
+    ;; PrintCharLit '=' ;; TODO smallest indication that GC is happenning
     Debug '['
     ;mov al, [gc_num]
     ;PrintHexAL
@@ -562,8 +563,9 @@ Bare_char_to_num:
 
 ;;; in: ArgReg -- number of bytes (as tagged number) for user data
 ;;; return-to-CC: ArgReg -- new string/bytes object, allocated on the heap (at sp)
-AllocBare_make_bytes:
+AllocBare_make_bytes: ;;; TODO: construct & emit this code in compiler. stage5-emu will test it!
     ;; flip si/di
+    ;; TODO: try xchng instruction
     mov ax, ArgOut
     mov ArgOut, ArgReg
     mov ArgReg, ax
