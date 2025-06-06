@@ -1,10 +1,10 @@
 -- | Define types for x86 assembly, and printer suitable for nasm
 module Stage5_ASM
   ( bytesPerWord
-  , Reg(..), frameReg,argReg,argOut, getCurrentCont,setCurrentCont
+  , Reg(..)
   , Image(..)
   , Lit(..)
-  , Code(..), codeReturn, flipArgSpace
+  , Code(..)
   , Op(..)
   , Jump(..)
   , BlockDescriptor(..), ScanMode(..)
@@ -13,9 +13,8 @@ module Stage5_ASM
   , BareBios(..)
   , AllocBareBios(..)
   , CodeLabel(..)
-  , DataLabel(..), labelTemps, labelCurrentCont
+  , DataLabel(..)
   , DataSpec(..)
-  , enableArgIndirection
   ) where
 
 import Data.Char (ord)
@@ -26,55 +25,11 @@ import Value (Number)
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 
-enableArgIndirection :: Bool
-enableArgIndirection = False -- TODO: make changes to runtime.asm so this can be flipped
-
-bytesPerWord :: Int
+bytesPerWord :: Int -- TODO: move to compiler?
 bytesPerWord = 2
 
 data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
   deriving (Eq,Ord)
-
--- Calling conventions: arg/frame in registers
-frameReg,argReg,argOut :: Reg
-frameReg = Bp
-argReg = Si
-argOut = Di
-
--- current continuation in memory
-setCurrentCont :: Source -> Op
-setCurrentCont = \case
-  SReg reg -> OpStore cc reg
-  source -> OpMany [ OpMove Ax source, OpStore cc Ax ]
-  where cc = TMemOffset labelCurrentCont 0
-
-getCurrentCont :: Source
-getCurrentCont = SMemOffset labelCurrentCont 0
-
-labelTemps :: DataLabel
-labelTemps = DataLabelR "Temps"
-
-labelCurrentCont :: DataLabel
-labelCurrentCont = DataLabelR "CurrentCont"
-
--- this is the calling convention to "return" to the current continuation
-codeReturn :: Code
-codeReturn =
-  Do (OpMany [ OpMove frameReg getCurrentCont
-             , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
-             ]) (Done (JumpIndirect frameReg))
-
--- this is the calling convention to flip the arg-spaces when entering a code block
-flipArgSpace :: Op
-flipArgSpace = OpMany (flipRegs argReg argOut)
-
-flipRegs :: Reg -> Reg -> [Op] --using Ax
-flipRegs a b =
-  [ OpMove Ax (SReg b)
-  , OpMove b (SReg a)
-  , OpMove a (SReg Ax)
-  ]
-
 
 data Image = Image
   { cmap :: Map CodeLabel Code

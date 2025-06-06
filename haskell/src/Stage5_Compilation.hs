@@ -1,5 +1,12 @@
 -- | Compile Stage4(CCF) to Stage5(ASM)
-module Stage5_Compilation ( compile ) where
+module Stage5_Compilation
+  ( compile
+  -- calling conventions; used in stage5 emulator
+  , enableArgIndirection
+  , frameReg,argReg,argOut
+  , labelCurrentCont
+  , codeReturn, flipArgSpace
+  ) where
 
 import Primitive (Primitive)
 import Control.Monad (ap,liftM)
@@ -12,6 +19,52 @@ import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
 
 import Stage5_ASM
+
+----------------------------------------------------------------------
+-- calling conventions
+
+enableArgIndirection :: Bool
+enableArgIndirection = False -- TODO: make changes to runtime.asm so this can be flipped
+
+-- Calling conventions: arg/frame in registers
+frameReg,argReg,argOut :: Reg
+frameReg = Bp
+argReg = Si
+argOut = Di
+
+-- current continuation in memory
+setCurrentCont :: Source -> Op
+setCurrentCont = \case
+  SReg reg -> OpStore cc reg
+  source -> OpMany [ OpMove Ax source, OpStore cc Ax ]
+  where cc = TMemOffset labelCurrentCont 0
+
+getCurrentCont :: Source
+getCurrentCont = SMemOffset labelCurrentCont 0
+
+labelTemps :: DataLabel
+labelTemps = DataLabelR "Temps"
+
+labelCurrentCont :: DataLabel
+labelCurrentCont = DataLabelR "CurrentCont"
+
+-- this is the calling convention to "return" to the current continuation
+codeReturn :: Code
+codeReturn =
+  Do (OpMany [ OpMove frameReg getCurrentCont
+             , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
+             ]) (Done (JumpIndirect frameReg))
+
+-- this is the calling convention to flip the arg-spaces when entering a code block
+flipArgSpace :: Op
+flipArgSpace = OpMany (flipRegs argReg argOut)
+
+flipRegs :: Reg -> Reg -> [Op] --using Ax
+flipRegs a b =
+  [ OpMove Ax (SReg b)
+  , OpMove b (SReg a)
+  , OpMove a (SReg Ax)
+  ]
 
 ----------------------------------------------------------------------
 -- Compile

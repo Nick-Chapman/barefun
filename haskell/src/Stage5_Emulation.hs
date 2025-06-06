@@ -19,6 +19,12 @@ import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM
+import Stage5_Compilation
+  ( enableArgIndirection
+  , frameReg,argReg,argOut
+  , labelCurrentCont
+  , codeReturn,flipArgSpace
+  )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
 gcAtEverySafePoint = True -- but slows "dune test" -- TODO: back to False
@@ -225,7 +231,7 @@ evacuateArgs = do
         Just w' -> SetReg argReg w'
         Nothing -> pure ()
     True -> do
-      w <- getMemIndirect Si
+      w <- getMemIndirect Si -- TODO: knowledge about Si should come from calling conventions
       evacuate w >>= \case
         Just w' -> setMemIndirect Si w'
         Nothing -> pure ()
