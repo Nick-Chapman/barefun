@@ -42,8 +42,7 @@
 
     drive_number equ 0x500 ; Space is available here because
 
-    Args equ 0x510
-    Temps equ 0x520 ; temps are stored at Temps+2, Temps+4 etc.
+    Temps equ 0x500 ; temps are stored at Temps+2, Temps+4 etc.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (2) Bootloader: entry
@@ -92,25 +91,6 @@ part2:
     db 0, 0, 2, 0, 0xee, 0xff, 0xff, 0xff, 1, 0, 0, 0, 1, 0, 0, 0
     times 510 - ($ - $$) db 0x00
     dw 0xaa55
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (4) Kernel entry: "main"
-
-    section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
-
-main:
-    mov sp, topA
-    mov bp, 0
-    mov si, 0
-
-    call clear_screen
-    jmp bare_start
-
-CurrentCont:
-    dw final_continuation
-
-final_continuation:
-    dw final_code
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (4) Macros: Out, Print*, and other debug helpers
@@ -198,6 +178,37 @@ final_continuation:
 %endmacro
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (4) Kernel entry: "main"
+
+    section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
+
+ArgSpaceA:  dw Arb
+ArgSpaceB:  dw Arb
+Arb:  dw 0
+
+CurrentCont:
+    dw final_continuation
+
+final_continuation:
+    dw final_code
+
+main:
+    mov sp, topA
+    mov bp, 0
+
+    ;;mov si, 0
+    mov si, ArgSpaceA
+    mov di, ArgSpaceB
+
+    call clear_screen
+
+    ;SeeReg si
+    ;SeeReg di
+    ;Stop `MAIN`
+
+    jmp bare_start
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; (5) Miscellaneous defs: clear_screen; print_string; final_code; halt, etc
 
 clear_screen:
@@ -262,6 +273,10 @@ bottom_of_hemi: dw botA, botB
 
 gc_num: db 0
 
+%macro Debug1 1
+    ;PrintCharLit %1 ; uncomment for GC debug
+%endmacro
+
 %macro Debug 1
     ;PrintCharLit %1 ; uncomment for GC debug
 %endmacro
@@ -271,6 +286,10 @@ gc_num: db 0
 %endmacro
 
 Bare_enter_check_function:
+    ;PrintCharLit 'B'
+    ;SeeReg si
+    ;SeeReg di
+
     pop bx
     mov [tCALLER], bx
 
@@ -283,13 +302,13 @@ Bare_enter_check_function:
     sub ax, [need]
     cmp ax, 0
     jl .need_to_gc
-    ;jmp .need_to_gc ; uncomment to GC every safe point; extreme testing!
+    ;jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing!
     jmp .return_to_caller
 
 .need_to_gc:
     inc byte [gc_num]
-    ;; PrintCharLit '=' ;; TODO smallest indication that GC is happenning
-    Debug '['
+    ;PrintCharLit '=' ;; DEV! uncomment for smallest indication that GC is happenning
+    Debug1 '['
     ;mov al, [gc_num]
     ;PrintHexAL
     ;Debug ':'
@@ -301,29 +320,37 @@ Bare_enter_check_function:
     mov ax, sp
     sub ax, [bottom_of_hemi + bx]
     ;SeeReg ax
-    Debug ']'
+    Debug1 ']'
     sub ax, [need]
     cmp ax, 0
+    Debug 'x'
     jl .out_of_memory
+    Debug 'y'
 
 .return_to_caller:
     jmp [tCALLER]
 
 .out_of_memory:
+    Debug 'z'
     PrintString `[OOM]\n`
+    Debug 'w'
     jmp halt
 
 bytesPerWord equ 2
 
 tArg: dw 0
+tArgOut: dw 0
 tFrame dw 0
 tCALLER dw 0
 
 gc_start:
+    ;Stop `NO-GC`
     pop ax
     mov [.caller], ax
     mov [tFrame], FrameReg
+    ;SeeReg ArgReg
     mov [tArg], ArgReg
+    mov [tArgOut], ArgOut
 
     ;; switch heap spaces
     mov bl, [which_hemi]
@@ -340,14 +367,22 @@ gc_start:
     ;; frame register
     mov si, [tFrame]
     call evacuate
+    Debug '1'
     mov [tFrame], si
-    ;; arg register
-    mov si, [tArg]
+    ;; arg-0
+    mov bx, [tArg]
+    ;SeeReg bx
+    mov si, [bx] ;;bx
     call evacuate
-    mov [tArg], si
+    mov bx, [tArg]
+    ;mov bx, [bx]
+    mov [bx], si
+    ;;mov [tArg], si
+    Debug '2'
     ;; current continuation
     mov si, [CurrentCont]
     call evacuate
+    Debug '3'
     mov [CurrentCont], si
     ;; Scavenge objects between sp and dx
     ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
@@ -382,10 +417,12 @@ gc_start:
     Debug ','
     mov si, [bx]
     call evacuate
+    ;Debug '4'
     mov [bx], si
     add bx, bytesPerWord
     dec di
     jne .scav_word
+    ;Debug '5'
 .done_object:
     cmp bx, dx
     jne .inner_loop
@@ -394,6 +431,7 @@ gc_start:
     jne .outer_loop
 .done_everything:
     mov ArgReg, [tArg]
+    mov ArgOut, [tArgOut]
     mov FrameReg, [tFrame]
     jmp [.caller]
 .bad_inner_loop:
@@ -564,25 +602,27 @@ Bare_char_to_num:
 ;;; in: ArgReg -- number of bytes (as tagged number) for user data
 ;;; return-to-CC: ArgReg -- new string/bytes object, allocated on the heap (at sp)
 AllocBare_make_bytes: ;;; TODO: construct & emit this code in compiler. stage5-emu will test it!
+    ;Stop `AllocBare_make_bytes`
+
     ;; flip si/di
     ;; TODO: try xchng instruction
     mov ax, ArgOut
     mov ArgOut, ArgReg
     mov ArgReg, ax
 
-    mov ax, ArgReg
+    mov ax, [ArgReg]
     shr ax, 1 ; untag
     mov word [need], ax
     call Bare_enter_check_function
 
-    mov dx, ArgReg
+    mov dx, [ArgReg]
     shr dx, 1       ; untag, to get number of bytes to..
     inc dx          ; round up and..
     and dx, 0xfffe  ; .. align to even
     sub sp, dx      ; slide stack pointer (allocated space is not uninializaed)
 
-    push ArgReg     ; tagged length word; part of user data
-    mov ArgOut, sp  ; grab result (before pushing the descriptor)
+    push word [ArgReg]   ; tagged length word; part of user data
+    mov [ArgOut], sp  ; grab result (before pushing the descriptor)
     add dx, 3       ; add 2 bytes for the length word; +1 to tag as raw data
     push dx         ; descriptor/size word; part of GC data
 

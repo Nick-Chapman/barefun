@@ -1,5 +1,6 @@
 L1: ; Arm: 9'15
-  mov di, g2
+  mov ax, g2
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -15,7 +16,8 @@ L2: ; Continuation
   add ax, bx
   sub ax, 1
   mov [Temps+2], ax
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
@@ -40,7 +42,8 @@ L3: ; Arm: 12'17
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+16], ax
-  mov di, [Temps+16]
+  mov ax, [Temps+16]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -63,7 +66,8 @@ L4: ; Arm: 13'20
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+16], ax
-  mov di, [Temps+16]
+  mov ax, [Temps+16]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -75,7 +79,7 @@ L5: ; Function: (loop,g1)
   mov si, ax
   Bare_enter_check(8)
   mov ax, 511
-  cmp word ax, si
+  cmp word ax, [si]
   call Bare_make_bool_from_n
   mov [Temps+2], ax
   mov bx, [Temps+2]
@@ -85,11 +89,11 @@ L5: ; Function: (loop,g1)
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+4], ax
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 17
   call Bare_make_bool_from_z
   mov [Temps+6], ax
-  push word si
+  push word [si]
   push word [CurrentCont]
   push word L2
   mov [CurrentCont], sp
@@ -97,14 +101,14 @@ L5: ; Function: (loop,g1)
   mov bx, [Temps+6]
   cmp word [bx], 3
   jz L3
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 21
   call Bare_make_bool_from_z
   mov [Temps+8], ax
   mov bx, [Temps+8]
   cmp word [bx], 3
   jz L4
-  mov ax, si
+  mov ax, [si]
   sar ax, 1
   call Bare_num_to_char
   mov [Temps+10], ax
@@ -112,7 +116,8 @@ L5: ; Function: (loop,g1)
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+12], ax
-  mov di, [Temps+12]
+  mov ax, [Temps+12]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -127,7 +132,8 @@ L6: ; Continuation
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+2], ax
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -142,7 +148,8 @@ L7: ; Start
   push word L6
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov di, 1
+  mov ax, 1
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 

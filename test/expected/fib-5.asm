@@ -1,5 +1,6 @@
 L1: ; Arm: 20'7
-  mov di, g2
+  mov ax, g2
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -10,7 +11,7 @@ L2: ; Function: (put_chars,g1)
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov bx, si
+  mov bx, [si]
   cmp word [bx], 1
   jz L1
   mov ax, [bx+2]
@@ -21,12 +22,14 @@ L2: ; Function: (put_chars,g1)
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+6], ax
-  mov di, [Temps+4]
+  mov ax, [Temps+4]
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
 L3: ; Arm: 30'11
-  mov di, si
+  mov ax, [si]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -38,11 +41,12 @@ L4: ; Continuation
   mov si, ax
   Bare_enter_check(0)
   mov ax, [bp+4]
-  mov bx, si
+  mov bx, [si]
   add ax, bx
   sub ax, 1
   mov [Temps+2], ax
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -58,12 +62,13 @@ L5: ; Continuation
   sub ax, bx
   add ax, 1
   mov [Temps+2], ax
-  push word si
+  push word [si]
   push word [CurrentCont]
   push word L4
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, g3
   jmp [bp]
 
@@ -72,29 +77,31 @@ L6: ; Function: (fib,g3)
   mov di, si
   mov si, ax
   Bare_enter_check(8)
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 5
   call Bare_make_bool_from_n
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L3
-  mov ax, si
+  mov ax, [si]
   mov bx, 3
   sub ax, bx
   add ax, 1
   mov [Temps+4], ax
-  push word si
+  push word [si]
   push word [CurrentCont]
   push word L5
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, [Temps+4]
+  mov ax, [Temps+4]
+  mov [di], ax
   mov bp, g3
   jmp [bp]
 
 L7: ; Arm: 4'13
-  mov di, [bp+2]
+  mov ax, [bp+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -105,8 +112,9 @@ L8: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov di, [bp+4]
-  mov bp, si
+  mov ax, [bp+4]
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L9: ; Function: (lam,t1)
@@ -114,7 +122,7 @@ L9: ; Function: (lam,t1)
   mov di, si
   mov si, ax
   Bare_enter_check(16)
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_n
   mov [Temps+2], ax
@@ -122,11 +130,11 @@ L9: ; Function: (lam,t1)
   cmp word [bx], 3
   jz L7
   mov ax, g5
-  mov bx, si
+  mov bx, [si]
   sar bx, 1
   call Bare_get_bytes
   mov [Temps+4], ax
-  mov ax, si
+  mov ax, [si]
   mov bx, 3
   sub ax, bx
   add ax, 1
@@ -141,7 +149,8 @@ L9: ; Function: (lam,t1)
   push word L8
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, [Temps+8]
+  mov ax, [Temps+8]
+  mov [di], ax
   mov bp, g4
   jmp [bp]
 
@@ -150,18 +159,20 @@ L10: ; Function: (explode_loop,g4)
   mov di, si
   mov si, ax
   Bare_enter_check(6)
-  push word si
+  push word [si]
   push word L9
   mov [Temps+2], sp
   push word 4 ;; scanned
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L11: ; Arm: 13'13
-  mov di, [bp+2]
+  mov ax, [bp+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -172,8 +183,9 @@ L12: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov di, [bp+4]
-  mov bp, si
+  mov ax, [bp+4]
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L13: ; Function: (lam,t1)
@@ -181,14 +193,14 @@ L13: ; Function: (lam,t1)
   mov di, si
   mov si, ax
   Bare_enter_check(16)
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L11
-  mov ax, si
+  mov ax, [si]
   sar ax, 1
   mov bx, 21
   sar bx, 1
@@ -206,7 +218,7 @@ L13: ; Function: (lam,t1)
   sar ax, 1
   call Bare_num_to_char
   mov [Temps+8], ax
-  mov ax, si
+  mov ax, [si]
   sar ax, 1
   mov bx, 21
   sar bx, 1
@@ -225,7 +237,8 @@ L13: ; Function: (lam,t1)
   push word L12
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, [Temps+12]
+  mov ax, [Temps+12]
+  mov [di], ax
   mov bp, g7
   jmp [bp]
 
@@ -234,18 +247,20 @@ L14: ; Function: (loop,g7)
   mov di, si
   mov si, ax
   Bare_enter_check(6)
-  push word si
+  push word [si]
   push word L13
   mov [Temps+2], sp
   push word 4 ;; scanned
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L15: ; Arm: 4'13
-  mov di, [bp+2]
+  mov ax, [bp+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -256,8 +271,9 @@ L16: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov di, [bp+4]
-  mov bp, si
+  mov ax, [bp+4]
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L17: ; Function: (lam,t1)
@@ -265,7 +281,7 @@ L17: ; Function: (lam,t1)
   mov di, si
   mov si, ax
   Bare_enter_check(16)
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_n
   mov [Temps+2], ax
@@ -273,11 +289,11 @@ L17: ; Function: (lam,t1)
   cmp word [bx], 3
   jz L15
   mov ax, g10
-  mov bx, si
+  mov bx, [si]
   sar bx, 1
   call Bare_get_bytes
   mov [Temps+4], ax
-  mov ax, si
+  mov ax, [si]
   mov bx, 3
   sub ax, bx
   add ax, 1
@@ -292,7 +308,8 @@ L17: ; Function: (lam,t1)
   push word L16
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, [Temps+8]
+  mov ax, [Temps+8]
+  mov [di], ax
   mov bp, g9
   jmp [bp]
 
@@ -301,18 +318,20 @@ L18: ; Function: (explode_loop,g9)
   mov di, si
   mov si, ax
   Bare_enter_check(6)
-  push word si
+  push word [si]
   push word L17
   mov [Temps+2], sp
   push word 4 ;; scanned
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L19: ; Arm: 13'13
-  mov di, [bp+2]
+  mov ax, [bp+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -323,8 +342,9 @@ L20: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov di, [bp+4]
-  mov bp, si
+  mov ax, [bp+4]
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L21: ; Function: (lam,t1)
@@ -332,14 +352,14 @@ L21: ; Function: (lam,t1)
   mov di, si
   mov si, ax
   Bare_enter_check(16)
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L19
-  mov ax, si
+  mov ax, [si]
   sar ax, 1
   mov bx, 21
   sar bx, 1
@@ -357,7 +377,7 @@ L21: ; Function: (lam,t1)
   sar ax, 1
   call Bare_num_to_char
   mov [Temps+8], ax
-  mov ax, si
+  mov ax, [si]
   sar ax, 1
   mov bx, 21
   sar bx, 1
@@ -376,7 +396,8 @@ L21: ; Function: (lam,t1)
   push word L20
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, [Temps+12]
+  mov ax, [Temps+12]
+  mov [di], ax
   mov bp, g12
   jmp [bp]
 
@@ -385,11 +406,12 @@ L22: ; Function: (loop,g12)
   mov di, si
   mov si, ax
   Bare_enter_check(6)
-  push word si
+  push word [si]
   push word L21
   mov [Temps+2], sp
   push word 4 ;; scanned
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -404,7 +426,8 @@ L23: ; Continuation
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+2], ax
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -419,7 +442,8 @@ L24: ; Continuation
   push word L23
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov di, si
+  mov ax, [si]
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
@@ -429,7 +453,8 @@ L25: ; Arm: 16'11
   push word 3
   mov [Temps+4], sp
   push word 6 ;; scanned
-  mov di, [Temps+4]
+  mov ax, [Temps+4]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -440,8 +465,9 @@ L26: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov di, [bp+4]
-  mov bp, si
+  mov ax, [bp+4]
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L27: ; Continuation
@@ -465,7 +491,8 @@ L27: ; Continuation
   push word L26
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, g14
+  mov ax, g14
+  mov [di], ax
   mov bp, g12
   jmp [bp]
 
@@ -479,7 +506,8 @@ L28: ; Continuation
   push word L27
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, si
+  mov ax, [si]
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
@@ -493,8 +521,9 @@ L29: ; Continuation
   push word L28
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, 9
-  mov bp, si
+  mov ax, 9
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L30: ; Continuation
@@ -507,7 +536,8 @@ L30: ; Continuation
   push word L29
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, g11
+  mov ax, g11
+  mov [di], ax
   mov bp, g9
   jmp [bp]
 
@@ -521,7 +551,8 @@ L31: ; Continuation
   push word L30
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, si
+  mov ax, [si]
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
@@ -535,8 +566,9 @@ L32: ; Continuation
   push word L31
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, 21
-  mov bp, si
+  mov ax, 21
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L33: ; Continuation
@@ -549,7 +581,8 @@ L33: ; Continuation
   push word L32
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, g8
+  mov ax, g8
+  mov [di], ax
   mov bp, g7
   jmp [bp]
 
@@ -563,7 +596,8 @@ L34: ; Continuation
   push word L33
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, si
+  mov ax, [si]
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
@@ -577,8 +611,9 @@ L35: ; Continuation
   push word L34
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, 7
-  mov bp, si
+  mov ax, 7
+  mov [di], ax
+  mov bp, [si]
   jmp [bp]
 
 L36: ; Continuation
@@ -586,12 +621,13 @@ L36: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(8)
-  push word si
+  push word [si]
   push word [CurrentCont]
   push word L35
   mov [CurrentCont], sp
   push word 6 ;; scanned
-  mov di, g6
+  mov ax, g6
+  mov [di], ax
   mov bp, g4
   jmp [bp]
 
@@ -604,7 +640,8 @@ L37: ; Start
   push word L36
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov di, 21
+  mov ax, 21
+  mov [di], ax
   mov bp, g3
   jmp [bp]
 

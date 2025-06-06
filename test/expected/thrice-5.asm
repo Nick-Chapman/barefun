@@ -119,7 +119,8 @@ L1: ; Start
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+58], ax
-  mov di, [Temps+58]
+  mov ax, [Temps+58]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax

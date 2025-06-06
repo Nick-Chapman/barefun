@@ -24,7 +24,7 @@ import Stage5_ASM
 -- calling conventions
 
 enableArgIndirection :: Bool
-enableArgIndirection = False -- TODO: make changes to runtime.asm so this can be flipped
+enableArgIndirection = True -- TODO: make changes to runtime.asm so this can be flipped
 
 -- Calling conventions: arg/frame in registers
 frameReg,argReg,argOut :: Reg

@@ -1,12 +1,14 @@
 L1: ; Arm: 5'27
-  mov di, g2
+  mov ax, g2
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L2: ; Arm: 4'26
-  mov di, g3
+  mov ax, g3
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -17,14 +19,14 @@ L3: ; Function: (is_even,g1)
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_z
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L1
-  mov ax, si
+  mov ax, [si]
   mov bx, 3
   sub ax, bx
   add ax, 1
@@ -41,7 +43,8 @@ L3: ; Function: (is_even,g1)
   sub ax, bx
   add ax, 1
   mov [Temps+8], ax
-  mov di, [Temps+8]
+  mov ax, [Temps+8]
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
@@ -50,18 +53,20 @@ L4: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov ax, si
+  mov ax, [si]
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+2], ax
-  mov di, [Temps+2]
+  mov ax, [Temps+2]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
   jmp [bp]
 
 L5: ; Arm: 9'25
-  mov di, `E`
+  mov ax, `E`
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -76,10 +81,11 @@ L6: ; Continuation
   push word L4
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov bx, si
+  mov bx, [si]
   cmp word [bx], 3
   jz L5
-  mov di, `O`
+  mov ax, `O`
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -90,7 +96,7 @@ L7: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(6)
-  mov ax, si
+  mov ax, [si]
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+2], ax
@@ -98,12 +104,14 @@ L7: ; Continuation
   push word L6
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov di, 27
+  mov ax, 27
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
 L8: ; Arm: 9'25
-  mov di, `E`
+  mov ax, `E`
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -118,10 +126,11 @@ L9: ; Continuation
   push word L7
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov bx, si
+  mov bx, [si]
   cmp word [bx], 3
   jz L8
-  mov di, `O`
+  mov ax, `O`
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -136,7 +145,8 @@ L10: ; Start
   push word L9
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov di, 85
+  mov ax, 85
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 

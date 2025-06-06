@@ -1,7 +1,8 @@
 L1: ; Arm: 11'25
   call Bare_get_keyboard_last_scancode
   mov [Temps+6], ax
-  mov di, [Temps+6]
+  mov ax, [Temps+6]
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -21,7 +22,8 @@ L2: ; Function: (get_scancode,g1)
   mov bx, [Temps+4]
   cmp word [bx], 3
   jz L1
-  mov di, g5
+  mov ax, g5
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
@@ -30,7 +32,7 @@ L3: ; Continuation
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov ax, si
+  mov ax, [si]
   call Bare_char_to_num
   shl ax, 1
   add ax, 1
@@ -122,7 +124,8 @@ L3: ; Continuation
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+34], ax
-  mov di, g8
+  mov ax, g8
+  mov [di], ax
   mov bp, g6
   jmp [bp]
 
@@ -135,13 +138,14 @@ L4: ; Function: (loop,g6)
   push word L3
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov di, g7
+  mov ax, g7
+  mov [di], ax
   mov bp, g1
   jmp [bp]
 
 L5: ; Arm: 6'28
   mov ax, g10
-  mov bx, si
+  mov bx, [si]
   sar bx, 1
   call Bare_get_bytes
   mov [Temps+4], ax
@@ -149,12 +153,13 @@ L5: ; Arm: 6'28
   call Bare_put_char
   mov ax, Bare_unit
   mov [Temps+6], ax
-  mov ax, si
+  mov ax, [si]
   mov bx, 3
   add ax, bx
   sub ax, 1
   mov [Temps+8], ax
-  mov di, [Temps+8]
+  mov ax, [Temps+8]
+  mov [di], ax
   mov bp, g9
   jmp [bp]
 
@@ -163,14 +168,15 @@ L6: ; Function: (loop,g9)
   mov di, si
   mov si, ax
   Bare_enter_check(0)
-  mov ax, si
+  mov ax, [si]
   cmp word ax, 85
   call Bare_make_bool_from_n
   mov [Temps+2], ax
   mov bx, [Temps+2]
   cmp word [bx], 3
   jz L5
-  mov di, g11
+  mov ax, g11
+  mov [di], ax
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
@@ -183,7 +189,8 @@ L7: ; Continuation
   Bare_enter_check(0)
   call Bare_init_interrupt_mode
   mov [Temps+2], ax
-  mov di, g13
+  mov ax, g13
+  mov [di], ax
   mov bp, g6
   jmp [bp]
 
@@ -196,7 +203,8 @@ L8: ; Start
   push word L7
   mov [CurrentCont], sp
   push word 4 ;; scanned
-  mov di, 1
+  mov ax, 1
+  mov [di], ax
   mov bp, g9
   jmp [bp]
 
