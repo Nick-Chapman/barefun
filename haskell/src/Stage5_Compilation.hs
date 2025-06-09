@@ -57,14 +57,7 @@ codeReturn =
 
 -- this is the calling convention to flip the arg-spaces when entering a code block
 flipArgSpace :: Op
-flipArgSpace = OpMany (flipRegs argReg argOut)
-
-flipRegs :: Reg -> Reg -> [Op] --using Ax
-flipRegs a b =
-  [ OpMove Ax (SReg b)
-  , OpMove b (SReg a)
-  , OpMove a (SReg Ax)
-  ]
+flipArgSpace = OpExchange argReg argOut
 
 ----------------------------------------------------------------------
 -- Compile

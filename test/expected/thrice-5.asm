@@ -1,7 +1,5 @@
 L1: ; Start
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, `@`
   call Bare_put_char

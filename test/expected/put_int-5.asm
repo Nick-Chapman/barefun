@@ -7,9 +7,7 @@ L1: ; Arm: 13'7
   jmp [bp]
 
 L2: ; Function: (put_chars,g1)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov bx, [si]
   cmp word [bx], 1
@@ -36,9 +34,7 @@ L3: ; Arm: 6'13
   jmp [bp]
 
 L4: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, [bp+4]
   mov [di], ax
@@ -46,9 +42,7 @@ L4: ; Continuation
   jmp [bp]
 
 L5: ; Function: (lam,t1)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(16)
   mov ax, [si]
   cmp word ax, 1
@@ -100,9 +94,7 @@ L5: ; Function: (lam,t1)
   jmp [bp]
 
 L6: ; Function: (loop,g3)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [si]
   push word L5
@@ -116,9 +108,7 @@ L6: ; Function: (loop,g3)
   jmp [bp]
 
 L7: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, [si]
   mov [di], ax
@@ -126,9 +116,7 @@ L7: ; Continuation
   jmp [bp]
 
 L8: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L7
@@ -140,9 +128,7 @@ L8: ; Continuation
   jmp [bp]
 
 L9: ; Start
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L8

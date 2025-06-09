@@ -9,9 +9,7 @@ L1: ; Arm: 11'25
   jmp [bp]
 
 L2: ; Function: (get_scancode,g1)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   hlt
   mov ax, Bare_unit
@@ -28,9 +26,7 @@ L2: ; Function: (get_scancode,g1)
   jmp [bp]
 
 L3: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, [si]
   call Bare_char_to_num
@@ -130,9 +126,7 @@ L3: ; Continuation
   jmp [bp]
 
 L4: ; Function: (loop,g6)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L3
@@ -164,9 +158,7 @@ L5: ; Arm: 6'28
   jmp [bp]
 
 L6: ; Function: (loop,g9)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, [si]
   cmp word ax, 85
@@ -183,9 +175,7 @@ L6: ; Function: (loop,g9)
   jmp [bp]
 
 L7: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   call Bare_init_interrupt_mode
   mov [Temps+2], ax
@@ -195,9 +185,7 @@ L7: ; Continuation
   jmp [bp]
 
 L8: ; Start
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L7

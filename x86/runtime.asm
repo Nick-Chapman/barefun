@@ -12,15 +12,15 @@
 ;;; - (1) Layout
 ;;; - (2) Bootloader: entry
 ;;; - (3) Bootloader: relocated
-;;; - (4) Kernel entry: "main"
 ;;; - (4) Macros: Out, Print*, and other debug helpers
-;;; - (5) Miscellaneous defs: clear_screen; print_string; final_code; halt, etc
-;;; - (6) Garbage Collection
-;;; - (7) "Bare_" routines (called from embedded user code)
-;;; - (8) Interrupt support (only for scancode based keyboard access)
-;;; - (9) Embedded User code. Must provide "bare_start"
-;;; - (10) Size checks
-;;; - (11) Embedded disk image
+;;; - (5) Kernel entry: "main"
+;;; - (6) Miscellaneous defs: clear_screen; print_string; final_code; halt, etc
+;;; - (7) Garbage Collection
+;;; - (8) "Bare_" routines (called from embedded user code)
+;;; - (9) Interrupt support (only for scancode based keyboard access)
+;;; - (10) Embedded User code. Must provide "bare_start"
+;;; - (11) Size checks
+;;; - (12) Embedded disk image
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (1) Layout
@@ -182,7 +182,7 @@ part2:
 %endmacro
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (4) Kernel entry: "main"
+;;;; (5) Kernel entry: "main"
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
 
@@ -213,7 +213,7 @@ main:
     jmp bare_start
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; (5) Miscellaneous defs: clear_screen; print_string; final_code; halt, etc
+;;;; (6) Miscellaneous defs: clear_screen; print_string; final_code; halt, etc
 
 clear_screen:
     mov ax, 0x0003 ; AH=0 AL=3 video mode 80x25
@@ -247,7 +247,7 @@ halt:
     jmp halt
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (6) Garbage Collection
+;;;; (7) Garbage Collection
 
 ;; GC roots; must match stage5 calling conventions
 %define ArgReg si
@@ -504,7 +504,7 @@ evacuate: ;; si --> si (uses: bp)
     dw 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (7) "Bare_" routines (called from embedded user code)
+;;;; (8) "Bare_" routines (called from embedded user code)
 
 Bare_crash:
     mov di, bx
@@ -610,13 +610,8 @@ Bare_char_to_num:
 ;;; in: ArgReg -- number of bytes (as tagged number) for user data
 ;;; return-to-CC: ArgReg -- new string/bytes object, allocated on the heap (at sp)
 AllocBare_make_bytes: ;;; TODO: construct & emit this code in compiler. stage5-emu will test it!
-    ;Stop `AllocBare_make_bytes`
 
-    ;; flip si/di
-    ;; TODO: try xchng instruction
-    mov ax, ArgOut
-    mov ArgOut, ArgReg
-    mov ArgReg, ax
+    xchg ArgReg, ArgOut
 
     mov ax, [ArgReg]
     shr ax, 1 ; untag
@@ -714,7 +709,7 @@ Bare_get_ticks:
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (8) Interrupt support (only for scancode based keyboard access)
+;;;; (9) Interrupt support (only for scancode based keyboard access)
 
 ticker_freq_htz equ 100
 
@@ -826,17 +821,14 @@ set_pit_freq:
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (9) Embedded User code. Must provide "bare_start"
+;;;; (10) Embedded User code. Must provide "bare_start"
 
 %include CODE
 
 end_of_code:
 
-;%assign X ($ - $$)
-;%error X
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (10) Size checks
+;;;; (11) Size checks
 
 ;; Size allocated in layout.asm:
 %assign As kernel_size_in_sectors       ; in sectors
@@ -850,21 +842,12 @@ end_of_code:
 %error Kernel sectors allocated: As, required: Rs
 %endif
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (11) Embedded disk image
-
-
-HemiSize equ 3600 ; match stage5 emulator
-RedzoneSize equ 300 ; needed for save/restore & also for interrupts. how big should this be?
+HemiSize equ 4500
+RedzoneSize equ 500
 
 %assign HeapSize (2*(HemiSize+RedzoneSize))
 
 %assign Avail (512 * kernel_size_in_sectors) - ($-$$)
-
-;%assign Avail0 (65536 - ((128 - kernel_size_in_sectors) * sector_size + ($-$$)))
-;%if Avail0 != Avail
-;%error "Expected Avail = Avail" Avail0 Avail
-;%endif
 
 %if HeapSize > Avail
 %error "HeapSize > Avail" HeapSize Avail
@@ -873,11 +856,12 @@ RedzoneSize equ 300 ; needed for save/restore & also for interrupts. how big sho
 times Avail db 0
 
 %assign ImageSizeBeforeDisk sector_size + ($-$$)
-%assign TwoE16 (128 - kernel_size_in_sectors) *sector_size + ($-$$)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (12) Embedded disk image
+
+incbin "disk.image"
 
 ;%error "Avail" Avail
 ;%error "HeapSize" HeapSize
 ;%error "ImageSizeBeforeDisk" ImageSizeBeforeDisk
-;%error "TwoE16" TwoE16
-
-incbin "disk.image"

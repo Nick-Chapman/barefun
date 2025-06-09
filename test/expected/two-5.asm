@@ -1,7 +1,5 @@
 L1: ; Function: (lam,t1)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, [bp+2]
   mov bx, [si]
@@ -16,9 +14,7 @@ L1: ; Function: (lam,t1)
   jmp [bp]
 
 L2: ; Function: (two,g1)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [si]
   push word L1
@@ -32,9 +28,7 @@ L2: ; Function: (two,g1)
   jmp [bp]
 
 L3: ; Function: (numA,g2)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, 121
   mov [di], ax
@@ -44,9 +38,7 @@ L3: ; Function: (numA,g2)
   jmp [bp]
 
 L4: ; Function: (numB,g3)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, 11
   mov [di], ax
@@ -56,9 +48,7 @@ L4: ; Function: (numB,g3)
   jmp [bp]
 
 L5: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, [si]
   mov [di], ax
@@ -68,9 +58,7 @@ L5: ; Continuation
   jmp [bp]
 
 L6: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L5
@@ -82,9 +70,7 @@ L6: ; Continuation
   jmp [bp]
 
 L7: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(8)
   push word [si]
   push word [CurrentCont]
@@ -97,9 +83,7 @@ L7: ; Continuation
   jmp [bp]
 
 L8: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(8)
   push word [si]
   push word [CurrentCont]
@@ -112,9 +96,7 @@ L8: ; Continuation
   jmp [bp]
 
 L9: ; Function: (call_two,g6)
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L8
@@ -126,9 +108,7 @@ L9: ; Function: (call_two,g6)
   jmp [bp]
 
 L10: ; Continuation
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(0)
   mov ax, [si]
   sar ax, 1
@@ -146,9 +126,7 @@ L10: ; Continuation
   jmp [bp]
 
 L11: ; Start
-  mov ax, di
-  mov di, si
-  mov si, ax
+  xchg si, di
   Bare_enter_check(6)
   push word [CurrentCont]
   push word L10

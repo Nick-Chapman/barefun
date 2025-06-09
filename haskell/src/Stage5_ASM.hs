@@ -61,6 +61,7 @@ data Op -- target; source (Intel Syntax style)
   | OpMulAx Reg  -- ax := ax * sourceReg
   | OpDivModAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
   | OpEnterCheck Int -- macro
+  | OpExchange Reg Reg
   | OpHlt
 
 data Jump
@@ -168,6 +169,7 @@ instance Show Op where
     OpMulAx src -> "mul " ++ show src
     OpDivModAxDx src -> "Div " ++ show src
     OpEnterCheck need -> printf "Bare_enter_check(%d)" need
+    OpExchange r1 r2 -> printf "xchg %s, %s" (show r1) (show r2)
     OpHlt -> "hlt"
 
 instance Show Jump where

@@ -397,6 +397,12 @@ execOp = \case
   OpHlt -> \cont ->
     -- this ops waits for the next interrupt; too detailed for this emulation
     cont
+  OpExchange r1 r2 -> \cont -> do
+    w1 <- GetReg r1
+    w2 <- GetReg r2
+    SetReg r1 w2
+    SetReg r2 w1
+    cont
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- performs sanity checking when a block-descriptor is pushed
