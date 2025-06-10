@@ -124,7 +124,7 @@ prettyA = \case
   ConApp tag [] -> [show tag]
   ConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam pre post x body -> (show pre ++ ", fun " ++ show post ++ " " ++ show x ++ " k ->") >>> prettyC body
-  Lam2{} -> undefined
+  Lam2 pre post x1 x2 body -> (show pre ++ ", fun " ++ show post ++ " " ++ show [x1,x2] ++ " k ->") >>> prettyC body
   RecLam pre post f x body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show x ++ " k ->")
     >>> prettyC body
@@ -238,7 +238,11 @@ evalCode genv env = \case
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         k (VFunc (\arg k -> evalCode genv (insert x arg env') body k))
 
-      Lam2{} -> undefined
+      Lam2 pre _ x1 x2 body -> \k -> do
+        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
+        k (VFunc (\arg1 k ->
+                    k (VFunc (\arg2 k ->
+                                evalCode genv (insert x1 arg1 $ insert x2 arg2 env') body k))))
 
       RecLam pre _ f x body -> \k -> do
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre

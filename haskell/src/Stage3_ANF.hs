@@ -62,7 +62,7 @@ provenanceAtomic = \case
   Prim pos _ _ -> ("prim",pos)
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ _ -> ("lam",pos)
-  Lam2{} -> undefined
+  Lam2 pos _ _ _ _ -> ("lam2",pos)
   RecLam pos _ _ _ _ -> undefined $ ("reclam",pos)
 
 ----------------------------------------------------------------------
@@ -365,5 +365,5 @@ fvsA = \case
   ConTag _ _ xs -> Set.unions (map fvsV xs)
   Prim _ _ xs -> Set.unions (map fvsV xs)
   Lam _ fvs _ _ -> Set.fromList fvs
-  Lam2{} -> undefined
+  Lam2 _ fvs _ _ _ -> Set.fromList fvs
   RecLam _ fvs _ _ _ -> Set.fromList fvs

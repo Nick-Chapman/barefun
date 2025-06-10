@@ -55,10 +55,10 @@ sizeExp = \case
   ConTag _ _ es -> 1 + sum (map sizeExp es)
   Prim _ _ es -> 1 + sum (map sizeExp es)
   Lam _ _ body -> 1 + sizeExp body
-  Lam2{} -> undefined -- _ _ body -> 1 + sizeExp body
+  Lam2 _ _ _ body -> 2 + sizeExp body
   RecLam _ _ _ body -> 2 + sizeExp body
-  App e1 _ e2 -> sizeExp e1 + sizeExp e2
-  App2{} -> undefined --  e1 _ e2 -> sizeExp e1 + sizeExp e2
+  App fun _ arg -> sizeExp fun + sizeExp arg
+  App2 fun _ arg1 arg2 -> sizeExp fun + sizeExp arg1 + sizeExp arg2
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
   Match _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
 
@@ -73,7 +73,7 @@ provenanceExp = \case
   Lit pos _ -> ("lit",pos)
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ -> ("lam",pos)
-  Lam2{} -> undefined -- pos _ _ -> ("lam",pos)
+  Lam2 pos _ _ _ -> ("lam2",pos)
 
   Let pos _ _ _ -> ("uLET", pos)
   Prim pos _ _ -> ("prim", pos)
