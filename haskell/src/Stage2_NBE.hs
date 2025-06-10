@@ -15,27 +15,26 @@ import qualified Stage1_EXP as SRC
 ----------------------------------------------------------------------
 -- The NBE compilation stage constructs multi-lam/app
 
-enableMulti :: Bool
-enableMulti = False -- TODO: this is my current goal!
+mkLam :: Position -> Id -> Exp -> M Exp
+mkLam p x1 body = do
+  enabled <- MultiLamEnabled
+  case (enabled, body) of
+    (True, Lam _ x2 e) -> pure $ Lam2 p x1 x2 e
+    (_, e) -> pure $ Lam p x1 e
 
-mkLam :: Position -> Id -> Exp -> Exp
-mkLam p x1 body =
-  case (enableMulti, body) of
-    (True, Lam _ x2 e) -> Lam2 p x1 x2 e
-    (_, e) -> Lam p x1 e
-
-mkApp :: Exp -> Position -> Exp -> Exp
-mkApp f p a2 =
-  case (enableMulti, f) of
-    (True, App f p a1) -> App2 f p a1 a2
-    (_, _) -> App f p a2
+mkApp :: Exp -> Position -> Exp -> M Exp
+mkApp f p a2 = do
+  enabled <- MultiAppEnabled
+  case (enabled, f) of
+    (True, App f p a1) -> pure $ App2 f p a1 a2
+    (_, _) -> pure $ App f p a2
 
 ----------------------------------------------------------------------
 -- The NBE compilation stage does not change the representation
 
 type Transformed = SRC.Exp
 
-compile :: SRC.Exp -> Transformed
+compile :: Bool -> Bool -> SRC.Exp -> Transformed
 compile = normalize
 
 execute :: Transformed -> Interaction
@@ -47,8 +46,8 @@ enabled = True -- controls 4 places
 ----------------------------------------------------------------------
 -- Normalize
 
-normalize :: Exp -> Exp
-normalize e = runM (norm env0 e)
+normalize :: Bool -> Bool -> Exp -> Exp
+normalize mlam mapp e = runM mlam mapp (norm env0 e)
 
 norm :: Env -> Exp -> M Exp
 norm env e =
@@ -119,7 +118,7 @@ reify = \case
       res :: SemValue <- f arg
       res :: Exp <- reify res
       pure res
-    pure $ mkLam (posOfId x) x body
+    mkLam (posOfId x) x body
 
 share :: Id -> SemValue -> M SemValue
 share x sv = do
@@ -138,7 +137,7 @@ apply fun p arg = do
     _ -> do
       fun <- reify fun
       arg <- reify arg
-      pure $ Syntax (mkApp fun p arg)
+      Syntax <$> mkApp fun p arg
 
 maybeAllConstant :: [SemValue] -> Maybe [BaseValue]
 maybeAllConstant svs = do
@@ -261,9 +260,12 @@ data M a where
   Fresh :: M Int
   Wrap :: (Exp -> Exp) -> M a -> M a
   Reset :: M Exp -> M Exp
+  -- dev mode control while mulit-lam/app is being developed.
+  MultiLamEnabled :: M Bool
+  MultiAppEnabled :: M Bool
 
-runM :: M Exp -> Exp
-runM m0 = snd $ loop 1 m0 k0
+runM :: Bool -> Bool -> M Exp -> Exp
+runM mlam mapp m0 = snd $ loop 1 m0 k0
   where
     k0 = \u x -> (u,x)
 
@@ -274,6 +276,8 @@ runM m0 = snd $ loop 1 m0 k0
       Fresh -> k (u+1) u
       Wrap f m  -> (u', f x) where (u',x) = loop u m k
       Reset m -> k u' x where (u',x) = loop u m k0
+      MultiLamEnabled -> k u mlam
+      MultiAppEnabled -> k u mapp
 
 type Res = (State,Exp)
 type State = Int

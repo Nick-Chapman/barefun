@@ -17,14 +17,14 @@ import qualified Stage5_Emulation as Stage5 (execute,TraceFlag(..),DebugFlag(..)
 main :: IO ()
 main = do
   config <- parseCommandLine <$> getArgs
-  let Config {paths,mode,stage,trace,debug,measure,ppp,ppu} = config
+  let Config {paths,mode,stage,trace,debug,measure,ppp,ppu,mlam,mapp} = config
   let ppc = Stage1.PPControl {ppp,ppu}
   let path = case paths of [] -> error "no .fun"; [x] -> x; _ -> error "too much .fun"
   s <- readFile path
 
   let e0 = wrapPreDefs (parseProg s)
   let e1 = Stage1.compile e0
-  let e2 = Stage2.compile e1
+  let e2 = Stage2.compile mlam mapp e1
   let e3 = Stage3.compile e2
   let e4 = Stage4.compile e3
   let e5 = Stage5.compile e4
@@ -71,6 +71,10 @@ data Config = Config
   , measure :: Bool
   , ppp :: Stage1.PPPosFlag
   , ppu :: Stage1.PPUniqueFlag
+  -- mlam/mapp -- dev flags to control multi-lam/app in stage 2
+  -- eventually these will be turned on permanently
+  , mlam :: Bool
+  , mapp :: Bool
   }
 
 data Mode = Compile | Eval
@@ -94,6 +98,8 @@ parseCommandLine = loop config0
                      , measure = False
                      , ppp = Stage1.PPPosOff
                      , ppu = Stage1.PPUniqueOff
+                     , mlam = False
+                     , mapp = False
                      }
 
     loop :: Config -> [String] -> Config
@@ -112,5 +118,7 @@ parseCommandLine = loop config0
       "-measure":xs     -> loop config { measure = True } xs
       "-ppp":xs         -> loop config { ppp = Stage1.PPPosOn } xs
       "-ppu":xs         -> loop config { ppu = Stage1.PPUniqueOn } xs
+      "-mlam":xs        -> loop config { mlam = True } xs
+      "-mapp":xs        -> loop config { mapp = True } xs
       ('-':flag):_      -> error (show ("unknown flag",flag))
       x:xs              -> loop config { paths = paths config ++ [x] } xs
