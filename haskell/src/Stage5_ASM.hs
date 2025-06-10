@@ -70,7 +70,7 @@ data Jump
   | JumpBare AllocBareBios
 
 data Target
-  = TRegIndirect Reg -- TODO: extend to take offset
+  = TRegIndirectOffset Reg Int -- TODO: extend to take offset
   | TMemOffset DataLabel Int
 
 data Source
@@ -180,8 +180,11 @@ instance Show Jump where
 
 instance Show Target where
   show = \case
-    TRegIndirect r -> show r
-    TMemOffset lab n -> ppLabelOffset lab n
+    TRegIndirectOffset r n ->
+      if n == 0 then show r else
+        printf "%s+%s" (show r) (show n)
+    TMemOffset lab n ->
+      ppLabelOffset lab n
 
 instance Show Source where
   show = \case

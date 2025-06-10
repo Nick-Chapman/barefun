@@ -53,7 +53,9 @@ data Atomic
   | Lam2 [Ref] [Ref] Ref Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code
 
-data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg | TheArg2 deriving (Eq,Ord)
+data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame
+  | TheArg | TheArg2 -- TODO: unify; take int
+  deriving (Eq,Ord)
 
 data Ref
   = Ref Id Location

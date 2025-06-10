@@ -123,8 +123,14 @@ cutEntryCode name code = do
 setArgOut :: Source -> Op
 setArgOut source =
   if enableArgIndirection
-  then setTarget (TRegIndirect argOut) source
+  then setTarget (TRegIndirectOffset argOut 0) source
   else OpMove argOut source
+
+setArgOut2 :: Source -> Op
+setArgOut2 source =
+  if enableArgIndirection
+  then setTarget (TRegIndirectOffset argOut bytesPerWord) source
+  else undefined
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -137,8 +143,12 @@ compileCode = \case
       , OpMove frameReg (compileRef fun)
       ] (Done (JumpIndirect frameReg))
 
-  SRC.Tail2{} -> do
-    undefined
+  SRC.Tail2 fun _pos arg1 arg2 -> do
+    pure $ doOps
+      [ setArgOut (compileRef arg1)
+      , setArgOut2 (compileRef arg2)
+      , OpMove frameReg (compileRef fun)
+      ] (Done (JumpIndirect frameReg))
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
@@ -342,7 +352,7 @@ compilePrimitiveTo prim = case prim of
   SRC.SetRef -> \target -> twoArgs $ \s1 s2 ->
     [ OpMove Bx s1
     , OpMove Ax s2
-    , OpStore (TRegIndirect Bx) Ax
+    , OpStore (TRegIndirectOffset Bx 0) Ax
     , setTarget target sUnit
     ]
   SRC.MakeBytes -> error "stage5: MakeBytes can only be tail-called "
@@ -460,12 +470,15 @@ compileRef = \case
         if enableArgIndirection
         then SMemIndirectOffset argReg 0
         else SReg argReg
-      SRC.TheArg2{} -> undefined
+      SRC.TheArg2 ->
+        if enableArgIndirection
+        then SMemIndirectOffset argReg bytesPerWord
+        else undefined
       SRC.TheFrame -> SReg frameReg
 
 sourceOfTarget :: Target -> Source
 sourceOfTarget = \case
-  TRegIndirect{} -> undefined -- TODO: why not triggered?
+  TRegIndirectOffset{} -> undefined -- TODO: why not triggered?
   TMemOffset lab n -> SMemOffset lab n
 
 lnumTagging :: Number -> Lit

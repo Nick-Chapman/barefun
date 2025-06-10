@@ -15,18 +15,18 @@ import qualified Stage1_EXP as SRC
 ----------------------------------------------------------------------
 -- The NBE compilation stage constructs multi-lam/app
 
-enabledMulti :: Bool
-enabledMulti = False
+enableMulti :: Bool
+enableMulti = False -- TODO: this is my current goal!
 
 mkLam :: Position -> Id -> Exp -> Exp
 mkLam p x1 body =
-  case (enabledMulti, body) of
+  case (enableMulti, body) of
     (True, Lam _ x2 e) -> Lam2 p x1 x2 e
     (_, e) -> Lam p x1 e
 
 mkApp :: Exp -> Position -> Exp -> Exp
 mkApp f p a2 =
-  case (enabledMulti, f) of
+  case (enableMulti, f) of
     (True, App f p a1) -> App2 f p a1 a2
     (_, _) -> App f p a2
 

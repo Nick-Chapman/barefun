@@ -346,6 +346,11 @@ execImage Image{start} = GetCode start >>= execCode
 
 execCode :: Code -> M ()
 execCode = \case
+  -- unfold OpMany here so we get nice tracing
+  Do (OpMany []) code -> do
+    execCode code
+  Do (OpMany (op:ops)) code -> do
+    execCode (Do op (Do (OpMany ops) code))
   Do op code -> do
     TraceOp op
     execOp op (execCode code)
@@ -356,8 +361,7 @@ execCode = \case
 execOp :: Op -> M () -> M ()
 execOp = \case
   OpComment{} -> \cont -> cont
-  OpMany [] -> \cont -> cont
-  OpMany (op:ops) -> \cont -> execOp op (execOp (OpMany ops) cont)
+  OpMany{} -> error "execOp/Many"
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
   OpStore t s -> \cont -> do w <- GetReg s; setTarget t w; cont
   OpCall bare -> \cont -> do execBare bare; cont
@@ -454,9 +458,10 @@ evalSource = \case
 
 setTarget :: Target -> Word -> M ()
 setTarget = \case
-  TRegIndirect r -> \w -> do
+  TRegIndirectOffset r i -> \w -> do
     a <- deAddr <$> GetReg r
-    SetMem a w
+    a' <- addAddr i a
+    SetMem a' w
   TMemOffset lab n -> \w -> SetMem (AStatic lab n) w
 
 getMemIndirect :: Reg -> M Word

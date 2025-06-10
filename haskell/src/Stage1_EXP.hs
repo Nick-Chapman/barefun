@@ -28,10 +28,10 @@ data Exp
   | ConTag Position Ctag [Exp]
   | Prim Position Primitive [Exp]
   | Lam Position Id Exp
-  | Lam2 Position Id Id Exp
+  | Lam2 Position Id Id Exp -- TODO LamN
   | RecLam Position Id Id Exp
   | App Exp Position Exp
-  | App2 Exp Position Exp Exp
+  | App2 Exp Position Exp Exp -- TODO AppN
   | Let Position Id Exp Exp
   | Match Position Exp [Arm]
 
@@ -69,7 +69,7 @@ provenanceExp :: Exp -> (String,Position)
 provenanceExp = \case
   Var{} -> error "provenanceExp/Var" -- we never call on a Var
   App _ pos _ -> ("app", pos)
-  App2{} -> undefined -- _ pos _ -> ("app", pos)
+  App2 _ pos _ _ -> ("app2",pos)
   Lit pos _ -> ("lit",pos)
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ -> ("lam",pos)
