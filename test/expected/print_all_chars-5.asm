@@ -8,7 +8,7 @@ L1: ; Arm: 9'15
 
 L2: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [bp+4]
   mov bx, 3
   add ax, bx
@@ -73,7 +73,7 @@ L4: ; Arm: 13'20
 
 L5: ; Function: (loop,g1)
   xchg si, di
-  Bare_enter_check(8)
+  Bare_heap_check(8)
   mov ax, 511
   cmp word ax, [si]
   call Bare_make_bool_from_n
@@ -121,7 +121,7 @@ L5: ; Function: (loop,g1)
 
 L6: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -135,7 +135,7 @@ L6: ; Continuation
 
 L7: ; Start
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L6
   mov [CurrentCont], sp

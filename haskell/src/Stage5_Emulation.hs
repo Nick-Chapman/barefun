@@ -394,10 +394,6 @@ execOp = \case
     SetReg Ax (WNum (dividend `div` divisor))
     SetReg Dx (WNum (dividend `mod` divisor))
     cont
-  -- when support multi lam, we can have seperate macros for CodeEntry and CheckHeap
-  OpEnterCheck need -> \cont -> do
-    heapCheck need
-    cont
   OpHlt -> \cont ->
     -- this ops waits for the next interrupt; too detailed for this emulation
     cont
@@ -406,6 +402,9 @@ execOp = \case
     w2 <- GetReg r2
     SetReg r1 w2
     SetReg r2 w1
+    cont
+  MacroHeapCheck { need } -> \cont -> do
+    heapCheck need
     cont
 
 -- this is called from user code which does OpPush & also from GC when copying

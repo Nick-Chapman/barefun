@@ -10,7 +10,7 @@ L1: ; Arm: 11'25
 
 L2: ; Function: (get_scancode,g1)
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   hlt
   mov ax, Bare_unit
   mov [Temps+2], ax
@@ -27,7 +27,7 @@ L2: ; Function: (get_scancode,g1)
 
 L3: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [si]
   call Bare_char_to_num
   shl ax, 1
@@ -127,7 +127,7 @@ L3: ; Continuation
 
 L4: ; Function: (loop,g6)
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L3
   mov [CurrentCont], sp
@@ -159,7 +159,7 @@ L5: ; Arm: 6'28
 
 L6: ; Function: (loop,g9)
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [si]
   cmp word ax, 85
   call Bare_make_bool_from_n
@@ -176,7 +176,7 @@ L6: ; Function: (loop,g9)
 
 L7: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   call Bare_init_interrupt_mode
   mov [Temps+2], ax
   mov ax, g13
@@ -186,7 +186,7 @@ L7: ; Continuation
 
 L8: ; Start
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L7
   mov [CurrentCont], sp

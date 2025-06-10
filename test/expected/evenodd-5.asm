@@ -16,7 +16,7 @@ L2: ; Arm: 4'26
 
 L3: ; Function: (is_even,g1)
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_z
@@ -48,7 +48,7 @@ L3: ; Function: (is_even,g1)
 
 L4: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [si]
   call Bare_put_char
   mov ax, Bare_unit
@@ -70,7 +70,7 @@ L5: ; Arm: 9'25
 
 L6: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L4
   mov [CurrentCont], sp
@@ -87,7 +87,7 @@ L6: ; Continuation
 
 L7: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   mov ax, [si]
   call Bare_put_char
   mov ax, Bare_unit
@@ -111,7 +111,7 @@ L8: ; Arm: 9'25
 
 L9: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L7
   mov [CurrentCont], sp
@@ -128,7 +128,7 @@ L9: ; Continuation
 
 L10: ; Start
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L9
   mov [CurrentCont], sp

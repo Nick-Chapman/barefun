@@ -254,10 +254,10 @@ halt:
 %define ArgOut di
 %define FrameReg bp
 
-%macro Bare_enter_check 1
+%macro Bare_heap_check 1
     mov word [need], %1
     jz %%no_need
-    call Bare_enter_check_function
+    call Bare_heap_check_function
 %%no_need:
 %endmacro
 
@@ -286,7 +286,7 @@ gc_num: db 0
     ;SeeReg %1 ; uncomment for GC debug
 %endmacro
 
-Bare_enter_check_function:
+Bare_heap_check_function:
     ;PrintCharLit 'B'
     ;SeeReg si
     ;SeeReg di
@@ -616,7 +616,7 @@ AllocBare_make_bytes: ;;; TODO: construct & emit this code in compiler. stage5-e
     mov ax, [ArgReg]
     shr ax, 1 ; untag
     mov word [need], ax
-    call Bare_enter_check_function
+    call Bare_heap_check_function
 
     mov dx, [ArgReg]
     shr dx, 1       ; untag, to get number of bytes to..

@@ -60,9 +60,9 @@ data Op -- target; source (Intel Syntax style)
   | OpSub Reg Source
   | OpMulAx Reg  -- ax := ax * sourceReg
   | OpDivModAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
-  | OpEnterCheck Int -- macro
   | OpExchange Reg Reg
   | OpHlt
+  | MacroHeapCheck { need :: Int }
 
 data Jump
   = JumpReg Reg
@@ -168,9 +168,9 @@ instance Show Op where
     OpSub r src -> "sub " ++ show r ++ ", " ++ show src
     OpMulAx src -> "mul " ++ show src
     OpDivModAxDx src -> "Div " ++ show src
-    OpEnterCheck need -> printf "Bare_enter_check(%d)" need
     OpExchange r1 r2 -> printf "xchg %s, %s" (show r1) (show r2)
     OpHlt -> "hlt"
+    MacroHeapCheck need -> printf "Bare_heap_check(%d)" need
 
 instance Show Jump where
   show = \case

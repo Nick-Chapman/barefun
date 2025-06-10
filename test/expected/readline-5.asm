@@ -8,7 +8,7 @@ L1: ; Arm: 14'7
 
 L2: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, [si]
@@ -16,7 +16,7 @@ L2: ; Continuation
 
 L3: ; Function: (lam,t1)
   xchg si, di
-  Bare_enter_check(16)
+  Bare_heap_check(16)
   mov bx, [si]
   cmp word [bx], 1
   jz L1
@@ -41,7 +41,7 @@ L3: ; Function: (lam,t1)
 
 L4: ; Function: (rev_onto,g1)
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [si]
   push word L3
   mov [Temps+2], sp
@@ -63,7 +63,7 @@ L5: ; Arm: 37'7
 
 L6: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, g2
@@ -107,7 +107,7 @@ L9: ; Arm: 32'16
 
 L10: ; Function: (put_chars,g2)
   xchg si, di
-  Bare_enter_check(8)
+  Bare_heap_check(8)
   mov bx, [si]
   cmp word [bx], 1
   jz L5
@@ -185,7 +185,7 @@ L11: ; Arm: 21'13
 
 L12: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, [si]
@@ -193,7 +193,7 @@ L12: ; Continuation
 
 L13: ; Function: (lam,t1)
   xchg si, di
-  Bare_enter_check(16)
+  Bare_heap_check(16)
   mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_n
@@ -228,7 +228,7 @@ L13: ; Function: (lam,t1)
 
 L14: ; Function: (explode_loop,g5)
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [si]
   push word L13
   mov [Temps+2], sp
@@ -242,7 +242,7 @@ L14: ; Function: (explode_loop,g5)
 
 L15: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, [si]
@@ -265,7 +265,7 @@ L16: ; Arm: 56'22
 
 L17: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, [si]
@@ -313,7 +313,7 @@ L20: ; Arm: 61'17
 
 L21: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, `\x08`
   call Bare_put_char
   mov ax, Bare_unit
@@ -353,7 +353,7 @@ L22: ; Arm: 63'31
 
 L23: ; Continuation
   xchg si, di
-  Bare_enter_check(8)
+  Bare_heap_check(8)
   push word [bp+4]
   push word [CurrentCont]
   push word L21
@@ -411,7 +411,7 @@ L25: ; Arm: 59'21
 
 L26: ; Continuation
   xchg si, di
-  Bare_enter_check(8)
+  Bare_heap_check(8)
   push word [bp+4]
   push word [bp+6]
   push word 3
@@ -460,7 +460,7 @@ L29: ; Arm: 32'16
 
 L30: ; Function: (readloop,g8)
   xchg si, di
-  Bare_enter_check(16)
+  Bare_heap_check(16)
   call Bare_get_char
   mov [Temps+2], ax
   mov ax, [Temps+2]
@@ -567,7 +567,7 @@ L31: ; Arm: 79'29
 
 L32: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, `\n`
   call Bare_put_char
   mov ax, Bare_unit
@@ -579,7 +579,7 @@ L32: ; Continuation
 
 L33: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   mov bx, [si]
   cmp word [bx], 3
   jz L31
@@ -602,7 +602,7 @@ L34: ; Arm: 73'7
 
 L35: ; Continuation
   xchg si, di
-  Bare_enter_check(8)
+  Bare_heap_check(8)
   push word [si]
   push word [CurrentCont]
   push word L33
@@ -628,7 +628,7 @@ L35: ; Continuation
 
 L36: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L35
   mov [CurrentCont], sp
@@ -640,7 +640,7 @@ L36: ; Continuation
 
 L37: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L36
   mov [CurrentCont], sp
@@ -652,7 +652,7 @@ L37: ; Continuation
 
 L38: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L37
   mov [CurrentCont], sp
@@ -664,7 +664,7 @@ L38: ; Continuation
 
 L39: ; Function: (mainloop,g4)
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L38
   mov [CurrentCont], sp
@@ -684,7 +684,7 @@ L40: ; Arm: 21'13
 
 L41: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, [si]
@@ -692,7 +692,7 @@ L41: ; Continuation
 
 L42: ; Function: (lam,t1)
   xchg si, di
-  Bare_enter_check(16)
+  Bare_heap_check(16)
   mov ax, [si]
   cmp word ax, 1
   call Bare_make_bool_from_n
@@ -727,7 +727,7 @@ L42: ; Function: (lam,t1)
 
 L43: ; Function: (explode_loop,g19)
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [si]
   push word L42
   mov [Temps+2], sp
@@ -741,7 +741,7 @@ L43: ; Function: (explode_loop,g19)
 
 L44: ; Continuation
   xchg si, di
-  Bare_enter_check(0)
+  Bare_heap_check(0)
   mov ax, g22
   mov [di], ax
   mov bp, g4
@@ -749,7 +749,7 @@ L44: ; Continuation
 
 L45: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L44
   mov [CurrentCont], sp
@@ -761,7 +761,7 @@ L45: ; Continuation
 
 L46: ; Continuation
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L45
   mov [CurrentCont], sp
@@ -773,7 +773,7 @@ L46: ; Continuation
 
 L47: ; Start
   xchg si, di
-  Bare_enter_check(6)
+  Bare_heap_check(6)
   push word [CurrentCont]
   push word L46
   mov [CurrentCont], sp

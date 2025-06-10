@@ -117,7 +117,7 @@ cutEntryCode :: String -> Code -> Asm CodeLabel
 cutEntryCode name code = do
   need <- Needed code
   CutCode name $ do
-    doOps ([flipArgSpace] ++ [OpEnterCheck need]) code
+    doOps ([flipArgSpace] ++ [MacroHeapCheck { need }]) code
 
 
 setArgOut :: Source -> Op
