@@ -217,7 +217,7 @@ compileAtomicTo who target = \case
   SRC.Prim prim xs -> pure (compilePrimitiveTo prim target (map compileRef xs))
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
   SRC.Lam pre _post _x body -> compileFunctionTo 1 who target pre body
-  SRC.Lam2{} -> undefined -- TODO: oops -- missed multi-args compilation
+  SRC.Lam2 pre _post _x1 _x2 body -> compileFunctionTo 2 who target pre body
   SRC.RecLam pre _post _f _x body -> compileFunctionTo 1 who target pre body
 
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
