@@ -62,7 +62,8 @@ data Op -- target; source (Intel Syntax style)
   | OpDivModAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
   | OpExchange Reg Reg
   | OpHlt
-  | MacroHeapCheck { need :: Int }
+  | MacroHeapCheck { need :: Int } -- TODO: rename heapBytesNeeded
+  | MacroArgCheck { desiredNumArgs :: Int }
 
 data Jump
   = JumpReg Reg
@@ -170,7 +171,8 @@ instance Show Op where
     OpDivModAxDx src -> "Div " ++ show src
     OpExchange r1 r2 -> printf "xchg %s, %s" (show r1) (show r2)
     OpHlt -> "hlt"
-    MacroHeapCheck need -> printf "Bare_heap_check(%d)" need
+    MacroHeapCheck { need } -> printf "Bare_heap_check(%d)" need
+    MacroArgCheck { desiredNumArgs } -> printf "Bare_arg_check(%d)" desiredNumArgs
 
 instance Show Jump where
   show = \case

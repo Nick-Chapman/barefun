@@ -254,6 +254,9 @@ halt:
 %define ArgOut di
 %define FrameReg bp
 
+%macro Bare_arg_check 1 ;; TODO
+%endmacro
+
 %macro Bare_heap_check 1
     mov word [need], %1
     jz %%no_need
@@ -842,7 +845,7 @@ end_of_code:
 %error Kernel sectors allocated: As, required: Rs
 %endif
 
-HemiSize equ 4500
+HemiSize equ 3500
 RedzoneSize equ 500
 
 %assign HeapSize (2*(HemiSize+RedzoneSize))

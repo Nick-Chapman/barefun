@@ -4,17 +4,21 @@ L1: ; Arm: 6'13
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L2: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, [si]
+  mov ax, 1
   jmp [bp]
 
 L3: ; Function: (lam,t1)
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(16)
   mov ax, [si]
@@ -64,9 +68,11 @@ L3: ; Function: (lam,t1)
   mov ax, [Temps+12]
   mov [di], ax
   mov bp, g1
+  mov ax, 1
   jmp [bp]
 
 L4: ; Function: (loop,g1)
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(6)
   push word [si]
@@ -78,6 +84,7 @@ L4: ; Function: (loop,g1)
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L5: ; Arm: 13'7
@@ -86,9 +93,11 @@ L5: ; Arm: 13'7
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L6: ; Function: (put_chars,g2)
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov bx, [si]
@@ -105,6 +114,7 @@ L6: ; Function: (put_chars,g2)
   mov ax, [Temps+4]
   mov [di], ax
   mov bp, g2
+  mov ax, 1
   jmp [bp]
 
 L7: ; Arm: 22'10
@@ -115,9 +125,11 @@ L7: ; Arm: 22'10
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L8: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [bp+4]
@@ -130,9 +142,11 @@ L8: ; Continuation
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L9: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(8)
   push word [si]
@@ -143,6 +157,7 @@ L9: ; Continuation
   mov ax, [bp+4]
   mov [di], ax
   mov bp, g4
+  mov ax, 1
   jmp [bp]
 
 L10: ; Arm: 23'15
@@ -158,9 +173,11 @@ L10: ; Arm: 23'15
   mov ax, [Temps+2]
   mov [di], ax
   mov bp, g4
+  mov ax, 1
   jmp [bp]
 
 L11: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [bp+4]
@@ -173,9 +190,11 @@ L11: ; Continuation
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L12: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(8)
   push word [si]
@@ -186,6 +205,7 @@ L12: ; Continuation
   mov ax, [bp+4]
   mov [di], ax
   mov bp, g4
+  mov ax, 1
   jmp [bp]
 
 L13: ; Arm: 24'15
@@ -201,9 +221,11 @@ L13: ; Arm: 24'15
   mov ax, [Temps+2]
   mov [di], ax
   mov bp, g4
+  mov ax, 1
   jmp [bp]
 
 L14: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [bp+4]
@@ -219,9 +241,11 @@ L14: ; Continuation
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L15: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(8)
   push word [si]
@@ -232,9 +256,11 @@ L15: ; Continuation
   mov ax, [bp+4]
   mov [di], ax
   mov bp, g4
+  mov ax, 1
   jmp [bp]
 
 L16: ; Function: (eval,g4)
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(8)
   mov bx, [si]
@@ -256,14 +282,17 @@ L16: ; Function: (eval,g4)
   mov ax, [Temps+2]
   mov [di], ax
   mov bp, g4
+  mov ax, 1
   jmp [bp]
 
 L17: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [si]
   mov [di], ax
   mov bp, g2
+  mov ax, 1
   jmp [bp]
 
 L18: ; Arm: 9'20
@@ -277,17 +306,21 @@ L18: ; Arm: 9'20
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L19: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [bp+4]
   mov [di], ax
   mov bp, [si]
+  mov ax, 1
   jmp [bp]
 
 L20: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(14)
   mov ax, [si]
@@ -309,9 +342,11 @@ L20: ; Continuation
   mov ax, g6
   mov [di], ax
   mov bp, g1
+  mov ax, 1
   jmp [bp]
 
 L21: ; Start
+  Bare_arg_check(0)
   xchg si, di
   Bare_heap_check(54)
   push word 2001
@@ -352,6 +387,7 @@ L21: ; Start
   mov ax, [Temps+14]
   mov [di], ax
   mov bp, g4
+  mov ax, 1
   jmp [bp]
 
 g1:

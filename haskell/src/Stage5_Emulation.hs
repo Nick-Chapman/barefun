@@ -406,6 +406,23 @@ execOp = \case
   MacroHeapCheck { need } -> \cont -> do
     heapCheck need
     cont
+  MacroArgCheck { desiredNumArgs = desired } -> \cont -> do
+    received :: Int <- (fromIntegral . deNum) <$> GetReg Ax
+    Debug (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
+    case (received,desired) of
+      (0,0) -> cont
+      (1,1) -> cont
+      (2,2) -> cont
+      (2,1) -> do overapp2for1 cont
+      (1,2) -> do pap1of2
+      _ ->
+        error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
+
+overapp2for1 :: M () -> M ()
+overapp2for1 _cont = error "overapp2for1"
+
+pap1of2 :: M ()
+pap1of2 = error "pap1of2"
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- performs sanity checking when a block-descriptor is pushed
@@ -893,6 +910,7 @@ state0 dmap = State
       , (frameReg, arbitrary)
       , (argReg, argsA)
       , (argOut, argsB)
+      , (Ax, WNum 0) -- this use of WNum is not tagged
       ]
 
     arbitrary = WAddr (AStatic (DataLabelR "arbitrary") 0)

@@ -1,4 +1,5 @@
 L1: ; Start
+  Bare_arg_check(0)
   xchg si, di
   Bare_heap_check(0)
   mov ax, `@`
@@ -122,6 +123,7 @@ L1: ; Start
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 

@@ -6,9 +6,11 @@ L1: ; Arm: 11'25
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L2: ; Function: (get_scancode,g1)
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   hlt
@@ -23,9 +25,11 @@ L2: ; Function: (get_scancode,g1)
   mov ax, g5
   mov [di], ax
   mov bp, g1
+  mov ax, 1
   jmp [bp]
 
 L3: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [si]
@@ -123,9 +127,11 @@ L3: ; Continuation
   mov ax, g8
   mov [di], ax
   mov bp, g6
+  mov ax, 1
   jmp [bp]
 
 L4: ; Function: (loop,g6)
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(6)
   push word [CurrentCont]
@@ -135,6 +141,7 @@ L4: ; Function: (loop,g6)
   mov ax, g7
   mov [di], ax
   mov bp, g1
+  mov ax, 1
   jmp [bp]
 
 L5: ; Arm: 6'28
@@ -155,9 +162,11 @@ L5: ; Arm: 6'28
   mov ax, [Temps+8]
   mov [di], ax
   mov bp, g9
+  mov ax, 1
   jmp [bp]
 
 L6: ; Function: (loop,g9)
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   mov ax, [si]
@@ -172,9 +181,11 @@ L6: ; Function: (loop,g9)
   mov bp, [CurrentCont]
   mov ax, [bp+2]
   mov [CurrentCont], ax
+  mov ax, 1
   jmp [bp]
 
 L7: ; Continuation
+  Bare_arg_check(1)
   xchg si, di
   Bare_heap_check(0)
   call Bare_init_interrupt_mode
@@ -182,9 +193,11 @@ L7: ; Continuation
   mov ax, g13
   mov [di], ax
   mov bp, g6
+  mov ax, 1
   jmp [bp]
 
 L8: ; Start
+  Bare_arg_check(0)
   xchg si, di
   Bare_heap_check(6)
   push word [CurrentCont]
@@ -194,6 +207,7 @@ L8: ; Start
   mov ax, 1
   mov [di], ax
   mov bp, g9
+  mov ax, 1
   jmp [bp]
 
 g1:

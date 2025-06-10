@@ -53,6 +53,7 @@ codeReturn :: Code
 codeReturn =
   Do (OpMany [ OpMove frameReg getCurrentCont
              , setCurrentCont (SMemIndirectOffset frameReg bytesPerWord)
+             , OpMove Ax (SLit (LNum 1))
              ]) (Done (JumpIndirect frameReg))
 
 -- this is the calling convention to flip the arg-spaces when entering a code block
@@ -75,7 +76,7 @@ targetOfTemp = \case
 compile :: SRC.Image -> Transformed
 compile x =
   -- not entry code. no args are being passed. TODO: avoid even cutting coded here?
-  runAsm (compileImage x >>= cutEntryCode "Start")
+  runAsm (compileImage x >>= cutEntryCode 0 "Start")
 
 compileImage :: SRC.Image -> Asm Code
 compileImage = \case
@@ -92,12 +93,12 @@ compileTopDef who = \case
   SRC.TopLitS string -> pure (DW [ lnumTagging (fromIntegral $ length string) ] : [ DS string ])
 
   SRC.TopLam _x body -> do
-    codeLabel <- compileCode body >>= cutEntryCode ("Function: " ++ who)
+    codeLabel <- compileCode body >>= cutEntryCode 1 ("Function: " ++ who)
     let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
 
   SRC.TopLam2 x1 x2 body -> do
-    codeLabel <- compileCode body >>= cutEntryCode ("Function: " ++ who ++ show [x1,x2])
+    codeLabel <- compileCode body >>= cutEntryCode 2 ("Function: " ++ who ++ show [x1,x2])
     let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
 
@@ -113,12 +114,14 @@ compileTopRef = \case
       SRC.InGlobal g -> LStatic (DataLabelG g)
       _ -> error "compileTopRef"
 
-cutEntryCode :: String -> Code -> Asm CodeLabel
-cutEntryCode name code = do
+cutEntryCode :: Int -> String -> Code -> Asm CodeLabel
+cutEntryCode desiredNumArgs name code = do
   need <- Needed code
   CutCode name $ do
-    doOps ([flipArgSpace] ++ [MacroHeapCheck { need }]) code
-
+    doOps [ MacroArgCheck { desiredNumArgs } -- what is best: before or after flip?
+          , flipArgSpace
+          , MacroHeapCheck { need }
+          ] code
 
 setArgOut :: Source -> Op
 setArgOut source =
@@ -141,6 +144,7 @@ compileCode = \case
     pure $ doOps
       [ setArgOut (compileRef arg)
       , OpMove frameReg (compileRef fun)
+      , OpMove Ax (SLit (LNum 1))
       ] (Done (JumpIndirect frameReg))
 
   SRC.Tail2 fun _pos arg1 arg2 -> do
@@ -148,6 +152,7 @@ compileCode = \case
       [ setArgOut (compileRef arg1)
       , setArgOut2 (compileRef arg2)
       , OpMove frameReg (compileRef fun)
+      , OpMove Ax (SLit (LNum 2))
       ] (Done (JumpIndirect frameReg))
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
@@ -165,7 +170,7 @@ compileCode = \case
     doOps ops <$> compileCode body
 
   SRC.PushContinuation pre _post (_x,later) first -> do
-    lab <- compileCode later >>= cutEntryCode "Continuation"
+    lab <- compileCode later >>= cutEntryCode 1 "Continuation"
     let
       desc = BlockDescriptor Scanned (2 * (length pre + 2))
     let
@@ -211,9 +216,9 @@ compileAtomicTo :: String -> Target -> SRC.Atomic -> Asm [Op]
 compileAtomicTo who target = \case
   SRC.Prim prim xs -> pure (compilePrimitiveTo prim target (map compileRef xs))
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
-  SRC.Lam pre _post _x body -> compileFunctionTo who target pre body
-  SRC.Lam2{} -> undefined
-  SRC.RecLam pre _post _f _x body -> compileFunctionTo who target pre body
+  SRC.Lam pre _post _x body -> compileFunctionTo 1 who target pre body
+  SRC.Lam2{} -> undefined -- TODO: oops -- missed multi-args compilation
+  SRC.RecLam pre _post _f _x body -> compileFunctionTo 1 who target pre body
 
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo target tag xs = do
@@ -223,9 +228,9 @@ compileConAppTo target tag xs = do
     , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
     ]
 
-compileFunctionTo :: String -> Target -> [SRC.Ref] -> SRC.Code -> Asm [Op]
-compileFunctionTo who target freeVars body = do
-  lab <- compileCode body >>= cutEntryCode ("Function: " ++ who)
+compileFunctionTo :: Int -> String -> Target -> [SRC.Ref] -> SRC.Code -> Asm [Op]
+compileFunctionTo expect who target freeVars body = do
+  lab <- compileCode body >>= cutEntryCode expect ("Function: " ++ who)
   let desc = BlockDescriptor Scanned (2 * (length freeVars + 1))
   pure (
     map OpPush (reverse (map compileRef freeVars)) ++

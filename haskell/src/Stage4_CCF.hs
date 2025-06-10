@@ -51,7 +51,7 @@ data Atomic
   | ConApp Ctag [Ref]
   | Lam [Ref] [Ref] Ref Code
   | Lam2 [Ref] [Ref] Ref Ref Code
-  | RecLam [Ref] [Ref] Ref Ref Code
+  | RecLam [Ref] [Ref] Ref Ref Code -- TODO: need versions for N-args
 
 data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame
   | TheArg | TheArg2 -- TODO: unify; take int
