@@ -205,7 +205,10 @@ instance Show Lit where
     LCodeLabel lab -> show lab
     LBlockDescriptor d -> show d
 
-instance Show CodeLabel where show (CodeLabel n _) = "L" ++ show n
+instance Show CodeLabel where
+  show (CodeLabel n str) =
+    if n == 0 then printf "L_%s" str else -- label-0 is internal, so show it's name
+      printf "L%d" n
 
 instance Show DataLabel where show = \case DataLabelG g -> show g; DataLabelR s -> s
 

@@ -6,6 +6,7 @@ module Stage5_Compilation
   , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn, flipArgSpace
+  , overapp2for1Code
   ) where
 
 import Primitive (Primitive)
@@ -59,6 +60,30 @@ codeReturn =
 -- this is the calling convention to flip the arg-spaces when entering a code block
 flipArgSpace :: Op
 flipArgSpace = OpExchange argReg argOut
+
+setArgOutN :: Int -> Source -> Op
+setArgOutN = \case
+  0 -> setArgOut
+  1 -> setArgOut2
+  n -> error (show ("setArgOutN",n))
+
+-- Would be great to actually see this code in the compiled output,
+-- rather than being magic'ed into existence in the emulator.
+-- Thus avoiding repeating it in runtime.asm
+overapp2for1Code :: Code
+overapp2for1Code = do
+  let a = 1
+  let b = 2
+  let firstContFrammeIndex = 2
+  let firstArgIndex = 0
+  doOps [ flipArgSpace
+        , OpMove frameReg (compileLoc SRC.TheArg)
+        , move (firstArgIndex+(b-a)) firstContFrammeIndex
+        , OpMove Ax (SLit (LNum 1))
+        ] (Done (JumpIndirect frameReg))
+    where
+      move tI sI = -- as normal: target <- source
+        setArgOutN tI (compileLoc (SRC.InFrame sI))
 
 ----------------------------------------------------------------------
 -- Compile
@@ -123,7 +148,7 @@ cutEntryCode desiredNumArgs name code = do
           , MacroHeapCheck { need }
           ] code
 
-setArgOut :: Source -> Op
+setArgOut :: Source -> Op -- TODO: SetArgOutN
 setArgOut source =
   if enableArgIndirection
   then setTarget (TRegIndirectOffset argOut 0) source
@@ -466,20 +491,22 @@ compileRef :: SRC.Ref -> Source
 compileRef = \case
     SRC.RefLitC c -> SLit (LChar c)
     SRC.RefLitN n -> SLit (lnumTagging n)
-    SRC.Ref _ loc -> do
-    case loc of
-      SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
-      SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
-      SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
-      SRC.TheArg ->
-        if enableArgIndirection
-        then SMemIndirectOffset argReg 0
-        else SReg argReg
-      SRC.TheArg2 ->
-        if enableArgIndirection
-        then SMemIndirectOffset argReg bytesPerWord
-        else undefined
-      SRC.TheFrame -> SReg frameReg
+    SRC.Ref _ loc -> compileLoc loc
+
+compileLoc :: SRC.Location -> Source
+compileLoc = \case
+  SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
+  SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
+  SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
+  SRC.TheArg ->
+    if enableArgIndirection
+    then SMemIndirectOffset argReg 0
+    else SReg argReg
+  SRC.TheArg2 ->
+    if enableArgIndirection
+    then SMemIndirectOffset argReg bytesPerWord
+    else undefined
+  SRC.TheFrame -> SReg frameReg
 
 sourceOfTarget :: Target -> Source
 sourceOfTarget = \case
@@ -508,7 +535,7 @@ runAsm asm = finalImage
   where
     finalImage = loop state0 asm k0
 
-    state0 = AsmState { u = 1 }
+    state0 = AsmState { u = 1 } -- first code label for user code starts at 1; 0 is for internal labels
     k0 _s start = Image { cmap = Map.empty, dmap = Map.empty, start }
 
     loop :: AsmState -> Asm a -> (AsmState -> a -> Image) -> Image

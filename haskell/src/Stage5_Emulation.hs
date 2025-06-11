@@ -24,6 +24,7 @@ import Stage5_Compilation
   , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn,flipArgSpace
+  , overapp2for1Code
   )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
@@ -233,6 +234,7 @@ evacuateArgs = do
       evacuate w >>= \case
         Just w' -> SetReg argReg w'
         Nothing -> pure ()
+    -- TODO: we must GC from all arg roots, where N is passed here somehow!
     True -> do
       w <- getMemIndirect Si -- TODO: knowledge about Si should come from calling conventions
       evacuate w >>= \case
@@ -418,8 +420,33 @@ execOp = \case
       _ ->
         error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
 
+
+-- TODO: reword as execution of constructed code
 overapp2for1 :: M () -> M ()
-overapp2for1 _cont = error "overapp2for1"
+overapp2for1 cont = do
+  Debug "[overapp2for1]...\n"
+  let numOverArgs = 1
+  let indexOfFirstOverArg = 1
+  let numWordsForDesc = numOverArgs + 1 + 1 -- the over-args; the current-cont; the re-app code pointer
+  let need = bytesPerWord * (numWordsForDesc + 1)
+  heapCheck need
+  let arg1source :: Source = SMemIndirectOffset argOut (bytesPerWord * indexOfFirstOverArg)
+  w1 :: Word <- evalSource arg1source
+  execPushAlloc AllocForUser w1
+  wCC :: Word <- evalSource getCurrentCont
+  execPushAlloc AllocForUser wCC
+  execPushAlloc AllocForUser (WCodeLabel overapp2for1Label)
+  let op :: Op = OpStore (TMemOffset labelCurrentCont 0) Sp
+  execOp op $ do
+  let desc = BlockDescriptor Scanned (numWordsForDesc * bytesPerWord)
+  execPushAlloc AllocForUser (WBlockDescriptor desc)
+  Debug "[overapp2for1]...done\n"
+  cont
+
+
+getCurrentCont :: Source -- Copied from stage5 compile
+getCurrentCont = SMemOffset labelCurrentCont 0
+
 
 pap1of2 :: M ()
 pap1of2 = error "pap1of2"
@@ -744,7 +771,12 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
 
     k0 _s () = IDone
 
-    cmap = Map.insert finalCodeLabel finalCode cmapUser
+    cmapInternal = Map.fromList
+      [ (finalCodeLabel, finalCode)
+      , (overapp2for1Label, overapp2for1Code)
+      ]
+
+    cmap = Map.union cmapInternal cmapUser
     finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
 
     trace :: String -> Interaction -> Interaction
@@ -870,7 +902,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
 
 data State = State
   { rmap :: Map Reg Word
-  , tmap :: Map SRC.Temp Word
+  , tmap :: Map SRC.Temp Word -- TODO: remove this along with unused [GS]etTemp
   , mem :: Map Addr Word
   , flagZ :: Bool
   , flagN :: Bool
@@ -986,3 +1018,6 @@ dUnit = DataLabelR "Bare_unit"
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
+
+overapp2for1Label :: CodeLabel
+overapp2for1Label = CodeLabel 0 "OverApp2for1"
