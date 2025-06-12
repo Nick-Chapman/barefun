@@ -1,6 +1,12 @@
 
+let flags_for_example = function
+  |"readline" -> ""
+  |"sham" -> ""
+  | _ -> "-mapp" (* TODO: make this work for all examples *)
+
 let generate_rules x =
   let capX = String.capitalize_ascii x in
+  let flags = flags_for_example x in
 
   Printf.printf
 {|
@@ -18,9 +24,9 @@ x x x x 'X' capX;
   (action
    (with-stdin-from ../../../test/inputs/%s.input
     (with-stdout-to %s.out%c
-     (run ../../../haskell/main.exe ../../../examples/%s.fun -%c)))))
+     (run ../../../haskell/main.exe ../../../examples/%s.fun %s -%c)))))
 |}
-x x x x v x v
+x x x x v x flags v
   in
   List.iter f ['0';'1';'2';'3';'4';'5'];
 

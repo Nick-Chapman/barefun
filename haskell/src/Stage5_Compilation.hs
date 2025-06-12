@@ -72,13 +72,11 @@ setArgOutN = \case
 -- Thus avoiding repeating it in runtime.asm
 overapp2for1Code :: Code
 overapp2for1Code = do
-  let a = 1
-  let b = 2
   let firstContFrammeIndex = 2
   let firstArgIndex = 0
   doOps [ flipArgSpace
-        , OpMove frameReg (compileLoc SRC.TheArg)
-        , move (firstArgIndex+(b-a)) firstContFrammeIndex
+        , move (firstArgIndex+0) firstContFrammeIndex -- first overarg passed as first arg
+        , OpMove frameReg (compileLoc SRC.TheArg) -- after args are set
         , OpMove Ax (SLit (LNum 1))
         ] (Done (JumpIndirect frameReg))
     where

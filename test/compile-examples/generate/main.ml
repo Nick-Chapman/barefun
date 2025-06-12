@@ -18,12 +18,16 @@ let select_versions_for_example = function
   | "two" -> [0;1;2;3;4;5]
   | _ -> []
 
+let flags_for_example = function
+  | _ -> ""
+
 let suffix_of_version v =
   if v >= 0 && v <= 4 then "ml" else
     if v == 5 then "asm" else
      failwith "suffix_of_version"
 
 let generate_rules x v =
+  let flags = flags_for_example x in
   let suf = suffix_of_version v in
   let m = Printf.sprintf "%d" v in
   Printf.printf
@@ -37,9 +41,9 @@ let generate_rules x v =
   (deps ../../../haskell/main.exe ../../../examples/%s.fun)
   (action
    (with-stdout-to %s-%s.gen
-    (run ../../../haskell/main.exe ../../../examples/%s.fun -compile -%s))))
+    (run ../../../haskell/main.exe ../../../examples/%s.fun -compile %s -%s))))
 
-|} x m suf x m  x x m  x m
+|} x m suf x m  x x m  x flags m
 
 let generate_rules_set example =
   List.iter (generate_rules example) (select_versions_for_example example)
