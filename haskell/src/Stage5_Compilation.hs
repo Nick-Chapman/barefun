@@ -181,6 +181,7 @@ compileCode = \case
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
       [ setArgOut (compileRef arg)
+      , OpMove Ax (SLit (LNum 1))
       ] (Done (JumpBare AllocBare_make_bytes))
 
   SRC.TailPrim prim _pos _arg ->

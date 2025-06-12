@@ -28,7 +28,7 @@ import Stage5_Compilation
   )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
-gcAtEverySafePoint = False -- but slows "dune test" -- TODO: back to False
+gcAtEverySafePoint = True -- but slows "dune test" -- TODO: make this on a flag
 
 hemiSizeInBytes :: Int
 --hemiSizeInBytes = 3600 -- 0x1000 -- 10000 -- 3000 was ok for sham; 5000 is needed for filesystem example
@@ -187,22 +187,25 @@ runGC :: M ()
 runGC = do
   gcNum <- BumpGC
   toSpace <- WhatHemi
+
+  numArgs :: Int <- (fromIntegral . deNum) <$> GetReg Ax
+
   Debug "["
-  Debug (printf "%02d:" gcNum)
+  Debug (printf "num=%02d, #args=%d ->" gcNum numArgs)
   setStackPointerToTopOfHemi toSpace
 
   watermark0 <- getSP
   evacuateReg frameReg
-  evacuateArgs
+  evacuateArgs numArgs
   evacuateCurrentCont
   loop watermark0
 
   HeapAddr sp <- getSP
   --let remainingBytes = fromIntegral sp - botOfHemi toSpace
   let liveBytes = topOfHemi toSpace - fromIntegral sp
-  Debug (printf "%04x" liveBytes) -- print in hex to match against runtime.asm
+  Debug (printf " live=%04x" liveBytes) -- print in hex to match against runtime.asm
   WatchLive liveBytes
-  Debug "]"
+  Debug "]\n"
 
   where
     loop :: HeapAddr -> M ()
@@ -226,20 +229,23 @@ runGC = do
                 nextScanPointer <- scavenge scanPointer
                 innerLoop nextScanPointer
 
-evacuateArgs :: M ()
-evacuateArgs = do
+evacuateArgs :: Int -> M ()
+evacuateArgs numArgs = do
   case enableArgIndirection of
     False -> do
       w <- GetReg argReg
       evacuate w >>= \case
         Just w' -> SetReg argReg w'
         Nothing -> pure ()
-    -- TODO: we must GC from all arg roots, where N is passed here somehow!
     True -> do
-      w <- getMemIndirect Si -- TODO: knowledge about Si should come from calling conventions
-      evacuate w >>= \case
-        Just w' -> setMemIndirect Si w'
-        Nothing -> pure ()
+      sequence_ [ evacOne (bytesPerWord * i) | i <- [ 0.. numArgs-1 ] ]
+      where
+        evacOne offset = do
+          -- TODO: knowledge about Si should come from calling conventions
+          w <- getMemIndirectOffset Si offset
+          evacuate w >>= \case
+            Just w' -> setMemIndirectOffset Si offset w'
+            Nothing -> pure ()
 
 evacuateCurrentCont :: M ()
 evacuateCurrentCont = do
@@ -507,15 +513,17 @@ setTarget = \case
     SetMem a' w
   TMemOffset lab n -> \w -> SetMem (AStatic lab n) w
 
-getMemIndirect :: Reg -> M Word
-getMemIndirect r = do
+getMemIndirectOffset :: Reg -> Int -> M Word
+getMemIndirectOffset r i = do
   a <- deAddr <$> GetReg r
-  GetMem a
+  a' <- addAddr i a
+  GetMem a'
 
-setMemIndirect :: Reg -> Word -> M ()
-setMemIndirect r w = do
+setMemIndirectOffset :: Reg -> Int -> Word -> M ()
+setMemIndirectOffset r i w = do
   a <- deAddr <$> GetReg r
-  SetMem a w
+  a' <- addAddr i a
+  SetMem a' w
 
 execBare :: BareBios -> M ()
 execBare = \case
@@ -620,14 +628,14 @@ jumpBare = \case
 
 getArg :: M Word
 getArg =
-  if enableArgIndirection
-  then getMemIndirect Si
+  if enableArgIndirection -- TODO: when this is killed. inline getArg/setArgOut
+  then getMemIndirectOffset Si 0
   else GetReg argReg
 
 setArgOut :: Word -> M ()
 setArgOut w = do
   if enableArgIndirection
-  then setMemIndirect Di w
+  then setMemIndirectOffset Di 0 w
   else SetReg argOut w
 
 setMemChar :: Addr -> Char -> M ()
@@ -966,7 +974,7 @@ state0 dmap = State
       -- and so when this initaitedteh GC, then we need for there to a valid first-arg
       -- when we make multi-args work, then every call will need to communicate the #actuals passed (in ax?)
       -- and so then we can set that to be 0, and the following wont be necesary
-      , (AStatic labelArgsB 0, arbitrary)
+--      , (AStatic labelArgsB 0, arbitrary) -- TODO: remove this when GC looks at #args
       ]
     user =
       concat [ [(AStatic lab i,w) | (i,w) <- specsWords specs ]

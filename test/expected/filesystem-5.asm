@@ -979,6 +979,7 @@ L61: ; Continuation
   push word 6 ;; scanned
   mov ax, [si]
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L62: ; Function: (implode,g24)
@@ -1834,6 +1835,7 @@ L110: ; Continuation
   push word 8 ;; scanned
   mov ax, [si]
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L111: ; Function: (rev_implode,g48)
@@ -2766,6 +2768,7 @@ L166: ; Function: (lam,t1)
   push word 10 ;; scanned
   mov ax, [si]
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L167: ; Function: (lam,t1)
@@ -3461,6 +3464,7 @@ L197: ; Continuation
   push word 10 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L198: ; Continuation
@@ -3660,6 +3664,7 @@ L205: ; Continuation
   push word 8 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L206: ; Function: (load_block,g84)
@@ -6814,6 +6819,7 @@ L399: ; Continuation
   push word 6 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L400: ; Arm: 10'9
@@ -7144,6 +7150,7 @@ L416: ; Function: (lam,g223)
   push word 6 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L417: ; Arm: 10'9
@@ -7515,6 +7522,7 @@ L439: ; Function: (lam,g348)
   push word 4 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L440: ; Continuation
@@ -9387,6 +9395,7 @@ L542: ; Continuation
   push word 14 ;; scanned
   mov ax, 257
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L543: ; Arm: 569'10
@@ -14008,6 +14017,7 @@ L814: ; Function: (lam,t1)
   push word 8 ;; scanned
   mov ax, 257
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L815: ; Continuation

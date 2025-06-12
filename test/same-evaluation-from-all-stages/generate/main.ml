@@ -1,8 +1,6 @@
 
 let flags_for_example = function
-  |"readline" -> ""
-  |"sham" -> ""
-  | _ -> "-mapp" (* TODO: make this work for all examples *)
+  | _ -> "-mapp" (* works for all examples. woo hoo! *)
 
 let generate_rules x =
   let capX = String.capitalize_ascii x in

@@ -113,6 +113,7 @@ L7: ; Function: (make_sector,g4)
   push word 6 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L8: ; Arm: 14'14
@@ -441,6 +442,7 @@ L24: ; Arm: 76'19
   push word 6 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L25: ; Continuation
@@ -853,6 +855,7 @@ L45: ; Continuation
   push word 4 ;; scanned
   mov ax, 1025
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L46: ; Start

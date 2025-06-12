@@ -176,6 +176,7 @@ L11: ; Continuation
   push word 6 ;; scanned
   mov ax, [si]
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L12: ; Function: (implode,g3)
@@ -432,6 +433,7 @@ L26: ; Continuation
   push word 4 ;; scanned
   mov ax, 11
   mov [di], ax
+  mov ax, 1
   jmp AllocBare_make_bytes
 
 L27: ; Continuation
