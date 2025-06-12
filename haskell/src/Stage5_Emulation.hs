@@ -430,7 +430,7 @@ overapp2for1 cont = do
   let numWordsForDesc = numOverArgs + 1 + 1 -- the over-args; the current-cont; the re-app code pointer
   let need = bytesPerWord * (numWordsForDesc + 1)
   heapCheck need
-  let arg1source :: Source = SMemIndirectOffset argOut (bytesPerWord * indexOfFirstOverArg)
+  let arg1source :: Source = SMemIndirectOffset argReg (bytesPerWord * indexOfFirstOverArg)
   w1 :: Word <- evalSource arg1source
   execPushAlloc AllocForUser w1
   wCC :: Word <- evalSource getCurrentCont

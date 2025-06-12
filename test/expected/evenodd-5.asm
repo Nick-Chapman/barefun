@@ -17,8 +17,8 @@ L2: ; Arm: 4'26
   jmp [bp]
 
 L3: ; Function: (is_even,g1)
-  Bare_arg_check(1)
   xchg si, di
+  Bare_arg_check(1)
   Bare_heap_check(0)
   mov ax, [si]
   cmp word ax, 1
@@ -51,8 +51,8 @@ L3: ; Function: (is_even,g1)
   jmp [bp]
 
 L4: ; Continuation
-  Bare_arg_check(1)
   xchg si, di
+  Bare_arg_check(1)
   Bare_heap_check(0)
   mov ax, [si]
   call Bare_put_char
@@ -76,8 +76,8 @@ L5: ; Arm: 9'25
   jmp [bp]
 
 L6: ; Continuation
-  Bare_arg_check(1)
   xchg si, di
+  Bare_arg_check(1)
   Bare_heap_check(6)
   push word [CurrentCont]
   push word L4
@@ -95,8 +95,8 @@ L6: ; Continuation
   jmp [bp]
 
 L7: ; Continuation
-  Bare_arg_check(1)
   xchg si, di
+  Bare_arg_check(1)
   Bare_heap_check(6)
   mov ax, [si]
   call Bare_put_char
@@ -122,8 +122,8 @@ L8: ; Arm: 9'25
   jmp [bp]
 
 L9: ; Continuation
-  Bare_arg_check(1)
   xchg si, di
+  Bare_arg_check(1)
   Bare_heap_check(6)
   push word [CurrentCont]
   push word L7
@@ -141,8 +141,8 @@ L9: ; Continuation
   jmp [bp]
 
 L10: ; Start
-  Bare_arg_check(0)
   xchg si, di
+  Bare_arg_check(0)
   Bare_heap_check(6)
   push word [CurrentCont]
   push word L9

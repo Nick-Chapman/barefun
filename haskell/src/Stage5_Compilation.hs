@@ -141,8 +141,8 @@ cutEntryCode :: Int -> String -> Code -> Asm CodeLabel
 cutEntryCode desiredNumArgs name code = do
   need <- Needed code
   CutCode name $ do
-    doOps [ MacroArgCheck { desiredNumArgs } -- what is best: before or after flip?
-          , flipArgSpace
+    doOps [ flipArgSpace
+          , MacroArgCheck { desiredNumArgs }
           , MacroHeapCheck { need }
           ] code
 

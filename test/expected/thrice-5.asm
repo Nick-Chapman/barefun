@@ -1,6 +1,6 @@
 L1: ; Start
-  Bare_arg_check(0)
   xchg si, di
+  Bare_arg_check(0)
   Bare_heap_check(0)
   mov ax, `@`
   call Bare_put_char
