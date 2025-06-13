@@ -44,6 +44,7 @@ data Atomic
   | Lam Position Fvs Id Code
   | Lam2 Position Fvs Id Id Code
   | RecLam Position Fvs Id Id Code
+  | RecLam2 Position Fvs Id Id Id Code
 
 -- Val expressions cause no evaluation.
 data Val
@@ -63,7 +64,8 @@ provenanceAtomic = \case
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ _ -> ("lam",pos)
   Lam2 pos _ _ _ _ -> ("lam2",pos)
-  RecLam pos _ _ _ _ -> undefined $ ("reclam",pos)
+  RecLam pos _ _ _ _ -> undefined $ ("reclam",pos) -- why never seen?
+  RecLam2 pos _ _ _ _ _ -> undefined $ ("reclam2",pos)
 
 ----------------------------------------------------------------------
 -- Show
@@ -74,7 +76,7 @@ pretty :: Code -> Lines
 pretty = \case
   Return _ x -> ["k " ++ show x]
   Tail func _pos arg -> [printf "%s %s k" (show func) (show arg)]
-  Tail2 func _pos arg1 arg2 -> [printf "%s %s k" (show func) (show [arg1,arg2])]
+  Tail2 func _pos arg0 arg1 -> [printf "%s %s k" (show func) (show [arg0,arg1])]
   TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ pretty body
   PushContinuation fvs (x,later) first -> indented ("let k " ++ show fvs ++ " " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
@@ -87,8 +89,10 @@ prettyA = \case
   ConTag _ tag [] -> [show tag]
   ConTag _ tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam _ fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
-  Lam2 _ fvs x1 x2 body -> indented ("fun " ++ show fvs ++ " " ++ show [x1,x2] ++ " k ->") (pretty body)
+  Lam2 _ fvs x0 x1 body -> indented ("fun " ++ show fvs ++ " " ++ show [x0,x1] ++ " k ->") (pretty body)
   RecLam _ fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
+  RecLam2 _ fvs f x0 x1 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show [x0,x1] ++ " k ->") (pretty body)
+
 
 prettyArm :: Arm -> Lines
 prettyArm = \case
@@ -153,12 +157,13 @@ evalCode env = \case
       ConTag _ tag vs -> \k -> k (VCons tag (map evalV vs))
       Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
-      Lam2 _ fvs x1 x2 body -> \k -> do
-        k (VFunc (\arg1 k ->
-                    k (VFunc (\arg2 k ->
-                                evalCode (insert x1 arg1 $ insert x2 arg2 (limit fvs env)) body k))))
+      Lam2 _ fvs x0 x1 body -> \k -> do
+        k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> evalCode (insert x0 arg0 $ insert x1 arg1 (limit fvs env)) body k))))
       RecLam _ fvs f x body -> \k -> do
         let me = VFunc (\arg k -> evalCode (insert f me (insert x arg (limit fvs env))) body k)
+        k me
+      RecLam2 _ fvs f x0 x1 body -> \k -> do
+        let me = VFunc (\arg0 k -> k (VFunc (\arg1 k -> evalCode (insert f me $ insert x0 arg0 $ insert x1 arg1 $ limit fvs env) body k)))
         k me
 
     evalV :: Val -> Value
@@ -242,9 +247,14 @@ compileExp = \case
   SRC.Lam pos x body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkLam pos x body
+
   SRC.RecLam pos f x body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkRecLam pos f x body
+
+  SRC.RecLam2 pos f x0 x1 body -> \k -> do
+    body <- compileTop body
+    k $ Atomic $ mkRecLam2 pos f x0 x1 body
 
   SRC.App eFunc pos eArg -> \k -> do
     compileAsId eArg $ \arg -> do
@@ -337,6 +347,9 @@ mkLam2 pos x1 x2 code = Lam2 pos (Set.toList (fvs code \\ Set.fromList [x1,x2]))
 mkRecLam :: Position -> Id -> Id -> Code -> Atomic
 mkRecLam pos f x code = RecLam pos (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
 
+mkRecLam2 :: Position -> Id -> Id -> Id -> Code -> Atomic
+mkRecLam2 pos f x0 x1 code = RecLam2 pos (Set.toList (fvs code \\ Set.fromList [f,x0,x1])) f x0 x1 code
+
 mkPushContinuation :: (Id,Code) -> Code -> Code
 mkPushContinuation (x,later) first =
   PushContinuation (Set.toList (fvs later \\ singleton x)) (x,later) first
@@ -367,3 +380,4 @@ fvsA = \case
   Lam _ fvs _ _ -> Set.fromList fvs
   Lam2 _ fvs _ _ _ -> Set.fromList fvs
   RecLam _ fvs _ _ _ -> Set.fromList fvs
+  RecLam2 _ fvs _ _ _ _ -> Set.fromList fvs

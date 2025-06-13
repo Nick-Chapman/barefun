@@ -30,6 +30,7 @@ data Exp
   | Lam Position Id Exp
   | Lam2 Position Id Id Exp -- TODO LamN
   | RecLam Position Id Id Exp
+  | RecLam2 Position Id Id Id Exp -- TODO RecLamN
   | App Exp Position Exp
   | App2 Exp Position Exp Exp -- TODO AppN
   | Let Position Id Exp Exp
@@ -57,6 +58,7 @@ sizeExp = \case
   Lam _ _ body -> 1 + sizeExp body
   Lam2 _ _ _ body -> 2 + sizeExp body
   RecLam _ _ _ body -> 2 + sizeExp body
+  RecLam2 _ _ _ _ body -> 3 + sizeExp body
   App fun _ arg -> sizeExp fun + sizeExp arg
   App2 fun _ arg1 arg2 -> sizeExp fun + sizeExp arg1 + sizeExp arg2
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
@@ -77,7 +79,8 @@ provenanceExp = \case
 
   Let pos _ _ _ -> ("uLET", pos)
   Prim pos _ _ -> ("prim", pos)
-  RecLam pos _ _ _ -> ("reclam",pos)
+  RecLam pos _ _ _ -> undefined ("reclam",pos) -- never seen these
+  RecLam2 pos _ _ _ _ -> undefined ("reclam2",pos)
   Match pos _ _ -> ("case",pos)
 
 ----------------------------------------------------------------------
@@ -114,6 +117,7 @@ prettyTop control = pretty
       Lam2 _ x1 x2 body -> bracket $ indented ("fun [" ++ prettyId x1 ++ "," ++ prettyId x2 ++ "] ->") (pretty body)
 
       RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
+      RecLam2 _ f x0 x1 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ prettyId x0 ++ "," ++ prettyId x1 ++ "] ->") (pretty body)
       App func _ arg -> bracket $ jux (pretty func) (pretty arg)
       App2 func _ arg1 arg2 -> bracket $ jux (pretty func) (jux (pretty arg1) (pretty arg2))
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
@@ -185,6 +189,10 @@ eval env@Env{venv} = \case
   RecLam _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
+  RecLam2 _ f x0 x1 body -> \k -> do
+    let me = VFunc (\arg0 k -> k $ VFunc (\arg1 k -> eval env { venv = Map.insert f me $ Map.insert x0 arg0 $ Map.insert x1 arg1 venv } body k))
+    k me
+
   App2 eFunc pos eArg1 eArg2 -> \k -> do -- right->left eval order
     eval env eArg2 $ \arg2 -> do
       eval env eArg1 $ \arg1 -> do

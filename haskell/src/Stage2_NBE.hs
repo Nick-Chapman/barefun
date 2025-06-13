@@ -15,19 +15,26 @@ import qualified Stage1_EXP as SRC
 ----------------------------------------------------------------------
 -- The NBE compilation stage constructs multi-lam/app
 
-mkLam :: Position -> Id -> Exp -> M Exp
-mkLam p x1 body = do
+mkRecLam :: Position -> Id -> Id -> Exp -> M Exp
+mkRecLam p f x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
-    (True, Lam _ x2 e) -> pure $ Lam2 p x1 x2 e
-    (_, e) -> pure $ Lam p x1 e
+    (True, Lam _ x1 body) -> pure $ RecLam2 p f x0 x1 body
+    (_, _) -> pure $ RecLam p f x0 body
+
+mkLam :: Position -> Id -> Exp -> M Exp
+mkLam p x0 body = do
+  enabled <- MultiLamEnabled
+  case (enabled, body) of
+    (True, Lam _ x1 e) -> pure $ Lam2 p x0 x1 e
+    (_, _) -> pure $ Lam p x0 body
 
 mkApp :: Exp -> Position -> Exp -> M Exp
-mkApp f p a2 = do
+mkApp fun p arg = do
   enabled <- MultiAppEnabled
-  case (enabled, f) of
-    (True, App f p a1) -> pure $ App2 f p a1 a2
-    (_, _) -> pure $ App f p a2
+  case (enabled, fun) of
+    (True, App fun p arg0) -> pure $ App2 fun p arg0 arg
+    (_, _) -> pure $ App fun p arg
 
 ----------------------------------------------------------------------
 -- The NBE compilation stage does not change the representation
@@ -162,9 +169,13 @@ reflectLit = \case
 
 reflect :: Env -> Exp -> M SemValue
 reflect env = \case
+  -- These are undefined because the multi-arg versions introduced only by the NbE stage
+  -- TODO: Stage2/NBE should have it's own type for the result of the transform
   Lam2{} ->
     undefined
   App2{} ->
+    undefined
+  RecLam2{} ->
     undefined
 
   Var _pos x -> do
@@ -189,7 +200,7 @@ reflect env = \case
     f' <- fresh f
     let env' = Map.insert x (syn x') (Map.insert f (syn f') env)
     body <- Reset (norm env' body)
-    pure $ Syntax $ RecLam pos f' x' body
+    Syntax <$> mkRecLam pos f' x' body
   App e1 p e2 -> do
     e1 <- reflect env e1
     e2 <- reflect env e2

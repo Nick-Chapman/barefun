@@ -27,7 +27,7 @@ import Stage5_Compilation
   )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
-gcAtEverySafePoint = True -- crazy slow -- TODO: control this with command line flag
+gcAtEverySafePoint = False -- crazy slow -- TODO: control this with command line flag
 
 hemiSizeInBytes :: Int
 hemiSizeInBytes = 3600
