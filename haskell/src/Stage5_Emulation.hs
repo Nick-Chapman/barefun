@@ -20,17 +20,17 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM
 import Stage5_Compilation
-  ( frameReg,argReg,argOut
+  ( bytesPerWord
+  , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn,flipArgSpace
   , overapp2for1Code
   )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
-gcAtEverySafePoint = True -- but slows "dune test" -- TODO: make this on a flag
+gcAtEverySafePoint = True -- crazy slow -- TODO: control this with command line flag
 
 hemiSizeInBytes :: Int
---hemiSizeInBytes = 3600 -- 0x1000 -- 10000 -- 3000 was ok for sham; 5000 is needed for filesystem example
 hemiSizeInBytes = 3600
 
 sizeRedzone :: Int -- interrupts in runtime.asm
@@ -232,10 +232,9 @@ evacuateArgs :: Int -> M ()
 evacuateArgs numArgs = sequence_ [ evacOne (bytesPerWord * i) | i <- [ 0.. numArgs-1 ] ]
   where
     evacOne offset = do
-      -- TODO: knowledge about Si should come from calling conventions
-      w <- getMemIndirectOffset Si offset
+      w <- getMemIndirectOffset argReg offset
       evacuate w >>= \case
-        Just w' -> setMemIndirectOffset Si offset w'
+        Just w' -> setMemIndirectOffset argReg offset w'
         Nothing -> pure ()
 
 evacuateCurrentCont :: M ()
@@ -417,9 +416,10 @@ execOp = \case
       _ ->
         error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
 
+pap1of2 :: M ()
+pap1of2 = error "pap1of2"
 
--- TODO: reword as execution of constructed code
-overapp2for1 :: M () -> M ()
+overapp2for1 :: M () -> M () -- TODO: write as code instead of behaviour
 overapp2for1 cont = do
   Debug "[overapp2for1]...\n"
   let numOverArgs = 1
@@ -430,7 +430,7 @@ overapp2for1 cont = do
   let arg1source :: Source = SMemIndirectOffset argReg (bytesPerWord * indexOfFirstOverArg)
   w1 :: Word <- evalSource arg1source
   execPushAlloc AllocForUser w1
-  wCC :: Word <- evalSource getCurrentCont
+  wCC :: Word <- evalSource (SMemOffset labelCurrentCont 0)
   execPushAlloc AllocForUser wCC
   execPushAlloc AllocForUser (WCodeLabel overapp2for1Label)
   let op :: Op = OpStore (TMemOffset labelCurrentCont 0) Sp
@@ -439,14 +439,6 @@ overapp2for1 cont = do
   execPushAlloc AllocForUser (WBlockDescriptor desc)
   Debug "[overapp2for1]...done\n"
   cont
-
-
-getCurrentCont :: Source -- Copied from stage5 compile
-getCurrentCont = SMemOffset labelCurrentCont 0
-
-
-pap1of2 :: M ()
-pap1of2 = error "pap1of2"
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- performs sanity checking when a block-descriptor is pushed
@@ -598,8 +590,7 @@ execBare = \case
 
 
 jumpBare :: AllocBareBios -> M ()
-jumpBare = \case
-  -- TODO: write this as op-code instead of behaviour
+jumpBare = \case -- TODO: write as code instead of behaviour
   AllocBare_make_bytes -> do
     execOp flipArgSpace $ do
     n <- deNum <$> getMemIndirectOffset argReg 0
@@ -947,12 +938,6 @@ state0 dmap = State
       , (aUnit, tagging tUnit)
       , (aFinalCont, WCodeLabel finalCodeLabel)
       , (aCurrentCont, WAddr aFinalCont)
-      -- at the moment, every entry-code acts as a single-arg function
-      -- if we are testing with gcAtEverySafePoint, this include the jump "Start" code
-      -- and so when this initaitedteh GC, then we need for there to a valid first-arg
-      -- when we make multi-args work, then every call will need to communicate the #actuals passed (in ax?)
-      -- and so then we can set that to be 0, and the following wont be necesary
---      , (AStatic labelArgsB 0, arbitrary) -- TODO: remove this when GC looks at #args
       ]
     user =
       concat [ [(AStatic lab i,w) | (i,w) <- specsWords specs ]

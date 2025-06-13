@@ -68,7 +68,7 @@ data Temp = Temp Int deriving (Eq,Ord)
 firstFrameIndexForLambdas,firstFrameIndexForContinuations,firstTempIndex,firstGlobalIndex :: Int
 firstFrameIndexForLambdas = 1
 firstFrameIndexForContinuations = 2
-firstTempIndex = 1
+firstTempIndex = 1 -- TODO: Justify these "first" values. Where else must match?
 firstGlobalIndex = 1
 
 -- need 29 temps for the thrice example; no reason to not have more; but want to know when required

@@ -2,6 +2,7 @@
 module Stage5_Compilation
   ( compile
   -- calling conventions; used in stage5 emulator
+  , bytesPerWord
   , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn, flipArgSpace
@@ -21,6 +22,9 @@ import qualified Stage4_CCF as SRC
 import Stage5_ASM
 
 ----------------------------------------------------------------------
+
+bytesPerWord :: Int
+bytesPerWord = 2
 
 -- Calling conventions: arg/frame in registers
 frameReg,argReg,argOut :: Reg
@@ -56,12 +60,6 @@ codeReturn =
 flipArgSpace :: Op
 flipArgSpace = OpExchange argReg argOut
 
-setArgOutN :: Int -> Source -> Op
-setArgOutN = \case
-  0 -> setArgOut
-  1 -> setArgOut2
-  n -> error (show ("setArgOutN",n))
-
 -- Would be great to actually see this code in the compiled output,
 -- rather than being magic'ed into existence in the emulator.
 -- Thus avoiding repeating it in runtime.asm
@@ -76,24 +74,18 @@ overapp2for1Code = do
         ] (Done (JumpIndirect frameReg))
     where
       move tI sI = -- as normal: target <- source
-        setArgOutN tI (compileLoc (SRC.InFrame sI))
+        setArgOut tI (compileLoc (SRC.InFrame sI))
 
 ----------------------------------------------------------------------
 -- Compile
 
 type Transformed = Image
 
-targetOfTemp :: SRC.Temp -> Target
-targetOfTemp = \case
-  SRC.Temp 0 -> error "targetOfTemp/temps start from 1"
-  SRC.Temp n -> TMemOffset labelTemps (bytesPerWord * n)
-
 -- Ax is the general scratch register
 -- Bx is used for case-scrutinee
 
 compile :: SRC.Image -> Transformed
 compile x =
-  -- not entry code. no args are being passed. TODO: avoid even cutting coded here?
   runAsm (compileImage x >>= cutEntryCode 0 "Start")
 
 compileImage :: SRC.Image -> Asm Code
@@ -141,35 +133,29 @@ cutEntryCode desiredNumArgs name code = do
           , MacroHeapCheck { need }
           ] code
 
-setArgOut :: Source -> Op -- TODO: SetArgOutN
-setArgOut source = setTarget (TRegIndirectOffset argOut 0) source
-
-setArgOut2 :: Source -> Op
-setArgOut2 source = setTarget (TRegIndirectOffset argOut bytesPerWord) source
-
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
   SRC.Return _pos res -> do
-    pure $ Do (setArgOut (compileRef res)) codeReturn
+    pure $ Do (setArgOut 0 (compileRef res)) codeReturn
 
   SRC.Tail fun _pos arg -> do
     pure $ doOps
-      [ setArgOut (compileRef arg)
+      [ setArgOut 0 (compileRef arg)
       , OpMove frameReg (compileRef fun)
       , OpMove Ax (SLit (LNum 1))
       ] (Done (JumpIndirect frameReg))
 
   SRC.Tail2 fun _pos arg1 arg2 -> do
     pure $ doOps
-      [ setArgOut (compileRef arg1)
-      , setArgOut2 (compileRef arg2)
+      [ setArgOut 0 (compileRef arg1)
+      , setArgOut 1 (compileRef arg2)
       , OpMove frameReg (compileRef fun)
       , OpMove Ax (SLit (LNum 2))
       ] (Done (JumpIndirect frameReg))
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
-      [ setArgOut (compileRef arg)
+      [ setArgOut 0 (compileRef arg)
       , OpMove Ax (SLit (LNum 1))
       ] (Done (JumpBare AllocBare_make_bytes))
 
@@ -204,6 +190,9 @@ compileCode = \case
         let ops1 = [ OpMove scrutReg (compileRef scrut) ]
         ops2 <- concat <$> mapM (compileArm scrutReg) (reverse armsR)
         doOps (ops1 ++ ops2) <$> compileArmTaken scrutReg lastArm
+
+setArgOut :: Int -> Source -> Op
+setArgOut i source = setTarget (TRegIndirectOffset argOut (i * bytesPerWord)) source
 
 compileArm :: Reg -> SRC.Arm -> Asm [Op]
 compileArm scrutReg arm =  do
@@ -485,15 +474,13 @@ compileLoc :: SRC.Location -> Source
 compileLoc = \case
   SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
   SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
-  SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
+  SRC.InTemp (SRC.Temp n) -> SMemOffset labelTemps (bytesPerWord * n)
   SRC.TheArg -> SMemIndirectOffset argReg 0
   SRC.TheArg2 -> SMemIndirectOffset argReg bytesPerWord
   SRC.TheFrame -> SReg frameReg
 
-sourceOfTarget :: Target -> Source
-sourceOfTarget = \case
-  TRegIndirectOffset{} -> undefined -- TODO: why not triggered?
-  TMemOffset lab n -> SMemOffset lab n
+targetOfTemp :: SRC.Temp -> Target
+targetOfTemp (SRC.Temp n) = TMemOffset labelTemps (bytesPerWord * n)
 
 lnumTagging :: Number -> Lit
 lnumTagging n = LNum (2 * n + 1)

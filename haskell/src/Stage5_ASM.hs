@@ -1,7 +1,6 @@
 -- | Define types for x86 assembly, and printer suitable for nasm
 module Stage5_ASM
-  ( bytesPerWord
-  , Reg(..)
+  ( Reg(..)
   , Image(..)
   , Lit(..)
   , Code(..)
@@ -24,9 +23,6 @@ import Text.Printf (printf)
 import Value (Number)
 import qualified Data.Map as Map
 import qualified Stage4_CCF as SRC
-
-bytesPerWord :: Int -- TODO: move to compiler?
-bytesPerWord = 2
 
 data Reg = Ax | Bx | Cx | Dx | Sp | Bp | Si | Di
   deriving (Eq,Ord)
@@ -71,7 +67,7 @@ data Jump
   | JumpBare AllocBareBios
 
 data Target
-  = TRegIndirectOffset Reg Int -- TODO: extend to take offset
+  = TRegIndirectOffset Reg Int
   | TMemOffset DataLabel Int
 
 data Source
