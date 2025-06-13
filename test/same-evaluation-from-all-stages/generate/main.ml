@@ -1,6 +1,6 @@
 
 let flags_for_example = function
-  | _ -> "-mapp" (* works for all examples. woo hoo! *)
+  | _ -> "-mlam" (* works for all examples. woo hoo! -- also with -mlam or both *)
 
 let generate_rules x =
   let capX = String.capitalize_ascii x in

@@ -23,9 +23,11 @@ import Stage5_Compilation
   , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn,flipArgSpace
+
   , overapp2for1SaveCode
-  , overapp2for1RestoreLabel
-  , overapp2for1RestoreCode
+  , pap1of2SaveCode
+  , cmapInternal
+  , finalCodeLabel
   )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
@@ -419,7 +421,9 @@ execOp = \case
         error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
 
 pap1of2 :: M ()
-pap1of2 = error "pap1of2"
+pap1of2 =
+  WithCodeLabel (CodeLabel 0 "pap1of2Save") $ do
+  execCode pap1of2SaveCode
 
 overapp2for1 :: M ()
 overapp2for1 =
@@ -733,13 +737,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
 
     k0 _s () = IDone
 
-    cmapInternal = Map.fromList
-      [ (finalCodeLabel, finalCode)
-      , (overapp2for1RestoreLabel, overapp2for1RestoreCode)
-      ]
-
     cmap = Map.union cmapInternal cmapUser
-    finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
 
     trace :: String -> Interaction -> Interaction
     trace = case traceFlag of
@@ -968,6 +966,3 @@ aUnit = AStatic dUnit 0
 
 dUnit :: DataLabel
 dUnit = DataLabelR "Bare_unit"
-
-finalCodeLabel :: CodeLabel
-finalCodeLabel = CodeLabel 0 "FINAL"

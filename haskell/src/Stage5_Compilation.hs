@@ -9,7 +9,14 @@ module Stage5_Compilation
   , overapp2for1SaveCode
   , overapp2for1RestoreLabel
   , overapp2for1RestoreCode
-  ) where
+
+  , pap1of2SaveCode
+  , pap1of2RestoreLabel
+  , pap1of2RestoreCode
+  , cmapInternal
+  , finalCodeLabel
+
+) where
 
 import Primitive (Primitive)
 import Control.Monad (ap,liftM)
@@ -24,11 +31,12 @@ import qualified Stage4_CCF as SRC
 import Stage5_ASM
 
 ----------------------------------------------------------------------
+-- Calling conventions
 
 bytesPerWord :: Int
 bytesPerWord = 2
 
--- Calling conventions: arg/frame in registers
+-- arg/frame in registers
 frameReg,argReg,argOut :: Reg
 frameReg = Bp
 argReg = Si
@@ -50,7 +58,7 @@ labelTemps = DataLabelR "Temps"
 labelCurrentCont :: DataLabel
 labelCurrentCont = DataLabelR "CurrentCont"
 
--- this is the calling convention to "return" to the current continuation
+-- "return" to the current continuation
 codeReturn :: Code
 codeReturn =
   Do (OpMany [ OpMove frameReg getCurrentCont
@@ -58,23 +66,50 @@ codeReturn =
              , OpMove Ax (SLit (LNum 1))
              ]) (Done (JumpIndirect frameReg))
 
--- this is the calling convention to flip the arg-spaces when entering a code block
+-- "tail-call" the given source with N args (already setup argOut register)
+codeTail :: Int -> Source -> Code
+codeTail n source =
+  doOps [ OpMove frameReg source
+        , OpMove Ax (SLit (LNum (fromIntegral n)))
+        ] (Done (JumpIndirect frameReg))
+
+-- prelude for every code-block: flip the arg-spaces when entering a code block
 flipArgSpace :: Op
 flipArgSpace = OpExchange argReg argOut
 
--- overapp...
+cmapInternal :: Map CodeLabel Code
+cmapInternal = Map.fromList
+  [ (finalCodeLabel, finalCode)
+  , (pap1of2RestoreLabel, pap1of2RestoreCode)
+  , (overapp2for1RestoreLabel, overapp2for1RestoreCode)
+  ]
+
+finalCodeLabel :: CodeLabel
+finalCodeLabel = CodeLabel 0 "FINAL"
+
+overapp2for1RestoreLabel :: CodeLabel
+overapp2for1RestoreLabel = CodeLabel 0 "OverApp2for1Restore"
+
+pap1of2RestoreLabel :: CodeLabel
+pap1of2RestoreLabel = CodeLabel 0 "Pap1of2Restore"
+
+finalCode :: Code
+finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
+
+----------------------------------------------------------------------
+-- overapp/pap
 -- Would be great to actually see this code in the compiled output,
--- rather than being magic'ed into existence in the emulator.
--- Thus avoiding repeating it in runtime.asm
+-- Rather than being magic'ed into existence in the emulator.
+-- And thus avoiding repeating it in runtime.asm
 
 overapp2for1SaveCode :: Code
 overapp2for1SaveCode = do
   let numOverArgs = 1
   let indexOfFirstOverArg = 1
-  let numWordsForDesc = numOverArgs + 1 + 1 -- the over-args; the current-cont; the re-app code pointer
+  let numWordsForDesc = numOverArgs + 1 + 1 -- the over-args; the current-cont; the restore code pointer
   let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
   let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
-  Do (OpMany [ MacroHeapCheck { heapBytesNeeded }
+  Do (OpMany [ MacroHeapCheck { heapBytesNeeded } -- TODO prefer doOPs to OpMany
              , OpPush (SMemIndirectOffset argReg (bytesPerWord * indexOfFirstOverArg))
              , OpPush getCurrentCont
              , OpPush (SLit (LCodeLabel overapp2for1RestoreLabel))
@@ -82,22 +117,34 @@ overapp2for1SaveCode = do
              , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
              ]) Fallthrough
 
-
-overapp2for1RestoreLabel :: CodeLabel
-overapp2for1RestoreLabel = CodeLabel 0 "OverApp2for1Restore"
-
 overapp2for1RestoreCode :: Code
 overapp2for1RestoreCode = do
   let firstContFrammeIndex = 2
   let firstArgIndex = 0
   doOps [ flipArgSpace
-        , move (firstArgIndex+0) firstContFrammeIndex -- first overarg passed as first arg
-        , OpMove frameReg (compileLoc (SRC.TheArg 0)) -- after args are set
-        , OpMove Ax (SLit (LNum 1))
-        ] (Done (JumpIndirect frameReg))
-    where
-      move tI sI = -- as normal: target <- source
-        setArgOut tI (compileLoc (SRC.InFrame sI))
+        , setArgOut (firstArgIndex+0) (compileLoc (SRC.InFrame firstContFrammeIndex))
+        ] (codeTail 1 (compileLoc (SRC.TheArg 0)))
+
+pap1of2SaveCode :: Code
+pap1of2SaveCode = do
+  let numPassedArgs = 1
+  let numWordsForDesc = numPassedArgs + 1 + 1 -- the over-args; the function; the restore code pointer
+  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
+  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
+  doOps [ MacroHeapCheck { heapBytesNeeded }
+        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 0)) -- save passed arg-0
+        , OpPush (SReg frameReg) -- save this func
+        , OpPush (SLit (LCodeLabel pap1of2RestoreLabel))
+        , setArgOut 0 (SReg Sp)
+        , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
+        ] codeReturn
+
+pap1of2RestoreCode :: Code
+pap1of2RestoreCode = do
+  doOps [ flipArgSpace
+        , setArgOut 0 (compileLoc (SRC.InFrame 2))
+        , setArgOut 1 (compileLoc (SRC.TheArg 0))
+        ] (codeTail 2 (compileLoc (SRC.InFrame 1)))
 
 
 ----------------------------------------------------------------------
@@ -165,17 +212,13 @@ compileCode = \case
   SRC.Tail fun _pos arg -> do
     pure $ doOps
       [ setArgOut 0 (compileRef arg)
-      , OpMove frameReg (compileRef fun)
-      , OpMove Ax (SLit (LNum 1))
-      ] (Done (JumpIndirect frameReg))
+      ] (codeTail 1 (compileRef fun))
 
   SRC.Tail2 fun _pos arg1 arg2 -> do
     pure $ doOps
       [ setArgOut 0 (compileRef arg1)
       , setArgOut 1 (compileRef arg2)
-      , OpMove frameReg (compileRef fun)
-      , OpMove Ax (SLit (LNum 2))
-      ] (Done (JumpIndirect frameReg))
+      ] (codeTail 2 (compileRef fun))
 
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
