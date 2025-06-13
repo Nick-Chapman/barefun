@@ -53,8 +53,7 @@ data Atomic
   | Lam2 [Ref] [Ref] Ref Ref Code
   | RecLam [Ref] [Ref] Ref Ref Code -- TODO: need versions for N-args
 
-data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame
-  | TheArg | TheArg2 -- TODO: unify; take int
+data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg Int
   deriving (Eq,Ord)
 
 data Ref
@@ -154,8 +153,7 @@ instance Show Location where
     InGlobal g -> show g
     InFrame n -> "f" ++ show n
     InTemp t -> show t
-    TheArg -> "arg"
-    TheArg2 -> "arg2"
+    TheArg n -> "arg" ++ show n
     TheFrame -> "me"
 
 instance Show Global where
@@ -300,7 +298,7 @@ compileCtop = compileC firstTempIndex
               Wrap (LetTop (x,xRefG) rhs) $ compileC nextTemp cenv body
 
       SRC.PushContinuation fvs (x,later) first -> do
-        let xRef = Ref x TheArg
+        let xRef = Ref x (TheArg 0)
         first <- compileC nextTemp cenv first
         (cenv,pre,post) <- pure $ frame firstFrameIndexForContinuations cenv fvs
         later <- compileCtop (Map.insert x xRef cenv) later
@@ -344,7 +342,7 @@ compileA cenv = \case
         pure $ Left (ConApp c xs')
 
   SRC.Lam _ fvs x body -> do
-    let argRef = Ref x TheArg
+    let argRef = Ref x (TheArg 0)
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
     body <- compileCtop (Map.insert x argRef cenv) body
     case (pre,post) of
@@ -355,8 +353,8 @@ compileA cenv = \case
         pure $ Left (Lam pre post argRef body)
 
   SRC.Lam2 _ fvs x1 x2 body -> do
-    let argRef1 = Ref x1 TheArg
-    let argRef2 = Ref x2 TheArg2
+    let argRef1 = Ref x1 (TheArg 0)
+    let argRef2 = Ref x2 (TheArg 1)
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
     body <- compileCtop (Map.insert x1 argRef1 $ Map.insert x2 argRef2 cenv) body
     case (pre,post) of
@@ -368,7 +366,7 @@ compileA cenv = \case
 
   SRC.RecLam _ fvs f x body -> do
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
-    let xRef = Ref x TheArg
+    let xRef = Ref x (TheArg 0)
     case (pre,post) of
       ([],[]) -> do
         g <- GlobalRef

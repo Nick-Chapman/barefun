@@ -69,7 +69,7 @@ overapp2for1Code = do
   let firstArgIndex = 0
   doOps [ flipArgSpace
         , move (firstArgIndex+0) firstContFrammeIndex -- first overarg passed as first arg
-        , OpMove frameReg (compileLoc SRC.TheArg) -- after args are set
+        , OpMove frameReg (compileLoc (SRC.TheArg 0)) -- after args are set
         , OpMove Ax (SLit (LNum 1))
         ] (Done (JumpIndirect frameReg))
     where
@@ -475,8 +475,7 @@ compileLoc = \case
   SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
   SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
   SRC.InTemp (SRC.Temp n) -> SMemOffset labelTemps (bytesPerWord * n)
-  SRC.TheArg -> SMemIndirectOffset argReg 0
-  SRC.TheArg2 -> SMemIndirectOffset argReg bytesPerWord
+  SRC.TheArg n -> SMemIndirectOffset argReg (bytesPerWord * n)
   SRC.TheFrame -> SReg frameReg
 
 targetOfTemp :: SRC.Temp -> Target

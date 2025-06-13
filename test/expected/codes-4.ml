@@ -4,7 +4,7 @@ let g2 = Unit0 in
 let g3 = Unit0 in
 let g4 = Unit0 in
 let g5 = Unit0 in
-let g1 = fun arg k ->
+let g1 = fun arg0 k ->
   let t1 = PRIM_Wait_for_interrupt(g2) in
   let t2 = PRIM_Is_keyboard_ready(g3) in
   match t2 with
@@ -14,9 +14,9 @@ let g1 = fun arg k ->
   | false0 -> g1 g5 k in
 let g7 = Unit0 in
 let g8 = Unit0 in
-let g6 = fun arg k ->
-  let k = [], fun [] arg ->
-    let t1 = PRIM_CharOrd(arg) in
+let g6 = fun arg0 k ->
+  let k = [], fun [] arg0 ->
+    let t1 = PRIM_CharOrd(arg0) in
     let t2 = PRIM_ModInt(t1,10) in
     let t3 = PRIM_DivInt(t1,10) in
     let t4 = PRIM_ModInt(t3,10) in
@@ -37,18 +37,18 @@ let g6 = fun arg k ->
   g1 g7 k in
 let g10 = "Press/release keys; see the scan codes...\n" in
 let g11 = Unit0 in
-let g9 = fun arg k ->
-  let t1 = PRIM_LessInt(arg,42) in
+let g9 = fun arg0 k ->
+  let t1 = PRIM_LessInt(arg0,42) in
   match t1 with
   | true1 ->
-    let t2 = PRIM_StringIndex(g10,arg) in
+    let t2 = PRIM_StringIndex(g10,arg0) in
     let t3 = PRIM_PutChar(t2) in
-    let t4 = PRIM_AddInt(arg,1) in
+    let t4 = PRIM_AddInt(arg0,1) in
     g9 t4 k
   | false0 -> k g11 in
 let g12 = Unit0 in
 let g13 = Unit0 in
-let k = [], fun [] arg ->
+let k = [], fun [] arg0 ->
   let t1 = PRIM_Init_interrupt_mode(g12) in
   g6 g13 k in
 g9 0 k
