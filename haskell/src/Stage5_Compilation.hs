@@ -2,7 +2,6 @@
 module Stage5_Compilation
   ( compile
   -- calling conventions; used in stage5 emulator
-  , enableArgIndirection
   , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn, flipArgSpace
@@ -22,10 +21,6 @@ import qualified Stage4_CCF as SRC
 import Stage5_ASM
 
 ----------------------------------------------------------------------
--- calling conventions
-
-enableArgIndirection :: Bool
-enableArgIndirection = True -- TODO: make changes to runtime.asm so this can be flipped
 
 -- Calling conventions: arg/frame in registers
 frameReg,argReg,argOut :: Reg
@@ -147,16 +142,10 @@ cutEntryCode desiredNumArgs name code = do
           ] code
 
 setArgOut :: Source -> Op -- TODO: SetArgOutN
-setArgOut source =
-  if enableArgIndirection
-  then setTarget (TRegIndirectOffset argOut 0) source
-  else OpMove argOut source
+setArgOut source = setTarget (TRegIndirectOffset argOut 0) source
 
 setArgOut2 :: Source -> Op
-setArgOut2 source =
-  if enableArgIndirection
-  then setTarget (TRegIndirectOffset argOut bytesPerWord) source
-  else undefined
+setArgOut2 source = setTarget (TRegIndirectOffset argOut bytesPerWord) source
 
 compileCode :: SRC.Code -> Asm Code
 compileCode = \case
@@ -497,14 +486,8 @@ compileLoc = \case
   SRC.InGlobal g -> SLit (LStatic (DataLabelG g))
   SRC.InFrame n -> SMemIndirectOffset frameReg (bytesPerWord * n)
   SRC.InTemp temp -> sourceOfTarget (targetOfTemp temp)
-  SRC.TheArg ->
-    if enableArgIndirection
-    then SMemIndirectOffset argReg 0
-    else SReg argReg
-  SRC.TheArg2 ->
-    if enableArgIndirection
-    then SMemIndirectOffset argReg bytesPerWord
-    else undefined
+  SRC.TheArg -> SMemIndirectOffset argReg 0
+  SRC.TheArg2 -> SMemIndirectOffset argReg bytesPerWord
   SRC.TheFrame -> SReg frameReg
 
 sourceOfTarget :: Target -> Source

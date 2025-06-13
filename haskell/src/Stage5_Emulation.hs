@@ -20,8 +20,7 @@ import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM
 import Stage5_Compilation
-  ( enableArgIndirection
-  , frameReg,argReg,argOut
+  ( frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn,flipArgSpace
   , overapp2for1Code
@@ -230,22 +229,14 @@ runGC = do
                 innerLoop nextScanPointer
 
 evacuateArgs :: Int -> M ()
-evacuateArgs numArgs = do
-  case enableArgIndirection of
-    False -> do
-      w <- GetReg argReg
+evacuateArgs numArgs = sequence_ [ evacOne (bytesPerWord * i) | i <- [ 0.. numArgs-1 ] ]
+  where
+    evacOne offset = do
+      -- TODO: knowledge about Si should come from calling conventions
+      w <- getMemIndirectOffset Si offset
       evacuate w >>= \case
-        Just w' -> SetReg argReg w'
+        Just w' -> setMemIndirectOffset Si offset w'
         Nothing -> pure ()
-    True -> do
-      sequence_ [ evacOne (bytesPerWord * i) | i <- [ 0.. numArgs-1 ] ]
-      where
-        evacOne offset = do
-          -- TODO: knowledge about Si should come from calling conventions
-          w <- getMemIndirectOffset Si offset
-          evacuate w >>= \case
-            Just w' -> setMemIndirectOffset Si offset w'
-            Nothing -> pure ()
 
 evacuateCurrentCont :: M ()
 evacuateCurrentCont = do
@@ -610,9 +601,8 @@ jumpBare :: AllocBareBios -> M ()
 jumpBare = \case
   -- TODO: write this as op-code instead of behaviour
   AllocBare_make_bytes -> do
-    -- flip si/di
     execOp flipArgSpace $ do
-    n <- deNum <$> getArg
+    n <- deNum <$> getMemIndirectOffset argReg 0
     let nBytes = n `div` 2
     let nBytesAligned = fromIntegral (2 * ((nBytes+1) `div` 2))
     let need = nBytesAligned + 2 + 2
@@ -621,22 +611,10 @@ jumpBare = \case
     slideStackPointer AllocForUser nBytesAligned
     execPushAlloc AllocForUser (WNum n) -- tagged length word; part of user data
     w <- GetReg Sp
-    setArgOut w
+    setMemIndirectOffset argOut 0 w
     let desc = BlockDescriptor RawData (nBytesAligned + bytesPerWord) -- +2 for the length word
     execPushAlloc AllocForUser (WBlockDescriptor desc) -- size word; part of GC data
     execCode codeReturn
-
-getArg :: M Word
-getArg =
-  if enableArgIndirection -- TODO: when this is killed. inline getArg/setArgOut
-  then getMemIndirectOffset Si 0
-  else GetReg argReg
-
-setArgOut :: Word -> M ()
-setArgOut w = do
-  if enableArgIndirection
-  then setMemIndirectOffset Di 0 w
-  else SetReg argOut w
 
 setMemChar :: Addr -> Char -> M ()
 setMemChar a x = do
