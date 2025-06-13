@@ -126,11 +126,11 @@ compileTopRef = \case
 
 cutEntryCode :: Int -> String -> Code -> Asm CodeLabel
 cutEntryCode desiredNumArgs name code = do
-  need <- Needed code
+  heapBytesNeeded <- Needed code
   CutCode name $ do
     doOps [ flipArgSpace
           , MacroArgCheck { desiredNumArgs }
-          , MacroHeapCheck { need }
+          , MacroHeapCheck { heapBytesNeeded }
           ] code
 
 compileCode :: SRC.Code -> Asm Code

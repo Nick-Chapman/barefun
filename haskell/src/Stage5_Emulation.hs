@@ -400,8 +400,8 @@ execOp = \case
     SetReg r1 w2
     SetReg r2 w1
     cont
-  MacroHeapCheck { need } -> \cont -> do
-    heapCheck need
+  MacroHeapCheck { heapBytesNeeded } -> \cont -> do
+    heapCheck heapBytesNeeded
     cont
   MacroArgCheck { desiredNumArgs = desired } -> \cont -> do
     received :: Int <- (fromIntegral . deNum) <$> GetReg Ax

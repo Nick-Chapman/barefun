@@ -58,7 +58,7 @@ data Op -- target; source (Intel Syntax style)
   | OpDivModAxDx Reg -- dx:ax / sourceReg. quotiant->ax, remainder->dx
   | OpExchange Reg Reg
   | OpHlt
-  | MacroHeapCheck { need :: Int } -- TODO: rename heapBytesNeeded
+  | MacroHeapCheck { heapBytesNeeded :: Int }
   | MacroArgCheck { desiredNumArgs :: Int }
 
 data Jump
@@ -167,7 +167,7 @@ instance Show Op where
     OpDivModAxDx src -> "Div " ++ show src
     OpExchange r1 r2 -> printf "xchg %s, %s" (show r1) (show r2)
     OpHlt -> "hlt"
-    MacroHeapCheck { need } -> printf "Bare_heap_check(%d)" need
+    MacroHeapCheck { heapBytesNeeded } -> printf "Bare_heap_check(%d)" heapBytesNeeded
     MacroArgCheck { desiredNumArgs } -> printf "Bare_arg_check(%d)" desiredNumArgs
 
 instance Show Jump where
