@@ -15,7 +15,6 @@ import Value (Interaction(..))
 import Value (Number,tTrue,tFalse,tUnit)
 import qualified Data.Char as Char (chr,ord)
 import qualified Data.Map as Map
-import qualified Stage4_CCF as SRC
 import qualified Value as I (Tickable(Op,Alloc,GC,Copied))
 
 import Stage5_ASM
@@ -720,8 +719,6 @@ data M a where
   GetCode :: CodeLabel -> M Code
   SetReg :: Reg -> Word -> M ()
   GetReg :: Reg -> M Word
-  SetTemp :: SRC.Temp -> Word -> M ()
-  GetTemp :: SRC.Temp -> M Word
   SetMem :: Addr -> Word -> M ()
   GetMem :: Addr -> M Word
   SetFlagZ :: Bool -> M ()
@@ -778,7 +775,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
             } ()
 
     loop :: State -> M a -> (State -> a -> Interaction) -> Interaction
-    loop s@State{rmap,tmap,mem,flagZ,flagN} m k = case m of
+    loop s@State{rmap,mem,flagZ,flagN} m k = case m of
 
       Ret x -> k s x
       Bind m f -> loop s m $ \s a -> loop s (f a) k
@@ -831,12 +828,6 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       GetReg r -> k s (maybe err id $ Map.lookup r rmap)
         where err = WUninitialized $ show ("GetReg/uninitialized",r)
 
-      SetTemp t w -> do
-        k s { tmap = Map.insert t w tmap } ()
-
-      GetTemp t -> k s (maybe err id $ Map.lookup t tmap)
-        where err = WUninitialized $ show ("GetTemp/uninitialized",t)
-
       SetMem a w -> do
         if not (evenAddr a) then error (printf "SetMem(odd): %s" (show a)) else
           k s { mem = Map.insert a w mem } ()
@@ -879,7 +870,6 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
 
 data State = State
   { rmap :: Map Reg Word
-  , tmap :: Map SRC.Temp Word -- TODO: remove this along with unused [GS]etTemp
   , mem :: Map Addr Word
   , flagZ :: Bool
   , flagN :: Bool
@@ -898,7 +888,6 @@ state0 :: Map DataLabel [DataSpec] -> State
 state0 dmap = State
   { mem
   , rmap
-  , tmap = Map.empty
   , flagZ = error "flagZ/uninitialized"
   , flagN = error "flagN/uninitialized"
   , countOps = 0
