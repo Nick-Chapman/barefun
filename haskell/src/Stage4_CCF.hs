@@ -71,7 +71,7 @@ firstFrameIndexForContinuations = 2
 firstTempIndex = 1 -- TODO: Justify these "first" values. Where else must match?
 firstGlobalIndex = 1
 
--- need 29 temps for the thrice example; no reason to not have more; but want to know when required
+-- need 29 temps for the norm (thrice) example; no reason to not have more; but want to know when required
 -- sham example needs more
 -- filesystem needs 48 -- no, even more! -- 51
 -- haskell laziness means the example can startup, and reach the filesystem explorer prompt
