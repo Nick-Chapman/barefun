@@ -15,6 +15,7 @@ let select_versions_for_example = function
   | "secex" -> [5]
   | "sham" -> [5]
   | "tree" -> [5]
+  | "thrice" -> [2;3;4;5]
   | "two" -> [0;1;2;3;4;5]
   | _ -> []
 
