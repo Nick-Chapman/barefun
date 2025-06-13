@@ -40,6 +40,7 @@ data DataSpec
 data Code
   = Do Op Code
   | Done Jump
+  | Fallthrough
 
 data Op -- target; source (Intel Syntax style)
   = OpComment String
@@ -148,6 +149,7 @@ instance Show Code where
   show = \case
     Do op code -> "  " ++ show op ++ "\n" ++ show code
     Done jump -> "  " ++ show jump ++ "\n"
+    Fallthrough{} -> error "Fallthrough"
 
 instance Show Op where
   show = \case

@@ -6,7 +6,9 @@ module Stage5_Compilation
   , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn, flipArgSpace
-  , overapp2for1Code
+  , overapp2for1SaveCode
+  , overapp2for1RestoreLabel
+  , overapp2for1RestoreCode
   ) where
 
 import Primitive (Primitive)
@@ -60,11 +62,32 @@ codeReturn =
 flipArgSpace :: Op
 flipArgSpace = OpExchange argReg argOut
 
+-- overapp...
 -- Would be great to actually see this code in the compiled output,
 -- rather than being magic'ed into existence in the emulator.
 -- Thus avoiding repeating it in runtime.asm
-overapp2for1Code :: Code
-overapp2for1Code = do
+
+overapp2for1SaveCode :: Code
+overapp2for1SaveCode = do
+  let numOverArgs = 1
+  let indexOfFirstOverArg = 1
+  let numWordsForDesc = numOverArgs + 1 + 1 -- the over-args; the current-cont; the re-app code pointer
+  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
+  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
+  Do (OpMany [ MacroHeapCheck { heapBytesNeeded }
+             , OpPush (SMemIndirectOffset argReg (bytesPerWord * indexOfFirstOverArg))
+             , OpPush getCurrentCont
+             , OpPush (SLit (LCodeLabel overapp2for1RestoreLabel))
+             , setCurrentCont (SReg Sp)
+             , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
+             ]) Fallthrough
+
+
+overapp2for1RestoreLabel :: CodeLabel
+overapp2for1RestoreLabel = CodeLabel 0 "OverApp2for1Restore"
+
+overapp2for1RestoreCode :: Code
+overapp2for1RestoreCode = do
   let firstContFrammeIndex = 2
   let firstArgIndex = 0
   doOps [ flipArgSpace
@@ -75,6 +98,7 @@ overapp2for1Code = do
     where
       move tI sI = -- as normal: target <- source
         setArgOut tI (compileLoc (SRC.InFrame sI))
+
 
 ----------------------------------------------------------------------
 -- Compile
@@ -537,6 +561,7 @@ runAsm asm = finalImage
     needC = \case
       Do op code -> needOp (needC code) op
       Done{} -> 0
+      Fallthrough{} -> error "need/Fallthrough"
 
     needOp :: Int -> Op -> Int
     needOp after = \case

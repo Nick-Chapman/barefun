@@ -23,7 +23,9 @@ import Stage5_Compilation
   , frameReg,argReg,argOut
   , labelCurrentCont
   , codeReturn,flipArgSpace
-  , overapp2for1Code
+  , overapp2for1SaveCode
+  , overapp2for1RestoreLabel
+  , overapp2for1RestoreCode
   )
 
 gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
@@ -354,6 +356,7 @@ execCode = \case
   Done jump -> do
     TraceJump jump
     execJump jump
+  Fallthrough -> pure () -- used to end runtime generated code segments
 
 execOp :: Op -> M () -> M ()
 execOp = \case
@@ -410,34 +413,18 @@ execOp = \case
       (0,0) -> cont
       (1,1) -> cont
       (2,2) -> cont
-      (2,1) -> do overapp2for1 cont
-      (1,2) -> do pap1of2
+      (2,1) -> do overapp2for1; cont
+      (1,2) -> do pap1of2 -- ignore cont
       _ ->
         error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
 
 pap1of2 :: M ()
 pap1of2 = error "pap1of2"
 
-overapp2for1 :: M () -> M () -- TODO: write as code instead of behaviour
-overapp2for1 cont = do
-  Debug "[overapp2for1]...\n"
-  let numOverArgs = 1
-  let indexOfFirstOverArg = 1
-  let numWordsForDesc = numOverArgs + 1 + 1 -- the over-args; the current-cont; the re-app code pointer
-  let need = bytesPerWord * (numWordsForDesc + 1)
-  heapCheck need
-  let arg1source :: Source = SMemIndirectOffset argReg (bytesPerWord * indexOfFirstOverArg)
-  w1 :: Word <- evalSource arg1source
-  execPushAlloc AllocForUser w1
-  wCC :: Word <- evalSource (SMemOffset labelCurrentCont 0)
-  execPushAlloc AllocForUser wCC
-  execPushAlloc AllocForUser (WCodeLabel overapp2for1Label)
-  let op :: Op = OpStore (TMemOffset labelCurrentCont 0) Sp
-  execOp op $ do
-  let desc = BlockDescriptor Scanned (numWordsForDesc * bytesPerWord)
-  execPushAlloc AllocForUser (WBlockDescriptor desc)
-  Debug "[overapp2for1]...done\n"
-  cont
+overapp2for1 :: M ()
+overapp2for1 =
+  WithCodeLabel (CodeLabel 0 "overapp2for1Save") $ do
+  execCode overapp2for1SaveCode
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- performs sanity checking when a block-descriptor is pushed
@@ -717,6 +704,7 @@ data M a where
   TraceJump :: Jump -> M ()
   TraceAlloc :: AllocMode -> M ()
   GetCode :: CodeLabel -> M Code
+  WithCodeLabel :: CodeLabel -> M a -> M a -- for better tracing of pap/overapp gen code
   SetReg :: Reg -> Word -> M ()
   GetReg :: Reg -> M Word
   SetMem :: Addr -> Word -> M ()
@@ -747,7 +735,7 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
 
     cmapInternal = Map.fromList
       [ (finalCodeLabel, finalCode)
-      , (overapp2for1Label, overapp2for1Code)
+      , (overapp2for1RestoreLabel, overapp2for1RestoreCode)
       ]
 
     cmap = Map.union cmapInternal cmapUser
@@ -821,6 +809,11 @@ runM traceFlag debugFlag measureFlag Image{cmap=cmapUser,dmap} m = loop stateLoa
       GetCode lab -> do
         k s { lastCodeLabel = lab, offsetFromLastLabel = 0 } (maybe err id $ Map.lookup lab cmap)
         where err = error (show ("runM/GetCode",lab))
+
+      WithCodeLabel tempLab m -> do
+        let State{lastCodeLabel=oldLab,offsetFromLastLabel=oldOffset} = s
+        loop s { lastCodeLabel = tempLab, offsetFromLastLabel = 0 } m $ \s ->
+          k s { lastCodeLabel = oldLab, offsetFromLastLabel = oldOffset }
 
       SetReg r w -> do
         k s { rmap = Map.insert r w rmap } ()
@@ -978,6 +971,3 @@ dUnit = DataLabelR "Bare_unit"
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
-
-overapp2for1Label :: CodeLabel
-overapp2for1Label = CodeLabel 0 "OverApp2for1"
