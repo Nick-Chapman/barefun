@@ -35,7 +35,7 @@ gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
 gcAtEverySafePoint = False -- crazy slow -- TODO: control this with command line flag
 
 hemiSizeInBytes :: Int
-hemiSizeInBytes = 3600
+hemiSizeInBytes = 4 * 1024
 
 sizeRedzone :: Int -- interrupts in runtime.asm
 sizeRedzone = 100
@@ -411,7 +411,7 @@ execOp = \case
     cont
   MacroArgCheck { desiredNumArgs = desired } -> \cont -> do
     received :: Int <- (fromIntegral . deNum) <$> GetReg Ax
-    Debug (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
+    --Debug (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
     case (received,desired) of
       (0,0) -> cont
       (1,1) -> cont

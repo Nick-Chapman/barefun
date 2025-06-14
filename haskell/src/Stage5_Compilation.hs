@@ -327,10 +327,10 @@ compileAtomicTo who target = \case
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
   SRC.Lam pre _post _x0 body -> compileFunctionTo 1 who target pre body
   SRC.Lam2 pre _post _x0 _x1 body -> compileFunctionTo 2 who target pre body
-  SRC.Lam3 pre _post _x0 _x1 _x2 body -> undefined $ compileFunctionTo 3 who target pre body -- TODO never reached
+  SRC.Lam3 pre _post _x0 _x1 _x2 body -> compileFunctionTo 3 who target pre body
   SRC.RecLam pre _post _f _x0 body -> compileFunctionTo 1 who target pre body
   SRC.RecLam2 pre _post _f _x0 _x1 body -> compileFunctionTo 2 who target pre body
-  SRC.RecLam3 pre _post _f _x0 _x1 _x2 body -> undefined $ compileFunctionTo 3 who target pre body -- TODO never reached
+  SRC.RecLam3 pre _post _f _x0 _x1 _x2 body -> compileFunctionTo 3 who target pre body
 
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo target tag xs = do
