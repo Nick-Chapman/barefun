@@ -391,7 +391,7 @@ compileA cenv = \case
       _ ->
         pure $ Left (Lam2 pre post r0 r1 body)
 
-  SRC.Lam3 _ fvs x0 x1 x2 body -> do
+  SRC.Lam3 _ fvs x0 x1 x2 body -> undefined $ do -- TODO never reached
     let r0 = Ref x0 (TheArg 0)
     let r1 = Ref x1 (TheArg 1)
     let r2 = Ref x2 (TheArg 2)

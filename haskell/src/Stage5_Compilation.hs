@@ -11,8 +11,7 @@ module Stage5_Compilation
   , overapp2for1RestoreCode
 
   , pap1of2SaveCode
-  , pap1of2RestoreLabel
-  , pap1of2RestoreCode
+  , pap1of3SaveCode
   , cmapInternal
   , finalCodeLabel
 
@@ -81,6 +80,7 @@ cmapInternal :: Map CodeLabel Code
 cmapInternal = Map.fromList
   [ (finalCodeLabel, finalCode)
   , (pap1of2RestoreLabel, pap1of2RestoreCode)
+  , (pap1of3RestoreLabel, pap1of3RestoreCode)
   , (overapp2for1RestoreLabel, overapp2for1RestoreCode)
   ]
 
@@ -92,6 +92,9 @@ overapp2for1RestoreLabel = CodeLabel 0 "OverApp2for1Restore"
 
 pap1of2RestoreLabel :: CodeLabel
 pap1of2RestoreLabel = CodeLabel 0 "Pap1of2Restore"
+
+pap1of3RestoreLabel :: CodeLabel
+pap1of3RestoreLabel = CodeLabel 0 "Pap1of3Restore"
 
 finalCode :: Code
 finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
@@ -139,16 +142,38 @@ pap1of2SaveCode = do
         , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
         ] codeReturn
 
+pap1of3SaveCode :: Code
+pap1of3SaveCode = do
+  let numPassedArgs = 1
+  let numWordsForDesc = numPassedArgs + 1 + 1 -- the over-args; the function; the restore code pointer
+  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
+  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
+  doOps [ MacroHeapCheck { heapBytesNeeded }
+        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 0)) -- save passed arg-0
+        , OpPush (SReg frameReg) -- save this func
+        , OpPush (SLit (LCodeLabel pap1of3RestoreLabel)) -- ONLY CHANGE HERE
+        , setArgOut 0 (SReg Sp)
+        , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
+        ] codeReturn
+
+
+-- TODO: Instead of ArgCheck, pass along all args (N in Ax), so pap1of2/pap1of3 are identical ?
 pap1of2RestoreCode :: Code
 pap1of2RestoreCode = do
-  -- TODO: cannot just assume that are called with the correct number of args
-  -- need to either do an ArgCheck for what we are expecting, potentially building a PAP chain
-  -- or, to copy along all passed args (finding N in Ax)
   doOps [ flipArgSpace
+        , MacroArgCheck { desiredNumArgs = 1 }
         , setArgOut 0 (compileLoc (SRC.InFrame 2))
         , setArgOut 1 (compileLoc (SRC.TheArg 0))
         ] (codeTail 2 (compileLoc (SRC.InFrame 1)))
 
+pap1of3RestoreCode :: Code
+pap1of3RestoreCode = do
+  doOps [ flipArgSpace
+        , MacroArgCheck { desiredNumArgs = 2 }
+        , setArgOut 0 (compileLoc (SRC.InFrame 2))
+        , setArgOut 1 (compileLoc (SRC.TheArg 0))
+        , setArgOut 2 (compileLoc (SRC.TheArg 1))
+        ] (codeTail 3 (compileLoc (SRC.InFrame 1)))
 
 ----------------------------------------------------------------------
 -- Compile
@@ -187,7 +212,7 @@ compileTopDef who = \case
     pure [DW [w1]]
 
   SRC.TopLam3 x1 x2 x3 body -> do
-    codeLabel <- compileCode body >>= cutEntryCode 2 ("Function: " ++ who ++ show [x1,x2,x3])
+    codeLabel <- compileCode body >>= cutEntryCode 3 ("Function: " ++ who ++ show [x1,x2,x3])
     let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
 
@@ -302,10 +327,10 @@ compileAtomicTo who target = \case
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
   SRC.Lam pre _post _x0 body -> compileFunctionTo 1 who target pre body
   SRC.Lam2 pre _post _x0 _x1 body -> compileFunctionTo 2 who target pre body
-  SRC.Lam3 pre _post _x0 _x1 _x2 body -> compileFunctionTo 3 who target pre body
+  SRC.Lam3 pre _post _x0 _x1 _x2 body -> undefined $ compileFunctionTo 3 who target pre body -- TODO never reached
   SRC.RecLam pre _post _f _x0 body -> compileFunctionTo 1 who target pre body
   SRC.RecLam2 pre _post _f _x0 _x1 body -> compileFunctionTo 2 who target pre body
-  SRC.RecLam3 pre _post _f _x0 _x1 _x2 body -> compileFunctionTo 3 who target pre body
+  SRC.RecLam3 pre _post _f _x0 _x1 _x2 body -> undefined $ compileFunctionTo 3 who target pre body -- TODO never reached
 
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]
 compileConAppTo target tag xs = do

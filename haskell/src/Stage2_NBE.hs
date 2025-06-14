@@ -20,6 +20,7 @@ mkRecLam p f x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
     (True, Lam _ x1 body) -> pure $ RecLam2 p f x0 x1 body
+    (True, Lam2 _ x1 x2 body) -> pure $ RecLam3 p f x0 x1 x2 body
     (_, _) -> pure $ RecLam p f x0 body
 
 mkLam :: Position -> Id -> Exp -> M Exp
@@ -27,6 +28,7 @@ mkLam p x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
     (True, Lam _ x1 e) -> pure $ Lam2 p x0 x1 e
+    (True, Lam2 _ x1 x2 e) -> pure $ Lam3 p x0 x1 x2 e
     (_, _) -> pure $ Lam p x0 body
 
 mkApp :: Exp -> Position -> Exp -> M Exp
