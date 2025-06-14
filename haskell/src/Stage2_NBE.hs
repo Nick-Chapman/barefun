@@ -177,6 +177,12 @@ reflect env = \case
     undefined
   RecLam2{} ->
     undefined
+  Lam3{} ->
+    undefined
+  App3{} ->
+    undefined
+  RecLam3{} ->
+    undefined
 
   Var _pos x -> do
     pure (look env x)
