@@ -27,6 +27,7 @@ import Stage5_Compilation
   , overapp2for1SaveCode
   , pap1of2SaveCode
   , pap1of3SaveCode
+  , pap2of3SaveCode
   , cmapInternal
   , finalCodeLabel
   )
@@ -420,6 +421,7 @@ execOp = \case
       (2,1) -> do overapp2for1; cont
       (1,2) -> do pap1of2 -- ignore cont
       (1,3) -> do pap1of3 -- ignore cont
+      (2,3) -> do pap2of3 -- ignore cont
       _ ->
         error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
 
@@ -432,6 +434,11 @@ pap1of3 :: M ()
 pap1of3 =
   WithCodeLabel (CodeLabel 0 "pap1of3Save") $ do
   execCode pap1of3SaveCode
+
+pap2of3 :: M ()
+pap2of3 =
+  WithCodeLabel (CodeLabel 0 "pap2of3Save") $ do
+  execCode pap2of3SaveCode
 
 overapp2for1 :: M ()
 overapp2for1 =

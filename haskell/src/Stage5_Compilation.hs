@@ -12,6 +12,7 @@ module Stage5_Compilation
 
   , pap1of2SaveCode
   , pap1of3SaveCode
+  , pap2of3SaveCode
   , cmapInternal
   , finalCodeLabel
 
@@ -81,6 +82,7 @@ cmapInternal = Map.fromList
   [ (finalCodeLabel, finalCode)
   , (pap1of2RestoreLabel, pap1of2RestoreCode)
   , (pap1of3RestoreLabel, pap1of3RestoreCode)
+  , (pap2of3RestoreLabel, pap2of3RestoreCode)
   , (overapp2for1RestoreLabel, overapp2for1RestoreCode)
   ]
 
@@ -90,11 +92,15 @@ finalCodeLabel = CodeLabel 0 "FINAL"
 overapp2for1RestoreLabel :: CodeLabel
 overapp2for1RestoreLabel = CodeLabel 0 "OverApp2for1Restore"
 
+-- TODO: kill these pointless bindings for a family of labels
 pap1of2RestoreLabel :: CodeLabel
 pap1of2RestoreLabel = CodeLabel 0 "Pap1of2Restore"
 
 pap1of3RestoreLabel :: CodeLabel
 pap1of3RestoreLabel = CodeLabel 0 "Pap1of3Restore"
+
+pap2of3RestoreLabel :: CodeLabel
+pap2of3RestoreLabel = CodeLabel 0 "Pap2of3Restore"
 
 finalCode :: Code
 finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
@@ -128,6 +134,8 @@ overapp2for1RestoreCode = do
         , setArgOut (firstArgIndex+0) (compileLoc (SRC.InFrame firstContFrammeIndex))
         ] (codeTail 1 (compileLoc (SRC.TheArg 0)))
 
+-- TODO: have code gen function for papIofJ -- which knows about what cases done so far
+
 pap1of2SaveCode :: Code
 pap1of2SaveCode = do
   let numPassedArgs = 1
@@ -156,6 +164,21 @@ pap1of3SaveCode = do
         , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
         ] codeReturn
 
+pap2of3SaveCode :: Code
+pap2of3SaveCode = do
+  let numPassedArgs = 2
+  let numWordsForDesc = numPassedArgs + 1 + 1 -- the over-args; the function; the restore code pointer
+  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
+  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
+  doOps [ MacroHeapCheck { heapBytesNeeded }
+        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 1)) -- save passed arg-1
+        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 0)) -- save passed arg-0
+        , OpPush (SReg frameReg) -- save this func
+        , OpPush (SLit (LCodeLabel pap2of3RestoreLabel)) -- CHANGE HERE
+        , setArgOut 0 (SReg Sp)
+        , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
+        ] codeReturn
+
 
 -- TODO: Instead of ArgCheck, pass along all args (N in Ax), so pap1of2/pap1of3 are identical ?
 pap1of2RestoreCode :: Code
@@ -173,6 +196,15 @@ pap1of3RestoreCode = do
         , setArgOut 0 (compileLoc (SRC.InFrame 2))
         , setArgOut 1 (compileLoc (SRC.TheArg 0))
         , setArgOut 2 (compileLoc (SRC.TheArg 1))
+        ] (codeTail 3 (compileLoc (SRC.InFrame 1)))
+
+pap2of3RestoreCode :: Code
+pap2of3RestoreCode = do
+  doOps [ flipArgSpace
+        , MacroArgCheck { desiredNumArgs = 1 }
+        , setArgOut 0 (compileLoc (SRC.InFrame 2))
+        , setArgOut 1 (compileLoc (SRC.InFrame 3))
+        , setArgOut 2 (compileLoc (SRC.TheArg 0))
         ] (codeTail 3 (compileLoc (SRC.InFrame 1)))
 
 ----------------------------------------------------------------------

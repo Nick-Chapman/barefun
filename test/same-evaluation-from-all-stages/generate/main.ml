@@ -1,6 +1,6 @@
 
 let flags_for_example = function
-  | _ -> "-mlam" (* TODO: add -mapp when support pap2of3 needed by sham *)
+  | _ -> "-mlam -mapp"
 
 let generate_rules x =
   let capX = String.capitalize_ascii x in
