@@ -75,27 +75,24 @@ flipArgSpace :: Op
 flipArgSpace = OpExchange argReg argOut
 
 cmapInternal :: Map CodeLabel Code
-cmapInternal = Map.fromList
-  [ (finalCodeLabel, finalCode)
-  -- TODO generate these numbers!
-  , (papRestoreLabel 1 2, papRestoreCode 1 2)
-  , (papRestoreLabel 1 3, papRestoreCode 1 3)
-  , (papRestoreLabel 2 3, papRestoreCode 2 3)
-  , (overappRestoreLabel 2 1, overappRestoreCode 2 1)
-  , (overappRestoreLabel 3 1, overappRestoreCode 3 1)
-  , (overappRestoreLabel 4 1, overappRestoreCode 4 1)
-  , (overappRestoreLabel 5 1, overappRestoreCode 5 1)
-  , (overappRestoreLabel 3 2, overappRestoreCode 3 2)
-  ]
+cmapInternal = do
+  let pap i j = (papRestoreLabel i j, papRestoreCode i j)
+  let overapp x = (overappRestoreLabel x, overappRestoreCode x)
+  Map.fromList
+    ( [(finalCodeLabel, finalCode)] ++
+      -- TODO: all numbers upto some max number of args -- the same which we collect in NBE
+      [ pap i j | (i,j) <- [(1,2),(1,3)] ] ++
+      [ overapp x | x <- [1,2,3,4] ]
+    )
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
 
-overappRestoreLabel :: Int -> Int -> CodeLabel
-overappRestoreLabel j i = assert (i<j) CodeLabel 0 (printf "OverApp%dfor%dRestore" j i)
+overappRestoreLabel :: Int -> CodeLabel
+overappRestoreLabel x = assert (x>0) CodeLabel 0 (printf "OverAppRestore_%d" x)
 
 papRestoreLabel :: Int -> Int -> CodeLabel
-papRestoreLabel i j = assert (i<j) CodeLabel 0 (printf "Pap%dof%dRestore" i j)
+papRestoreLabel i j = assert (i<j) CodeLabel 0 (printf "PapRestore_%d/%d" i j)
 
 finalCode :: Code
 finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
@@ -138,14 +135,13 @@ overappSaveCode j i = do
   doOps ([ MacroHeapCheck { heapBytesNeeded } ] ++
          [ OpPush (SMemIndirectOffset argReg (bytesPerWord * n)) | n <- reverse [i..j-1] ] ++
          [ OpPush getCurrentCont
-         , OpPush (SLit (LCodeLabel (overappRestoreLabel j i)))
+         , OpPush (SLit (LCodeLabel (overappRestoreLabel (j-i))))
          , setCurrentCont (SReg Sp)
          , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
          ]) Fallthrough
 
-overappRestoreCode :: Int -> Int -> Code
-overappRestoreCode j i = do
-  let x = j-i
+overappRestoreCode :: Int -> Code
+overappRestoreCode x = do
   doOps ([ flipArgSpace ] ++
         [ setArgOut n (compileLoc (SRC.InFrame (2+n))) | n <- reverse [0..x] ]
         ) (codeTail x (compileLoc (SRC.TheArg 0)))

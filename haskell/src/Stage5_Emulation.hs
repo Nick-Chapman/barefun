@@ -22,8 +22,8 @@ import Stage5_Compilation
   ( bytesPerWord
   , frameReg,argReg,argOut
   , labelCurrentCont
-  , codeReturn,flipArgSpace
-
+  , codeReturn
+  , flipArgSpace
   , overappSaveCode
   , papSaveCode
   , cmapInternal
@@ -412,30 +412,19 @@ execOp = \case
   MacroArgCheck { desiredNumArgs = desired } -> \cont -> do
     received :: Int <- (fromIntegral . deNum) <$> GetReg Ax
     --Debug (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
-    case (received,desired) of
-      (0,0) -> cont
-      (1,1) -> cont
-      (2,2) -> cont
-      (3,3) -> cont
-      (2,1) -> do overapp 2 1; cont
-      (3,1) -> do overapp 3 1; cont
-      (4,1) -> do overapp 4 1; cont
-      (5,1) -> do overapp 5 1; cont
-      (3,2) -> do overapp 3 2; cont
-      (1,2) -> papSave 1 2 -- ignore cont
-      (1,3) -> papSave 1 3 -- ignore cont
-      (2,3) -> papSave 2 3 -- ignore cont
-      _ ->
-        error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
+    case compare received desired of
+      EQ -> cont
+      LT -> papSave received desired -- ignore cont
+      GT -> do overappSave received desired; cont
 
 papSave :: Int -> Int -> M ()
 papSave i j =
-  WithCodeLabel (CodeLabel 0 (printf "pap%dof%dSave" i j)) $ do
+  WithCodeLabel (CodeLabel 0 (printf "PapSave_%d/%d" i j)) $ do
   execCode (papSaveCode i j)
 
-overapp :: Int -> Int -> M ()
-overapp j i =
-  WithCodeLabel (CodeLabel 0 (printf "overapp%dfor%dSave" j i)) $ do
+overappSave :: Int -> Int -> M ()
+overappSave j i =
+  WithCodeLabel (CodeLabel 0 (printf "OverappSave_%d/%d" j i)) $ do
   execCode (overappSaveCode j i)
 
 -- this is called from user code which does OpPush & also from GC when copying
