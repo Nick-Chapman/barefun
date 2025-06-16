@@ -45,6 +45,7 @@ data Code
 data Op -- target; source (Intel Syntax style)
   = OpComment String
   | OpMany [Op]
+  | OpDebug Char -- used to compile "PrintCharLit" debug into the generated code
   | OpMove Reg Source
   | OpStore Target Reg
   | OpCall BareBios
@@ -155,6 +156,7 @@ instance Show Op where
   show = \case
     OpComment message ->  ";; " ++ message
     OpMany ops -> intercalate "\n  " (map show ops)
+    OpDebug c -> printf "PrintCharLit `%s` " (escapeCharForNasm c)
     OpMove r src -> "mov " ++ show r ++ ", " ++ show src
     OpStore target src -> "mov [" ++ show target ++ "], " ++ show src
     OpCall bare -> "call " ++ show bare

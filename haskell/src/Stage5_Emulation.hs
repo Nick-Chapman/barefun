@@ -364,6 +364,7 @@ execOp :: Op -> M () -> M ()
 execOp = \case
   OpComment{} -> \cont -> cont
   OpMany{} -> error "execOp/Many"
+  OpDebug c -> \cont -> do Debug (printf "OpDebug: %c" c); cont
   OpMove r s -> \cont -> do w <- evalSource s; SetReg r w; cont
   OpStore t s -> \cont -> do w <- GetReg s; setTarget t w; cont
   OpCall bare -> \cont -> do execBare bare; cont
