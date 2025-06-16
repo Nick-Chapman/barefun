@@ -83,6 +83,8 @@ cmapInternal = Map.fromList
   , (papRestoreLabel 2 3, papRestoreCode 2 3)
   , (overappRestoreLabel 2 1, overappRestoreCode 2 1)
   , (overappRestoreLabel 3 1, overappRestoreCode 3 1)
+  , (overappRestoreLabel 4 1, overappRestoreCode 4 1)
+  , (overappRestoreLabel 5 1, overappRestoreCode 5 1)
   , (overappRestoreLabel 3 2, overappRestoreCode 3 2)
   ]
 

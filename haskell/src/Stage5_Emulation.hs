@@ -419,6 +419,8 @@ execOp = \case
       (3,3) -> cont
       (2,1) -> do overapp 2 1; cont
       (3,1) -> do overapp 3 1; cont
+      (4,1) -> do overapp 4 1; cont
+      (5,1) -> do overapp 5 1; cont
       (3,2) -> do overapp 3 2; cont
       (1,2) -> papSave 1 2 -- ignore cont
       (1,3) -> papSave 1 3 -- ignore cont
