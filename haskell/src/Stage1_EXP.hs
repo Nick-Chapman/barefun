@@ -9,9 +9,9 @@ module Stage1_EXP
 import Primitive (Primitive,executePrimitive)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
+import Lines (Lines,juxComma,bracket,bracketSquare,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0_AST (evalLit,apply,apply2,apply3,Literal,Cid,Bid(..))
+import Stage0_AST (evalLit,apply,apply2,apply3,applyN,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
 import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..))
@@ -36,6 +36,7 @@ data Exp
   | App Exp Position Exp
   | App2 Exp Position Exp Exp -- TODO AppN
   | App3 Exp Position Exp Exp Exp
+  | AppN Exp Position [Exp]
   | Let Position Id Exp Exp
   | Match Position Exp [Arm]
 
@@ -67,6 +68,7 @@ sizeExp = \case
   App fun _ arg -> sizeExp fun + sizeExp arg
   App2 fun _ arg1 arg2 -> sizeExp fun + sizeExp arg1 + sizeExp arg2
   App3 fun _ arg1 arg2 arg3 -> sizeExp fun + sizeExp arg1 + sizeExp arg2 + sizeExp arg3
+  AppN fun _ args -> sizeExp fun + sum (map sizeExp args)
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
   Match _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
 
@@ -79,6 +81,7 @@ provenanceExp = \case
   App _ pos _ -> ("app", pos)
   App2 _ pos _ _ -> ("app2",pos)
   App3 _ pos _ _ _ -> ("app3",pos)
+  AppN _ pos _ -> ("appN",pos)
   Lit pos _ -> ("lit",pos)
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ -> ("lam",pos)
@@ -132,6 +135,9 @@ prettyTop control = pretty
       App func _ arg -> bracket $ jux (pretty func) (pretty arg)
       App2 func _ arg1 arg2 -> bracket $ jux (pretty func) (jux (pretty arg1) (pretty arg2))
       App3 func _ arg1 arg2 arg3 -> bracket $ jux (pretty func) (jux (pretty arg1) (jux (pretty arg2) (pretty arg3)))
+
+      AppN func _ args -> jux (pretty func) (bracketSquare (foldl1 juxComma (map pretty args)))
+
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
       Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
@@ -221,6 +227,12 @@ eval env@Env{venv} = \case
         eval env eArg1 $ \arg1 -> do
           eval env eFunc $ \func -> do
             ITick I.App $ ITick I.App $ apply3 func pos arg1 arg2 arg3 k
+
+  AppN eFunc pos eArgs -> \k -> do
+    evals env (reverse eArgs) $ \argsInRev -> do
+      eval env eFunc $ \func -> do
+        ITick I.App $ applyN func pos (reverse argsInRev) k
+
   App eFunc pos eArg -> \k -> do
     eval env eArg $ \arg -> do
       eval env eFunc $ \func -> do

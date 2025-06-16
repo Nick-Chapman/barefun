@@ -35,8 +35,12 @@ mkApp :: Exp -> Position -> Exp -> M Exp
 mkApp fun p arg = do
   enabled <- MultiAppEnabled
   case (enabled, fun) of
-    (True, App fun p arg0) -> pure $ App2 fun p arg0 arg
-    (True, App2 fun p arg0 arg1) -> pure $ App3 fun p arg0 arg1 arg
+    --(True, App fun p arg0) -> pure $ App2 fun p arg0 arg
+    --(True, App2 fun p arg0 arg1) -> pure $ App3 fun p arg0 arg1 arg
+    --(_, _) -> pure $ App fun p arg
+
+    (True, AppN fun p args) -> pure $ AppN fun p (args ++ [arg])
+    (True, _) -> pure $ AppN fun p [arg]
     (_, _) -> pure $ App fun p arg
 
 ----------------------------------------------------------------------
@@ -185,6 +189,8 @@ reflect env = \case
   App3{} ->
     undefined
   RecLam3{} ->
+    undefined
+  AppN{} ->
     undefined
 
   Var _pos x -> do

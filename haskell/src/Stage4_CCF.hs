@@ -12,7 +12,7 @@ import Data.Map (Map)
 import Data.Set (notMember)
 import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
-import Stage0_AST (apply,apply2,apply3)
+import Stage0_AST (apply,apply2,apply3,applyN)
 import Stage1_EXP (Id(..),Ctag(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
@@ -41,6 +41,7 @@ data Code
   | Tail Ref Position Ref
   | Tail2 Ref Position Ref Ref
   | Tail3 Ref Position Ref Ref Ref
+  | TailN Ref Position [Ref]
   | TailPrim Primitive Position Ref
   | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
@@ -112,6 +113,7 @@ prettyC = \case
   Tail func _pos arg -> [printf "%s %s k" (show func) (show arg)]
   Tail2 func _pos arg1 arg2 -> [printf "%s %s k" (show func) (show [arg1,arg2])]
   Tail3 func _pos arg1 arg2 arg3 -> [printf "%s %s k" (show func) (show [arg1,arg2,arg3])]
+  TailN func _pos args -> [printf "%s %s k" (show func) (show args)]
   TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic (_,t) rhs body ->
     ("let " ++ show t ++ " = ") <++ prettyA rhs ++> " in"
@@ -218,6 +220,7 @@ evalCode genv env = \case
   Tail func pos arg -> \k -> ITick I.Enter $ apply (look env func) pos (look env arg) k
   Tail2 func pos arg1 arg2 -> \k -> ITick I.Enter $ ITick I.Enter $ apply2 (look env func) pos (look env arg1) (look env arg2) k
   Tail3 func pos arg1 arg2 arg3 -> \k -> ITick I.Enter $ ITick I.Enter $ apply3 (look env func) pos (look env arg1) (look env arg2) (look env arg3) k
+  TailN func pos args -> \k -> ITick I.Enter $ applyN (look env func) pos (map (look env) args) k
   TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ executePrimitive prim [look env arg] k
   LetAtomic (x,t) a1 c2 -> \k -> do
     evalA a1 $ \v1 -> do
@@ -308,6 +311,7 @@ compileCtop = compileC firstTempIndex
       SRC.Tail func pos arg -> pure $ Tail (compileV cenv func) pos (compileV cenv arg)
       SRC.Tail2 func pos arg1 arg2 -> pure $ Tail2 (compileV cenv func) pos (compileV cenv arg1) (compileV cenv arg2)
       SRC.Tail3 func pos arg1 arg2 arg3 -> pure $ Tail3 (compileV cenv func) pos (compileV cenv arg1) (compileV cenv arg2) (compileV cenv arg3)
+      SRC.TailN func pos args -> pure $ TailN (compileV cenv func) pos (map (compileV cenv) args)
       SRC.TailPrim prim pos arg-> pure $ TailPrim prim pos (compileV cenv arg)
 
       SRC.LetAtomic x rhs body -> do

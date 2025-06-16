@@ -233,6 +233,11 @@ compileCode = \case
       , setArgOut 2 (compileRef arg3)
       ] (codeTail 3 (compileRef fun))
 
+  SRC.TailN fun _pos args -> do
+    pure $ doOps
+      [ setArgOut i (compileRef arg) | (i,arg) <- zip [0..] args ]
+      (codeTail (length args) (compileRef fun))
+
   SRC.TailPrim SRC.MakeBytes _pos arg -> do
     pure $ doOps
       [ setArgOut 0 (compileRef arg)

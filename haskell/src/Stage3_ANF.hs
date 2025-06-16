@@ -12,7 +12,7 @@ import Data.Map (Map)
 import Data.Set (Set,singleton,(\\),union)
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
-import Stage0_AST (apply,apply2,apply3)
+import Stage0_AST (apply,apply2,apply3,applyN)
 import Stage1_EXP (Id(..),Name(GeneratedName),Ctag(..),provenanceExp)
 import Text.Printf (printf)
 import Value (Interaction(..))
@@ -30,6 +30,7 @@ data Code
   | Tail Val Position Val
   | Tail2 Val Position Val Val
   | Tail3 Val Position Val Val Val
+  | TailN Val Position [Val]
   | TailPrim Primitive Position Val
   | LetAtomic Id Atomic Code
   | PushContinuation Fvs (Id,Code) Code
@@ -83,6 +84,7 @@ pretty = \case
   Tail func _pos arg -> [printf "%s %s k" (show func) (show arg)]
   Tail2 func _pos arg0 arg1 -> [printf "%s %s k" (show func) (show [arg0,arg1])]
   Tail3 func _pos arg0 arg1 arg2 -> [printf "%s %s k" (show func) (show [arg0,arg1,arg2])]
+  TailN func _pos args -> [printf "%s %s k" (show func) (show args)]
   TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ pretty body
   PushContinuation fvs (x,later) first -> indented ("let k " ++ show fvs ++ " " ++ show x ++ " =") (onTail (++ " in") (pretty later)) ++ pretty first
@@ -134,6 +136,7 @@ evalCode env = \case
   Tail fun pos arg -> \k -> ITick I.Enter $ apply (evalV fun) pos (evalV arg) k
   Tail2 fun pos arg1 arg2 -> \k -> ITick I.Enter $ ITick I.Enter $ apply2 (evalV fun) pos (evalV arg1) (evalV arg2) k
   Tail3 fun pos arg1 arg2 arg3 -> \k -> ITick I.Enter $ ITick I.Enter $ apply3 (evalV fun) pos (evalV arg1) (evalV arg2) (evalV arg3) k
+  TailN fun pos args -> \k -> ITick I.Enter $ applyN (evalV fun) pos (map evalV args) k
   TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ do
     executePrimitive prim [evalV arg] k
   LetAtomic x a1 c2 -> \k -> do
@@ -296,6 +299,11 @@ compileExp = \case
           compileAsId eFunc $ \func -> do
             k $ Compound $ Tail3 func pos arg1 arg2 arg3
 
+  SRC.AppN eFunc pos eArgs-> \k -> do
+    compileAsIds (reverse eArgs) $ \argsInRev -> do
+      compileAsId eFunc $ \func -> do
+        k $ Compound $ TailN func pos (reverse argsInRev)
+
   SRC.Let _pos x rhs body -> \k -> do
     compileExp rhs $ \rhs -> do
       body <- compileExp body k >>= nameAtomic
@@ -395,6 +403,7 @@ fvs = \case
   Tail func _ arg -> Set.unions [fvsV func,fvsV arg]
   Tail2 func _ arg1 arg2 -> Set.unions [fvsV func,fvsV arg1,fvsV arg2]
   Tail3 func _ arg1 arg2 arg3 -> Set.unions [fvsV func,fvsV arg1,fvsV arg2,fvsV arg3]
+  TailN func _ args -> fvsV func `union` Set.unions (map fvsV args)
   TailPrim _ _ x -> fvsV x
   LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
   PushContinuation frame _ rhs -> fvs rhs `union` Set.fromList frame

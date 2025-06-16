@@ -1,7 +1,7 @@
 
 module Lines
   ( Lines
-  , juxComma, bracket, onHead, onTail, jux, indented
+  , juxComma, bracket, bracketSquare, onHead, onTail, jux, indented
   , (<++), (++>), (>>>)
   ) where
 
@@ -21,6 +21,9 @@ juxComma a b = jux (onTail (++",") a) b
 
 bracket :: Lines -> Lines
 bracket = onHead ("(" ++) . onTail (++ ")")
+
+bracketSquare :: Lines -> Lines
+bracketSquare = onHead ("[" ++) . onTail (++ "]")
 
 onHead :: (String -> String) -> Lines -> Lines
 onHead _ [] = error "onHead"
