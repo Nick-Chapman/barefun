@@ -50,8 +50,8 @@ data Interaction
   | IReadSector Number (String -> Interaction)
   | IWriteSector Number String Interaction
 
-runInteraction :: Bool -> Interaction -> IO ()
-runInteraction measure next = do
+runInteraction :: Bool -> FilePath -> Interaction -> IO ()
+runInteraction measure diskImagePath next = do
   hSetEcho stdin False
   hSetBuffering stdin NoBuffering
   loop state0 next
@@ -147,22 +147,22 @@ runInteraction measure next = do
         loop state k
 
       IReadSector i k -> do
-        text <- readSector i
+        text <- readSector diskImagePath i
         loop state (k text)
 
       IWriteSector i s k -> do
-        writeSector i s
+        writeSector diskImagePath i s
         loop state k
 
-readSector :: Number -> IO String
-readSector i = do
-  withSectorSeek i $ \fd -> do
+readSector :: FilePath -> Number -> IO String
+readSector diskImagePath i = do
+  withSectorSeek diskImagePath i $ \fd -> do
     unpack <$> fdRead fd (fromIntegral sectorSize)
       where unpack bs = map (chr . fromIntegral) (BS.unpack bs)
 
-writeSector :: Number -> String -> IO ()
-writeSector i s = do
-  withSectorSeek i $ \fd -> do
+writeSector :: FilePath -> Number -> String -> IO ()
+writeSector diskImagePath i s = do
+  withSectorSeek diskImagePath i $ \fd -> do
     _::ByteCount <- fdWrite fd (pack s)
     pure ()
       where pack string = BS.pack (map (fromIntegral . ord) string)
@@ -171,9 +171,9 @@ sectorSize,numSectors :: Int
 sectorSize = 512
 numSectors = 32
 
-withSectorSeek :: Number -> (Fd -> IO a) -> IO a
-withSectorSeek i f = do
-  path <- BS.fromFilePath "disk.image"
+withSectorSeek :: FilePath -> Number -> (Fd -> IO a) -> IO a
+withSectorSeek diskImagePath i f = do
+  path <- BS.fromFilePath diskImagePath
   fd <- openFd path ReadWrite defaultFileFlags { creat = Just 0o640 }
   setFdSize fd (fromIntegral (sectorSize * numSectors))
   _::FileOffset <- fdSeek fd AbsoluteSeek (fromIntegral i * fromIntegral sectorSize)

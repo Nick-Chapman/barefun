@@ -2,6 +2,7 @@ module CommandLine (main) where
 
 import Parser (parseProg)
 import Predefined (wrapPreDefs)
+import System.Posix.Process (getProcessID)
 import System.Environment (getArgs)
 import Text.Printf (printf)
 import Value (runInteraction)
@@ -45,7 +46,9 @@ main = do
 
   -- flag "-measure" prints the opening whoami banner and the final instumention
   let whoami = if measure then printf "[%s%s]\n" tag tagZ else ""
-  let runInteraction = Value.runInteraction measure
+  pid <- getProcessID
+  let diskImagePath = printf "/tmp/disk.image.%s" (show pid)
+  let runInteraction = Value.runInteraction measure diskImagePath
 
   case (stage,mode) of
     (Stage0,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e0)

@@ -1,5 +1,7 @@
-Using ocaml for the big filesystem test. Haskell emulators are too slow.
-cat ../inputs/filesystem.input | ../../haskell/main.exe ../../examples/filesystem.fun
+
+Using ocaml for the reference evaluation since the stage5 haskell evaluator is quite slow.
+We still test the haskell emulations in ../same-evaluation-from-all-stages/.
+
   $ cat ../inputs/filesystem.input | ../../ocaml/main.exe Filesystem
   Filesystem explorer
   - sector_size: 512
@@ -12,89 +14,62 @@ cat ../inputs/filesystem.input | ../../haskell/main.exe ../../examples/filesyste
   1> wipe
   2> format
   3> mount
-  4> ls
-  5> create
+  4> create
   Creating file 0; (to finish type ^D)
   Hello world!
   ^D
-  6> 
-  7> create
+  5> 
+  6> create
   Creating file 1; (to finish type ^D)
   z^D
-  8> 
-  9> create
+  7> 
+  8> create
   Creating file 2; (to finish type ^D)
   ^D
-  10> 
-  11> create
+  9> 
+  10> create
   Creating file 3; (to finish type ^D)
   Goodbye.
   ^D
-  12> 
-  13> ls
-  file 0 : 13
-  file 1 : 1
-  file 2 : 0
-  file 3 : 9
-  14> cat 0
+  11> 
+  12> cat 0
   Hello world!
-  15> cat 1
-  z16> cat 2
-  17> cat 3
+  13> cat 1
+  z14> cat 2
+  15> cat 3
   Goodbye.
-  18> append 1
+  16> append 1
   Appending to file 1; (to finish type ^D)
   ero one
   two
   ^D
-  19> 
-  20> cat 1
+  17> 
+  18> cat 1
   zero one
   two
-  21> splat 1 8
+  19> splat 1 8
   Overwriting file 1 from offset 8; (to finish type ^D)
    two three four
   ^D
-  22> 
-  23> cat 1
+  20> 
+  21> cat 1
   zero one two three four
-  24> append 1
+  22> append 1
   Appending to file 1; (to finish type ^D)
   five six seven eight nine ten eleven twelve thirteen
   ^D
-  25> 
-  26> cat 1
+  23> 
+  24> cat 1
   zero one two three four
   five six seven eight nine ten eleven twelve thirteen
-  27> ls
+  25> ls
   file 0 : 13
   file 1 : 77
   file 2 : 0
   file 3 : 9
-  28> debug
+  26> debug
   Filesystem found:
   - superblock: #blocks=40, #admin-blocks=1+5, #inodes=80
   - #free-blocks = 31
   - #free-inodes = 76
-  29> cat 0
-  Hello world!
-  30> rm 0
-  31> append 1
-  Appending to file 1; (to finish type ^D)
-  fourteen fifteen sixteen seventeen eighteen nineteen twenty
-  ^D
-  32> 
-  33> cat 1
-  zero one two three four
-  five six seven eight nine ten eleven twelve thirteen
-  fourteen fifteen sixteen seventeen eighteen nineteen twenty
-  34> ls
-  file 1 : 137
-  file 2 : 0
-  file 3 : 9
-  35> debug
-  Filesystem found:
-  - superblock: #blocks=40, #admin-blocks=1+5, #inodes=80
-  - #free-blocks = 31
-  - #free-inodes = 77
-  36> [EOF]
+  27> [EOF]
