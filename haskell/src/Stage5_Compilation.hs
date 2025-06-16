@@ -77,20 +77,23 @@ flipArgSpace = OpExchange argReg argOut
 cmapInternal :: Map CodeLabel Code
 cmapInternal = Map.fromList
   [ (finalCodeLabel, finalCode)
+  -- TODO generate these numbers!
   , (papRestoreLabel 1 2, papRestoreCode 1 2)
   , (papRestoreLabel 1 3, papRestoreCode 1 3)
   , (papRestoreLabel 2 3, papRestoreCode 2 3)
-  , (overapp2for1RestoreLabel, overapp2for1RestoreCode)
+  , (overappRestoreLabel 2 1, overappRestoreCode 2 1)
+  , (overappRestoreLabel 3 1, overappRestoreCode 3 1)
+  , (overappRestoreLabel 3 2, overappRestoreCode 3 2)
   ]
 
 finalCodeLabel :: CodeLabel
 finalCodeLabel = CodeLabel 0 "FINAL"
 
-overapp2for1RestoreLabel :: CodeLabel
-overapp2for1RestoreLabel = CodeLabel 0 "OverApp2for1Restore"
+overappRestoreLabel :: Int -> Int -> CodeLabel
+overappRestoreLabel j i = assert (i<j) CodeLabel 0 (printf "OverApp%dfor%dRestore" j i)
 
 papRestoreLabel :: Int -> Int -> CodeLabel
-papRestoreLabel i j = CodeLabel 0 (printf "Pap%dof%dRestore" i j)
+papRestoreLabel i j = assert (i<j) CodeLabel 0 (printf "Pap%dof%dRestore" i j)
 
 finalCode :: Code
 finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
@@ -123,37 +126,27 @@ papRestoreCode i j = do
         ) (codeTail j (compileLoc (SRC.InFrame 1)))
 
 ----------------------------------------------------------------------
--- app
+-- overapp
 
 overappSaveCode :: Int -> Int -> Code
-overappSaveCode j i =
-  case (j,i) of
-    (2,1) -> overapp2for1SaveCode
-    _ -> error (show ("overappSaveCode",j,i))
-
-
-overapp2for1SaveCode :: Code
-overapp2for1SaveCode = do
-  let numOverArgs = 1
-  let indexOfFirstOverArg = 1
-  let numWordsForDesc = numOverArgs + 1 + 1 -- the over-args; the current-cont; the restore code pointer
+overappSaveCode j i = do
+  let numWordsForDesc = (j-i) + 2 -- the over-args; the current-cont; the restore code pointer
   let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
   let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
-  Do (OpMany [ MacroHeapCheck { heapBytesNeeded } -- TODO prefer doOPs to OpMany
-             , OpPush (SMemIndirectOffset argReg (bytesPerWord * indexOfFirstOverArg))
-             , OpPush getCurrentCont
-             , OpPush (SLit (LCodeLabel overapp2for1RestoreLabel))
-             , setCurrentCont (SReg Sp)
-             , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
-             ]) Fallthrough
+  doOps ([ MacroHeapCheck { heapBytesNeeded } ] ++
+         [ OpPush (SMemIndirectOffset argReg (bytesPerWord * n)) | n <- reverse [i..j-1] ] ++
+         [ OpPush getCurrentCont
+         , OpPush (SLit (LCodeLabel (overappRestoreLabel j i)))
+         , setCurrentCont (SReg Sp)
+         , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
+         ]) Fallthrough
 
-overapp2for1RestoreCode :: Code
-overapp2for1RestoreCode = do
-  let firstContFrammeIndex = 2
-  let firstArgIndex = 0
-  doOps [ flipArgSpace
-        , setArgOut (firstArgIndex+0) (compileLoc (SRC.InFrame firstContFrammeIndex))
-        ] (codeTail 1 (compileLoc (SRC.TheArg 0)))
+overappRestoreCode :: Int -> Int -> Code
+overappRestoreCode j i = do
+  let x = j-i
+  doOps ([ flipArgSpace ] ++
+        [ setArgOut n (compileLoc (SRC.InFrame (2+n))) | n <- reverse [0..x] ]
+        ) (codeTail x (compileLoc (SRC.TheArg 0)))
 
 ----------------------------------------------------------------------
 -- Compile

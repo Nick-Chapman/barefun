@@ -36,6 +36,7 @@ mkApp fun p arg = do
   enabled <- MultiAppEnabled
   case (enabled, fun) of
     (True, App fun p arg0) -> pure $ App2 fun p arg0 arg
+    (True, App2 fun p arg0 arg1) -> pure $ App3 fun p arg0 arg1 arg
     (_, _) -> pure $ App fun p arg
 
 ----------------------------------------------------------------------
