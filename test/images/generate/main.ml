@@ -25,6 +25,7 @@ let generate_rules x =
 |} x x x x x x x x x x x
 
 let allow_example = function
+  | "filesystem" -> false (* generated code is too big *)
   | _ -> true
 
 let () =
