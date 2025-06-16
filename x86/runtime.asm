@@ -210,6 +210,7 @@ main:
     ;SeeReg di
     ;Stop `MAIN`
 
+    mov ax, 0
     jmp bare_start
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -246,6 +247,40 @@ halt:
     hlt ;; avoid spinning the fans
     jmp halt
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (6.9) Arg Check
+
+%macro Bare_arg_check 1
+    mov word bx, %1
+    call Bare_arg_check_function
+%endmacro
+
+Bare_arg_check_function:
+    ;; ax contains the number of args passed
+    ;; bx contains the number of args desired
+    cmp ax,bx
+    jb .pap
+    jnz .overapp
+    cmp ax, 2
+    jge .multi
+    ret
+.multi:
+    SeeReg ax
+    SeeReg bx
+    Stop "MULTI"
+    ret
+.pap:
+    SeeReg ax
+    SeeReg bx
+    Stop "PAP"
+    ret
+.overapp:
+    SeeReg ax
+    SeeReg bx
+    Stop "OVERAPP"
+    ret
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (7) Garbage Collection
 
@@ -253,9 +288,6 @@ halt:
 %define ArgReg si
 %define ArgOut di
 %define FrameReg bp
-
-%macro Bare_arg_check 1 ;; TODO
-%endmacro
 
 %macro Bare_heap_check 1
     mov word [need], %1
@@ -635,6 +667,7 @@ AllocBare_make_bytes: ;;; TODO: construct & emit this code in compiler. stage5-e
     mov bp, [CurrentCont]
     mov ax, [bp+2]
     mov [CurrentCont], ax
+    mov ax, 1 ;; Was BUG; was missing
     jmp [bp]
 
 Bare_get_bytes:
