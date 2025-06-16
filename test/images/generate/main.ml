@@ -1,12 +1,16 @@
 
+let flags_for_example = function
+  | _ -> "" (*"-mlam -mapp"*)
+
 let generate_rules x =
+  let flags = flags_for_example x in
   Printf.printf
 {|
  (rule
   (deps ../../../haskell/main.exe ../../../examples/%s.fun)
   (action
    (with-stdout-to %s.asm
-    (run ../../../haskell/main.exe ../../../examples/%s.fun -compile))))
+    (run ../../../haskell/main.exe ../../../examples/%s.fun -compile %s))))
 
  (rule
   (deps ../../../x86/runtime.asm ../../../disk.image %s.asm)
@@ -22,7 +26,7 @@ let generate_rules x =
    (run chmod +w %s.img)
    (run qemu-system-i386 -hda %s.img))))
 
-|} x x x x x x x x x x x
+|} x x x  flags  x x x x x x x x
 
 let allow_example = function
   | "filesystem" -> false (* generated code is too big *)
