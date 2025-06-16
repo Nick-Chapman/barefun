@@ -24,10 +24,8 @@ import Stage5_Compilation
   , labelCurrentCont
   , codeReturn,flipArgSpace
 
-  , overapp2for1SaveCode
-  , pap1of2SaveCode
-  , pap1of3SaveCode
-  , pap2of3SaveCode
+  , overappSaveCode
+  , papSaveCode
   , cmapInternal
   , finalCodeLabel
   )
@@ -418,32 +416,22 @@ execOp = \case
       (1,1) -> cont
       (2,2) -> cont
       (3,3) -> cont
-      (2,1) -> do overapp2for1; cont
-      (1,2) -> do pap1of2 -- ignore cont
-      (1,3) -> do pap1of3 -- ignore cont
-      (2,3) -> do pap2of3 -- ignore cont
+      (2,1) -> do overapp 2 1; cont
+      (1,2) -> papSave 1 2 -- ignore cont
+      (1,3) -> papSave 1 3 -- ignore cont
+      (2,3) -> papSave 2 3 -- ignore cont
       _ ->
         error (printf "MacroArgCheck: desired=%d, received: %d\n" desired received)
 
-pap1of2 :: M ()
-pap1of2 =
-  WithCodeLabel (CodeLabel 0 "pap1of2Save") $ do
-  execCode pap1of2SaveCode
+papSave :: Int -> Int -> M ()
+papSave i j =
+  WithCodeLabel (CodeLabel 0 (printf "pap%dof%dSave" i j)) $ do
+  execCode (papSaveCode i j)
 
-pap1of3 :: M ()
-pap1of3 =
-  WithCodeLabel (CodeLabel 0 "pap1of3Save") $ do
-  execCode pap1of3SaveCode
-
-pap2of3 :: M ()
-pap2of3 =
-  WithCodeLabel (CodeLabel 0 "pap2of3Save") $ do
-  execCode pap2of3SaveCode
-
-overapp2for1 :: M ()
-overapp2for1 =
-  WithCodeLabel (CodeLabel 0 "overapp2for1Save") $ do
-  execCode overapp2for1SaveCode
+overapp :: Int -> Int -> M ()
+overapp j i =
+  WithCodeLabel (CodeLabel 0 (printf "overapp%dfor%dSave" j i)) $ do
+  execCode (overappSaveCode j i)
 
 -- this is called from user code which does OpPush & also from GC when copying
 -- performs sanity checking when a block-descriptor is pushed

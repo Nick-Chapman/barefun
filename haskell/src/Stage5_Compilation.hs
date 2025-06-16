@@ -5,20 +5,17 @@ module Stage5_Compilation
   , bytesPerWord
   , frameReg,argReg,argOut
   , labelCurrentCont
-  , codeReturn, flipArgSpace
-  , overapp2for1SaveCode
-  , overapp2for1RestoreLabel
-  , overapp2for1RestoreCode
-
-  , pap1of2SaveCode
-  , pap1of3SaveCode
-  , pap2of3SaveCode
+  , codeReturn
+  , flipArgSpace
+  , overappSaveCode
+  , papSaveCode
   , cmapInternal
   , finalCodeLabel
 
 ) where
 
 import Primitive (Primitive)
+import Control.Exception (assert)
 import Control.Monad (ap,liftM)
 import Data.Map (Map)
 import Stage1_EXP (Ctag(..))
@@ -80,9 +77,9 @@ flipArgSpace = OpExchange argReg argOut
 cmapInternal :: Map CodeLabel Code
 cmapInternal = Map.fromList
   [ (finalCodeLabel, finalCode)
-  , (pap1of2RestoreLabel, pap1of2RestoreCode)
-  , (pap1of3RestoreLabel, pap1of3RestoreCode)
-  , (pap2of3RestoreLabel, pap2of3RestoreCode)
+  , (papRestoreLabel 1 2, papRestoreCode 1 2)
+  , (papRestoreLabel 1 3, papRestoreCode 1 3)
+  , (papRestoreLabel 2 3, papRestoreCode 2 3)
   , (overapp2for1RestoreLabel, overapp2for1RestoreCode)
   ]
 
@@ -92,24 +89,48 @@ finalCodeLabel = CodeLabel 0 "FINAL"
 overapp2for1RestoreLabel :: CodeLabel
 overapp2for1RestoreLabel = CodeLabel 0 "OverApp2for1Restore"
 
--- TODO: kill these pointless bindings for a family of labels
-pap1of2RestoreLabel :: CodeLabel
-pap1of2RestoreLabel = CodeLabel 0 "Pap1of2Restore"
-
-pap1of3RestoreLabel :: CodeLabel
-pap1of3RestoreLabel = CodeLabel 0 "Pap1of3Restore"
-
-pap2of3RestoreLabel :: CodeLabel
-pap2of3RestoreLabel = CodeLabel 0 "Pap2of3Restore"
+papRestoreLabel :: Int -> Int -> CodeLabel
+papRestoreLabel i j = CodeLabel 0 (printf "Pap%dof%dRestore" i j)
 
 finalCode :: Code
 finalCode = Do (OpCall Bare_halt) (error "finalCode;will have halterd")
 
 ----------------------------------------------------------------------
--- overapp/pap
--- Would be great to actually see this code in the compiled output,
--- Rather than being magic'ed into existence in the emulator.
--- And thus avoiding repeating it in runtime.asm
+-- pap
+
+papSaveCode :: Int -> Int -> Code
+papSaveCode i j = -- i: #args so far; j: #args needed in total
+  assert (i > 0) assert (j > i) $ do
+  let numWordsForDesc = i + 2 -- the early-args; the function & the restore code pointer
+  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
+  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
+  doOps ([ MacroHeapCheck { heapBytesNeeded } ] ++
+         [ OpPush (SMemIndirectOffset argReg (bytesPerWord * n)) | n <- reverse [0..i-1] ] ++
+         [ OpPush (SReg frameReg)
+         , OpPush (SLit (LCodeLabel (papRestoreLabel i j))) -- j only needed when we restore
+         , setArgOut 0 (SReg Sp)
+         , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
+         ]) codeReturn
+
+papRestoreCode :: Int -> Int -> Code
+papRestoreCode i j = do
+  doOps ([ flipArgSpace, MacroArgCheck { desiredNumArgs = j-i }] ++
+         -- copy the early args into place
+         [ setArgOut n (compileLoc (SRC.InFrame (n+2))) | n <- [0..i] ] ++
+         -- copy the late args into place
+         [ setArgOut (i+n) (compileLoc (SRC.TheArg n)) | n <- [0..j-i] ]
+         -- make the call
+        ) (codeTail j (compileLoc (SRC.InFrame 1)))
+
+----------------------------------------------------------------------
+-- app
+
+overappSaveCode :: Int -> Int -> Code
+overappSaveCode j i =
+  case (j,i) of
+    (2,1) -> overapp2for1SaveCode
+    _ -> error (show ("overappSaveCode",j,i))
+
 
 overapp2for1SaveCode :: Code
 overapp2for1SaveCode = do
@@ -133,79 +154,6 @@ overapp2for1RestoreCode = do
   doOps [ flipArgSpace
         , setArgOut (firstArgIndex+0) (compileLoc (SRC.InFrame firstContFrammeIndex))
         ] (codeTail 1 (compileLoc (SRC.TheArg 0)))
-
--- TODO: have code gen function for papIofJ -- which knows about what cases done so far
-
-pap1of2SaveCode :: Code
-pap1of2SaveCode = do
-  let numPassedArgs = 1
-  let numWordsForDesc = numPassedArgs + 1 + 1 -- the over-args; the function; the restore code pointer
-  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
-  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
-  doOps [ MacroHeapCheck { heapBytesNeeded }
-        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 0)) -- save passed arg-0
-        , OpPush (SReg frameReg) -- save this func
-        , OpPush (SLit (LCodeLabel pap1of2RestoreLabel))
-        , setArgOut 0 (SReg Sp)
-        , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
-        ] codeReturn
-
-pap1of3SaveCode :: Code
-pap1of3SaveCode = do
-  let numPassedArgs = 1
-  let numWordsForDesc = numPassedArgs + 1 + 1 -- the over-args; the function; the restore code pointer
-  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
-  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
-  doOps [ MacroHeapCheck { heapBytesNeeded }
-        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 0)) -- save passed arg-0
-        , OpPush (SReg frameReg) -- save this func
-        , OpPush (SLit (LCodeLabel pap1of3RestoreLabel)) -- ONLY CHANGE HERE
-        , setArgOut 0 (SReg Sp)
-        , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
-        ] codeReturn
-
-pap2of3SaveCode :: Code
-pap2of3SaveCode = do
-  let numPassedArgs = 2
-  let numWordsForDesc = numPassedArgs + 1 + 1 -- the over-args; the function; the restore code pointer
-  let heapBytesNeeded = bytesPerWord * (numWordsForDesc + 1)
-  let desc = BlockDescriptor Scanned (bytesPerWord * numWordsForDesc)
-  doOps [ MacroHeapCheck { heapBytesNeeded }
-        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 1)) -- save passed arg-1
-        , OpPush (SMemIndirectOffset argReg (bytesPerWord * 0)) -- save passed arg-0
-        , OpPush (SReg frameReg) -- save this func
-        , OpPush (SLit (LCodeLabel pap2of3RestoreLabel)) -- CHANGE HERE
-        , setArgOut 0 (SReg Sp)
-        , OpPush (SLit (LBlockDescriptor desc)) -- pushed *after* Sp is read
-        ] codeReturn
-
-
--- TODO: Instead of ArgCheck, pass along all args (N in Ax), so pap1of2/pap1of3 are identical ?
-pap1of2RestoreCode :: Code
-pap1of2RestoreCode = do
-  doOps [ flipArgSpace
-        , MacroArgCheck { desiredNumArgs = 1 }
-        , setArgOut 0 (compileLoc (SRC.InFrame 2))
-        , setArgOut 1 (compileLoc (SRC.TheArg 0))
-        ] (codeTail 2 (compileLoc (SRC.InFrame 1)))
-
-pap1of3RestoreCode :: Code
-pap1of3RestoreCode = do
-  doOps [ flipArgSpace
-        , MacroArgCheck { desiredNumArgs = 2 }
-        , setArgOut 0 (compileLoc (SRC.InFrame 2))
-        , setArgOut 1 (compileLoc (SRC.TheArg 0))
-        , setArgOut 2 (compileLoc (SRC.TheArg 1))
-        ] (codeTail 3 (compileLoc (SRC.InFrame 1)))
-
-pap2of3RestoreCode :: Code
-pap2of3RestoreCode = do
-  doOps [ flipArgSpace
-        , MacroArgCheck { desiredNumArgs = 1 }
-        , setArgOut 0 (compileLoc (SRC.InFrame 2))
-        , setArgOut 1 (compileLoc (SRC.InFrame 3))
-        , setArgOut 2 (compileLoc (SRC.TheArg 0))
-        ] (codeTail 3 (compileLoc (SRC.InFrame 1)))
 
 ----------------------------------------------------------------------
 -- Compile
