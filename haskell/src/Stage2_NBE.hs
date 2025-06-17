@@ -402,25 +402,32 @@ fresh SRC.Id{name,pos} = do
   pure y
 
 
+maxLam :: Int
+maxLam = 7
+
+maxApp :: Int
+maxApp = 7
+
 mkRecLam :: Position -> Id -> Id -> Exp -> M Exp
 mkRecLam p f x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
-    (True, LamN _ xs body) -> pure $ RecLamN p f (x0 : xs) body
+    (True, LamN _ xs body) | length xs < maxApp -> pure $ RecLamN p f (x0 : xs) body
     (_, _) -> pure $ RecLamN p f [x0] body
 
 mkLam :: Position -> Id -> Exp -> M Exp
 mkLam p x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
-    (True, LamN _ xs body) -> pure $ LamN p (x0 : xs) body
+    (True, LamN _ xs body) | length xs < maxLam -> pure $ LamN p (x0 : xs) body
     (_, _) -> pure $ LamN p [x0] body
+
 
 mkApp :: Exp -> Position -> Exp -> M Exp
 mkApp fun p arg = do
   enabled <- MultiAppEnabled
   case (enabled, fun) of
-    (True, AppN fun p args) -> pure $ AppN fun p (args ++ [arg])
+    (True, AppN fun p args) | length args < maxApp -> pure $ AppN fun p (args ++ [arg])
     (_, _) -> pure $ AppN fun p [arg]
 
 

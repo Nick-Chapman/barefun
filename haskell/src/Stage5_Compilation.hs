@@ -81,7 +81,7 @@ cmapInternal = do
   Map.fromList
     ( [(finalCodeLabel, finalCode)] ++
       -- TODO: all numbers upto some max number of args -- the same which we collect in NBE
-      [ pap i j | (i,j) <- [(1,2),(1,3),(1,4),(1,5)] ] ++
+      [ pap i j | (i,j) <- [(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)] ] ++
       [ overapp x | x <- [1,2,3,4] ]
     )
 
