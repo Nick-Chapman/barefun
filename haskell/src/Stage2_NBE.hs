@@ -180,18 +180,6 @@ reflect :: Env -> Exp -> M SemValue
 reflect env = \case
   -- These are undefined because the multi-arg versions introduced only by the NbE stage
   -- TODO: Stage2/NBE should have it's own type for the result of the transform
-  Lam2{} ->
-    undefined
-  App2{} ->
-    undefined
-  RecLam2{} ->
-    undefined
-  Lam3{} ->
-    undefined
-  App3{} ->
-    undefined
-  RecLam3{} ->
-    undefined
   AppN{} ->
     undefined
   LamN{} ->

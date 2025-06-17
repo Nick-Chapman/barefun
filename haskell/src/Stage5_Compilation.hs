@@ -171,27 +171,14 @@ compileTopDef :: String -> SRC.Top -> Asm [DataSpec]
 compileTopDef who = \case
   SRC.TopPrim prim xs -> error (show ("Unexpected TopPrim (a Pure Primitive did not get inlined)",prim,xs))
   SRC.TopLitS string -> pure (DW [ lnumTagging (fromIntegral $ length string) ] : [ DS string ])
-
   SRC.TopLam _x body -> do
     codeLabel <- compileCode body >>= cutEntryCode 1 ("Function: " ++ who)
     let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
-
-  SRC.TopLam2 x1 x2 body -> do
-    codeLabel <- compileCode body >>= cutEntryCode 2 ("Function: " ++ who ++ show [x1,x2])
-    let w1 = LCodeLabel codeLabel
-    pure [DW [w1]]
-
-  SRC.TopLam3 x1 x2 x3 body -> do
-    codeLabel <- compileCode body >>= cutEntryCode 3 ("Function: " ++ who ++ show [x1,x2,x3])
-    let w1 = LCodeLabel codeLabel
-    pure [DW [w1]]
-
   SRC.TopLamN xs body -> do
     codeLabel <- compileCode body >>= cutEntryCode (length xs) ("Function: " ++ who ++ show xs)
     let w1 = LCodeLabel codeLabel
     pure [DW [w1]]
-
   SRC.TopConApp (Ctag _ tag) xs -> do
     pure [DW (lnumTagging tag : map compileTopRef xs)]
 
@@ -222,19 +209,6 @@ compileCode = \case
     pure $ doOps
       [ setArgOut 0 (compileRef arg)
       ] (codeTail 1 (compileRef fun))
-
-  SRC.Tail2 fun _pos arg1 arg2 -> do
-    pure $ doOps
-      [ setArgOut 0 (compileRef arg1)
-      , setArgOut 1 (compileRef arg2)
-      ] (codeTail 2 (compileRef fun))
-
-  SRC.Tail3 fun _pos arg1 arg2 arg3 -> do
-    pure $ doOps
-      [ setArgOut 0 (compileRef arg1)
-      , setArgOut 1 (compileRef arg2)
-      , setArgOut 2 (compileRef arg3)
-      ] (codeTail 3 (compileRef fun))
 
   SRC.TailN fun _pos args -> do
     pure $ doOps
@@ -307,12 +281,8 @@ compileAtomicTo who target = \case
   SRC.Prim prim xs -> pure (compilePrimitiveTo prim target (map compileRef xs))
   SRC.ConApp (Ctag _ tag) xs -> pure (compileConAppTo target tag xs)
   SRC.Lam pre _post _x0 body -> compileFunctionTo 1 who target pre body
-  SRC.Lam2 pre _post _x0 _x1 body -> compileFunctionTo 2 who target pre body
-  SRC.Lam3 pre _post _x0 _x1 _x2 body -> compileFunctionTo 3 who target pre body
   SRC.LamN pre _post xs body -> compileFunctionTo (length xs) who target pre body
   SRC.RecLam pre _post _f _x0 body -> compileFunctionTo 1 who target pre body
-  SRC.RecLam2 pre _post _f _x0 _x1 body -> compileFunctionTo 2 who target pre body
-  SRC.RecLam3 pre _post _f _x0 _x1 _x2 body -> compileFunctionTo 3 who target pre body
   SRC.RecLamN pre _post _f xs body -> compileFunctionTo (length xs) who target pre body
 
 compileConAppTo :: Target -> Number -> [SRC.Ref] -> [Op]

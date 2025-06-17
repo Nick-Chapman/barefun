@@ -2,7 +2,7 @@
 module Stage0_AST
   ( Prog(..),Def(..),Exp(..),Arm(..),Literal(..),Id(..),Cid(..),Bid(..)
   , mkUserId
-  , execute,evalLit,apply,apply2,apply3,applyN
+  , execute,evalLit,apply,applyN
   ) where
 
 import Primitive (Primitive,executePrimitive)
@@ -179,29 +179,11 @@ apply func p arg k = do
     VFunc f -> f arg k
     v -> error (show ("apply",v,p))
 
-apply2 :: Value -> Position -> Value -> Value -> (Value -> Interaction) -> Interaction
-apply2 func p arg1 arg2 k = do
-  case func of
-    VFunc f1 -> f1 arg1 $ \func -> apply func p arg2 k
-      {-f1 arg1 $ \case
-        VFunc f2 -> f2 arg2 k
-        v -> error (show ("apply2(after app1)",v,p))-}
-    v ->
-      error (show ("apply2",v,p))
-
-apply3 :: Value -> Position -> Value -> Value -> Value -> (Value -> Interaction) -> Interaction
-apply3 func p arg1 arg2 arg3 k = do
-  case func of
-    VFunc f1 -> f1 arg1 $ \func -> apply2 func p arg2 arg3 k
-    v ->
-      error (show ("apply3",v,p))
-
 applyN :: Value -> Position -> [Value] -> (Value -> Interaction) -> Interaction
 applyN func pos args k = do
   case args of
     [] -> k func
     arg:args -> apply func pos arg $ \fa -> applyN fa pos args k
-
 
 evalLit :: Literal -> Value
 evalLit = \case

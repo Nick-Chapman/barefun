@@ -11,7 +11,7 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,bracketSquare,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0_AST (evalLit,apply,apply2,apply3,applyN,Literal,Cid,Bid(..))
+import Stage0_AST (evalLit,apply,applyN,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
 import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..))
@@ -28,16 +28,10 @@ data Exp
   | ConTag Position Ctag [Exp]
   | Prim Position Primitive [Exp]
   | Lam Position Id Exp
-  | Lam2 Position Id Id Exp -- TODO LamN
-  | Lam3 Position Id Id Id Exp
   | LamN Position [Id] Exp
   | RecLam Position Id Id Exp
-  | RecLam2 Position Id Id Id Exp -- TODO RecLamN
-  | RecLam3 Position Id Id Id Id Exp
   | RecLamN Position Id [Id] Exp
   | App Exp Position Exp
-  | App2 Exp Position Exp Exp -- TODO AppN
-  | App3 Exp Position Exp Exp Exp
   | AppN Exp Position [Exp]
   | Let Position Id Exp Exp
   | Match Position Exp [Arm]
@@ -62,16 +56,10 @@ sizeExp = \case
   ConTag _ _ es -> 1 + sum (map sizeExp es)
   Prim _ _ es -> 1 + sum (map sizeExp es)
   Lam _ _ body -> 1 + sizeExp body
-  Lam2 _ _ _ body -> 2 + sizeExp body
-  Lam3 _ _ _ _ body -> 3 + sizeExp body
   LamN _ xs body -> length xs + sizeExp body
   RecLam _ _ _ body -> 2 + sizeExp body
-  RecLam2 _ _ _ _ body -> 3 + sizeExp body
-  RecLam3 _ _ _ _ _ body -> 4 + sizeExp body
   RecLamN _ _ xs body -> 1 + length xs  + sizeExp body
   App fun _ arg -> sizeExp fun + sizeExp arg
-  App2 fun _ arg1 arg2 -> sizeExp fun + sizeExp arg1 + sizeExp arg2
-  App3 fun _ arg1 arg2 arg3 -> sizeExp fun + sizeExp arg1 + sizeExp arg2 + sizeExp arg3
   AppN fun _ args -> sizeExp fun + sum (map sizeExp args)
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
   Match _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
@@ -83,21 +71,15 @@ provenanceExp :: Exp -> (String,Position)
 provenanceExp = \case
   Var{} -> error "provenanceExp/Var" -- we never call on a Var
   App _ pos _ -> ("app", pos)
-  App2 _ pos _ _ -> ("app2",pos)
-  App3 _ pos _ _ _ -> ("app3",pos)
   AppN _ pos _ -> ("appN",pos)
   Lit pos _ -> ("lit",pos)
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ -> ("lam",pos)
-  Lam2 pos _ _ _ -> ("lam2",pos)
-  Lam3 pos _ _ _ _ -> ("lam3",pos)
   LamN pos _ _ -> ("lamN",pos)
 
   Let pos _ _ _ -> ("uLET", pos)
   Prim pos _ _ -> ("prim", pos)
   RecLam pos _ _ _ -> undefined ("reclam",pos) -- never seen these
-  RecLam2 pos _ _ _ _ -> undefined ("reclam2",pos)
-  RecLam3 pos _ _ _ _ _ -> undefined ("reclam3",pos)
   RecLamN{} -> undefined
   Match pos _ _ -> ("case",pos)
 
@@ -132,21 +114,11 @@ prettyTop control = pretty
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
       Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
       Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
-      Lam2 _ x1 x2 body -> bracket $ indented ("fun [" ++ prettyId x1 ++ "," ++ prettyId x2 ++ "] ->") (pretty body)
-      Lam3 _ x1 x2 x3 body -> bracket $ indented ("fun [" ++ prettyId x1 ++ "," ++ prettyId x2  ++ "," ++ prettyId x3 ++ "] ->") (pretty body)
       LamN _ xs body -> bracket $ indented ("fun [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
-
       RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
-      RecLam2 _ f x0 x1 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ prettyId x0 ++ "," ++ prettyId x1 ++ "] ->") (pretty body)
-      RecLam3 _ f x0 x1 x2 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ prettyId x0 ++ "," ++ prettyId x1 ++ "," ++ prettyId x2 ++ "] ->") (pretty body)
       RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
-
       App func _ arg -> bracket $ jux (pretty func) (pretty arg)
-      App2 func _ arg1 arg2 -> bracket $ jux (pretty func) (jux (pretty arg1) (pretty arg2))
-      App3 func _ arg1 arg2 arg3 -> bracket $ jux (pretty func) (jux (pretty arg1) (jux (pretty arg2) (pretty arg3)))
-
       AppN func _ args -> jux (pretty func) (bracketSquare (foldl1 juxComma (map pretty args)))
-
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
       Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
@@ -219,47 +191,23 @@ eval env@Env{venv} = \case
       executePrimitive prim vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
-  Lam2 _ x1 x2 body -> \k -> do
-    k (VFunc (\arg1 k -> k $ VFunc (\arg2 k -> eval env { venv = Map.insert x1 arg1 (Map.insert x2 arg2 venv) } body k)))
-  Lam3 _ x1 x2 x3 body -> \k -> do
-    k (VFunc (\arg1 k -> k $ VFunc (\arg2 k -> k $ VFunc (\arg3 k -> eval env { venv = Map.insert x1 arg1 (Map.insert x2 arg2 (Map.insert x3 arg3 venv)) } body k))))
   LamN _ xs body -> \k ->
     abstract env xs body k
   RecLam _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
-  RecLam2 _ f x0 x1 body -> \k -> do
-    let me = VFunc (\arg0 k -> k $ VFunc (\arg1 k -> eval env { venv = Map.insert f me $ Map.insert x0 arg0 $ Map.insert x1 arg1 venv } body k))
-    k me
-  RecLam3 _ f x0 x1 x2 body -> \k -> do
-    let me = VFunc (\arg0 k -> k $ VFunc (\arg1 k -> k $ VFunc (\arg2 k -> eval env { venv = Map.insert f me $ Map.insert x0 arg0 $ Map.insert x1 arg1 $ Map.insert x2 arg2 venv } body k)))
-    k me
   RecLamN _ _ [] _ -> error "recLamN/[]"
   RecLamN _ f (x0:xs0) body -> \k -> do
     let me = abstractV env { venv = Map.insert f me venv } x0 xs0 body
     k me
-
-  App2 eFunc pos eArg1 eArg2 -> \k -> do -- right->left eval order
-    eval env eArg2 $ \arg2 -> do
-      eval env eArg1 $ \arg1 -> do
-        eval env eFunc $ \func -> do
-          ITick I.App $ ITick I.App $ apply2 func pos arg1 arg2 k
-  App3 eFunc pos eArg1 eArg2 eArg3 -> \k -> do -- right->left eval order
-    eval env eArg3 $ \arg3 -> do
-      eval env eArg2 $ \arg2 -> do
-        eval env eArg1 $ \arg1 -> do
-          eval env eFunc $ \func -> do
-            ITick I.App $ ITick I.App $ apply3 func pos arg1 arg2 arg3 k
-
-  AppN eFunc pos eArgs -> \k -> do
-    evals env (reverse eArgs) $ \argsInRev -> do
-      eval env eFunc $ \func -> do
-        ITick I.App $ applyN func pos (reverse argsInRev) k
-
   App eFunc pos eArg -> \k -> do
     eval env eArg $ \arg -> do
       eval env eFunc $ \func -> do
         ITick I.App $ apply func pos arg k
+  AppN eFunc pos eArgs -> \k -> do
+    evals env (reverse eArgs) $ \argsInRev -> do
+      eval env eFunc $ \func -> do
+        ITick I.App $ applyN func pos (reverse argsInRev) k
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k

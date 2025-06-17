@@ -12,7 +12,7 @@ import Data.Map (Map)
 import Data.Set (Set,singleton,(\\),union)
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
-import Stage0_AST (apply,apply2,apply3,applyN)
+import Stage0_AST (apply,applyN)
 import Stage1_EXP (Id(..),Name(GeneratedName),Ctag(..),provenanceExp)
 import Text.Printf (printf)
 import Value (Interaction(..))
@@ -28,8 +28,6 @@ type Transformed = Code
 data Code
   = Return Position Val
   | Tail Val Position Val
-  | Tail2 Val Position Val Val
-  | Tail3 Val Position Val Val Val
   | TailN Val Position [Val]
   | TailPrim Primitive Position Val
   | LetAtomic Id Atomic Code
@@ -44,12 +42,8 @@ data Atomic
   | Prim Position Primitive [Val]
   | ConTag Position Ctag [Val]
   | Lam Position Fvs Id Code
-  | Lam2 Position Fvs Id Id Code
-  | Lam3 Position Fvs Id Id Id Code
   | LamN Position Fvs [Id] Code
   | RecLam Position Fvs Id Id Code
-  | RecLam2 Position Fvs Id Id Id Code
-  | RecLam3 Position Fvs Id Id Id Id Code
   | RecLamN Position Fvs Id [Id] Code
 
 -- Val expressions cause no evaluation.
@@ -69,12 +63,8 @@ provenanceAtomic = \case
   Prim pos _ _ -> ("prim",pos)
   ConTag pos _ _ -> ("con",pos)
   Lam pos _ _ _ -> ("lam",pos)
-  Lam2 pos _ _ _ _ -> ("lam2",pos)
-  Lam3 pos _ _ _ _ _ -> ("lam3",pos)
   LamN pos _ _ _ -> ("lamN",pos)
   RecLam pos _ _ _ _ -> undefined $ ("reclam",pos) -- why never seen?
-  RecLam2 pos _ _ _ _ _ -> undefined $ ("reclam2",pos)
-  RecLam3 pos _ _ _ _ _ _ -> undefined $ ("reclam3",pos)
   RecLamN{} -> undefined
 
 ----------------------------------------------------------------------
@@ -86,8 +76,6 @@ pretty :: Code -> Lines
 pretty = \case
   Return _ x -> ["k " ++ show x]
   Tail func _pos arg -> [printf "%s %s k" (show func) (show arg)]
-  Tail2 func _pos arg0 arg1 -> [printf "%s %s k" (show func) (show [arg0,arg1])]
-  Tail3 func _pos arg0 arg1 arg2 -> [printf "%s %s k" (show func) (show [arg0,arg1,arg2])]
   TailN func _pos args -> [printf "%s %s k" (show func) (show args)]
   TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic x rhs body -> onHead (("let " ++ show x ++ " = ")++) (onTail (++ " in") (prettyA rhs)) ++ pretty body
@@ -101,12 +89,8 @@ prettyA = \case
   ConTag _ tag [] -> [show tag]
   ConTag _ tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam _ fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
-  Lam2 _ fvs x0 x1 body -> indented ("fun " ++ show fvs ++ " " ++ show [x0,x1] ++ " k ->") (pretty body)
-  Lam3 _ fvs x0 x1 x2 body -> indented ("fun " ++ show fvs ++ " " ++ show [x0,x1,x2] ++ " k ->") (pretty body)
   LamN _ fvs xs body -> indented ("fun " ++ show fvs ++ " " ++ show xs ++ " k ->") (pretty body)
   RecLam _ fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
-  RecLam2 _ fvs f x0 x1 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show [x0,x1] ++ " k ->") (pretty body)
-  RecLam3 _ fvs f x0 x1 x2 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show [x0,x1,x2] ++ " k ->") (pretty body)
   RecLamN _ fvs f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show xs ++ " k ->") (pretty body)
 
 
@@ -141,8 +125,6 @@ evalCode :: Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode env = \case
   Return _ v -> \k -> ITick I.Return $ k (evalV v)
   Tail fun pos arg -> \k -> ITick I.Enter $ apply (evalV fun) pos (evalV arg) k
-  Tail2 fun pos arg1 arg2 -> \k -> ITick I.Enter $ ITick I.Enter $ apply2 (evalV fun) pos (evalV arg1) (evalV arg2) k
-  Tail3 fun pos arg1 arg2 arg3 -> \k -> ITick I.Enter $ ITick I.Enter $ apply3 (evalV fun) pos (evalV arg1) (evalV arg2) (evalV arg3) k
   TailN fun pos args -> \k -> ITick I.Enter $ applyN (evalV fun) pos (map evalV args) k
   TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ do
     executePrimitive prim [evalV arg] k
@@ -176,22 +158,11 @@ evalCode env = \case
       ConTag _ tag vs -> \k -> k (VCons tag (map evalV vs))
       Lam _ fvs x body -> \k -> do
         k (VFunc (\arg k -> evalCode (insert x arg (limit fvs env)) body k))
-      Lam2 _ fvs x0 x1 body -> \k -> do
-        k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> evalCode (insert x0 arg0 $ insert x1 arg1 (limit fvs env)) body k))))
-      Lam3 _ fvs x0 x1 x2 body -> \k -> do
-        k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode (insert x0 arg0 $ insert x1 arg1 $ insert x2 arg2 (limit fvs env)) body k))))))
       LamN _ fvs xs body -> \k ->
         abstract (limit fvs env) xs body k
       RecLam _ fvs f x body -> \k -> do
         let me = VFunc (\arg k -> evalCode (insert f me (insert x arg (limit fvs env))) body k)
         k me
-      RecLam2 _ fvs f x0 x1 body -> \k -> do
-        let me = VFunc (\arg0 k -> k (VFunc (\arg1 k -> evalCode (insert f me $ insert x0 arg0 $ insert x1 arg1 $ limit fvs env) body k)))
-        k me
-      RecLam3 _ fvs f x0 x1 x2 body -> \k -> do
-        let me = VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode (insert f me $ insert x0 arg0 $ insert x1 arg1 $ insert x2 arg2 $ limit fvs env) body k)))))
-        k me
-
       RecLamN _ _ _ [] _ -> error "recLamN/[]"
       RecLamN _ fvs f (x0:xs0) body -> \k -> do
         let me = abstractV (insert f me $ limit fvs env) x0 xs0 body
@@ -280,15 +251,6 @@ compileExp = \case
         compileAsIds es $ \xs ->
         k $ Atomic $ Prim pos prim xs
 
-
-  SRC.Lam2 pos x1 x2 body -> \k -> do
-    body <- compileTop body
-    k $ Atomic $ mkLam2 pos x1 x2 body
-
-  SRC.Lam3 pos x1 x2 x3 body -> \k -> do
-    body <- compileTop body
-    k $ Atomic $ mkLam3 pos x1 x2 x3 body
-
   SRC.LamN pos xs body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkLamN pos xs body
@@ -301,14 +263,6 @@ compileExp = \case
     body <- compileTop body
     k $ Atomic $ mkRecLam pos f x body
 
-  SRC.RecLam2 pos f x0 x1 body -> \k -> do
-    body <- compileTop body
-    k $ Atomic $ mkRecLam2 pos f x0 x1 body
-
-  SRC.RecLam3 pos f x0 x1 x2 body -> \k -> do
-    body <- compileTop body
-    k $ Atomic $ mkRecLam3 pos f x0 x1 x2 body
-
   SRC.RecLamN pos f xs body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkRecLamN pos f xs body
@@ -317,19 +271,6 @@ compileExp = \case
     compileAsId eArg $ \arg -> do
       compileAsId eFunc $ \func -> do
         k $ Compound $ Tail func pos arg
-
-  SRC.App2 eFunc pos eArg1 eArg2 -> \k -> do
-    compileAsId eArg2 $ \arg2 -> do
-      compileAsId eArg1 $ \arg1 -> do
-        compileAsId eFunc $ \func -> do
-          k $ Compound $ Tail2 func pos arg1 arg2
-
-  SRC.App3 eFunc pos eArg1 eArg2 eArg3-> \k -> do
-    compileAsId eArg3 $ \arg3 -> do
-      compileAsId eArg2 $ \arg2 -> do
-        compileAsId eArg1 $ \arg1 -> do
-          compileAsId eFunc $ \func -> do
-            k $ Compound $ Tail3 func pos arg1 arg2 arg3
 
   SRC.AppN eFunc pos eArgs-> \k -> do
     compileAsIds (reverse eArgs) $ \argsInRev -> do
@@ -340,6 +281,7 @@ compileExp = \case
     compileExp rhs $ \rhs -> do
       body <- compileExp body k >>= nameAtomic
       pure $ Compound $ mkBind x rhs body
+
   SRC.Match _pos scrut arms -> \k -> do
     compileAsId scrut $ \scrut -> do
       arms <- mapM compileArm arms
@@ -410,23 +352,11 @@ runM m0 = loop 1 m0 $ \_ x -> x
 mkLam :: Position -> Id -> Code -> Atomic
 mkLam pos x code = Lam pos (Set.toList (fvs code \\ singleton x)) x code
 
-mkLam2 :: Position -> Id -> Id -> Code -> Atomic
-mkLam2 pos x1 x2 code = Lam2 pos (Set.toList (fvs code \\ Set.fromList [x1,x2])) x1 x2 code
-
-mkLam3 :: Position -> Id -> Id -> Id -> Code -> Atomic
-mkLam3 pos x1 x2 x3 code = Lam3 pos (Set.toList (fvs code \\ Set.fromList [x1,x2,x3])) x1 x2 x3 code
-
 mkLamN :: Position -> [Id] -> Code -> Atomic
 mkLamN pos xs code = LamN pos (Set.toList (fvs code \\ Set.fromList xs)) xs code
 
 mkRecLam :: Position -> Id -> Id -> Code -> Atomic
 mkRecLam pos f x code = RecLam pos (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
-
-mkRecLam2 :: Position -> Id -> Id -> Id -> Code -> Atomic
-mkRecLam2 pos f x0 x1 code = RecLam2 pos (Set.toList (fvs code \\ Set.fromList [f,x0,x1])) f x0 x1 code
-
-mkRecLam3 :: Position -> Id -> Id -> Id -> Id -> Code -> Atomic
-mkRecLam3 pos f x0 x1 x2 code = RecLam3 pos (Set.toList (fvs code \\ Set.fromList [f,x0,x1,x2])) f x0 x1 x2 code
 
 mkRecLamN :: Position -> Id -> [Id] -> Code -> Atomic
 mkRecLamN pos f xs code = RecLamN pos (Set.toList (fvs code \\ Set.fromList (f:xs))) f xs code
@@ -439,8 +369,6 @@ fvs :: Code -> Set Id
 fvs = \case
   Return _ x -> fvsV x
   Tail func _ arg -> Set.unions [fvsV func,fvsV arg]
-  Tail2 func _ arg1 arg2 -> Set.unions [fvsV func,fvsV arg1,fvsV arg2]
-  Tail3 func _ arg1 arg2 arg3 -> Set.unions [fvsV func,fvsV arg1,fvsV arg2,fvsV arg3]
   TailN func _ args -> fvsV func `union` Set.unions (map fvsV args)
   TailPrim _ _ x -> fvsV x
   LetAtomic x rhs body -> fvsA rhs `union` (fvs body \\ singleton x)
@@ -461,10 +389,6 @@ fvsA = \case
   ConTag _ _ xs -> Set.unions (map fvsV xs)
   Prim _ _ xs -> Set.unions (map fvsV xs)
   Lam _ fvs _ _ -> Set.fromList fvs
-  Lam2 _ fvs _ _ _ -> Set.fromList fvs
-  Lam3 _ fvs _ _ _ _ -> Set.fromList fvs
   LamN _ fvs _ _ -> Set.fromList fvs
   RecLam _ fvs _ _ _ -> Set.fromList fvs
-  RecLam2 _ fvs _ _ _ _ -> Set.fromList fvs
-  RecLam3 _ fvs _ _ _ _ _ -> Set.fromList fvs
   RecLamN _ fvs _ _ _ -> Set.fromList fvs

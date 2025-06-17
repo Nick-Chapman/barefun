@@ -12,7 +12,7 @@ import Data.Map (Map)
 import Data.Set (notMember)
 import Lines (Lines,(<++),(++>),(>>>))
 import Par4 (Position(..))
-import Stage0_AST (apply,apply2,apply3,applyN)
+import Stage0_AST (apply,applyN)
 import Stage1_EXP (Id(..),Ctag(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
@@ -32,16 +32,12 @@ data Top
   = TopLitS String
   | TopPrim Primitive [Ref]
   | TopLam Ref Code -- All top function defs allow recursion. We dont even have an unrecursive form.
-  | TopLam2 Ref Ref Code
-  | TopLam3 Ref Ref Ref Code
   | TopLamN [Ref] Code
   | TopConApp Ctag [Ref]
 
 data Code
   = Return Position Ref
   | Tail Ref Position Ref
-  | Tail2 Ref Position Ref Ref
-  | Tail3 Ref Position Ref Ref Ref
   | TailN Ref Position [Ref]
   | TailPrim Primitive Position Ref
   | LetAtomic (Id,Temp) Atomic Code
@@ -54,12 +50,8 @@ data Atomic
   = Prim Primitive [Ref]
   | ConApp Ctag [Ref]
   | Lam [Ref] [Ref] Ref Code
-  | Lam2 [Ref] [Ref] Ref Ref Code
-  | Lam3 [Ref] [Ref] Ref Ref Ref Code
   | LamN [Ref] [Ref] [Ref] Code
   | RecLam [Ref] [Ref] Ref Ref Code
-  | RecLam2 [Ref] [Ref] Ref Ref Ref Code
-  | RecLam3 [Ref] [Ref] Ref Ref Ref Ref Code
   | RecLamN [Ref] [Ref] Ref [Ref] Code
 
 data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg Int
@@ -105,8 +97,6 @@ prettyT = \case
   TopLitS x -> [show x]
   TopPrim prim xs -> [printf "PRIM_%s(%s)" (show prim) (intercalate "," (map show xs))]
   TopLam x body -> ("fun " ++ show x ++ " k ->") >>> prettyC body
-  TopLam2 x1 x2 body -> ("fun " ++ show [x1,x2] ++ " k ->") >>> prettyC body
-  TopLam3 x1 x2 x3 body -> ("fun " ++ show [x1,x2,x3] ++ " k ->") >>> prettyC body
   TopLamN xs body -> ("fun " ++ show xs ++ " k ->") >>> prettyC body
   TopConApp tag [] -> [show tag]
   TopConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
@@ -115,8 +105,6 @@ prettyC :: Code -> Lines
 prettyC = \case
   Return _ x -> ["k " ++ show x]
   Tail func _pos arg -> [printf "%s %s k" (show func) (show arg)]
-  Tail2 func _pos arg1 arg2 -> [printf "%s %s k" (show func) (show [arg1,arg2])]
-  Tail3 func _pos arg1 arg2 arg3 -> [printf "%s %s k" (show func) (show [arg1,arg2,arg3])]
   TailN func _pos args -> [printf "%s %s k" (show func) (show args)]
   TailPrim prim _pos arg -> [printf "PRIM_%s(%s) k" (show prim) (show arg)]
   LetAtomic (_,t) rhs body ->
@@ -136,17 +124,9 @@ prettyA = \case
   ConApp tag [] -> [show tag]
   ConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
   Lam pre post x0 body -> (show pre ++ ", fun " ++ show post ++ " " ++ show x0 ++ " k ->") >>> prettyC body
-  Lam2 pre post x0 x1 body -> (show pre ++ ", fun " ++ show post ++ " " ++ show [x0,x1] ++ " k ->") >>> prettyC body
-  Lam3 pre post x0 x1 x2 body -> (show pre ++ ", fun " ++ show post ++ " " ++ show [x0,x1,x2] ++ " k ->") >>> prettyC body
   LamN pre post xs body -> (show pre ++ ", fun " ++ show post ++ " " ++ show xs ++ " k ->") >>> prettyC body
   RecLam pre post f x0 body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show x0 ++ " k ->")
-    >>> prettyC body
-  RecLam2 pre post f x0 x1 body ->
-    (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show [x0,x1] ++ " k ->")
-    >>> prettyC body
-  RecLam3 pre post f x0 x1 x2 body ->
-    (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show [x0,x1,x2] ++ " k ->")
     >>> prettyC body
   RecLamN pre post f xs body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show xs ++ " k ->")
@@ -218,8 +198,6 @@ evalT genv = \case
   TopLitS string -> VString string
   TopPrim prim xs -> evaluatePurePrimitive prim (map (look genv) xs)
   TopLam x body -> VFunc $ \arg k -> evalCode genv (insert x arg genv) body k
-  TopLam2 x1 x2 body -> VFunc $ \arg1 k -> k $ VFunc $ \arg2 k -> do evalCode genv (insert x1 arg1 $ insert x2 arg2 genv) body k
-  TopLam3 x1 x2 x3 body -> VFunc $ \arg1 k -> k $ VFunc $ \arg2 k -> k $ VFunc $ \arg3 k -> do evalCode genv (insert x1 arg1 $ insert x2 arg2 $ insert x3 arg3 genv) body k
   TopLamN [] _ -> error "TopLamN/[]"
   TopLamN (x:xs) body -> abstractV genv genv x xs body
   TopConApp tag xs -> VCons tag (map (look genv) xs)
@@ -228,8 +206,6 @@ evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
 evalCode genv env = \case
   Return _ x -> \k -> ITick I.Return $ k (look env x)
   Tail func pos arg -> \k -> ITick I.Enter $ apply (look env func) pos (look env arg) k
-  Tail2 func pos arg1 arg2 -> \k -> ITick I.Enter $ ITick I.Enter $ apply2 (look env func) pos (look env arg1) (look env arg2) k
-  Tail3 func pos arg1 arg2 arg3 -> \k -> ITick I.Enter $ ITick I.Enter $ apply3 (look env func) pos (look env arg1) (look env arg2) (look env arg3) k
   TailN func pos args -> \k -> ITick I.Enter $ applyN (look env func) pos (map (look env) args) k
   TailPrim prim _pos arg -> \k -> ITick I.TailPrim $ executePrimitive prim [look env arg] k
   LetAtomic (x,t) a1 c2 -> \k -> do
@@ -265,14 +241,6 @@ evalCode genv env = \case
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         k (VFunc (\arg k -> evalCode genv (insert x arg env') body k))
 
-      Lam2 pre _ x0 x1 body -> \k -> do
-        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
-        k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> evalCode genv (insert x0 arg0 $ insert x1 arg1 env') body k))))
-
-      Lam3 pre _ x0 x1 x2 body -> \k -> do
-        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
-        k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode genv (insert x0 arg0 $ insert x1 arg1  $ insert x2 arg2 env') body k))))))
-
       LamN pre _ xs body -> \k -> do
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         abstract genv env' xs body k
@@ -281,14 +249,7 @@ evalCode genv env = \case
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         let me = VFunc (\arg0 k -> evalCode genv (insert x0 arg0 $ insert f me env') body k)
         k me
-      RecLam2 pre _ f x0 x1 body -> \k -> do
-        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
-        let me = VFunc (\arg0 k -> k (VFunc (\arg1 k -> evalCode genv (insert x0 arg0 $ insert x1 arg1 $ insert f me env') body k)))
-        k me
-      RecLam3 pre _ f x0 x1 x2 body -> \k -> do
-        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
-        let me = VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode genv (insert x0 arg0 $ insert x1 arg1 $ insert x2 arg2 $ insert f me env') body k)))))
-        k me
+
       RecLamN _ _ _ [] _ -> error "RecLamN/[]"
       RecLamN pre _ f (x:xs) body -> \k -> do
         let env' = insert f me (mkFrameEnv firstFrameIndexForLambdas genv env pre)
@@ -336,8 +297,6 @@ compileCtop = compileC firstTempIndex
     compileC nextTemp cenv = \case
       SRC.Return pos v -> pure $ Return pos (compileV cenv v)
       SRC.Tail func pos arg -> pure $ Tail (compileV cenv func) pos (compileV cenv arg)
-      SRC.Tail2 func pos arg1 arg2 -> pure $ Tail2 (compileV cenv func) pos (compileV cenv arg1) (compileV cenv arg2)
-      SRC.Tail3 func pos arg1 arg2 arg3 -> pure $ Tail3 (compileV cenv func) pos (compileV cenv arg1) (compileV cenv arg2) (compileV cenv arg3)
       SRC.TailN func pos args -> pure $ TailN (compileV cenv func) pos (map (compileV cenv) args)
       SRC.TailPrim prim pos arg-> pure $ TailPrim prim pos (compileV cenv arg)
 
@@ -410,31 +369,6 @@ compileA cenv = \case
       _ ->
         pure $ Left (Lam pre post r0 body)
 
-  SRC.Lam2 _ fvs x0 x1 body -> do
-    let r0 = Ref x0 (TheArg 0)
-    let r1 = Ref x1 (TheArg 1)
-    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
-    body <- compileCtop (Map.insert x0 r0 $ Map.insert x1 r1 cenv) body
-    case (pre,post) of
-      ([],[]) -> do
-        g <- GlobalRef
-        pure $ Right (g, TopLam2 r0 r1 body)
-      _ ->
-        pure $ Left (Lam2 pre post r0 r1 body)
-
-  SRC.Lam3 _ fvs x0 x1 x2 body -> do
-    let r0 = Ref x0 (TheArg 0)
-    let r1 = Ref x1 (TheArg 1)
-    let r2 = Ref x2 (TheArg 2)
-    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
-    body <- compileCtop (Map.insert x0 r0 $ Map.insert x1 r1 $ Map.insert x2 r2 $ cenv) body
-    case (pre,post) of
-      ([],[]) -> do
-        g <- GlobalRef
-        pure $ Right (g, TopLam3 r0 r1 r2 body)
-      _ ->
-        pure $ Left (Lam3 pre post r0 r1 r2 body)
-
   SRC.LamN _ fvs xs body -> do
     let rs = [ Ref x (TheArg i) | (i,x) <- zip [0..] xs ]
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
@@ -459,37 +393,6 @@ compileA cenv = \case
         let rF = Ref f TheFrame
         body <- compileCtop (Map.insert f rF $ Map.insert x0 r0 cenv) body
         pure $ Left (RecLam pre post rF r0 body)
-
-  SRC.RecLam2 _ fvs f x0 x1 body -> do
-    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
-    let r0 = Ref x0 (TheArg 0)
-    let r1 = Ref x1 (TheArg 1)
-    case (pre,post) of
-      ([],[]) -> do
-        g <- GlobalRef
-        let rF = Ref f (InGlobal g)
-        body <- compileCtop (Map.insert f rF $ Map.insert x0 r0 $ Map.insert x1 r1 cenv) body
-        pure $ Right (g, TopLam2 r0 r1 body)
-      _ -> do
-        let rF = Ref f TheFrame
-        body <- compileCtop (Map.insert f rF $ Map.insert x0 r0 $ Map.insert x1 r1 cenv) body
-        pure $ Left (RecLam2 pre post rF r0 r1 body)
-
-  SRC.RecLam3 _ fvs f x0 x1 x2 body -> do
-    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
-    let r0 = Ref x0 (TheArg 0)
-    let r1 = Ref x1 (TheArg 1)
-    let r2 = Ref x2 (TheArg 2)
-    case (pre,post) of
-      ([],[]) -> do
-        g <- GlobalRef
-        let rF = Ref f (InGlobal g)
-        body <- compileCtop (Map.insert f rF $ Map.insert x0 r0 $ Map.insert x1 r1 $ Map.insert x2 r2 $ cenv) body
-        pure $ Right (g, TopLam3 r0 r1 r2 body)
-      _ -> do
-        let rF = Ref f TheFrame
-        body <- compileCtop (Map.insert f rF $ Map.insert x0 r0 $ Map.insert x1 r1 $ Map.insert x2 r2 $ cenv) body
-        pure $ Left (RecLam3 pre post rF r0 r1 r2 body)
 
   SRC.RecLamN _ fvs f xs body -> do
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
