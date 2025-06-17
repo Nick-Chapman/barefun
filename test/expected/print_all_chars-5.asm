@@ -76,7 +76,7 @@ L4: ; Arm: 13'20
   mov ax, 1
   jmp [bp]
 
-L5: ; Function: (loop,g1)
+L5: ; Function: (loop,g1)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(8)

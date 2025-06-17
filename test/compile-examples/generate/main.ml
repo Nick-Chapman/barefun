@@ -1,4 +1,7 @@
 
+let flags_for_example = function
+  | _ -> "-mlam -mapp"
+
 let select_versions_for_example = function
   | "bytes" -> [5]
   | "codes" -> [2;3;4;5]
@@ -18,9 +21,6 @@ let select_versions_for_example = function
   | "thrice" -> [2;3;4;5]
   | "two" -> [0;1;2;3;4;5]
   | _ -> []
-
-let flags_for_example = function
-  | _ -> ""
 
 let suffix_of_version v =
   if v >= 0 && v <= 4 then "ml" else

@@ -102,7 +102,7 @@ L6: ; Continuation
   mov ax, 1
   jmp [bp]
 
-L7: ; Function: (make_sector,g4)
+L7: ; Function: (make_sector,g4)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(8)
@@ -161,7 +161,7 @@ L10: ; Arm: 6'9
   mov ax, 1
   jmp [bp]
 
-L11: ; Function: (loop,g17)
+L11: ; Function: (loop,g17)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(8)
@@ -509,7 +509,7 @@ L27: ; Continuation
   mov ax, 1
   jmp [bp]
 
-L28: ; Function: (xloop,g5)
+L28: ; Function: (xloop,g5)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(8)
@@ -592,7 +592,7 @@ L31: ; Arm: 6'9
   mov ax, 1
   jmp [bp]
 
-L32: ; Function: (loop,g23)
+L32: ; Function: (loop,g23)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(8)

@@ -9,7 +9,7 @@ L1: ; Arm: 11'25
   mov ax, 1
   jmp [bp]
 
-L2: ; Function: (get_scancode,g1)
+L2: ; Function: (get_scancode,g1)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(0)
@@ -130,7 +130,7 @@ L3: ; Continuation
   mov ax, 1
   jmp [bp]
 
-L4: ; Function: (loop,g6)
+L4: ; Function: (loop,g6)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(6)
@@ -165,7 +165,7 @@ L5: ; Arm: 6'28
   mov ax, 1
   jmp [bp]
 
-L6: ; Function: (loop,g9)
+L6: ; Function: (loop,g9)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(0)

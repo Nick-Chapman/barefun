@@ -16,7 +16,7 @@ L2: ; Arm: 4'26
   mov ax, 1
   jmp [bp]
 
-L3: ; Function: (is_even,g1)
+L3: ; Function: (is_even,g1)[arg0]
   xchg si, di
   Bare_arg_check(1)
   Bare_heap_check(0)
