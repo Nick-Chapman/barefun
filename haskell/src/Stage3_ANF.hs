@@ -256,22 +256,9 @@ compileExp = \case
     body <- compileTop body
     k $ Atomic $ mkLamN pos xs body
 
-  SRC.Lam pos x body -> \k -> do
-    body <- compileTop body
-    k $ Atomic $ mkLam pos x body
-
-  SRC.RecLam pos f x body -> \k -> do
-    body <- compileTop body
-    k $ Atomic $ mkRecLam pos f x body
-
   SRC.RecLamN pos f xs body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkRecLamN pos f xs body
-
-  SRC.App eFunc pos eArg -> \k -> do
-    compileAsId eArg $ \arg -> do
-      compileAsId eFunc $ \func -> do
-        k $ Compound $ Tail func pos arg
 
   SRC.AppN eFunc pos eArgs-> \k -> do
     compileAsIds (reverse eArgs) $ \argsInRev -> do
@@ -350,14 +337,8 @@ runM m0 = loop 1 m0 $ \_ x -> x
 ----------------------------------------------------------------------
 -- Free Vars
 
-mkLam :: Position -> Id -> Code -> Atomic
-mkLam pos x code = Lam pos (Set.toList (fvs code \\ singleton x)) x code
-
 mkLamN :: Position -> [Id] -> Code -> Atomic
 mkLamN pos xs code = LamN pos (Set.toList (fvs code \\ Set.fromList xs)) xs code
-
-mkRecLam :: Position -> Id -> Id -> Code -> Atomic
-mkRecLam pos f x code = RecLam pos (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
 
 mkRecLamN :: Position -> Id -> [Id] -> Code -> Atomic
 mkRecLamN pos f xs code = RecLamN pos (Set.toList (fvs code \\ Set.fromList (f:xs))) f xs code

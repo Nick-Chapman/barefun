@@ -12,7 +12,7 @@ import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,bracketSquare,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Primitive (Primitive(Noinline),isPure,evaluatePurePrimitive,executePrimitive)
-import Stage0_AST (Literal(..),evalLit,apply,applyN)
+import Stage0_AST (Literal(..),evalLit,applyN)
 import Stage1_EXP (Ctag(..),PPControl(..),PPPosFlag(..), PPUniqueFlag(..))
 import Text.Printf (printf)
 import Value (Interaction(..),Value(..),Number,deUnit)
@@ -35,11 +35,8 @@ data Exp
   | Lit Position Literal
   | ConTag Position Ctag [Exp]
   | Prim Position Primitive [Exp]
-  | Lam Position Id Exp
   | LamN Position [Id] Exp
-  | RecLam Position Id Id Exp
   | RecLamN Position Id [Id] Exp
-  | App Exp Position Exp
   | AppN Exp Position [Exp]
   | Let Position Id Exp Exp
   | Match Position Exp [Arm]
@@ -57,11 +54,8 @@ sizeExp = \case
   Lit{} -> 1
   ConTag _ _ es -> 1 + sum (map sizeExp es)
   Prim _ _ es -> 1 + sum (map sizeExp es)
-  Lam _ _ body -> 1 + sizeExp body
   LamN _ xs body -> length xs + sizeExp body
-  RecLam _ _ _ body -> 2 + sizeExp body
   RecLamN _ _ xs body -> 1 + length xs  + sizeExp body
-  App fun _ arg -> sizeExp fun + sizeExp arg
   AppN fun _ args -> sizeExp fun + sum (map sizeExp args)
   Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
   Match _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
@@ -72,16 +66,12 @@ sizeExp = \case
 provenanceExp :: Exp -> (String,Position)
 provenanceExp = \case
   Var{} -> error "provenanceExp/Var" -- we never call on a Var
-  App _ pos _ -> ("app", pos)
   AppN _ pos _ -> ("appN",pos)
   Lit pos _ -> ("lit",pos)
   ConTag pos _ _ -> ("con",pos)
-  Lam pos _ _ -> ("lam",pos)
   LamN pos _ _ -> ("lamN",pos)
-
   Let pos _ _ _ -> ("uLET", pos)
   Prim pos _ _ -> ("prim", pos)
-  RecLam pos _ _ _ -> undefined ("reclam",pos) -- never seen these
   RecLamN{} -> undefined
   Match pos _ _ -> ("case",pos)
 
@@ -103,11 +93,8 @@ prettyTop control = pretty
       ConTag _ tag [] -> [show tag]
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
       Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
-      Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
       LamN _ xs body -> bracket $ indented ("fun [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
-      RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
       RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
-      App func _ arg -> bracket $ jux (pretty func) (pretty arg)
       AppN func _ args -> jux (pretty func) (bracketSquare (foldl1 juxComma (map pretty args)))
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
       Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
@@ -179,21 +166,12 @@ eval env@Env{venv} = \case
   Prim _ prim es -> \k -> do
     evals env es $ \vs -> ITick I.Prim $ do
       executePrimitive prim vs k
-  Lam _ x body -> \k -> do
-    k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
   LamN _ xs body -> \k ->
     abstract env xs body k
-  RecLam _ f x body -> \k -> do
-    let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
-    k me
   RecLamN _ _ [] _ -> error "recLamN/[]"
   RecLamN _ f (x0:xs0) body -> \k -> do
     let me = abstractV env { venv = Map.insert f me venv } x0 xs0 body
     k me
-  App eFunc pos eArg -> \k -> do
-    eval env eArg $ \arg -> do
-      eval env eFunc $ \func -> do
-        ITick I.App $ apply func pos arg k
   AppN eFunc pos eArgs -> \k -> do
     evals env (reverse eArgs) $ \argsInRev -> do
       eval env eFunc $ \func -> do
@@ -339,14 +317,6 @@ reflectLit = \case
 
 reflect :: Cenv -> SRC.Exp -> M SemValue
 reflect env = \case
-  -- These are undefined because the multi-arg versions introduced only by the NbE stage
-  -- TODO: Stage2/NBE should have it's own type for the result of the transform
-  SRC.AppN{} ->
-    undefined
-  SRC.LamN{} ->
-    undefined
-  SRC.RecLamN{} ->
-    undefined
 
   SRC.Var _pos x -> do
     pure (look env x)
@@ -437,24 +407,21 @@ mkRecLam p f x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
     (True, LamN _ xs body) -> pure $ RecLamN p f (x0 : xs) body
-    (True, _) -> pure $ RecLamN p f [x0] body
-    (_, _) -> pure $ RecLam p f x0 body
+    (_, _) -> pure $ RecLamN p f [x0] body
 
 mkLam :: Position -> Id -> Exp -> M Exp
 mkLam p x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
     (True, LamN _ xs body) -> pure $ LamN p (x0 : xs) body
-    (True, _) -> pure $ LamN p [x0] body
-    (_, _) -> pure $ Lam p x0 body
+    (_, _) -> pure $ LamN p [x0] body
 
 mkApp :: Exp -> Position -> Exp -> M Exp
 mkApp fun p arg = do
   enabled <- MultiAppEnabled
   case (enabled, fun) of
     (True, AppN fun p args) -> pure $ AppN fun p (args ++ [arg])
-    (True, _) -> pure $ AppN fun p [arg]
-    (_, _) -> pure $ App fun p arg
+    (_, _) -> pure $ AppN fun p [arg]
 
 
 instance Functor M where fmap = liftM

@@ -8,10 +8,10 @@ module Stage1_EXP
 
 import Data.List (intercalate)
 import Data.Map (Map)
-import Lines (Lines,juxComma,bracket,bracketSquare,onHead,onTail,jux,indented)
+import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Primitive (Primitive,executePrimitive)
-import Stage0_AST (evalLit,apply,applyN,Literal,Cid,Bid(..))
+import Stage0_AST (evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
 import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..))
@@ -28,11 +28,8 @@ data Exp
   | ConTag Position Ctag [Exp]
   | Prim Position Primitive [Exp]
   | Lam Position Id Exp
-  | LamN Position [Id] Exp
   | RecLam Position Id Id Exp
-  | RecLamN Position Id [Id] Exp
   | App Exp Position Exp
-  | AppN Exp Position [Exp]
   | Let Position Id Exp Exp
   | Match Position Exp [Arm]
 
@@ -77,11 +74,8 @@ prettyTop control = pretty
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
       Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
       Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
-      LamN _ xs body -> bracket $ indented ("fun [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
       RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
-      RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
       App func _ arg -> bracket $ jux (pretty func) (pretty arg)
-      AppN func _ args -> jux (pretty func) (bracketSquare (foldl1 juxComma (map pretty args)))
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
       Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
 
@@ -130,15 +124,6 @@ evals env es k = case es of
       evals env es $ \vs -> do
         k (v:vs)
 
-abstract :: Env -> [Id] -> Exp -> (Value -> Interaction) -> Interaction
-abstract env xs body k = case xs of
-  [] -> eval env body k
-  x:xs -> k (abstractV env x xs body)
-
-abstractV :: Env -> Id -> [Id] -> Exp -> Value
-abstractV env@Env{venv} x xs body =
-  VFunc (\arg k -> abstract env { venv = Map.insert x arg venv } xs body k)
-
 eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
 eval env@Env{venv} = \case
   Var pos x -> \k -> do
@@ -154,23 +139,13 @@ eval env@Env{venv} = \case
       executePrimitive prim vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
-  LamN _ xs body -> \k ->
-    abstract env xs body k
   RecLam _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
-    k me
-  RecLamN _ _ [] _ -> error "recLamN/[]"
-  RecLamN _ f (x0:xs0) body -> \k -> do
-    let me = abstractV env { venv = Map.insert f me venv } x0 xs0 body
     k me
   App eFunc pos eArg -> \k -> do
     eval env eArg $ \arg -> do
       eval env eFunc $ \func -> do
         ITick I.App $ apply func pos arg k
-  AppN eFunc pos eArgs -> \k -> do
-    evals env (reverse eArgs) $ \argsInRev -> do
-      eval env eFunc $ \func -> do
-        ITick I.App $ applyN func pos (reverse argsInRev) k
   Let _ x e1 e2 -> \k -> do
     eval env e1 $ \v1 -> do
       eval env { venv = Map.insert x v1 venv } e2 k
