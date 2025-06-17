@@ -5,22 +5,23 @@ module Stage3_ANF
   , compile
   ) where
 
-import Primitive (Primitive(MakeBytes),executePrimitive)
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Set (Set,singleton,(\\),union)
 import Lines (Lines,bracket,onHead,onTail,indented)
 import Par4 (Position(..))
+import Primitive (Primitive(MakeBytes),executePrimitive)
 import Stage0_AST (apply,applyN)
-import Stage1_EXP (Id(..),Name(GeneratedName),Ctag(..),provenanceExp)
+import Stage1_EXP (Id(..),Name(GeneratedName),Ctag(..))
+import Stage2_NBE (provenanceExp)
 import Text.Printf (printf)
 import Value (Interaction(..))
 import Value (Value(..),deUnit,Number)
 import qualified Data.Map as Map
 import qualified Data.Set as Set (toList,fromList,unions,empty)
 import qualified Stage0_AST as SRC (Literal(..))
-import qualified Stage1_EXP as SRC
+import qualified Stage2_NBE as SRC
 import qualified Value as I (Tickable(..))
 
 type Transformed = Code

@@ -7,8 +7,8 @@ import System.Environment (getArgs)
 import Text.Printf (printf)
 import Value (runInteraction)
 import qualified Stage0_AST as Stage0 (execute)
-import qualified Stage1_EXP as Stage1 (compile,execute,sizeExp,pp,PPControl(..),PPPosFlag(..),PPUniqueFlag(..))
-import qualified Stage2_NBE as Stage2 (compile,execute)
+import qualified Stage1_EXP as Stage1 (compile,execute,pp,PPControl(..),PPPosFlag(..),PPUniqueFlag(..))
+import qualified Stage2_NBE as Stage2 (compile,execute,sizeExp,pp)
 import qualified Stage3_ANF as Stage3 (compile,execute)
 import qualified Stage4_CCF as Stage4 (compile,execute)
 
@@ -42,7 +42,7 @@ main = do
   let reachedNormStage = (stage >= Stage2)
   let
     tagZ = if reachedNormStage then printf "; post normalization size: %d" sizeN else ""
-      where sizeN = Stage1.sizeExp e2
+      where sizeN = Stage2.sizeExp e2
 
   -- flag "-measure" prints the opening whoami banner and the final instumention
   let whoami = if measure then printf "[%s%s]\n" tag tagZ else ""
@@ -53,7 +53,7 @@ main = do
   case (stage,mode) of
     (Stage0,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e0)
     (Stage1,Compile) -> do printf "(*%s*)\n" tag; putStrLn (Stage1.pp ppc e1)
-    (Stage2,Compile) -> do printf "(*%s*)\n" tag; putStrLn (Stage1.pp ppc e2)
+    (Stage2,Compile) -> do printf "(*%s*)\n" tag; putStrLn (Stage2.pp ppc e2)
     (Stage3,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e3)
     (Stage4,Compile) -> do printf "(*%s*)\n" tag; putStrLn (show e4)
     (Stage5,Compile) -> do putStrLn (show e5)

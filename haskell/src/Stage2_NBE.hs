@@ -1,71 +1,234 @@
 -- | Normalize using "Normalization by Evaluation" (Inlining & Constant Folding).
-module Stage2_NBE (compile,execute) where
+module Stage2_NBE
+  ( Exp(..),Arm(..),Ctag(..), provenanceExp, sizeExp
+  , compile
+  , execute
+  , pp
+  ) where
 
-import Primitive (Primitive(Noinline),isPure,evaluatePurePrimitive)
 import Control.Monad (ap,liftM)
+import Data.List (intercalate)
 import Data.Map (Map)
+import Lines (Lines,juxComma,bracket,bracketSquare,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Stage0_AST (Literal(..))
-import Stage1_EXP (Exp(..),Arm(..),Id(..),Ctag(..))
-import Value (Interaction)
-import Value (Value(..),Number)
+import Primitive (Primitive(Noinline),isPure,evaluatePurePrimitive,executePrimitive)
+import Stage0_AST (Literal(..),evalLit,apply,applyN)
+import Stage1_EXP (Ctag(..),PPControl(..),PPPosFlag(..), PPUniqueFlag(..))
+import Text.Printf (printf)
+import Value (Interaction(..),Value(..),Number,deUnit)
 import qualified Data.Map as Map
 import qualified Stage1_EXP as SRC
+import qualified Value as I (Tickable(Prim,App))
 
-----------------------------------------------------------------------
 -- The NBE compilation stage constructs multi-lam/app
 
-mkRecLam :: Position -> Id -> Id -> Exp -> M Exp
-mkRecLam p f x0 body = do
-  enabled <- MultiLamEnabled
-  case (enabled, body) of
-    --(True, Lam _ x1 body) -> pure $ RecLam2 p f x0 x1 body
-    --(True, Lam2 _ x1 x2 body) -> pure $ RecLam3 p f x0 x1 x2 body
-    (True, LamN _ xs body) -> pure $ RecLamN p f (x0 : xs) body
-    (True, _) -> pure $ RecLamN p f [x0] body
-    (_, _) -> pure $ RecLam p f x0 body
-
-mkLam :: Position -> Id -> Exp -> M Exp
-mkLam p x0 body = do
-  enabled <- MultiLamEnabled
-  case (enabled, body) of
-    --(True, Lam _ x1 e) -> pure $ Lam2 p x0 x1 e
-    --(True, Lam2 _ x1 x2 e) -> pure $ Lam3 p x0 x1 x2 e
-    (True, LamN _ xs body) -> pure $ LamN p (x0 : xs) body
-    (True, _) -> pure $ LamN p [x0] body
-    (_, _) -> pure $ Lam p x0 body
-
-mkApp :: Exp -> Position -> Exp -> M Exp
-mkApp fun p arg = do
-  enabled <- MultiAppEnabled
-  case (enabled, fun) of
-    --(True, App fun p arg0) -> pure $ App2 fun p arg0 arg
-    --(True, App2 fun p arg0 arg1) -> pure $ App3 fun p arg0 arg1 arg
-    (True, AppN fun p args) -> pure $ AppN fun p (args ++ [arg])
-    (True, _) -> pure $ AppN fun p [arg]
-    (_, _) -> pure $ App fun p arg
-
-----------------------------------------------------------------------
--- The NBE compilation stage does not change the representation
-
-type Transformed = SRC.Exp
+type Transformed = Exp
 
 compile :: Bool -> Bool -> SRC.Exp -> Transformed
 compile = normalize
 
-execute :: Transformed -> Interaction
-execute = SRC.execute
-
 enabled :: Bool
 enabled = True -- controls 4 places
+
+data Exp
+  = Var Position Id
+  | Lit Position Literal
+  | ConTag Position Ctag [Exp]
+  | Prim Position Primitive [Exp]
+  | Lam Position Id Exp
+  | LamN Position [Id] Exp
+  | RecLam Position Id Id Exp
+  | RecLamN Position Id [Id] Exp
+  | App Exp Position Exp
+  | AppN Exp Position [Exp]
+  | Let Position Id Exp Exp
+  | Match Position Exp [Arm]
+
+data Arm = ArmTag Position Ctag [Id] Exp
+
+type Id = SRC.Id
+
+----------------------------------------------------------------------
+-- size
+
+sizeExp :: Exp -> Int
+sizeExp = \case
+  Var{} -> 1
+  Lit{} -> 1
+  ConTag _ _ es -> 1 + sum (map sizeExp es)
+  Prim _ _ es -> 1 + sum (map sizeExp es)
+  Lam _ _ body -> 1 + sizeExp body
+  LamN _ xs body -> length xs + sizeExp body
+  RecLam _ _ _ body -> 2 + sizeExp body
+  RecLamN _ _ xs body -> 1 + length xs  + sizeExp body
+  App fun _ arg -> sizeExp fun + sizeExp arg
+  AppN fun _ args -> sizeExp fun + sum (map sizeExp args)
+  Let _ _ rhs body -> 1 + sizeExp rhs + sizeExp body
+  Match _ scrut arms -> sizeExp scrut + sum [ 1 + length xs + sizeExp rhs | ArmTag _pos _tag xs rhs <- arms ]
+
+----------------------------------------------------------------------
+-- provenance
+
+provenanceExp :: Exp -> (String,Position)
+provenanceExp = \case
+  Var{} -> error "provenanceExp/Var" -- we never call on a Var
+  App _ pos _ -> ("app", pos)
+  AppN _ pos _ -> ("appN",pos)
+  Lit pos _ -> ("lit",pos)
+  ConTag pos _ _ -> ("con",pos)
+  Lam pos _ _ -> ("lam",pos)
+  LamN pos _ _ -> ("lamN",pos)
+
+  Let pos _ _ _ -> ("uLET", pos)
+  Prim pos _ _ -> ("prim", pos)
+  RecLam pos _ _ _ -> undefined ("reclam",pos) -- never seen these
+  RecLamN{} -> undefined
+  Match pos _ _ -> ("case",pos)
+
+----------------------------------------------------------------------
+-- Show
+
+pp :: PPControl -> Exp -> String
+pp control = intercalate "\n" . prettyTop control
+
+prettyTop :: PPControl -> Exp -> Lines
+prettyTop control = pretty
+  where
+    prettyId = prettyId0 control
+
+    pretty :: Exp -> Lines
+    pretty = \case
+      Var _ x -> [prettyId x]
+      Lit _ x -> [show x]
+      ConTag _ tag [] -> [show tag]
+      ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
+      Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
+      Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
+      LamN _ xs body -> bracket $ indented ("fun [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
+      RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
+      RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
+      App func _ arg -> bracket $ jux (pretty func) (pretty arg)
+      AppN func _ args -> jux (pretty func) (bracketSquare (foldl1 juxComma (map pretty args)))
+      Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
+      Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
+
+    prettyArm :: Arm -> Lines
+    prettyArm (ArmTag _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
+
+    prettyPat :: Ctag -> [Id] -> String
+    prettyPat c = \case
+      [] -> show c
+      xs -> printf "%s(%s)" (show c) (intercalate "," (map prettyId xs))
+
+prettyId0 :: PPControl -> Id -> String
+prettyId0 control SRC.Id{name,optUnique,pos} =
+  maybePos (maybeTag (maybeBracket (show name)))
+  where
+    maybePos s =
+      case ppp control of
+        PPPosOn -> printf "%s_%s" s (show pos)
+        PPPosOff -> s
+
+    maybeTag s =
+      case optUnique of
+        Nothing -> s
+        Just n ->
+          case ppu control of
+            PPUniqueOn -> printf "%s_%d" s n
+            PPUniqueOff -> s
+
+    maybeBracket s = if needBracket s then printf "( %s )" s else s
+    needBracket = \case "*" -> True; _ -> False
+
+----------------------------------------------------------------------
+-- Execute
+
+execute :: Transformed -> Interaction
+execute = eval0
+
+eval0 :: Exp -> Interaction
+eval0 exp = eval env0 exp $ \v -> case deUnit v of () -> IDone
+
+evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
+evals env es k = case es of
+  [] -> k []
+  e:es -> do
+    eval env e $ \v -> do
+      evals env es $ \vs -> do
+        k (v:vs)
+
+abstract :: Env -> [Id] -> Exp -> (Value -> Interaction) -> Interaction
+abstract env xs body k = case xs of
+  [] -> eval env body k
+  x:xs -> k (abstractV env x xs body)
+
+abstractV :: Env -> Id -> [Id] -> Exp -> Value
+abstractV env@Env{venv} x xs body =
+  VFunc (\arg k -> abstract env { venv = Map.insert x arg venv } xs body k)
+
+eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
+eval env@Env{venv} = \case
+  Var pos x -> \k -> do
+    k (maybe err id $ Map.lookup x venv)
+      where err = error (show ("var-lookup",x,pos))
+  Lit _ literal -> \k -> do
+    k (evalLit literal)
+  ConTag _ tag es -> \k -> do
+    evals env es $ \vs -> do
+      k (VCons tag vs)
+  Prim _ prim es -> \k -> do
+    evals env es $ \vs -> ITick I.Prim $ do
+      executePrimitive prim vs k
+  Lam _ x body -> \k -> do
+    k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
+  LamN _ xs body -> \k ->
+    abstract env xs body k
+  RecLam _ f x body -> \k -> do
+    let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
+    k me
+  RecLamN _ _ [] _ -> error "recLamN/[]"
+  RecLamN _ f (x0:xs0) body -> \k -> do
+    let me = abstractV env { venv = Map.insert f me venv } x0 xs0 body
+    k me
+  App eFunc pos eArg -> \k -> do
+    eval env eArg $ \arg -> do
+      eval env eFunc $ \func -> do
+        ITick I.App $ apply func pos arg k
+  AppN eFunc pos eArgs -> \k -> do
+    evals env (reverse eArgs) $ \argsInRev -> do
+      eval env eFunc $ \func -> do
+        ITick I.App $ applyN func pos (reverse argsInRev) k
+  Let _ x e1 e2 -> \k -> do
+    eval env e1 $ \v1 -> do
+      eval env { venv = Map.insert x v1 venv } e2 k
+  Match _ e arms0 -> \k -> do
+    eval env e $ \case
+      VCons (Ctag _ tagActual) vArgs -> do
+        let
+          dispatch :: [Arm] -> Interaction
+          dispatch arms = case arms of
+            [] -> error "case match failure"
+            ArmTag pos (Ctag _ tag) xs body : arms -> do
+              if tag /= tagActual then dispatch arms else do
+                if length xs /= length vArgs then error (show ("case arm mismatch",pos,xs,vArgs)) else do
+                  let env' = env { venv = foldr (uncurry Map.insert) venv (zip xs vArgs) }
+                  eval env' body k
+        dispatch arms0
+      v ->
+        error (printf "case/scrut not a constructed value: %s" (show v))
+
+data Env = Env { venv :: Map Id Value }
+
+env0 :: Env
+env0 = Env { venv = Map.empty }
 
 ----------------------------------------------------------------------
 -- Normalize
 
-normalize :: Bool -> Bool -> Exp -> Exp
-normalize mlam mapp e = runM mlam mapp (norm env0 e)
+normalize :: Bool -> Bool -> SRC.Exp -> Exp
+normalize mlam mapp e = runM mlam mapp (norm cenv0 e)
 
-norm :: Env -> Exp -> M Exp
+norm :: Cenv -> SRC.Exp -> M Exp
 norm env e =
   reflect env e >>= reify
 
@@ -75,7 +238,6 @@ data SemValue
   | Constant Position BaseValue
   | Constructed Position Ctag [SemValue]
 
-
 isSharable :: SemValue -> Bool
 isSharable = \case
   Constant{} -> True
@@ -83,7 +245,6 @@ isSharable = \case
   Constructed _ _ svs -> all isSharable svs
   Syntax (Var{}) -> True
   Syntax{} -> False
-
 
 data BaseValue -- should BaseValue contain the Position infi?
   = BVString String
@@ -108,7 +269,7 @@ toBV = \case
   v -> error (show ("toBV",v))
 
 posOfId :: Id -> Position
-posOfId = \case Id{pos} -> pos
+posOfId = \case SRC.Id{pos} -> pos
 
 syn :: Id -> SemValue
 syn x = Syntax (Var (posOfId x) x)
@@ -143,8 +304,8 @@ share x sv = do
     rhs <- reify sv
     Wrap (Let (posOfId x) x rhs) (pure (syn x))
 
-apply :: SemValue -> Position -> SemValue -> M SemValue
-apply fun p arg = do
+applyI :: SemValue -> Position -> SemValue -> M SemValue
+applyI fun p arg = do
   case (enabled,fun) of
     -- (1) Normalize: Function Inlining
     (True, Macro x fun) -> do
@@ -176,48 +337,48 @@ reflectLit = \case
   LitN n -> BVNum n
   LitS s -> BVString s
 
-reflect :: Env -> Exp -> M SemValue
+reflect :: Cenv -> SRC.Exp -> M SemValue
 reflect env = \case
   -- These are undefined because the multi-arg versions introduced only by the NbE stage
   -- TODO: Stage2/NBE should have it's own type for the result of the transform
-  AppN{} ->
+  SRC.AppN{} ->
     undefined
-  LamN{} ->
+  SRC.LamN{} ->
     undefined
-  RecLamN{} ->
+  SRC.RecLamN{} ->
     undefined
 
-  Var _pos x -> do
+  SRC.Var _pos x -> do
     pure (look env x)
-  Lit pos x -> do
+  SRC.Lit pos x -> do
     pure $ Constant pos (reflectLit x)
-  ConTag pos tag args -> do
+  SRC.ConTag pos tag args -> do
     args <- mapM (reflect env) args
     pure $ Constructed pos tag args
-  Prim _ Noinline [e] -> do
+  SRC.Prim _ Noinline [e] -> do
     -- The noinline primitive has blocked inlining; now we throw it away
     Syntax <$> norm env e
-  Prim pos prim es -> do
+  SRC.Prim pos prim es -> do
     es <- mapM (reflect env) es
     reflectPrimitive pos prim es
-  Lam _pos x body -> do
+  SRC.Lam _pos x body -> do
     pure $ Macro x $ \arg -> do
       let env' = Map.insert x arg env
       reflect env' body
-  RecLam pos f x body -> do
+  SRC.RecLam pos f x body -> do
     x' <- fresh x
     f' <- fresh f
     let env' = Map.insert x (syn x') (Map.insert f (syn f') env)
     body <- Reset (norm env' body)
     Syntax <$> mkRecLam pos f' x' body
-  App e1 p e2 -> do
+  SRC.App e1 p e2 -> do
     e1 <- reflect env e1
     e2 <- reflect env e2
-    apply e1 p e2
-  Let p x rhs body -> do
+    applyI e1 p e2
+  SRC.Let p x rhs body -> do
     case enabled of
       -- (3) Normalize: Lets as Applied-Lambdas
-      True -> reflect env (App (Lam p x body) p rhs)
+      True -> reflect env (SRC.App (SRC.Lam p x body) p rhs)
       False -> do
         -- when not enabled, we preserve the user lets
         x' <- fresh x
@@ -225,7 +386,7 @@ reflect env = \case
         body <- norm (Map.insert x (syn x') env) body
         pure $ Syntax $ Let p x' rhs body
 
-  Match pos scrut arms -> do
+  SRC.Match pos scrut arms -> do
     scrut <- reflect env scrut
     case (enabled,scrut) of
       -- (4) Normalize: Constant Branch Selection
@@ -238,37 +399,63 @@ reflect env = \case
         arms <- mapM (normArm env) arms
         pure $ Syntax $ Match pos scrut arms
 
-caseSelect :: Ctag -> [SemValue] -> Env -> [Arm] -> M SemValue
+caseSelect :: Ctag -> [SemValue] -> Cenv -> [SRC.Arm] -> M SemValue
 caseSelect tag vs env arms = do
   let
-    (xs,body) :: ([Id],Exp) =
-      case [ (xs,body) | ArmTag _pos tagArm xs body <- arms, tagArm == tag ] of
+    (xs,body) :: ([Id],SRC.Exp) =
+      case [ (xs,body) | SRC.ArmTag _pos tagArm xs body <- arms, tagArm == tag ] of
         [] -> error "reflect: case match failure"
         x:_ -> x
   reflect (foldr (uncurry Map.insert) env (zip xs vs)) body
 
-normArm :: Env -> Arm -> M Arm
-normArm env (ArmTag pos c xs body) = do
+normArm :: Cenv -> SRC.Arm -> M Arm
+normArm env (SRC.ArmTag pos c xs body) = do
   xys <- sequence [ do y <- fresh x; pure (x,y) | x <- xs ]
   let env' = foldr (uncurry Map.insert) env [ (x,syn y) | (x,y) <- xys ]
   body <- Reset (norm env' body)
   pure $ ArmTag pos c (map snd xys) body
 
-type Env = Map Id SemValue
+type Cenv = Map Id SemValue
 
-env0 :: Env
-env0 = Map.empty
+cenv0 :: Cenv
+cenv0 = Map.empty
 
-look :: Env -> Id -> SemValue
+look :: Cenv -> Id -> SemValue
 look env x = maybe err id $ Map.lookup x env
   where err = error (show ("Normalize.walk/Var",x))
 
 fresh :: Id -> M Id
-fresh Id{name,pos} = do
+fresh SRC.Id{name,pos} = do
   u <- Fresh
   let optUnique = Just u
-  let y = Id { optUnique, pos, name}
+  let y = SRC.Id { optUnique, pos, name}
   pure y
+
+
+mkRecLam :: Position -> Id -> Id -> Exp -> M Exp
+mkRecLam p f x0 body = do
+  enabled <- MultiLamEnabled
+  case (enabled, body) of
+    (True, LamN _ xs body) -> pure $ RecLamN p f (x0 : xs) body
+    (True, _) -> pure $ RecLamN p f [x0] body
+    (_, _) -> pure $ RecLam p f x0 body
+
+mkLam :: Position -> Id -> Exp -> M Exp
+mkLam p x0 body = do
+  enabled <- MultiLamEnabled
+  case (enabled, body) of
+    (True, LamN _ xs body) -> pure $ LamN p (x0 : xs) body
+    (True, _) -> pure $ LamN p [x0] body
+    (_, _) -> pure $ Lam p x0 body
+
+mkApp :: Exp -> Position -> Exp -> M Exp
+mkApp fun p arg = do
+  enabled <- MultiAppEnabled
+  case (enabled, fun) of
+    (True, AppN fun p args) -> pure $ AppN fun p (args ++ [arg])
+    (True, _) -> pure $ AppN fun p [arg]
+    (_, _) -> pure $ App fun p arg
+
 
 instance Functor M where fmap = liftM
 instance Applicative M where pure = Ret; (<*>) = ap
