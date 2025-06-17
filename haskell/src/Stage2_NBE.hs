@@ -19,16 +19,20 @@ mkRecLam :: Position -> Id -> Id -> Exp -> M Exp
 mkRecLam p f x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
-    (True, Lam _ x1 body) -> pure $ RecLam2 p f x0 x1 body
-    (True, Lam2 _ x1 x2 body) -> pure $ RecLam3 p f x0 x1 x2 body
+    --(True, Lam _ x1 body) -> pure $ RecLam2 p f x0 x1 body
+    --(True, Lam2 _ x1 x2 body) -> pure $ RecLam3 p f x0 x1 x2 body
+    (True, LamN _ xs body) -> pure $ RecLamN p f (x0 : xs) body
+    (True, _) -> pure $ RecLamN p f [x0] body
     (_, _) -> pure $ RecLam p f x0 body
 
 mkLam :: Position -> Id -> Exp -> M Exp
 mkLam p x0 body = do
   enabled <- MultiLamEnabled
   case (enabled, body) of
-    (True, Lam _ x1 e) -> pure $ Lam2 p x0 x1 e
-    (True, Lam2 _ x1 x2 e) -> pure $ Lam3 p x0 x1 x2 e
+    --(True, Lam _ x1 e) -> pure $ Lam2 p x0 x1 e
+    --(True, Lam2 _ x1 x2 e) -> pure $ Lam3 p x0 x1 x2 e
+    (True, LamN _ xs body) -> pure $ LamN p (x0 : xs) body
+    (True, _) -> pure $ LamN p [x0] body
     (_, _) -> pure $ Lam p x0 body
 
 mkApp :: Exp -> Position -> Exp -> M Exp
@@ -37,8 +41,6 @@ mkApp fun p arg = do
   case (enabled, fun) of
     --(True, App fun p arg0) -> pure $ App2 fun p arg0 arg
     --(True, App2 fun p arg0 arg1) -> pure $ App3 fun p arg0 arg1 arg
-    --(_, _) -> pure $ App fun p arg
-
     (True, AppN fun p args) -> pure $ AppN fun p (args ++ [arg])
     (True, _) -> pure $ AppN fun p [arg]
     (_, _) -> pure $ App fun p arg
@@ -191,6 +193,10 @@ reflect env = \case
   RecLam3{} ->
     undefined
   AppN{} ->
+    undefined
+  LamN{} ->
+    undefined
+  RecLamN{} ->
     undefined
 
   Var _pos x -> do

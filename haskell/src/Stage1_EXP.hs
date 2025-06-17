@@ -30,9 +30,11 @@ data Exp
   | Lam Position Id Exp
   | Lam2 Position Id Id Exp -- TODO LamN
   | Lam3 Position Id Id Id Exp
+  | LamN Position [Id] Exp
   | RecLam Position Id Id Exp
   | RecLam2 Position Id Id Id Exp -- TODO RecLamN
   | RecLam3 Position Id Id Id Id Exp
+  | RecLamN Position Id [Id] Exp
   | App Exp Position Exp
   | App2 Exp Position Exp Exp -- TODO AppN
   | App3 Exp Position Exp Exp Exp
@@ -62,9 +64,11 @@ sizeExp = \case
   Lam _ _ body -> 1 + sizeExp body
   Lam2 _ _ _ body -> 2 + sizeExp body
   Lam3 _ _ _ _ body -> 3 + sizeExp body
+  LamN _ xs body -> length xs + sizeExp body
   RecLam _ _ _ body -> 2 + sizeExp body
   RecLam2 _ _ _ _ body -> 3 + sizeExp body
   RecLam3 _ _ _ _ _ body -> 4 + sizeExp body
+  RecLamN _ _ xs body -> 1 + length xs  + sizeExp body
   App fun _ arg -> sizeExp fun + sizeExp arg
   App2 fun _ arg1 arg2 -> sizeExp fun + sizeExp arg1 + sizeExp arg2
   App3 fun _ arg1 arg2 arg3 -> sizeExp fun + sizeExp arg1 + sizeExp arg2 + sizeExp arg3
@@ -87,12 +91,14 @@ provenanceExp = \case
   Lam pos _ _ -> ("lam",pos)
   Lam2 pos _ _ _ -> ("lam2",pos)
   Lam3 pos _ _ _ _ -> ("lam3",pos)
+  LamN pos _ _ -> ("lamN",pos)
 
   Let pos _ _ _ -> ("uLET", pos)
   Prim pos _ _ -> ("prim", pos)
   RecLam pos _ _ _ -> undefined ("reclam",pos) -- never seen these
   RecLam2 pos _ _ _ _ -> undefined ("reclam2",pos)
   RecLam3 pos _ _ _ _ _ -> undefined ("reclam3",pos)
+  RecLamN{} -> undefined
   Match pos _ _ -> ("case",pos)
 
 ----------------------------------------------------------------------
@@ -128,10 +134,13 @@ prettyTop control = pretty
       Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
       Lam2 _ x1 x2 body -> bracket $ indented ("fun [" ++ prettyId x1 ++ "," ++ prettyId x2 ++ "] ->") (pretty body)
       Lam3 _ x1 x2 x3 body -> bracket $ indented ("fun [" ++ prettyId x1 ++ "," ++ prettyId x2  ++ "," ++ prettyId x3 ++ "] ->") (pretty body)
+      LamN _ xs body -> bracket $ indented ("fun [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
 
       RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
       RecLam2 _ f x0 x1 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ prettyId x0 ++ "," ++ prettyId x1 ++ "] ->") (pretty body)
       RecLam3 _ f x0 x1 x2 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ prettyId x0 ++ "," ++ prettyId x1 ++ "," ++ prettyId x2 ++ "] ->") (pretty body)
+      RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
+
       App func _ arg -> bracket $ jux (pretty func) (pretty arg)
       App2 func _ arg1 arg2 -> bracket $ jux (pretty func) (jux (pretty arg1) (pretty arg2))
       App3 func _ arg1 arg2 arg3 -> bracket $ jux (pretty func) (jux (pretty arg1) (jux (pretty arg2) (pretty arg3)))
@@ -186,6 +195,15 @@ evals env es k = case es of
       evals env es $ \vs -> do
         k (v:vs)
 
+abstract :: Env -> [Id] -> Exp -> (Value -> Interaction) -> Interaction
+abstract env xs body k = case xs of
+  [] -> eval env body k
+  x:xs -> k (abstractV env x xs body)
+
+abstractV :: Env -> Id -> [Id] -> Exp -> Value
+abstractV env@Env{venv} x xs body =
+  VFunc (\arg k -> abstract env { venv = Map.insert x arg venv } xs body k)
+
 eval :: Env -> Exp -> (Value -> Interaction) -> Interaction
 eval env@Env{venv} = \case
   Var pos x -> \k -> do
@@ -205,7 +223,8 @@ eval env@Env{venv} = \case
     k (VFunc (\arg1 k -> k $ VFunc (\arg2 k -> eval env { venv = Map.insert x1 arg1 (Map.insert x2 arg2 venv) } body k)))
   Lam3 _ x1 x2 x3 body -> \k -> do
     k (VFunc (\arg1 k -> k $ VFunc (\arg2 k -> k $ VFunc (\arg3 k -> eval env { venv = Map.insert x1 arg1 (Map.insert x2 arg2 (Map.insert x3 arg3 venv)) } body k))))
-
+  LamN _ xs body -> \k ->
+    abstract env xs body k
   RecLam _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
@@ -214,6 +233,10 @@ eval env@Env{venv} = \case
     k me
   RecLam3 _ f x0 x1 x2 body -> \k -> do
     let me = VFunc (\arg0 k -> k $ VFunc (\arg1 k -> k $ VFunc (\arg2 k -> eval env { venv = Map.insert f me $ Map.insert x0 arg0 $ Map.insert x1 arg1 $ Map.insert x2 arg2 venv } body k)))
+    k me
+  RecLamN _ _ [] _ -> error "recLamN/[]"
+  RecLamN _ f (x0:xs0) body -> \k -> do
+    let me = abstractV env { venv = Map.insert f me venv } x0 xs0 body
     k me
 
   App2 eFunc pos eArg1 eArg2 -> \k -> do -- right->left eval order

@@ -46,9 +46,11 @@ data Atomic
   | Lam Position Fvs Id Code
   | Lam2 Position Fvs Id Id Code
   | Lam3 Position Fvs Id Id Id Code
+  | LamN Position Fvs [Id] Code
   | RecLam Position Fvs Id Id Code
   | RecLam2 Position Fvs Id Id Id Code
   | RecLam3 Position Fvs Id Id Id Id Code
+  | RecLamN Position Fvs Id [Id] Code
 
 -- Val expressions cause no evaluation.
 data Val
@@ -69,9 +71,11 @@ provenanceAtomic = \case
   Lam pos _ _ _ -> ("lam",pos)
   Lam2 pos _ _ _ _ -> ("lam2",pos)
   Lam3 pos _ _ _ _ _ -> ("lam3",pos)
+  LamN pos _ _ _ -> ("lamN",pos)
   RecLam pos _ _ _ _ -> undefined $ ("reclam",pos) -- why never seen?
   RecLam2 pos _ _ _ _ _ -> undefined $ ("reclam2",pos)
   RecLam3 pos _ _ _ _ _ _ -> undefined $ ("reclam3",pos)
+  RecLamN{} -> undefined
 
 ----------------------------------------------------------------------
 -- Show
@@ -99,9 +103,12 @@ prettyA = \case
   Lam _ fvs x body -> indented ("fun " ++ show fvs ++ " " ++ show x ++ " k ->") (pretty body)
   Lam2 _ fvs x0 x1 body -> indented ("fun " ++ show fvs ++ " " ++ show [x0,x1] ++ " k ->") (pretty body)
   Lam3 _ fvs x0 x1 x2 body -> indented ("fun " ++ show fvs ++ " " ++ show [x0,x1,x2] ++ " k ->") (pretty body)
+  LamN _ fvs xs body -> indented ("fun " ++ show fvs ++ " " ++ show xs ++ " k ->") (pretty body)
   RecLam _ fvs f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show x ++ " k ->") (pretty body)
   RecLam2 _ fvs f x0 x1 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show [x0,x1] ++ " k ->") (pretty body)
   RecLam3 _ fvs f x0 x1 x2 body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show [x0,x1,x2] ++ " k ->") (pretty body)
+  RecLamN _ fvs f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show fvs ++ " " ++ show f ++ " " ++ show xs ++ " k ->") (pretty body)
+
 
 
 prettyArm :: Arm -> Lines
@@ -173,6 +180,8 @@ evalCode env = \case
         k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> evalCode (insert x0 arg0 $ insert x1 arg1 (limit fvs env)) body k))))
       Lam3 _ fvs x0 x1 x2 body -> \k -> do
         k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode (insert x0 arg0 $ insert x1 arg1 $ insert x2 arg2 (limit fvs env)) body k))))))
+      LamN _ fvs xs body -> \k ->
+        abstract (limit fvs env) xs body k
       RecLam _ fvs f x body -> \k -> do
         let me = VFunc (\arg k -> evalCode (insert f me (insert x arg (limit fvs env))) body k)
         k me
@@ -181,6 +190,11 @@ evalCode env = \case
         k me
       RecLam3 _ fvs f x0 x1 x2 body -> \k -> do
         let me = VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode (insert f me $ insert x0 arg0 $ insert x1 arg1 $ insert x2 arg2 $ limit fvs env) body k)))))
+        k me
+
+      RecLamN _ _ _ [] _ -> error "recLamN/[]"
+      RecLamN _ fvs f (x0:xs0) body -> \k -> do
+        let me = abstractV (insert f me $ limit fvs env) x0 xs0 body
         k me
 
     evalV :: Val -> Value
@@ -194,6 +208,16 @@ evalCode env = \case
       let Env{venv} = env
       maybe err id $ Map.lookup x venv
         where err = error (show ("var-lookup",x))
+
+abstract :: Env -> [Id] -> Code -> (Value -> Interaction) -> Interaction
+abstract env xs body k = case xs of
+  [] -> evalCode env body k
+  x:xs -> k (abstractV env x xs body)
+
+abstractV :: Env -> Id -> [Id] -> Code -> Value
+abstractV env@Env{venv} x xs body =
+  VFunc (\arg k -> abstract env { venv = Map.insert x arg venv } xs body k)
+
 
 data Env = Env { venv :: Map Id Value }
 
@@ -265,6 +289,10 @@ compileExp = \case
     body <- compileTop body
     k $ Atomic $ mkLam3 pos x1 x2 x3 body
 
+  SRC.LamN pos xs body -> \k -> do
+    body <- compileTop body
+    k $ Atomic $ mkLamN pos xs body
+
   SRC.Lam pos x body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkLam pos x body
@@ -280,6 +308,10 @@ compileExp = \case
   SRC.RecLam3 pos f x0 x1 x2 body -> \k -> do
     body <- compileTop body
     k $ Atomic $ mkRecLam3 pos f x0 x1 x2 body
+
+  SRC.RecLamN pos f xs body -> \k -> do
+    body <- compileTop body
+    k $ Atomic $ mkRecLamN pos f xs body
 
   SRC.App eFunc pos eArg -> \k -> do
     compileAsId eArg $ \arg -> do
@@ -384,6 +416,9 @@ mkLam2 pos x1 x2 code = Lam2 pos (Set.toList (fvs code \\ Set.fromList [x1,x2]))
 mkLam3 :: Position -> Id -> Id -> Id -> Code -> Atomic
 mkLam3 pos x1 x2 x3 code = Lam3 pos (Set.toList (fvs code \\ Set.fromList [x1,x2,x3])) x1 x2 x3 code
 
+mkLamN :: Position -> [Id] -> Code -> Atomic
+mkLamN pos xs code = LamN pos (Set.toList (fvs code \\ Set.fromList xs)) xs code
+
 mkRecLam :: Position -> Id -> Id -> Code -> Atomic
 mkRecLam pos f x code = RecLam pos (Set.toList (fvs code \\ Set.fromList [f,x])) f x code
 
@@ -392,6 +427,9 @@ mkRecLam2 pos f x0 x1 code = RecLam2 pos (Set.toList (fvs code \\ Set.fromList [
 
 mkRecLam3 :: Position -> Id -> Id -> Id -> Id -> Code -> Atomic
 mkRecLam3 pos f x0 x1 x2 code = RecLam3 pos (Set.toList (fvs code \\ Set.fromList [f,x0,x1,x2])) f x0 x1 x2 code
+
+mkRecLamN :: Position -> Id -> [Id] -> Code -> Atomic
+mkRecLamN pos f xs code = RecLamN pos (Set.toList (fvs code \\ Set.fromList (f:xs))) f xs code
 
 mkPushContinuation :: (Id,Code) -> Code -> Code
 mkPushContinuation (x,later) first =
@@ -425,6 +463,8 @@ fvsA = \case
   Lam _ fvs _ _ -> Set.fromList fvs
   Lam2 _ fvs _ _ _ -> Set.fromList fvs
   Lam3 _ fvs _ _ _ _ -> Set.fromList fvs
+  LamN _ fvs _ _ -> Set.fromList fvs
   RecLam _ fvs _ _ _ -> Set.fromList fvs
   RecLam2 _ fvs _ _ _ _ -> Set.fromList fvs
   RecLam3 _ fvs _ _ _ _ _ -> Set.fromList fvs
+  RecLamN _ fvs _ _ _ -> Set.fromList fvs

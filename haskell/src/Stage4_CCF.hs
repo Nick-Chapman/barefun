@@ -34,6 +34,7 @@ data Top
   | TopLam Ref Code -- All top function defs allow recursion. We dont even have an unrecursive form.
   | TopLam2 Ref Ref Code
   | TopLam3 Ref Ref Ref Code
+  | TopLamN [Ref] Code
   | TopConApp Ctag [Ref]
 
 data Code
@@ -55,9 +56,11 @@ data Atomic
   | Lam [Ref] [Ref] Ref Code
   | Lam2 [Ref] [Ref] Ref Ref Code
   | Lam3 [Ref] [Ref] Ref Ref Ref Code
+  | LamN [Ref] [Ref] [Ref] Code
   | RecLam [Ref] [Ref] Ref Ref Code
   | RecLam2 [Ref] [Ref] Ref Ref Ref Code
   | RecLam3 [Ref] [Ref] Ref Ref Ref Ref Code
+  | RecLamN [Ref] [Ref] Ref [Ref] Code
 
 data Location = InGlobal Global | InFrame Int | InTemp Temp | TheFrame | TheArg Int
   deriving (Eq,Ord)
@@ -104,6 +107,7 @@ prettyT = \case
   TopLam x body -> ("fun " ++ show x ++ " k ->") >>> prettyC body
   TopLam2 x1 x2 body -> ("fun " ++ show [x1,x2] ++ " k ->") >>> prettyC body
   TopLam3 x1 x2 x3 body -> ("fun " ++ show [x1,x2,x3] ++ " k ->") >>> prettyC body
+  TopLamN xs body -> ("fun " ++ show xs ++ " k ->") >>> prettyC body
   TopConApp tag [] -> [show tag]
   TopConApp tag xs -> [printf "%s%s" (show tag) (show xs)]
 
@@ -134,6 +138,7 @@ prettyA = \case
   Lam pre post x0 body -> (show pre ++ ", fun " ++ show post ++ " " ++ show x0 ++ " k ->") >>> prettyC body
   Lam2 pre post x0 x1 body -> (show pre ++ ", fun " ++ show post ++ " " ++ show [x0,x1] ++ " k ->") >>> prettyC body
   Lam3 pre post x0 x1 x2 body -> (show pre ++ ", fun " ++ show post ++ " " ++ show [x0,x1,x2] ++ " k ->") >>> prettyC body
+  LamN pre post xs body -> (show pre ++ ", fun " ++ show post ++ " " ++ show xs ++ " k ->") >>> prettyC body
   RecLam pre post f x0 body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show x0 ++ " k ->")
     >>> prettyC body
@@ -142,6 +147,9 @@ prettyA = \case
     >>> prettyC body
   RecLam3 pre post f x0 x1 x2 body ->
     (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show [x0,x1,x2] ++ " k ->")
+    >>> prettyC body
+  RecLamN pre post f xs body ->
+    (show pre ++ ", fun " ++ show post ++ " " ++ show f ++ " " ++ show xs ++ " k ->")
     >>> prettyC body
 
 prettyArm :: Arm -> Lines
@@ -186,7 +194,7 @@ execute = evalImage0
 
 evalImage0 :: Image -> Interaction
 evalImage0 exp = do
-  -- All global defs may mutually recurse; we tie the knot for gev here.
+  -- All global defs may mutually recurse; we tie the knot for genv here.
   let (code,genv) = evalImage genv env0 exp
   evalCode genv genv code $ \v -> case deUnit v of () -> IDone
 
@@ -212,6 +220,8 @@ evalT genv = \case
   TopLam x body -> VFunc $ \arg k -> evalCode genv (insert x arg genv) body k
   TopLam2 x1 x2 body -> VFunc $ \arg1 k -> k $ VFunc $ \arg2 k -> do evalCode genv (insert x1 arg1 $ insert x2 arg2 genv) body k
   TopLam3 x1 x2 x3 body -> VFunc $ \arg1 k -> k $ VFunc $ \arg2 k -> k $ VFunc $ \arg3 k -> do evalCode genv (insert x1 arg1 $ insert x2 arg2 $ insert x3 arg3 genv) body k
+  TopLamN [] _ -> error "TopLamN/[]"
+  TopLamN (x:xs) body -> abstractV genv genv x xs body
   TopConApp tag xs -> VCons tag (map (look genv) xs)
 
 evalCode :: Env -> Env -> Code -> (Value -> Interaction) -> Interaction
@@ -263,6 +273,10 @@ evalCode genv env = \case
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         k (VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode genv (insert x0 arg0 $ insert x1 arg1  $ insert x2 arg2 env') body k))))))
 
+      LamN pre _ xs body -> \k -> do
+        let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
+        abstract genv env' xs body k
+
       RecLam pre _ f x0 body -> \k -> do
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         let me = VFunc (\arg0 k -> evalCode genv (insert x0 arg0 $ insert f me env') body k)
@@ -275,6 +289,19 @@ evalCode genv env = \case
         let env' = mkFrameEnv firstFrameIndexForLambdas genv env pre
         let me = VFunc (\arg0 k -> k (VFunc (\arg1 k -> k (VFunc (\arg2 k -> evalCode genv (insert x0 arg0 $ insert x1 arg1 $ insert x2 arg2 $ insert f me env') body k)))))
         k me
+      RecLamN _ _ _ [] _ -> error "RecLamN/[]"
+      RecLamN pre _ f (x:xs) body -> \k -> do
+        let env' = insert f me (mkFrameEnv firstFrameIndexForLambdas genv env pre)
+            me = abstractV genv env' x xs body
+        k me
+
+abstractV :: Env -> Env -> Ref -> [Ref] -> Code -> Value
+abstractV genv env x xs body = VFunc (\arg k -> abstract genv (insert x arg env) xs body k)
+
+abstract :: Env -> Env -> [Ref] -> Code -> (Value -> Interaction) -> Interaction
+abstract genv env xs body k = case xs of
+  [] -> evalCode genv env body k
+  x:xs -> k (abstractV genv env x xs body)
 
 data Env = Env { venv :: Map Location Value }
 
@@ -408,6 +435,17 @@ compileA cenv = \case
       _ ->
         pure $ Left (Lam3 pre post r0 r1 r2 body)
 
+  SRC.LamN _ fvs xs body -> do
+    let rs = [ Ref x (TheArg i) | (i,x) <- zip [0..] xs ]
+    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
+    body <- compileCtop (Map.fromList (zip xs rs) `Map.union` cenv) body
+    case (pre,post) of
+      ([],[]) -> do
+        g <- GlobalRef
+        pure $ Right (g, TopLamN rs body)
+      _ ->
+        pure $ Left (LamN pre post rs body)
+
   SRC.RecLam _ fvs f x0 body -> do
     (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
     let r0 = Ref x0 (TheArg 0)
@@ -453,6 +491,19 @@ compileA cenv = \case
         body <- compileCtop (Map.insert f rF $ Map.insert x0 r0 $ Map.insert x1 r1 $ Map.insert x2 r2 $ cenv) body
         pure $ Left (RecLam3 pre post rF r0 r1 r2 body)
 
+  SRC.RecLamN _ fvs f xs body -> do
+    (cenv,pre,post) <- pure $ frame firstFrameIndexForLambdas cenv fvs
+    let rs = [ Ref x (TheArg i) | (i,x) <- zip [0..] xs ]
+    case (pre,post) of
+      ([],[]) -> do
+        g <- GlobalRef
+        let rF = Ref f (InGlobal g)
+        body <- compileCtop (Map.fromList ((f,rF):zip xs rs) `Map.union` cenv) body
+        pure $ Right (g, TopLamN rs body)
+      _ -> do
+        let rF = Ref f TheFrame
+        body <- compileCtop (Map.fromList ((f,rF):zip xs rs) `Map.union` cenv) body
+        pure $ Left (RecLamN pre post rF rs body)
 
 compileV :: Cenv -> SRC.Val -> Ref
 compileV cenv = \case
