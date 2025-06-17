@@ -74,10 +74,9 @@ data Config = Config
   , measure :: Bool
   , ppp :: Stage1.PPPosFlag
   , ppu :: Stage1.PPUniqueFlag
-  -- mlam/mapp -- dev flags to control multi-lam/app in stage 2
-  -- eventually these will be turned on permanently
-  , mlam :: Bool
-  , mapp :: Bool
+  -- mlam/mapp -- flags to control maximum multi-lam/app in stage 2. 0(default) means no maximum
+  , mlam :: Int
+  , mapp :: Int
   }
 
 data Mode = Compile | Eval
@@ -101,8 +100,8 @@ parseCommandLine = loop config0
                      , measure = False
                      , ppp = Stage1.PPPosOff
                      , ppu = Stage1.PPUniqueOff
-                     , mlam = False
-                     , mapp = False
+                     , mlam = 0
+                     , mapp = 0
                      }
 
     loop :: Config -> [String] -> Config
@@ -121,7 +120,7 @@ parseCommandLine = loop config0
       "-measure":xs     -> loop config { measure = True } xs
       "-ppp":xs         -> loop config { ppp = Stage1.PPPosOn } xs
       "-ppu":xs         -> loop config { ppu = Stage1.PPUniqueOn } xs
-      "-mlam":xs        -> loop config { mlam = True } xs
-      "-mapp":xs        -> loop config { mapp = True } xs
+      "-mlam":n:xs      -> loop config { mlam = read n } xs
+      "-mapp":n:xs      -> loop config { mapp = read n } xs
       ('-':flag):_      -> error (show ("unknown flag",flag))
       x:xs              -> loop config { paths = paths config ++ [x] } xs

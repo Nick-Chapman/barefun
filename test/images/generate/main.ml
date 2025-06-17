@@ -1,6 +1,6 @@
 
 let flags_for_example = function
-  | _ -> "-mlam -mapp" (* starting to work in qemu *)
+  | _ -> ""
 
 let generate_rules x =
   let flags = flags_for_example x in

@@ -24,7 +24,7 @@ import qualified Value as I (Tickable(Prim,App))
 
 type Transformed = Exp
 
-compile :: Bool -> Bool -> SRC.Exp -> Transformed
+compile :: Int -> Int -> SRC.Exp -> Transformed
 compile = normalize
 
 enabled :: Bool
@@ -203,7 +203,7 @@ env0 = Env { venv = Map.empty }
 ----------------------------------------------------------------------
 -- Normalize
 
-normalize :: Bool -> Bool -> SRC.Exp -> Exp
+normalize :: Int -> Int -> SRC.Exp -> Exp
 normalize mlam mapp e = runM mlam mapp (norm cenv0 e)
 
 norm :: Cenv -> SRC.Exp -> M Exp
@@ -401,35 +401,32 @@ fresh SRC.Id{name,pos} = do
   let y = SRC.Id { optUnique, pos, name}
   pure y
 
-
-maxLam :: Int
-maxLam = 7
-
-maxApp :: Int
-maxApp = 7
-
 mkRecLam :: Position -> Id -> Id -> Exp -> M Exp
 mkRecLam p f x0 body = do
-  enabled <- MultiLamEnabled
-  case (enabled, body) of
-    (True, LamN _ xs body) | length xs < maxApp -> pure $ RecLamN p f (x0 : xs) body
-    (_, _) -> pure $ RecLamN p f [x0] body
+  threshold <- MultiLamEnabled
+  case body of
+    LamN _ xs body
+      | threshold == 0 || length xs < threshold
+        -> pure $ RecLamN p f (x0 : xs) body
+    _ -> pure $ RecLamN p f [x0] body
 
 mkLam :: Position -> Id -> Exp -> M Exp
 mkLam p x0 body = do
-  enabled <- MultiLamEnabled
-  case (enabled, body) of
-    (True, LamN _ xs body) | length xs < maxLam -> pure $ LamN p (x0 : xs) body
-    (_, _) -> pure $ LamN p [x0] body
-
+  threshold <- MultiLamEnabled
+  case body of
+    LamN _ xs body
+      | threshold == 0 || length xs < threshold
+        -> pure $ LamN p (x0 : xs) body
+    _ -> pure $ LamN p [x0] body
 
 mkApp :: Exp -> Position -> Exp -> M Exp
 mkApp fun p arg = do
-  enabled <- MultiAppEnabled
-  case (enabled, fun) of
-    (True, AppN fun p args) | length args < maxApp -> pure $ AppN fun p (args ++ [arg])
-    (_, _) -> pure $ AppN fun p [arg]
-
+  threshold <- MultiAppEnabled
+  case fun of
+    AppN fun p args
+      | (threshold == 0 || length args < threshold)
+        -> pure $ AppN fun p (args ++ [arg])
+    _ -> pure $ AppN fun p [arg]
 
 instance Functor M where fmap = liftM
 instance Applicative M where pure = Ret; (<*>) = ap
@@ -441,11 +438,11 @@ data M a where
   Fresh :: M Int
   Wrap :: (Exp -> Exp) -> M a -> M a
   Reset :: M Exp -> M Exp
-  -- dev mode control while mulit-lam/app is being developed.
-  MultiLamEnabled :: M Bool
-  MultiAppEnabled :: M Bool
+  -- apply threshold to maximum multi-lama/all. (0 unbounded)
+  MultiLamEnabled :: M Int
+  MultiAppEnabled :: M Int
 
-runM :: Bool -> Bool -> M Exp -> Exp
+runM :: Int -> Int -> M Exp -> Exp
 runM mlam mapp m0 = snd $ loop 1 m0 k0
   where
     k0 = \u x -> (u,x)

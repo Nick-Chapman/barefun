@@ -1,6 +1,6 @@
 
 let flags_for_example = function
-  | _ -> "-mlam -mapp"
+  | _ -> ""
 
 let generate_rules x =
   let capX = String.capitalize_ascii x in
@@ -38,7 +38,7 @@ x a x b in
   List.iter f ['X','0'; '0','1'; '1','2'; '2','3'; '3','4'; '4','5';]
 
 let allow = function
-  (*| "filesystem" -> false*) (* slow -- but some of the pap code is only hit by this example *)
+  (*| "filesystem" -> false*) (* slow *)
   | _ -> true
 
 let () =

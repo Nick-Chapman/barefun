@@ -1,6 +1,6 @@
 
 let flags_for_example = function
-  | _ -> "-mlam -mapp"
+  | _ -> ""
 
 let select_versions_for_example = function
   | "bytes" -> [5]
