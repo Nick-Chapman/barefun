@@ -186,8 +186,9 @@ part2:
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
 
-ArgSpaceA:  dw Arb
-ArgSpaceB:  dw Arb
+MaxNumArgs equ 7 ;; TODO: how many do we need? TODO: detect too many
+ArgSpaceA: times MaxNumArgs dw Arb
+ArgSpaceB: times MaxNumArgs dw Arb
 Arb:  dw 0
 
 CurrentCont:
@@ -247,42 +248,16 @@ halt:
     hlt ;; avoid spinning the fans
     jmp halt
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (6.9) Arg Check
+;;;; (6.8) Arg Check prerequisites
 
-%macro Bare_arg_check 1
-    mov word bx, %1
-    call Bare_arg_check_function
+%macro Debug 1
+    PrintCharLit %1 ; uncomment for GC debug
 %endmacro
 
-Bare_arg_check_function:
-    ;; ax contains the number of args passed
-    ;; bx contains the number of args desired
-    cmp ax,bx
-    jb .pap
-    jnz .overapp
-    cmp ax, 2
-    jge .multi
-    ret
-.multi:
-    SeeReg ax
-    SeeReg bx
-    Stop "MULTI"
-    ret
-.pap:
-    SeeReg ax
-    SeeReg bx
-    Stop "PAP"
-    ret
-.overapp:
-    SeeReg ax
-    SeeReg bx
-    Stop "OVERAPP"
-    ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (7) Garbage Collection
+%macro DebugSeeReg 1
+    SeeReg %1 ; uncomment for GC debug
+%endmacro
 
 ;; GC roots; must match stage5 calling conventions
 %define ArgReg si
@@ -296,7 +271,77 @@ Bare_arg_check_function:
 %%no_need:
 %endmacro
 
-need: dw 0
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (6.9) Arg Check
+
+%macro Bare_arg_check 1
+    mov word bx, %1
+    call Bare_arg_check_function
+%endmacro
+
+ArgRoots: dw 0
+
+Bare_arg_check_function:
+    pop word [.caller]
+
+    ;; ax contains the number of args passed
+    ;; bx contains the number of args desired
+    mov [ArgRoots], ax
+    ;;Debug 'a'
+    ;;DebugSeeReg ax
+    cmp ax,bx
+    jb .pap
+    jnz .overapp
+    cmp ax, 4 ;; ALLOW 2/2, 3/3
+    jge .multi
+    jmp [.caller]
+.multi:
+    SeeReg ax
+    SeeReg bx
+    Stop "MULTI"
+.pap:
+    SeeReg ax
+    SeeReg bx
+    Stop "PAP"
+.overapp:
+    cmp ax, 2
+    jne .overapp_no
+    cmp bx, 1
+    jne .overapp_no
+    jmp .overapp_2_1
+.overapp_no:
+    SeeReg ax
+    SeeReg bx
+    Stop "OVERAPP"
+
+.overapp_2_1:
+
+    ;;; copied from generated code...
+    Bare_heap_check(8)
+    push word [si+2]
+    push word [CurrentCont]
+    push word L_OverAppRestore_1
+    mov [CurrentCont], sp
+    push word 6 ;; scanned
+    jmp [.caller]
+
+.caller:
+    dw 0
+
+L_OverAppRestore_1:
+    xchg si, di
+    mov ax, [bp+6]
+    mov [di+2], ax
+    mov ax, [bp+4]
+    mov [di], ax
+    mov bp, [si]
+    mov ax, 1
+    jmp [bp]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (7) Garbage Collection
+
+need: dw 0 ;; TODO longer name
 
 topA equ 0x0000
 botA equ topA - HemiSize
@@ -309,22 +354,7 @@ bottom_of_hemi: dw botA, botB
 
 gc_num: db 0
 
-%macro DebugX 1
-    PrintCharLit %1 ; uncomment for GC debug
-%endmacro
-
-%macro Debug 1
-    ;PrintCharLit %1 ; uncomment for GC debug
-%endmacro
-
-%macro DebugSeeReg 1
-    ;SeeReg %1 ; uncomment for GC debug
-%endmacro
-
 Bare_heap_check_function:
-    ;PrintCharLit 'B'
-    ;SeeReg si
-    ;SeeReg di
 
     pop bx
     mov [tCALLER], bx
@@ -338,17 +368,13 @@ Bare_heap_check_function:
     sub ax, [need]
     cmp ax, 0
     jl .need_to_gc
-    ;jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing!
+    ;; jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing!
     jmp .return_to_caller
 
 .need_to_gc:
-
-    ;mov bx, [tCALLER]
-    ;SeeReg bx
-
     inc byte [gc_num]
-    ;DebugX '=' ;; DEV! uncomment for smallest indication that GC is happenning
-    Debug '['
+    ;;Debug '=' ;; DEV! uncomment for smallest indication that GC is happenning
+    ;;Debug '['
     ;mov al, [gc_num]
     ;PrintHexAL
     ;Debug ':'
@@ -359,24 +385,16 @@ Bare_heap_check_function:
     mov bh, 0
     mov ax, sp
     sub ax, [bottom_of_hemi + bx]
-    ;SeeReg ax
-    Debug ']'
+    ;;Debug ']'
     sub ax, [need]
     cmp ax, 0
-    ;DebugX 'x'
     jl .out_of_memory
-    ;DebugX 'y'
-
-    ;mov ax, [tCALLER]
-    ;SeeReg ax
 
 .return_to_caller:
     jmp [tCALLER]
 
 .out_of_memory:
-    DebugX 'O'
     PrintString `[OOM]\n`
-    DebugX 'M'
     jmp halt
 
 bytesPerWord equ 2
@@ -387,11 +405,10 @@ tFrame dw 0
 tCALLER dw 0
 
 gc_start:
-    ;Stop `NO-GC`
     pop ax
     mov [.caller], ax
     mov [tFrame], FrameReg
-    ;SeeReg ArgReg
+
     mov [tArg], ArgReg
     mov [tArgOut], ArgOut
 
@@ -407,26 +424,66 @@ gc_start:
 
     mov dx, sp ; set scavenge threshold
     ;; evacuate roots...
+
     ;; frame register
     mov si, [tFrame]
     call evacuate
-    Debug '1'
     mov [tFrame], si
-    ;; arg-0
+
+.loopArgRoot:
+    mov ax, [ArgRoots]
+    cmp ax, 0
+    jz .noMoreArgRoots
+    dec ax
+    mov [ArgRoots], ax
+    shl ax, 1
     mov bx, [tArg]
-    ;SeeReg bx
-    mov si, [bx] ;;bx
+    add bx, ax
+    mov si, [bx]
     call evacuate
     mov bx, [tArg]
-    ;mov bx, [bx]
+    mov ax, [ArgRoots]
+    shl ax, 1
+    add bx, ax
     mov [bx], si
-    ;;mov [tArg], si
-    Debug '2'
+
+    jmp .loopArgRoot
+
+.noMoreArgRoots:
+
+
+;;     ;; old...
+;;     cmp ax, 2
+;;     ja roots
+;;     cmp ax, 0
+;;     jz .zeroArgsRoots
+;;     cmp ax, 1
+;;     jz .oneArgRoot
+;; .twoArgRoots:
+;;     Debug '2'
+;;     ;; arg-1
+;;     mov bx, [tArg]
+;;     mov si, [bx+2]
+;;     call evacuate
+;;     mov bx, [tArg]
+;;     mov [bx+2], si
+;; .oneArgRoot:
+;;     Debug '1'
+;;     ;; arg-0
+;;     mov bx, [tArg]
+;;     mov si, [bx]
+;;     call evacuate
+;;     mov bx, [tArg]
+;;     mov [bx], si
+;; .zeroArgsRoots:
+;;     Debug '0'
+
+
     ;; current continuation
     mov si, [CurrentCont]
     call evacuate
-    Debug '3'
     mov [CurrentCont], si
+
     ;; Scavenge objects between sp and dx
     ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
     cmp dx, sp
@@ -438,9 +495,9 @@ gc_start:
 .inner_loop:
     cmp bx, dx
     jg .bad_inner_loop
-    DebugSeeReg bx
+    ;;DebugSeeReg bx
     mov di, [bx] ; descriptor (size in bytes; maybe tagged as raw-data)
-    DebugSeeReg di
+    ;;DebugSeeReg di
     cmp di, 0
     jz .bad_zero_descriptor
     test di, 1
@@ -453,19 +510,19 @@ gc_start:
     PrintString `[bad_zero_descriptor!]\n`
     jmp halt
 .scav_payload:
-    Debug '-'
+    ;;Debug '-'
     add bx, bytesPerWord
     shr di, 1
 .scav_word:
-    Debug ','
+    ;;Debug ','
     mov si, [bx]
     call evacuate
-    ;Debug '4'
+    ;;Debug '4'
     mov [bx], si
     add bx, bytesPerWord
     dec di
     jne .scav_word
-    ;Debug '5'
+    ;;Debug '5'
 .done_object:
     cmp bx, dx
     jne .inner_loop
@@ -489,9 +546,9 @@ toobig:
     Stop `[Bad descriptor]\n`
 
 evacuate: ;; si --> si (uses: bp)
-    Debug 'e'
+    ;;Debug 'e'
     pop bp
-    mov [.caller], bp
+    mov [.caller], bp ;; TODO: why not pop directly; avoiding use of bp?
     cmp si, end_of_code
     jb .done ; jb for unsigned comparison!
     test si, 1
@@ -502,24 +559,24 @@ evacuate: ;; si --> si (uses: bp)
     jnz toobig
     cmp si, 0
     jz .use_broken_heart
-    Debug '('
+    ;;Debug '('
     and si, 0xfffe ; align to even offset
 
-    DebugSeeReg bp
+    ;;DebugSeeReg bp
     mov ax, [bp - bytesPerWord]
-    DebugSeeReg ax
+    ;;DebugSeeReg ax
 .loop:
-    Debug 'c'
+    ;;Debug 'c'
     push word [bp + si - bytesPerWord]
     sub si, bytesPerWord
     jnz .loop
 
     mov si, sp ; si is relocation address
-    Debug 'd'
+    ;;Debug 'd'
 
-    DebugSeeReg bp
+    ;;DebugSeeReg bp
     mov ax, [bp - bytesPerWord]
-    DebugSeeReg ax
+    ;;DebugSeeReg ax
     test ax, 0xf000
     jnz toobig
 
@@ -527,10 +584,10 @@ evacuate: ;; si --> si (uses: bp)
     mov word [bp - bytesPerWord], 0 ; set broken heart
     mov [bp], si ; and relocation address
 
-    Debug ')'
+    ;;Debug ')'
     jmp [.caller]
 .use_broken_heart:
-    Debug 'h'
+    ;;Debug 'h'
     mov si, [bp] ; access relocation address from broken heart
     jmp [.caller]
 .done:
