@@ -34,7 +34,7 @@ gcAtEverySafePoint :: Bool -- more likely to pickup bugs in codegen
 gcAtEverySafePoint = False -- crazy slow -- TODO: control this with command line flag
 
 hemiSizeInBytes :: Int
-hemiSizeInBytes = 4 * 1024
+hemiSizeInBytes = 5000
 
 sizeRedzone :: Int -- interrupts in runtime.asm
 sizeRedzone = 100
@@ -187,13 +187,14 @@ heapCheck need = do
 
 runGC :: M ()
 runGC = do
-  gcNum <- BumpGC
+  _gcNum <- BumpGC
   toSpace <- WhatHemi
 
   numArgs :: Int <- (fromIntegral . deNum) <$> GetReg Ax
 
   Debug "["
-  Debug (printf "num=%02d, #args=%d ->" gcNum numArgs)
+  --Debug (printf "num=%02d, #args=%d ->" _gcNum numArgs)
+  --Debug (printf "%02x:" _gcNum)
   setStackPointerToTopOfHemi toSpace
 
   watermark0 <- getSP
@@ -205,9 +206,10 @@ runGC = do
   HeapAddr sp <- getSP
   --let remainingBytes = fromIntegral sp - botOfHemi toSpace
   let liveBytes = topOfHemi toSpace - fromIntegral sp
-  Debug (printf " live=%04x" liveBytes) -- print in hex to match against runtime.asm
+  --Debug (printf " live=%04x" liveBytes) -- print in hex to match against runtime.asm
+  --Debug "]\n"
   WatchLive liveBytes
-  Debug "]\n"
+  Debug (printf "%04x]" liveBytes)
 
   where
     loop :: HeapAddr -> M ()
