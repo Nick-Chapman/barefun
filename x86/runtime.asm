@@ -256,7 +256,10 @@ halt:
 
 %macro Bare_heap_check 1
     mov word [need], %1
-    jz %%no_need ;; means extreme GC dont do anything
+    ;; WAS BUG HERE. A jz should always follow a cmp!!
+    ;mov ax, %1
+    ;cmp ax, 0
+    ;jz %%no_need ;; means extreme GC dont do anything
     call Bare_heap_check_function
 %%no_need:
 %endmacro
@@ -987,7 +990,7 @@ end_of_code:
 %error Kernel sectors allocated: As, required: Rs
 %endif
 
-HemiSize equ 8000
+HemiSize equ 7000
 RedzoneSize equ 500
 
 %assign HeapSize (2*(HemiSize+RedzoneSize))
