@@ -201,16 +201,10 @@ main:
     mov sp, topA
     mov bp, 0
 
-    ;;mov si, 0
     mov si, ArgSpaceA
     mov di, ArgSpaceB
 
     call clear_screen
-
-    ;SeeReg si
-    ;SeeReg di
-    ;Stop `MAIN`
-
     mov ax, 0
     jmp bare_start
 
@@ -255,10 +249,6 @@ halt:
     PrintCharLit %1 ; uncomment for GC debug
 %endmacro
 
-%macro DebugSeeReg 1
-    SeeReg %1 ; uncomment for GC debug
-%endmacro
-
 ;; GC roots; must match stage5 calling conventions
 %define ArgReg si
 %define ArgOut di
@@ -266,7 +256,7 @@ halt:
 
 %macro Bare_heap_check 1
     mov word [need], %1
-    jz %%no_need
+    jz %%no_need ;; means extreme GC dont do anything
     call Bare_heap_check_function
 %%no_need:
 %endmacro
@@ -461,7 +451,6 @@ bottom_of_hemi: dw botA, botB
 gc_num: db 0
 
 Bare_heap_check_function:
-
     pop bx
     mov [tCALLER], bx
 
@@ -474,7 +463,7 @@ Bare_heap_check_function:
     sub ax, [need]
     cmp ax, 0
     jl .need_to_gc
-    jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing! TODO: switch off
+    ;;jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing! TODO: switch off
     jmp .return_to_caller
 
 .need_to_gc:
@@ -573,9 +562,7 @@ gc_start:
 .inner_loop:
     cmp bx, dx
     jg .bad_inner_loop
-    ;;DebugSeeReg bx
     mov di, [bx] ; descriptor (size in bytes; maybe tagged as raw-data)
-    ;;DebugSeeReg di
     cmp di, 0
     jz .bad_zero_descriptor
     test di, 1
@@ -595,12 +582,10 @@ gc_start:
     ;;Debug ','
     mov si, [bx]
     call evacuate
-    ;;Debug '4'
     mov [bx], si
     add bx, bytesPerWord
     dec di
     jne .scav_word
-    ;;Debug '5'
 .done_object:
     cmp bx, dx
     jne .inner_loop
@@ -614,8 +599,6 @@ gc_start:
     jmp [.caller]
 .bad_inner_loop:
     PrintString `\n[Bad_inner_loop]\n`
-    ;SeeReg bx
-    ;SeeReg dx
     jmp halt
 .caller:
     dw 0
@@ -639,29 +622,20 @@ evacuate: ;; si --> si (uses: bp)
     jz .use_broken_heart
     ;;Debug '('
     and si, 0xfffe ; align to even offset
-
-    ;;DebugSeeReg bp
     mov ax, [bp - bytesPerWord]
-    ;;DebugSeeReg ax
 .loop:
     ;;Debug 'c'
     push word [bp + si - bytesPerWord]
     sub si, bytesPerWord
     jnz .loop
-
     mov si, sp ; si is relocation address
     ;;Debug 'd'
-
-    ;;DebugSeeReg bp
     mov ax, [bp - bytesPerWord]
-    ;;DebugSeeReg ax
     test ax, 0xf000
     jnz toobig
-
     push word [bp - bytesPerWord]
     mov word [bp - bytesPerWord], 0 ; set broken heart
     mov [bp], si ; and relocation address
-
     ;;Debug ')'
     jmp [.caller]
 .use_broken_heart:
@@ -1013,7 +987,7 @@ end_of_code:
 %error Kernel sectors allocated: As, required: Rs
 %endif
 
-HemiSize equ 3500
+HemiSize equ 8000
 RedzoneSize equ 500
 
 %assign HeapSize (2*(HemiSize+RedzoneSize))
