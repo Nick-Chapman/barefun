@@ -288,57 +288,81 @@ ArgCheckCaller: dw 0
 
 Bare_arg_check_function:
     pop word [ArgCheckCaller]
-
     mov [Passed], ax
     mov [Desired], bx
-
     mov [ArgRoots], ax
-
     cmp ax,bx
-    jb papSaveG
-    jnz overappPick
+    jb PapSave
+    jnz OverAppSave
     jmp [ArgCheckCaller]
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (*) overapp
 
-overappPick:
-    cmp ax, 2
-    jne .overapp_no
-    cmp bx, 1
-    jne .overapp_no
-    jmp .overapp_2_1
-.overapp_no:
-    SeeReg ax
-    SeeReg bx
-    Stop "OVERAPP"
-
-.overapp_2_1:
-
-    Bare_heap_check(8)
-    push word [si+2]
+OverAppSave:
+    ;; heap check: (Passed-Desired+3)*2
+    mov ax, [Passed]
+    sub ax, [Desired]
+    add ax, 3
+    shl ax, 1
+    mov word [need], ax
+    call Bare_heap_check_function
+    mov cx, [Passed]
+    ;; push over-args
+.loop:
+    dec cx
+    mov bx, si
+    add bx, cx
+    add bx, cx
+    mov ax, [bx]
+    push word ax
+    cmp cx, [Desired]
+    jnz .loop
+    ;; push the continuation & pointer to the restore code
     push word [CurrentCont]
-    push word .OverAppRestore_1
+    push word OverAppRestore
     mov [CurrentCont], sp
-    push word 6 ;; scanned
+    ;; push descriptor: (Passed-Desired+2)*2
+    mov ax, [Passed]
+    sub ax, [Desired]
+    add ax, 2
+    shl ax, 1
+    push word ax
+    mov ax, [Desired]
+    mov [ArgRoots], ax
     jmp [ArgCheckCaller]
 
-.OverAppRestore_1:
+OverAppRestore:
     xchg si, di
-    mov ax, [bp+6]
-    mov [di+2], ax
-    mov ax, [bp+4]
-    mov [di], ax
+    mov ax, [bp-2] ;; descriptor; size of the frame, not including descriptor
+    sub ax, 4 ;; 2 words for this code pointer & the function we need to call
+    shr ax, 1 ;; bytes->words: to get the number of saved args
+    mov [.saved], ax
+    mov cx, [.saved]
+    inc cx
+.loop:
+    dec cx
+    mov bx, bp
+    add bx, 4
+    add bx, cx
+    add bx, cx
+    mov ax, [bx]
+    mov bx, di
+    add bx, cx
+    add bx, cx
+    mov [bx], ax
+    cmp cx, 0
+    jnz .loop
+    ;; re-enter
     mov bp, [si]
-    mov ax, 1
+    mov ax, [.saved]
     jmp [bp]
-
+.saved: dw 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (*) PAP
 
-papSaveG:
+PapSave:
     ;; heap check: (Passed+3)*2
     mov ax, [Passed]
     add ax, 3
@@ -351,6 +375,7 @@ papSaveG:
     shl ax, 1
     mov bx, si
     add bx, ax
+    ;; push the early args
 .loop:
     mov ax, [bx]
     push word ax
@@ -361,7 +386,7 @@ papSaveG:
 .done:
     ;; push the function being called & then pointer to the restore code
     push word bp
-    push word papRestoreG
+    push word PapRestore
     ;; set the single result arg
     mov [di], sp
     ;; push descriptor: (Passed+2)*2
@@ -376,7 +401,7 @@ papSaveG:
     mov ax, 1
     jmp [bp]
 
-papRestoreG:
+PapRestore:
     ;; Not exchanging si/di -- just find args in di and pass in di
     mov [.late], ax
     mov ax, [bp-2] ;; descriptor; size of the frame, not including descriptor
@@ -384,7 +409,8 @@ papRestoreG:
     shr ax, 1 ;; bytes->words
     mov [.early], ax
     mov cx, [.late]
-.loop: ;; shift late args up to accomadate early args
+    ;; shift late args up (those just received) to accommodate early args
+.loop:
     dec cx
     mov bx, di
     add bx, cx
@@ -396,7 +422,8 @@ papRestoreG:
     cmp cx, 0
     jnz .loop
     mov cx, [.early]
-.loop2: ;; shift late args up to accommodate early args
+    ;; copy in early args from the closure
+.loop2:
     dec cx
     mov bx, bp
     add bx, 4
@@ -409,6 +436,7 @@ papRestoreG:
     mov [bx], ax
     cmp cx, 0
     jnz .loop2
+    ;; make the tail call
     mov bp, [bp+2]
     mov ax, [.early]
     add ax, [.late]
@@ -446,7 +474,7 @@ Bare_heap_check_function:
     sub ax, [need]
     cmp ax, 0
     jl .need_to_gc
-    ;;jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing!
+    jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing! TODO: switch off
     jmp .return_to_caller
 
 .need_to_gc:
