@@ -478,6 +478,13 @@ Bare_heap_check_function:
     ;Debug ':'
     call gc_start
 
+    ;; live words debug...
+    ;mov bl, [which_hemi]
+    ;mov bh, 0
+    ;mov ax, [top_of_hemi + bx]
+    ;sub ax, sp
+    ;SeeReg ax
+
     ; space remaining after GC
     mov bl, [which_hemi]
     mov bh, 0
