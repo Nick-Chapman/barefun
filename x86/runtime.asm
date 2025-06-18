@@ -770,6 +770,9 @@ AllocBare_make_bytes: ;;; TODO: construct & emit this code in compiler. stage5-e
     mov ax, [ArgReg]
     shr ax, 1 ; untag
     mov word [need], ax
+
+    ;; Was a bug here -- not setting [ArgRoots]
+    mov word [ArgRoots], 1
     call Bare_heap_check_function
 
     mov dx, [ArgReg]
