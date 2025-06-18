@@ -1000,8 +1000,8 @@ end_of_code:
 %error Kernel sectors allocated: As, required: Rs
 %endif
 
-HemiSize equ 7000
-RedzoneSize equ 500
+HemiSize equ 10000
+RedzoneSize equ 10
 
 %assign HeapSize (2*(HemiSize+RedzoneSize))
 
