@@ -272,7 +272,7 @@ halt:
 %endmacro
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (6.9) Arg Check
+;;;; (*) Arg Check
 
 %macro Bare_arg_check 1
     mov word bx, %1
@@ -281,29 +281,29 @@ halt:
 
 ArgRoots: dw 0
 
-Bare_arg_check_function:
-    pop word [.caller]
+Passed dw 0
+Desired dw 0
 
-    ;; ax contains the number of args passed
-    ;; bx contains the number of args desired
+ArgCheckCaller: dw 0
+
+Bare_arg_check_function:
+    pop word [ArgCheckCaller]
+
+    mov [Passed], ax
+    mov [Desired], bx
+
     mov [ArgRoots], ax
-    ;;Debug 'a'
-    ;;DebugSeeReg ax
+
     cmp ax,bx
-    jb .pap
-    jnz .overapp
-    cmp ax, 4 ;; ALLOW 2/2, 3/3
-    jge .multi
-    jmp [.caller]
-.multi:
-    SeeReg ax
-    SeeReg bx
-    Stop "MULTI"
-.pap:
-    SeeReg ax
-    SeeReg bx
-    Stop "PAP"
-.overapp:
+    jb papSaveG
+    jnz overappPick
+    jmp [ArgCheckCaller]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (*) overapp
+
+overappPick:
     cmp ax, 2
     jne .overapp_no
     cmp bx, 1
@@ -316,19 +316,15 @@ Bare_arg_check_function:
 
 .overapp_2_1:
 
-    ;;; copied from generated code...
     Bare_heap_check(8)
     push word [si+2]
     push word [CurrentCont]
-    push word L_OverAppRestore_1
+    push word .OverAppRestore_1
     mov [CurrentCont], sp
     push word 6 ;; scanned
-    jmp [.caller]
+    jmp [ArgCheckCaller]
 
-.caller:
-    dw 0
-
-L_OverAppRestore_1:
+.OverAppRestore_1:
     xchg si, di
     mov ax, [bp+6]
     mov [di+2], ax
@@ -337,6 +333,88 @@ L_OverAppRestore_1:
     mov bp, [si]
     mov ax, 1
     jmp [bp]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; (*) PAP
+
+papSaveG:
+    ;; heap check: (Passed+3)*2
+    mov ax, [Passed]
+    add ax, 3
+    shl ax, 1
+    mov word [need], ax
+    call Bare_heap_check_function
+    ;; setup bx to point at last arg to be saved
+    mov word ax, [Passed]
+    dec ax
+    shl ax, 1
+    mov bx, si
+    add bx, ax
+.loop:
+    mov ax, [bx]
+    push word ax
+    cmp bx, si
+    jz .done
+    sub bx, 2
+    jmp .loop
+.done:
+    ;; push the function being called & then pointer to the restore code
+    push word bp
+    push word papRestoreG
+    ;; set the single result arg
+    mov [di], sp
+    ;; push descriptor: (Passed+2)*2
+    mov ax, [Passed]
+    add ax, 2
+    shl ax, 1
+    push word ax
+    ;; return
+    mov bp, [CurrentCont]
+    mov ax, [bp+2]
+    mov [CurrentCont], ax
+    mov ax, 1
+    jmp [bp]
+
+papRestoreG:
+    ;; Not exchanging si/di -- just find args in di and pass in di
+    mov [.late], ax
+    mov ax, [bp-2] ;; descriptor; size of the frame, not including descriptor
+    sub ax, 4 ;; 2 words for this code pointer & the funct we need to call
+    shr ax, 1 ;; bytes->words
+    mov [.early], ax
+    mov cx, [.late]
+.loop: ;; shift late args up to accomadate early args
+    dec cx
+    mov bx, di
+    add bx, cx
+    add bx, cx
+    mov ax, [bx]
+    add bx, [.early]
+    add bx, [.early]
+    mov [bx], ax
+    cmp cx, 0
+    jnz .loop
+    mov cx, [.early]
+.loop2: ;; shift late args up to accommodate early args
+    dec cx
+    mov bx, bp
+    add bx, 4
+    add bx, cx
+    add bx, cx
+    mov ax, [bx]
+    mov bx, di
+    add bx, cx
+    add bx, cx
+    mov [bx], ax
+    cmp cx, 0
+    jnz .loop2
+    mov bp, [bp+2]
+    mov ax, [.early]
+    add ax, [.late]
+    jmp [bp]
+.late dw 0
+.early dw 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (7) Garbage Collection
@@ -368,7 +446,7 @@ Bare_heap_check_function:
     sub ax, [need]
     cmp ax, 0
     jl .need_to_gc
-    ;; jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing!
+    ;;jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing!
     jmp .return_to_caller
 
 .need_to_gc:
@@ -450,34 +528,6 @@ gc_start:
     jmp .loopArgRoot
 
 .noMoreArgRoots:
-
-
-;;     ;; old...
-;;     cmp ax, 2
-;;     ja roots
-;;     cmp ax, 0
-;;     jz .zeroArgsRoots
-;;     cmp ax, 1
-;;     jz .oneArgRoot
-;; .twoArgRoots:
-;;     Debug '2'
-;;     ;; arg-1
-;;     mov bx, [tArg]
-;;     mov si, [bx+2]
-;;     call evacuate
-;;     mov bx, [tArg]
-;;     mov [bx+2], si
-;; .oneArgRoot:
-;;     Debug '1'
-;;     ;; arg-0
-;;     mov bx, [tArg]
-;;     mov si, [bx]
-;;     call evacuate
-;;     mov bx, [tArg]
-;;     mov [bx], si
-;; .zeroArgsRoots:
-;;     Debug '0'
-
 
     ;; current continuation
     mov si, [CurrentCont]
