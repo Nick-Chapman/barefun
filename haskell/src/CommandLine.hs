@@ -100,8 +100,8 @@ parseCommandLine = loop config0
                      , measure = False
                      , ppp = Stage1.PPPosOff
                      , ppu = Stage1.PPUniqueOff
-                     , mlam = 0
-                     , mapp = 0
+                     , mlam = 7
+                     , mapp = 7 -- needs to match in runtime.asm
                      }
 
     loop :: Config -> [String] -> Config

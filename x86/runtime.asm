@@ -36,7 +36,6 @@
     bootloader_relocation_address equ 0xfe00
 
     kernel_load_address equ 0x600
-;%assign kernel_load_address 0x600 ;; TODO: what's the difference
 
     kernel_size_in_sectors equ 124 ;; max before relocated bootloader
     ;; TODO: relocate bootloader at 500. so when load kernel at 600, we have max 125 sectors
@@ -186,7 +185,7 @@ part2:
 
     section KERNEL follows=BOOTSECTOR vstart=kernel_load_address
 
-MaxNumArgs equ 7 ;; TODO: how many do we need? TODO: detect too many
+MaxNumArgs equ 7 ;; needs to match -mapp, defaults to 7 in CommandLine.hs
 ArgSpaceA: times MaxNumArgs dw Arb
 ArgSpaceB: times MaxNumArgs dw Arb
 Arb:  dw 0
@@ -243,7 +242,7 @@ halt:
     jmp halt
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (6.8) Arg Check prerequisites
+;;;; Arg Check prerequisites
 
 %macro Debug 1
     PrintCharLit %1 ; uncomment for GC debug
@@ -254,18 +253,10 @@ halt:
 %define ArgOut di
 %define FrameReg bp
 
-%macro Bare_heap_check 1
-    mov word [need], %1
-    ;; WAS BUG HERE. A jz should always follow a cmp!!
-    ;mov ax, %1
-    ;cmp ax, 0
-    ;jz %%no_need ;; means extreme GC dont do anything
-    call Bare_heap_check_function
-%%no_need:
-%endmacro
+HeapBytesNeeded: dw 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (*) Arg Check
+;;;; Arg Check
 
 %macro Bare_arg_check 1
     mov word bx, %1
@@ -291,7 +282,7 @@ Bare_arg_check_function:
     jmp [ArgCheckCaller]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (*) overapp
+;;;; OverApp
 
 OverAppSave:
     ;; heap check: (Passed-Desired+3)*2
@@ -299,8 +290,8 @@ OverAppSave:
     sub ax, [Desired]
     add ax, 3
     shl ax, 1
-    mov word [need], ax
-    call Bare_heap_check_function
+    mov word [HeapBytesNeeded], ax
+    call HeapCheck
     mov cx, [Passed]
     ;; push over-args
 .loop:
@@ -354,15 +345,15 @@ OverAppRestore:
 .saved: dw 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; (*) PAP
+;;;; PAP
 
 PapSave:
     ;; heap check: (Passed+3)*2
     mov ax, [Passed]
     add ax, 3
     shl ax, 1
-    mov word [need], ax
-    call Bare_heap_check_function
+    mov word [HeapBytesNeeded], ax
+    call HeapCheck
     ;; setup bx to point at last arg to be saved
     mov word ax, [Passed]
     dec ax
@@ -441,8 +432,6 @@ PapRestore:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; (7) Garbage Collection
 
-need: dw 0 ;; TODO longer name
-
 topA equ 0x0000
 botA equ topA - HemiSize
 topB equ botA - RedzoneSize
@@ -454,9 +443,22 @@ bottom_of_hemi: dw botA, botB
 
 gc_num: db 0
 
-Bare_heap_check_function:
+%macro Bare_heap_check 1
+    mov word [HeapBytesNeeded], %1
+    ;; WAS BUG HERE. A jz should always follow a cmp!!
+    ;mov ax, %1
+    ;cmp ax, 0
+    ;jz %%no_need ;; means extreme GC dont do anything
+    call HeapCheck
+%%no_need:
+%endmacro
+
+
+HeapCheckCaller dw 0
+
+HeapCheck:
     pop bx
-    mov [tCALLER], bx
+    mov [HeapCheckCaller], bx
 
     ; space remaining before potential GC
     mov bl, [which_hemi]
@@ -464,20 +466,20 @@ Bare_heap_check_function:
     mov ax, sp
     sub ax, [bottom_of_hemi + bx]
 
-    sub ax, [need]
+    sub ax, [HeapBytesNeeded]
     cmp ax, 0
-    jl .need_to_gc
-    ;;jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing! TODO: switch off
-    jmp .return_to_caller
+    jl RunGC_checkEnoughSpace
+    ;;jmp .need_to_gc ; DEV! uncomment to GC every safe point; extreme testing!
+    jmp [HeapCheckCaller]
 
-.need_to_gc:
+RunGC_checkEnoughSpace:
     inc byte [gc_num]
     ;;Debug '=' ;; DEV! uncomment for smallest indication that GC is happenning
     ;;Debug '['
     ;mov al, [gc_num]
     ;PrintHexAL
     ;Debug ':'
-    call gc_start
+    call RunGC
 
     ;; live words debug...
     ;mov bl, [which_hemi]
@@ -492,14 +494,14 @@ Bare_heap_check_function:
     mov ax, sp
     sub ax, [bottom_of_hemi + bx]
     ;;Debug ']'
-    sub ax, [need]
+    sub ax, [HeapBytesNeeded]
     cmp ax, 0
-    jl .out_of_memory
+    jl OOM
 
-.return_to_caller:
-    jmp [tCALLER]
+    ;; GC done
+    jmp [HeapCheckCaller]
 
-.out_of_memory:
+OOM:
     PrintString `[OOM]\n`
     jmp halt
 
@@ -508,13 +510,10 @@ bytesPerWord equ 2
 tArg: dw 0
 tArgOut: dw 0
 tFrame dw 0
-tCALLER dw 0
 
-gc_start:
-    pop ax
-    mov [.caller], ax
+RunGC:
+    pop word [.caller]
     mov [tFrame], FrameReg
-
     mov [tArg], ArgReg
     mov [tArgOut], ArgOut
 
@@ -530,16 +529,15 @@ gc_start:
 
     mov dx, sp ; set scavenge threshold
     ;; evacuate roots...
-
     ;; frame register
     mov si, [tFrame]
     call evacuate
     mov [tFrame], si
-
-.loopArgRoot:
+    ;; args...
+.loopArgRoots:
     mov ax, [ArgRoots]
     cmp ax, 0
-    jz .noMoreArgRoots
+    jz .doneArgRoots
     dec ax
     mov [ArgRoots], ax
     shl ax, 1
@@ -552,16 +550,12 @@ gc_start:
     shl ax, 1
     add bx, ax
     mov [bx], si
-
-    jmp .loopArgRoot
-
-.noMoreArgRoots:
-
+    jmp .loopArgRoots
+.doneArgRoots:
     ;; current continuation
     mov si, [CurrentCont]
     call evacuate
     mov [CurrentCont], si
-
     ;; Scavenge objects between sp and dx
     ;; Maybe none of the 3 roots are heap pointers, and there is nothing to do.
     cmp dx, sp
@@ -619,8 +613,7 @@ toobig:
 
 evacuate: ;; si --> si (uses: bp)
     ;;Debug 'e'
-    pop bp
-    mov [.caller], bp ;; TODO: why not pop directly; avoiding use of bp?
+    pop word [.caller]
     cmp si, end_of_code
     jb .done ; jb for unsigned comparison!
     test si, 1
@@ -770,11 +763,11 @@ AllocBare_make_bytes: ;;; TODO: construct & emit this code in compiler. stage5-e
 
     mov ax, [ArgReg]
     shr ax, 1 ; untag
-    mov word [need], ax
+    mov word [HeapBytesNeeded], ax
 
     ;; Was a bug here -- not setting [ArgRoots]
     mov word [ArgRoots], 1
-    call Bare_heap_check_function
+    call HeapCheck
 
     mov dx, [ArgReg]
     shr dx, 1       ; untag, to get number of bytes to..
