@@ -532,7 +532,7 @@ let loadI : super -> ii -> inode option =
 
 (* fsck: discover/compute the free block and free inode info *)
 let fsck : unit -> fs option =
-  fun () ->
+  noinline (fun () ->
   match load_super () with
   | None -> None
   | Some super ->
@@ -551,7 +551,7 @@ let fsck : unit -> fs option =
         in
         let first_datablock = 1 + num_inode_blocks in
         let all_bis = map (fun b -> BI b) (upto first_datablock (num_blocks-1)) in
-        loop all_bis [] 0
+        loop all_bis [] 0)
 
 let allocII : fs -> (fs,ii) pair option =
   fun fs ->
@@ -826,14 +826,14 @@ let command_format () =
      iter f (upto 0 (c-1))
 
 (* mount: Discover the existing filesystem; allow files to be accessed. *)
-let command_mount () =
+let command_mount = noinline (fun () ->
   match !mounted with
   | Some _ -> error "filesystem already mounted"
   | None ->
      match fsck () with
      | None -> error "no filesystem found; try format"
      | Some fs ->
-        mounted := Some fs
+        mounted := Some fs)
 
 (* unmount: Unmount the existing filesystem; required to format. *)
 let command_unmount () =
@@ -864,7 +864,7 @@ let command_stat i =
      put_string (show_ii ii ^ " : " ^ showI opt ^ "\n")
 
 (* list: List all file/sizes of a mounted filesystem. *)
-let command_list () =
+let command_list = noinline (fun () ->
   match !mounted with
   | None -> error mes_no_filesystem_mounted
   | Some fs ->
@@ -879,7 +879,7 @@ let command_list () =
           | Some inode ->
              put_string ("file " ^ sofi (deII ii) ^ " : " ^ sofi (size_of_inode inode) ^ "\n")
         in
-        iter pr (upto 0 (n-1))
+        iter pr (upto 0 (n-1)))
 
 let rec write_to_file ii offset =
   let text = read_line () in
@@ -1007,11 +1007,9 @@ let rec repl i =
     let () = execute line in
     repl (i+1)
 
-(*let auto_mount() = (* useful during development *)
+let auto_mount() = (* useful during development *)
   command_mount();
-  command_format();
-  command_mount();
-  command_debug()*)
+  command_list()
 
 let print_size_info() =
   put_string_nl ("- sector_size: " ^ sofi sector_size);
@@ -1027,4 +1025,5 @@ let main () =
   put_string_nl "Filesystem explorer";
   print_size_info();
   put_string ("Try: " ^ concat " " coms ^ "\n");
+  auto_mount();
   repl 1

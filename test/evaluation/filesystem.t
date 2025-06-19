@@ -11,6 +11,8 @@ We still test the haskell emulations in ../same-evaluation-from-all-stages/.
   - #blocks_on_disk: 40
   - max_file_size (6 blocks): 768
   Try: help dump sector format mount unmount debug ls stat cat rm create append splat wipe
+  Error: no filesystem found; try format
+  Error: no filesystem mounted; try mount
   1> wipe
   2> format
   3> mount
