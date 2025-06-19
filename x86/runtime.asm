@@ -280,6 +280,7 @@ Desired dw 0
 ArgCheckCaller: dw 0
 
 Bare_arg_check_function:
+    ;;Debug '.'
     pop word [ArgCheckCaller]
     mov [Passed], ax
     mov [Desired], bx
@@ -1000,7 +1001,7 @@ end_of_code:
 %error Kernel sectors allocated: As, required: Rs
 %endif
 
-HemiSize equ 10000
+HemiSize equ 7000
 RedzoneSize equ 10
 
 %assign HeapSize (2*(HemiSize+RedzoneSize))

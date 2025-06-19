@@ -1,5 +1,6 @@
 
 let flags_for_example = function
+  | "filesystem" -> "-mlam 1"
   | _ -> ""
 
 let generate_rules x =
