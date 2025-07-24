@@ -1,0 +1,36 @@
+
+executable-name:
+  echo barefun > executable-name
+
+include ../../../jenga/rulelib/haskell.jenga
+
+main-entry:
+  echo CommandLine > main-entry
+
+ghc-version:
+  echo 9.8.4 > ghc-version
+
+ghc-options:
+  echo -Wall >>ghc-options
+  echo -Werror >>ghc-options
+  echo -Wno-name-shadowing >>ghc-options
+  echo -O0 >>ghc-options
+
+# These dependencies are not discovered by gcc -M (not sure why)
+xdepends:
+  echo 'Stage5_Compilation.o : Par4.hi' >>xdepends
+  echo 'Stage5_Emulation.o : Stage4_CCF.hi' >>xdepends
+  echo 'CommandLine.o : Stage5_ASM.hi' >>xdepends
+
+default-extensions:
+  echo DuplicateRecordFields >>default-extensions
+  echo GADTs >>default-extensions
+  echo LambdaCase >>default-extensions
+  echo NondecreasingIndentation >>default-extensions
+
+pkgdb:
+  echo /home/nic/.stack/snapshots/x86_64-linux/0c0e09a39c717a2ea362c88b471e2ca3bfed98555f446ae62de384c509723563/9.8.4/pkgdb >pkgdb
+
+packages:
+  echo unix >>packages
+  echo bytestring >>packages
