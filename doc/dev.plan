@@ -1,0 +1,322 @@
+
+
+TODO:
+Debug GC. #Live-words... using hello example
+comparing stage5 vs runtimme.asm
+
+
+
+
+
+----------------------------------------------------------------------
+multi lam/app...
+-- THINK I MIGHT BE DONE
+
+default and flags to control:
+- make default behav to be collect Lam/App for N as large as possible
+- perhaps have command line control to set max on the -mlam/-mapp
+
+- hmm, just add some mac thresholds to check/force the remaining pap/overapp numbers
+- then kill the flags
+
+
+runtime.asm
+- implement ArgCheck. compare against Ax. stop if different
+- make sure to adapt GC in runtime.asm
+- switch on -mlam/-mapp, first unbalanced, for N=2,3..
+- drive imp of pap/overapp in ASM
+
+
+----------------------------------------------------------------------
+
+undefined
+
+Make -ppu and -ppp  work for stage3 compile output and above
+
+
+When I have multi-arg working
+- add the flags to genertaed the expected compilation output & start to puruse,,,
+- study the output of examples (start small & increasing)
+- can I improve the providence info
+- so that we can see what is gooing on in stage5 genertaed ASM
+Please!
+
+max-args - make sure generated code does not need more avaiable space that allocated
+
+write out the pap/overapp code with user code? -- nah! -- YES
+
+Suppress compilation for arg-check/#args-passed for continuation-code/return ?
+- this will always be 1 !!
+
+
+wondering (again) if si/di flip is better done at call site
+thus minimizing the extent of the calling convention
+only si/ax needs to be set
+the called function can initialize di (as the other space from si) if it needs
+
+
+gg undefined
+
+----------------------------------------------------------------------
+
+TODO: easy win -- KILL because unused
+
+  mov ax, Bare_unit
+  mov [Temps+14], ax
+
+----------------------------------------------------------------------
+zig
+- try build from source
+- fib timing; cps version
+
+----------------------------------------------------------------------
+
+cleanup commented-debug in runtime.asm
+FIX: enableArgIndirection=True
+arith.fun fails in qemu (ok in stage5 emu-- so that must be wrong)
+ff.fun in qemu VS stage5 -- deviates from fib 22. think qemu is 15bit. stage 5 not
+
+
+document my value representtation layout & calling convention
+- part doc / maybe for blog ?
+
+----------------------------------------------------------------------
+
+small todo
+- forever todo: DO or DONT!
+
+value-rep:
+- why do string have tagged-length as part of user data, why not untagged?
+
+stage5
+- avoid trivial Bare_ primitives (todos). fewer places for stage5-emu to diverge from runtime.asm
+- string/bytes set/get -- avoid Bare. just generate ops.
+- flag to select heap size
+- GC word rep check in stage 5
+
+register allocation
+- destination-driven code generation: adapt for my ANF style of code (everything let bound)
+
+
+filesystem example
+- new features -- DO or DONT
+- increase #sectors further from 10 -> 31
+- sector caching (grab from v1)
+- move to 512 byte blocks: simpler code; address more disk!
+- trunc/fix-zeroing for splat past end of file
+- indirection blocks for large files
+- dont get stuck when out of blocks
+- filename & directories
+- limit readline to avoid OOM
+
+x86:
+- debug occassion GC crash; try force crash in qemu by GC at every safe point
+- check when program + heap wont fit!
+- explore use of segmentation to have code in data in diff segments & so get 2x example size??
+
+parser/language
+- combinators: incrementally compute row/col is this becomes a speed issue
+- have prelude.fun instead of repeating in every eample (unused stuff will drop away in BnE)
+
+provanance
+- position info in generated .asm is very unstable
+- review ASM output for examples form small->big... check/improve provenance
+- support optional end-of-line comments in ASM
+- gg noPos
+- do better that noPos in predefined
+- mandatory pos in stage 0/1 Exp -- have recursive Exp be (Pos,Exp)
+- PP generated names in Stage2 should show unique not pos
+- PP for Stage3 should show user names -- for functions!
+
+optimize
+- unboxed variants
+- untagged tuples
+- share identical values during stage3 (ANF and globalization)
+- avoid slow closure-entry code for top level functions
+
+concurreny
+- THE NEXT BIG THING
+
+slow builds for haskell/stack wrapped in dune - see note in ,NOTES
+
+arithmetic
+- signed vs unsigned : div vs idiv
+
+sham example
+- allow enable GC dynamically in sham
+- history: command and read_line up/down arrows
+- small calculator: parser to expression tree and evaluator? (parse combinators?)
+- expose time in sham example
+
+stage5
+- is is possible to run the exact same GC code as in runtime.asm
+- use IO array refs to avoid leak in rep for bytes/string
+- not really important to have speed for any of the haskell interpreters
+- unless it starts to interfer with dev progress
+- what could make stage5 eval quicker?
+    perhaps avoid functional Map for mem? (which is slow and leaks)
+    could we use an IO-based rep for memory (perhaps via Interaction)? and get piggy back GC
+
+blocking inlining
+- block (prim)
+- user code (noinline) -- functional type
+- block can be used for any expression-- say liter string given to explode
+- noinline is only for functions -- any is typed that way - useful distinction?
+- is_constant (prim) -- semantics, non-deterministic bool
+- user code (inline_only_foor_constant_arg) -- combines is_constant and block/noinline
+- will be SUPER COOL
+- limited unrolling of user loops!
+
+ancient allocation
+- allocations which are never freed
+- in some global place.
+- wont need GC
+- good for stuff like cached sectors read from disk
+
+misc compiler mods
+- dont need unique numbers until after normalization (Stage1 output)
+- maybe wont need generated names until ANF (Stage2)
+- stage1 : avoid constructing "main()" application
+- value: Have only "data Base v" in Value.hs - tie knot in each evalator.
+- all stages: prefer closures to functional rep for functions
+
+segmentation? (avoid protected mode for longer)
+- maybe try use segmentation to have stack in higer memory (NEEDS research)
+
+protected mode for 32 bits
+- print chars by direct writing to mem-mapped VGA
+- cant use BIOS anymore
+- work through tutorials to make teh switch
+
+self hosting dream
+- simple in memory filesystem --DONE
+- some kind of editor
+- have interpreter for simple number calculation baked into OS
+- have interpreter for .fun files baked into OS
+- port haskell .fun-interpreter to .fun
+- have interpreter.fun present in initial Filesystem
+- have files which represent executables -- which can be 'run' by the shell
+- have compiler which generates these .exe file
+- actually make the .exe files really be x86 code
+
+
+----------------------------------------------------------------------
+
+Wed Sep  3 12:32:11 2025
+
+Wrapup. This file moved from ~
+Copy over items + text From todoist. And close them.
+
+
+- Blogging
+
+    Plan. Bullet points. Some organization. Voice transcription. Edit for nice English.
+
+    Audience. Me in 10 years time.
+    My novel ideas.
+    What I coded.
+    What I never got to.
+
+    Prepare topics! So many.
+
+    Write 5 interpreters
+
+    No stacks
+
+    Fp no carrying. User controlled multi arg function. Maybe lisp got this right?
+
+    Stacks harmful
+
+    Tail calls important
+    CPS known for ages.
+    Neg: call frames in heap.
+    Has a cost. Maybe. Maybe small.
+    Ref to old papers. Heap vs Stack.
+    Lots of upside...
+
+    Have GC heap anyway.
+    GC off stack is a pain. Easy to leak.
+    Simpler uniform representation.
+    Concurrency
+    Lightweight threads easy.
+    No stacks! Call frames in heap.
+    User access to continuation.
+    Scheduler in user code.
+
+    Per thread stacks are a pain.
+    How big?
+    Too small... overflow
+    Too big... waste space.
+    Slow to switch?
+    Solution. Linked stack segments.
+    What is this called in literature?
+    In essence, the same as heap allocated call frames.
+
+- Stage5. Gen code for emu.
+
+    Instead of defining behav for bare_alloc.
+    Construct fixed code. And emu that.
+    Then emit fixed code to .asm
+    Avoid duplicate code in runtime.asm
+    qemu should work if stage5 emu does.
+
+    Then do the same thing for GC code!
+
+    Also pap/overapp
+
+- Stage5 value rep checks
+
+    Model Mem address contents with Word16 with explicit conversion from/to the high-level variant rep.
+    Maybe catch any bugs of representation interpretation mistakes.
+
+- Avoid pap/overapp
+
+    Diff approach. Tuples
+
+- Compile to Zig
+- Compile to x64 with zig runtime/GC
+- Better register allocation
+
+    Did lots of research.
+    Tricky problem.
+
+- Concurrency
+
+    Including non-blocked keyboard IO.
+    Long running computation.
+    Timed triggers.
+    Monitor GC
+
+- Direct VGA access
+- Disc access without BIOS
+- Protected mode
+
+    When no more use of bios.
+    Get 32 bit address space
+
+- Untagged unboxed
+
+    Research project.
+    Track boxed/unboxed in src.
+    NbE to the max.
+
+    23/5/25 dog walk
+    Thinking about this again.
+    Need compiler stage which infers the types to generate SystemF where polymorphism is explicit.
+
+    Explicit type abs/app constructs.
+
+    Nbe will ensure all type vars are specialized before reaching following stages.
+    Don't need full type info, just its boxiness. PTR or DATA.
+
+    What we need is for evert place which constructs heap objects to know the status of every word.
+    Is in a ptr or an unboxed 16b num/data.
+    This is recorded in the descriptor.
+
+    Also need to know same info for the registers/gx-roots at ever safe point.
+
+
+- Use barefun to solve protohackers
+
+    Hmm.. maybe too big of a project
+    Will need to implement tcp protocol
