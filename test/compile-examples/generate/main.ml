@@ -20,6 +20,7 @@ let select_versions_for_example = function
   | "tree" -> [5]
   | "thrice" -> [2;3;4;5]
   | "two" -> [0;1;2;3;4;5]
+  | "peval" -> [0;1;2;3;4;5]
   | _ -> []
 
 let suffix_of_version v =
