@@ -1,10 +1,11 @@
 
-let goal = 10 (*100_000_000*)
+let goal = 5 (*100_000_000*)
 
-let not b =
+(* use requires normalize "match (of) match" *)
+(*let not b =
   match b with
   | true -> false
-  | false -> true
+  | false -> true*)
 
 let explode = noinline (fun s ->
   let rec explode_loop acc i =
@@ -79,6 +80,21 @@ let rec drop : int -> 'a list -> 'a list =
   | [] -> []
   | _::xs -> drop (i-1) xs
 
+let myfix : ('a -> 'a) -> 'a = fun f ->
+  let rec fixed x = f fixed x
+  in fixed
+
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
+
 let execute : op list -> unit =
   fun program0 ->
   let setPC : int -> op list = fun i -> drop i program0 in
@@ -96,7 +112,8 @@ let execute : op list -> unit =
         crash "local_at")
   in
   let acc : value ref = ref zero in
-  let rec loop : op list -> unit = fun ops ->
+  let loop = myfix (fun loop -> fun ops ->
+    let () = put_char '.' in
     match ops with
     | [] -> crash "run out of instructions"
     | op::ops ->
@@ -109,10 +126,10 @@ let execute : op list -> unit =
        | PRINTI -> put_int (deVal (!acc)); loop ops
        | PRINT s -> put_string s; loop ops
        | JMPNZ address ->
-          if not (deVal (!acc) = 0)
-          then loop (setPC address)
-          else loop ops
-       | HALT -> ()
+          if deVal (!acc) = 0
+          then loop ops
+          else noinline loop (setPC address)
+       | HALT -> ())
   in
   loop program0
 

@@ -77,22 +77,56 @@ let local_at =
       | true1 -> PRIM_DeRef(local1)
       | false0 -> PRIM_Crash("local_at")) in
 let acc = PRIM_MakeRef(VALUE0(0)) in
-let loop =
-  fix (fun loop [ops] ->
-    match ops with
+let _ = PRIM_PutChar('.') in
+let _ = PRIM_SetRef(acc, VALUE0(0)) in
+let _ = PRIM_PutChar('.') in
+let _ = local_at_put [0, PRIM_DeRef(acc)] in
+let _ = PRIM_PutChar('.') in
+let _ = PRIM_SetRef(acc, VALUE0(5)) in
+let _ = PRIM_PutChar('.') in
+let _ = local_at_put [1, PRIM_DeRef(acc)] in
+let _ = PRIM_PutChar('.') in
+let v1 = local_at [0] in
+let v2 = local_at [1] in
+let x =
+  match v1 with
+  | VALUE0(i) -> i in
+let y =
+  match v2 with
+  | VALUE0(i) -> i in
+let y = VALUE0(PRIM_AddInt(x, y)) in
+let _ = PRIM_SetRef(acc, y) in
+let _ = PRIM_PutChar('.') in
+let _ = local_at_put [0, PRIM_DeRef(acc)] in
+let _ = PRIM_PutChar('.') in
+let y = local_at [1] in
+let _ = PRIM_SetRef(acc, y) in
+let _ = PRIM_PutChar('.') in
+let v = PRIM_DeRef(acc) in
+let x =
+  match v with
+  | VALUE0(i) -> i in
+let y = VALUE0(PRIM_SubInt(x, 1)) in
+let _ = PRIM_SetRef(acc, y) in
+let _ = PRIM_PutChar('.') in
+let _ = local_at_put [1, PRIM_DeRef(acc)] in
+let fixed =
+  fix (fun fixed [x] ->
+    let _ = PRIM_PutChar('.') in
+    match x with
     | Nil0 -> PRIM_Crash("run out of instructions")
     | Cons1(op,ops) ->
       match op with
       | LOAD_IMMEDIATE0(v) ->
         let _ = PRIM_SetRef(acc, v) in
-        loop [ops]
+        fixed [ops]
       | STORE_LOCAL1(i) ->
         let _ = local_at_put [i, PRIM_DeRef(acc)] in
-        loop [ops]
+        fixed [ops]
       | LOAD_LOCAL2(i) ->
         let y = local_at [i] in
         let _ = PRIM_SetRef(acc, y) in
-        loop [ops]
+        fixed [ops]
       | ADD3(i,j) ->
         let v1 = local_at [i] in
         let v2 = local_at [j] in
@@ -104,7 +138,7 @@ let loop =
           | VALUE0(i) -> i in
         let y = VALUE0(PRIM_AddInt(x, y)) in
         let _ = PRIM_SetRef(acc, y) in
-        loop [ops]
+        fixed [ops]
       | DEC4 ->
         let v = PRIM_DeRef(acc) in
         let x =
@@ -112,28 +146,33 @@ let loop =
           | VALUE0(i) -> i in
         let y = VALUE0(PRIM_SubInt(x, 1)) in
         let _ = PRIM_SetRef(acc, y) in
-        loop [ops]
+        fixed [ops]
       | PRINTI6 ->
         let v = PRIM_DeRef(acc) in
         let _ =
           put_int
           [match v with
           | VALUE0(i) -> i] in
-        loop [ops]
+        fixed [ops]
       | PRINT5(s) ->
         let _ = put_chars [explode [s]] in
-        loop [ops]
+        fixed [ops]
       | JMPNZ7(address) ->
         let v = PRIM_DeRef(acc) in
         let x =
           match v with
           | VALUE0(i) -> i in
-        let b = PRIM_EqInt(x, 0) in
-        match match b with
-        | true1 -> false0
-        | false0 -> true1 with
-        | true1 -> loop [drop [address, Cons1(LOAD_IMMEDIATE0(VALUE0(0)), Cons1(STORE_LOCAL1(0), Cons1(LOAD_IMMEDIATE0(VALUE0(10)), Cons1(STORE_LOCAL1(1), Cons1(ADD3(0, 1), Cons1(STORE_LOCAL1(0), Cons1(LOAD_LOCAL2(1), Cons1(DEC4, Cons1(STORE_LOCAL1(1), Cons1(JMPNZ7(4), Cons1(PRINT5("(Ocaml)Result: "), Cons1(LOAD_LOCAL2(0), Cons1(PRINTI6, Cons1(PRINT5("\n"), Cons1(HALT8, Nil0)))))))))))))))]]
-        | false0 -> loop [ops]
+        match PRIM_EqInt(x, 0) with
+        | true1 -> fixed [ops]
+        | false0 -> fixed [drop [address, Cons1(LOAD_IMMEDIATE0(VALUE0(0)), Cons1(STORE_LOCAL1(0), Cons1(LOAD_IMMEDIATE0(VALUE0(5)), Cons1(STORE_LOCAL1(1), Cons1(ADD3(0, 1), Cons1(STORE_LOCAL1(0), Cons1(LOAD_LOCAL2(1), Cons1(DEC4, Cons1(STORE_LOCAL1(1), Cons1(JMPNZ7(4), Cons1(PRINT5("(Ocaml)Result: "), Cons1(LOAD_LOCAL2(0), Cons1(PRINTI6, Cons1(PRINT5("\n"), Cons1(HALT8, Nil0)))))))))))))))]]
       | HALT8 -> Unit0) in
-let _ = loop [Cons1(LOAD_IMMEDIATE0(VALUE0(0)), Cons1(STORE_LOCAL1(0), Cons1(LOAD_IMMEDIATE0(VALUE0(10)), Cons1(STORE_LOCAL1(1), Cons1(ADD3(0, 1), Cons1(STORE_LOCAL1(0), Cons1(LOAD_LOCAL2(1), Cons1(DEC4, Cons1(STORE_LOCAL1(1), Cons1(JMPNZ7(4), Cons1(PRINT5("(Ocaml)Result: "), Cons1(LOAD_LOCAL2(0), Cons1(PRINTI6, Cons1(PRINT5("\n"), Cons1(HALT8, Nil0)))))))))))))))] in
+let _ = PRIM_PutChar('.') in
+let v = PRIM_DeRef(acc) in
+let x =
+  match v with
+  | VALUE0(i) -> i in
+let _ =
+  match PRIM_EqInt(x, 0) with
+  | true1 -> fixed [Cons1(PRINT5("(Ocaml)Result: "), Cons1(LOAD_LOCAL2(0), Cons1(PRINTI6, Cons1(PRINT5("\n"), Cons1(HALT8, Nil0)))))]
+  | false0 -> fixed [drop [4, Cons1(LOAD_IMMEDIATE0(VALUE0(0)), Cons1(STORE_LOCAL1(0), Cons1(LOAD_IMMEDIATE0(VALUE0(5)), Cons1(STORE_LOCAL1(1), Cons1(ADD3(0, 1), Cons1(STORE_LOCAL1(0), Cons1(LOAD_LOCAL2(1), Cons1(DEC4, Cons1(STORE_LOCAL1(1), Cons1(JMPNZ7(4), Cons1(PRINT5("(Ocaml)Result: "), Cons1(LOAD_LOCAL2(0), Cons1(PRINTI6, Cons1(PRINT5("\n"), Cons1(HALT8, Nil0)))))))))))))))]] in
 Unit0
