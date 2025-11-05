@@ -7,6 +7,8 @@ module X : sig
 
   val noinline : 'a -> 'a
 
+  val is_comptime_known : 'a -> bool
+
   val ( * ) : int -> int -> int
   val (%) : int -> int -> int
   val (+) : int -> int -> int
@@ -54,6 +56,8 @@ end = struct
   let crash message = raise (CRASH message)
 
   let noinline x = x
+
+  let is_comptime_known _ = false
 
   let (=) = (=)
   let (<) = (<)

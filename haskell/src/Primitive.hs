@@ -7,6 +7,7 @@ import qualified Data.Char as Char (chr,ord)
 data Primitive
   = Crash
   | Noinline
+  | IsComptimeKnown
   | PutChar | GetChar
   | AddInt | SubInt | MulInt | DivInt | ModInt | LessInt | EqInt
   | EqChar | CharOrd | CharChr
@@ -50,6 +51,7 @@ definePrimitive :: Primitive -> Semantics
 definePrimitive b =
   case b of
     Noinline -> Impure $ \vs k -> k (oneArg vs)
+    IsComptimeKnown -> Pure (\_ -> mkBool False)
     PutChar -> Impure $ \vs k -> IPut (deChar (oneArg vs)) (k unit)
     GetChar -> Impure $ \vs k -> case deUnit (oneArg vs) of () -> IGet (\c -> k (VChar c))
     AddInt -> Pure (\vs -> VNum (uncurry (+) (twoArgs deNum deNum vs)))

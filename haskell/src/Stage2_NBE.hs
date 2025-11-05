@@ -11,11 +11,11 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,bracketSquare,onHead,onTail,jux,indented)
 import Par4 (Position(..))
-import Primitive (Primitive(Noinline),isPure,evaluatePurePrimitive,executePrimitive)
+import Primitive (Primitive(Noinline,IsComptimeKnown),isPure,evaluatePurePrimitive,executePrimitive)
 import Stage0_AST (Literal(..),evalLit,applyN)
 import Stage1_EXP (Ctag(..),PPControl(..),PPPosFlag(..), PPUniqueFlag(..))
 import Text.Printf (printf)
-import Value (Interaction(..),Value(..),Number,deUnit)
+import Value (Interaction(..),Value(..),Number,deUnit,mkBool)
 import qualified Data.Map as Map
 import qualified Stage1_EXP as SRC
 import qualified Value as I (Tickable(Prim,App))
@@ -216,6 +216,13 @@ data SemValue
   | Constant Position BaseValue
   | Constructed Position Ctag [SemValue]
 
+isComptimeKnown :: SemValue -> Bool
+isComptimeKnown = \case
+  Constant{} -> True
+  Macro{} -> True
+  Constructed{} -> True
+  Syntax{} -> False -- only syntax is comptime-unknown
+
 isSharable :: SemValue -> Bool
 isSharable = \case
   Constant{} -> True
@@ -325,6 +332,12 @@ reflect env = \case
   SRC.ConTag pos tag args -> do
     args <- mapM (reflect env) args
     pure $ Constructed pos tag args
+
+  SRC.Prim pos IsComptimeKnown [e] -> do
+    sv <- reflect env e
+    let bv = toBV (mkBool (isComptimeKnown sv))
+    pure (Constant pos bv)
+
   SRC.Prim _ Noinline [e] -> do
     -- The noinline primitive has blocked inlining; now we throw it away
     Syntax <$> norm env e

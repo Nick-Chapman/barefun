@@ -311,6 +311,7 @@ compilePrimitiveTo prim = case prim of
   SRC.Noinline -> \target -> oneArg $ \s1 ->
     [ setTarget target s1
     ]
+  SRC.IsComptimeKnown -> \target -> oneArg $ \s1 -> undefined target s1
   SRC.PutChar -> \target -> oneArg $ \s1 ->
     [ OpMove Ax s1
     , OpCall Bare_put_char

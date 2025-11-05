@@ -47,6 +47,7 @@ wrapPreDefs (Prog defs) =
       , ("is_keyboard_ready" , prim1 Is_keyboard_ready)
       , ("get_keyboard_last_scancode" , prim1 Get_keyboard_last_scancode)
       , ("noinline", prim1 Noinline)
+      , ("is_comptime_known", prim1 IsComptimeKnown)
 
       -- The arg-count and types of predefined names which wrap Primitive primitives must match:
       -- (a) The evaluation semantic defined in Primitive.hs
