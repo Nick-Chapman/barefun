@@ -68,21 +68,18 @@ let local_at =
       match PRIM_EqInt(i, 1) with
       | true1 -> PRIM_DeRef(local1)
       | false0 -> PRIM_Crash("local_at")) in
-let acc = PRIM_MakeRef(VALUE0(0)) in
 let outer =
-  fix (fun outer [pc] ->
+  fix (fun outer [acc,pc] ->
     let _ = PRIM_PutChar('x') in
     match PRIM_EqInt(pc, 0) with
     | true1 ->
       let _ = PRIM_PutChar('.') in
-      let _ = PRIM_SetRef(acc, VALUE0(0)) in
       let _ = PRIM_PutChar('.') in
-      let _ = local_at_put [0, PRIM_DeRef(acc)] in
+      let _ = local_at_put [0, VALUE0(0)] in
       let _ = PRIM_PutChar('.') in
-      let _ = PRIM_SetRef(acc, VALUE0(5)) in
       let _ = PRIM_PutChar('.') in
-      let _ = local_at_put [1, PRIM_DeRef(acc)] in
-      outer [4]
+      let _ = local_at_put [1, VALUE0(5)] in
+      outer [VALUE0(5), 4]
     | false0 ->
       match PRIM_EqInt(pc, 4) with
       | true1 ->
@@ -95,45 +92,38 @@ let outer =
         let y =
           match v2 with
           | VALUE0(i) -> i in
-        let y = VALUE0(PRIM_AddInt(x, y)) in
-        let _ = PRIM_SetRef(acc, y) in
+        let acc = VALUE0(PRIM_AddInt(x, y)) in
         let _ = PRIM_PutChar('.') in
-        let _ = local_at_put [0, PRIM_DeRef(acc)] in
+        let _ = local_at_put [0, acc] in
         let _ = PRIM_PutChar('.') in
-        let y = local_at [1] in
-        let _ = PRIM_SetRef(acc, y) in
+        let acc = local_at [1] in
         let _ = PRIM_PutChar('.') in
-        let v = PRIM_DeRef(acc) in
         let x =
-          match v with
+          match acc with
           | VALUE0(i) -> i in
-        let y = VALUE0(PRIM_SubInt(x, 1)) in
-        let _ = PRIM_SetRef(acc, y) in
+        let acc = VALUE0(PRIM_SubInt(x, 1)) in
         let _ = PRIM_PutChar('.') in
-        let _ = local_at_put [1, PRIM_DeRef(acc)] in
+        let _ = local_at_put [1, acc] in
         let _ = PRIM_PutChar('.') in
-        let v = PRIM_DeRef(acc) in
         let x =
-          match v with
+          match acc with
           | VALUE0(i) -> i in
         match PRIM_EqInt(x, 0) with
         | true1 ->
           let _ = PRIM_PutChar('.') in
           let _ = put_chars [explode ["(Ocaml)Result: "]] in
           let _ = PRIM_PutChar('.') in
-          let y = local_at [0] in
-          let _ = PRIM_SetRef(acc, y) in
+          let acc = local_at [0] in
           let _ = PRIM_PutChar('.') in
-          let v = PRIM_DeRef(acc) in
           let _ =
             put_int
-            [match v with
+            [match acc with
             | VALUE0(i) -> i] in
           let _ = PRIM_PutChar('.') in
           let _ = put_chars [explode ["\n"]] in
           let _ = PRIM_PutChar('.') in
           Unit0
-        | false0 -> outer [4]
+        | false0 -> outer [acc, 4]
       | false0 -> PRIM_Crash("with_starting")) in
-let _ = outer [0] in
+let _ = outer [VALUE0(0), 0] in
 Unit0

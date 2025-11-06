@@ -103,7 +103,6 @@ let execute () =
       if i = 1 then !local1 else
         crash "local_at")
   in
-  let acc : value ref = ref zero in
 
   (* continuation style to get case-of-case optimization *)
   let with_starting pc k =
@@ -112,32 +111,33 @@ let execute () =
         crash "with_starting"
   in
 
-  let rec outer pc =
+  let rec outer acc pc =
     let () = put_char 'x' in
-    let inner = unroll (fun inner pc ->
+    let inner = unroll (fun inner acc pc ->
       let () = put_char '.' in
-      let loop pc' =
+      let loop acc pc' =
         let backedge = not (pc < pc') in
         let jump_dest = (pc' = 4) in (*the only jump dest*)
-        (if backedge || jump_dest then outer else inner) pc'
+        (if backedge || jump_dest then outer else inner) acc pc'
       in
       match op_at_pc pc with
-      | LOAD_IMMEDIATE v -> acc := v; loop (pc+1)
-      | STORE_LOCAL i -> local_at_put i !acc; loop (pc+1)
-      | LOAD_LOCAL i -> acc := local_at i; loop (pc+1)
-      | ADD (i,j) -> acc := vadd (local_at i) (local_at j); loop (pc+1)
-      | DEC -> acc := vdec (!acc); loop (pc+1)
-      | PRINTI -> put_int (deVal (!acc)); loop (pc+1)
-      | PRINT s -> put_string s; loop (pc+1)
+      | LOAD_IMMEDIATE v -> let acc = v in loop acc (pc+1)
+      | STORE_LOCAL i -> local_at_put i acc; loop acc (pc+1)
+      | LOAD_LOCAL i -> let acc = local_at i in loop acc (pc+1)
+      | ADD (i,j) -> let acc = vadd (local_at i) (local_at j) in loop acc (pc+1)
+      | DEC -> let acc = vdec acc in loop acc (pc+1)
+      | PRINTI -> put_int (deVal acc); loop acc (pc+1)
+      | PRINT s -> put_string s; loop acc (pc+1)
       | JMPNZ address ->
-         if deVal (!acc) = 0
-         then loop (pc+1)
-         else loop address
+         if deVal acc = 0
+         then loop acc (pc+1)
+         else loop acc address
       | HALT -> ())
     in
-    with_starting pc inner
+    with_starting pc (inner acc)
   in
-  outer 0
+  outer zero 0
+
 
 let main() =
   let () = execute () in
