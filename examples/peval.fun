@@ -1,11 +1,11 @@
+(*v4*)
 
-let goal = 5 (*100_000_000*)
+let goal = 5
 
-(* use requires normalize "match (of) match" *)
-(*let not b =
+let not b =
   match b with
   | true -> false
-  | false -> true*)
+  | false -> true
 
 let explode = noinline (fun s ->
   let rec explode_loop acc i =
@@ -35,7 +35,8 @@ let put_int = noinline (fun i ->
   then put_chars ('-' :: chars_of_int (0 - i))
   else put_chars (chars_of_int i))
 
-type value = VALUE of int (* TODO: kill this wrapper *)
+
+type value = VALUE of int
 let deVal v = match v with VALUE i -> i
 let vadd v1 v2 = VALUE (deVal v1 + deVal v2)
 let vdec v = VALUE (deVal v - 1)
@@ -51,53 +52,44 @@ type op
   | JMPNZ of int
   | HALT
 
-let program : op list =
+let op_at_pc : int -> op = fun pc ->
   let result = 0 in
   let loopc = 1 in
-  [ LOAD_IMMEDIATE (VALUE 0)
-  ; STORE_LOCAL result
-  ; LOAD_IMMEDIATE (VALUE goal)
-  ; STORE_LOCAL loopc
 
-  ; ADD (result,loopc)
-  ; STORE_LOCAL result
-  ; LOAD_LOCAL loopc
-  ; DEC
-  ; STORE_LOCAL loopc
-  ; JMPNZ (*8*) 4
+  if pc = 0 then LOAD_IMMEDIATE (VALUE 0) else
+  if pc = 1 then STORE_LOCAL result else
+  if pc = 2 then LOAD_IMMEDIATE (VALUE goal) else
+  if pc = 3 then STORE_LOCAL loopc else
 
-  ; PRINT "(Ocaml)Result: "
-  ; LOAD_LOCAL result
-  ; PRINTI
-  ; PRINT "\n"
-  ; HALT
-  ]
+  if pc = 4 then ADD (result,loopc) else
+  if pc = 5 then STORE_LOCAL result else
+  if pc = 6 then LOAD_LOCAL loopc else
+  if pc = 7 then DEC else
+  if pc = 8 then STORE_LOCAL loopc else
+  if pc = 9 then JMPNZ (*8*) 4 else
 
-let rec drop : int -> 'a list -> 'a list =
-  fun i xs ->
-  if i = 0 then xs else
-  match xs with
-  | [] -> []
-  | _::xs -> drop (i-1) xs
+  if pc = 10 then PRINT "(Ocaml)Result: " else
+  if pc = 11 then LOAD_LOCAL result else
+  if pc = 12 then PRINTI else
+  if pc = 13 then PRINT "\n" else
+  if pc = 14 then HALT else
+  crash "pc to big"
 
-let myfix : ('a -> 'a) -> 'a = fun f ->
-  let rec fixed x = f fixed x
-  in fixed
+(* Just enough steps of unrolling... *)
+let unroll _f _x = crash "unroll"
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
+let unroll f x = f (unroll f) x
 
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-let myfix : ('a -> 'a) -> 'a = fun f x -> f (myfix f) x
-
-let execute : op list -> unit =
-  fun program0 ->
-  let setPC : int -> op list = fun i -> drop i program0 in
+let execute () =
   let zero = VALUE 0 in
   let local0 = ref zero in
   let local1 = ref zero in
@@ -112,27 +104,41 @@ let execute : op list -> unit =
         crash "local_at")
   in
   let acc : value ref = ref zero in
-  let loop = myfix (fun loop -> fun ops ->
-    let () = put_char '.' in
-    match ops with
-    | [] -> crash "run out of instructions"
-    | op::ops ->
-       match op with
-       | LOAD_IMMEDIATE v -> acc := v; loop ops
-       | STORE_LOCAL i -> local_at_put i !acc; loop ops
-       | LOAD_LOCAL i -> acc := local_at i; loop ops
-       | ADD (i,j) -> acc := vadd (local_at i) (local_at j); loop ops
-       | DEC -> acc := vdec (!acc); loop ops
-       | PRINTI -> put_int (deVal (!acc)); loop ops
-       | PRINT s -> put_string s; loop ops
-       | JMPNZ address ->
-          if deVal (!acc) = 0
-          then loop ops
-          else noinline loop (setPC address)
-       | HALT -> ())
+
+  (* continuation style to get case-of-case optimization *)
+  let with_starting pc k =
+    if pc = 0 then k 0 else
+      if pc = 4 then k 4 else
+        crash "with_starting"
   in
-  loop program0
+
+  let rec outer pc =
+    let () = put_char 'x' in
+    let inner = unroll (fun inner pc ->
+      let () = put_char '.' in
+      let loop pc' =
+        let backedge = not (pc < pc') in
+        let jump_dest = (pc' = 4) in (*the only jump dest*)
+        (if backedge || jump_dest then outer else inner) pc'
+      in
+      match op_at_pc pc with
+      | LOAD_IMMEDIATE v -> acc := v; loop (pc+1)
+      | STORE_LOCAL i -> local_at_put i !acc; loop (pc+1)
+      | LOAD_LOCAL i -> acc := local_at i; loop (pc+1)
+      | ADD (i,j) -> acc := vadd (local_at i) (local_at j); loop (pc+1)
+      | DEC -> acc := vdec (!acc); loop (pc+1)
+      | PRINTI -> put_int (deVal (!acc)); loop (pc+1)
+      | PRINT s -> put_string s; loop (pc+1)
+      | JMPNZ address ->
+         if deVal (!acc) = 0
+         then loop (pc+1)
+         else loop address
+      | HALT -> ())
+    in
+    with_starting pc inner
+  in
+  outer 0
 
 let main() =
-  let () = execute program in
+  let () = execute () in
   ()

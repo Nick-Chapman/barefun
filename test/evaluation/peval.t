@@ -1,4 +1,4 @@
 
   $ ../../haskell/main.exe ../../examples/peval.fun
-  ...................................(Ocaml)Result: ..15.
+  x....x......x......x......x......x.......(Ocaml)Result: ..15.
   .[HALT]
