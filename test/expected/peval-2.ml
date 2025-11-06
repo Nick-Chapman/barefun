@@ -50,42 +50,32 @@ let put_int =
       [match PRIM_EqInt(i, 0) with
       | true1 -> Cons1('0', Nil0)
       | false0 -> loop [Nil0, i]]) in
-let local0 = PRIM_MakeRef(VALUE0(0)) in
-let local1 = PRIM_MakeRef(VALUE0(0)) in
-let local_at_put =
-  (fun [i,v] ->
-    match PRIM_EqInt(i, 0) with
-    | true1 -> PRIM_SetRef(local0, v)
-    | false0 ->
-      match PRIM_EqInt(i, 1) with
-      | true1 -> PRIM_SetRef(local1, v)
-      | false0 -> PRIM_Crash("local_at_put")) in
-let local_at =
-  (fun [i] ->
-    match PRIM_EqInt(i, 0) with
-    | true1 -> PRIM_DeRef(local0)
-    | false0 ->
-      match PRIM_EqInt(i, 1) with
-      | true1 -> PRIM_DeRef(local1)
-      | false0 -> PRIM_Crash("local_at")) in
 let outer =
-  fix (fun outer [acc,pc] ->
+  fix (fun outer [pc,acc,locals] ->
     let _ = PRIM_PutChar('x') in
     match PRIM_EqInt(pc, 0) with
     | true1 ->
       let _ = PRIM_PutChar('.') in
       let _ = PRIM_PutChar('.') in
-      let _ = local_at_put [0, VALUE0(0)] in
+      let locals =
+        match locals with
+        | Locals0(local0,local1) -> Locals0(VALUE0(0), local1) in
       let _ = PRIM_PutChar('.') in
       let _ = PRIM_PutChar('.') in
-      let _ = local_at_put [1, VALUE0(5)] in
-      outer [VALUE0(5), 4]
+      let locals =
+        match locals with
+        | Locals0(local0,local1) -> Locals0(local0, VALUE0(5)) in
+      outer [4, VALUE0(5), locals]
     | false0 ->
       match PRIM_EqInt(pc, 4) with
       | true1 ->
         let _ = PRIM_PutChar('.') in
-        let v1 = local_at [0] in
-        let v2 = local_at [1] in
+        let v1 =
+          match locals with
+          | Locals0(local0,local1) -> local0 in
+        let v2 =
+          match locals with
+          | Locals0(local0,local1) -> local1 in
         let x =
           match v1 with
           | VALUE0(i) -> i in
@@ -94,16 +84,22 @@ let outer =
           | VALUE0(i) -> i in
         let acc = VALUE0(PRIM_AddInt(x, y)) in
         let _ = PRIM_PutChar('.') in
-        let _ = local_at_put [0, acc] in
+        let locals =
+          match locals with
+          | Locals0(local0,local1) -> Locals0(acc, local1) in
         let _ = PRIM_PutChar('.') in
-        let acc = local_at [1] in
+        let acc =
+          match locals with
+          | Locals0(local0,local1) -> local1 in
         let _ = PRIM_PutChar('.') in
         let x =
           match acc with
           | VALUE0(i) -> i in
         let acc = VALUE0(PRIM_SubInt(x, 1)) in
         let _ = PRIM_PutChar('.') in
-        let _ = local_at_put [1, acc] in
+        let locals =
+          match locals with
+          | Locals0(local0,local1) -> Locals0(local0, acc) in
         let _ = PRIM_PutChar('.') in
         let x =
           match acc with
@@ -113,7 +109,9 @@ let outer =
           let _ = PRIM_PutChar('.') in
           let _ = put_chars [explode ["(Ocaml)Result: "]] in
           let _ = PRIM_PutChar('.') in
-          let acc = local_at [0] in
+          let acc =
+            match locals with
+            | Locals0(local0,local1) -> local0 in
           let _ = PRIM_PutChar('.') in
           let _ =
             put_int
@@ -123,7 +121,6 @@ let outer =
           let _ = put_chars [explode ["\n"]] in
           let _ = PRIM_PutChar('.') in
           Unit0
-        | false0 -> outer [acc, 4]
+        | false0 -> outer [4, acc, locals]
       | false0 -> PRIM_Crash("with_starting")) in
-let _ = outer [VALUE0(0), 0] in
-Unit0
+outer [0, VALUE0(0), Locals0(VALUE0(0), VALUE0(0))]

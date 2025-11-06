@@ -89,56 +89,52 @@ let unroll f x = f (unroll f) x
 let unroll f x = f (unroll f) x
 let unroll f x = f (unroll f) x
 
-let execute () =
-  let zero = VALUE 0 in
-  let local0 = ref zero in
-  let local1 = ref zero in
-  let local_at_put : int -> value -> unit = noinline (fun i v ->
-    if i = 0 then local0 := v else
-      if i = 1 then local1 := v else
-        crash "local_at_put")
-  in
-  let local_at : int -> value = noinline (fun i ->
-    if i = 0 then !local0 else
-      if i = 1 then !local1 else
-        crash "local_at")
-  in
+type locals = Locals of (value*value)
 
-  (* continuation style to get case-of-case optimization *)
-  let with_starting pc k =
-    if pc = 0 then k 0 else
-      if pc = 4 then k 4 else
-        crash "with_starting"
-  in
+let local_at_put : locals -> int -> value -> locals = fun locals i v ->
+  match locals with Locals (local0,local1) ->
+    if i = 0 then Locals (v,local1) else
+      if i = 1 then Locals (local0,v) else
+        crash "local_at_put"
 
-  let rec outer acc pc =
+let local_at : locals -> int -> value = fun locals i ->
+  match locals with Locals (local0,local1) ->
+    if i = 0 then local0 else
+      if i = 1 then local1 else
+        crash "local_at"
+
+(* continuation style to get case-of-case optimization *)
+let with_starting pc k =
+  if pc = 0 then k 0 else
+    if pc = 4 then k 4 else
+      crash "with_starting"
+
+let main () =
+  let rec outer pc acc locals =
     let () = put_char 'x' in
-    let inner = unroll (fun inner acc pc ->
+    let inner = unroll (fun inner pc acc locals ->
       let () = put_char '.' in
-      let loop acc pc' =
+      let loop pc' =
         let backedge = not (pc < pc') in
         let jump_dest = (pc' = 4) in (*the only jump dest*)
-        (if backedge || jump_dest then outer else inner) acc pc'
+        (if backedge || jump_dest then outer else inner) pc'
       in
       match op_at_pc pc with
-      | LOAD_IMMEDIATE v -> let acc = v in loop acc (pc+1)
-      | STORE_LOCAL i -> local_at_put i acc; loop acc (pc+1)
-      | LOAD_LOCAL i -> let acc = local_at i in loop acc (pc+1)
-      | ADD (i,j) -> let acc = vadd (local_at i) (local_at j) in loop acc (pc+1)
-      | DEC -> let acc = vdec acc in loop acc (pc+1)
-      | PRINTI -> put_int (deVal acc); loop acc (pc+1)
-      | PRINT s -> put_string s; loop acc (pc+1)
+      | LOAD_IMMEDIATE v -> let acc = v in loop (pc+1) acc locals
+      | STORE_LOCAL i -> let locals = local_at_put locals i acc in loop (pc+1) acc locals
+      | LOAD_LOCAL i -> let acc = local_at locals i in loop (pc+1) acc locals
+      | ADD (i,j) -> let acc = vadd (local_at locals i) (local_at locals j) in loop (pc+1) acc locals
+      | DEC -> let acc = vdec acc in loop (pc+1) acc locals
+      | PRINTI -> put_int (deVal acc); loop (pc+1) acc locals
+      | PRINT s -> put_string s; loop (pc+1) acc locals
       | JMPNZ address ->
          if deVal acc = 0
-         then loop acc (pc+1)
-         else loop acc address
+         then loop (pc+1) acc locals
+         else loop address acc locals
       | HALT -> ())
     in
-    with_starting pc (inner acc)
+    with_starting pc (fun pc -> inner pc acc locals)
   in
-  outer zero 0
 
-
-let main() =
-  let () = execute () in
-  ()
+  let zero = VALUE 0 in
+  outer 0 zero (Locals (zero,zero))
