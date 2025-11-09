@@ -1,19 +1,19 @@
 (*Stage4 (CCF)*)
 let k () = ()
-let g2 = Unit0 in
-let g3 = Unit0 in
-let g4 = Unit0 in
-let g5 = Unit0 in
+let g2 = Unit in
+let g3 = Unit in
+let g4 = Unit in
+let g5 = Unit in
 let g1 = fun [arg0] k ->
   let t1 = PRIM_Wait_for_interrupt(g2) in
   let t2 = PRIM_Is_keyboard_ready(g3) in
   match t2 with
-  | true1 ->
+  | true ->
     let t3 = PRIM_Get_keyboard_last_scancode(g4) in
     k t3
-  | false0 -> g1 [g5] k in
-let g7 = Unit0 in
-let g8 = Unit0 in
+  | false -> g1 [g5] k in
+let g7 = Unit in
+let g8 = Unit in
 let g6 = fun [arg0] k ->
   let k = [], fun [] arg0 ->
     let t1 = PRIM_CharOrd(arg0) in
@@ -36,18 +36,18 @@ let g6 = fun [arg0] k ->
     g6 [g8] k in
   g1 [g7] k in
 let g10 = "Press/release keys; see the scan codes...\n" in
-let g11 = Unit0 in
+let g11 = Unit in
 let g9 = fun [arg0] k ->
   let t1 = PRIM_LessInt(arg0,42) in
   match t1 with
-  | true1 ->
+  | true ->
     let t2 = PRIM_StringIndex(g10,arg0) in
     let t3 = PRIM_PutChar(t2) in
     let t4 = PRIM_AddInt(arg0,1) in
     g9 [t4] k
-  | false0 -> k g11 in
-let g12 = Unit0 in
-let g13 = Unit0 in
+  | false -> k g11 in
+let g12 = Unit in
+let g13 = Unit in
 let k = [], fun [] arg0 ->
   let t1 = PRIM_Init_interrupt_mode(g12) in
   g6 [g13] k in

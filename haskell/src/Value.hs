@@ -244,7 +244,8 @@ instance Show Value where
     VFunc{} -> "[function]"
     VRef{} -> "[ref]"
 
-instance Show Ctag where show (Ctag cid n) = printf "%s%s" (show cid) (show n)
+--instance Show Ctag where show (Ctag cid n) = printf "%s%s" (show cid) (show n)
+instance Show Ctag where show (Ctag cid _n) = printf "%s" (show cid)
 instance Show Cid where show (Cid s) = s
 
 cUnit,cFalse,cTrue,cNil,cCons :: Cid

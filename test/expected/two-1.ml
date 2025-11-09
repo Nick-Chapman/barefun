@@ -4,7 +4,7 @@ let % = (fun x -> (fun y -> PRIM_ModInt(x, y))) in
 let ( * ) = (fun x -> (fun y -> PRIM_MulInt(x, y))) in
 let - = (fun x -> (fun y -> PRIM_SubInt(x, y))) in
 let / = (fun x -> (fun y -> PRIM_DivInt(x, y))) in
-let :: = (fun x -> (fun y -> Cons1(x, y))) in
+let :: = (fun x -> (fun y -> Cons(x, y))) in
 let < = (fun x -> (fun y -> PRIM_LessInt(x, y))) in
 let = = (fun x -> (fun y -> PRIM_EqInt(x, y))) in
 let chr = (fun x -> PRIM_CharChr(x)) in
@@ -39,12 +39,12 @@ let numB = (noinline (fun _ -> 5)) in
 let call_two =
   (noinline
   (fun _ ->
-    let a = (numA Unit0) in
-    let b = (numB Unit0) in
+    let a = (numA Unit) in
+    let b = (numB Unit) in
     let res = ((two a) b) in
     res)) in
 let main =
   (fun _ ->
-    let res = (call_two Unit0) in
+    let res = (call_two Unit) in
     (put_char (chr res))) in
-(main Unit0)
+(main Unit)

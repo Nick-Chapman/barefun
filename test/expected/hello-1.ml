@@ -4,7 +4,7 @@ let % = (fun x -> (fun y -> PRIM_ModInt(x, y))) in
 let ( * ) = (fun x -> (fun y -> PRIM_MulInt(x, y))) in
 let - = (fun x -> (fun y -> PRIM_SubInt(x, y))) in
 let / = (fun x -> (fun y -> PRIM_DivInt(x, y))) in
-let :: = (fun x -> (fun y -> Cons1(x, y))) in
+let :: = (fun x -> (fun y -> Cons(x, y))) in
 let < = (fun x -> (fun y -> PRIM_LessInt(x, y))) in
 let = = (fun x -> (fun y -> PRIM_EqInt(x, y))) in
 let chr = (fun x -> PRIM_CharChr(x)) in
@@ -39,16 +39,16 @@ let explode =
       fix (fun explode_loop acc ->
         (fun i ->
           match ((< i) 0) with
-          | true1 -> acc
-          | false0 -> ((explode_loop ((:: ((string_index s) i)) acc)) ((- i) 1)))) in
-    ((explode_loop Nil0) ((- (string_length s)) 1))) in
+          | true -> acc
+          | false -> ((explode_loop ((:: ((string_index s) i)) acc)) ((- i) 1)))) in
+    ((explode_loop Nil) ((- (string_length s)) 1))) in
 let put_chars =
   fix (fun put_chars xs ->
     match xs with
-    | Nil0 -> Unit0
-    | Cons1(x,xsMore) ->
+    | Nil -> Unit
+    | Cons(x,xsMore) ->
       let _ = (put_char x) in
       (put_chars xsMore)) in
 let put_string = (fun s -> (put_chars (explode s))) in
 let main = (fun _ -> (put_string "Hello, world!\n")) in
-(main Unit0)
+(main Unit)
