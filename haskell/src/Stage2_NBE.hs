@@ -9,7 +9,7 @@ module Stage2_NBE
 import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
-import Lines (Lines,juxComma,bracket,bracketSquare,onHead,onTail,jux,indented)
+import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
 import Par4 (Position(..))
 import Primitive (Primitive(Noinline,IsComptimeKnown),isPure,evaluatePurePrimitive,executePrimitive)
 import Stage0_AST (Literal(..),evalLit,applyN)
@@ -92,12 +92,12 @@ prettyTop control = pretty
       Lit _ x -> [show x]
       ConTag _ tag [] -> [show tag]
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
-      Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
-      LamN _ xs body -> bracket $ indented ("fun [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
-      RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " [" ++ intercalate "," (map prettyId xs) ++ "] ->") (pretty body)
-      AppN func _ args -> jux (pretty func) (bracketSquare (foldl1 juxComma (map pretty args)))
+      Prim _ prim xs -> onHead (printf "prim_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
+      LamN _ xs body -> bracket $ indented ("fun (" ++ intercalate "," (map prettyId xs) ++ ") ->") (pretty body)
+      RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " (" ++ intercalate "," (map prettyId xs) ++ ") ->") (pretty body)
+      AppN func _ args -> jux (pretty func) (bracket (foldl1 juxComma (map pretty args)))
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
-      Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
+      Match _ scrut arms -> bracket ((onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms))
 
     prettyArm :: Arm -> Lines
     prettyArm (ArmTag _pos c xs rhs) = indented ("| " ++ prettyPat c xs ++ " ->") (pretty rhs)
