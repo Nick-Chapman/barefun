@@ -26,7 +26,7 @@ data Exp
   | Con Position Cid [Exp]
   | Prim Position Primitive [Exp]
   | Lam Position Bid Exp
-  | RecLam Position Bid Bid Exp
+  | RecLam Position Bool Bid Bid Exp
   | App Exp Position Exp
   | Let Position Bid Exp Exp
   | Match Position Exp [Arm]
@@ -74,7 +74,7 @@ pretty = \case
   Con _ c es -> onHead (show c ++) (bracket (foldl1 juxComma (map pretty es)))
   Prim _ p xs -> [printf "PRIM_%s(%s)" (show p) (intercalate "," (map show xs))]
   Lam _ x body -> bracket $ indented ("fun " ++ show x ++ " ->") (pretty body)
-  RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
+  RecLam _ u f x body -> onHead ((if u then "[@unroll] fix " else "fix ") ++) $ bracket $ indented ("fun " ++ show f ++ " " ++ show x ++ " ->") (pretty body)
   App e1 _ e2 -> bracket $ jux (pretty e1) (pretty e2)
   Let _ x rhs body -> indented ("let " ++ show x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
   Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
@@ -141,7 +141,7 @@ eval env@Env{venv,cenv} = \case
       executePrimitive prim vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval (insert x arg env) body k))
-  RecLam _ f x body -> \k -> do
+  RecLam _ _ f x body -> \k -> do
     let me = VFunc (\arg k -> eval (insert f me (insert x arg env)) body k)
     k me
   App e1 pos e2 -> \k -> do

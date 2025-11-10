@@ -28,7 +28,7 @@ data Exp
   | ConTag Position Ctag [Exp]
   | Prim Position Primitive [Exp]
   | Lam Position Id Exp
-  | RecLam Position Id Id Exp
+  | RecLam Position Bool Id Id Exp
   | App Exp Position Exp
   | Let Position Id Exp Exp
   | Match Position Exp [Arm]
@@ -74,7 +74,7 @@ prettyTop control = pretty
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
       Prim _ prim xs -> onHead (printf "PRIM_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
       Lam _ x body -> bracket $ indented ("fun " ++ prettyId x ++ " ->") (pretty body)
-      RecLam _ f x body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
+      RecLam _ u f x body -> onHead ((if u then "[@unroll] fix " else "fix ") ++) $ bracket $ indented ("fun " ++ prettyId f ++ " " ++ prettyId x ++ " ->") (pretty body)
       App func _ arg -> bracket $ jux (pretty func) (pretty arg)
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
       Match _ scrut arms -> (onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms)
@@ -139,7 +139,7 @@ eval env@Env{venv} = \case
       executePrimitive prim vs k
   Lam _ x body -> \k -> do
     k (VFunc (\arg k -> eval env { venv = Map.insert x arg venv } body k))
-  RecLam _ f x body -> \k -> do
+  RecLam _ _unroll f x body -> \k -> do -- unrolling has no impact on evaluation
     let me = VFunc (\arg k -> eval env { venv = Map.insert f me (Map.insert x arg venv) } body k)
     k me
   App eFunc pos eArg -> \k -> do
@@ -208,10 +208,10 @@ trans cenv = \case
   SRC.Lam p x body -> do
     let (x',cenv1) = posProp x cenv
     Lam p x' (trans cenv1 body)
-  SRC.RecLam p f x body -> do
+  SRC.RecLam p unroll f x body -> do
     let (f',cenv1) = posProp f cenv
     let (x',cenv2) = posProp x cenv1
-    RecLam p f' x' (trans cenv2 body)
+    RecLam p unroll f' x' (trans cenv2 body)
   SRC.App e1 p e2 -> App (trans cenv e1) p (trans cenv e2)
   SRC.Let pos x rhs body -> do
     let (x',cenv1) = posProp x cenv

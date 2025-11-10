@@ -22,6 +22,7 @@ let select_versions_for_example = function
   | "two" -> [0;1;2;3;4;5]
   | "peval" -> [2]
   | "detect_comptime" -> [2]
+  | "unroll" -> [0;1;2]
   | _ -> []
 
 let suffix_of_version v =

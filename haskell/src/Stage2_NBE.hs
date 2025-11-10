@@ -349,12 +349,14 @@ reflect env = \case
     pure $ Macro x $ \arg -> do
       let env' = Map.insert x arg env
       reflect env' body
-  SRC.RecLam pos f x body -> do
+
+  SRC.RecLam pos _unroll f x body -> do -- TODO: unroll when requested
     x' <- fresh x
     f' <- fresh f
     let env' = Map.insert x (syn x') (Map.insert f (syn f') env)
     body <- Reset (norm env' body)
     Syntax <$> mkRecLam pos f' x' body
+
   SRC.App e1 p e2 -> do
     e1 <- reflect env e1
     e2 <- reflect env e2

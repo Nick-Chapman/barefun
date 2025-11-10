@@ -334,15 +334,18 @@ gram6 = program where
   binding :: Par (Bid,Exp) = do
     key "let"
     pos <- position
-    isRec <- alts [do key "rec"; pure True, pure False]
+    r <- alts [ do key "[@unroll]"; key "rec"; pure (Just True)
+              , do key "rec"; pure (Just False)
+              , pure Nothing]
     f <- bound $ alts [identOrUnit,bracketedOperatorName]
     _ <- opt type_annotation
-    case isRec of
-      True -> do
+    case r of
+      Just unroll -> do
+        --let unroll = False
         bindingAbstraction >>= \case
-          AST.Lam _ x1 rhs -> pure (f, AST.RecLam pos f x1 rhs)
+          AST.Lam _ x1 rhs -> pure (f, AST.RecLam pos unroll f x1 rhs)
           _ -> fail
-      False -> do
+      Nothing -> do
         rhs <- bindingAbstraction
         pure (f,rhs)
 
