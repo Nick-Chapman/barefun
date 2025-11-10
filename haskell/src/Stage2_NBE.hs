@@ -350,12 +350,19 @@ reflect env = \case
       let env' = Map.insert x arg env
       reflect env' body
 
-  SRC.RecLam pos _unroll f x body -> do -- TODO: unroll when requested
+  SRC.RecLam pos False f x body -> do
     x' <- fresh x
     f' <- fresh f
     let env' = Map.insert x (syn x') (Map.insert f (syn f') env)
     body <- Reset (norm env' body)
     Syntax <$> mkRecLam pos f' x' body
+
+  SRC.RecLam _ True f x body -> pure unrolled
+    where
+      -- no attempt to prevent non-termination
+      unrolled = Macro x $ \xarg -> do
+        let env' = Map.insert x xarg  $ Map.insert f unrolled env
+        reflect env' body
 
   SRC.App e1 p e2 -> do
     e1 <- reflect env e1

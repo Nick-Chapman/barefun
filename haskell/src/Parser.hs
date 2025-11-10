@@ -341,7 +341,6 @@ gram6 = program where
     _ <- opt type_annotation
     case r of
       Just unroll -> do
-        --let unroll = False
         bindingAbstraction >>= \case
           AST.Lam _ x1 rhs -> pure (f, AST.RecLam pos unroll f x1 rhs)
           _ -> fail
