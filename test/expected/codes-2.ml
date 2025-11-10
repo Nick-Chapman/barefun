@@ -1,12 +1,12 @@
 (*Stage2 (NbE)*)
 let get_scancode =
-  fix (fun get_scancode (_) ->
+  let rec get_scancode (_) =
     let _ = prim_Wait_for_interrupt(Unit) in
     (match prim_Is_keyboard_ready(Unit) with
     | true -> prim_Get_keyboard_last_scancode(Unit)
-    | false -> get_scancode (Unit))) in
+    | false -> get_scancode (Unit)) in get_scancode in
 let loop =
-  fix (fun loop (_) ->
+  let rec loop (_) =
     let char = get_scancode (Unit) in
     let n = prim_CharOrd(char) in
     let z = prim_ModInt(n, 10) in
@@ -25,15 +25,15 @@ let loop =
     let _ = prim_PutChar(x) in
     let _ = prim_PutChar('}') in
     let _ = prim_PutChar(' ') in
-    loop (Unit)) in
+    loop (Unit) in loop in
 let loop =
-  fix (fun loop (i) ->
+  let rec loop (i) =
     (match prim_LessInt(i, 42) with
     | true ->
       let x = prim_StringIndex("Press/release keys; see the scan codes...\n", i) in
       let _ = prim_PutChar(x) in
       loop (prim_AddInt(i, 1))
-    | false -> Unit)) in
+    | false -> Unit) in loop in
 let _ = loop (0) in
 let _ = prim_Init_interrupt_mode(Unit) in
 loop (Unit)

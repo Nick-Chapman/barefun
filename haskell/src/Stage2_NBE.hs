@@ -94,7 +94,8 @@ prettyTop control = pretty
       ConTag _ tag es -> onHead (show tag ++) (bracket (foldl1 juxComma (map pretty es)))
       Prim _ prim xs -> onHead (printf "prim_%s" (show prim) ++) (bracket (foldl1 juxComma (map pretty xs)))
       LamN _ xs body -> bracket $ indented ("fun (" ++ intercalate "," (map prettyId xs) ++ ") ->") (pretty body)
-      RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " (" ++ intercalate "," (map prettyId xs) ++ ") ->") (pretty body)
+      --RecLamN _ f xs body -> onHead ("fix "++) $ bracket $ indented ("fun " ++ prettyId f ++ " (" ++ intercalate "," (map prettyId xs) ++ ") ->") (pretty body)
+      RecLamN _ f xs body -> onTail (++ " in " ++ prettyId f) $ indented ("let rec " ++ prettyId f ++ " (" ++ intercalate "," (map prettyId xs) ++ ") =") (pretty body)
       AppN func _ args -> jux (pretty func) (bracket (foldl1 juxComma (map pretty args)))
       Let _ x rhs body -> indented ("let " ++ prettyId x ++ " =") (onTail (++ " in") (pretty rhs)) ++ pretty body
       Match _ scrut arms -> bracket ((onHead ("match "++) . onTail (++ " with")) (pretty scrut) ++ concat (map prettyArm arms))

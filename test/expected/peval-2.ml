@@ -2,35 +2,35 @@
 let explode =
   (fun (s) ->
     let explode_loop =
-      fix (fun explode_loop (acc,i) ->
+      let rec explode_loop (acc,i) =
         (match prim_LessInt(i, 0) with
         | true -> acc
         | false ->
           let x = prim_StringIndex(s, i) in
-          explode_loop (Cons(x, acc), prim_SubInt(i, 1)))) in
+          explode_loop (Cons(x, acc), prim_SubInt(i, 1))) in explode_loop in
     let x = prim_StringLength(s) in
     explode_loop (Nil, prim_SubInt(x, 1))) in
 let put_chars =
-  fix (fun put_chars (xs) ->
+  let rec put_chars (xs) =
     (match xs with
     | Nil -> Unit
     | Cons(x,xs) ->
       let _ = prim_PutChar(x) in
-      put_chars (xs))) in
+      put_chars (xs)) in put_chars in
 let put_int =
   (fun (i) ->
     (match prim_LessInt(i, 0) with
     | true ->
       let i = prim_SubInt(0, i) in
       let loop =
-        fix (fun loop (acc,i) ->
+        let rec loop (acc,i) =
           (match prim_EqInt(i, 0) with
           | true -> acc
           | false ->
             let c = prim_ModInt(i, 10) in
             let x = prim_AddInt(48, c) in
             let x = prim_CharChr(x) in
-            loop (Cons(x, acc), prim_DivInt(i, 10)))) in
+            loop (Cons(x, acc), prim_DivInt(i, 10))) in loop in
       let y =
         (match prim_EqInt(i, 0) with
         | true -> Cons('0', Nil)
@@ -38,20 +38,20 @@ let put_int =
       put_chars (Cons('-', y))
     | false ->
       let loop =
-        fix (fun loop (acc,i) ->
+        let rec loop (acc,i) =
           (match prim_EqInt(i, 0) with
           | true -> acc
           | false ->
             let c = prim_ModInt(i, 10) in
             let x = prim_AddInt(48, c) in
             let x = prim_CharChr(x) in
-            loop (Cons(x, acc), prim_DivInt(i, 10)))) in
+            loop (Cons(x, acc), prim_DivInt(i, 10))) in loop in
       put_chars
       ((match prim_EqInt(i, 0) with
       | true -> Cons('0', Nil)
       | false -> loop (Nil, i))))) in
 let outer =
-  fix (fun outer (pc,acc,locals) ->
+  let rec outer (pc,acc,locals) =
     let _ = prim_PutChar('x') in
     (match prim_EqInt(pc, 0) with
     | true ->
@@ -122,5 +122,5 @@ let outer =
           let _ = prim_PutChar('.') in
           Unit
         | false -> outer (4, acc, locals))
-      | false -> prim_Crash("with_starting")))) in
+      | false -> prim_Crash("with_starting"))) in outer in
 outer (0, VALUE(0), Locals(VALUE(0), VALUE(0)))
