@@ -1,0 +1,6 @@
+
+# Materialize the barefun executable for use my other repos.
+# (Note: materialization currently does not play well with jenga-w)
+
+!barefun.exe : haskell/src/barefun
+  ln -s barefun barefun.exe
