@@ -2,7 +2,7 @@
 executable-name:
   echo barefun > executable-name
 
-include ../../../jenga/rulelib/haskell.jenga
+include /home/nic/code/jenga/rulelib/haskell.jenga
 
 main-entry:
   echo CommandLine > main-entry
