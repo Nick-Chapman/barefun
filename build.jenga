@@ -1,6 +1,6 @@
 
-# Materialize the barefun executable for use my other repos.
-# (Note: materialization currently does not play well with jenga-w)
+# Materialize the barefun executable for use from other repos.
+# This is a half-arsed workaround while jenga doesn't follow links across repos
 
 !barefun.exe : haskell/src/barefun
   ln -s barefun barefun.exe
