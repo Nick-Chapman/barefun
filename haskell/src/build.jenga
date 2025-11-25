@@ -1,33 +1,33 @@
 
 executable-name:
-  echo barefun > executable-name
+  echo barefun > $@
 
 include ~/code/jenga/rulelib/haskell.jenga
 
 main-entry:
-  echo CommandLine > main-entry
+  echo CommandLine > $@
 
 ghc-version:
-  echo 9.8.4 > ghc-version
+  echo 9.8.4 > $@
 
 ghc-options:
-  echo -Wall >>ghc-options
-  echo -Werror >>ghc-options
-  echo -Wno-name-shadowing >>ghc-options
-  echo -O0 >>ghc-options
+  echo -Wall >> $@
+  echo -Werror >> $@
+  echo -Wno-name-shadowing >> $@
+  echo -O0 >> $@
 
 # These dependencies are not discovered by gcc -M (not sure why)
 xdepends:
-  echo 'Stage5_Compilation.o : Par4.hi' >>xdepends
-  echo 'Stage5_Emulation.o : Stage4_CCF.hi' >>xdepends
-  echo 'CommandLine.o : Stage5_ASM.hi' >>xdepends
+  echo 'Stage5_Compilation.o : Par4.hi' >> $@
+  echo 'Stage5_Emulation.o : Stage4_CCF.hi' >> $@
+  echo 'CommandLine.o : Stage5_ASM.hi' >> $@
 
 default-extensions:
-  echo DuplicateRecordFields >>default-extensions
-  echo GADTs >>default-extensions
-  echo LambdaCase >>default-extensions
-  echo NondecreasingIndentation >>default-extensions
+  echo DuplicateRecordFields >> $@
+  echo GADTs >> $@
+  echo LambdaCase >> $@
+  echo NondecreasingIndentation >> $@
 
 packages:
-  echo unix >>packages
-  echo bytestring >>packages
+  echo unix >> $@
+  echo bytestring >> $@

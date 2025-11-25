@@ -3,4 +3,4 @@
 # This is a half-arsed workaround while jenga doesn't follow links across repos
 
 !barefun.exe : haskell/src/barefun
-  ln -s barefun barefun.exe
+  ln $< $@
