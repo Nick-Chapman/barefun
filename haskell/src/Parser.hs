@@ -9,7 +9,10 @@ import qualified Par4
 import qualified Stage0_AST as AST
 
 parseProg :: String -> Prog
-parseProg = Par4.parse gram6
+parseProg s =
+  case Par4.parse gram6 s of
+    Right prog -> prog
+    Left msg -> error msg
 
 mkAbstraction :: [Bid] -> Exp -> Exp
 mkAbstraction xs e = case xs of [] -> e; x@(Bid pos _):xs -> AST.Lam pos x (mkAbstraction xs e)
