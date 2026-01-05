@@ -1,6 +1,6 @@
 module Parser (parseProg) where
 
-import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Position(..))
+import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Pos(..))
 import Stage0_AST (Prog,Exp,Id,Arm,Cid,Bid(..),mkUserId)
 import Text.Printf (printf)
 import Value (Number,cUnit,cFalse,cTrue,cNil,cCons)
@@ -17,17 +17,17 @@ parseProg s =
 mkAbstraction :: [Bid] -> Exp -> Exp
 mkAbstraction xs e = case xs of [] -> e; x@(Bid pos _):xs -> AST.Lam pos x (mkAbstraction xs e)
 
-mkApps :: Exp -> [(Position,Exp)] -> Exp
+mkApps :: Exp -> [(Pos,Exp)] -> Exp
 mkApps f es = case es of [] -> f; (pos,e):es -> mkApps (AST.App f pos e) es
 
-mkIte :: Position -> Exp -> Position -> Exp -> Position -> Exp -> Exp
+mkIte :: Pos -> Exp -> Pos -> Exp -> Pos -> Exp -> Exp
 mkIte pos i posThen t posElse e =
   AST.Match pos i [AST.Arm posThen cTrue [] t, AST.Arm posElse cFalse [] e ]
 
 underscore :: Id
 underscore = mkUserId "_"
 
-positioned :: Par a -> Par (Position,a)
+positioned :: Par a -> Par (Pos,a)
 positioned par = do
   pos <- position
   x <- par
@@ -224,7 +224,7 @@ gram6 = program where
              closePos <- position
              key "]"
              let
-               mkList :: [(Position,Exp)] -> Exp
+               mkList :: [(Pos,Exp)] -> Exp
                mkList = \case
                  [] -> AST.Con closePos cNil []
                  (pos,e1):es -> AST.Con pos cCons [e1,mkList es]

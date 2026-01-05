@@ -10,7 +10,7 @@ import Control.Monad (ap,liftM)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
-import Par4 (Position(..))
+import Par4 (Pos(..))
 import Primitive (Primitive(Noinline,IsComptimeKnown),isPure,evaluatePurePrimitive,executePrimitive)
 import Stage0_AST (Literal(..),evalLit,applyN)
 import Stage1_EXP (Ctag(..),PPControl(..),PPPosFlag(..), PPUniqueFlag(..))
@@ -31,17 +31,17 @@ enabled :: Bool
 enabled = True -- controls 4 places
 
 data Exp
-  = Var Position Id
-  | Lit Position Literal
-  | ConTag Position Ctag [Exp]
-  | Prim Position Primitive [Exp]
-  | LamN Position [Id] Exp
-  | RecLamN Position Id [Id] Exp
-  | AppN Exp Position [Exp]
-  | Let Position Id Exp Exp
-  | Match Position Exp [Arm]
+  = Var Pos Id
+  | Lit Pos Literal
+  | ConTag Pos Ctag [Exp]
+  | Prim Pos Primitive [Exp]
+  | LamN Pos [Id] Exp
+  | RecLamN Pos Id [Id] Exp
+  | AppN Exp Pos [Exp]
+  | Let Pos Id Exp Exp
+  | Match Pos Exp [Arm]
 
-data Arm = ArmTag Position Ctag [Id] Exp
+data Arm = ArmTag Pos Ctag [Id] Exp
 
 type Id = SRC.Id
 
@@ -63,7 +63,7 @@ sizeExp = \case
 ----------------------------------------------------------------------
 -- provenance
 
-provenanceExp :: Exp -> (String,Position)
+provenanceExp :: Exp -> (String,Pos)
 provenanceExp = \case
   Var{} -> error "provenanceExp/Var" -- we never call on a Var
   AppN _ pos _ -> ("appN",pos)
@@ -214,8 +214,8 @@ norm env e =
 data SemValue
   = Syntax Exp
   | Macro Id (SemValue -> M SemValue)
-  | Constant Position BaseValue
-  | Constructed Position Ctag [SemValue]
+  | Constant Pos BaseValue
+  | Constructed Pos Ctag [SemValue]
 
 isComptimeKnown :: SemValue -> Bool
 isComptimeKnown = \case
@@ -232,7 +232,7 @@ isSharable = \case
   Syntax (Var{}) -> True
   Syntax{} -> False
 
-data BaseValue -- should BaseValue contain the Position infi?
+data BaseValue -- should BaseValue contain the Pos infi?
   = BVString String
   | BVChar Char
   | BVNum Number
@@ -254,13 +254,13 @@ toBV = \case
   -- A Pure primitive should never return a non base value
   v -> error (show ("toBV",v))
 
-posOfId :: Id -> Position
+posOfId :: Id -> Pos
 posOfId = \case SRC.Id{pos} -> pos
 
 syn :: Id -> SemValue
 syn x = Syntax (Var (posOfId x) x)
 
-reifyBaseValue :: Position -> BaseValue -> Exp
+reifyBaseValue :: Pos -> BaseValue -> Exp
 reifyBaseValue pos = \case
   BVNum n -> Lit pos (LitN n)
   BVChar c -> Lit pos (LitC c)
@@ -290,7 +290,7 @@ share x sv = do
     rhs <- reify sv
     Wrap (Let (posOfId x) x rhs) (pure (syn x))
 
-applyI :: SemValue -> Position -> SemValue -> M SemValue
+applyI :: SemValue -> Pos -> SemValue -> M SemValue
 applyI fun p arg = do
   case (enabled,fun) of
     -- (1) Normalize: Function Inlining
@@ -307,7 +307,7 @@ maybeAllConstant svs = do
   let vs = [ v | Constant _ v <- svs ]
   if length vs == length svs then Just vs else Nothing
 
-reflectPrimitive :: Position -> Primitive -> [SemValue] -> M SemValue
+reflectPrimitive :: Pos -> Primitive -> [SemValue] -> M SemValue
 reflectPrimitive pos prim es = do
   case (enabled && isPure prim, maybeAllConstant es) of
     -- (2) Normalize: Constant Propogation
@@ -424,7 +424,7 @@ fresh SRC.Id{name,pos} = do
   let y = SRC.Id { optUnique, pos, name}
   pure y
 
-mkRecLam :: Position -> Id -> Id -> Exp -> M Exp
+mkRecLam :: Pos -> Id -> Id -> Exp -> M Exp
 mkRecLam p f x0 body = do
   threshold <- MultiLamEnabled
   case body of
@@ -433,7 +433,7 @@ mkRecLam p f x0 body = do
         -> pure $ RecLamN p f (x0 : xs) body
     _ -> pure $ RecLamN p f [x0] body
 
-mkLam :: Position -> Id -> Exp -> M Exp
+mkLam :: Pos -> Id -> Exp -> M Exp
 mkLam p x0 body = do
   threshold <- MultiLamEnabled
   case body of
@@ -442,7 +442,7 @@ mkLam p x0 body = do
         -> pure $ LamN p (x0 : xs) body
     _ -> pure $ LamN p [x0] body
 
-mkApp :: Exp -> Position -> Exp -> M Exp
+mkApp :: Exp -> Pos -> Exp -> M Exp
 mkApp fun p arg = do
   threshold <- MultiAppEnabled
   case fun of

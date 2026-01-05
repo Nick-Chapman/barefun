@@ -11,7 +11,7 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Set (notMember)
 import Lines (Lines,(<++),(++>),(>>>))
-import Par4 (Position(..))
+import Par4 (Pos(..))
 import Stage0_AST (apply,applyN)
 import Stage1_EXP (Id(..),Ctag(..))
 import Text.Printf (printf)
@@ -36,15 +36,15 @@ data Top
   | TopConApp Ctag [Ref]
 
 data Code
-  = Return Position Ref
-  | Tail Ref Position Ref
-  | TailN Ref Position [Ref]
-  | TailPrim Primitive Position Ref
+  = Return Pos Ref
+  | Tail Ref Pos Ref
+  | TailN Ref Pos [Ref]
+  | TailPrim Primitive Pos Ref
   | LetAtomic (Id,Temp) Atomic Code
   | PushContinuation [Ref] [Ref] (Ref,Code) Code
   | Match Ref [Arm]
 
-data Arm = ArmTag Position Ctag [(Id,Temp)] Code
+data Arm = ArmTag Pos Ctag [(Id,Temp)] Code
 
 data Atomic
   = Prim Primitive [Ref]

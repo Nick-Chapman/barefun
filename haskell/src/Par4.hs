@@ -1,5 +1,5 @@
 -- | 4-value Parser Combinators
-module Par4 (Par,parse,word,key,int,ws0,ws1,sp,nl,lit,sat,char,alts,opt,skip,separated,terminated,many,some,digit,dot,noError,Position(..),position) where
+module Par4 (Par,parse,word,key,int,ws0,ws1,sp,nl,lit,sat,char,alts,opt,skip,separated,terminated,many,some,digit,dot,noError,Pos(..),position) where
 
 import Control.Applicative (Alternative,empty,(<|>),many,some)
 import Control.Monad (ap,liftM)
@@ -29,7 +29,7 @@ dot :: Par Char
 sat :: (Char -> Bool) -> Par Char
 char :: Par Char
 noError :: Par a -> Par a
-position :: Par Position
+position :: Par Pos
 
 skip p = do _ <- many p; return ()
 separated sep p = do x <- p; alts [ pure [x], do sep; xs <- separated sep p; pure (x:xs) ]
@@ -54,10 +54,10 @@ digitOfChar :: Char -> Int
 digitOfChar c = Char.ord c - ord0 where ord0 = Char.ord '0'
 
 noError = NoError
-position = Pos
+position = Position
 
 data Par a where
-  Pos :: Par Position
+  Position :: Par Pos
   Ret :: a -> Par a
   Bind :: Par a -> (a -> Par b) -> Par b
   Fail :: Par a
@@ -86,12 +86,12 @@ parse parStart chars0  = do
 
   where
     report :: Int -> String
-    report i = item ++ " at " ++ show (mkPosition i)
+    report i = item ++ " at " ++ show (mkPos i)
       where
         item = if i == length chars0 then "<EOF>" else show (chars0 !! i)
 
-    mkPosition :: Int -> Position
-    mkPosition p = Position {line,col}
+    mkPos :: Int -> Pos
+    mkPos p = Pos {line,col}
       where
         line :: Int = 1 + length [ () | c <- take p chars0, c == '\n' ]
         col :: Int = length (takeWhile (/= '\n') (reverse (take p chars0)))
@@ -105,10 +105,10 @@ parse parStart chars0  = do
     run :: Int -> [Char] -> Par a -> K4 a b -> Res b
     run i chars par k@K4{eps,succ,fail,err} = case par of
 
-      Pos -> do
+      Position -> do
         -- It would be more efficient to track line/col directly in the state of the parser
-        -- instead of mkPosition recounting newlines passed so far each time a position is required.
-        let position = mkPosition i
+        -- instead of mkPos recounting newlines passed so far each time a position is required.
+        let position = mkPos i
         eps position
 
       Ret x -> eps x
@@ -152,7 +152,7 @@ parse parStart chars0  = do
                           }
 
 
-data Position = Position { line :: Int, col :: Int } deriving (Eq,Ord)
+data Pos = Pos { line :: Int, col :: Int } deriving (Eq,Ord)
 
-instance Show Position where
-  show Position{line,col} = show line ++ "'" ++ show col
+instance Show Pos where
+  show Pos{line,col} = show line ++ "'" ++ show col

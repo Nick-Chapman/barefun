@@ -9,7 +9,7 @@ import Primitive (Primitive,executePrimitive)
 import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
-import Par4 (Position(..))
+import Par4 (Pos(..))
 import Text.Printf (printf)
 import Value (Interaction(..))
 import Value (Value(..),Number,tUnit,tFalse,tTrue,tNil,tCons,deUnit,Ctag(..),Cid(..))
@@ -21,17 +21,17 @@ data Prog = Prog [Def]
 data Def = ValDef Bid Exp | TypeDef [Cid]
 
 data Exp
-  = Var Position Id
-  | Lit Position Literal
-  | Con Position Cid [Exp]
-  | Prim Position Primitive [Exp]
-  | Lam Position Bid Exp
-  | RecLam Position Bool Bid Bid Exp
-  | App Exp Position Exp
-  | Let Position Bid Exp Exp
-  | Match Position Exp [Arm]
+  = Var Pos Id
+  | Lit Pos Literal
+  | Con Pos Cid [Exp]
+  | Prim Pos Primitive [Exp]
+  | Lam Pos Bid Exp
+  | RecLam Pos Bool Bid Bid Exp
+  | App Exp Pos Exp
+  | Let Pos Bid Exp Exp
+  | Match Pos Exp [Arm]
 
-data Arm = Arm Position Cid [Bid] Exp
+data Arm = Arm Pos Cid [Bid] Exp
 data Literal = LitC Char | LitN Number | LitS String
 
 data Id = Id { name :: String } deriving (Eq,Ord)
@@ -39,7 +39,7 @@ data Id = Id { name :: String } deriving (Eq,Ord)
 mkUserId :: String -> Id
 mkUserId name = Id { name }
 
-data Bid = Bid Position Id -- we always know the position of a bound identifier...
+data Bid = Bid Pos Id -- we always know the position of a bound identifier...
 instance Show Bid where show (Bid _ x) = show x -- ...but we never show it!
 
 ----------------------------------------------------------------------
@@ -113,7 +113,7 @@ executeProg (Prog defs) = loop env0 defs
 mainApp :: Exp
 mainApp = App main noPos (Con noPos cUnit [])
   where
-    noPos = Position 0 0
+    noPos = Pos 0 0
     main = Var noPos (mkUserId "main")
 
 evals :: Env -> [Exp] -> ([Value] -> Interaction) -> Interaction
@@ -173,13 +173,13 @@ eval env@Env{venv,cenv} = \case
 insert :: Bid -> Value -> Env -> Env
 insert (Bid _ x) v env@Env{venv} = env { venv = Map.insert x v venv }
 
-apply :: Value -> Position -> Value -> (Value -> Interaction) -> Interaction
+apply :: Value -> Pos -> Value -> (Value -> Interaction) -> Interaction
 apply func p arg k = do
   case func of
     VFunc f -> f arg k
     v -> error (show ("apply",v,p))
 
-applyN :: Value -> Position -> [Value] -> (Value -> Interaction) -> Interaction
+applyN :: Value -> Pos -> [Value] -> (Value -> Interaction) -> Interaction
 applyN func pos args k = do
   case args of
     [] -> k func

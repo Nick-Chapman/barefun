@@ -3,7 +3,7 @@ module Predefined
   ) where
 
 import Primitive (Primitive(..))
-import Par4 (Position(..))
+import Par4 (Pos(..))
 import Stage0_AST (Prog(..),Def(..),Exp(..),mkUserId,Bid(..))
 import Value (cCons)
 
@@ -11,7 +11,7 @@ wrapPreDefs :: Prog -> Prog
 wrapPreDefs (Prog defs) =
   Prog ([ ValDef (Bid noPos (mkUserId x)) exp | (x,exp) <- bindings ] ++ defs)
   where
-    noPos = Position 0 0
+    noPos = Pos 0 0
     bindings :: [(String,Exp)]
     bindings =
       [ ("+"            , prim2 AddInt)

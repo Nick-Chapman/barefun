@@ -9,7 +9,7 @@ module Stage1_EXP
 import Data.List (intercalate)
 import Data.Map (Map)
 import Lines (Lines,juxComma,bracket,onHead,onTail,jux,indented)
-import Par4 (Position(..))
+import Par4 (Pos(..))
 import Primitive (Primitive,executePrimitive)
 import Stage0_AST (evalLit,apply,Literal,Cid,Bid(..))
 import Text.Printf (printf)
@@ -23,21 +23,21 @@ import qualified Value as I (Tickable(Prim,App))
 type Transformed = Exp
 
 data Exp
-  = Var Position Id
-  | Lit Position Literal
-  | ConTag Position Ctag [Exp]
-  | Prim Position Primitive [Exp]
-  | Lam Position Id Exp
-  | RecLam Position Bool Id Id Exp
-  | App Exp Position Exp
-  | Let Position Id Exp Exp
-  | Match Position Exp [Arm]
+  = Var Pos Id
+  | Lit Pos Literal
+  | ConTag Pos Ctag [Exp]
+  | Prim Pos Primitive [Exp]
+  | Lam Pos Id Exp
+  | RecLam Pos Bool Id Id Exp
+  | App Exp Pos Exp
+  | Let Pos Id Exp Exp
+  | Match Pos Exp [Arm]
 
-data Arm = ArmTag Position Ctag [Id] Exp
+data Arm = ArmTag Pos Ctag [Id] Exp
 
 data Id = Id
   { optUnique :: Maybe Int
-  , pos :: Position
+  , pos :: Pos
   , name :: Name
   } deriving (Eq,Ord)
 
@@ -186,7 +186,7 @@ transProg cenv0 (SRC.Prog defs) = walk cenv0 defs
     walk cenv = \case
       [] -> do
         let mainId = transId cenv (SRC.mkUserId "main")
-        let noPos = Position 0 0
+        let noPos = Pos 0 0
         let main = Var noPos mainId
         App main noPos (ConTag noPos tUnit [])
 

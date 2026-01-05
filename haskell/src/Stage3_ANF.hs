@@ -10,7 +10,7 @@ import Data.List (intercalate)
 import Data.Map (Map)
 import Data.Set (Set,singleton,(\\),union)
 import Lines (Lines,bracket,onHead,onTail,indented)
-import Par4 (Position(..))
+import Par4 (Pos(..))
 import Primitive (Primitive(MakeBytes),executePrimitive)
 import Stage0_AST (apply,applyN)
 import Stage1_EXP (Id(..),Name(GeneratedName),Ctag(..))
@@ -27,25 +27,25 @@ import qualified Value as I (Tickable(..))
 type Transformed = Code
 
 data Code
-  = Return Position Val
-  | Tail Val Position Val
-  | TailN Val Position [Val]
-  | TailPrim Primitive Position Val
+  = Return Pos Val
+  | Tail Val Pos Val
+  | TailN Val Pos [Val]
+  | TailPrim Primitive Pos Val
   | LetAtomic Id Atomic Code
   | PushContinuation Fvs (Id,Code) Code
   | Match Val [Arm]
 
-data Arm = ArmTag Position Ctag [Id] Code
+data Arm = ArmTag Pos Ctag [Id] Code
 
 -- Atomic expressions cause only bounded evaluation.
 data Atomic
-  = LitS Position String
-  | Prim Position Primitive [Val]
-  | ConTag Position Ctag [Val]
-  | Lam Position Fvs Id Code
-  | LamN Position Fvs [Id] Code
-  | RecLam Position Fvs Id Id Code
-  | RecLamN Position Fvs Id [Id] Code
+  = LitS Pos String
+  | Prim Pos Primitive [Val]
+  | ConTag Pos Ctag [Val]
+  | Lam Pos Fvs Id Code
+  | LamN Pos Fvs [Id] Code
+  | RecLam Pos Fvs Id Id Code
+  | RecLamN Pos Fvs Id [Id] Code
 
 -- Val expressions cause no evaluation.
 data Val
@@ -58,7 +58,7 @@ type Fvs = [Id]
 ----------------------------------------------------------------------
 -- provenance
 
-provenanceAtomic :: Atomic -> (String,Position)
+provenanceAtomic :: Atomic -> (String,Pos)
 provenanceAtomic = \case
   LitS pos _ -> ("lit",pos)
   Prim pos _ _ -> ("prim",pos)
@@ -222,7 +222,7 @@ nameAtomic = \case
   Atomic a -> do
     let (what,pos) = provenanceAtomic a
     x <- Fresh pos what
-    let noPos = Position 0 0
+    let noPos = Pos 0 0
     pure $ LetAtomic x a (Return noPos (Named x))
 
 compileExp :: SRC.Exp -> (AC -> M AC) -> M AC
@@ -318,7 +318,7 @@ instance Monad M where (>>=) = Bind
 data M a where
   Ret :: a -> M a
   Bind :: M a -> (a -> M b) -> M b
-  Fresh :: Position -> String -> M Id
+  Fresh :: Pos -> String -> M Id
 
 runM :: M a -> a
 runM m0 = loop 1 m0 $ \_ x -> x
@@ -337,10 +337,10 @@ runM m0 = loop 1 m0 $ \_ x -> x
 ----------------------------------------------------------------------
 -- Free Vars
 
-mkLamN :: Position -> [Id] -> Code -> Atomic
+mkLamN :: Pos -> [Id] -> Code -> Atomic
 mkLamN pos xs code = LamN pos (Set.toList (fvs code \\ Set.fromList xs)) xs code
 
-mkRecLamN :: Position -> Id -> [Id] -> Code -> Atomic
+mkRecLamN :: Pos -> Id -> [Id] -> Code -> Atomic
 mkRecLamN pos f xs code = RecLamN pos (Set.toList (fvs code \\ Set.fromList (f:xs))) f xs code
 
 mkPushContinuation :: (Id,Code) -> Code -> Code
