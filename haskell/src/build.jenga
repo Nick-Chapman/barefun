@@ -31,3 +31,4 @@ default-extensions:
 packages:
   echo unix >> $@
   echo bytestring >> $@
+  echo text >> $@

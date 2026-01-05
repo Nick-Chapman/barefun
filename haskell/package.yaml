@@ -33,6 +33,7 @@ default-extensions:
 - FlexibleContexts
 - GADTs
 - GeneralizedNewtypeDeriving
+- ImportQualifiedPost
 - InstanceSigs
 - LambdaCase
 - MultiWayIf

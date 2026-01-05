@@ -1,5 +1,6 @@
 module Parser (parseProg) where
 
+import Data.Text qualified as Text (pack)
 import Par4 (Par,noError,skip,alts,opt,many,some,sat,separated,position,Pos(..))
 import Stage0_AST (Prog,Exp,Id,Arm,Cid,Bid(..),mkUserId)
 import Text.Printf (printf)
@@ -10,7 +11,7 @@ import qualified Stage0_AST as AST
 
 parseProg :: String -> Prog
 parseProg s =
-  case Par4.parse gram6 s of
+  case Par4.parse gram6 (Text.pack s) of
     Right prog -> prog
     Left msg -> error msg
 
