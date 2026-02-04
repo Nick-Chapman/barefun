@@ -16,12 +16,6 @@ ghc-options:
   echo -Wno-name-shadowing >> $@
   echo -O0 >> $@
 
-# These dependencies are not discovered by gcc -M (not sure why)
-xdepends:
-  echo 'Stage5_Compilation.o : Par4.hi' >> $@
-  echo 'Stage5_Emulation.o : Stage4_CCF.hi' >> $@
-  echo 'CommandLine.o : Stage5_ASM.hi' >> $@
-
 default-extensions:
   echo DuplicateRecordFields >> $@
   echo GADTs >> $@
